@@ -1,0 +1,7 @@
+apiVersion: networking.x.k8s.io/v1alpha1
+kind: HttpRoute
+metadata:
+  name: httproute-sample
+spec:
+  # Add fields here
+  foo: bar
