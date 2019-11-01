@@ -1,0 +1,261 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: gateways.networking.x.k8s.io
+spec:
+  group: networking.x.k8s.io
+  names:
+    kind: Gateway
+    listKind: GatewayList
+    plural: gateways
+    singular: gateway
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      description: Gateway represents an instantiation of a service-traffic handling
+        infrastructure.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: "GatewaySpec defines the desired state of Gateway. \n The Spec
+            is split into two major pieces: listeners describing client-facing properties
+            and routes that describe application-level routing. \n Not all possible
+            combinations of options specified in the Spec are valid. Some invalid
+            configurations can be caught synchronously via a webhook, but there are
+            many cases that will require asynchronous signaling via the GatewayStatus
+            block."
+          properties:
+            class:
+              description: Class used for this Gateway. This is the name of a GatewayClass
+                resource.
+              type: string
+            listeners:
+              description: Listeners associated with this Gateway. Listeners define
+                what addresses, ports, protocols are bound on this Gateway.
+              items:
+                description: Listener defines a
+                properties:
+                  address:
+                    description: Address bound on the listener. This is optional and
+                      behavior can depend on GatewayClass. If a value is set in the
+                      spec and the request address is invalid, the GatewayClass MUST
+                      indicate this in the associated entry in GatewayStatus.Listeners.
+                    properties:
+                      address:
+                        description: 'Address value. Examples: "1.2.3.4", "128::1",
+                          "my-ip-address".'
+                        type: string
+                      type:
+                        description: "Type of the Address. This is one of the *AddressType
+                          constants. \n Support: Extended"
+                        type: string
+                    required:
+                    - address
+                    - type
+                    type: object
+                  ports:
+                    description: Ports is a list of ports associated with the Address.
+                    items:
+                      description: ListenerPort xxx
+                      properties:
+                        extension:
+                          description: TypedLocalObjectReference contains enough information
+                            to let you locate the typed referenced object inside the
+                            same namespace.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        port:
+                          type: integer
+                        protocols:
+                          items:
+                            type: string
+                          type: array
+                        tls:
+                          description: "ListenerTLS describes the TLS configuration
+                            for a given port. \n References - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
+                            - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
+                            - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
+                            - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
+                            - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
+                            - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112"
+                          properties:
+                            certificates:
+                              description: "Certificates is a list of certificates
+                                containing resources that are bound to the listener.
+                                \n If apiGroup and kind are empty, will default to
+                                Kubernetes Secrets resources. \n Support: Core (Kubernetes
+                                Secrets) Support: Implementation-specific (Other resource
+                                types)"
+                              items:
+                                description: TypedLocalObjectReference contains enough
+                                  information to let you locate the typed referenced
+                                  object inside the same namespace.
+                                properties:
+                                  apiGroup:
+                                    description: APIGroup is the group for the resource
+                                      being referenced. If APIGroup is not specified,
+                                      the specified Kind must be in the core API group.
+                                      For any other third-party types, APIGroup is
+                                      required.
+                                    type: string
+                                  kind:
+                                    description: Kind is the type of resource being
+                                      referenced
+                                    type: string
+                                  name:
+                                    description: Name is the name of resource being
+                                      referenced
+                                    type: string
+                                required:
+                                - kind
+                                - name
+                                type: object
+                              type: array
+                            minimumVersion:
+                              description: "MinimumVersion of TLS allowed. It is recommended
+                                to use one of the TLSVersion_* constants above. Note:
+                                this is not strongly typed to allow newly available
+                                version to be used without requiring updates to the
+                                API types. String must be of the form \"<protocol>_<major>_<minor>\".
+                                \n Support: Core"
+                              type: string
+                            options:
+                              additionalProperties:
+                                type: string
+                              description: "Options are a list of key/value pairs
+                                to give extended options to the provider. \n There
+                                variation among providers as to how ciphersuites are
+                                expressed. If there is a common subset for expressing
+                                ciphers then it will make sense to loft that as a
+                                core API construct. \n Support: Implementation-specific."
+                              type: object
+                          required:
+                          - minimumVersion
+                          - options
+                          type: object
+                      required:
+                      - extension
+                      - port
+                      - protocols
+                      - tls
+                      type: object
+                    type: array
+                required:
+                - ports
+                type: object
+              type: array
+            routes:
+              description: Routes associated with this Gateway. Routes define protocol-specific
+                routing to backends (e.g. Services).
+              items:
+                description: TypedLocalObjectReference contains enough information
+                  to let you locate the typed referenced object inside the same namespace.
+                properties:
+                  apiGroup:
+                    description: APIGroup is the group for the resource being referenced.
+                      If APIGroup is not specified, the specified Kind must be in
+                      the core API group. For any other third-party types, APIGroup
+                      is required.
+                    type: string
+                  kind:
+                    description: Kind is the type of resource being referenced
+                    type: string
+                  name:
+                    description: Name is the name of resource being referenced
+                    type: string
+                required:
+                - kind
+                - name
+                type: object
+              type: array
+          required:
+          - class
+          - listeners
+          - routes
+          type: object
+        status:
+          description: GatewayStatus defines the observed state of Gateway
+          properties:
+            listeners:
+              description: Listeners is the status for each listener block in the
+                Spec. The status for a given block will match the order as declared
+                in the Spec, e.g. the status for Spec.Listeners[3] will be in Status.Listeners[3].
+              items:
+                properties:
+                  address:
+                    type: string
+                  errors:
+                    description: Errors is a list of reasons why a given Listener
+                      Spec is not valid. Errors will be empty if the Spec is valid.
+                    items:
+                      description: ListenerError is an error status for a given ListenerSpec.
+                      properties:
+                        message:
+                          description: Message is a human-understandable error message.
+                          type: string
+                        reason:
+                          description: Reason is a automation friendly reason code
+                            for the error.
+                          type: string
+                      required:
+                      - message
+                      - reason
+                      type: object
+                    type: array
+                required:
+                - address
+                - errors
+                type: object
+              type: array
+            routes:
+              description: Routes is the status for each attached route to the Gateway.
+                The status for a given route will match the orer as declared in the
+                Spec, e.g. the status for Spec.Routes[3] will be in Status.Routes[3].
+              items:
+                type: object
+              type: array
+          required:
+          - listeners
+          - routes
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

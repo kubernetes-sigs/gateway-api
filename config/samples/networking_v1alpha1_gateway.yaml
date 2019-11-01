@@ -2,6 +2,35 @@ apiVersion: networking.x.k8s.io/v1alpha1
 kind: Gateway
 metadata:
   name: gateway-sample
+  namespace: gateway-sample
 spec:
-  # Add fields here
-  foo: bar
+  class: gatewayclass-sample
+  listeners:
+  - address:
+      type: IPAddress
+      address: 1.2.3.4
+    ports:
+    - port: 443
+      protocols:
+      - https
+      - http
+      tls:
+        certificates:
+        - apiGroup: v1
+          kind: Secret
+          name: gateway-sample
+        minimumVersion: TLS_1_0
+        options:
+          gateway-controller.vendor.x.k8s.io/tls-option-1: value1
+          gateway-controller.vendor.x.k8s.io/tls-option-2: value2
+      extension:
+        apiGroup: sample.vendor.io
+        kind: MyProtocolListener
+        name: my-protocol-listener
+  routes:
+  - name: http-app-1
+    namespace: app-1
+    kind: HTTPRoute
+  - name: tcp-app-1
+    namespace: app-1
+    kind: TCPRoute

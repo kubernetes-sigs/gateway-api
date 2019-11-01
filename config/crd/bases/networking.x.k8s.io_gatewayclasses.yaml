@@ -1,0 +1,71 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  creationTimestamp: null
+  name: gatewayclasses.networking.x.k8s.io
+spec:
+  group: networking.x.k8s.io
+  names:
+    kind: GatewayClass
+    listKind: GatewayClassList
+    plural: gatewayclasses
+    singular: gatewayclass
+  scope: ""
+  validation:
+    openAPIV3Schema:
+      description: "GatewayClass describes a class of gateways available to the user
+        for defining access to their routed services. \n GatewayClass is a non-namespaced
+        resource."
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+          type: string
+        controller:
+          description: 'Controller is a domain/path that denotes which controller
+            is responsible for this class. Example: "acme.io/gateway-controller".'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        parameters:
+          description: Parameters is a controller specific resource containing the
+            configuration parameters corresponding to this class. This is optional
+            if the controllers does not require any additional configuration.
+          properties:
+            apiGroup:
+              description: APIGroup is the group for the resource being referenced.
+                If APIGroup is not specified, the specified Kind must be in the core
+                API group. For any other third-party types, APIGroup is required.
+              type: string
+            kind:
+              description: Kind is the type of resource being referenced
+              type: string
+            name:
+              description: Name is the name of resource being referenced
+              type: string
+          required:
+          - kind
+          - name
+          type: object
+      required:
+      - controller
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

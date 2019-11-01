@@ -26,8 +26,8 @@ import (
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GatewayClass describes a class of gateways available to the user
-// for defining access to their routed services.
+// GatewayClass describes a class of gateways av
+// for defining access to their routed services. GatewayClass allow a
 //
 // GatewayClass is a non-namespaced resource.
 type GatewayClass struct {
@@ -37,7 +37,7 @@ type GatewayClass struct {
 	// Controller is a domain/path that denotes which controller is responsible
 	// for this class. Example: "acme.io/gateway-controller".
 	Controller string `json:"controller" protobuf:"bytes,2,opt,name=controller"`
-	// Parameters is an controller specific resource containing the
+	// Parameters is a controller specific resource containing the
 	// configuration parameters corresponding to this class. This is optional
 	// if the controllers does not require any additional configuration.
 	// +optional
