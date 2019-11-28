@@ -1,0 +1,14 @@
+site_name: Kubernetes Service API Evolution
+repo_url: http://sigs.k8s.io/service-apis
+theme:
+        name: readthedocs
+
+nav:
+        - Introduction: index.md
+        - User guide: userguide.md
+        - API cookbook: cookbook.md
+        - API concepts and details: concepts.md
+        - API specification: spec.md
+        - Developer guide: devguide.md
+        - Feedback/user stories/bug reports: feedback.md
+        - How to contribute: community.md
