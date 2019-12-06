@@ -43,4 +43,14 @@ Live preview for editing (view on [http://localhost:8000]()):
 make -f docs.mk serve
 ```
 
+### Publishing
+
+We currently publish the docs using Github pages
+(https://kubernetes-sigs.github.io/service-apis/). Submit a PR against the
+`gh-pages` branch, where the root of the repository is the contents of the
+`/site/` produced by the doc build.
+
+TODO(bowei): this is pretty awkward and I think we should just have the docs
+TODO(bowei): in the master branch.
+
 [mkdocs]: https://www.mkdocs.org/

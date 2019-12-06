@@ -23,33 +23,35 @@ MKDOCS_IMAGE ?= k8s.gcr.io/service-apis-mkdocs:latest
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # DOCROOT is the root of the mkdocs tree.
 DOCROOT := $(abspath $(TOP))
+# GENROOT is the root of the generated documentation.
+GENROOT := $(DOCROOT)/docs
 
 # Grab the uid/gid to fix permissions due to running in a docker container.
 GID := $(shell id -g)
 UID := $(shell id -u)
 
 # SOURCES is a list of a source files used to generate the documentation.
-SOURCES := $(shell find $(DOCROOT)/docs -name \*.md)
-SOURCES += mkdocs.yml
+SOURCES := $(shell find $(DOCROOT)/docs-src -name \*.md)
+SOURCES += mkdocs.yml docs.mk
 
 # entrypoint
 all: .gen.timestamp
 
-# generate the site from SOURCES
+# generate the `docs` from SOURCES
 .gen.timestamp: $(SOURCES)
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && /usr/bin/mkdocs build; find /d/site -exec chown $(UID):$(GID) {} \;"
+		/bin/bash -c "cd /d && /usr/bin/mkdocs build; find /d/docs -exec chown $(UID):$(GID) {} \;"
 	date > $@
 
 # clean deletes generated files
 .PHONY: clean
 clean:
 	test -f .gen.timestamp && rm .gen.timestamp || true
-	rm -r $(DOCROOT)/site || true
+	rm -r $(GENROOT)/* || true
 
 # serve runs mkdocs as a local webserver for interactive development.
 # This will serve the live copy of the docs on 127.0.0.1:8000.

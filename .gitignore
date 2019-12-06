@@ -87,4 +87,3 @@ network_closure.sh
 
 # Project specific ignores.
 .*.timestamp
-/site/
