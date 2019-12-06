@@ -50,12 +50,14 @@ TODO
 
 | Title | Description |
 |-------|-------------|
-| API sketch |             |
+| [API sketch][api-sketch] | Sketch of the proposed API |
+
+[api-sketch]:  https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag
 
 ## Presentations, Talks
 
-| Date | Title |  |
-|------|-------|-------|
+| Date | Title |    |
+|------|-------|----|
 | November, 2019 | [Kubecon 2019 San Diego: Evolving the Kubernetes Ingress APIs to GA and Beyond][2019-kubecon-na-slides] | [slides][2019-kubecon-na-slides], [video][2019-kubecon-na-video]|
 | November, 2019 | Kubecon 2019 San Diego: SIG-NETWORK Service/Ingress Evolution Discussion | [slides][2019-kubecon-na-community-slides] |
 | May, 2019      | [Kubecon 2019 Barcelona: Ingress V2 and Multicluster Services][2019-kubecon-eu] | [slides][2019-kubecon-eu-slides], [video][2019-kubecon-eu-video]|
@@ -70,7 +72,6 @@ TODO
 [survey-data]: https://github.com/bowei/k8s-ingress-survey-2018
 [survey-slides]: https://github.com/bowei/k8s-ingress-survey-2018/blob/master/survey.pdf
 [2019-kubecon-na-community-slides]: https://docs.google.com/presentation/d/1s0scrQCCFLJMVjjGXGQHoV6_4OIZkaIGjwj4wpUUJ7M
-[2019-kubecon-na-community-notes]:
 
 ## Code of conduct
 

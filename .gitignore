@@ -86,5 +86,4 @@ network_closure.sh
 *.pyc
 
 # Project specific ignores.
-/site/
 .*.timestamp
