@@ -18,6 +18,7 @@
 
 DOCKER ?= docker
 MKDOCS_IMAGE ?= k8s.gcr.io/service-apis-mkdocs:latest
+SERVE_BIND_ADDRESS ?= 127.0.0.1
 
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
@@ -61,7 +62,7 @@ serve:
 		-it \
 		--sig-proxy=true \
 		--mount type=bind,source=$(DOCROOT),target=/d \
-		-p 127.0.0.1:8000:8000 \
+		-p $(SERVE_BIND_ADDRESS):8000:8000 \
 		--rm \
 		$(MKDOCS_IMAGE) \
 		/bin/bash -c "cd /d && /usr/bin/mkdocs serve -a 0.0.0.0:8000"
