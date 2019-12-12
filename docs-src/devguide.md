@@ -18,9 +18,28 @@ limitations under the License.
 
 You will need to have Docker installed to perform the steps below.
 
+## Project management
+
+We are using the Github issues and project dashboard to manage the list of TODOs
+for this project:
+
+* [Open issues][gh-issues]
+* [Project dashboard][gh-dashboard]
+
+[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues
+[gh-dashboard]: https://github.com/kubernetes-sigs/service-apis/projects/1
+
+Issues labeled `good first issue` and `help wanted` are especially good for a
+first contribution.
+
 ## Building the code
 
-TODO
+The project uses `make` to drive the build. You can kick off an overall build
+from the top-level makefile:
+
+```shell
+make
+```
 
 ## Testing the code
 
