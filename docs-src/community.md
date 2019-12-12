@@ -27,12 +27,35 @@ accommodate participants from various time zones:
 * Thursday 10:30 AM Pacific ([calendar link][cal-meeting-am])
 * Thursday  4:30 (16:30) PM Pacific ([calendar link][cal-meeting-pm])
 
-[cal-meeting-am]: TODO
-[cal-meeting-pm]: TODO
+[cal-meeting-am]: https://calendar.google.com/event?action=TEMPLATE&tmeid=M21yb3U1YTcwbzJwdG0zN3IwMXFnZmg5ZDBfMjAyMDAxMTZUMTgzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL
+[cal-meeting-pm]: https://calendar.google.com/event?action=TEMPLATE&tmeid=NmE1YXFtaHMzbzdsc3RyaDlzdDBta2NnZjdfMjAyMDAxMzFUMDAzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL
 
 ### Video conferencing
 
-TODO
+[Meeting link](https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09)
+
+```
+Topic: [SIG-NETWORK] Ingress/Service API evolution
+
+Join Zoom Meeting
+https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09
+
+Meeting ID: 931 530 074
+Password: 621590
+
+One tap mobile
+
++14086380968,,931530074# US (San Jose)
++16465588656,,931530074# US (New York)
+
+Dial by your location
+
++1 408 638 0968 US (San Jose)
++1 646 558 8656 US (New York)
+
+Meeting ID: 931 530 074
+Find your local number: https://zoom.us/u/abdiTq5bx
+```
 
 ### Meeting notes
 

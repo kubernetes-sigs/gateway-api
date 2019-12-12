@@ -26,10 +26,15 @@ TODO
 
 TODO
 
+## Submitting a review
+
+TODO
+
 ## Documentation
 
 The site documentation is written in [mkdocs][mkdocs] format. The files are
-contained in `docs/`.
+contained in `docs-src/`. Generated files are in `docs/` and published to
+Github Pages.
 
 Building the docs:
 
@@ -37,7 +42,7 @@ Building the docs:
 make -f docs.mk
 ```
 
-Live preview for editing (view on [http://localhost:8000]()):
+Live preview for editing (view on [http://localhost:8000](), CTRL-C to quit):
 
 ```shell
 make -f docs.mk serve
@@ -45,12 +50,10 @@ make -f docs.mk serve
 
 ### Publishing
 
-We currently publish the docs using Github pages
-(https://kubernetes-sigs.github.io/service-apis/). Submit a PR against the
-`gh-pages` branch, where the root of the repository is the contents of the
-`/site/` produced by the doc build.
+The docs are published automatically to [Github pages][ghp]. When making changes to the
+documentation, generate the new documentation and make the generated code a
+self-contained commit (e.g. the changes to `docs/`). This will keep the code
+reviews simple and clearly delineate user vs generated content.
 
-TODO(bowei): this is pretty awkward and I think we should just have the docs
-TODO(bowei): in the master branch.
-
+[ghp]: https://kubernetes-sigs.github.io/service-apis/
 [mkdocs]: https://www.mkdocs.org/
