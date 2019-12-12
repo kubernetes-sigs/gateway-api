@@ -34,28 +34,26 @@ accommodate participants from various time zones:
 
 [Meeting link](https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09)
 
-```
-Topic: [SIG-NETWORK] Ingress/Service API evolution
-
-Join Zoom Meeting
-https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09
-
-Meeting ID: 931 530 074
-Password: 621590
-
-One tap mobile
-
-+14086380968,,931530074# US (San Jose)
-+16465588656,,931530074# US (New York)
-
-Dial by your location
-
-+1 408 638 0968 US (San Jose)
-+1 646 558 8656 US (New York)
-
-Meeting ID: 931 530 074
-Find your local number: https://zoom.us/u/abdiTq5bx
-```
+> Topic: [SIG-NETWORK] Ingress/Service API evolution
+>
+> Join Zoom Meeting:
+> https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09
+>
+> Meeting ID: 931 530 074
+> Password: 621590
+>
+> One tap mobile
+>
+> +14086380968,,931530074# US (San Jose)
+> +16465588656,,931530074# US (New York)
+>
+> Dial by your location:
+>
+> +1 408 638 0968 US (San Jose)
+> +1 646 558 8656 US (New York)
+>
+> Meeting ID: 931 530 074
+> Find your local number: https://zoom.us/u/abdiTq5bx
 
 ### Meeting notes
 
