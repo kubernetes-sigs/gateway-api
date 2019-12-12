@@ -1,5 +1,9 @@
 # Release Process
 
+TODO
+
+(text below is from the template)
+
 The Kubernetes Template Project is released on an as-needed basis. The process is as follows:
 
 1. An issue is proposing a new release with a changelog since the last release
