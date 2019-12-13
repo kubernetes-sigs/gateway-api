@@ -16,4 +16,14 @@ limitations under the License.
 
 # API Concepts
 
+This document is a deep dive into the reasoning and design for the API.
+
+TODO
+
+## Roles and personas
+
+TODO
+
+## Resource model
+
 TODO

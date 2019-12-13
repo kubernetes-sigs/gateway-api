@@ -19,6 +19,17 @@ limitations under the License.
 This page contains links to all of the meeting notes, design docs and related
 discussions around the APIs.
 
+## Communications
+
+Major discussions and notifications will be sent on the [SIG-NETWORK mailing
+list][signetg].
+
+We also have a [Slack channel (sig-network-service-apis)][slack] on k8s.io for day-to-day
+questions, discussions.
+
+[signetg]: https://groups.google.com/forum/#!forum/kubernetes-sig-network
+[slack]: https://kubernetes.slack.com/archives/CR0H13KGA
+
 ## Meetings
 
 Meetings discussing the evolution of the service APIs will alternate times to
