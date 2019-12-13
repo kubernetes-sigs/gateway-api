@@ -3,8 +3,7 @@ repo_url: http://sigs.k8s.io/service-apis
 site_dir: docs
 docs_dir: docs-src
 theme:
-        name: readthedocs
-
+        name: material
 nav:
         - Introduction: index.md
         - User guide: userguide.md

@@ -18,6 +18,7 @@
 
 DOCKER ?= docker
 MKDOCS_IMAGE ?= k8s.gcr.io/service-apis-mkdocs:latest
+MKDOCS ?= mkdocs
 SERVE_BIND_ADDRESS ?= 127.0.0.1
 
 # TOP is the current directory where this Makefile lives.
@@ -36,22 +37,22 @@ SOURCES := $(shell find $(DOCROOT)/docs-src -name \*.md)
 SOURCES += mkdocs.yml docs.mk
 
 # entrypoint
-all: .gen.timestamp
+all: .mkdocs.timestamp
 
 # generate the `docs` from SOURCES
-.gen.timestamp: $(SOURCES)
+.mkdocs.timestamp: $(SOURCES)
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && /usr/bin/mkdocs build; find /d/docs -exec chown $(UID):$(GID) {} \;"
+		/bin/bash -c "cd /d && $(MKDOCS) build; find /d/docs -exec chown $(UID):$(GID) {} \;"
 	date > $@
 
 # clean deletes generated files
 .PHONY: clean
 clean:
-	test -f .gen.timestamp && rm .gen.timestamp || true
+	test -f .mkdocs.timestamp && rm .mkdocs.timestamp || true
 	rm -r $(GENROOT)/* || true
 
 # serve runs mkdocs as a local webserver for interactive development.
@@ -65,7 +66,7 @@ serve:
 		-p $(SERVE_BIND_ADDRESS):8000:8000 \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && /usr/bin/mkdocs serve -a 0.0.0.0:8000"
+		/bin/bash -c "cd /d && $(MKDOCS) serve -a 0.0.0.0:8000"
 
 # help prints usage for this Makefile.
 .PHONY: help
@@ -85,5 +86,5 @@ init:
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "/usr/bin/mkdocs new d; find /d -exec chown $(UID):$(GID) {} \;"
+		/bin/bash -c "$(MKDOCS) new d; find /d -exec chown $(UID):$(GID) {} \;"
 
