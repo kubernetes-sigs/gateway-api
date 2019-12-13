@@ -12,4 +12,7 @@
 # limitations under the License.
 
 FROM debian:buster
-RUN apt-get update && apt-get install -y mkdocs mkdocs-bootstrap
+RUN apt-get update
+RUN apt-get install -y python-pip
+RUN pip install mkdocs
+RUN pip install mkdocs-material
