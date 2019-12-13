@@ -21,8 +21,7 @@ import (
 	"github.com/go-logr/logr"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
-	networkingv1alpha1 "github.com/bowei/service-apis/api/v1alpha1"
+	"sigs.k8s.io/service-apis/api/v1alpha1"
 )
 
 // GatewayReconciler reconciles a Gateway object
@@ -45,6 +44,6 @@ func (r *GatewayReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 
 func (r *GatewayReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&networkingv1alpha1.Gateway{}).
+		For(&v1alpha1.Gateway{}).
 		Complete(r)
 }

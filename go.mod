@@ -1,4 +1,4 @@
-module github.com/bowei/service-apis
+module sigs.k8s.io/service-apis
 
 go 1.12
 
