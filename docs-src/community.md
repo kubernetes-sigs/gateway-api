@@ -70,11 +70,13 @@ Find your local number: https://zoom.us/u/abdiTq5bx
 
 ### Meeting notes
 
-| Date |    |
-|------|----|
-| November, 2019 | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
-| November, 2019 | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
-| May, 2019      | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
+| Date                                 |    |
+|--------------------------------------|----|
+| January 2, 2020 (PST PM time slot)   | (scheduled) |
+| December 19, 2019 (PST AM time slot) | (scheduled) |
+| November, 2019                       | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
+| November, 2019                       | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
+| May, 2019                            | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
 
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
@@ -90,8 +92,8 @@ Find your local number: https://zoom.us/u/abdiTq5bx
 
 ## Presentations, Talks
 
-| Date | Title |    |
-|------|-------|----|
+| Date           | Title |    |
+|----------------|-------|----|
 | November, 2019 | [Kubecon 2019 San Diego: Evolving the Kubernetes Ingress APIs to GA and Beyond][2019-kubecon-na-slides] | [slides][2019-kubecon-na-slides], [video][2019-kubecon-na-video]|
 | November, 2019 | Kubecon 2019 San Diego: SIG-NETWORK Service/Ingress Evolution Discussion | [slides][2019-kubecon-na-community-slides] |
 | May, 2019      | [Kubecon 2019 Barcelona: Ingress V2 and Multicluster Services][2019-kubecon-eu] | [slides][2019-kubecon-eu-slides], [video][2019-kubecon-eu-video]|
