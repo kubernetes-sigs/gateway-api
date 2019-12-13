@@ -68,18 +68,6 @@ Meeting ID: 931 530 074
 Find your local number: https://zoom.us/u/abdiTq5bx
 ```
 
-* Join Zoom Meeting:
-     * [https://zoom.us/j/931530074?pwd=SmtZai9UeS9wVGE3azdFWGEwRTVtdz09][meeting]
-     * Meeting ID: 931 530 074
-     * Password: 621590
-     * One tap mobile
-          * +14086380968,,931530074# US (San Jose)
-          * +16465588656,,931530074# US (New York)
-     * Dial by your location:
-          * +1 408 638 0968 US (San Jose)
-          * +1 646 558 8656 US (New York)
-          * Find your local number: [https://zoom.us/u/abdiTq5bx](https://zoom.us/u/abdiTq5bx)
-
 ### Meeting notes
 
 | Date |    |
