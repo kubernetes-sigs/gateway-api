@@ -39,8 +39,17 @@ SOURCES += mkdocs.yml docs.mk
 # entrypoint
 all: .mkdocs.timestamp
 
+# Support docker images.
+.PHONY: images
+images: .mkdocs.dockerfile.timestamp
+
+# build the image for mkdocs
+.mkdocs.dockerfile.timestamp: mkdocs.dockerfile
+	docker build -t $(MKDOCS_IMAGE) -f mkdocs.dockerfile .
+	date > $@
+
 # generate the `docs` from SOURCES
-.mkdocs.timestamp: $(SOURCES)
+.mkdocs.timestamp: images $(SOURCES)
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \
 		--sig-proxy=true \
@@ -53,11 +62,12 @@ all: .mkdocs.timestamp
 .PHONY: clean
 clean:
 	test -f .mkdocs.timestamp && rm .mkdocs.timestamp || true
+	test -f .mkdocs.dockerfile.timestamp && rm .mkdocs.dockerfile.timestamp || true
 	rm -r $(GENROOT)/* || true
 
 # serve runs mkdocs as a local webserver for interactive development.
 # This will serve the live copy of the docs on 127.0.0.1:8000.
-.PHONY: serve
+.PHONY: images serve
 serve:
 	$(DOCKER) run \
 		-it \
@@ -79,7 +89,7 @@ help:
 	@echo "make serve  Run the webserver for live editing (ctrl-C to quit)"
 
 # init creates a new mkdocs template. This is included for completeness.
-.PHONY: init
+.PHONY: images init
 init:
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \

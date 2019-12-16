@@ -12,27 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DOCKER_IMAGES := \
-	.service-apis-mkdocs.dockerfile.timestamp
-MKDOCS_IMAGE := k8s.gcr.io/service-apis-mkdocs
+all: controller docs
 
-all: controller images docs
-
-images: $(DOCKER_IMAGES)
-
+# Kubebuilder driven custom resource definitions.
 .PHONY: controller
 controller:
 	make -f kubebuilder.mk
 
+# Build the documentation.
 .PHONY: docs
 docs:
 	make -f docs.mk
 
 .PHONY: clean
 clean:
-	rm .*.timestamp
 	make -f docs.mk clean
-
-.service-apis-mkdocs.dockerfile.timestamp: mkdocs.dockerfile
-	docker build -t $(MKDOCS_IMAGE) -f mkdocs.dockerfile .
-	touch $@
