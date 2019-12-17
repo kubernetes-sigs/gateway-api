@@ -14,10 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# User feedback
+# Feedback
 
+## Use cases, user stories
 
+We are currently collecting use case and user stories on
+[this shared Google Doc][use-cases-doc] as this is the lowest barrier to entry. When
+things stabilize, we will take the contents of the doc and publish it here as
+individual pages in the repo.
 
-This page links to user experiences and feedback from users of the API.
+[use-cases-doc]: https://docs.google.com/document/d/1OAzVO0HfmF4qD8AW41_eeUY0KP6xjqghusUVwhp4BNg/edit#
 
-## Links
+## Bug reports
+
+Bug reports should be filed as [Github Issues][gh-issues] on this repo. Be sure to use the following template:
+
+```text
+TODO
+```
+
+[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues
