@@ -22,9 +22,9 @@ under [SIG-NETWORK][sig-network].
 
 [sig-network]: https://groups.google.com/g/kubernetes-sig-network
 
-## Gateway/Routes API
+## Gateway API
 
-Gateway/Routes is an API for a common portable declarative description
+Gateway is an API for a common portable declarative description
 of load-balancing infrastructure for Kubernetes.
 
 If you are a user:
