@@ -116,8 +116,10 @@ TODO
 This resource represents a category of Gateways that can be instantiated.
 
 ```yaml
+apiVersion: networking.x-k8s.io/v1alpha1
 kind: GatewayClass
-name: from-internet
+metadata:
+  name: from-internet
 controller:                          # links to a custom resource
   apiGroup: networking.acme.io       # that implements this class. 
   kind: cloud-lb
@@ -127,9 +129,10 @@ controller:                          # links to a custom resource
 A sample controller file:
 
 ```yaml
-apiGroup: networking.acme.io
+apiVersion: networking.acme.io/v1alpha1
 kind: CloudLB
-name: from-internet
+metadata:
+  name: from-internet
 networkTier: auto
 ipAllocation: auto
 ```

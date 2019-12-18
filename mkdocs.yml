@@ -8,8 +8,8 @@ nav:
         - Introduction: index.md
         - User guide: userguide.md
         - API cookbook: cookbook.md
-        - API concepts and details: concepts.md
+        - API concepts: concepts.md
         - API specification: spec.md
         - Developer guide: devguide.md
-        - Feedback/user stories/bug reports: feedback.md
+        - Feedback: feedback.md
         - How to contribute: community.md
