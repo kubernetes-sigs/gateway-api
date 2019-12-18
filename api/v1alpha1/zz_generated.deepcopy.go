@@ -85,7 +85,7 @@ func (in *GatewayClass) DeepCopyObject() runtime.Object {
 func (in *GatewayClassList) DeepCopyInto(out *GatewayClassList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]GatewayClass, len(*in))
@@ -117,7 +117,7 @@ func (in *GatewayClassList) DeepCopyObject() runtime.Object {
 func (in *GatewayList) DeepCopyInto(out *GatewayList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]Gateway, len(*in))
@@ -247,7 +247,7 @@ func (in *HttpRoute) DeepCopyObject() runtime.Object {
 func (in *HttpRouteList) DeepCopyInto(out *HttpRouteList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]HttpRoute, len(*in))
@@ -482,7 +482,7 @@ func (in *TcpRoute) DeepCopyObject() runtime.Object {
 func (in *TcpRouteList) DeepCopyInto(out *TcpRouteList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]TcpRoute, len(*in))
@@ -571,7 +571,7 @@ func (in *TrafficSplit) DeepCopyObject() runtime.Object {
 func (in *TrafficSplitList) DeepCopyInto(out *TrafficSplitList) {
 	*out = *in
 	out.TypeMeta = in.TypeMeta
-	out.ListMeta = in.ListMeta
+	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
 		*out = make([]TrafficSplit, len(*in))

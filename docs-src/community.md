@@ -73,7 +73,7 @@ Find your local number: https://zoom.us/u/abdiTq5bx
 | Date                                 |    |
 |--------------------------------------|----|
 | January 2, 2020 (PST PM time slot)   | (scheduled) |
-| December 19, 2019 (PST AM time slot) | (scheduled) |
+| December 19, 2019 (PST AM time slot) | [meeting notes][meeting-notes] |
 | November, 2019                       | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
 | November, 2019                       | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
 | May, 2019                            | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
@@ -81,6 +81,7 @@ Find your local number: https://zoom.us/u/abdiTq5bx
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
 [sig-net-2019-11-sync]: https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview
+[meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
 
 ## Design docs
 

@@ -15,14 +15,14 @@ spec:
   scope: ""
   validation:
     openAPIV3Schema:
-      description: "GatewayClass describes a class of gateways available to the user
-        for defining access to their routed services. \n GatewayClass is a non-namespaced
+      description: "GatewayClass describes a class of gateways av for defining access
+        to their routed services. GatewayClass allow a \n GatewayClass is a non-namespaced
         resource."
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources'
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
           type: string
         controller:
           description: 'Controller is a domain/path that denotes which controller
@@ -31,7 +31,7 @@ spec:
         kind:
           description: 'Kind is a string value representing the REST resource this
             object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds'
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
           type: string
         metadata:
           type: object
