@@ -36,7 +36,7 @@
     
     
       
-        <title>API concepts and details - Kubernetes Service API Evolution</title>
+        <title>API concepts - Kubernetes Service API Evolution</title>
       
     
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                API concepts and details
+                API concepts
               
             </span>
           
@@ -245,11 +245,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        API concepts and details
+        API concepts
       </label>
     
-    <a href="./" title="API concepts and details" class="md-nav__link md-nav__link--active">
-      API concepts and details
+    <a href="./" title="API concepts" class="md-nav__link md-nav__link--active">
+      API concepts
     </a>
     
       
@@ -439,8 +439,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../feedback/" title="Feedback/user stories/bug reports" class="md-nav__link">
-      Feedback/user stories/bug reports
+    <a href="../feedback/" title="Feedback" class="md-nav__link">
+      Feedback
     </a>
   </li>
 
@@ -731,8 +731,10 @@ handling this:</p>
 <h3 id="gatewayclass">GatewayClass</h3>
 <p><code>GatewayClass</code> is cluster-scoped resource defined by the infrastructure ops.
 This resource represents a category of Gateways that can be instantiated.</p>
-<pre><code class="yaml">kind: GatewayClass
-name: from-internet
+<pre><code class="yaml">apiVersion: networking.x-k8s.io/v1alpha1
+kind: GatewayClass
+metadata:
+  name: from-internet
 controller:                          # links to a custom resource
   apiGroup: networking.acme.io       # that implements this class. 
   kind: cloud-lb
@@ -740,9 +742,10 @@ controller:                          # links to a custom resource
 </code></pre>
 
 <p>A sample controller file:</p>
-<pre><code class="yaml">apiGroup: networking.acme.io
+<pre><code class="yaml">apiVersion: networking.acme.io/v1alpha1
 kind: CloudLB
-name: from-internet
+metadata:
+  name: from-internet
 networkTier: auto
 ipAllocation: auto
 </code></pre>
