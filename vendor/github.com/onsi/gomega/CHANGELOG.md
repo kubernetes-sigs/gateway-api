@@ -1,3 +1,21 @@
+## 1.5.0
+
+### Features
+
+- Added MatchKeys matchers [8b909fc]
+
+### Fixes and Minor Improvements
+
+- Add type aliases to remove stuttering [03b0461]
+- Don't run session_test.go on windows (#324) [5533ce8]
+
+## 1.4.3
+
+### Fixes:
+
+- ensure file name and line numbers are correctly reported for XUnit [6fff58f]
+- Fixed matcher for content-type (#305) [69d9b43]
+
 ## 1.4.2
 
 ### Fixes:
