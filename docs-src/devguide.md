@@ -32,6 +32,18 @@ for this project:
 Issues labeled `good first issue` and `help wanted` are especially good for a
 first contribution.
 
+## Release cadence
+
+During the development phase, we expect to release on a monthly cadence. We are
+explicitly decoupling ourselves from the Kubernetes API versioning cycle to
+give us more flexibility to evolve the specification. As the specification solidifies,
+we will slow down our release cycle.
+
+General target timeline:
+
+* 1H 2020: Monthly release cycle, with first release targeted for January 31
+* 2H 2020: Slower release cycle
+
 ## Building the code
 
 The project uses `make` to drive the build. You can kick off an overall build
