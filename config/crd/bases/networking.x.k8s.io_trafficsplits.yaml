@@ -9,7 +9,9 @@ spec:
   group: networking.x.k8s.io
   names:
     kind: TrafficSplit
+    listKind: TrafficSplitList
     plural: trafficsplits
+    singular: trafficsplit
   scope: ""
   validation:
     openAPIV3Schema:
