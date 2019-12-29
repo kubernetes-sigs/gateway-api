@@ -9,9 +9,7 @@ spec:
   group: networking.x.k8s.io
   names:
     kind: HttpRoute
-    listKind: HttpRouteList
     plural: httproutes
-    singular: httproute
   scope: ""
   validation:
     openAPIV3Schema:

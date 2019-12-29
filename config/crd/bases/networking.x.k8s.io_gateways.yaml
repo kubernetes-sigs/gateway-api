@@ -9,9 +9,7 @@ spec:
   group: networking.x.k8s.io
   names:
     kind: Gateway
-    listKind: GatewayList
     plural: gateways
-    singular: gateway
   scope: ""
   validation:
     openAPIV3Schema:
