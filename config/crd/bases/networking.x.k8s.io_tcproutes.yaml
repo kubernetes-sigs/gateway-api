@@ -9,9 +9,7 @@ spec:
   group: networking.x.k8s.io
   names:
     kind: TcpRoute
-    listKind: TcpRouteList
     plural: tcproutes
-    singular: tcproute
   scope: ""
   validation:
     openAPIV3Schema:
