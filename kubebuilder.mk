@@ -24,6 +24,9 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
+# enable Go modules
+export GO111MODULE=on
+
 all: manager
 
 # Run tests
