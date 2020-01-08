@@ -33,6 +33,7 @@ type GatewayClassReconciler struct {
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=gatewayclasses,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=gatewayclasses/status,verbs=get;update;patch
 
+// Reconcile the changes.
 func (r *GatewayClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("gatewayclass", req.NamespacedName)
@@ -42,6 +43,7 @@ func (r *GatewayClassReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager wires up the controller.
 func (r *GatewayClassReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.GatewayClass{}).

@@ -24,8 +24,8 @@ import (
 	"sigs.k8s.io/service-apis/api/v1alpha1"
 )
 
-// HttpRouteReconciler reconciles a HttpRoute object
-type HttpRouteReconciler struct {
+// HTTPRouteReconciler reconciles a HTTPRoute object
+type HTTPRouteReconciler struct {
 	client.Client
 	Log logr.Logger
 }
@@ -33,7 +33,8 @@ type HttpRouteReconciler struct {
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=httproutes,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=httproutes/status,verbs=get;update;patch
 
-func (r *HttpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+// Reconcile the changes.
+func (r *HTTPRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("httproute", req.NamespacedName)
 
@@ -42,8 +43,9 @@ func (r *HttpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
-func (r *HttpRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
+// SetupWithManager wires up the controller.
+func (r *HTTPRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1alpha1.HttpRoute{}).
+		For(&v1alpha1.HTTPRoute{}).
 		Complete(r)
 }
