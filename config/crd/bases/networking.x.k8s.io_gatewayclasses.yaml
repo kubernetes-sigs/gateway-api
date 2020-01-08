@@ -14,7 +14,7 @@ spec:
     listKind: GatewayClassList
     plural: gatewayclasses
     singular: gatewayclass
-  scope: Namespaced
+  scope: Cluster
   validation:
     openAPIV3Schema:
       description: "GatewayClass describes a class of gateways av for defining access

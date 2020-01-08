@@ -21,6 +21,7 @@ import (
 )
 
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:scope=Cluster
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:openapi-gen=true
