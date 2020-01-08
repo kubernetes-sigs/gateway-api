@@ -66,7 +66,7 @@ kind create cluster
 make -f kubebuilder.mk install
 
 # Remove the CRDs and associated CRs
-./hack/delete-crds.sh
+make uninstall
 ```
 
 [kubebuilder]: https://book.kubebuilder.io/
@@ -83,7 +83,7 @@ changes. The [Prow presubmit][prow-setup] will not let your change merge if
 verification fails.
 
 ```shell
-./hack/verify-all.sh
+make verify
 ```
 
 [prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis
@@ -97,13 +97,13 @@ Github Pages.
 Building the docs:
 
 ```shell
-make -f docs.mk
+make docs
 ```
 
 Live preview for editing (view on [http://localhost:8000](), CTRL-C to quit):
 
 ```shell
-make -f docs.mk serve
+make serve
 ```
 
 ### Publishing

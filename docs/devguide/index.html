@@ -547,7 +547,7 @@ for <code>kind</code> in the README in the repo.</p>
 make -f kubebuilder.mk install
 
 # Remove the CRDs and associated CRs
-./hack/delete-crds.sh
+make uninstall
 </code></pre>
 
 <h2 id="submitting-a-review">Submitting a review</h2>
@@ -556,7 +556,7 @@ make -f kubebuilder.mk install
 <p>Make sure you run the static analysis over the repo before submitting your
 changes. The <a href="https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis">Prow presubmit</a> will not let your change merge if
 verification fails.</p>
-<pre><code class="shell">./hack/verify-all.sh
+<pre><code class="shell">make verify
 </code></pre>
 
 <h2 id="documentation">Documentation</h2>
@@ -564,11 +564,11 @@ verification fails.</p>
 contained in <code>docs-src/</code>. Generated files are in <code>docs/</code> and published to
 Github Pages.</p>
 <p>Building the docs:</p>
-<pre><code class="shell">make -f docs.mk
+<pre><code class="shell">make docs
 </code></pre>
 
 <p>Live preview for editing (view on <a href="">http://localhost:8000</a>, CTRL-C to quit):</p>
-<pre><code class="shell">make -f docs.mk serve
+<pre><code class="shell">make serve
 </code></pre>
 
 <h3 id="publishing">Publishing</h3>
