@@ -3,6 +3,8 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.4
   creationTimestamp: null
   name: httproutes.networking.x.k8s.io
 spec:
@@ -12,7 +14,7 @@ spec:
     listKind: HTTPRouteList
     plural: httproutes
     singular: httproute
-  scope: ""
+  scope: Namespaced
   validation:
     openAPIV3Schema:
       description: HTTPRoute is the Schema for the httproutes API
@@ -33,18 +35,39 @@ spec:
           description: HTTPRouteSpec defines the desired state of HTTPRoute
           properties:
             default:
-              description: Default is the default host to use.
+              description: Default is the default host to use. Default.Hostnames must
+                be an empty list.
               properties:
+                extension:
+                  description: "Extension is an optional, implementation-specific
+                    extension to the \"host\" block. \n Support: custom"
+                  properties:
+                    apiGroup:
+                      description: APIGroup is the group for the resource being referenced.
+                        If APIGroup is not specified, the specified Kind must be in
+                        the core API group. For any other third-party types, APIGroup
+                        is required.
+                      type: string
+                    kind:
+                      description: Kind is the type of resource being referenced
+                      type: string
+                    name:
+                      description: Name is the name of resource being referenced
+                      type: string
+                  required:
+                  - kind
+                  - name
+                  type: object
                 hostnames:
-                  description: 'Hostnames are a list of hosts names to use. TODO:
-                    RFC link'
+                  description: "Hostnames are a list of hosts names that match this
+                    host block. \n TODO: RFC link"
                   items:
                     type: string
                   type: array
-                paths:
-                  description: Paths are a list of HTTP matchers, filters and actions.
+                rules:
+                  description: Rules are a list of HTTP matchers, filters and actions.
                   items:
-                    description: HTTPRoutePath is the configuration for a given path.
+                    description: HTTPRouteRule is the configuration for a given path.
                     properties:
                       action:
                         description: Action defines what happens to the request.
@@ -195,23 +218,43 @@ spec:
                   type: array
               required:
               - hostnames
-              - paths
+              - rules
               type: object
             hosts:
               description: Hosts is a list of Host definitions.
               items:
                 description: HTTPRouteHost is the configuration for a given host.
                 properties:
+                  extension:
+                    description: "Extension is an optional, implementation-specific
+                      extension to the \"host\" block. \n Support: custom"
+                    properties:
+                      apiGroup:
+                        description: APIGroup is the group for the resource being
+                          referenced. If APIGroup is not specified, the specified
+                          Kind must be in the core API group. For any other third-party
+                          types, APIGroup is required.
+                        type: string
+                      kind:
+                        description: Kind is the type of resource being referenced
+                        type: string
+                      name:
+                        description: Name is the name of resource being referenced
+                        type: string
+                    required:
+                    - kind
+                    - name
+                    type: object
                   hostnames:
-                    description: 'Hostnames are a list of hosts names to use. TODO:
-                      RFC link'
+                    description: "Hostnames are a list of hosts names that match this
+                      host block. \n TODO: RFC link"
                     items:
                       type: string
                     type: array
-                  paths:
-                    description: Paths are a list of HTTP matchers, filters and actions.
+                  rules:
+                    description: Rules are a list of HTTP matchers, filters and actions.
                     items:
-                      description: HTTPRoutePath is the configuration for a given
+                      description: HTTPRouteRule is the configuration for a given
                         path.
                       properties:
                         action:
@@ -374,7 +417,7 @@ spec:
                     type: array
                 required:
                 - hostnames
-                - paths
+                - rules
                 type: object
               type: array
           type: object
