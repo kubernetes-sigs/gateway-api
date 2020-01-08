@@ -33,6 +33,7 @@ type TrafficSplitReconciler struct {
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=trafficsplits,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=trafficsplits/status,verbs=get;update;patch
 
+// Reconcile the changes.
 func (r *TrafficSplitReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("trafficsplit", req.NamespacedName)
@@ -42,6 +43,7 @@ func (r *TrafficSplitReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager wires up the controller.
 func (r *TrafficSplitReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.TrafficSplit{}).

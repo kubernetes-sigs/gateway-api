@@ -50,9 +50,6 @@ type GatewayList struct {
 // valid. Some invalid configurations can be caught synchronously via a
 // webhook, but there are many cases that will require asynchronous
 // signaling via the GatewayStatus block.
-//
-//
-//
 type GatewaySpec struct {
 	// Class used for this Gateway. This is the name of a GatewayClass resource.
 	Class string `json:"class"`
@@ -64,6 +61,13 @@ type GatewaySpec struct {
 	Routes []core.TypedLocalObjectReference `json:"routes"`
 }
 
+const (
+	// HTTPProcotol constant.
+	HTTPProcotol = "HTTP"
+	// HTTPSProcotol constant.
+	HTTPSProcotol = "HTTPS"
+)
+
 // Listener defines a
 type Listener struct {
 	// Address bound on the listener. This is optional and behavior
@@ -71,15 +75,42 @@ type Listener struct {
 	// the request address is invalid, the GatewayClass MUST indicate
 	// this in the associated entry in GatewayStatus.Listeners.
 	//
+	// Support:
+	//
 	// +optional
 	Address *ListenerAddress `json:"address"`
-	// Ports is a list of ports associated with the Address.
-	Ports []ListenerPort `json:"ports"`
+	// Port is a list of ports associated with the Address.
+	//
+	// Support:
+	// +optional
+	Port *int `json:"port"`
+	// Protocol to use.
+	//
+	// Support:
+	// +optional
+	Protocol *string `json:"protocol"`
+	// TLS configuraton for the Listener.
+	//
+	// Support:
+	// +optional
+	TLS *ListenerTLS `json:"tls"`
+	// Extension for this Listener.
+	//
+	// Support: custom.
+	// +optional
+	Extension *core.TypedLocalObjectReference `json:"extension"`
 }
 
 const (
-	IPAddressType    = "IPAddress"
-	NamedAddressType = "NamedAddress"
+	// IPAddress is an address that is an IP address.
+	//
+	// Support: Extended.
+	IPAddress = "IPAddress"
+	// NamedAddress is an address selected by name. The interpretation of
+	// the name is depenedent on the controller.
+	//
+	// Support: Implementation-specific.
+	NamedAddress = "NamedAddress"
 )
 
 // ListenerAddress describes an address bound by the
@@ -89,23 +120,20 @@ type ListenerAddress struct {
 	//
 	// Support: Extended
 	Type string `json:"type"`
-	// Address value. Examples: "1.2.3.4", "128::1", "my-ip-address".
-	Address string `json:"address"`
-}
-
-// ListenerPort xxx
-type ListenerPort struct {
-	Port      *int                            `json:"port"`
-	Protocols []string                        `json:"protocols"`
-	TLS       *ListenerTLS                    `json:"tls"`
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
+	// values will depend on `Type` and support by the controller.
+	Value string `json:"value"`
 }
 
 const (
-	TLSVersion_1_0 = "TLS_1_0"
-	TLSVersion_1_1 = "TLS_1_1"
-	TLSVersion_1_2 = "TLS_1_2"
-	TLSVersion_1_3 = "TLS_1_3"
+	// TLS1_0 denotes the TLS v1.0.
+	TLS1_0 = "TLS1_0"
+	// TLS1_1 denotes the TLS v1.0.
+	TLS1_1 = "TLS1_1"
+	// TLS1_2 denotes the TLS v1.0.
+	TLS1_2 = "TLS1_2"
+	// TLS1_3 denotes the TLS v1.0.
+	TLS1_3 = "TLS1_3"
 )
 
 // ListenerTLS describes the TLS configuration for a given port.
@@ -127,12 +155,15 @@ type ListenerTLS struct {
 	// Support: Implementation-specific (Other resource types)
 	Certificates []core.TypedLocalObjectReference `json:"certificates,omitempty"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
-	// the TLSVersion_* constants above. Note: this is not strongly
-	// typed to allow newly available version to be used without
+	// the TLS_* constants above. Note: this is not strongly
+	// typed to allow implementation-specific versions to be used without
 	// requiring updates to the API types. String must be of the form
-	// "<protocol>_<major>_<minor>".
+	// "<protocol><major>_<minor>".
 	//
-	// Support: Core
+	// Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
+	// values.
+	//
+	// +optional
 	MinimumVersion *string `json:"minimumVersion"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
@@ -162,6 +193,7 @@ type GatewayStatus struct {
 	Routes []GatewayRouteStatus `json:"routes"`
 }
 
+// ListenerStatus is the status associated with each listener block.
 type ListenerStatus struct {
 	// Errors is a list of reasons why a given Listener Spec is
 	// not valid. Errors will be empty if the Spec is valid.
@@ -171,6 +203,8 @@ type ListenerStatus struct {
 	Address string `json:"address"`
 }
 
+// ListenerErrorReason is the type for errors associated with the
+// listener.
 type ListenerErrorReason string
 
 const (
@@ -192,6 +226,8 @@ type ListenerError struct {
 	Message string `json:"message"`
 }
 
+// GatewayRouteStatus is the status associated with a given (Gateway,
+// Route) pair.
 type GatewayRouteStatus struct {
 }
 

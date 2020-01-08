@@ -9,7 +9,9 @@ spec:
   group: networking.x.k8s.io
   names:
     kind: Gateway
+    listKind: GatewayList
     plural: gateways
+    singular: gateway
   scope: ""
   validation:
     openAPIV3Schema:
@@ -48,29 +50,61 @@ spec:
                 description: Listener defines a
                 properties:
                   address:
-                    description: Address bound on the listener. This is optional and
-                      behavior can depend on GatewayClass. If a value is set in the
-                      spec and the request address is invalid, the GatewayClass MUST
-                      indicate this in the associated entry in GatewayStatus.Listeners.
+                    description: "Address bound on the listener. This is optional
+                      and behavior can depend on GatewayClass. If a value is set in
+                      the spec and the request address is invalid, the GatewayClass
+                      MUST indicate this in the associated entry in GatewayStatus.Listeners.
+                      \n Support:"
                     properties:
-                      address:
-                        description: 'Address value. Examples: "1.2.3.4", "128::1",
-                          "my-ip-address".'
-                        type: string
                       type:
                         description: "Type of the Address. This is one of the *AddressType
                           constants. \n Support: Extended"
                         type: string
+                      value:
+                        description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address".
+                          Validity of the values will depend on `Type` and support
+                          by the controller.'
+                        type: string
                     required:
-                    - address
                     - type
+                    - value
                     type: object
-                  ports:
-                    description: Ports is a list of ports associated with the Address.
-                    items:
-                      description: ListenerPort xxx
-                      properties:
-                        extension:
+                  extension:
+                    description: "Extension for this Listener. \n Support: custom."
+                    properties:
+                      apiGroup:
+                        description: APIGroup is the group for the resource being
+                          referenced. If APIGroup is not specified, the specified
+                          Kind must be in the core API group. For any other third-party
+                          types, APIGroup is required.
+                        type: string
+                      kind:
+                        description: Kind is the type of resource being referenced
+                        type: string
+                      name:
+                        description: Name is the name of resource being referenced
+                        type: string
+                    required:
+                    - kind
+                    - name
+                    type: object
+                  port:
+                    description: "Port is a list of ports associated with the Address.
+                      \n Support:"
+                    type: integer
+                  protocol:
+                    description: "Protocol to use. \n Support:"
+                    type: string
+                  tls:
+                    description: "TLS configuraton for the Listener. \n Support:"
+                    properties:
+                      certificates:
+                        description: "Certificates is a list of certificates containing
+                          resources that are bound to the listener. \n If apiGroup
+                          and kind are empty, will default to Kubernetes Secrets resources.
+                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
+                          (Other resource types)"
+                        items:
                           description: TypedLocalObjectReference contains enough information
                             to let you locate the typed referenced object inside the
                             same namespace.
@@ -91,84 +125,29 @@ spec:
                           - kind
                           - name
                           type: object
-                        port:
-                          type: integer
-                        protocols:
-                          items:
-                            type: string
-                          type: array
-                        tls:
-                          description: "ListenerTLS describes the TLS configuration
-                            for a given port. \n References - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
-                            - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
-                            - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
-                            - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
-                            - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-                            - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112"
-                          properties:
-                            certificates:
-                              description: "Certificates is a list of certificates
-                                containing resources that are bound to the listener.
-                                \n If apiGroup and kind are empty, will default to
-                                Kubernetes Secrets resources. \n Support: Core (Kubernetes
-                                Secrets) Support: Implementation-specific (Other resource
-                                types)"
-                              items:
-                                description: TypedLocalObjectReference contains enough
-                                  information to let you locate the typed referenced
-                                  object inside the same namespace.
-                                properties:
-                                  apiGroup:
-                                    description: APIGroup is the group for the resource
-                                      being referenced. If APIGroup is not specified,
-                                      the specified Kind must be in the core API group.
-                                      For any other third-party types, APIGroup is
-                                      required.
-                                    type: string
-                                  kind:
-                                    description: Kind is the type of resource being
-                                      referenced
-                                    type: string
-                                  name:
-                                    description: Name is the name of resource being
-                                      referenced
-                                    type: string
-                                required:
-                                - kind
-                                - name
-                                type: object
-                              type: array
-                            minimumVersion:
-                              description: "MinimumVersion of TLS allowed. It is recommended
-                                to use one of the TLSVersion_* constants above. Note:
-                                this is not strongly typed to allow newly available
-                                version to be used without requiring updates to the
-                                API types. String must be of the form \"<protocol>_<major>_<minor>\".
-                                \n Support: Core"
-                              type: string
-                            options:
-                              additionalProperties:
-                                type: string
-                              description: "Options are a list of key/value pairs
-                                to give extended options to the provider. \n There
-                                variation among providers as to how ciphersuites are
-                                expressed. If there is a common subset for expressing
-                                ciphers then it will make sense to loft that as a
-                                core API construct. \n Support: Implementation-specific."
-                              type: object
-                          required:
-                          - minimumVersion
-                          - options
-                          type: object
-                      required:
-                      - extension
-                      - port
-                      - protocols
-                      - tls
-                      type: object
-                    type: array
-                required:
-                - ports
+                        type: array
+                      minimumVersion:
+                        description: "MinimumVersion of TLS allowed. It is recommended
+                          to use one of the TLS_* constants above. Note: this is not
+                          strongly typed to allow implementation-specific versions
+                          to be used without requiring updates to the API types. String
+                          must be of the form \"<protocol><major>_<minor>\". \n Support:
+                          Core for TLS1_{1,2,3}. Implementation-specific for all other
+                          values."
+                        type: string
+                      options:
+                        additionalProperties:
+                          type: string
+                        description: "Options are a list of key/value pairs to give
+                          extended options to the provider. \n There variation among
+                          providers as to how ciphersuites are expressed. If there
+                          is a common subset for expressing ciphers then it will make
+                          sense to loft that as a core API construct. \n Support:
+                          Implementation-specific."
+                        type: object
+                    required:
+                    - options
+                    type: object
                 type: object
               type: array
             routes:
@@ -208,6 +187,8 @@ spec:
                 Spec. The status for a given block will match the order as declared
                 in the Spec, e.g. the status for Spec.Listeners[3] will be in Status.Listeners[3].
               items:
+                description: ListenerStatus is the status associated with each listener
+                  block.
                 properties:
                   address:
                     type: string
@@ -239,6 +220,8 @@ spec:
                 The status for a given route will match the orer as declared in the
                 Spec, e.g. the status for Spec.Routes[3] will be in Status.Routes[3].
               items:
+                description: GatewayRouteStatus is the status associated with a given
+                  (Gateway, Route) pair.
                 type: object
               type: array
           required:

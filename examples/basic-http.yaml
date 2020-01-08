@@ -1,0 +1,40 @@
+kind: GatewayClass
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+controller: acme.io/gateway-controller
+parameters:
+  apiGroup: networking.acme.io
+  kind: AcmeLBConfig
+  name: acme-lb-config
+---
+kind: Gateway
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  class: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - protocol: HTTP
+  routes:
+  - name: http-app-1
+    namespace: default
+    kind: HTTPRoute
+---
+kind: HTTPRoute
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  namespace: default
+spec:
+  hosts:
+    - hostnames:
+        - "foo.com"
+      rules:
+        - match:
+            path: /bar
+          action:
+            forwardTo:
+              kind: Service
+              name: my-service

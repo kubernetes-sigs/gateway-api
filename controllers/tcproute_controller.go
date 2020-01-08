@@ -33,6 +33,7 @@ type TcpRouteReconciler struct {
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=tcproutes,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=networking.x.k8s.io,resources=tcproutes/status,verbs=get;update;patch
 
+// Reconcile the changes.
 func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("tcproute", req.NamespacedName)
@@ -42,6 +43,7 @@ func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
+// SetupWithManager wires up the controller.
 func (r *TcpRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&v1alpha1.TcpRoute{}).

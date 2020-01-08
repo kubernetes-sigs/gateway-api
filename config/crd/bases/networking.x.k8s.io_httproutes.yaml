@@ -8,12 +8,14 @@ metadata:
 spec:
   group: networking.x.k8s.io
   names:
-    kind: HttpRoute
+    kind: HTTPRoute
+    listKind: HTTPRouteList
     plural: httproutes
+    singular: httproute
   scope: ""
   validation:
     openAPIV3Schema:
-      description: HttpRoute is the Schema for the httproutes API
+      description: HTTPRoute is the Schema for the httproutes API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -28,10 +30,398 @@ spec:
         metadata:
           type: object
         spec:
-          description: HttpRouteSpec defines the desired state of HttpRoute
+          description: HTTPRouteSpec defines the desired state of HTTPRoute
+          properties:
+            default:
+              description: Default is the default host to use.
+              properties:
+                hostnames:
+                  description: 'Hostnames are a list of hosts names to use. TODO:
+                    RFC link'
+                  items:
+                    type: string
+                  type: array
+                paths:
+                  description: Paths are a list of HTTP matchers, filters and actions.
+                  items:
+                    description: HTTPRoutePath is the configuration for a given path.
+                    properties:
+                      action:
+                        description: Action defines what happens to the request.
+                        properties:
+                          extension:
+                            description: "Extension is an optional, implementation-specific
+                              extension to the \"action\" behavior. \n Support: custom"
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                          forwardTo:
+                            description: ForwardTo sends requests to the referenced
+                              object.
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                        required:
+                        - forwardTo
+                        type: object
+                      filter:
+                        description: Filter defines what filters are applied to the
+                          request.
+                        properties:
+                          extension:
+                            description: "Extension is an optional, implementation-specific
+                              extension to the \"filter\" behavior. \n Support: custom"
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                          headers:
+                            description: "Headers related filters. \n Support: extended"
+                            properties:
+                              add:
+                                additionalProperties:
+                                  type: string
+                                description: "Add adds the given header (name, value)
+                                  to the request before the action. \n Input:   GET
+                                  /foo HTTP/1.1 \n Config:   add: {\"my-header\":
+                                  \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header:
+                                  foo \n Support: extended?"
+                                type: object
+                              remove:
+                                description: "Remove the given header(s) on the HTTP
+                                  request before the action. The value of RemoveHeader
+                                  is a list of HTTP header names. Note that the header
+                                  names are case-insensitive [RFC-2616 4.2]. \n Input:
+                                  \  GET /foo HTTP/1.1   My-Header1: ABC   My-Header2:
+                                  DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\",
+                                  \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2:
+                                  DEF \n Support: extended?"
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                            - add
+                            - remove
+                            type: object
+                        type: object
+                      match:
+                        description: Match defines which requests match this path.
+                        properties:
+                          extension:
+                            description: "Extension is an optional, implementation-specific
+                              extension to the \"match\" behavior. \n Support: custom"
+                            properties:
+                              apiGroup:
+                                description: APIGroup is the group for the resource
+                                  being referenced. If APIGroup is not specified,
+                                  the specified Kind must be in the core API group.
+                                  For any other third-party types, APIGroup is required.
+                                type: string
+                              kind:
+                                description: Kind is the type of resource being referenced
+                                type: string
+                              name:
+                                description: Name is the name of resource being referenced
+                                type: string
+                            required:
+                            - kind
+                            - name
+                            type: object
+                          header:
+                            additionalProperties:
+                              type: string
+                            description: Header are the Header matches as interpreted
+                              via HeaderType.
+                            type: object
+                          headerType:
+                            description: HeaderType defines the semantics of the `Header`
+                              matcher.
+                            type: string
+                          path:
+                            description: "Path is the value of the HTTP path as interpreted
+                              via PathType. \n Default: \"/\""
+                            type: string
+                          pathType:
+                            description: "PathType is defines the semantics of the
+                              `Path` matcher. \n Support: core (Exact, Prefix) Support:
+                              extended (RegularExpression) Support: custom (ImplementationSpecific)
+                              \n Default: \"Exact\""
+                            type: string
+                        required:
+                        - path
+                        type: object
+                    type: object
+                  type: array
+              required:
+              - hostnames
+              - paths
+              type: object
+            hosts:
+              description: Hosts is a list of Host definitions.
+              items:
+                description: HTTPRouteHost is the configuration for a given host.
+                properties:
+                  hostnames:
+                    description: 'Hostnames are a list of hosts names to use. TODO:
+                      RFC link'
+                    items:
+                      type: string
+                    type: array
+                  paths:
+                    description: Paths are a list of HTTP matchers, filters and actions.
+                    items:
+                      description: HTTPRoutePath is the configuration for a given
+                        path.
+                      properties:
+                        action:
+                          description: Action defines what happens to the request.
+                          properties:
+                            extension:
+                              description: "Extension is an optional, implementation-specific
+                                extension to the \"action\" behavior. \n Support:
+                                custom"
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                            forwardTo:
+                              description: ForwardTo sends requests to the referenced
+                                object.
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                          required:
+                          - forwardTo
+                          type: object
+                        filter:
+                          description: Filter defines what filters are applied to
+                            the request.
+                          properties:
+                            extension:
+                              description: "Extension is an optional, implementation-specific
+                                extension to the \"filter\" behavior. \n Support:
+                                custom"
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                            headers:
+                              description: "Headers related filters. \n Support: extended"
+                              properties:
+                                add:
+                                  additionalProperties:
+                                    type: string
+                                  description: "Add adds the given header (name, value)
+                                    to the request before the action. \n Input:   GET
+                                    /foo HTTP/1.1 \n Config:   add: {\"my-header\":
+                                    \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header:
+                                    foo \n Support: extended?"
+                                  type: object
+                                remove:
+                                  description: "Remove the given header(s) on the
+                                    HTTP request before the action. The value of RemoveHeader
+                                    is a list of HTTP header names. Note that the
+                                    header names are case-insensitive [RFC-2616 4.2].
+                                    \n Input:   GET /foo HTTP/1.1   My-Header1: ABC
+                                    \  My-Header2: DEF   My-Header2: GHI \n Config:
+                                    \  remove: [\"my-header1\", \"my-header3\"] \n
+                                    Output:   GET /foo HTTP/1.1   My-Header2: DEF
+                                    \n Support: extended?"
+                                  items:
+                                    type: string
+                                  type: array
+                              required:
+                              - add
+                              - remove
+                              type: object
+                          type: object
+                        match:
+                          description: Match defines which requests match this path.
+                          properties:
+                            extension:
+                              description: "Extension is an optional, implementation-specific
+                                extension to the \"match\" behavior. \n Support: custom"
+                              properties:
+                                apiGroup:
+                                  description: APIGroup is the group for the resource
+                                    being referenced. If APIGroup is not specified,
+                                    the specified Kind must be in the core API group.
+                                    For any other third-party types, APIGroup is required.
+                                  type: string
+                                kind:
+                                  description: Kind is the type of resource being
+                                    referenced
+                                  type: string
+                                name:
+                                  description: Name is the name of resource being
+                                    referenced
+                                  type: string
+                              required:
+                              - kind
+                              - name
+                              type: object
+                            header:
+                              additionalProperties:
+                                type: string
+                              description: Header are the Header matches as interpreted
+                                via HeaderType.
+                              type: object
+                            headerType:
+                              description: HeaderType defines the semantics of the
+                                `Header` matcher.
+                              type: string
+                            path:
+                              description: "Path is the value of the HTTP path as
+                                interpreted via PathType. \n Default: \"/\""
+                              type: string
+                            pathType:
+                              description: "PathType is defines the semantics of the
+                                `Path` matcher. \n Support: core (Exact, Prefix) Support:
+                                extended (RegularExpression) Support: custom (ImplementationSpecific)
+                                \n Default: \"Exact\""
+                              type: string
+                          required:
+                          - path
+                          type: object
+                      type: object
+                    type: array
+                required:
+                - hostnames
+                - paths
+                type: object
+              type: array
           type: object
         status:
-          description: HttpRouteStatus defines the observed state of HttpRoute
+          description: HTTPRouteStatus defines the observed state of HTTPRoute
+          properties:
+            gateways:
+              items:
+                description: ObjectReference contains enough information to let you
+                  inspect or modify the referred object.
+                properties:
+                  apiVersion:
+                    description: API version of the referent.
+                    type: string
+                  fieldPath:
+                    description: 'If referring to a piece of an object instead of
+                      an entire object, this string should contain a valid JSON/Go
+                      field access statement, such as desiredState.manifest.containers[2].
+                      For example, if the object reference is to a container within
+                      a pod, this would take on a value like: "spec.containers{name}"
+                      (where "name" refers to the name of the container that triggered
+                      the event) or if no container name is specified "spec.containers[2]"
+                      (container with index 2 in this pod). This syntax is chosen
+                      only to have some well-defined way of referencing a part of
+                      an object. TODO: this design is not final and this field is
+                      subject to change in the future.'
+                    type: string
+                  kind:
+                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                    type: string
+                  name:
+                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                    type: string
+                  namespace:
+                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                    type: string
+                  resourceVersion:
+                    description: 'Specific resourceVersion to which this reference
+                      is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                    type: string
+                  uid:
+                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                    type: string
+                type: object
+              type: array
+          required:
+          - gateways
           type: object
       type: object
   version: v1alpha1
