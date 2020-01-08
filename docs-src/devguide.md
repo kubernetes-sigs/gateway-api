@@ -43,11 +43,38 @@ make
 
 ## Testing the code
 
-TODO
+The easiest way to test the code is to use the [kubebuilder][kubebuilder]
+created CRD with a [kind][kind] cluster. Follow the installation instructions
+for `kind` in the README in the repo.
+
+```shell
+kind create cluster
+...
+# Install the CRDs
+make -f kubebuilder.mk install
+
+# Remove the CRDs and associated CRs
+./hack/delete-crds.sh
+```
+
+[kubebuilder]: https://book.kubebuilder.io/
+[kind]: https://github.com/kubernetes-sigs/kind
 
 ## Submitting a review
 
 TODO
+
+### Verify
+
+Make sure you run the static analysis over the repo before submitting your
+changes. The [Prow presubmit][prow-setup] will not let your change merge if
+verification fails.
+
+```shell
+./hack/verify-all.sh
+```
+
+[prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis
 
 ## Documentation
 
