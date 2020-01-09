@@ -70,13 +70,22 @@ Find your local number: https://zoom.us/u/abdiTq5bx
 
 ### Meeting notes
 
-| Date                            |    |
-|---------------------------------|----|
-| January 2, 2020 (4:30 PM PT)    | [meeting notes][meeting-notes] (recording to be uploaded)|
-| December 19, 2019 (10:30 AM PT) | [meeting notes][meeting-notes] ([recording](https://youtu.be/FIcySpPkGa4)) |
-| November, 2019                  | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
-| November, 2019                  | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
-| May, 2019                       | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
+[Meeting schedule scratch pad][meeting-sched-scratch]
+
+[meeting-sched-scratch]: https://docs.google.com/spreadsheets/d/1_jXy5hHLAmLTVN9rTNsI3Xx_Dzc0JvLqNqjS9hdzryI
+
+| Date                          |    |
+|-------------------------------|----|
+| February 6, 2019  10:30 PT    | (Planned) Conformance, what is going to be in the MVP?  |
+| January 30, 2019  16:30 PT    | (Planned) First pass: Status, Extensibility |
+| January 23, 2019  10:30 PT    | (Planned) First pass: Routes (HTTPRoutes), Inclusion/delegation |
+| January 16, 2019  16:30 PT    | (Planned) First pass: Gateway: Listener (HTTPS, SNI, lifecycle); Gateway <=> Route binding |
+| January 9, 2019 10:30 PT      | First pass: Personas and resource model: RBAC, resource scope, GatewayClass [meeting notes][meeting-notes] |
+| January 2, 2020 4:30 PM PT    | [meeting notes][meeting-notes] (recording didn't work :-( look at the notes) |
+| December 19, 2019 10:30 AM PT | [meeting notes][meeting-notes] ([recording](https://youtu.be/FIcySpPkGa4)) |
+| November, 2019                | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
+| November, 2019                | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
+| May, 2019                     | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
 
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
