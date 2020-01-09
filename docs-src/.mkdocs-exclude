@@ -1,0 +1,5 @@
+.mkdocs-exclude
+.nojekyll
+.placeholder
+search/search_index.json
+sitemap.xml.gz
