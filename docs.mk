@@ -58,6 +58,19 @@ images: .mkdocs.dockerfile.timestamp
 		/bin/bash -c "cd /d && $(MKDOCS) build; find /d/docs -exec chown $(UID):$(GID) {} \;"
 	date > $@
 
+.PHONY: verify
+# verify that the docs have been properly updated.
+#
+# docs-src/.mkdocs-exclude contains a list of `diff -X` files to
+# exclude from the verification diff.
+verify:
+	$(DOCKER) run \
+		--mount type=bind,source=$(DOCROOT),target=/d \
+		--sig-proxy=true \
+		--rm \
+		$(MKDOCS_IMAGE) \
+		/bin/bash -c "cd /d && $(MKDOCS) build --site-dir=/tmp/d && diff -X /d/docs-src/.mkdocs-exclude -qr /d/docs /tmp/d"
+
 # clean deletes generated files
 .PHONY: clean
 clean:
