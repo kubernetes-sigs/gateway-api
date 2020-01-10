@@ -22,11 +22,4 @@ SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd $SCRIPT_ROOT
 # Run the docs make
-make -f docs.mk
-
-# If there's any uncommitted changes, fail.
-if git status -s docs/ 2>&1 | grep -E -q '^\s+[MADRCU]'; then
-		echo "Uncommitted changes in docs:" ;
-		git status -s docs;
-		exit 1;
-fi
+make -f docs.mk verify
