@@ -11,5 +11,6 @@ nav:
         - API concepts: concepts.md
         - API specification: spec.md
         - Developer guide: devguide.md
+        - Releases: releases.md
         - Feedback: feedback.md
         - How to contribute: community.md

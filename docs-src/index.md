@@ -41,4 +41,5 @@ For everyone:
 
 * [Concepts and detailed descriptions](concepts.md)
 * [API specification](spec.md)
+* [Releases](releases.md)
 * [Feedback, use cases, user stories, bug reports](feedback.md)
