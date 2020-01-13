@@ -508,7 +508,7 @@ func (in *Listener) DeepCopyInto(out *Listener) {
 	}
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
-		*out = new(int)
+		*out = new(int32)
 		**out = **in
 	}
 	if in.Protocol != nil {

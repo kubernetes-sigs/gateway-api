@@ -83,7 +83,7 @@ type Listener struct {
 	//
 	// Support:
 	// +optional
-	Port *int `json:"port"`
+	Port *int32 `json:"port"`
 	// Protocol to use.
 	//
 	// Support:
