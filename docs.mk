@@ -63,7 +63,7 @@ images: .mkdocs.dockerfile.timestamp
 #
 # docs-src/.mkdocs-exclude contains a list of `diff -X` files to
 # exclude from the verification diff.
-verify:
+verify: images
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \
 		--sig-proxy=true \
