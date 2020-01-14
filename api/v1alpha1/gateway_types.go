@@ -146,14 +146,15 @@ const (
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type ListenerTLS struct {
-	// Certificates is a list of certificates containing resources
-	// that are bound to the listener.
+	// Certificate is a reference to a Kubernetes object containing the identity
+	// certificate bound to the listener. Certificate is used when an HTTPRoute
+	// does not specify a certificate.
 	//
-	// If apiGroup and kind are empty, will default to Kubernetes Secrets resources.
+	// If apiGroup and kind are empty, defaults to a Kubernetes Secret resource.
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
-	Certificates []core.TypedLocalObjectReference `json:"certificates,omitempty"`
+	Certificate core.TypedLocalObjectReference `json:"certificate,omitempty"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without

@@ -43,6 +43,16 @@ type HTTPRouteHost struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules"`
 
+	// TLS is the TLS configuration of an HTTPRouteHost.
+	//
+	// If unspecified, the TLS configuration of the binding gateway
+	// will be used.
+	//
+	// Support: core
+	//
+	// +optional
+	TLS *TLSConfig `json:"tls,omitempty"`
+
 	// Extension is an optional, implementation-specific extension
 	// to the "host" block.
 	//
@@ -189,6 +199,75 @@ type HTTPRouteAction struct {
 	// +optional
 	Extension *core.TypedLocalObjectReference `json:"extension"`
 }
+
+// TLSConfig defines the schema of a TLS configuration.
+type TLSConfig struct {
+	// Termination defines how to terminate TLS connections.
+	//
+	// If unspecified, TLS termination type "Edge" will be used.
+	//
+	// Support: core
+	//
+	// +optional
+	Termination TLSTerminationType `json:"termination,omitempty"`
+
+	// Certificate is a reference to a Kubernetes object containing
+	// the identity certificate, key and CA certificate used to terminate
+	// the TLS connection. Certificate is used with "Reencrypt" and "Edge"
+	// TLS termination types.
+	//
+	// If apiGroup and kind are empty, will default to a Kubernetes Secret
+	// resources.
+	//
+	// If unspecified, the certificate of the binding gateway will be used.
+	//
+	// Support: Core (Kubernetes Secrets)
+	// Support: Implementation-specific (For other resource types)
+	//
+	// +optional
+	Certificate core.TypedLocalObjectReference `json:"certificate,omitempty"`
+
+	// DestinationCACertificate is a reference to a CA certificate used
+	// for establishing a TLS connection with the final destination when
+	// using TLS termination type "Reencrypt".
+	//
+	// Here is a ConfigMap example (in yaml):
+	//
+	// apiVersion: v1
+	// kind: ConfigMap
+	// metadata:
+	//  name: my-dest-svc-ca
+	//  namespace: my-dest-svc-namespace
+	//  data:
+	//    ca-bundle.crt: |
+	//      -----BEGIN CERTIFICATE-----
+	//      Destination Service CA Certificate Bundle.
+	//      -----END CERTIFICATE-----
+	//
+	// Support: Core (Kubernetes ConfigMap)
+	// Support: Implementation-specific (For other resource types)
+	//
+	// +optional
+	DestinationCACertificate core.TypedLocalObjectReference `json:"destinationCACertificate,omitempty"`
+}
+
+// TLSTerminationType specifies where TLS connections will terminate.
+type TLSTerminationType string
+
+const (
+	// TLSTerminationEdge terminates the TLS connection at the gateway.
+	TLSTerminationEdge TLSTerminationType = "Edge"
+
+	// TLSTerminationPassthrough terminates the TLS connection at the
+	// destination service. The destination service is responsible for
+	// decrypting data from the connection.
+	TLSTerminationPassthrough TLSTerminationType = "Passthrough"
+
+	// TLSTerminationReencrypt terminates the TLS connection at the gateway.
+	// The gateway creates an encrypted connection to the destination service
+	// using the provided certificate from DestinationCACertificate.
+	TLSTerminationReencrypt TLSTerminationType = "Reencrypt"
+)
 
 // HTTPRouteStatus defines the observed state of HTTPRoute
 type HTTPRouteStatus struct {
