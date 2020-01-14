@@ -24,6 +24,26 @@ controller:
 docs:
 	make -f docs.mk
 
+# Serve the docs site locally at http://localhost:8000.
+.PHONY: serve
+serve:
+	make -f docs.mk serve
+
 .PHONY: clean
 clean:
 	make -f docs.mk clean
+
+# Install the CRD's to a pre-existing cluster.
+.PHONY: install
+install:
+	make -f kubebuilder.mk install
+
+# Remove installed CRD's and CR's.
+.PHONY: uninstall
+uninstall:
+	hack/delete-crds.sh
+
+# Run static analysis.
+.PHONY: verify
+verify:
+	hack/verify-all.sh

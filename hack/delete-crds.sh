@@ -28,6 +28,6 @@ RESOURCES="
   trafficsplits.networking.x.k8s.io"
 
 for TYPE in ${RESOURCES}; do
-  kubectl delete --all-namespaces --all ${TYPE}
+  kubectl delete ${TYPE} --all
   kubectl delete crd/${TYPE}
 done
