@@ -35,11 +35,17 @@ questions, discussions.
 Meetings discussing the evolution of the service APIs will alternate times to
 accommodate participants from various time zones:
 
-* Thursday 10:30 AM Pacific ([calendar link][cal-meeting-am])
-* Thursday  4:30 (16:30) PM Pacific ([calendar link][cal-meeting-pm])
+<iframe
+  src="https://calendar.google.com/calendar/embed?src=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&ctz=America%2FLos_Angeles"
+  style="border: 0" width="800" height="600" frameborder="0"
+  scrolling="no">  
+</iframe>
 
-[cal-meeting-am]: https://calendar.google.com/event?action=TEMPLATE&tmeid=M21yb3U1YTcwbzJwdG0zN3IwMXFnZmg5ZDBfMjAyMDAxMTZUMTgzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL
-[cal-meeting-pm]: https://calendar.google.com/event?action=TEMPLATE&tmeid=NmE1YXFtaHMzbzdsc3RyaDlzdDBta2NnZjdfMjAyMDAxMzFUMDAzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL
+* Thursday 10:30 AM Pacific <a target="_blank"
+    href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=NDR2NDRyMDg4bjFidGV1ZDE2YTY2dGw2NDdfMjAyMDAxMjNUMTgzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&amp;tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&amp;scp=ALL"><img
+    border="0"
+    src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+* Thursday 4:30 (16:30) PM Pacific <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=bGVvMWduMWE2dnVxcDRsMTc5NmVlcDIxaTFfMjAyMDAxMTdUMDAzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&amp;tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&amp;scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 
 ### Video conferencing
 
