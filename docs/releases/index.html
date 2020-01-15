@@ -36,7 +36,7 @@
     
     
       
-        <title>Feedback - Kubernetes Service API Evolution</title>
+        <title>Releases - Kubernetes Service API Evolution</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#feedback" tabindex="1" class="md-skip">
+      <a href="#releases" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Feedback
+                Releases
               
             </span>
           
@@ -270,18 +270,6 @@
       
       
 
-
-  <li class="md-nav__item">
-    <a href="../releases/" title="Releases" class="md-nav__link">
-      Releases
-    </a>
-  </li>
-
-    
-      
-      
-      
-
   
 
 
@@ -293,11 +281,11 @@
     
     
       <label class="md-nav__link md-nav__link--active" for="__toc">
-        Feedback
+        Releases
       </label>
     
-    <a href="./" title="Feedback" class="md-nav__link md-nav__link--active">
-      Feedback
+    <a href="./" title="Releases" class="md-nav__link md-nav__link--active">
+      Releases
     </a>
     
       
@@ -311,15 +299,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#use-cases-user-stories" class="md-nav__link">
-    Use cases, user stories
+  <a href="#versioning" class="md-nav__link">
+    Versioning
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#bug-reports" class="md-nav__link">
-    Bug reports
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-official-custom-resources" class="md-nav__link">
+    Other Official Custom Resources
   </a>
   
 </li>
@@ -332,6 +327,18 @@
   
 </nav>
     
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../feedback/" title="Feedback" class="md-nav__link">
+      Feedback
+    </a>
   </li>
 
     
@@ -368,15 +375,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#use-cases-user-stories" class="md-nav__link">
-    Use cases, user stories
+  <a href="#versioning" class="md-nav__link">
+    Versioning
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#bug-reports" class="md-nav__link">
-    Bug reports
+  <a href="#installation" class="md-nav__link">
+    Installation
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#other-official-custom-resources" class="md-nav__link">
+    Other Official Custom Resources
   </a>
   
 </li>
@@ -399,7 +413,7 @@
                 
                 
                 <!--
-Copyright 2019 The Kubernetes Authors.
+Copyright 2020 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -414,16 +428,46 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<h1 id="feedback">Feedback</h1>
-<h2 id="use-cases-user-stories">Use cases, user stories</h2>
-<p>We are currently collecting use case and user stories on
-<a href="https://docs.google.com/document/d/1OAzVO0HfmF4qD8AW41_eeUY0KP6xjqghusUVwhp4BNg/edit#">this shared Google Doc</a> as this is the lowest barrier to entry. When
-things stabilize, we will take the contents of the doc and publish it here as
-individual pages in the repo.</p>
-<h2 id="bug-reports">Bug reports</h2>
-<p>Bug reports should be filed as <a href="https://github.com/kubernetes-sigs/service-apis/issues">Github Issues</a> on this repo. Be sure to use the following template:</p>
-<pre><code class="text">TODO
-</code></pre>
+<h1 id="releases">Releases</h1>
+<p>Although Service APIs are an official Kubernetes project, and represent official
+APIs, these APIs will not be installed by default on Kubernetes clusters at this
+time. This project will use Custom Resource Definitions (CRDs) to represent the
+new API types that Service APIs include.</p>
+<p>Similar to other Kubernetes APIs, these will go through a formal Kubernetes
+Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Service API
+releases will be independent from Kubernetes releases initially.</p>
+<p>Service API releases will include four components:
+* Custom Resource Definitions to define the API.
+* Go client libraries.
+* Validation webhooks to implement cross field validations.
+* Conversion webhooks to convert resources between API versions.</p>
+<h2 id="versioning">Versioning</h2>
+<p>Versioning will be completely separate from the Kubernetes release process, but
+similar methodology will be used. Service API versions will use the <a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions">same
+version level requirements as other Kubernetes
+features</a>.</p>
+<p>Service APIs are currently at the development stage of versioning described in
+the Kubernetes documentation above. An initial alpha release is currently
+planned for February 2020.</p>
+<p>A faster release cadence will be used for alpha versions, with new alpha
+releases monthly. Users and controller authors will be expected to use the
+latest version of the API. There will be little to no provisions for backwards
+compatibility for alpha versions. Generally we expect the alpha API to be for
+users and controller developers to test out the API but not in any production
+environment.</p>
+<p>Beta and stable releases will operate on a slower, more standard, release
+schedule. They will also provide all of the stability guarantees that other beta
+and stable Kubernetes features provide.</p>
+<h2 id="installation">Installation</h2>
+<p>This project will be responsible for providing straightforward and reliable ways
+to install releases of Service APIs.</p>
+<h2 id="other-official-custom-resources">Other Official Custom Resources</h2>
+<p>This is a relatively new concept, and there is only one previous example of
+official custom resources being used:
+<a href="https://kubernetes.io/blog/2018/10/09/introducing-volume-snapshot-alpha-for-kubernetes/">VolumeSnapshots</a>.
+Although VolumeSnapshot CRDs can be installed directly by CSI drivers that
+support them, Service APIs must support multiple controllers per cluster, so the
+CRDs will live in and be installed from this repo.</p>
                 
                   
                 
@@ -445,7 +489,7 @@ individual pages in the repo.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../releases/" title="Releases" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../devguide/" title="Developer guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -454,19 +498,19 @@ individual pages in the repo.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Releases
+                Developer guide
               </span>
             </div>
           </a>
         
         
-          <a href="../community/" title="How to contribute" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../feedback/" title="Feedback" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                How to contribute
+                Feedback
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
