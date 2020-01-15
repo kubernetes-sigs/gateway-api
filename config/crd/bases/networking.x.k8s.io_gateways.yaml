@@ -91,6 +91,7 @@ spec:
                   port:
                     description: "Port is a list of ports associated with the Address.
                       \n Support:"
+                    format: int32
                     type: integer
                   protocol:
                     description: "Protocol to use. \n Support:"
