@@ -63,7 +63,7 @@ for `kind` in the README in the repo.
 kind create cluster
 ...
 # Install the CRDs
-make -f kubebuilder.mk install
+make install
 
 # Remove the CRDs and associated CRs
 make uninstall
