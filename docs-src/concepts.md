@@ -62,13 +62,14 @@ model.
 > be assumed to be part of this API group.
 
 Our resource model is based around a separation of concerns for a service
-producer. Each resource is intended to be (mostly) independently-evolvable and self-consistent:
+producer. Each resource is intended to be (mostly) independently-evolvable and
+self-consistent:
 
 * A way to group pods (backends) into a set via label selection: Kubernetes
   `core.Service`, independent of application-level routing.
 * A way to describe application-level routing: `xxxxRoute`, e.g. `HTTPRoute`,
-  `TCPRoute` independent of traffic access and consumption (e.g.
-* A way to describe traffic access and consumption: `Gateway` independent of
+  `TCPRoute` independent of traffic access and consumption.
+* A way to describe traffic access and consumption: `Gateway`, independent of
   implementation.
 * A way to describe which implementations of traffic access are available:
   `GatewayClass`.
@@ -90,11 +91,12 @@ The Kubernetes API guarantees consistency only on a single resource level. There
 are a couple of consequences for complex resource graphs as opposed to single
 resources:
 
-* Error checking of properties spanning multiple resource will be asynchronous.
-  Simple syntax checks will be possible at the single resource level, but cross
-  resource dependencies will need to be handled by the controller.
-* Controllers will need to handle broken links between resources and/or
-  mismatched configuration.
+*   Error checking of properties spanning multiple resource will be asynchronous
+    and eventually consistent. Simple syntax checks will be possible at the
+    single resource level, but cross resource dependencies will need to be
+    handled by the controller.
+*   Controllers will need to handle broken links between resources and/or
+    mismatched configuration.
 
 #### Conflicts
 
@@ -112,62 +114,145 @@ TODO
 
 ### GatewayClass
 
-`GatewayClass` is cluster-scoped resource defined by the infrastructure ops.
-This resource represents a category of Gateways that can be instantiated.
+`GatewayClass` ([source code][gatewayclass-src]) is cluster-scoped resource
+defined by the infrastructure provider. This resource represents a class of
+Gateways that can be instantiated.
+
+[gatewayclass-src]: https://github.com/kubernetes-sigs/service-apis/blob/master/api/v1alpha1/gatewayclass_types.go
+
+> Note: this serves the same function as the [`networking.IngressClass` resource][ingress-class-api].
+
+[ingress-class-api]: https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingressclass-resource
 
 ```yaml
-apiVersion: networking.x-k8s.io/v1alpha1
 kind: GatewayClass
 metadata:
-  name: from-internet
-controller:                          # links to a custom resource
-  apiGroup: networking.acme.io       # that implements this class. 
-  kind: cloud-lb
-  name: from-internet
+  name: cluster-gateway
+spec:
+  controller: "acme.io/gateway-controller"
 ```
 
-A sample controller file:
+We expect that one or more `GatewayClasses` will be created by the
+infrastructure provider for the user. It allows decoupling of which mechanism
+(e.g. controller) implements the `Gateways` from the user. For instance, an
+infrastructure provider may create two `GatewayClasses` named `internet` and
+`private` to reflect `Gateways` that define Internet-facing vs private, internal
+applications.
 
 ```yaml
-apiVersion: networking.acme.io/v1alpha1
-kind: CloudLB
+kind: GatewayClass
 metadata:
-  name: from-internet
-networkTier: auto
-ipAllocation: auto
+  name: internet
+  ...
+---
+kind: GatewayClass
+metadata:
+  name: private
+  ...
 ```
 
-We expect that one or more GatewayClasses will be created by the infrastructure
-provider for the user as part of their cloud infrastructure. If the cluster
-operator wishes to customize their `GatewayClasses`, they are free to do so,
-interacting with the custom resource parameters. Example parameters
-`GatewayClass.controller` resource will include cluster-level defaults and
-constraints.
+The user of the classes will not need to know *how* `internet` and `private` are
+implemented. Instead, the user will only need to understand the resulting
+properties of the class that the `Gateway` was created with.
 
-> The community may converge around a common set of GatewayClass names with
-> well-known meanings (e.g. `internet`, `private`) to ease interoperability
-> between platforms.
+#### GatewayClass parameters
+
+Providers of the `Gateway API` may need to pass parameters to their controller
+as part of the class definition. This is done using the
+`GatewayClass.spec.parametersRef` field:
+
+```yaml
+# GatewayClass for Gateways that define Internet-facing applications.
+kind: GatewayClass
+metadata:
+  name: internet
+spec:
+  controller: "acme.io/gateway-controller"
+  parametersRef:
+    apiVersion: core/v1
+    kind: ConfigMap
+    namespace: acme-system
+    name: internet-gateway
+---
+kind: ConfigMap
+metadata:
+  name: internet-gateway
+  namespace: acme-system
+data:
+  ip-address-pool: internet-vips
+  ...
+```
+
+The type of object referenced by `GatewayClass.spec.parametersRef` will depend
+on the provider itself. A `core.ConfigMap` is used in the example above, but
+controllers may opt to use a `CustomResource` for better schema validation.
+
+#### GatewayClass status
+
+`GatewayClasses` MUST be validated by the provider to ensure that the configured
+parameters are valid. The validity of the class will be signaled to the user via
+`GatewayClass.status`:
+
+```yaml
+kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: Unknown
+    ...
+```
+
+A new `GatewayClass` will start with the `InvalidParameters` condition set to
+`Unknown`. At this point the controller has not seen the configuration. Once the
+controller has processed the configuration, the condition will be set to
+`False`:
+
+```yaml
+kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: False
+    ...
+```
+
+If there is an error in the `GatewayClass.spec`, the conditions will be
+non-empty and contain information about the error. 
+
+```yaml
+kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: True
+    Reason: BadFooBar
+    Message: "foobar" is an FooBar.
+```
 
 ### Gateway
 
-A `Gateway` is 1:1 with the life cycle of the configuration of LB
+A `Gateway` is 1:1 with the life cycle of the configuration of 
 infrastructure. When a user creates a `Gateway`, a load balancer is provisioned
 (see below for details) by the `GatewayClass` controller. `Gateway` is the
 resource that triggers actions in this API. Other resources in this API are
 configuration snippets until a Gateway has been created to link the resources
 together.
 
-The Gateway spec defines the following:
+The `Gateway` spec defines the following:
 
-* GatewayClass used to instantiate this Gateway.
-* Listener bindings, which define addresses and ports, protocol termination,
-  TLS-settings. Listener configuration requested by a Gateway definition can be
-  incompatible with a given GatewayClass (e.g. port/protocol combination is not
-  supported)
+*   `GatewayClass` used to instantiate this Gateway.
+*   Listener bindings, which define addresses and ports, protocol termination,
+    TLS-settings. Listener configuration requested by a Gateway definition can
+    be incompatible with a given `GatewayClass` (e.g. port/protocol combination
+    is not supported)
 
-. In this case, the Gateway will be in an error state, signalled by the status field.
-Routes, which point to a set of protocol-specific routing served by the Gateway.
-OPTIONAL: A Gateway can point directly to Kubernetes Service if no advanced routing is required.
+In this case, the Gateway will be in an error state, signalled by the status
+field.  Routes, which point to a set of protocol-specific routing served by the
+Gateway.  OPTIONAL: A Gateway can point directly to Kubernetes Service if no
+advanced routing is required.
 
 #### Deployment models
 
