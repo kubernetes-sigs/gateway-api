@@ -17,7 +17,7 @@ limitations under the License.
 # API Concepts
 
 This document is a deep dive into the reasoning and design for the API. The
-content of this document is taken from the [API sketch][api-sketch]. 
+content of this document is taken from the [API sketch][api-sketch].
 
 > We will try to keep the two documents in sync as the sketch document has to
 > lowest bar to contribution, but this document is easier to format well and
@@ -30,7 +30,7 @@ content of this document is taken from the [API sketch][api-sketch].
 In the original design of Kubernetes, the Ingress and Service resources were
 based on a self-service model of usage; developers who create Services and
 Ingresses control all aspects of defining and exposing their applications to
-their users. 
+their users.
 
 We have found that the self-service model does not fully capture some of the
 more complex deployment and team structures that our users are seeing. The
@@ -219,7 +219,7 @@ status:
 ```
 
 If there is an error in the `GatewayClass.spec`, the conditions will be
-non-empty and contain information about the error. 
+non-empty and contain information about the error.
 
 ```yaml
 kind: GatewayClass
@@ -234,7 +234,7 @@ status:
 
 ### Gateway
 
-A `Gateway` is 1:1 with the life cycle of the configuration of 
+A `Gateway` is 1:1 with the life cycle of the configuration of
 infrastructure. When a user creates a `Gateway`, a load balancer is provisioned
 (see below for details) by the `GatewayClass` controller. `Gateway` is the
 resource that triggers actions in this API. Other resources in this API are
@@ -249,10 +249,12 @@ The `Gateway` spec defines the following:
     be incompatible with a given `GatewayClass` (e.g. port/protocol combination
     is not supported)
 
-In this case, the Gateway will be in an error state, signalled by the status
-field.  Routes, which point to a set of protocol-specific routing served by the
-Gateway.  OPTIONAL: A Gateway can point directly to Kubernetes Service if no
-advanced routing is required.
+Listener configuration requested by a Gateway definition can be incompatible
+with a given GatewayClass (e.g. port/protocol combination is not supported). In
+this case, the Gateway will be in an error state, signaled by the status field.
+Routes, which point to a set of protocol-specific routing served by the Gateway.
+A Gateway can point directly to Kubernetes Service if no advanced routing is
+required.
 
 #### Deployment models
 
@@ -269,6 +271,16 @@ the following actions:
 The API does not specify which one of these actions will be taken. Note that a
 GatewayClass controller that manages in-cluster proxy processes MAY restrict
 Gateway configuration scope, e.g. only be served in the same namespace.
+
+#### Gateway Status
+
+Gateways track status for the `Gateway` resource as a whole as well as each
+`Listener` it contains. The status for a specific Route is reported in the
+status of the `Route` resource. Within `GatewayStatus`, Listeners will have
+status entries corresponding to their name. Both `GatewayStatus` and
+`ListenerStatus` follow the conditions pattern used elsewhere in Kubernetes.
+This is a list that includes a type of condition, the status of that condition,
+and the last time this condition changed.
 
 #### Listeners
 
