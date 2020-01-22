@@ -42,7 +42,7 @@ For everyone:
 * [Concepts and detailed descriptions](concepts.md)
 * [API specification](spec.md)
 * [Releases](releases.md)
-* [Enhancements](enhancements.md)
+* [Enhancement requests](enhancement-requests.md)
 * [Feedback and bug reports](feedback.md)
 
 ## Contacts

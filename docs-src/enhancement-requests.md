@@ -14,21 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Enhancements Tracking and Backlog
+# Enhancement Tracking and Backlog
 
-Inspired by the [Kubernetes enhancement](https://github.com/kubernetes/enhancements)
-process, provide a mechanism to discuss and reach consensus for introducing new
-functionality to the service-api's project.
+Inspired by [Kubernetes enhancements](https://github.com/kubernetes/enhancements), service-api's
+provides a process for introducing new functionality or considerable changes to the project. The
+enhancement process will evolve over time as the project matures.
 
-Enhancements may take multiple releases to complete and thus provide
-the basis of a community roadmap.  Enhancements may be filed by anyone in the
-community, but require project maintainers for acceptance to the project.
+Enhancements provides the basis of a community roadmap. Enhancements may be filed by anyone, but
+require approval from a maintainer to accept the enhancement into the project.
 
 ## Quick start
 
-1. Socialize an idea with community members.
-2. Follow the process outlined in the
-[enhancement template](https://github.com/kubernetes-sigs/service-apis/tree/master/enhancements/template.md).
+1. Create an [Issue](https://github.com/kubernetes-sigs/service-apis/issues/new/choose) and select
+"Enhancement Request".
+2. Follow the instructions in the enhancement request template and submit the Issue.
 
 ## What is Considered an Enhancement?
 
@@ -52,13 +51,13 @@ and ask.
 
 ## When to Create a New Enhancement
 
-Create an enhancement once you:
+Create an enhancement once you have:
 
-- have circulated your idea to see if there is interest
-- have done a prototype in your own fork (optionally)
-- have identified community members who agree to work on and maintain the
-enhancement
-  - enhancements may take several releases to complete  
+- circulated your idea to see if there is interest.
+- identified community members who agree to work on and maintain the enhancement.
+  - enhancements may take several releases to complete.
+- a prototype in your own fork (optional)
+
 
 ## Why are Enhancements Tracked
 
