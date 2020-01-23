@@ -11,8 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM debian:buster
-RUN apt-get update
-RUN apt-get install -y python-pip
-RUN pip install mkdocs
-RUN pip install mkdocs-material
+FROM alpine:3.11
+
+RUN apk add -U --no-cache \
+    python3 \
+    bash \
+    diffutils \
+  && pip3 install mkdocs \
+  && pip3 install mkdocs-material
