@@ -42,4 +42,10 @@ For everyone:
 * [Concepts and detailed descriptions](concepts.md)
 * [API specification](spec.md)
 * [Releases](releases.md)
-* [Feedback, use cases, user stories, bug reports](feedback.md)
+* [Enhancement requests](enhancement-requests.md)
+* [Feedback and bug reports](feedback.md)
+
+## Contacts
+
+- Slack: [#sig-network-service-apis](https://kubernetes.slack.com/messages/sig-network-service-apis)
+- [Project Owners](https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS)

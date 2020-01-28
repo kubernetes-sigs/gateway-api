@@ -14,20 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Feedback
+# Feedback and Bug Reports
 
-## Use cases, user stories
-
-We are currently collecting use case and user stories on
-[this shared Google Doc][use-cases-doc] as this is the lowest barrier to entry. When
-things stabilize, we will take the contents of the doc and publish it here as
-individual pages in the repo.
-
-[use-cases-doc]: https://docs.google.com/document/d/1OAzVO0HfmF4qD8AW41_eeUY0KP6xjqghusUVwhp4BNg/edit#
-
-## Bug reports
-
-Bug reports should be filed as [Github Issues][gh-issues] on this repo. Be sure to use the following template:
+Feedback and bug reports should be filed as [Github Issues][gh-issues] on this repo.
+Be sure to use the following template:
 
 ```text
 TODO
