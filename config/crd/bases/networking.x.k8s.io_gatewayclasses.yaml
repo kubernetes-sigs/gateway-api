@@ -17,18 +17,14 @@ spec:
   scope: Cluster
   validation:
     openAPIV3Schema:
-      description: "GatewayClass describes a class of gateways av for defining access
-        to their routed services. GatewayClass allow a \n GatewayClass is a non-namespaced
-        resource."
+      description: "GatewayClass describes a class of Gateways available to the user
+        for creating Gateway resources. \n GatewayClass is a Cluster level resource.
+        \n Support: Core."
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
             of an object. Servers should convert recognized schemas to the latest
             internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-          type: string
-        controller:
-          description: 'Controller is a domain/path that denotes which controller
-            is responsible for this class. Example: "acme.io/gateway-controller".'
           type: string
         kind:
           description: 'Kind is a string value representing the REST resource this
@@ -37,28 +33,97 @@ spec:
           type: string
         metadata:
           type: object
-        parameters:
-          description: Parameters is a controller specific resource containing the
-            configuration parameters corresponding to this class. This is optional
-            if the controllers does not require any additional configuration.
+        spec:
+          description: Spec for this GatewayClass.
           properties:
-            apiGroup:
-              description: APIGroup is the group for the resource being referenced.
-                If APIGroup is not specified, the specified Kind must be in the core
-                API group. For any other third-party types, APIGroup is required.
+            controller:
+              description: "Controller is a domain/path string that indicates the
+                controller that managing Gateways of this class. \n Example: \"acme.io/gateway-controller\".
+                \n This field is not mutable and cannot be empty. \n The format of
+                this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes
+                names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+                \n Support: Core"
               type: string
-            kind:
-              description: Kind is the type of resource being referenced
-              type: string
-            name:
-              description: Name is the name of resource being referenced
-              type: string
+            parameters:
+              description: "ParametersRef is a controller specific resource containing
+                the configuration parameters corresponding to this class. This is
+                optional if the controller does not require any additional configuration.
+                \n Valid types for reference are up to the Controller. Examples include
+                `core.ConfigMap` or a custom resource (CRD). \n Support: Custom"
+              properties:
+                apiVersion:
+                  description: API version of the referent.
+                  type: string
+                fieldPath:
+                  description: 'If referring to a piece of an object instead of an
+                    entire object, this string should contain a valid JSON/Go field
+                    access statement, such as desiredState.manifest.containers[2].
+                    For example, if the object reference is to a container within
+                    a pod, this would take on a value like: "spec.containers{name}"
+                    (where "name" refers to the name of the container that triggered
+                    the event) or if no container name is specified "spec.containers[2]"
+                    (container with index 2 in this pod). This syntax is chosen only
+                    to have some well-defined way of referencing a part of an object.
+                    TODO: this design is not final and this field is subject to change
+                    in the future.'
+                  type: string
+                kind:
+                  description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                  type: string
+                name:
+                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                  type: string
+                namespace:
+                  description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                  type: string
+                resourceVersion:
+                  description: 'Specific resourceVersion to which this reference is
+                    made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                  type: string
+                uid:
+                  description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                  type: string
+              type: object
           required:
-          - kind
-          - name
+          - controller
           type: object
-      required:
-      - controller
+        status:
+          description: Status of the GatewayClass.
+          properties:
+            conditions:
+              description: Conditions is the current status from the controller for
+                this GatewayClass.
+              items:
+                description: "GatewayClassCondition contains the details for the current
+                  condition of this GatewayClass. \n Support: Core, unless otherwise
+                  specified."
+                properties:
+                  lastTransitionTime:
+                    description: LastTransitionTime is the time of the last change
+                      to this condition.
+                    format: date-time
+                    type: string
+                  message:
+                    description: Message is a human readable reason for last transition.
+                    type: string
+                  reason:
+                    description: "Reason is a machine consumable string for the last
+                      transition. It should be a one-word, CamelCase string. Reason
+                      will be defined by the controller. \n Support: Custom; values
+                      will be controller-specific."
+                    type: string
+                  status:
+                    description: Status of this condition.
+                    type: string
+                  type:
+                    description: Type of this condition.
+                    type: string
+                required:
+                - status
+                - type
+                type: object
+              type: array
+          type: object
       type: object
   version: v1alpha1
   versions:
