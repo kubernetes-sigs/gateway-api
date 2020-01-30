@@ -316,6 +316,26 @@
     GatewayClass
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-parameters" class="md-nav__link">
+    GatewayClass parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-status" class="md-nav__link">
+    GatewayClass status
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -543,6 +563,26 @@
     GatewayClass
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-parameters" class="md-nav__link">
+    GatewayClass parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-status" class="md-nav__link">
+    GatewayClass status
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
         
           <li class="md-nav__item">
@@ -699,13 +739,14 @@ Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
 be assumed to be part of this API group.</p>
 </blockquote>
 <p>Our resource model is based around a separation of concerns for a service
-producer. Each resource is intended to be (mostly) independently-evolvable and self-consistent:</p>
+producer. Each resource is intended to be (mostly) independently-evolvable and
+self-consistent:</p>
 <ul>
 <li>A way to group pods (backends) into a set via label selection: Kubernetes
   <code>core.Service</code>, independent of application-level routing.</li>
 <li>A way to describe application-level routing: <code>xxxxRoute</code>, e.g. <code>HTTPRoute</code>,
-  <code>TCPRoute</code> independent of traffic access and consumption (e.g.</li>
-<li>A way to describe traffic access and consumption: <code>Gateway</code> independent of
+  <code>TCPRoute</code> independent of traffic access and consumption.</li>
+<li>A way to describe traffic access and consumption: <code>Gateway</code>, independent of
   implementation.</li>
 <li>A way to describe which implementations of traffic access are available:
   <code>GatewayClass</code>.</li>
@@ -723,11 +764,12 @@ relationships between the different resources:</p>
 are a couple of consequences for complex resource graphs as opposed to single
 resources:</p>
 <ul>
-<li>Error checking of properties spanning multiple resource will be asynchronous.
-  Simple syntax checks will be possible at the single resource level, but cross
-  resource dependencies will need to be handled by the controller.</li>
+<li>Error checking of properties spanning multiple resource will be asynchronous
+    and eventually consistent. Simple syntax checks will be possible at the
+    single resource level, but cross resource dependencies will need to be
+    handled by the controller.</li>
 <li>Controllers will need to handle broken links between resources and/or
-  mismatched configuration.</li>
+    mismatched configuration.</li>
 </ul>
 <h4 id="conflicts">Conflicts</h4>
 <p>Separation and delegation of responsibility among independent actors (e.g
@@ -741,56 +783,124 @@ handling this:</p>
 <h4 id="extensibility">Extensibility</h4>
 <p>TODO</p>
 <h3 id="gatewayclass">GatewayClass</h3>
-<p><code>GatewayClass</code> is cluster-scoped resource defined by the infrastructure ops.
-This resource represents a category of Gateways that can be instantiated.</p>
-<pre><code class="yaml">apiVersion: networking.x-k8s.io/v1alpha1
+<p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/api/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
+defined by the infrastructure provider. This resource represents a class of
+Gateways that can be instantiated.</p>
+<blockquote>
+<p>Note: this serves the same function as the <a href="https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingressclass-resource"><code>networking.IngressClass</code> resource</a>.</p>
+</blockquote>
+<pre><code class="yaml">kind: GatewayClass
+metadata:
+  name: cluster-gateway
+spec:
+  controller: &quot;acme.io/gateway-controller&quot;
+</code></pre>
+
+<p>We expect that one or more <code>GatewayClasses</code> will be created by the
+infrastructure provider for the user. It allows decoupling of which mechanism
+(e.g. controller) implements the <code>Gateways</code> from the user. For instance, an
+infrastructure provider may create two <code>GatewayClasses</code> named <code>internet</code> and
+<code>private</code> to reflect <code>Gateways</code> that define Internet-facing vs private, internal
+applications.</p>
+<pre><code class="yaml">kind: GatewayClass
+metadata:
+  name: internet
+  ...
+---
 kind: GatewayClass
 metadata:
-  name: from-internet
-controller:                          # links to a custom resource
-  apiGroup: networking.acme.io       # that implements this class. 
-  kind: cloud-lb
-  name: from-internet
+  name: private
+  ...
 </code></pre>
 
-<p>A sample controller file:</p>
-<pre><code class="yaml">apiVersion: networking.acme.io/v1alpha1
-kind: CloudLB
+<p>The user of the classes will not need to know <em>how</em> <code>internet</code> and <code>private</code> are
+implemented. Instead, the user will only need to understand the resulting
+properties of the class that the <code>Gateway</code> was created with.</p>
+<h4 id="gatewayclass-parameters">GatewayClass parameters</h4>
+<p>Providers of the <code>Gateway API</code> may need to pass parameters to their controller
+as part of the class definition. This is done using the
+<code>GatewayClass.spec.parametersRef</code> field:</p>
+<pre><code class="yaml"># GatewayClass for Gateways that define Internet-facing applications.
+kind: GatewayClass
 metadata:
-  name: from-internet
-networkTier: auto
-ipAllocation: auto
+  name: internet
+spec:
+  controller: &quot;acme.io/gateway-controller&quot;
+  parametersRef:
+    apiVersion: core/v1
+    kind: ConfigMap
+    namespace: acme-system
+    name: internet-gateway
+---
+kind: ConfigMap
+metadata:
+  name: internet-gateway
+  namespace: acme-system
+data:
+  ip-address-pool: internet-vips
+  ...
 </code></pre>
 
-<p>We expect that one or more GatewayClasses will be created by the infrastructure
-provider for the user as part of their cloud infrastructure. If the cluster
-operator wishes to customize their <code>GatewayClasses</code>, they are free to do so,
-interacting with the custom resource parameters. Example parameters
-<code>GatewayClass.controller</code> resource will include cluster-level defaults and
-constraints.</p>
-<blockquote>
-<p>The community may converge around a common set of GatewayClass names with
-well-known meanings (e.g. <code>internet</code>, <code>private</code>) to ease interoperability
-between platforms.</p>
-</blockquote>
+<p>The type of object referenced by <code>GatewayClass.spec.parametersRef</code> will depend
+on the provider itself. A <code>core.ConfigMap</code> is used in the example above, but
+controllers may opt to use a <code>CustomResource</code> for better schema validation.</p>
+<h4 id="gatewayclass-status">GatewayClass status</h4>
+<p><code>GatewayClasses</code> MUST be validated by the provider to ensure that the configured
+parameters are valid. The validity of the class will be signaled to the user via
+<code>GatewayClass.status</code>:</p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: Unknown
+    ...
+</code></pre>
+
+<p>A new <code>GatewayClass</code> will start with the <code>InvalidParameters</code> condition set to
+<code>Unknown</code>. At this point the controller has not seen the configuration. Once the
+controller has processed the configuration, the condition will be set to
+<code>False</code>:</p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: False
+    ...
+</code></pre>
+
+<p>If there is an error in the <code>GatewayClass.spec</code>, the conditions will be
+non-empty and contain information about the error. </p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: True
+    Reason: BadFooBar
+    Message: &quot;foobar&quot; is an FooBar.
+</code></pre>
+
 <h3 id="gateway">Gateway</h3>
-<p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of LB
+<p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of 
 infrastructure. When a user creates a <code>Gateway</code>, a load balancer is provisioned
 (see below for details) by the <code>GatewayClass</code> controller. <code>Gateway</code> is the
 resource that triggers actions in this API. Other resources in this API are
 configuration snippets until a Gateway has been created to link the resources
 together.</p>
-<p>The Gateway spec defines the following:</p>
+<p>The <code>Gateway</code> spec defines the following:</p>
 <ul>
-<li>GatewayClass used to instantiate this Gateway.</li>
+<li><code>GatewayClass</code> used to instantiate this Gateway.</li>
 <li>Listener bindings, which define addresses and ports, protocol termination,
-  TLS-settings. Listener configuration requested by a Gateway definition can be
-  incompatible with a given GatewayClass (e.g. port/protocol combination is not
-  supported)</li>
+    TLS-settings. Listener configuration requested by a Gateway definition can
+    be incompatible with a given <code>GatewayClass</code> (e.g. port/protocol combination
+    is not supported)</li>
 </ul>
-<p>. In this case, the Gateway will be in an error state, signalled by the status field.
-Routes, which point to a set of protocol-specific routing served by the Gateway.
-OPTIONAL: A Gateway can point directly to Kubernetes Service if no advanced routing is required.</p>
+<p>In this case, the Gateway will be in an error state, signalled by the status
+field.  Routes, which point to a set of protocol-specific routing served by the
+Gateway.  OPTIONAL: A Gateway can point directly to Kubernetes Service if no
+advanced routing is required.</p>
 <h4 id="deployment-models">Deployment models</h4>
 <p>Depending on the <code>GatewayClass</code>, the creation of the <code>Gateway</code> could do any of
 the following actions:</p>
