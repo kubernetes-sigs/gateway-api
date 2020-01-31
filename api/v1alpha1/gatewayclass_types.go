@@ -27,22 +27,103 @@ import (
 // +k8s:openapi-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
-// GatewayClass describes a class of gateways av
-// for defining access to their routed services. GatewayClass allow a
+// GatewayClass describes a class of Gateways available to the user
+// for creating Gateway resources.
 //
-// GatewayClass is a non-namespaced resource.
+// GatewayClass is a Cluster level resource.
+//
+// Support: Core.
 type GatewayClass struct {
 	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
-	// Controller is a domain/path that denotes which controller is responsible
-	// for this class. Example: "acme.io/gateway-controller".
-	Controller string `json:"controller" protobuf:"bytes,2,opt,name=controller"`
-	// Parameters is a controller specific resource containing the
-	// configuration parameters corresponding to this class. This is optional
-	// if the controllers does not require any additional configuration.
+	// Spec for this GatewayClass.
+	Spec GatewayClassSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	// Status of the GatewayClass.
+	Status GatewayClassStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+}
+
+// GatewayClassSpec reflects the configuration of a class of Gateways.
+type GatewayClassSpec struct {
+	// Controller is a domain/path string that indicates the
+	// controller that managing Gateways of this class.
+	//
+	// Example: "acme.io/gateway-controller".
+	//
+	// This field is not mutable and cannot be empty.
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN
+	// and PATH are valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// Support: Core
+	//
+	// +required
+	Controller string `json:"controller" protobuf:"bytes,1,opt,name=controller"`
+
+	// ParametersRef is a controller specific resource containing
+	// the configuration parameters corresponding to this
+	// class. This is optional if the controller does not require
+	// any additional configuration.
+	//
+	// Valid types for reference are up to the
+	// Controller. Examples include `core.ConfigMap` or a custom
+	// resource (CRD).
+	//
+	// Support: Custom
+	//
 	// +optional
-	Parameters *core.TypedLocalObjectReference `json:"parameters,omitempty" protobuf:"bytes,3,opt,name=parameters"`
+	ParametersRef *core.ObjectReference `json:"parameters,omitempty" protobuf:"bytes,2,opt,name=parametersRef"`
+}
+
+// GatewayClassConditionType is the type of status conditions.
+type GatewayClassConditionType string
+
+const (
+	// GatewayClassConditionStatusInvalidParameters indicates the
+	// validity of the Parameters set for a given controller. This
+	// will initially start off as "Unknown".
+	GatewayClassConditionStatusInvalidParameters GatewayClassConditionType = "InvalidParameters"
+)
+
+// GatewayClassConditionStatus is the status for a condition.
+type GatewayClassConditionStatus = core.ConditionStatus
+
+// GatewayClassStatus is the current status for the GatewayClass.
+//
+// +kubebuilder:subresource:status
+type GatewayClassStatus struct {
+	// Conditions is the current status from the controller for
+	// this GatewayClass.
+	Conditions []GatewayClassCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
+}
+
+// GatewayClassCondition contains the details for the current
+// condition of this GatewayClass.
+//
+// Support: Core, unless otherwise specified.
+type GatewayClassCondition struct {
+	// Type of this condition.
+	Type GatewayClassConditionType `json:"type" protobuf:"bytes,1,opt,name=type"`
+	// Status of this condition.
+	Status GatewayClassConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
+
+	// Reason is a machine consumable string for the last
+	// transition. It should be a one-word, CamelCase
+	// string. Reason will be defined by the controller.
+	//
+	// Support: Custom; values will be controller-specific.
+	//
+	// +optional
+	Reason *string `json:"reason,omitempty" protobuf:"bytes,3,opt,name=reason"`
+	// Message is a human readable reason for last transition.
+	//
+	// +optional
+	Message *string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
+	// LastTransitionTime is the time of the last change to this condition.
+	//
+	// +optional
+	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
 // +kubebuilder:object:root=true
@@ -50,8 +131,8 @@ type GatewayClass struct {
 // GatewayClassList contains a list of GatewayClass
 type GatewayClassList struct {
 	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []GatewayClass `json:"items"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	Items           []GatewayClass `json:"items" protobuf:"bytes,2,rep,name=items"`
 }
 
 func init() {
