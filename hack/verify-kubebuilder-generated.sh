@@ -22,43 +22,49 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
 
-GENERATED_FILE_NAME="zz_generated"
+GENERATED_FILE_NAME="zz_generated.deepcopy.go"
 
 find_non_generated_files() {
+    # ignoring tools since it's an invalid go package
     find . -not \( \
         \( \
         -wholename './.git' \
         -o -wholename '*/vendor/*' \
-        -o -wholename "**/${GENERATED_FILE_NAME}.*.go" \
+        -o -wholename './tools' \
+        -o -wholename "**/${GENERATED_FILE_NAME}" \
         \) -prune \
         \) -name '*.go'
 }
 
+generate() {
+    # taken from the kubebuilder.mk generate rule
+    GOFLAGS=-mod=vendor go run sigs.k8s.io/controller-tools/cmd/controller-gen object:headerFile=./hack/boilerplate.go.txt paths="$1" output:stdout
+}
+
+sha() {
+    sha256sum "$1" | cut -d ' ' -f 1
+}
+
 # get a list of all stale generated files
-stale_files=
+stale_packages=()
 for directory in $(find_non_generated_files | xargs -L 1 dirname | uniq); do
-    # filter out go directorys without generated files
-    if ! compgen -G "${directory}/${GENERATED_FILE_NAME}.*.go" >/dev/null; then
+    # filter out go directories without generated files
+    if (! compgen -G "${directory}/${GENERATED_FILE_NAME}" >/dev/null) && generate "$directory"; then
         continue
     fi
 
-    # latest modified date of all input files
-    latest_modified_date=$(find $directory -type f -not -name '*zz_generated*' | xargs -L 1 stat -c '%Y' | sort -r | head -1)
+    generated_file_output=$(sha <(generate "$directory"))
+    current_generated_file=$(sha "${directory}/${GENERATED_FILE_NAME}")
 
-    for generated_file in $(find $directory -type f -name '*zz_generated*'); do
-        # modified date of the generated file
-        generated_file_modified_date=$(stat -c '%Y' $generated_file)
-
-        if [ "$generated_file_modified_date" -le "$latest_modified_date" ]; then
-            # generated file was made before the latest change
-            stale_files+=($generated_file)
-        fi
-    done
+    if [ "$generated_file_output" != "$current_generated_file" ]; then
+        stale_packages+=("$directory")
+    fi
 
 done
 
-if [[ -n "${stale_files}" ]]; then
-    echo "!!! following generated files are stale (run 'make -f kubebuilder.mk generate'): "
-    echo "${stale_files}"
+# check if there exists any stale packages
+if [[ -n "${stale_packages:+1}" ]]; then
+    echo "!!! following packages have stale generated files (run 'make -f kubebuilder.mk generate' to fix): "
+    echo "${stale_packages}"
     exit 1
 fi
