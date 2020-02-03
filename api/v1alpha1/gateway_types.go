@@ -70,7 +70,11 @@ const (
 
 // Listener defines a
 type Listener struct {
-	// Address bound on the listener. This is optional and behavior
+	// Name can be used to tie this Listener to a ListenerStatus entry with the
+	// same name. Each listener must have a unique name within a Gateway. This
+	// must be a valid DNS_LABEL.
+	Name string `json:"string"`
+	// Address requested for this listener. This is optional and behavior
 	// can depend on GatewayClass. If a value is set in the spec and
 	// the request address is invalid, the GatewayClass MUST indicate
 	// this in the associated entry in GatewayStatus.Listeners.
@@ -78,27 +82,27 @@ type Listener struct {
 	// Support:
 	//
 	// +optional
-	Address *ListenerAddress `json:"address"`
+	Address *ListenerAddress `json:"address,omitempty"`
 	// Port is a list of ports associated with the Address.
 	//
 	// Support:
 	// +optional
-	Port *int32 `json:"port"`
+	Port *int32 `json:"port,omitempty"`
 	// Protocol to use.
 	//
 	// Support:
 	// +optional
-	Protocol *string `json:"protocol"`
+	Protocol *string `json:"protocol,omitempty"`
 	// TLS configuraton for the Listener.
 	//
 	// Support:
 	// +optional
-	TLS *ListenerTLS `json:"tls"`
+	TLS *ListenerTLS `json:"tls,omitempty"`
 	// Extension for this Listener.
 	//
 	// Support: custom.
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	Extension *core.TypedLocalObjectReference `json:"extension,omitempty"`
 }
 
 const (
@@ -113,8 +117,7 @@ const (
 	NamedAddress = "NamedAddress"
 )
 
-// ListenerAddress describes an address bound by the
-// Listener.
+// ListenerAddress describes an address for the Listener.
 type ListenerAddress struct {
 	// Type of the Address. This is one of the *AddressType constants.
 	//
@@ -177,58 +180,102 @@ type ListenerTLS struct {
 	Options map[string]string `json:"options"`
 }
 
-// GatewayStatus defines the observed state of Gateway
+// GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
-	// TODO overall status
-
-	// Listeners is the status for each listener block in the
-	// Spec. The status for a given block will match the order as
-	// declared in the Spec, e.g. the status for Spec.Listeners[3]
-	// will be in Status.Listeners[3].
+	// Conditions describe the current conditions of the Gateway.
+	Conditions []GatewayCondition `json:"conditions"`
+	// Listeners provide status for each listener defined in the Spec. The name
+	// in ListenerStatus refers to the corresponding Listener of the same name.
 	Listeners []ListenerStatus `json:"listeners"`
-	// Routes is the status for each attached route to the
-	// Gateway. The status for a given route will match the orer as
-	// declared in the Spec, e.g. the status for Spec.Routes[3] will
-	// be in Status.Routes[3].
-	Routes []GatewayRouteStatus `json:"routes"`
+}
+
+// GatewayConditionType is a type of condition associated with a Gateway.
+type GatewayConditionType string
+
+const (
+	// ConditionNoSuchGatewayClass indicates that the specified GatewayClass
+	// does not exist.
+	ConditionNoSuchGatewayClass GatewayConditionType = "NoSuchGatewayClass"
+	// ConditionGatewayNotScheduled indicates that the Gateway has not been
+	// scheduled.
+	ConditionGatewayNotScheduled GatewayConditionType = "GatewayNotScheduled"
+	// ConditionListenersNotReady indicates that at least one of the specified
+	// listeners is not ready. If this condition has a status of True, a more
+	// detailed ListenerCondition should be present in the corresponding
+	// ListenerStatus.
+	ConditionListenersNotReady GatewayConditionType = "ListenersNotReady"
+	// ConditionInvalidListeners indicates that at least one of the specified
+	// listeners is invalid. If this condition has a status of True, a more
+	// detailed ListenerCondition should be present in the corresponding
+	// ListenerStatus.
+	ConditionInvalidListeners GatewayConditionType = "InvalidListeners"
+	// ConditionRoutesNotReady indicates that at least one of the specified
+	// routes is not ready.
+	ConditionRoutesNotReady GatewayConditionType = "RoutesNotReady"
+	// ConditionInvalidRoutes indicates that at least one of the specified
+	// routes is invalid.
+	ConditionInvalidRoutes GatewayConditionType = "InvalidRoutes"
+)
+
+// GatewayCondition is an error status for a given route.
+type GatewayCondition struct {
+	// Type indicates the type of condition.
+	Type GatewayConditionType `json:"type"`
+	// Status describes the current state of this condition. Can be "True",
+	// "False", or "Unknown".
+	Status core.ConditionStatus `json:"status"`
+	// Message is a human-understandable message describing the condition.
+	// +optional
+	Message string `json:"message,omitempty"`
+	// Reason indicates why the condition is in this state.
+	// +optional
+	Reason string `json:"reason,omitempty"`
+	// LastTransitionTime indicates the last time this condition changed.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // ListenerStatus is the status associated with each listener block.
 type ListenerStatus struct {
-	// Errors is a list of reasons why a given Listener Spec is
-	// not valid. Errors will be empty if the Spec is valid.
-	Errors []ListenerError `json:"errors"`
-
-	//
-	Address string `json:"address"`
+	// Name is the name of the listener this status refers to.
+	Name string `json:"name"`
+	// Address bound on this listener.
+	Address *ListenerAddress `json:"address"`
+	// Conditions describe the current condition of this listener.
+	Conditions []ListenerCondition `json:"conditions"`
 }
 
-// ListenerErrorReason is the type for errors associated with the
-// listener.
-type ListenerErrorReason string
+// ListenerConditionType is a type of condition associated with the listener.
+type ListenerConditionType string
 
 const (
-	// ErrListenerInvalidSpec is a generic error that is a
-	// catch all for unsupported configurations that do not match a
-	// more specific error. Implementors should try to use more
-	// specific errors instead of this one to give users and
-	// automation a more information.
-	ErrListenerInvalidSpec ListenerErrorReason = "InvalidSpec"
-	// ErrListenerBadAddress indicates the Address
-	ErrListenerBadAddress ListenerErrorReason = "InvalidAddress"
+	// ConditionInvalidListener is a generic condition that is a catch all for
+	// unsupported configurations that do not match a more specific condition.
+	// Implementors should try to use a more specific condition instead of this
+	// one to give users and automation more information.
+	ConditionInvalidListener ListenerConditionType = "InvalidListener"
+	// ConditionListenerNotReady indicates the listener is not ready.
+	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
+	// ConditionInvalidAddress indicates the Address is invalid.
+	ConditionInvalidAddress ListenerConditionType = "InvalidAddress"
 )
 
-// ListenerError is an error status for a given ListenerSpec.
-type ListenerError struct {
-	// Reason is a automation friendly reason code for the error.
-	Reason ListenerErrorReason `json:"reason"`
-	// Message is a human-understandable error message.
-	Message string `json:"message"`
-}
-
-// GatewayRouteStatus is the status associated with a given (Gateway,
-// Route) pair.
-type GatewayRouteStatus struct {
+// ListenerCondition is an error status for a given listener.
+type ListenerCondition struct {
+	// Type indicates the type of condition.
+	Type ListenerConditionType `json:"type"`
+	// Status describes the current state of this condition. Can be "True",
+	// "False", or "Unknown".
+	Status core.ConditionStatus `json:"status"`
+	// Message is a human-understandable message describing the condition.
+	// +optional
+	Message string `json:"message,omitempty"`
+	// Reason indicates why the condition is in this state.
+	// +optional
+	Reason string `json:"reason,omitempty"`
+	// LastTransitionTime indicates the last time this condition changed.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 func init() {
