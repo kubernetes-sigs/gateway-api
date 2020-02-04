@@ -180,7 +180,12 @@ configuration. For example, two application teams may inadvertently submit
 configuration for the same HTTP path. There are several different strategies for
 handling this:
 
-* TODO
+* A controller may detect this situation during reconciliation and choose to honor
+  one resource or other, perhaps based on a timestamp (e.g. first write wins).
+  Resource `status` fields would reflect the result.
+* A [validating admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
+  might maintain a global view of all configuration and reject changes that would cause a conflict with existing configuration.
+* TODO: others?
 
 ### Extensibility
 
