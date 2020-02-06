@@ -81,6 +81,28 @@ relationships between the different resources:
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
 ![schema](schema-uml.svg)
 
+## Request flow
+
+The typical flow of an ingress request for service-api's is:
+
+ 1. A client makes a request to an FQDN (i.e. foo.example.com).
+ 2. The FQDN gets resolved to `gateway.status.listeners[x].address`.
+ 3. The request is received by the Gateway implementation (load-balancer, reverse proxy, etc.) on
+ `gateway.status.listeners[x].address` and `gateway.spec.listeners[x].port`.
+ 4. If the request uses TLS, then `gateway.spec.listeners[x].tls` and SNI (for hostname matching) is used to
+ authenticate the request. __Note:__ The details for modeling a "virtual host" is still
+ [under review](https://github.com/kubernetes-sigs/service-apis/issues/49). Therefore, how TLS is configured may change
+ in the future..
+ 5. If authentication passes, an `HTTPRoute` is selected based on the request’s host header (i.e. FQDN in step 1). An
+ `HTTPRoute` is selected based on the request’s host header matching `httpRoute.spec.hosts[x].hostname`.
+ __Note:__ Whether `hosts` should be singular is still [under review](https://github.com/kubernetes-sigs/service-apis/pull/43).
+ 6. The Gateway implementation performs filtering (optional) and forwarding based on
+ `httpRoute.spec.hosts[x].rules[x].match` . The match can be based on the request path and/or header.
+ 7. Lastly, the request is forwarded to an object such as a Service within the cluster.
+
+There are kinds of "gateways" that can be modeled which don't involve proxying (e.g. smart client-side stubs used in
+many rpc systems), so this flow is an example, but not required.
+
 ### Design considerations
 
 There are some general design guidelines used throughout this API.
