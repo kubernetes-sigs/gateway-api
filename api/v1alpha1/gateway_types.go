@@ -70,10 +70,24 @@ const (
 
 // Listener defines a
 type Listener struct {
-	// Name can be used to tie this Listener to a ListenerStatus entry with the
-	// same name. Each listener must have a unique name within a Gateway. This
-	// must be a valid DNS_LABEL.
-	Name string `json:"string"`
+	// Name is the listener's name and should be specified as an
+	// RFC 1035 DNS_LABEL [1]:
+	//
+	// [1] https://tools.ietf.org/html/rfc1035
+	//
+	// Each listener of a Gateway must have a unique name. Name is used
+	// for the following features:
+	//
+	// * Associating a listener in ListenerStatus.
+	//
+	// * Generating a wildcard certificate for the subdomain of Name when
+	//   the TLS configuration of an HTTPS listener does not include a
+	//   certificate.
+	//
+	// Support: Core
+	//
+	// +required
+	Name string `json:"name"`
 	// Address requested for this listener. This is optional and behavior
 	// can depend on GatewayClass. If a value is set in the spec and
 	// the request address is invalid, the GatewayClass MUST indicate
@@ -93,9 +107,11 @@ type Listener struct {
 	// Support:
 	// +optional
 	Protocol *string `json:"protocol,omitempty"`
-	// TLS configuraton for the Listener.
+	// TLS is the TLS configuration for the Listener. If unspecified,
+	// the listener will not support TLS connections.
 	//
-	// Support:
+	// Support: Core
+	//
 	// +optional
 	TLS *ListenerTLS `json:"tls,omitempty"`
 	// Extension for this Listener.
@@ -149,13 +165,20 @@ const (
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type ListenerTLS struct {
-	// Certificates is a list of certificates containing resources
-	// that are bound to the listener.
+	// Certificates is a reference to one or more Kubernetes objects each containing
+	// an identity certificate that is bound to the listener. The hostname in a TLS
+	// SNI client hello message is used for certificate matching and route hostname
+	// selection.
 	//
-	// If apiGroup and kind are empty, will default to Kubernetes Secrets resources.
+	// If unspecified, a wildcard certificate is generated for the subdomain of the
+	// listener's name.
+	//
+	// If apiGroup and kind are empty, defaults to a Kubernetes Secret resource.
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
+	//
+	// +optional
 	Certificates []core.TypedLocalObjectReference `json:"certificates,omitempty"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
