@@ -180,7 +180,6 @@ type HTTPHeaderFilter struct {
 type HTTPRouteAction struct {
 	// ForwardTo sends requests to the referenced object.
 	ForwardTo *core.TypedLocalObjectReference `json:"forwardTo"`
-
 	// Extension is an optional, implementation-specific extension
 	// to the "action" behavior.
 	//

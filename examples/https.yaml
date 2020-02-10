@@ -1,0 +1,83 @@
+kind: GatewayClass
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+controller: acme.io/gateway-controller
+parameters:
+  apiGroup: networking.acme.io
+  kind: AcmeLBConfig
+  name: acme-lb-config
+---
+kind: Gateway
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  class: acme-lb
+  listeners:
+    - name: my-https-listener
+      protocol: HTTPS
+      port: 443
+      tls:
+        listenerCertificates:
+          - name: my-listener-https-cert
+            namespace: default
+            kind: Secret
+        minimumVersion: TLS1_2
+  routes:
+  - route:
+      - routeRef:
+          - name: https-app-1
+            namespace: default
+            kind: HTTPRoute
+        tls:
+          caCertificates:
+            - name: my-https-svc1-ca-cert
+              namespace: default
+              kind: Secret
+          minimumVersion: TLS1_3
+      - routeRef:
+          - name: https-app-2
+            namespace: default
+            kind: HTTPRoute
+        tls:
+          caCertificates:
+            - name: my-https-svc2-ca-cert
+              namespace: default
+              kind: Secret
+          minimumVersion: TLS1_1
+---
+kind: HTTPRoute
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: https-app-1
+  namespace: default
+spec:
+  hosts:
+    - hostnames:
+        - "foo.com"
+      rules:
+        - match:
+            path: /bar
+          action:
+            forwardTo:
+              kind: Service
+              name: my-https-service1
+---
+kind: HTTPRoute
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: https-app-2
+  namespace: default
+spec:
+  hosts:
+    - hostnames:
+        - "bar.com"
+      rules:
+        - match:
+            path: /foo
+          action:
+            forwardTo:
+              kind: Service
+              name: my-https-service2

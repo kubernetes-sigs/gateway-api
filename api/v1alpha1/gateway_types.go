@@ -56,9 +56,12 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
 	Listeners []Listener `json:"listeners"`
-	// Routes associated with this Gateway. Routes define
-	// protocol-specific routing to backends (e.g. Services).
-	Routes []core.TypedLocalObjectReference `json:"routes"`
+	// Routes defines routes to associate with the Gateway.
+	//
+	// Support: Core
+	//
+	// +optional
+	Routes []Route `json:"routes,omitempty"`
 }
 
 const (
@@ -67,6 +70,25 @@ const (
 	// HTTPSProcotol constant.
 	HTTPSProcotol = "HTTPS"
 )
+
+// Route defines the schema for a route.
+type Route struct {
+	// RouteRef is a reference to an object to associate with the Gateway.
+	// RouteRef defines protocol-specific routing to back-ends (e.g. Services).
+	//
+	// If unspecified, no routes will be associated to the Gateway.
+	//
+	// Support: Core
+	//
+	// +optional
+	RouteRef core.ObjectReference `json:"routeRef"`
+	// TLS is the configuration used for establishing a TLS connection.
+	//
+	// Support: Core
+	//
+	// +optional
+	TLS *TLSConfig `json:"tls,omitempty"`
+}
 
 // Listener defines a
 type Listener struct {
@@ -87,7 +109,7 @@ type Listener struct {
 	// the request address is invalid, the GatewayClass MUST indicate
 	// this in the associated entry in GatewayStatus.Listeners.
 	//
-	// Support:
+	// Support: Core
 	//
 	// +optional
 	Address *ListenerAddress `json:"address,omitempty"`
@@ -107,7 +129,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *ListenerTLS `json:"tls,omitempty"`
+	TLS *TLSConfig `json:"tls,omitempty"`
 	// Extension for this Listener.
 	//
 	// Support: custom.
@@ -149,7 +171,7 @@ const (
 	TLS1_3 = "TLS1_3"
 )
 
-// ListenerTLS describes the TLS configuration for a given port.
+// TLSConfig describes configuration for establishing a TLS connection.
 //
 // References
 // - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
@@ -158,20 +180,41 @@ const (
 // - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-type ListenerTLS struct {
+type TLSConfig struct {
 	// Certificates is a reference to one or more Kubernetes objects each containing
-	// an identity certificate that is bound to the listener. The hostname in a TLS
+	// an identity certificate that is bound to a listener. The hostname in a TLS
 	// SNI client hello message is used for certificate matching and route hostname
-	// selection. The SNI server_name must match a route hostname for the Gateway to
-	// route the TLS request.
+	// selection.
 	//
 	// If apiGroup and kind are empty, will default to Kubernetes Secrets resources.
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
-	// +required
-	Certificates []core.TypedLocalObjectReference `json:"certificates"`
+	// +optional
+	ListenerCertificates []core.TypedLocalObjectReference `json:"listenerCertificates,omitempty"`
+	// CACertificates is a reference to one or more Kubernetes objects
+	// each containing a CA certificate used by the TLS client for
+	// establishing a connection with a server.
+	//
+	// Here is a ConfigMap example (in yaml):
+	//
+	// apiVersion: v1
+	// kind: ConfigMap
+	// metadata:
+	//  name: my-dest-svc-ca
+	//  namespace: my-dest-svc-namespace
+	//  data:
+	//    ca-bundle.crt: |
+	//      -----BEGIN CERTIFICATE-----
+	//      Destination Service CA Certificate Bundle.
+	//      -----END CERTIFICATE-----
+	//
+	// Support: Core (Kubernetes ConfigMap)
+	// Support: Implementation-specific (For other resource types)
+	//
+	// +optional
+	CACertificates []core.TypedLocalObjectReference `json:"caCertificates,omitempty"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without
@@ -182,7 +225,15 @@ type ListenerTLS struct {
 	// values.
 	//
 	// +optional
-	MinimumVersion *string `json:"minimumVersion"`
+	MinimumVersion *string `json:"minimumVersion,omitempty"`
+	// TLSTermination defines how to terminate TLS connections.
+	//
+	// If unspecified, TLS termination type "Edge" will be used.
+	//
+	// Support: Core
+	//
+	// +optional
+	TLSTermination TLSTerminationType `json:"tlsTermination,omitempty"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//
@@ -192,8 +243,25 @@ type ListenerTLS struct {
 	// construct.
 	//
 	// Support: Implementation-specific.
-	Options map[string]string `json:"options"`
+	//
+	// +optional
+	Options map[string]string `json:"options,omitempty"`
 }
+
+// TLSTerminationType specifies where TLS connections will terminate.
+type TLSTerminationType string
+
+const (
+	// TLSTerminationEdge terminates the TLS connection at the gateway.
+	TLSTerminationEdge TLSTerminationType = "Edge"
+
+	// TLSTerminationPassthrough terminates the TLS connection at the
+	// destination service. The destination service is responsible for
+	// decrypting data from the connection. The Gateway listener must be
+	// configured for the HTTPS protocol. SNI is used by the Gateway to
+	// perform route selection.
+	TLSTerminationPassthrough TLSTerminationType = "Passthrough"
+)
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

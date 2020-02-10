@@ -56,7 +56,7 @@ spec:
                       and behavior can depend on GatewayClass. If a value is set in
                       the spec and the request address is invalid, the GatewayClass
                       MUST indicate this in the associated entry in GatewayStatus.Listeners.
-                      \n Support:"
+                      \n Support: Core"
                     properties:
                       type:
                         description: "Type of the Address. This is one of the *AddressType
@@ -110,16 +110,48 @@ spec:
                       unspecified, the listener will not support TLS connections.
                       \n Support: Core"
                     properties:
-                      certificates:
+                      caCertificates:
+                        description: "CACertificates is a reference to one or more
+                          Kubernetes objects each containing a CA certificate used
+                          by the TLS client for establishing a connection with a server.
+                          \n Here is a ConfigMap example (in yaml): \n apiVersion:
+                          v1 kind: ConfigMap metadata:  name: my-dest-svc-ca  namespace:
+                          my-dest-svc-namespace  data:    ca-bundle.crt: |      -----BEGIN
+                          CERTIFICATE-----      Destination Service CA Certificate
+                          Bundle.      -----END CERTIFICATE----- \n Support: Core
+                          (Kubernetes ConfigMap) Support: Implementation-specific
+                          (For other resource types)"
+                        items:
+                          description: TypedLocalObjectReference contains enough information
+                            to let you locate the typed referenced object inside the
+                            same namespace.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        type: array
+                      listenerCertificates:
                         description: "Certificates is a reference to one or more Kubernetes
                           objects each containing an identity certificate that is
-                          bound to the listener. The hostname in a TLS SNI client
-                          hello message is used for certificate matching and route
-                          hostname selection. The SNI server_name must match a route
-                          hostname for the Gateway to route the TLS request. \n If
-                          apiGroup and kind are empty, will default to Kubernetes
-                          Secrets resources. \n Support: Core (Kubernetes Secrets)
-                          Support: Implementation-specific (Other resource types)"
+                          bound to a listener. The hostname in a TLS SNI client hello
+                          message is used for certificate matching and route hostname
+                          selection. \n If apiGroup and kind are empty, will default
+                          to Kubernetes Secrets resources. \n Support: Core (Kubernetes
+                          Secrets) Support: Implementation-specific (Other resource
+                          types)"
                         items:
                           description: TypedLocalObjectReference contains enough information
                             to let you locate the typed referenced object inside the
@@ -161,42 +193,159 @@ spec:
                           sense to loft that as a core API construct. \n Support:
                           Implementation-specific."
                         type: object
-                    required:
-                    - certificates
-                    - options
+                      tlsTermination:
+                        description: "TLSTermination defines how to terminate TLS
+                          connections. \n If unspecified, TLS termination type \"Edge\"
+                          will be used. \n Support: Core"
+                        type: string
                     type: object
                 required:
                 - name
                 type: object
               type: array
             routes:
-              description: Routes associated with this Gateway. Routes define protocol-specific
-                routing to backends (e.g. Services).
+              description: "Routes defines routes to associate with the Gateway. \n
+                Support: Core"
               items:
-                description: TypedLocalObjectReference contains enough information
-                  to let you locate the typed referenced object inside the same namespace.
+                description: Route defines the schema for a route.
                 properties:
-                  apiGroup:
-                    description: APIGroup is the group for the resource being referenced.
-                      If APIGroup is not specified, the specified Kind must be in
-                      the core API group. For any other third-party types, APIGroup
-                      is required.
-                    type: string
-                  kind:
-                    description: Kind is the type of resource being referenced
-                    type: string
-                  name:
-                    description: Name is the name of resource being referenced
-                    type: string
-                required:
-                - kind
-                - name
+                  routeRef:
+                    description: "RouteRef is a reference to an object to associate
+                      with the Gateway. RouteRef defines protocol-specific routing
+                      to back-ends (e.g. Services). \n If unspecified, no routes will
+                      be associated to the Gateway. \n Support: Core"
+                    properties:
+                      apiVersion:
+                        description: API version of the referent.
+                        type: string
+                      fieldPath:
+                        description: 'If referring to a piece of an object instead
+                          of an entire object, this string should contain a valid
+                          JSON/Go field access statement, such as desiredState.manifest.containers[2].
+                          For example, if the object reference is to a container within
+                          a pod, this would take on a value like: "spec.containers{name}"
+                          (where "name" refers to the name of the container that triggered
+                          the event) or if no container name is specified "spec.containers[2]"
+                          (container with index 2 in this pod). This syntax is chosen
+                          only to have some well-defined way of referencing a part
+                          of an object. TODO: this design is not final and this field
+                          is subject to change in the future.'
+                        type: string
+                      kind:
+                        description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                        type: string
+                      name:
+                        description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                        type: string
+                      namespace:
+                        description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                        type: string
+                      resourceVersion:
+                        description: 'Specific resourceVersion to which this reference
+                          is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                        type: string
+                      uid:
+                        description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                        type: string
+                    type: object
+                  tls:
+                    description: "TLS is the configuration used for establishing a
+                      TLS connection. \n Support: extended"
+                    properties:
+                      caCertificates:
+                        description: "CACertificates is a reference to one or more
+                          Kubernetes objects each containing a CA certificate used
+                          by the TLS client for establishing a connection with a server.
+                          \n Here is a ConfigMap example (in yaml): \n apiVersion:
+                          v1 kind: ConfigMap metadata:  name: my-dest-svc-ca  namespace:
+                          my-dest-svc-namespace  data:    ca-bundle.crt: |      -----BEGIN
+                          CERTIFICATE-----      Destination Service CA Certificate
+                          Bundle.      -----END CERTIFICATE----- \n Support: Core
+                          (Kubernetes ConfigMap) Support: Implementation-specific
+                          (For other resource types)"
+                        items:
+                          description: TypedLocalObjectReference contains enough information
+                            to let you locate the typed referenced object inside the
+                            same namespace.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        type: array
+                      listenerCertificates:
+                        description: "Certificates is a reference to one or more Kubernetes
+                          objects each containing an identity certificate that is
+                          bound to a listener. The hostname in a TLS SNI client hello
+                          message is used for certificate matching and route hostname
+                          selection. \n If apiGroup and kind are empty, will default
+                          to Kubernetes Secrets resources. \n Support: Core (Kubernetes
+                          Secrets) Support: Implementation-specific (Other resource
+                          types)"
+                        items:
+                          description: TypedLocalObjectReference contains enough information
+                            to let you locate the typed referenced object inside the
+                            same namespace.
+                          properties:
+                            apiGroup:
+                              description: APIGroup is the group for the resource
+                                being referenced. If APIGroup is not specified, the
+                                specified Kind must be in the core API group. For
+                                any other third-party types, APIGroup is required.
+                              type: string
+                            kind:
+                              description: Kind is the type of resource being referenced
+                              type: string
+                            name:
+                              description: Name is the name of resource being referenced
+                              type: string
+                          required:
+                          - kind
+                          - name
+                          type: object
+                        type: array
+                      minimumVersion:
+                        description: "MinimumVersion of TLS allowed. It is recommended
+                          to use one of the TLS_* constants above. Note: this is not
+                          strongly typed to allow implementation-specific versions
+                          to be used without requiring updates to the API types. String
+                          must be of the form \"<protocol><major>_<minor>\". \n Support:
+                          Core for TLS1_{1,2,3}. Implementation-specific for all other
+                          values."
+                        type: string
+                      options:
+                        additionalProperties:
+                          type: string
+                        description: "Options are a list of key/value pairs to give
+                          extended options to the provider. \n There variation among
+                          providers as to how ciphersuites are expressed. If there
+                          is a common subset for expressing ciphers then it will make
+                          sense to loft that as a core API construct. \n Support:
+                          Implementation-specific."
+                        type: object
+                      tlsTermination:
+                        description: "TLSTermination defines how to terminate TLS
+                          connections. \n If unspecified, TLS termination type \"Edge\"
+                          will be used. \n Support: Core"
+                        type: string
+                    type: object
                 type: object
               type: array
           required:
           - class
           - listeners
-          - routes
           type: object
         status:
           description: GatewayStatus defines the observed state of Gateway.
