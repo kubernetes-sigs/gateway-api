@@ -72,23 +72,25 @@ spec:
                     - value
                     type: object
                   extension:
-                    description: "Extension for this Listener. \n Support: custom."
+                    description: "Extension for this Listener.  The resource may be
+                      \"configmap\" (use the empty string for the group) or an implementation-defined
+                      resource (for example, resource \"mylistener\" in group \"networking.acme.io\").
+                      \n Support: custom."
                     properties:
-                      apiGroup:
-                        description: APIGroup is the group for the resource being
-                          referenced. If APIGroup is not specified, the specified
-                          Kind must be in the core API group. For any other third-party
-                          types, APIGroup is required.
-                        type: string
-                      kind:
-                        description: Kind is the type of resource being referenced
+                      group:
+                        description: Group is the group of the referent.  The empty
+                          string represents the core API group.
                         type: string
                       name:
-                        description: Name is the name of resource being referenced
+                        description: Name is the name of the referent.
+                        type: string
+                      resource:
+                        description: Resource is the resource of the referent.
                         type: string
                     required:
-                    - kind
+                    - group
                     - name
+                    - resource
                     type: object
                   name:
                     description: "Name is the listener's name and should be specified
@@ -111,35 +113,36 @@ spec:
                       \n Support: Core"
                     properties:
                       certificates:
-                        description: "Certificates is a reference to one or more Kubernetes
-                          objects each containing an identity certificate that is
-                          bound to the listener. The hostname in a TLS SNI client
+                        description: "Certificates is a list of references to Kubernetes
+                          objects that each contain an identity certificate that is
+                          bound to the listener.  The host name in a TLS SNI client
                           hello message is used for certificate matching and route
-                          hostname selection. The SNI server_name must match a route
-                          hostname for the Gateway to route the TLS request. \n If
-                          apiGroup and kind are empty, will default to Kubernetes
-                          Secrets resources. \n Support: Core (Kubernetes Secrets)
-                          Support: Implementation-specific (Other resource types)"
+                          host name selection.  The SNI server_name must match a route
+                          host name for the Gateway to route the TLS request.  If
+                          an entry in this list specifies the empty string for both
+                          the group and the resource, the resource defaults to \"secret\".
+                          \ An implementation may support other resources (for example,
+                          resource \"mycertificate\" in group \"networking.acme.io\").
+                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
+                          (Other resource types)"
                         items:
-                          description: TypedLocalObjectReference contains enough information
-                            to let you locate the typed referenced object inside the
-                            same namespace.
+                          description: LocalObjectReference identifies an API object
+                            within a known namespace.
                           properties:
-                            apiGroup:
-                              description: APIGroup is the group for the resource
-                                being referenced. If APIGroup is not specified, the
-                                specified Kind must be in the core API group. For
-                                any other third-party types, APIGroup is required.
-                              type: string
-                            kind:
-                              description: Kind is the type of resource being referenced
+                            group:
+                              description: Group is the group of the referent.  The
+                                empty string represents the core API group.
                               type: string
                             name:
-                              description: Name is the name of resource being referenced
+                              description: Name is the name of the referent.
+                              type: string
+                            resource:
+                              description: Resource is the resource of the referent.
                               type: string
                           required:
-                          - kind
+                          - group
                           - name
+                          - resource
                           type: object
                         type: array
                       minimumVersion:
@@ -162,7 +165,6 @@ spec:
                           Implementation-specific."
                         type: object
                     required:
-                    - certificates
                     - options
                     type: object
                 required:
@@ -171,26 +173,27 @@ spec:
               type: array
             routes:
               description: Routes associated with this Gateway. Routes define protocol-specific
-                routing to backends (e.g. Services).
+                routing to backends (e.g. Services).  Typically the resource is "httproute"
+                or "tcproute" in group "networking.x.k8s.io", or an implementation
+                may support other resources.
               items:
-                description: TypedLocalObjectReference contains enough information
-                  to let you locate the typed referenced object inside the same namespace.
+                description: LocalObjectReference identifies an API object within
+                  a known namespace.
                 properties:
-                  apiGroup:
-                    description: APIGroup is the group for the resource being referenced.
-                      If APIGroup is not specified, the specified Kind must be in
-                      the core API group. For any other third-party types, APIGroup
-                      is required.
-                    type: string
-                  kind:
-                    description: Kind is the type of resource being referenced
+                  group:
+                    description: Group is the group of the referent.  The empty string
+                      represents the core API group.
                     type: string
                   name:
-                    description: Name is the name of resource being referenced
+                    description: Name is the name of the referent.
+                    type: string
+                  resource:
+                    description: Resource is the resource of the referent.
                     type: string
                 required:
-                - kind
+                - group
                 - name
+                - resource
                 type: object
               type: array
           required:

@@ -56,9 +56,11 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
 	Listeners []Listener `json:"listeners"`
-	// Routes associated with this Gateway. Routes define
-	// protocol-specific routing to backends (e.g. Services).
-	Routes []core.TypedLocalObjectReference `json:"routes"`
+	// Routes associated with this Gateway. Routes define protocol-specific
+	// routing to backends (e.g. Services).  Typically the resource is
+	// "httproute" or "tcproute" in group "networking.x.k8s.io", or an
+	// implementation may support other resources.
+	Routes []RouteObjectReference `json:"routes"`
 }
 
 const (
@@ -108,11 +110,13 @@ type Listener struct {
 	//
 	// +optional
 	TLS *ListenerTLS `json:"tls,omitempty"`
-	// Extension for this Listener.
+	// Extension for this Listener.  The resource may be "configmap" (use
+	// the empty string for the group) or an implementation-defined resource
+	// (for example, resource "mylistener" in group "networking.acme.io").
 	//
 	// Support: custom.
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension,omitempty"`
+	Extension *ListenerExtensionObjectReference `json:"extension,omitempty"`
 }
 
 const (
@@ -159,19 +163,21 @@ const (
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type ListenerTLS struct {
-	// Certificates is a reference to one or more Kubernetes objects each containing
-	// an identity certificate that is bound to the listener. The hostname in a TLS
-	// SNI client hello message is used for certificate matching and route hostname
-	// selection. The SNI server_name must match a route hostname for the Gateway to
-	// route the TLS request.
-	//
-	// If apiGroup and kind are empty, will default to Kubernetes Secrets resources.
+	// Certificates is a list of references to Kubernetes objects that each
+	// contain an identity certificate that is bound to the listener.  The
+	// host name in a TLS SNI client hello message is used for certificate
+	// matching and route host name selection.  The SNI server_name must
+	// match a route host name for the Gateway to route the TLS request.  If
+	// an entry in this list specifies the empty string for both the group
+	// and the resource, the resource defaults to "secret".  An
+	// implementation may support other resources (for example, resource
+	// "mycertificate" in group "networking.acme.io").
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	Certificates []core.TypedLocalObjectReference `json:"certificates"`
+	Certificates []CertificateObjectReference `json:"certificates,omitempty"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without
@@ -194,6 +200,43 @@ type ListenerTLS struct {
 	// Support: Implementation-specific.
 	Options map[string]string `json:"options"`
 }
+
+// LocalObjectReference identifies an API object within a known namespace.
+type LocalObjectReference struct {
+	// Group is the group of the referent.  The empty string represents
+	// the core API group.
+	//
+	// +kubebuilder:validation:Required
+	// +required
+	Group string `json:"group"`
+	// Resource is the resource of the referent.
+	//
+	// +kubebuilder:validation:Required
+	// +required
+	Resource string `json:"resource"`
+	// Name is the name of the referent.
+	//
+	// +kubebuilder:validation:Required
+	// +required
+	Name string `json:"name"`
+}
+
+// CertificateObjectReference identifies a certificate object within a known
+// namespace.
+//
+// +k8s:deepcopy-gen=false
+type CertificateObjectReference = LocalObjectReference
+
+// ListenerExtensionObjectReference identifies a listener extension object
+// within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type ListenerExtensionObjectReference = LocalObjectReference
+
+// RouteObjectReference identifies a route object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

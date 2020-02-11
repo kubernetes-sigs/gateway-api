@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -43,13 +42,15 @@ type HTTPRouteHost struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules"`
 
-	// Extension is an optional, implementation-specific extension
-	// to the "host" block.
+	// Extension is an optional, implementation-specific extension to the
+	// "host" block.  The resource may be "configmap" (use the empty string
+	// for the group) or an implementation-defined resource (for example,
+	// resource "myroutehost" in group "networking.acme.io").
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	Extension *RouteHostExtensionObjectReference `json:"extension"`
 }
 
 // HTTPRouteRule is the configuration for a given path.
@@ -107,14 +108,22 @@ type HTTPRouteMatch struct {
 	// +optional
 	Header map[string]string `json:"header"`
 
-	// Extension is an optional, implementation-specific extension
-	// to the "match" behavior.
+	// Extension is an optional, implementation-specific extension to the
+	// "match" behavior.  The resource may be "configmap" (use the empty
+	// string for the group) or an implementation-defined resource (for
+	// example, resource "myroutematcher" in group "networking.acme.io").
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	Extension *RouteMatchExtensionObjectReference `json:"extension"`
 }
+
+// RouteMatchExtensionObjectReference identifies a route-match extension object
+// within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteMatchExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteFilter defines a filter-like action to be applied to
 // requests.
@@ -125,14 +134,22 @@ type HTTPRouteFilter struct {
 	// +optional
 	Headers *HTTPHeaderFilter `json:"headers"`
 
-	// Extension is an optional, implementation-specific extension
-	// to the "filter" behavior.
+	// Extension is an optional, implementation-specific extension to the
+	// "filter" behavior.  The resource may be "configmap" (use the empty
+	// string for the group) or an implementation-defined resource (for
+	// example, resource "myroutefilter" in group "networking.acme.io").
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	Extension *RouteFilterExtensionObjectReference `json:"extension"`
 }
+
+// RouteFilterExtensionObjectReference identifies a route-filter extension
+// object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteFilterExtensionObjectReference = LocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
 type HTTPHeaderFilter struct {
@@ -178,21 +195,56 @@ type HTTPHeaderFilter struct {
 
 // HTTPRouteAction is the action taken given a match.
 type HTTPRouteAction struct {
-	// ForwardTo sends requests to the referenced object.
-	ForwardTo *core.TypedLocalObjectReference `json:"forwardTo"`
+	// ForwardTo sends requests to the referenced object.  The resource may
+	// be "service" (use the empty string for the group), or an
+	// implementation may support other resources (for example, resource
+	// "myroutetarget" in group "networking.acme.io").
+	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo"`
 
-	// Extension is an optional, implementation-specific extension
-	// to the "action" behavior.
+	// Extension is an optional, implementation-specific extension to the
+	// "action" behavior.  The resource may be "configmap" (use the empty
+	// string for the group) or an implementation-defined resource (for
+	// example, resource "myrouteaction" in group "networking.acme.io").
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *core.TypedLocalObjectReference `json:"extension"`
+	Extension *RouteActionExtensionObjectReference `json:"extension"`
 }
 
-// HTTPRouteStatus defines the observed state of HTTPRoute
+// RouteActionTargetObjectReference identifies a target object for a route
+// action within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteActionTargetObjectReference = LocalObjectReference
+
+// RouteActionExtensionObjectReference identifies a route-action extension
+// object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteActionExtensionObjectReference = LocalObjectReference
+
+// RouteHostExtensionObjectReference identifies a route-host extension object
+// within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteHostExtensionObjectReference = LocalObjectReference
+
+// HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
-	Gateways []core.ObjectReference `json:"gateways"`
+	Gateways []GatewayObjectReference `json:"gateways"`
+}
+
+// GatewayObjectReference identifies a Gateway object.
+type GatewayObjectReference struct {
+	// Namespace is the namespace of the referent.
+	// +optional
+	Namespace string `json:"namespace,omitempty"`
+	// Name is the name of the referent.
+	//
+	// +kubebuilder:validation:Required
+	// +required
+	Name string `json:"name"`
 }
 
 // +kubebuilder:object:root=true

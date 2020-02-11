@@ -48,41 +48,24 @@ spec:
               description: "ParametersRef is a controller specific resource containing
                 the configuration parameters corresponding to this class. This is
                 optional if the controller does not require any additional configuration.
-                \n Valid types for reference are up to the Controller. Examples include
-                `core.ConfigMap` or a custom resource (CRD). \n Support: Custom"
+                \n Valid resources for reference are up to the Controller. Examples
+                include \"configmap\" (using the empty string to indicate the core
+                API group) or a custom resource (CRD). \n Support: Custom"
               properties:
-                apiVersion:
-                  description: API version of the referent.
-                  type: string
-                fieldPath:
-                  description: 'If referring to a piece of an object instead of an
-                    entire object, this string should contain a valid JSON/Go field
-                    access statement, such as desiredState.manifest.containers[2].
-                    For example, if the object reference is to a container within
-                    a pod, this would take on a value like: "spec.containers{name}"
-                    (where "name" refers to the name of the container that triggered
-                    the event) or if no container name is specified "spec.containers[2]"
-                    (container with index 2 in this pod). This syntax is chosen only
-                    to have some well-defined way of referencing a part of an object.
-                    TODO: this design is not final and this field is subject to change
-                    in the future.'
-                  type: string
-                kind:
-                  description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                group:
+                  description: Group is the group of the referent.  The empty string
+                    represents the core API group.
                   type: string
                 name:
-                  description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                  description: Name is the name of the referent.
                   type: string
-                namespace:
-                  description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                resource:
+                  description: Resource is the resource of the referent.
                   type: string
-                resourceVersion:
-                  description: 'Specific resourceVersion to which this reference is
-                    made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
-                  type: string
-                uid:
-                  description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
-                  type: string
+              required:
+              - group
+              - name
+              - resource
               type: object
           required:
           - controller
