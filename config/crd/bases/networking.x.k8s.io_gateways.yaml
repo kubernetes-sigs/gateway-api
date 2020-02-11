@@ -52,7 +52,7 @@ spec:
                 description: Listener defines a
                 properties:
                   address:
-                    description: "Address bound on the listener. This is optional
+                    description: "Address requested for this listener. This is optional
                       and behavior can depend on GatewayClass. If a value is set in
                       the spec and the request address is invalid, the GatewayClass
                       MUST indicate this in the associated entry in GatewayStatus.Listeners.
@@ -90,6 +90,13 @@ spec:
                     - kind
                     - name
                     type: object
+                  name:
+                    description: "Name is the listener's name and should be specified
+                      as an RFC 1035 DNS_LABEL [1]: \n [1] https://tools.ietf.org/html/rfc1035
+                      \n Each listener of a Gateway must have a unique name. Name
+                      is used for associating a listener in Gateway status. \n Support:
+                      Core"
+                    type: string
                   port:
                     description: "Port is a list of ports associated with the Address.
                       \n Support:"
@@ -99,14 +106,20 @@ spec:
                     description: "Protocol to use. \n Support:"
                     type: string
                   tls:
-                    description: "TLS configuraton for the Listener. \n Support:"
+                    description: "TLS is the TLS configuration for the Listener. If
+                      unspecified, the listener will not support TLS connections.
+                      \n Support: Core"
                     properties:
                       certificates:
-                        description: "Certificates is a list of certificates containing
-                          resources that are bound to the listener. \n If apiGroup
-                          and kind are empty, will default to Kubernetes Secrets resources.
-                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
-                          (Other resource types)"
+                        description: "Certificates is a reference to one or more Kubernetes
+                          objects each containing an identity certificate that is
+                          bound to the listener. The hostname in a TLS SNI client
+                          hello message is used for certificate matching and route
+                          hostname selection. The SNI server_name must match a route
+                          hostname for the Gateway to route the TLS request. \n If
+                          apiGroup and kind are empty, will default to Kubernetes
+                          Secrets resources. \n Support: Core (Kubernetes Secrets)
+                          Support: Implementation-specific (Other resource types)"
                         items:
                           description: TypedLocalObjectReference contains enough information
                             to let you locate the typed referenced object inside the
@@ -149,8 +162,11 @@ spec:
                           Implementation-specific."
                         type: object
                     required:
+                    - certificates
                     - options
                     type: object
+                required:
+                - name
                 type: object
               type: array
             routes:
@@ -183,53 +199,106 @@ spec:
           - routes
           type: object
         status:
-          description: GatewayStatus defines the observed state of Gateway
+          description: GatewayStatus defines the observed state of Gateway.
           properties:
+            conditions:
+              description: Conditions describe the current conditions of the Gateway.
+              items:
+                description: GatewayCondition is an error status for a given route.
+                properties:
+                  lastTransitionTime:
+                    description: LastTransitionTime indicates the last time this condition
+                      changed.
+                    format: date-time
+                    type: string
+                  message:
+                    description: Message is a human-understandable message describing
+                      the condition.
+                    type: string
+                  reason:
+                    description: Reason indicates why the condition is in this state.
+                    type: string
+                  status:
+                    description: Status describes the current state of this condition.
+                      Can be "True", "False", or "Unknown".
+                    type: string
+                  type:
+                    description: Type indicates the type of condition.
+                    type: string
+                required:
+                - status
+                - type
+                type: object
+              type: array
             listeners:
-              description: Listeners is the status for each listener block in the
-                Spec. The status for a given block will match the order as declared
-                in the Spec, e.g. the status for Spec.Listeners[3] will be in Status.Listeners[3].
+              description: Listeners provide status for each listener defined in the
+                Spec. The name in ListenerStatus refers to the corresponding Listener
+                of the same name.
               items:
                 description: ListenerStatus is the status associated with each listener
                   block.
                 properties:
                   address:
-                    type: string
-                  errors:
-                    description: Errors is a list of reasons why a given Listener
-                      Spec is not valid. Errors will be empty if the Spec is valid.
+                    description: Address bound on this listener.
+                    properties:
+                      type:
+                        description: "Type of the Address. This is one of the *AddressType
+                          constants. \n Support: Extended"
+                        type: string
+                      value:
+                        description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address".
+                          Validity of the values will depend on `Type` and support
+                          by the controller.'
+                        type: string
+                    required:
+                    - type
+                    - value
+                    type: object
+                  conditions:
+                    description: Conditions describe the current condition of this
+                      listener.
                     items:
-                      description: ListenerError is an error status for a given ListenerSpec.
+                      description: ListenerCondition is an error status for a given
+                        listener.
                       properties:
+                        lastTransitionTime:
+                          description: LastTransitionTime indicates the last time
+                            this condition changed.
+                          format: date-time
+                          type: string
                         message:
-                          description: Message is a human-understandable error message.
+                          description: Message is a human-understandable message describing
+                            the condition.
                           type: string
                         reason:
-                          description: Reason is a automation friendly reason code
-                            for the error.
+                          description: Reason indicates why the condition is in this
+                            state.
+                          type: string
+                        status:
+                          description: Status describes the current state of this
+                            condition. Can be "True", "False", or "Unknown".
+                          type: string
+                        type:
+                          description: Type indicates the type of condition.
                           type: string
                       required:
-                      - message
-                      - reason
+                      - status
+                      - type
                       type: object
                     type: array
+                  name:
+                    description: Name is the name of the listener this status refers
+                      to.
+                    type: string
                 required:
                 - address
-                - errors
-                type: object
-              type: array
-            routes:
-              description: Routes is the status for each attached route to the Gateway.
-                The status for a given route will match the orer as declared in the
-                Spec, e.g. the status for Spec.Routes[3] will be in Status.Routes[3].
-              items:
-                description: GatewayRouteStatus is the status associated with a given
-                  (Gateway, Route) pair.
+                - conditions
+                - name
                 type: object
               type: array
           required:
+          - conditions
           - listeners
-          - routes
           type: object
       type: object
   version: v1alpha1
