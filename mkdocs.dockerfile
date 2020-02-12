@@ -13,9 +13,9 @@
 
 FROM alpine:3.11
 
+COPY mkdocs.requirements.txt /
 RUN apk add -U --no-cache \
     python3 \
     bash \
     diffutils \
-  && pip3 install mkdocs \
-  && pip3 install mkdocs-material
+  && pip3 install -r /mkdocs.requirements.txt
