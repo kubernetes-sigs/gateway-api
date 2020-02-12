@@ -56,6 +56,9 @@ images: .mkdocs.dockerfile.timestamp
 		--rm \
 		$(MKDOCS_IMAGE) \
 		/bin/bash -c "cd /d && $(MKDOCS) build; find /d/docs -exec chown $(UID):$(GID) {} \;"
+	# Remove sitemap as it contains the timestamp, which is a source of a lot
+	# of merge conflicts.
+	rm docs/sitemap.xml docs/sitemap.xml.gz
 	date > $@
 
 .PHONY: verify
