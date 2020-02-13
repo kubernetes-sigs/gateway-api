@@ -236,6 +236,35 @@ spec:
                         type: object
                     type: object
                   type: array
+                tls:
+                  description: TLS specifies the TLS configuration for the target
+                    (if the target uses TLS).
+                  properties:
+                    destincationCACertificate:
+                      description: "DestinationCACertificate is a reference to a Kubernetes
+                        objects containing a CA certificate that can be used to validate
+                        the route's target's serving certificate.  If both the group
+                        and the resource are empty, the resource defaults to \"secret\".
+                        \ An implementation may support other resources (for example,
+                        resource \"mycertificate\" in group \"networking.acme.io\").
+                        \n Support: Extended."
+                      properties:
+                        group:
+                          description: Group is the group of the referent.  The empty
+                            string represents the core API group.
+                          type: string
+                        name:
+                          description: Name is the name of the referent.
+                          type: string
+                        resource:
+                          description: Resource is the resource of the referent.
+                          type: string
+                      required:
+                      - group
+                      - name
+                      - resource
+                      type: object
+                  type: object
               required:
               - rules
               type: object
@@ -444,6 +473,35 @@ spec:
                           type: object
                       type: object
                     type: array
+                  tls:
+                    description: TLS specifies the TLS configuration for the target
+                      (if the target uses TLS).
+                    properties:
+                      destincationCACertificate:
+                        description: "DestinationCACertificate is a reference to a
+                          Kubernetes objects containing a CA certificate that can
+                          be used to validate the route's target's serving certificate.
+                          \ If both the group and the resource are empty, the resource
+                          defaults to \"secret\".  An implementation may support other
+                          resources (for example, resource \"mycertificate\" in group
+                          \"networking.acme.io\"). \n Support: Extended."
+                        properties:
+                          group:
+                            description: Group is the group of the referent.  The
+                              empty string represents the core API group.
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            type: string
+                          resource:
+                            description: Resource is the resource of the referent.
+                            type: string
+                        required:
+                        - group
+                        - name
+                        - resource
+                        type: object
+                    type: object
                 required:
                 - rules
                 type: object

@@ -55,6 +55,12 @@ type HTTPRouteHost struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
+	// TLS specifies the TLS configuration for the target (if the target
+	// uses TLS).
+	//
+	// +optional
+	TLS *HTTPRouteTLS `json:"tls" protobuf:"bytes,4,opt,name=tls"`
+
 	// Extension is an optional, implementation-specific extension to the
 	// "host" block.  The resource may be "configmap" (use the empty string
 	// for the group) or an implementation-defined resource (for example,
@@ -247,6 +253,21 @@ type RouteActionExtensionObjectReference = LocalObjectReference
 // +k8s:deepcopy-gen=false
 // +protobuf=false
 type RouteHostExtensionObjectReference = LocalObjectReference
+
+// HTTPRouteTLS describes the TLS configuration for a given host.
+type HTTPRouteTLS struct {
+	// DestinationCACertificate is a reference to a Kubernetes objects
+	// containing a CA certificate that can be used to validate the route's
+	// target's serving certificate.  If both the group and the resource are
+	// empty, the resource defaults to "secret".  An implementation may
+	// support other resources (for example, resource "mycertificate" in
+	// group "networking.acme.io").
+	//
+	// Support: Extended.
+	//
+	// +optional
+	DestinationCACertificate CertificateObjectReference `json:"destincationCACertificate" protobuf:"bytes,1,opt,name=destincationCACertificate"`
+}
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {

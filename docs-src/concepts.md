@@ -347,7 +347,19 @@ TODO
 
 #### `HTTPRoute`
 
-TODO
+`HTTPRoute` is a namespace-scoped resource defined by the application
+developer.  An `HTTPRoute` is associated with an arbitrary number of
+`Gateways` and specifies a mapping between incoming HTTP requests
+matching criteria defined in the `HTTPRoute` and some target
+(typically a `Service`, but implementations may allow other resources
+as targets).
+
+TODO: Describe match rules, filters, and actions.
+
+When a `Gateway` uses an `HTTPRoute` to forward a connection, the
+`Gateway` terminates TLS.  If end-to-end encryption is desired, use
+either an `HTTPRoute` and the `Reencrypt` action or a `TCPRoute` to
+pass TLS through without decryption.
 
 #### `TCPRoute`
 

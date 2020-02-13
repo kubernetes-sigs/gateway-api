@@ -1073,7 +1073,17 @@ and the last time this condition changed.</p>
 <h3 id="routes">Routes</h3>
 <p>TODO</p>
 <h4 id="httproute"><code>HTTPRoute</code></h4>
-<p>TODO</p>
+<p><code>HTTPRoute</code> is a namespace-scoped resource defined by the application
+developer.  An <code>HTTPRoute</code> is associated with an arbitrary number of
+<code>Gateways</code> and specifies a mapping between incoming HTTP requests
+matching criteria defined in the <code>HTTPRoute</code> and some target
+(typically a <code>Service</code>, but implementations may allow other resources
+as targets).</p>
+<p>TODO: Describe match rules, filters, and actions.</p>
+<p>When a <code>Gateway</code> uses an <code>HTTPRoute</code> to forward a connection, the
+<code>Gateway</code> terminates TLS.  If end-to-end encryption is desired, use
+either an <code>HTTPRoute</code> and the <code>Reencrypt</code> action or a <code>TCPRoute</code> to
+pass TLS through without decryption.</p>
 <h4 id="tcproute"><code>TCPRoute</code></h4>
 <p>TODO</p>
 <h4 id="generic-routing">Generic routing</h4>
