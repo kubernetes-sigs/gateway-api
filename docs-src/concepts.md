@@ -81,6 +81,26 @@ relationships between the different resources:
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
 ![schema](schema-uml.svg)
 
+## Request flow
+
+A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
+
+ 1. A client makes a request to an FQDN, i.e. "foo.example.com".
+ 2. The FQDN gets resolved to `gateway.status.listeners[x].address`.
+ 3. The request is received by the Gateway implementation, i.e. reverse proxy, on `gateway.status.listeners[x].address`
+ and `gateway.spec.listeners[x].port`.
+ 4. If the request uses TLS, then `gateway.spec.listeners[x].tls` is used for establishing the connection.
+ __Note:__ The details for modeling a "virtual host" is still [under review](https://github.com/kubernetes-sigs/service-apis/issues/49).
+ Therefore, how TLS is configured may change in the future.
+ 5. If the `Gateway` is configured to terminate the TLS connection, an `HTTPRoute` is selected based on the request’s
+ [Host header](https://tools.ietf.org/html/rfc7230#section-5.4), i.e. FQDN in step 1, matching
+ `httpRoute.spec.hosts[x].hostname`. If the `Gateway` is configured to pass the TLS connection through to the backend
+ object, i.e. Service, SNI is used to match the request with an `HTTPRoute` based on `httpRoute.spec.hosts[x].hostname`.
+ __Note:__ Whether `hosts` should be singular is still [under review](https://github.com/kubernetes-sigs/service-apis/pull/43).
+ 6. The Gateway implementation performs filtering (optional) and forwarding based on
+ `httpRoute.spec.hosts[x].rules[x].match` . The match can be based on the request path and/or header.
+ 7. Lastly, the request is forwarded to an object within the cluster.
+
 ### Design considerations
 
 There are some general design guidelines used throughout this API.
