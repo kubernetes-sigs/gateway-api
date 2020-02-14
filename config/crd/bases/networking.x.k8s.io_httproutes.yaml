@@ -40,23 +40,25 @@ spec:
               properties:
                 extension:
                   description: "Extension is an optional, implementation-specific
-                    extension to the \"host\" block. \n Support: custom"
+                    extension to the \"host\" block.  The resource may be \"configmap\"
+                    (use the empty string for the group) or an implementation-defined
+                    resource (for example, resource \"myroutehost\" in group \"networking.acme.io\").
+                    \n Support: custom"
                   properties:
-                    apiGroup:
-                      description: APIGroup is the group for the resource being referenced.
-                        If APIGroup is not specified, the specified Kind must be in
-                        the core API group. For any other third-party types, APIGroup
-                        is required.
-                      type: string
-                    kind:
-                      description: Kind is the type of resource being referenced
+                    group:
+                      description: Group is the group of the referent.  The empty
+                        string represents the core API group.
                       type: string
                     name:
-                      description: Name is the name of resource being referenced
+                      description: Name is the name of the referent.
+                      type: string
+                    resource:
+                      description: Resource is the resource of the referent.
                       type: string
                   required:
-                  - kind
+                  - group
                   - name
+                  - resource
                   type: object
                 hostname:
                   description: "Hostname is the fully qualified domain name of a network
@@ -81,43 +83,48 @@ spec:
                         properties:
                           extension:
                             description: "Extension is an optional, implementation-specific
-                              extension to the \"action\" behavior. \n Support: custom"
+                              extension to the \"action\" behavior.  The resource
+                              may be \"configmap\" (use the empty string for the group)
+                              or an implementation-defined resource (for example,
+                              resource \"myrouteaction\" in group \"networking.acme.io\").
+                              \n Support: custom"
                             properties:
-                              apiGroup:
-                                description: APIGroup is the group for the resource
-                                  being referenced. If APIGroup is not specified,
-                                  the specified Kind must be in the core API group.
-                                  For any other third-party types, APIGroup is required.
-                                type: string
-                              kind:
-                                description: Kind is the type of resource being referenced
+                              group:
+                                description: Group is the group of the referent.  The
+                                  empty string represents the core API group.
                                 type: string
                               name:
-                                description: Name is the name of resource being referenced
+                                description: Name is the name of the referent.
+                                type: string
+                              resource:
+                                description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - kind
+                            - group
                             - name
+                            - resource
                             type: object
                           forwardTo:
                             description: ForwardTo sends requests to the referenced
-                              object.
+                              object.  The resource may be "service" (use the empty
+                              string for the group), or an implementation may support
+                              other resources (for example, resource "myroutetarget"
+                              in group "networking.acme.io").
                             properties:
-                              apiGroup:
-                                description: APIGroup is the group for the resource
-                                  being referenced. If APIGroup is not specified,
-                                  the specified Kind must be in the core API group.
-                                  For any other third-party types, APIGroup is required.
-                                type: string
-                              kind:
-                                description: Kind is the type of resource being referenced
+                              group:
+                                description: Group is the group of the referent.  The
+                                  empty string represents the core API group.
                                 type: string
                               name:
-                                description: Name is the name of resource being referenced
+                                description: Name is the name of the referent.
+                                type: string
+                              resource:
+                                description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - kind
+                            - group
                             - name
+                            - resource
                             type: object
                         required:
                         - forwardTo
@@ -128,23 +135,26 @@ spec:
                         properties:
                           extension:
                             description: "Extension is an optional, implementation-specific
-                              extension to the \"filter\" behavior. \n Support: custom"
+                              extension to the \"filter\" behavior.  The resource
+                              may be \"configmap\" (use the empty string for the group)
+                              or an implementation-defined resource (for example,
+                              resource \"myroutefilter\" in group \"networking.acme.io\").
+                              \n Support: custom"
                             properties:
-                              apiGroup:
-                                description: APIGroup is the group for the resource
-                                  being referenced. If APIGroup is not specified,
-                                  the specified Kind must be in the core API group.
-                                  For any other third-party types, APIGroup is required.
-                                type: string
-                              kind:
-                                description: Kind is the type of resource being referenced
+                              group:
+                                description: Group is the group of the referent.  The
+                                  empty string represents the core API group.
                                 type: string
                               name:
-                                description: Name is the name of resource being referenced
+                                description: Name is the name of the referent.
+                                type: string
+                              resource:
+                                description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - kind
+                            - group
                             - name
+                            - resource
                             type: object
                           headers:
                             description: "Headers related filters. \n Support: extended"
@@ -180,23 +190,26 @@ spec:
                         properties:
                           extension:
                             description: "Extension is an optional, implementation-specific
-                              extension to the \"match\" behavior. \n Support: custom"
+                              extension to the \"match\" behavior.  The resource may
+                              be \"configmap\" (use the empty string for the group)
+                              or an implementation-defined resource (for example,
+                              resource \"myroutematcher\" in group \"networking.acme.io\").
+                              \n Support: custom"
                             properties:
-                              apiGroup:
-                                description: APIGroup is the group for the resource
-                                  being referenced. If APIGroup is not specified,
-                                  the specified Kind must be in the core API group.
-                                  For any other third-party types, APIGroup is required.
-                                type: string
-                              kind:
-                                description: Kind is the type of resource being referenced
+                              group:
+                                description: Group is the group of the referent.  The
+                                  empty string represents the core API group.
                                 type: string
                               name:
-                                description: Name is the name of resource being referenced
+                                description: Name is the name of the referent.
+                                type: string
+                              resource:
+                                description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - kind
+                            - group
                             - name
+                            - resource
                             type: object
                           header:
                             additionalProperties:
@@ -233,23 +246,25 @@ spec:
                 properties:
                   extension:
                     description: "Extension is an optional, implementation-specific
-                      extension to the \"host\" block. \n Support: custom"
+                      extension to the \"host\" block.  The resource may be \"configmap\"
+                      (use the empty string for the group) or an implementation-defined
+                      resource (for example, resource \"myroutehost\" in group \"networking.acme.io\").
+                      \n Support: custom"
                     properties:
-                      apiGroup:
-                        description: APIGroup is the group for the resource being
-                          referenced. If APIGroup is not specified, the specified
-                          Kind must be in the core API group. For any other third-party
-                          types, APIGroup is required.
-                        type: string
-                      kind:
-                        description: Kind is the type of resource being referenced
+                      group:
+                        description: Group is the group of the referent.  The empty
+                          string represents the core API group.
                         type: string
                       name:
-                        description: Name is the name of resource being referenced
+                        description: Name is the name of the referent.
+                        type: string
+                      resource:
+                        description: Resource is the resource of the referent.
                         type: string
                     required:
-                    - kind
+                    - group
                     - name
+                    - resource
                     type: object
                   hostname:
                     description: "Hostname is the fully qualified domain name of a
@@ -275,48 +290,48 @@ spec:
                           properties:
                             extension:
                               description: "Extension is an optional, implementation-specific
-                                extension to the \"action\" behavior. \n Support:
-                                custom"
+                                extension to the \"action\" behavior.  The resource
+                                may be \"configmap\" (use the empty string for the
+                                group) or an implementation-defined resource (for
+                                example, resource \"myrouteaction\" in group \"networking.acme.io\").
+                                \n Support: custom"
                               properties:
-                                apiGroup:
-                                  description: APIGroup is the group for the resource
-                                    being referenced. If APIGroup is not specified,
-                                    the specified Kind must be in the core API group.
-                                    For any other third-party types, APIGroup is required.
-                                  type: string
-                                kind:
-                                  description: Kind is the type of resource being
-                                    referenced
+                                group:
+                                  description: Group is the group of the referent.  The
+                                    empty string represents the core API group.
                                   type: string
                                 name:
-                                  description: Name is the name of resource being
-                                    referenced
+                                  description: Name is the name of the referent.
+                                  type: string
+                                resource:
+                                  description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - kind
+                              - group
                               - name
+                              - resource
                               type: object
                             forwardTo:
                               description: ForwardTo sends requests to the referenced
-                                object.
+                                object.  The resource may be "service" (use the empty
+                                string for the group), or an implementation may support
+                                other resources (for example, resource "myroutetarget"
+                                in group "networking.acme.io").
                               properties:
-                                apiGroup:
-                                  description: APIGroup is the group for the resource
-                                    being referenced. If APIGroup is not specified,
-                                    the specified Kind must be in the core API group.
-                                    For any other third-party types, APIGroup is required.
-                                  type: string
-                                kind:
-                                  description: Kind is the type of resource being
-                                    referenced
+                                group:
+                                  description: Group is the group of the referent.  The
+                                    empty string represents the core API group.
                                   type: string
                                 name:
-                                  description: Name is the name of resource being
-                                    referenced
+                                  description: Name is the name of the referent.
+                                  type: string
+                                resource:
+                                  description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - kind
+                              - group
                               - name
+                              - resource
                               type: object
                           required:
                           - forwardTo
@@ -327,26 +342,26 @@ spec:
                           properties:
                             extension:
                               description: "Extension is an optional, implementation-specific
-                                extension to the \"filter\" behavior. \n Support:
-                                custom"
+                                extension to the \"filter\" behavior.  The resource
+                                may be \"configmap\" (use the empty string for the
+                                group) or an implementation-defined resource (for
+                                example, resource \"myroutefilter\" in group \"networking.acme.io\").
+                                \n Support: custom"
                               properties:
-                                apiGroup:
-                                  description: APIGroup is the group for the resource
-                                    being referenced. If APIGroup is not specified,
-                                    the specified Kind must be in the core API group.
-                                    For any other third-party types, APIGroup is required.
-                                  type: string
-                                kind:
-                                  description: Kind is the type of resource being
-                                    referenced
+                                group:
+                                  description: Group is the group of the referent.  The
+                                    empty string represents the core API group.
                                   type: string
                                 name:
-                                  description: Name is the name of resource being
-                                    referenced
+                                  description: Name is the name of the referent.
+                                  type: string
+                                resource:
+                                  description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - kind
+                              - group
                               - name
+                              - resource
                               type: object
                             headers:
                               description: "Headers related filters. \n Support: extended"
@@ -383,25 +398,26 @@ spec:
                           properties:
                             extension:
                               description: "Extension is an optional, implementation-specific
-                                extension to the \"match\" behavior. \n Support: custom"
+                                extension to the \"match\" behavior.  The resource
+                                may be \"configmap\" (use the empty string for the
+                                group) or an implementation-defined resource (for
+                                example, resource \"myroutematcher\" in group \"networking.acme.io\").
+                                \n Support: custom"
                               properties:
-                                apiGroup:
-                                  description: APIGroup is the group for the resource
-                                    being referenced. If APIGroup is not specified,
-                                    the specified Kind must be in the core API group.
-                                    For any other third-party types, APIGroup is required.
-                                  type: string
-                                kind:
-                                  description: Kind is the type of resource being
-                                    referenced
+                                group:
+                                  description: Group is the group of the referent.  The
+                                    empty string represents the core API group.
                                   type: string
                                 name:
-                                  description: Name is the name of resource being
-                                    referenced
+                                  description: Name is the name of the referent.
+                                  type: string
+                                resource:
+                                  description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - kind
+                              - group
                               - name
+                              - resource
                               type: object
                             header:
                               additionalProperties:
@@ -434,45 +450,20 @@ spec:
               type: array
           type: object
         status:
-          description: HTTPRouteStatus defines the observed state of HTTPRoute
+          description: HTTPRouteStatus defines the observed state of HTTPRoute.
           properties:
             gateways:
               items:
-                description: ObjectReference contains enough information to let you
-                  inspect or modify the referred object.
+                description: GatewayObjectReference identifies a Gateway object.
                 properties:
-                  apiVersion:
-                    description: API version of the referent.
-                    type: string
-                  fieldPath:
-                    description: 'If referring to a piece of an object instead of
-                      an entire object, this string should contain a valid JSON/Go
-                      field access statement, such as desiredState.manifest.containers[2].
-                      For example, if the object reference is to a container within
-                      a pod, this would take on a value like: "spec.containers{name}"
-                      (where "name" refers to the name of the container that triggered
-                      the event) or if no container name is specified "spec.containers[2]"
-                      (container with index 2 in this pod). This syntax is chosen
-                      only to have some well-defined way of referencing a part of
-                      an object. TODO: this design is not final and this field is
-                      subject to change in the future.'
-                    type: string
-                  kind:
-                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                    type: string
                   name:
-                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                    description: Name is the name of the referent.
                     type: string
                   namespace:
-                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                    description: Namespace is the namespace of the referent.
                     type: string
-                  resourceVersion:
-                    description: 'Specific resourceVersion to which this reference
-                      is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
-                    type: string
-                  uid:
-                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
-                    type: string
+                required:
+                - name
                 type: object
               type: array
           required:
