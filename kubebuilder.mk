@@ -17,6 +17,10 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
+DOCKER ?= docker
+# Image to build protobugs
+PROTO_IMG ?= k8s.gcr.io/kube-cross:v1.13.6-1
+
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
 GOBIN=$(shell go env GOPATH)/bin
@@ -56,6 +60,9 @@ deploy: manifests
 manifests:
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
+.PHONY: update
+update: fmt vet generate protos
+
 # Run go fmt against code
 fmt:
 	go fmt ./...
@@ -67,6 +74,17 @@ vet:
 # Generate code
 generate:
 	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths="./..."
+
+.PHONY: protos
+protos:
+	$(DOCKER) run -it \
+		--mount type=bind,source=$(GOPATH),target=/go \
+		--env GOPATH=/go \
+		--rm \
+		--user "$(id -u):$(id -g)" \
+		-w /go/src/sigs.k8s.io/service-apis \
+		$(PROTO_IMG) \
+		hack/update-proto.sh
 
 # Build the docker image
 docker-build: test
