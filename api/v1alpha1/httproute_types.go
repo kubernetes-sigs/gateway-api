@@ -34,11 +34,24 @@ type HTTPRouteSpec struct {
 
 // HTTPRouteHost is the configuration for a given host.
 type HTTPRouteHost struct {
-	// Hostnames are a list of hosts names that match this host
-	// block.
+	// Hostname is the fully qualified domain name of a network host,
+	// as defined by RFC 3986. Note the following deviations from the
+	// "host" part of the URI as defined in the RFC:
 	//
-	// TODO: RFC link
-	Hostnames []string `json:"hostnames"`
+	// 1. IPs are not allowed.
+	// 2. The `:` delimiter is not respected because ports are not allowed.
+	//
+	// Incoming requests are matched against Hostname before processing HTTPRoute
+	// rules. For example, if the request header contains host: foo.example.com,
+	// an HTTPRoute with hostname foo.example.com will match. However, an
+	// HTTPRoute with hostname example.com or bar.example.com will not match.
+	// If Hostname is unspecified, the Gateway routes all traffic based on
+	// the specified rules.
+	//
+	// Support: Core
+	//
+	// +optional
+	Hostname string `json:"hostname,omitempty"`
 
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules"`
