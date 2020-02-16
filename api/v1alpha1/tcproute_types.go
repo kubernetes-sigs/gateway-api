@@ -19,25 +19,39 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
-
 // TcpRouteSpec defines the desired state of TcpRoute
-type TcpRouteSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+type StreamServerSpec struct {
+	// Hostnames are the set of domain name that refers to this
+	// StreamServer. These names must be unique across the Listener.
+	Hostnames []string `json:"hostnames,omitempty"`
+
+	// If this host has multiple names, each name should be present in the
+	// server certificate as a DNS SAN.
+	//
+	// If this server does not have a TLS configuration, or the TLS
+	// configuration does not specify any ALPN protocol names, it must
+	// be attached to a Dedicated listener.
+	TLS *TLSAcceptor
+
+	// Rules are a list of HTTP matchers, filters and actions.
+	Rules []StreamRouteRule `json:"rules"`
 }
 
-// TcpRouteStatus defines the observed state of TcpRoute
-type TcpRouteStatus struct {
+// StreamrouteRule describes how a byte stream is forwarded to its destination.
+type StreamRouteRule struct {
+}
+
+// StreamServerStatus defines the observed state of TcpRoute
+type StreamServerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
 // +kubebuilder:object:root=true
 
-// TcpRoute is the Schema for the tcproutes API
-type TcpRoute struct {
+// StreamServer is a virtual server that accepts a stream of bytes and forwards
+// it to a subsequent destination.
+type StreamServer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 

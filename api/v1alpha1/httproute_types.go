@@ -19,38 +19,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// HTTPRouteSpec defines the desired state of HTTPRoute
-type HTTPRouteSpec struct {
-	// Hosts is a list of Host definitions.
-	Hosts []HTTPRouteHost `json:"hosts,omitempty"`
+// HTTPServerSpec defines the desired state of HTTPServer.
+type HTTPServerSpec struct {
+	// Hostnames are the set of domain name that refers to this
+	// HTTPServer. These names must be unique across the Listener.
+	Hostnames []string `json:"hostnames,omitempty"`
 
-	// Default is the default host to use. Default.Hostnames must
-	// be an empty list.
+	// If this host has multiple names, each name should be present in the
+	// server certificate as a DNS SAN.
 	//
-	// +optional
-	Default *HTTPRouteHost `json:"default"`
-}
-
-// HTTPRouteHost is the configuration for a given host.
-type HTTPRouteHost struct {
-	// Hostname is the fully qualified domain name of a network host,
-	// as defined by RFC 3986. Note the following deviations from the
-	// "host" part of the URI as defined in the RFC:
-	//
-	// 1. IPs are not allowed.
-	// 2. The `:` delimiter is not respected because ports are not allowed.
-	//
-	// Incoming requests are matched against Hostname before processing HTTPRoute
-	// rules. For example, if the request header contains host: foo.example.com,
-	// an HTTPRoute with hostname foo.example.com will match. However, an
-	// HTTPRoute with hostname example.com or bar.example.com will not match.
-	// If Hostname is unspecified, the Gateway routes all traffic based on
-	// the specified rules.
-	//
-	// Support: Core
-	//
-	// +optional
-	Hostname string `json:"hostname,omitempty"`
+	// The ALPNProtocols field in this TLSAcceptor must contain only valid
+	// HTTP protocol identifiers, i.e. "http/0.9", "http/1.0", "http/1.1",
+	// "h2". Implementations may accept only a subset of these values if
+	// the underlying proxy implementation does not implement the
+	// corresponding HTTP protocol version.
+	TLS *TLSAcceptor
 
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules"`
@@ -243,8 +226,8 @@ type RouteActionExtensionObjectReference = LocalObjectReference
 // +k8s:deepcopy-gen=false
 type RouteHostExtensionObjectReference = LocalObjectReference
 
-// HTTPRouteStatus defines the observed state of HTTPRoute.
-type HTTPRouteStatus struct {
+// HTTPServerStatus defines the observed state of HTTPServer.
+type HTTPServerStatus struct {
 	Gateways []GatewayObjectReference `json:"gateways"`
 }
 
@@ -262,24 +245,24 @@ type GatewayObjectReference struct {
 
 // +kubebuilder:object:root=true
 
-// HTTPRoute is the Schema for the httproutes API
-type HTTPRoute struct {
+// HTTPServer is a virtual HTTP server, hosted by a Gateway.
+type HTTPServer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
-	Status HTTPRouteStatus `json:"status,omitempty"`
+	Spec   HttpHostSpec   `json:"spec,omitempty"`
+	Status HttpHostStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// HTTPRouteList contains a list of HTTPRoute
-type HTTPRouteList struct {
+// HTTPServerList contains a list of HTTPServer
+type HTTPServerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []HTTPRoute `json:"items"`
+	Items           []HTTPServer `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&HTTPRoute{}, &HTTPRouteList{})
+	SchemeBuilder.Register(&HTTPServer{}, &HTTPServerList{})
 }
