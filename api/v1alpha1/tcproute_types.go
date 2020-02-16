@@ -19,7 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TcpRouteSpec defines the desired state of TcpRoute
+// StreamServerSpec defines the desired state of StreamServer
 type StreamServerSpec struct {
 	// Hostnames are the set of domain name that refers to this
 	// StreamServer. These names must be unique across the Listener.
@@ -41,7 +41,7 @@ type StreamServerSpec struct {
 type StreamRouteRule struct {
 }
 
-// StreamServerStatus defines the observed state of TcpRoute
+// StreamServerStatus defines the observed state of StreamServer
 type StreamServerStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
@@ -55,19 +55,19 @@ type StreamServer struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TcpRouteSpec   `json:"spec,omitempty"`
-	Status TcpRouteStatus `json:"status,omitempty"`
+	Spec   StreamServerSpec   `json:"spec,omitempty"`
+	Status StreamServerStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// TcpRouteList contains a list of TcpRoute
-type TcpRouteList struct {
+// StreamServerList contains a list of StreamServer
+type StreamServerList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []TcpRoute `json:"items"`
+	Items           []StreamServer `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&TcpRoute{}, &TcpRouteList{})
+	SchemeBuilder.Register(&StreamServer{}, &StreamServerList{})
 }
