@@ -270,28 +270,22 @@ type GatewayStatus struct {
 type GatewayConditionType string
 
 const (
-	// ConditionNoSuchGatewayClass indicates that the specified GatewayClass
-	// does not exist.
-	ConditionNoSuchGatewayClass GatewayConditionType = "NoSuchGatewayClass"
-	// ConditionGatewayNotScheduled indicates that the Gateway has not been
-	// scheduled.
-	ConditionGatewayNotScheduled GatewayConditionType = "GatewayNotScheduled"
-	// ConditionListenersNotReady indicates that at least one of the specified
-	// listeners is not ready. If this condition has a status of True, a more
-	// detailed ListenerCondition should be present in the corresponding
-	// ListenerStatus.
-	ConditionListenersNotReady GatewayConditionType = "ListenersNotReady"
-	// ConditionInvalidListeners indicates that at least one of the specified
-	// listeners is invalid. If this condition has a status of True, a more
-	// detailed ListenerCondition should be present in the corresponding
-	// ListenerStatus.
-	ConditionInvalidListeners GatewayConditionType = "InvalidListeners"
-	// ConditionRoutesNotReady indicates that at least one of the specified
-	// routes is not ready.
-	ConditionRoutesNotReady GatewayConditionType = "RoutesNotReady"
-	// ConditionInvalidRoutes indicates that at least one of the specified
-	// routes is invalid.
-	ConditionInvalidRoutes GatewayConditionType = "InvalidRoutes"
+	// ConditionGatewayClassExists indicates that the specified GatewayClass exists.
+	ConditionGatewayClassExists GatewayConditionType = "GatewayClassExists"
+	// ConditionGatewayScheduled indicates that the Gateway has been scheduled.
+	ConditionGatewayScheduled GatewayConditionType = "GatewayScheduled"
+	// ConditionListenersReady indicates that all of the specified listeners
+	// are ready. If this condition has a status of False, a more detailed
+	// ListenerCondition should be present in the corresponding ListenerStatus.
+	ConditionListenersReady GatewayConditionType = "ListenersReady"
+	// ConditionListenersValid indicates that all of the specified listeners
+	// are valid. If this condition has a status of False, a more detailed
+	// ListenerCondition should be present in the corresponding ListenerStatus.
+	ConditionListenersValid GatewayConditionType = "ListenersValid"
+	// ConditionRoutesReady indicates that all of the specified routes are ready.
+	ConditionRoutesReady GatewayConditionType = "RoutesReady"
+	// ConditionRoutesValid indicates that all of the specified routes are valid.
+	ConditionRoutesValid GatewayConditionType = "RoutesValid"
 )
 
 // GatewayCondition is an error status for a given route.
@@ -326,15 +320,14 @@ type ListenerStatus struct {
 type ListenerConditionType string
 
 const (
-	// ConditionInvalidListener is a generic condition that is a catch all for
-	// unsupported configurations that do not match a more specific condition.
-	// Implementors should try to use a more specific condition instead of this
-	// one to give users and automation more information.
-	ConditionInvalidListener ListenerConditionType = "InvalidListener"
-	// ConditionListenerNotReady indicates the listener is not ready.
-	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
-	// ConditionInvalidAddress indicates the Address is invalid.
-	ConditionInvalidAddress ListenerConditionType = "InvalidAddress"
+	// ConditionListenerValid is a generic condition that is a catch all for
+	// supported configurations. Implementors should try to use a more specific
+	// condition instead of this one to give users and automation more information.
+	ConditionListenerValid ListenerConditionType = "ListenerValid"
+	// ConditionListenerReady indicates the listener is ready to receive traffic.
+	ConditionListenerReady ListenerConditionType = "ListenerReady"
+	// ConditionValidAddress indicates the listener Address is valid.
+	ConditionValidAddress ListenerConditionType = "ValidAddress"
 )
 
 // ListenerCondition is an error status for a given listener.
