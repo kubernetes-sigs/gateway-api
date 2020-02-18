@@ -61,7 +61,7 @@ manifests:
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
 
 .PHONY: update
-update: fmt vet generate protos
+update: fmt vet generate proto
 
 # Run go fmt against code
 fmt:
@@ -75,8 +75,8 @@ vet:
 generate:
 	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths="./..."
 
-.PHONY: protos
-protos:
+.PHONY: proto
+proto:
 	$(DOCKER) run -it \
 		--mount type=bind,source=$(GOPATH),target=/go \
 		--env GOPATH=/go \
@@ -85,6 +85,28 @@ protos:
 		-w /go/src/sigs.k8s.io/service-apis \
 		$(PROTO_IMG) \
 		hack/update-proto.sh
+
+.PHONY: verify-proto
+verify-proto:
+	$(DOCKER) run -it \
+		--mount type=bind,source=$(GOPATH),target=/realgo \
+		--env GOPATH=/go \
+		--rm \
+		--user "$(id -u):$(id -g)" \
+		-w /go \
+		$(PROTO_IMG) \
+		/bin/bash -c "mkdir -p src/sigs.k8s.io/service-apis && \
+            mkdir -p src/k8s.io/kubernetes && \
+            mkdir -p src/k8s.io/apimachinery && \
+            mkdir -p src/github.com/gogo/protobuf/gogoproto && \
+			cp -r /realgo/src/sigs.k8s.io/service-apis/ src/sigs.k8s.io && \
+			cp -r /realgo/src/k8s.io/kubernetes/ src/k8s.io && \
+			cp -r /realgo/src/k8s.io/apimachinery/ src/k8s.io && \
+			cp -r /realgo/src/github.com/gogo/protobuf/gogoproto/gogo.proto src/github.com/gogo/protobuf/gogoproto/gogo.proto && \
+			cd src/sigs.k8s.io/service-apis && \
+			hack/update-proto.sh && \
+			diff -r api /realgo/src/sigs.k8s.io/service-apis/api"
+
 
 # Build the docker image
 docker-build: test

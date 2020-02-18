@@ -22,10 +22,4 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
 
-make -f kubebuilder.mk protos
-if [[ -n $(git status --porcelain) ]]; then
-  git status
-  git diff
-  echo "ERROR: Some proto files need to be updated, please run 'make -f kubebuilder.mk protos'"
-  exit 1
-fi
+make -f kubebuilder.mk verify-proto
