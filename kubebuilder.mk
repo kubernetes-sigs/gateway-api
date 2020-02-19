@@ -28,6 +28,11 @@ else
 GOBIN=$(shell go env GOBIN)
 endif
 
+# TOP is the current directory where this Makefile lives.
+TOP := $(dir $(firstword $(MAKEFILE_LIST)))
+# ROOT is the root of the mkdocs tree.
+ROOT := $(abspath $(TOP))
+
 # enable Go modules
 export GO111MODULE=on
 
@@ -75,34 +80,32 @@ vet:
 generate:
 	$(CONTROLLER_GEN) object:headerFile=./hack/boilerplate.go.txt paths="./..."
 
+# Generate protobufs
 .PHONY: proto
 proto:
 	$(DOCKER) run -it \
-		--mount type=bind,source=$(GOPATH),target=/go \
+		--mount type=bind,source=$(ROOT),target=/go/src/sigs.k8s.io/service-apis  \
 		--env GOPATH=/go \
+		--env GOCACHE=/go/.cache \
 		--rm \
-		--user "$(id -u):$(id -g)" \
+		--user "$(shell id -u):$(shell id -g)" \
 		-w /go/src/sigs.k8s.io/service-apis \
 		$(PROTO_IMG) \
 		hack/update-proto.sh
 
+# Verify protobuf generation
 .PHONY: verify-proto
 verify-proto:
-	$(DOCKER) run -it \
-		--mount type=bind,source=$(GOPATH),target=/realgo \
+	$(DOCKER) run \
+		--mount type=bind,source=$(ROOT),target=/realgo/src/sigs.k8s.io/service-apis \
 		--env GOPATH=/go \
+		--env GOCACHE=/go/.cache \
 		--rm \
-		--user "$(id -u):$(id -g)" \
+		--user "$(shell id -u):$(shell id -g)" \
 		-w /go \
 		$(PROTO_IMG) \
 		/bin/bash -c "mkdir -p src/sigs.k8s.io/service-apis && \
-            mkdir -p src/k8s.io/kubernetes && \
-            mkdir -p src/k8s.io/apimachinery && \
-            mkdir -p src/github.com/gogo/protobuf/gogoproto && \
 			cp -r /realgo/src/sigs.k8s.io/service-apis/ src/sigs.k8s.io && \
-			cp -r /realgo/src/k8s.io/kubernetes/ src/k8s.io && \
-			cp -r /realgo/src/k8s.io/apimachinery/ src/k8s.io && \
-			cp -r /realgo/src/github.com/gogo/protobuf/gogoproto/gogo.proto src/github.com/gogo/protobuf/gogoproto/gogo.proto && \
 			cd src/sigs.k8s.io/service-apis && \
 			hack/update-proto.sh && \
 			diff -r api /realgo/src/sigs.k8s.io/service-apis/api"
