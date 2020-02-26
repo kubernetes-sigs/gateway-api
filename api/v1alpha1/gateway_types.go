@@ -119,16 +119,25 @@ type Listener struct {
 	Extension *ListenerExtensionObjectReference `json:"extension,omitempty"`
 }
 
+// AddressType defines how a network address is represented as a text string.
+type AddressType string
+
 const (
-	// IPAddress is an address that is an IP address.
+	// IPAddressType a textual representation of a numeric IP
+	// address. IPv4 addresses, must be in dotted-decimal
+	// form. IPv6 addresses must be in a standard IPv6 text
+	// representation (see RFC 5952).
+	//
+	// Implementations should accept any address representation
+	// accepted by the inet_pton(3) API.
 	//
 	// Support: Extended.
-	IPAddress = "IPAddress"
+	IPAddressType AddressType = "IPAddress"
 	// NamedAddress is an address selected by name. The interpretation of
 	// the name is depenedent on the controller.
 	//
 	// Support: Implementation-specific.
-	NamedAddress = "NamedAddress"
+	NamedAddressType AddressType = "NamedAddress"
 )
 
 // ListenerAddress describes an address for the Listener.
@@ -136,7 +145,7 @@ type ListenerAddress struct {
 	// Type of the Address. This is one of the *AddressType constants.
 	//
 	// Support: Extended
-	Type string `json:"type"`
+	Type AddressType `json:"type"`
 	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
 	// values will depend on `Type` and support by the controller.
 	Value string `json:"value"`
