@@ -56,10 +56,18 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
 	Listeners []Listener `json:"listeners"`
-	// Routes associated with this Gateway. Routes define protocol-specific
-	// routing to backends (e.g. Services).  Typically the resource is
-	// "httproute" or "tcproute" in group "networking.x.k8s.io", or an
+	// Routes is a list of resources to associate with the Gateway. A route is a
+	// resource capable of servicing a request and allows a cluster operator to
+	// expose a cluster resource (i.e. Service) by externally-reachable URL,
+	// load-balance traffic and terminate SSL/TLS. Typically, a route is a
+	// "httproute" or "tcproute" in group "networking.x.k8s.io". However, an
 	// implementation may support other resources.
+	//
+	// If unspecified, no routes will be associated to the Gateway.
+	//
+	// Support: Core
+	//
+	// +optional
 	Routes []RouteObjectReference `json:"routes"`
 }
 

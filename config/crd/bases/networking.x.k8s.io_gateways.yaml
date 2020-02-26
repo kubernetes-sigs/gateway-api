@@ -172,10 +172,13 @@ spec:
                 type: object
               type: array
             routes:
-              description: Routes associated with this Gateway. Routes define protocol-specific
-                routing to backends (e.g. Services).  Typically the resource is "httproute"
-                or "tcproute" in group "networking.x.k8s.io", or an implementation
-                may support other resources.
+              description: "Routes is a list of resources to associate with the Gateway.
+                A route is a resource capable of servicing a request and allows a
+                cluster operator to expose a cluster resource (i.e. Service) by externally-reachable
+                URL, load-balance traffic and terminate SSL/TLS. Typically, a route
+                is a \"httproute\" or \"tcproute\" in group \"networking.x.k8s.io\".
+                However, an implementation may support other resources. \n If unspecified,
+                no routes will be associated to the Gateway. \n Support: Core"
               items:
                 description: LocalObjectReference identifies an API object within
                   a known namespace.
@@ -199,7 +202,6 @@ spec:
           required:
           - class
           - listeners
-          - routes
           type: object
         status:
           description: GatewayStatus defines the observed state of Gateway.
