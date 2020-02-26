@@ -612,7 +612,8 @@ message ListenerTLS {
   map<string, string> options = 3;
 }
 
-// RouteObjectReference identifies a route object within a known namespace.
+// RouteMatchExtensionObjectReference identifies a route-match extension object
+// within a known namespace.
 //
 // +k8s:deepcopy-gen=false
 message LocalObjectReference {

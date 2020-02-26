@@ -270,20 +270,13 @@ type RouteBindingSelector struct {
 // namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type CertificateObjectReference = LocalObjectReference
 
 // ListenerExtensionObjectReference identifies a listener extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type ListenerExtensionObjectReference = LocalObjectReference
-
-// RouteObjectReference identifies a route object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

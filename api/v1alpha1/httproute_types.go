@@ -136,7 +136,6 @@ type HTTPRouteMatch struct {
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteMatchExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteFilter defines a filter-like action to be applied to
@@ -163,7 +162,6 @@ type HTTPRouteFilter struct {
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteFilterExtensionObjectReference = LocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
@@ -231,21 +229,18 @@ type HTTPRouteAction struct {
 // action within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteActionTargetObjectReference = LocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteActionExtensionObjectReference = LocalObjectReference
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteHostExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
