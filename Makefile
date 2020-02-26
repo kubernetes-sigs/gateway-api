@@ -33,10 +33,19 @@ serve:
 clean:
 	make -f docs.mk clean
 
-# Install the CRD's to a pre-existing cluster.
+# Install the CRD's and example resources to a pre-existing cluster.
 .PHONY: install
-install:
+install: crd example
+
+# Install the CRD's to a pre-existing cluster.
+.PHONY: crd
+crd:
 	make -f kubebuilder.mk install
+
+# Install the example resources to a pre-existing cluster.
+.PHONY: example
+example:
+	hack/install-examples.sh
 
 # Remove installed CRD's and CR's.
 .PHONY: uninstall
