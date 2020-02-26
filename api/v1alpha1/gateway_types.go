@@ -61,15 +61,6 @@ type GatewaySpec struct {
 	// "httproute" or "tcproute" in group "networking.x.k8s.io", or an
 	// implementation may support other resources.
 	Routes []RouteObjectReference `json:"routes"`
-	// SchedulingPolicy enables explicit control over the scheduling of a Gateway
-	// deployment.
-	//
-	// If unset, defaults are used. See SchedulingPolicy for more details.
-	//
-	// Support: Core
-	//
-	// +optional
-	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
 }
 
 const (
@@ -208,34 +199,6 @@ type ListenerTLS struct {
 	//
 	// Support: Implementation-specific.
 	Options map[string]string `json:"options"`
-}
-
-// SchedulingPolicy describes the schema for scheduling a Gateway
-// to a specific set of nodes in a cluster.
-type SchedulingPolicy struct {
-	// NodeSelector is the node selector applied to a gateway.
-	//
-	// If unset, the default is:
-	//
-	//   beta.kubernetes.io/os: linux
-	//   node-role.kubernetes.io/worker: ''
-	//
-	// If set, the specified selector is used and replaces the default.
-	//
-	// See https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
-	// for additional background on node selector.
-	//
-	// +optional
-	NodeSelector *metav1.LabelSelector `json:"nodeSelector,omitempty"`
-	// Tolerations is a list of tolerations applied to a gateway.
-	//
-	// The default is an empty list.
-	//
-	// See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
-	// for additional background on taints and tolerations.
-	//
-	// +optional
-	Tolerations []core.Toleration `json:"tolerations,omitempty"`
 }
 
 // LocalObjectReference identifies an API object within a known namespace.

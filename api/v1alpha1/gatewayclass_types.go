@@ -74,6 +74,44 @@ type GatewayClassSpec struct {
 	//
 	// +optional
 	ParametersRef *GatewayClassParametersObjectReference `json:"parameters,omitempty" protobuf:"bytes,2,opt,name=parametersRef"`
+
+	// SchedulingPolicy enables explicit control over the scheduling of a Gateway
+	// deployment.
+	//
+	// If unset, defaults are used. See SchedulingPolicy for more details.
+	//
+	// Support: Extended
+	//
+	// +optional
+	SchedulingPolicy *SchedulingPolicy `json:"schedulingPolicy,omitempty"`
+}
+
+// SchedulingPolicy describes the schema for scheduling a Gateway
+// to a specific set of nodes in a cluster.
+type SchedulingPolicy struct {
+	// NodeSelector is the node selector applied to a gateway.
+	//
+	// If unset, the default is:
+	//
+	//   beta.kubernetes.io/os: linux
+	//   node-role.kubernetes.io/worker: ''
+	//
+	// If set, the specified selector is used and replaces the default.
+	//
+	// See https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+	// for additional background on node selector.
+	//
+	// +optional
+	NodeSelector *metav1.LabelSelector `json:"nodeSelector,omitempty"`
+	// Tolerations is a list of tolerations applied to a gateway.
+	//
+	// The default is an empty list.
+	//
+	// See https://kubernetes.io/docs/concepts/configuration/taint-and-toleration/
+	// for additional background on taints and tolerations.
+	//
+	// +optional
+	Tolerations []core.Toleration `json:"tolerations,omitempty"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a
