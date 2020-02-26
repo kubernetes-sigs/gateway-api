@@ -115,9 +115,11 @@ type Listener struct {
 	//
 	// +optional
 	TLS *ListenerTLS `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
-	// Extension for this Listener.  The resource may be "configmap" (use
-	// the empty string for the group) or an implementation-defined resource
-	// (for example, resource "mylistener" in group "networking.acme.io").
+	// Extension for this Listener.  The resource may be "configmaps" or an
+	// implementation-defined resource (for example, resource "mylisteners"
+	// in group "networking.acme.io").  Omitting or specifying the empty
+	// string for both the resource and group indicates that the resource is
+	// "configmaps".
 	//
 	// Support: custom.
 	// +optional
@@ -182,10 +184,10 @@ type ListenerTLS struct {
 	// host name in a TLS SNI client hello message is used for certificate
 	// matching and route host name selection.  The SNI server_name must
 	// match a route host name for the Gateway to route the TLS request.  If
-	// an entry in this list specifies the empty string for both the group
-	// and the resource, the resource defaults to "secret".  An
+	// an entry in this list omits or specifies the empty string for both
+	// the group and the resource, the resource defaults to "secrets".  An
 	// implementation may support other resources (for example, resource
-	// "mycertificate" in group "networking.acme.io").
+	// "mycertificates" in group "networking.acme.io").
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
@@ -217,11 +219,10 @@ type ListenerTLS struct {
 
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
-	// Group is the group of the referent.  The empty string represents
-	// the core API group.
+	// Group is the group of the referent.  Omitting the value or specifying
+	// the empty string indicates the core API group.
 	//
-	// +kubebuilder:validation:Required
-	// +required
+	// +optional
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the resource of the referent.
 	//

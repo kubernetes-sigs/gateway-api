@@ -40,14 +40,17 @@ spec:
               properties:
                 extension:
                   description: "Extension is an optional, implementation-specific
-                    extension to the \"host\" block.  The resource may be \"configmap\"
-                    (use the empty string for the group) or an implementation-defined
-                    resource (for example, resource \"myroutehost\" in group \"networking.acme.io\").
-                    \n Support: custom"
+                    extension to the \"host\" block.  The resource may be \"configmaps\"
+                    (omit or specify the empty string for the group) or an implementation-defined
+                    resource (for example, resource \"myroutehosts\" in group \"networking.acme.io\").
+                    Omitting or specifying the empty string for both the resource
+                    and group indicates that the resource is \"configmaps\". \n Support:
+                    custom"
                   properties:
                     group:
-                      description: Group is the group of the referent.  The empty
-                        string represents the core API group.
+                      description: Group is the group of the referent.  Omitting the
+                        value or specifying the empty string indicates the core API
+                        group.
                       type: string
                     name:
                       description: Name is the name of the referent.
@@ -56,7 +59,6 @@ spec:
                       description: Resource is the resource of the referent.
                       type: string
                   required:
-                  - group
                   - name
                   - resource
                   type: object
@@ -84,14 +86,17 @@ spec:
                           extension:
                             description: "Extension is an optional, implementation-specific
                               extension to the \"action\" behavior.  The resource
-                              may be \"configmap\" (use the empty string for the group)
-                              or an implementation-defined resource (for example,
-                              resource \"myrouteaction\" in group \"networking.acme.io\").
+                              may be \"configmaps\" (use the empty string for the
+                              group) or an implementation-defined resource (for example,
+                              resource \"myrouteactions\" in group \"networking.acme.io\").
+                              Omitting or specifying the empty string for both the
+                              resource and group indicates that the resource is \"configmaps\".
                               \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  The
-                                  empty string represents the core API group.
+                                description: Group is the group of the referent.  Omitting
+                                  the value or specifying the empty string indicates
+                                  the core API group.
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -100,20 +105,22 @@ spec:
                                 description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - group
                             - name
                             - resource
                             type: object
                           forwardTo:
                             description: ForwardTo sends requests to the referenced
-                              object.  The resource may be "service" (use the empty
-                              string for the group), or an implementation may support
-                              other resources (for example, resource "myroutetarget"
-                              in group "networking.acme.io").
+                              object.  The resource may be "services" (omit or use
+                              the empty string for the group), or an implementation
+                              may support other resources (for example, resource "myroutetargets"
+                              in group "networking.acme.io").  Omitting or specifying
+                              the empty string for both the resource and group indicates
+                              that the resource is "services".
                             properties:
                               group:
-                                description: Group is the group of the referent.  The
-                                  empty string represents the core API group.
+                                description: Group is the group of the referent.  Omitting
+                                  the value or specifying the empty string indicates
+                                  the core API group.
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -122,7 +129,6 @@ spec:
                                 description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - group
                             - name
                             - resource
                             type: object
@@ -138,12 +144,15 @@ spec:
                               extension to the \"filter\" behavior.  The resource
                               may be \"configmap\" (use the empty string for the group)
                               or an implementation-defined resource (for example,
-                              resource \"myroutefilter\" in group \"networking.acme.io\").
+                              resource \"myroutefilters\" in group \"networking.acme.io\").
+                              Omitting or specifying the empty string for both the
+                              resource and group indicates that the resource is \"configmaps\".
                               \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  The
-                                  empty string represents the core API group.
+                                description: Group is the group of the referent.  Omitting
+                                  the value or specifying the empty string indicates
+                                  the core API group.
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -152,7 +161,6 @@ spec:
                                 description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - group
                             - name
                             - resource
                             type: object
@@ -193,12 +201,15 @@ spec:
                               extension to the \"match\" behavior.  The resource may
                               be \"configmap\" (use the empty string for the group)
                               or an implementation-defined resource (for example,
-                              resource \"myroutematcher\" in group \"networking.acme.io\").
+                              resource \"myroutematchers\" in group \"networking.acme.io\").
+                              Omitting or specifying the empty string for both the
+                              resource and group indicates that the resource is \"configmaps\".
                               \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  The
-                                  empty string represents the core API group.
+                                description: Group is the group of the referent.  Omitting
+                                  the value or specifying the empty string indicates
+                                  the core API group.
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -207,7 +218,6 @@ spec:
                                 description: Resource is the resource of the referent.
                                 type: string
                             required:
-                            - group
                             - name
                             - resource
                             type: object
@@ -246,14 +256,17 @@ spec:
                 properties:
                   extension:
                     description: "Extension is an optional, implementation-specific
-                      extension to the \"host\" block.  The resource may be \"configmap\"
-                      (use the empty string for the group) or an implementation-defined
-                      resource (for example, resource \"myroutehost\" in group \"networking.acme.io\").
-                      \n Support: custom"
+                      extension to the \"host\" block.  The resource may be \"configmaps\"
+                      (omit or specify the empty string for the group) or an implementation-defined
+                      resource (for example, resource \"myroutehosts\" in group \"networking.acme.io\").
+                      Omitting or specifying the empty string for both the resource
+                      and group indicates that the resource is \"configmaps\". \n
+                      Support: custom"
                     properties:
                       group:
-                        description: Group is the group of the referent.  The empty
-                          string represents the core API group.
+                        description: Group is the group of the referent.  Omitting
+                          the value or specifying the empty string indicates the core
+                          API group.
                         type: string
                       name:
                         description: Name is the name of the referent.
@@ -262,7 +275,6 @@ spec:
                         description: Resource is the resource of the referent.
                         type: string
                     required:
-                    - group
                     - name
                     - resource
                     type: object
@@ -291,14 +303,17 @@ spec:
                             extension:
                               description: "Extension is an optional, implementation-specific
                                 extension to the \"action\" behavior.  The resource
-                                may be \"configmap\" (use the empty string for the
+                                may be \"configmaps\" (use the empty string for the
                                 group) or an implementation-defined resource (for
-                                example, resource \"myrouteaction\" in group \"networking.acme.io\").
-                                \n Support: custom"
+                                example, resource \"myrouteactions\" in group \"networking.acme.io\").
+                                Omitting or specifying the empty string for both the
+                                resource and group indicates that the resource is
+                                \"configmaps\". \n Support: custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  The
-                                    empty string represents the core API group.
+                                  description: Group is the group of the referent.  Omitting
+                                    the value or specifying the empty string indicates
+                                    the core API group.
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -307,20 +322,22 @@ spec:
                                   description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - group
                               - name
                               - resource
                               type: object
                             forwardTo:
                               description: ForwardTo sends requests to the referenced
-                                object.  The resource may be "service" (use the empty
-                                string for the group), or an implementation may support
-                                other resources (for example, resource "myroutetarget"
-                                in group "networking.acme.io").
+                                object.  The resource may be "services" (omit or use
+                                the empty string for the group), or an implementation
+                                may support other resources (for example, resource
+                                "myroutetargets" in group "networking.acme.io").  Omitting
+                                or specifying the empty string for both the resource
+                                and group indicates that the resource is "services".
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  The
-                                    empty string represents the core API group.
+                                  description: Group is the group of the referent.  Omitting
+                                    the value or specifying the empty string indicates
+                                    the core API group.
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -329,7 +346,6 @@ spec:
                                   description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - group
                               - name
                               - resource
                               type: object
@@ -345,12 +361,15 @@ spec:
                                 extension to the \"filter\" behavior.  The resource
                                 may be \"configmap\" (use the empty string for the
                                 group) or an implementation-defined resource (for
-                                example, resource \"myroutefilter\" in group \"networking.acme.io\").
-                                \n Support: custom"
+                                example, resource \"myroutefilters\" in group \"networking.acme.io\").
+                                Omitting or specifying the empty string for both the
+                                resource and group indicates that the resource is
+                                \"configmaps\". \n Support: custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  The
-                                    empty string represents the core API group.
+                                  description: Group is the group of the referent.  Omitting
+                                    the value or specifying the empty string indicates
+                                    the core API group.
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -359,7 +378,6 @@ spec:
                                   description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - group
                               - name
                               - resource
                               type: object
@@ -401,12 +419,15 @@ spec:
                                 extension to the \"match\" behavior.  The resource
                                 may be \"configmap\" (use the empty string for the
                                 group) or an implementation-defined resource (for
-                                example, resource \"myroutematcher\" in group \"networking.acme.io\").
-                                \n Support: custom"
+                                example, resource \"myroutematchers\" in group \"networking.acme.io\").
+                                Omitting or specifying the empty string for both the
+                                resource and group indicates that the resource is
+                                \"configmaps\". \n Support: custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  The
-                                    empty string represents the core API group.
+                                  description: Group is the group of the referent.  Omitting
+                                    the value or specifying the empty string indicates
+                                    the core API group.
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -415,7 +436,6 @@ spec:
                                   description: Resource is the resource of the referent.
                                   type: string
                               required:
-                              - group
                               - name
                               - resource
                               type: object

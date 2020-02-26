@@ -99,8 +99,10 @@ type GatewayClassSpec struct {
 	// any additional configuration.
 	//
 	// Valid resources for reference are up to the Controller. Examples
-	// include "configmap" (using the empty string to indicate the core API
-	// group) or a custom resource (CRD).
+	// include "configmaps" (omit or specify the empty string for the group
+	// to indicate the core API group) or a custom resource (CRD).  Omitting
+	// or specifying the empty string for both the resource and group
+	// indicates that the resource is "configmaps".
 	//
 	// Support: Custom
 	//

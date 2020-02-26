@@ -56,9 +56,11 @@ type HTTPRouteHost struct {
 	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
 	// Extension is an optional, implementation-specific extension to the
-	// "host" block.  The resource may be "configmap" (use the empty string
-	// for the group) or an implementation-defined resource (for example,
-	// resource "myroutehost" in group "networking.acme.io").
+	// "host" block.  The resource may be "configmaps" (omit or specify the
+	// empty string for the group) or an implementation-defined resource
+	// (for example, resource "myroutehosts" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".
 	//
 	// Support: custom
 	//
@@ -124,7 +126,9 @@ type HTTPRouteMatch struct {
 	// Extension is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematcher" in group "networking.acme.io").
+	// example, resource "myroutematchers" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".
 	//
 	// Support: custom
 	//
@@ -150,7 +154,9 @@ type HTTPRouteFilter struct {
 	// Extension is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutefilter" in group "networking.acme.io").
+	// example, resource "myroutefilters" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".
 	//
 	// Support: custom
 	//
@@ -209,15 +215,19 @@ type HTTPHeaderFilter struct {
 // HTTPRouteAction is the action taken given a match.
 type HTTPRouteAction struct {
 	// ForwardTo sends requests to the referenced object.  The resource may
-	// be "service" (use the empty string for the group), or an
+	// be "services" (omit or use the empty string for the group), or an
 	// implementation may support other resources (for example, resource
-	// "myroutetarget" in group "networking.acme.io").
+	// "myroutetargets" in group "networking.acme.io").  Omitting or
+	// specifying the empty string for both the resource and group indicates
+	// that the resource is "services".
 	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
 	// Extension is an optional, implementation-specific extension to the
-	// "action" behavior.  The resource may be "configmap" (use the empty
+	// "action" behavior.  The resource may be "configmaps" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteaction" in group "networking.acme.io").
+	// example, resource "myrouteactions" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".
 	//
 	// Support: custom
 	//

@@ -151,12 +151,14 @@ spec:
                 the configuration parameters corresponding to this class. This is
                 optional if the controller does not require any additional configuration.
                 \n Valid resources for reference are up to the Controller. Examples
-                include \"configmap\" (using the empty string to indicate the core
-                API group) or a custom resource (CRD). \n Support: Custom"
+                include \"configmaps\" (omit or specify the empty string for the group
+                to indicate the core API group) or a custom resource (CRD).  Omitting
+                or specifying the empty string for both the resource and group indicates
+                that the resource is \"configmaps\". \n Support: Custom"
               properties:
                 group:
-                  description: Group is the group of the referent.  The empty string
-                    represents the core API group.
+                  description: Group is the group of the referent.  Omitting the value
+                    or specifying the empty string indicates the core API group.
                   type: string
                 name:
                   description: Name is the name of the referent.
@@ -165,7 +167,6 @@ spec:
                   description: Resource is the resource of the referent.
                   type: string
               required:
-              - group
               - name
               - resource
               type: object

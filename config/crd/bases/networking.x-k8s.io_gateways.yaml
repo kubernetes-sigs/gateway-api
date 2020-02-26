@@ -73,13 +73,15 @@ spec:
                     type: object
                   extension:
                     description: "Extension for this Listener.  The resource may be
-                      \"configmap\" (use the empty string for the group) or an implementation-defined
-                      resource (for example, resource \"mylistener\" in group \"networking.acme.io\").
-                      \n Support: custom."
+                      \"configmaps\" or an implementation-defined resource (for example,
+                      resource \"mylisteners\" in group \"networking.acme.io\").  Omitting
+                      or specifying the empty string for both the resource and group
+                      indicates that the resource is \"configmaps\". \n Support: custom."
                     properties:
                       group:
-                        description: Group is the group of the referent.  The empty
-                          string represents the core API group.
+                        description: Group is the group of the referent.  Omitting
+                          the value or specifying the empty string indicates the core
+                          API group.
                         type: string
                       name:
                         description: Name is the name of the referent.
@@ -88,7 +90,6 @@ spec:
                         description: Resource is the resource of the referent.
                         type: string
                     required:
-                    - group
                     - name
                     - resource
                     type: object
@@ -119,10 +120,10 @@ spec:
                           hello message is used for certificate matching and route
                           host name selection.  The SNI server_name must match a route
                           host name for the Gateway to route the TLS request.  If
-                          an entry in this list specifies the empty string for both
-                          the group and the resource, the resource defaults to \"secret\".
-                          \ An implementation may support other resources (for example,
-                          resource \"mycertificate\" in group \"networking.acme.io\").
+                          an entry in this list omits or specifies the empty string
+                          for both the group and the resource, the resource defaults
+                          to \"secrets\".  An implementation may support other resources
+                          (for example, resource \"mycertificates\" in group \"networking.acme.io\").
                           \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
                           (Other resource types)"
                         items:
@@ -130,8 +131,9 @@ spec:
                             within a known namespace.
                           properties:
                             group:
-                              description: Group is the group of the referent.  The
-                                empty string represents the core API group.
+                              description: Group is the group of the referent.  Omitting
+                                the value or specifying the empty string indicates
+                                the core API group.
                               type: string
                             name:
                               description: Name is the name of the referent.
@@ -140,7 +142,6 @@ spec:
                               description: Resource is the resource of the referent.
                               type: string
                           required:
-                          - group
                           - name
                           - resource
                           type: object
