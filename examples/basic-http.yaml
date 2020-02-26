@@ -16,11 +16,12 @@ metadata:
 spec:
   class: acme-lb
   listeners:  # Use GatewayClass defaults for listener definition.
-  - protocol: HTTP
+  - name: my-http-listener
+    protocol: HTTP
   routes:
   - name: http-app-1
-    namespace: default
-    kind: HTTPRoute
+    group: networking.x.k8s.io
+    resource: HTTPRoute
 ---
 kind: HTTPRoute
 apiVersion: networking.x.k8s.io/v1alpha1
@@ -36,5 +37,6 @@ spec:
             path: /bar
           action:
             forwardTo:
-              kind: Service
+              resource: Service
+              group: core
               name: my-service
