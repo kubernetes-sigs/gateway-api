@@ -60,7 +60,9 @@ type HTTPRouteHost struct {
 	// empty string for the group) or an implementation-defined resource
 	// (for example, resource "myroutehosts" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
@@ -128,7 +130,9 @@ type HTTPRouteMatch struct {
 	// string for the group) or an implementation-defined resource (for
 	// example, resource "myroutematchers" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
@@ -156,7 +160,9 @@ type HTTPRouteFilter struct {
 	// string for the group) or an implementation-defined resource (for
 	// example, resource "myroutefilters" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
@@ -219,7 +225,9 @@ type HTTPRouteAction struct {
 	// implementation may support other resources (for example, resource
 	// "myroutetargets" in group "networking.acme.io").  Omitting or
 	// specifying the empty string for both the resource and group indicates
-	// that the resource is "services".
+	// that the resource is "services".  If the referent cannot be found,
+	// the "InvalidRoutes" status condition on any Gateway that includes the
+	// HTTPRoute will be true.
 	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
 	// Extension is an optional, implementation-specific extension to the
@@ -227,7 +235,9 @@ type HTTPRouteAction struct {
 	// string for the group) or an implementation-defined resource (for
 	// example, resource "myrouteactions" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//

@@ -102,7 +102,9 @@ type GatewayClassSpec struct {
 	// include "configmaps" (omit or specify the empty string for the group
 	// to indicate the core API group) or a custom resource (CRD).  Omitting
 	// or specifying the empty string for both the resource and group
-	// indicates that the resource is "configmaps".
+	// indicates that the resource is "configmaps".  If the referent cannot
+	// be found, the GatewayClass's "InvalidParameters" status condition
+	// will be true.
 	//
 	// Support: Custom
 	//

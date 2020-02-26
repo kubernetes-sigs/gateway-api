@@ -119,7 +119,8 @@ type Listener struct {
 	// implementation-defined resource (for example, resource "mylisteners"
 	// in group "networking.acme.io").  Omitting or specifying the empty
 	// string for both the resource and group indicates that the resource is
-	// "configmaps".
+	// "configmaps".  If the referent cannot be found, the listener's
+	// "InvalidListener" status condition will be true.
 	//
 	// Support: custom.
 	// +optional
@@ -187,7 +188,9 @@ type ListenerTLS struct {
 	// an entry in this list omits or specifies the empty string for both
 	// the group and the resource, the resource defaults to "secrets".  An
 	// implementation may support other resources (for example, resource
-	// "mycertificates" in group "networking.acme.io").
+	// "mycertificates" in group "networking.acme.io").  If a referent
+	// cannot be found, the listener's "InvalidListener" status condition
+	// will be true.
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)

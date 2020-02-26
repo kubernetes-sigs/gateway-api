@@ -76,7 +76,9 @@ spec:
                       \"configmaps\" or an implementation-defined resource (for example,
                       resource \"mylisteners\" in group \"networking.acme.io\").  Omitting
                       or specifying the empty string for both the resource and group
-                      indicates that the resource is \"configmaps\". \n Support: custom."
+                      indicates that the resource is \"configmaps\".  If the referent
+                      cannot be found, the listener's \"InvalidListener\" status condition
+                      will be true. \n Support: custom."
                     properties:
                       group:
                         description: Group is the group of the referent.  Omitting
@@ -124,8 +126,10 @@ spec:
                           for both the group and the resource, the resource defaults
                           to \"secrets\".  An implementation may support other resources
                           (for example, resource \"mycertificates\" in group \"networking.acme.io\").
-                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
-                          (Other resource types)"
+                          \ If a referent cannot be found, the listener's \"InvalidListener\"
+                          status condition will be true. \n Support: Core (Kubernetes
+                          Secrets) Support: Implementation-specific (Other resource
+                          types)"
                         items:
                           description: LocalObjectReference identifies an API object
                             within a known namespace.
