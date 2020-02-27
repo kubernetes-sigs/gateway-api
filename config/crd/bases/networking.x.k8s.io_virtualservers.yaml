@@ -1,0 +1,333 @@
+
+---
+apiVersion: apiextensions.k8s.io/v1beta1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.2.4
+  creationTimestamp: null
+  name: virtualservers.networking.x.k8s.io
+spec:
+  group: networking.x.k8s.io
+  names:
+    kind: VirtualServer
+    listKind: VirtualServerList
+    plural: virtualservers
+    singular: virtualserver
+  scope: Namespaced
+  validation:
+    openAPIV3Schema:
+      description: VirtualServer is the Schema for the virtualservers API.
+      properties:
+        apiVersion:
+          description: 'APIVersion defines the versioned schema of this representation
+            of an object. Servers should convert recognized schemas to the latest
+            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+          type: string
+        kind:
+          description: 'Kind is a string value representing the REST resource this
+            object represents. Servers may infer this from the endpoint the client
+            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+          type: string
+        metadata:
+          type: object
+        spec:
+          description: VirtualServerSpec defines the desired state of VirtualServer.
+          properties:
+            extension:
+              description: "Extension is an optional, implementation-specific extension
+                to the \"host\" block.  The resource may be \"configmap\" (use the
+                empty string for the group) or an implementation-defined resource
+                (for example, resource \"myroutehost\" in group \"networking.acme.io\").
+                \n Support: Custom"
+              properties:
+                group:
+                  description: Group is the group of the referent.  The empty string
+                    represents the core API group.
+                  type: string
+                name:
+                  description: Name is the name of the referent.
+                  type: string
+                resource:
+                  description: Resource is the resource of the referent.
+                  type: string
+              required:
+              - group
+              - name
+              - resource
+              type: object
+            hostnames:
+              description: "Hostnames are the set of domain name that refers to this
+                HTTPServer. These names must be unique across the Listener. \n Support:
+                Core"
+              items:
+                type: string
+              type: array
+            rules:
+              description: "Rules are rules to match, filter and perform actions on
+                requests. \n Support: Core"
+              items:
+                description: VirtualServerRule is a rule to match, filter and perform
+                  actions on requests to a VirtualServer.
+                properties:
+                  action:
+                    description: "Action defines what happens to the request. \n Support:
+                      Core"
+                    properties:
+                      extension:
+                        description: "Extension is an optional, implementation-specific
+                          extension to the \"action\" behavior.  The resource may
+                          be \"configmap\" (use the empty string for the group) or
+                          an implementation-defined resource (for example, resource
+                          \"my-virtualserver-action\" in group \"networking.acme.io\").
+                          \n Support: custom"
+                        properties:
+                          group:
+                            description: Group is the group of the referent.  The
+                              empty string represents the core API group.
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            type: string
+                          resource:
+                            description: Resource is the resource of the referent.
+                            type: string
+                        required:
+                        - group
+                        - name
+                        - resource
+                        type: object
+                      forwardTo:
+                        description: "ForwardTo sends requests to the referenced object.
+                          \ The resource may be \"service\" (use the empty string
+                          for the group), or an implementation may support other resources
+                          (for example, resource \"my-virtualserver-target\" in group
+                          \"networking.acme.io\"). \n Support: Core"
+                        properties:
+                          group:
+                            description: Group is the group of the referent.  The
+                              empty string represents the core API group.
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            type: string
+                          resource:
+                            description: Resource is the resource of the referent.
+                            type: string
+                        required:
+                        - group
+                        - name
+                        - resource
+                        type: object
+                    type: object
+                  filter:
+                    description: "Filter defines what filters are applied to the request.
+                      \n Support: Core"
+                    properties:
+                      extension:
+                        description: "Extension is an optional, implementation-specific
+                          extension to the \"filter\" behavior.  The resource may
+                          be \"configmap\" (use the empty string for the group) or
+                          an implementation-defined resource (for example, resource
+                          \"myroutefilter\" in group \"networking.acme.io\"). \n Support:
+                          custom"
+                        properties:
+                          group:
+                            description: Group is the group of the referent.  The
+                              empty string represents the core API group.
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            type: string
+                          resource:
+                            description: Resource is the resource of the referent.
+                            type: string
+                        required:
+                        - group
+                        - name
+                        - resource
+                        type: object
+                      headers:
+                        description: "Headers related filters. \n Support: extended"
+                        properties:
+                          add:
+                            additionalProperties:
+                              type: string
+                            description: "Add adds the given header (name, value)
+                              to the request before the action. \n Input:   GET /foo
+                              HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"}
+                              \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support:
+                              extended?"
+                            type: object
+                          remove:
+                            description: "Remove the given header(s) on the HTTP request
+                              before the action. The value of RemoveHeader is a list
+                              of HTTP header names. Note that the header names are
+                              case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo
+                              HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2:
+                              GHI \n Config:   remove: [\"my-header1\", \"my-header3\"]
+                              \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n
+                              Support: extended?"
+                            items:
+                              type: string
+                            type: array
+                        type: object
+                    type: object
+                  match:
+                    description: "Match defines criteria for matching a request. \n
+                      Support: Core"
+                    properties:
+                      extension:
+                        description: "Extension is an optional, implementation-specific
+                          extension to the \"match\" behavior.  The resource may be
+                          \"configmap\" (use the empty string for the group) or an
+                          implementation-defined resource (for example, resource \"myroutematcher\"
+                          in group \"networking.acme.io\"). \n Support: custom"
+                        properties:
+                          group:
+                            description: Group is the group of the referent.  The
+                              empty string represents the core API group.
+                            type: string
+                          name:
+                            description: Name is the name of the referent.
+                            type: string
+                          resource:
+                            description: Resource is the resource of the referent.
+                            type: string
+                        required:
+                        - group
+                        - name
+                        - resource
+                        type: object
+                      header:
+                        additionalProperties:
+                          type: string
+                        description: "Header are the Header matches as interpreted
+                          via HeaderType. \n Support: ?"
+                        type: object
+                      headerType:
+                        description: "HeaderType defines the semantics of the `Header`
+                          matcher. \n Support: ?"
+                        type: string
+                      path:
+                        description: "Path is the value of the HTTP path as interpreted
+                          via PathType. \n Default: \"/\" \n Support: ?"
+                        type: string
+                      pathType:
+                        description: "PathType is defines the semantics of the `Path`
+                          matcher. \n Support: core (Exact, Prefix) Support: extended
+                          (RegularExpression) Support: custom (ImplementationSpecific)
+                          \n Default: \"Exact\""
+                        type: string
+                    type: object
+                required:
+                - action
+                - match
+                type: object
+              type: array
+            tls:
+              description: "TLS is the TLS configuration used for the VirtualServer.
+                If this host has multiple names, each name should be present in the
+                server certificate as a DNS SAN. \n The ALPNProtocols field in this
+                TLSConfig must contain only valid HTTP protocol identifiers, i.e.
+                \"http/0.9\", \"http/1.0\", \"http/1.1\", \"h2\". Implementations
+                may accept only a subset of these values if the underlying proxy implementation
+                does not implement the corresponding HTTP protocol version. \n Support:
+                Core"
+              properties:
+                alpnProtocols:
+                  description: "ALPNProtocols is the list of IANA-registered ALPN
+                    protocol names that this TLS party is willing to accept. \n https://www.iana.org/assignments/tls-extensiontype-values/tls-extensiontype-values.xhtml#alpn-protocol-ids
+                    \n TODO: If unset, defaults to? \n Support: Core"
+                  items:
+                    description: ALPNProtocolType identifies supported ALPN protocols.
+                    type: string
+                  type: array
+                certificates:
+                  description: "Certificates is a list of references to Kubernetes
+                    objects that each contain an identity certificate that is bound
+                    to the listener.  The host name in a TLS SNI client hello message
+                    is used for certificate matching and route host name selection.
+                    \ The SNI server_name must match a route host name for the Gateway
+                    to route the TLS request.  If an entry in this list specifies
+                    the empty string for both the group and the resource, the resource
+                    defaults to \"secret\".  An implementation may support other resources
+                    (for example, resource \"mycertificate\" in group \"networking.acme.io\").
+                    \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
+                    (Other resource types)"
+                  items:
+                    description: LocalObjectReference identifies an API object within
+                      a known namespace.
+                    properties:
+                      group:
+                        description: Group is the group of the referent.  The empty
+                          string represents the core API group.
+                        type: string
+                      name:
+                        description: Name is the name of the referent.
+                        type: string
+                      resource:
+                        description: Resource is the resource of the referent.
+                        type: string
+                    required:
+                    - group
+                    - name
+                    - resource
+                    type: object
+                  type: array
+                minimumVersion:
+                  description: "MinimumVersion of TLS allowed. It is recommended to
+                    use one of the TLS_* constants above. Note: this is not strongly
+                    typed to allow implementation-specific versions to be used without
+                    requiring updates to the API types. String must be of the form
+                    \"<protocol><major>_<minor>\". \n Support: Core for TLS1_{1,2,3}.
+                    Implementation-specific for all other values."
+                  type: string
+                options:
+                  additionalProperties:
+                    type: string
+                  description: "Options are a list of key/value pairs to give extended
+                    options to the provider. \n There variation among providers as
+                    to how ciphersuites are expressed. If there is a common subset
+                    for expressing ciphers then it will make sense to loft that as
+                    a core API construct. \n Support: Implementation-specific."
+                  type: object
+              required:
+              - certificates
+              type: object
+          required:
+          - hostnames
+          - rules
+          type: object
+        status:
+          description: VirtualServerStatus defines the observed state of VirtualServer.
+          properties:
+            gateways:
+              items:
+                description: GatewayObjectReference identifies a Gateway object.
+                properties:
+                  name:
+                    description: Name is the name of the referent.
+                    type: string
+                  namespace:
+                    description: Namespace is the namespace of the referent.
+                    type: string
+                required:
+                - name
+                type: object
+              type: array
+          required:
+          - gateways
+          type: object
+      type: object
+  version: v1alpha1
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

@@ -19,33 +19,34 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/service-apis/api/v1alpha1"
+
+	networkingv1alpha1 "sigs.k8s.io/service-apis/api/v1alpha1"
 )
 
-// HTTPRouteReconciler reconciles a HTTPRoute object
-type HTTPRouteReconciler struct {
+// VirtualServerReconciler reconciles a VirtualServer object
+type VirtualServerReconciler struct {
 	client.Client
-	Log logr.Logger
+	Log    logr.Logger
+	Scheme *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=httproutes,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=httproutes/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=virtualservers,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=virtualservers/status,verbs=get;update;patch
 
-// Reconcile the changes.
-func (r *HTTPRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *VirtualServerReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
-	_ = r.Log.WithValues("httproute", req.NamespacedName)
+	_ = r.Log.WithValues("virtualserver", req.NamespacedName)
 
 	// your logic here
 
 	return ctrl.Result{}, nil
 }
 
-// SetupWithManager wires up the controller.
-func (r *HTTPRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *VirtualServerReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1alpha1.HTTPRoute{}).
+		For(&networkingv1alpha1.VirtualServer{}).
 		Complete(r)
 }

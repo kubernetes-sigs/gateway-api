@@ -56,30 +56,59 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
 	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
-	// Routes is a list of resources to associate with the Gateway. A route is a
-	// resource capable of servicing a request and allows a cluster operator to
-	// expose a cluster resource (i.e. Service) by externally-reachable URL,
-	// load-balance traffic and terminate SSL/TLS. Typically, a route is a
-	// "httproute" or "tcproute" in group "networking.x.k8s.io". However, an
-	// implementation may support other resources.
+	// Servers binds virtual servers that are hosted by the gateway
+	// to listeners.
 	//
-	// If unspecified, no routes will be associated to the Gateway.
+	// An implementation must validate that Dedicated listeners have no
+	// more than 1 server binding.
 	//
-	// Support: Core
-	//
-	// +optional
-	Routes []RouteObjectReference `json:"routes" protobuf:"bytes,3,rep,name=routes"`
+	// An implementation must validate that all the servers bound to the
+	// same combined listener have a compatible discriminator.
+	// TODO(jpeach): describe consequences of this validating failing.
+	VirtualServers []VirtualServerBinding `json:"virtualServers" protobuf:"bytes,3,rep,name=virtualServers"`
 }
 
-const (
-	// HTTPProcotol constant.
-	HTTPProcotol = "HTTP"
-	// HTTPSProcotol constant.
-	HTTPSProcotol = "HTTPS"
-)
+// VirtualServerBinding specifies which listener a virtual server should
+// be attached to. A server can be bound to 1 or more listeners.
+type VirtualServerBinding struct {
+	// ListenerName is the unique name of a listener.
+	//
+	// TODO(jpeach): We could let an empty name mean all listeners, but
+	// there are trade-offs to that. For now this field must not be empty.
+	//
+	// +required
+	ListenerName string `json:"listenerName" protobuf:"bytes,1,opt,name=listenerName"`
+	// VirtualServer is a reference to the virtual server to be attached.
+	//
+	// +required
+	VirtualServer VirtualServerObjectReference `json:"virtualServer" protobuf:"bytes,2,opt,name=virtualServer"`
+}
+
+type ListenerProtocolType string
+
+const ListenerProtocolTCP ListenerProtocolType = "TCP"
+const ListenerProtocolUDP ListenerProtocolType = "UDP"
+
+type ListenerType string
+
+// DedicatedListenerType describes a listener with exactly one attached server.
+// All traffic received by this listener is terminated by this server.
+const DedicatedListenerType ListenerType = "Dedicated"
+
+// CombinedListenerType describes a listener what may have multiple attached
+// servers. The protocol recognized by this listener must have a discriminator
+// that can be used to select the appropriate server for the incoming request.
+// In the case of a streaming data over TLS, the ALPN protocol name can inspect
+// between different StreamServer specification. In the case of HTTP traffic,
+// the HTTP Host (i.e. H2 authority) provides the discriminator.
+const CombinedListenerType ListenerType = "Combined"
 
 // Listener defines a
 type Listener struct {
+	// Type specifies the server binding semantics of this listener.
+	//
+	// +required
+	Type ListenerType `json:"type" protobuf:"bytes,1,opt,name=type"`
 	// Name is the listener's name and should be specified as an
 	// RFC 1035 DNS_LABEL [1]:
 	//
@@ -91,7 +120,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
-	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
+	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 	// Address requested for this listener. This is optional and behavior
 	// can depend on GatewayClass. If a value is set in the spec and
 	// the request address is invalid, the GatewayClass MUST indicate
@@ -100,24 +129,20 @@ type Listener struct {
 	// Support:
 	//
 	// +optional
-	Address *ListenerAddress `json:"address,omitempty" protobuf:"bytes,2,opt,name=address"`
+	Address *ListenerAddress `json:"address,omitempty" protobuf:"bytes,3,opt,name=address"`
 	// Port is a list of ports associated with the Address.
 	//
 	// Support:
 	// +optional
-	Port *int32 `json:"port,omitempty" protobuf:"varint,3,opt,name=port"`
-	// Protocol to use.
+	Port *int32 `json:"port,omitempty" protobuf:"varint,4,opt,name=port"`
+	// Protocol is the protocol used by the listener, either TCP or UDP.
 	//
-	// Support:
-	// +optional
-	Protocol *string `json:"protocol,omitempty" protobuf:"bytes,4,opt,name=protocol"`
-	// TLS is the TLS configuration for the Listener. If unspecified,
-	// the listener will not support TLS connections.
+	// Defaults to TCP.
 	//
 	// Support: Core
 	//
 	// +optional
-	TLS *ListenerTLS `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
+	Protocol *ListenerProtocolType `json:"protocol,omitempty" protobuf:"bytes,5,opt,name=protocol"`
 	// Extension for this Listener.  The resource may be "configmap" (use
 	// the empty string for the group) or an implementation-defined resource
 	// (for example, resource "mylistener" in group "networking.acme.io").
@@ -159,65 +184,6 @@ type ListenerAddress struct {
 	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
 }
 
-const (
-	// TLS1_0 denotes the TLS v1.0.
-	TLS1_0 = "TLS1_0"
-	// TLS1_1 denotes the TLS v1.0.
-	TLS1_1 = "TLS1_1"
-	// TLS1_2 denotes the TLS v1.0.
-	TLS1_2 = "TLS1_2"
-	// TLS1_3 denotes the TLS v1.0.
-	TLS1_3 = "TLS1_3"
-)
-
-// ListenerTLS describes the TLS configuration for a given port.
-//
-// References
-// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
-// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
-// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
-// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
-// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-type ListenerTLS struct {
-	// Certificates is a list of references to Kubernetes objects that each
-	// contain an identity certificate that is bound to the listener.  The
-	// host name in a TLS SNI client hello message is used for certificate
-	// matching and route host name selection.  The SNI server_name must
-	// match a route host name for the Gateway to route the TLS request.  If
-	// an entry in this list specifies the empty string for both the group
-	// and the resource, the resource defaults to "secret".  An
-	// implementation may support other resources (for example, resource
-	// "mycertificate" in group "networking.acme.io").
-	//
-	// Support: Core (Kubernetes Secrets)
-	// Support: Implementation-specific (Other resource types)
-	//
-	// +required
-	Certificates []CertificateObjectReference `json:"certificates,omitempty" protobuf:"bytes,1,rep,name=certificates"`
-	// MinimumVersion of TLS allowed. It is recommended to use one of
-	// the TLS_* constants above. Note: this is not strongly
-	// typed to allow implementation-specific versions to be used without
-	// requiring updates to the API types. String must be of the form
-	// "<protocol><major>_<minor>".
-	//
-	// Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
-	// values.
-	//
-	// +optional
-	MinimumVersion *string `json:"minimumVersion" protobuf:"bytes,2,opt,name=minimumVersion"`
-	// Options are a list of key/value pairs to give extended options
-	// to the provider.
-	//
-	// There variation among providers as to how ciphersuites are
-	// expressed. If there is a common subset for expressing ciphers
-	// then it will make sense to loft that as a core API
-	// construct.
-	//
-	// Support: Implementation-specific.
-	Options map[string]string `json:"options" protobuf:"bytes,3,rep,name=options"`
-}
-
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
 	// Group is the group of the referent.  The empty string represents
@@ -252,10 +218,11 @@ type CertificateObjectReference = LocalObjectReference
 // +protobuf=false
 type ListenerExtensionObjectReference = LocalObjectReference
 
-// RouteObjectReference identifies a route object within a known namespace.
+// VirtualServerObjectReference identifies a virtual server object in the same
+// namespace as the Gateway.
 //
 // +k8s:deepcopy-gen=false
-type RouteObjectReference = LocalObjectReference
+type VirtualServerObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

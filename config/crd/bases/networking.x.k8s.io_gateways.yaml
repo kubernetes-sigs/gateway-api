@@ -105,103 +105,64 @@ spec:
                     format: int32
                     type: integer
                   protocol:
-                    description: "Protocol to use. \n Support:"
+                    description: "Protocol is the protocol used by the listener, either
+                      TCP or UDP. \n Defaults to TCP. \n Support: Core"
                     type: string
-                  tls:
-                    description: "TLS is the TLS configuration for the Listener. If
-                      unspecified, the listener will not support TLS connections.
-                      \n Support: Core"
-                    properties:
-                      certificates:
-                        description: "Certificates is a list of references to Kubernetes
-                          objects that each contain an identity certificate that is
-                          bound to the listener.  The host name in a TLS SNI client
-                          hello message is used for certificate matching and route
-                          host name selection.  The SNI server_name must match a route
-                          host name for the Gateway to route the TLS request.  If
-                          an entry in this list specifies the empty string for both
-                          the group and the resource, the resource defaults to \"secret\".
-                          \ An implementation may support other resources (for example,
-                          resource \"mycertificate\" in group \"networking.acme.io\").
-                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
-                          (Other resource types)"
-                        items:
-                          description: LocalObjectReference identifies an API object
-                            within a known namespace.
-                          properties:
-                            group:
-                              description: Group is the group of the referent.  The
-                                empty string represents the core API group.
-                              type: string
-                            name:
-                              description: Name is the name of the referent.
-                              type: string
-                            resource:
-                              description: Resource is the resource of the referent.
-                              type: string
-                          required:
-                          - group
-                          - name
-                          - resource
-                          type: object
-                        type: array
-                      minimumVersion:
-                        description: "MinimumVersion of TLS allowed. It is recommended
-                          to use one of the TLS_* constants above. Note: this is not
-                          strongly typed to allow implementation-specific versions
-                          to be used without requiring updates to the API types. String
-                          must be of the form \"<protocol><major>_<minor>\". \n Support:
-                          Core for TLS1_{1,2,3}. Implementation-specific for all other
-                          values."
-                        type: string
-                      options:
-                        additionalProperties:
-                          type: string
-                        description: "Options are a list of key/value pairs to give
-                          extended options to the provider. \n There variation among
-                          providers as to how ciphersuites are expressed. If there
-                          is a common subset for expressing ciphers then it will make
-                          sense to loft that as a core API construct. \n Support:
-                          Implementation-specific."
-                        type: object
-                    required:
-                    - options
-                    type: object
+                  type:
+                    description: Type specifies the server binding semantics of this
+                      listener.
+                    type: string
                 required:
                 - name
+                - type
                 type: object
               type: array
-            routes:
-              description: "Routes is a list of resources to associate with the Gateway.
-                A route is a resource capable of servicing a request and allows a
-                cluster operator to expose a cluster resource (i.e. Service) by externally-reachable
-                URL, load-balance traffic and terminate SSL/TLS. Typically, a route
-                is a \"httproute\" or \"tcproute\" in group \"networking.x.k8s.io\".
-                However, an implementation may support other resources. \n If unspecified,
-                no routes will be associated to the Gateway. \n Support: Core"
+            virtualServers:
+              description: "Servers binds virtual servers that are hosted by the gateway
+                to listeners. \n An implementation must validate that Dedicated listeners
+                have no more than 1 server binding. \n An implementation must validate
+                that all the servers bound to the same combined listener have a compatible
+                discriminator. TODO(jpeach): describe consequences of this validating
+                failing."
               items:
-                description: LocalObjectReference identifies an API object within
-                  a known namespace.
+                description: VirtualServerBinding specifies which listener a virtual
+                  server should be attached to. A server can be bound to 1 or more
+                  listeners.
                 properties:
-                  group:
-                    description: Group is the group of the referent.  The empty string
-                      represents the core API group.
+                  listenerName:
+                    description: "ListenerName is the unique name of a listener. \n
+                      TODO(jpeach): We could let an empty name mean all listeners,
+                      but there are trade-offs to that. For now this field must not
+                      be empty."
                     type: string
-                  name:
-                    description: Name is the name of the referent.
-                    type: string
-                  resource:
-                    description: Resource is the resource of the referent.
-                    type: string
+                  virtualServer:
+                    description: VirtualServer is a reference to the virtual server
+                      to be attached.
+                    properties:
+                      group:
+                        description: Group is the group of the referent.  The empty
+                          string represents the core API group.
+                        type: string
+                      name:
+                        description: Name is the name of the referent.
+                        type: string
+                      resource:
+                        description: Resource is the resource of the referent.
+                        type: string
+                    required:
+                    - group
+                    - name
+                    - resource
+                    type: object
                 required:
-                - group
-                - name
-                - resource
+                - listenerName
+                - virtualServer
                 type: object
               type: array
           required:
           - class
           - listeners
+          - virtualServers
           type: object
         status:
           description: GatewayStatus defines the observed state of Gateway.

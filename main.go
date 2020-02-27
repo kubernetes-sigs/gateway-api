@@ -76,13 +76,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Gateway")
 		os.Exit(1)
 	}
-	if err = (&controllers.HTTPRouteReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("HTTPRoute"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "HTTPRoute")
-		os.Exit(1)
-	}
 	if err = (&controllers.TrafficSplitReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("TrafficSplit"),
@@ -95,6 +88,14 @@ func main() {
 		Log:    ctrl.Log.WithName("controllers").WithName("TcpRoute"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "TcpRoute")
+		os.Exit(1)
+	}
+	if err = (&controllers.VirtualServerReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("VirtualServer"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "VirtualServer")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder
