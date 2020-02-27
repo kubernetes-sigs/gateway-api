@@ -22,13 +22,13 @@ import (
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpec struct {
 	// Hosts is a list of Host definitions.
-	Hosts []HTTPRouteHost `json:"hosts,omitempty"`
+	Hosts []HTTPRouteHost `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
 
 	// Default is the default host to use. Default.Hostnames must
 	// be an empty list.
 	//
 	// +optional
-	Default *HTTPRouteHost `json:"default"`
+	Default *HTTPRouteHost `json:"default" protobuf:"bytes,2,opt,name=default"`
 }
 
 // HTTPRouteHost is the configuration for a given host.
@@ -50,10 +50,10 @@ type HTTPRouteHost struct {
 	// Support: Core
 	//
 	// +optional
-	Hostname string `json:"hostname,omitempty"`
+	Hostname string `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
 
 	// Rules are a list of HTTP matchers, filters and actions.
-	Rules []HTTPRouteRule `json:"rules"`
+	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
 	// Extension is an optional, implementation-specific extension to the
 	// "host" block.  The resource may be "configmap" (use the empty string
@@ -63,20 +63,20 @@ type HTTPRouteHost struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteHostExtensionObjectReference `json:"extension"`
+	Extension *RouteHostExtensionObjectReference `json:"extension" protobuf:"bytes,3,opt,name=extension"`
 }
 
 // HTTPRouteRule is the configuration for a given path.
 type HTTPRouteRule struct {
 	// Match defines which requests match this path.
 	// +optional
-	Match *HTTPRouteMatch `json:"match"`
+	Match *HTTPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
 	// Filter defines what filters are applied to the request.
 	// +optional
-	Filter *HTTPRouteFilter `json:"filter"`
+	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
 	// Action defines what happens to the request.
 	// +optional
-	Action *HTTPRouteAction `json:"action"`
+	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
 }
 
 // PathType constants.
@@ -104,22 +104,22 @@ type HTTPRouteMatch struct {
 	// Default: "Exact"
 	//
 	// +optional
-	PathType string `json:"pathType"`
+	PathType string `json:"pathType" protobuf:"bytes,1,opt,name=pathType"`
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
 	//
 	// Default: "/"
-	Path *string `json:"path"`
+	Path *string `json:"path" protobuf:"bytes,2,opt,name=path"`
 
 	// HeaderType defines the semantics of the `Header` matcher.
 	//
 	// +optional
-	HeaderType *string `json:"headerType"`
+	HeaderType *string `json:"headerType" protobuf:"bytes,3,opt,name=headerType"`
 	// Header are the Header matches as interpreted via
 	// HeaderType.
 	//
 	// +optional
-	Header map[string]string `json:"header"`
+	Header map[string]string `json:"header" protobuf:"bytes,4,rep,name=header"`
 
 	// Extension is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
@@ -129,13 +129,14 @@ type HTTPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteMatchExtensionObjectReference `json:"extension"`
+	Extension *RouteMatchExtensionObjectReference `json:"extension" protobuf:"bytes,5,opt,name=extension"`
 }
 
 // RouteMatchExtensionObjectReference identifies a route-match extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type RouteMatchExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteFilter defines a filter-like action to be applied to
@@ -145,7 +146,7 @@ type HTTPRouteFilter struct {
 	//
 	// Support: extended
 	// +optional
-	Headers *HTTPHeaderFilter `json:"headers"`
+	Headers *HTTPHeaderFilter `json:"headers" protobuf:"bytes,1,opt,name=headers"`
 
 	// Extension is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
@@ -155,13 +156,14 @@ type HTTPRouteFilter struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteFilterExtensionObjectReference `json:"extension"`
+	Extension *RouteFilterExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
 }
 
 // RouteFilterExtensionObjectReference identifies a route-filter extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type RouteFilterExtensionObjectReference = LocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
@@ -180,7 +182,7 @@ type HTTPHeaderFilter struct {
 	//   my-header: foo
 	//
 	// Support: extended?
-	Add map[string]string `json:"add"`
+	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
 
 	// Remove the given header(s) on the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
@@ -201,7 +203,7 @@ type HTTPHeaderFilter struct {
 	//   My-Header2: DEF
 	//
 	// Support: extended?
-	Remove []string `json:"remove"`
+	Remove []string `json:"remove" protobuf:"bytes,2,rep,name=remove"`
 
 	// TODO
 }
@@ -212,7 +214,7 @@ type HTTPRouteAction struct {
 	// be "service" (use the empty string for the group), or an
 	// implementation may support other resources (for example, resource
 	// "myroutetarget" in group "networking.acme.io").
-	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo"`
+	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
 	// Extension is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmap" (use the empty
@@ -222,62 +224,65 @@ type HTTPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteActionExtensionObjectReference `json:"extension"`
+	Extension *RouteActionExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
 }
 
 // RouteActionTargetObjectReference identifies a target object for a route
 // action within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type RouteActionTargetObjectReference = LocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type RouteActionExtensionObjectReference = LocalObjectReference
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type RouteHostExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
-	Gateways []GatewayObjectReference `json:"gateways"`
+	Gateways []GatewayObjectReference `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
 }
 
 // GatewayObjectReference identifies a Gateway object.
 type GatewayObjectReference struct {
 	// Namespace is the namespace of the referent.
 	// +optional
-	Namespace string `json:"namespace,omitempty"`
+	Namespace string `json:"namespace,omitempty" protobuf:"bytes,1,opt,name=namespace"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
 	// +required
-	Name string `json:"name"`
+	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 }
 
 // +kubebuilder:object:root=true
 
 // HTTPRoute is the Schema for the httproutes API
 type HTTPRoute struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 
-	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
-	Status HTTPRouteStatus `json:"status,omitempty"`
+	Spec   HTTPRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status HTTPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
 // +kubebuilder:object:root=true
 
 // HTTPRouteList contains a list of HTTPRoute
 type HTTPRouteList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []HTTPRoute `json:"items"`
+	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	Items           []HTTPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
 
 func init() {

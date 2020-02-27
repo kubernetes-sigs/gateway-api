@@ -38,20 +38,20 @@ type TrafficSplitStatus struct {
 
 // TrafficSplit is the Schema for the trafficsplits API
 type TrafficSplit struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 
-	Spec   TrafficSplitSpec   `json:"spec,omitempty"`
-	Status TrafficSplitStatus `json:"status,omitempty"`
+	Spec   TrafficSplitSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status TrafficSplitStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
 // +kubebuilder:object:root=true
 
 // TrafficSplitList contains a list of TrafficSplit
 type TrafficSplitList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []TrafficSplit `json:"items"`
+	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	Items           []TrafficSplit `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
 
 func init() {

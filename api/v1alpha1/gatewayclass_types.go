@@ -34,7 +34,7 @@ import (
 //
 // Support: Core.
 type GatewayClass struct {
-	metav1.TypeMeta   `json:",inline"`
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,4,opt,name=typeMeta"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 
 	// Spec for this GatewayClass.
@@ -73,6 +73,7 @@ type GatewayClassSpec struct {
 	// Support: Custom
 	//
 	// +optional
+	// +protobuf=false
 	ParametersRef *GatewayClassParametersObjectReference `json:"parameters,omitempty" protobuf:"bytes,2,opt,name=parametersRef"`
 }
 
@@ -80,6 +81,7 @@ type GatewayClassSpec struct {
 // gateway class within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type GatewayClassParametersObjectReference = LocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions.
@@ -136,7 +138,7 @@ type GatewayClassCondition struct {
 
 // GatewayClassList contains a list of GatewayClass
 type GatewayClassList struct {
-	metav1.TypeMeta `json:",inline"`
+	metav1.TypeMeta `json:",inline" protobuf:"bytes,3,opt,name=typeMeta"`
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
 	Items           []GatewayClass `json:"items" protobuf:"bytes,2,rep,name=items"`
 }

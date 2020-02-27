@@ -38,20 +38,20 @@ type TcpRouteStatus struct {
 
 // TcpRoute is the Schema for the tcproutes API
 type TcpRoute struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 
-	Spec   TcpRouteSpec   `json:"spec,omitempty"`
-	Status TcpRouteStatus `json:"status,omitempty"`
+	Spec   TcpRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status TcpRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
 // +kubebuilder:object:root=true
 
 // TcpRouteList contains a list of TcpRoute
 type TcpRouteList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []TcpRoute `json:"items"`
+	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	Items           []TcpRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
 
 func init() {
