@@ -18,4 +18,6 @@ RUN apk add -U --no-cache \
     python3 \
     bash \
     diffutils \
+    git \
+    git-fast-import \
   && pip3 install -r /mkdocs.requirements.txt

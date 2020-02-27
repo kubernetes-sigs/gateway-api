@@ -1,7 +1,7 @@
 site_name: Kubernetes Service API Evolution
 repo_url: http://sigs.k8s.io/service-apis
-site_dir: docs
-docs_dir: docs-src
+strict: true
+
 theme:
         name: material
 nav:

@@ -25,66 +25,34 @@ SERVE_BIND_ADDRESS ?= 127.0.0.1
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # DOCROOT is the root of the mkdocs tree.
 DOCROOT := $(abspath $(TOP))
-# GENROOT is the root of the generated documentation.
-GENROOT := $(DOCROOT)/docs
 
 # Grab the uid/gid to fix permissions due to running in a docker container.
 GID := $(shell id -g)
 UID := $(shell id -u)
-
-# SOURCES is a list of a source files used to generate the documentation.
-SOURCES := $(shell find $(DOCROOT)/docs-src -name \*.md)
-SOURCES += mkdocs.yml docs.mk
-
-# entrypoint
-all: .mkdocs.timestamp
 
 # Support docker images.
 .PHONY: images
 images: .mkdocs.dockerfile.timestamp
 
 # build the image for mkdocs
-.mkdocs.dockerfile.timestamp: mkdocs.dockerfile
+.mkdocs.dockerfile.timestamp: mkdocs.dockerfile mkdocs.requirements.txt
 	docker build -t $(MKDOCS_IMAGE) -f mkdocs.dockerfile .
 	date > $@
 
-# generate the `docs` from SOURCES
-.mkdocs.timestamp: images $(SOURCES)
-	$(DOCKER) run \
-		--mount type=bind,source=$(DOCROOT),target=/d \
-		--sig-proxy=true \
-		--rm \
-		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && $(MKDOCS) build; find /d/docs -exec chown $(UID):$(GID) {} \;"
-	# Remove sitemap as it contains the timestamp, which is a source of a lot
-	# of merge conflicts.
-	rm docs/sitemap.xml docs/sitemap.xml.gz
-	date > $@
-
+# verify that the docs can be successfully built
 .PHONY: verify
-# verify that the docs have been properly updated.
-#
-# docs-src/.mkdocs-exclude contains a list of `diff -X` files to
-# exclude from the verification diff.
 verify: images
 	$(DOCKER) run \
 		--mount type=bind,source=$(DOCROOT),target=/d \
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && $(MKDOCS) build --site-dir=/tmp/d && diff -X /d/docs-src/.mkdocs-exclude -qr /d/docs /tmp/d"
-
-# clean deletes generated files
-.PHONY: clean
-clean:
-	test -f .mkdocs.timestamp && rm .mkdocs.timestamp || true
-	test -f .mkdocs.dockerfile.timestamp && rm .mkdocs.dockerfile.timestamp || true
-	rm -r $(GENROOT)/* || true
+		/bin/bash -c "cd /d && $(MKDOCS) build --site-dir=/tmp/d"
 
 # serve runs mkdocs as a local webserver for interactive development.
 # This will serve the live copy of the docs on 127.0.0.1:8000.
-.PHONY: images serve
-serve:
+.PHONY: serve
+serve: images
 	$(DOCKER) run \
 		-it \
 		--sig-proxy=true \
@@ -94,6 +62,17 @@ serve:
 		$(MKDOCS_IMAGE) \
 		/bin/bash -c "cd /d && $(MKDOCS) serve -a 0.0.0.0:8000"
 
+# deploy will publish generated docs into gh-pages branch.
+.PHONY: deploy
+deploy: images
+	$(DOCKER) run \
+		-it \
+		--sig-proxy=true \
+		--mount type=bind,source=$(DOCROOT),target=/d \
+		--rm \
+		$(MKDOCS_IMAGE) \
+		/bin/bash -c "cd /d && git config --global url."https://$$GITHUB_USER:$$GITHUB_TOKEN@github.com/".pushInsteadOf "https://github.com/" && $(MKDOCS) gh-deploy --site-dir=/tmp/d"
+
 # help prints usage for this Makefile.
 .PHONY: help
 help:
@@ -101,8 +80,9 @@ help:
 	@echo ""
 	@echo "make        Build the documentation"
 	@echo "make help   Print this help message"
-	@echo "make clean  Delete generated files"
+	@echo "make verify Verify docs can be successfully generated"
 	@echo "make serve  Run the webserver for live editing (ctrl-C to quit)"
+	@echo "make deploy Deploy generated docs into gh-pages branch"
 
 # init creates a new mkdocs template. This is included for completeness.
 .PHONY: images init
@@ -113,4 +93,3 @@ init:
 		--rm \
 		$(MKDOCS_IMAGE) \
 		/bin/bash -c "$(MKDOCS) new d; find /d -exec chown $(UID):$(GID) {} \;"
-

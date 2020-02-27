@@ -12,26 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-all: controller docs
+all: controller
 
 # Kubebuilder driven custom resource definitions.
 .PHONY: controller
 controller:
 	make -f kubebuilder.mk
 
-# Build the documentation.
-.PHONY: docs
-docs:
-	make -f docs.mk
-
 # Serve the docs site locally at http://localhost:8000.
-.PHONY: serve
-serve:
+.PHONY: docs-serve
+docs-serve:
 	make -f docs.mk serve
 
-.PHONY: clean
-clean:
-	make -f docs.mk clean
+# deploy will publish generated docs into gh-pages branch.
+# ```GITHUB_USER=<> GITHUB_TOKEN=<> make docs-deploy```
+.PHONY: docs-deploy
+docs-deploy:
+	make -f docs.mk deploy
 
 # Install the CRD's and example resources to a pre-existing cluster.
 .PHONY: install
