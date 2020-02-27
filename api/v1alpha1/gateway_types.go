@@ -24,20 +24,20 @@ import (
 
 // Gateway represents an instantiation of a service-traffic handling infrastructure.
 type Gateway struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 
-	Spec   GatewaySpec   `json:"spec,omitempty"`
-	Status GatewayStatus `json:"status,omitempty"`
+	Spec   GatewaySpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status GatewayStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
 // +kubebuilder:object:root=true
 
 // GatewayList contains a list of Gateway
 type GatewayList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []Gateway `json:"items"`
+	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	Items           []Gateway `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
 
 // GatewaySpec defines the desired state of Gateway.
@@ -52,10 +52,10 @@ type GatewayList struct {
 // signaling via the GatewayStatus block.
 type GatewaySpec struct {
 	// Class used for this Gateway. This is the name of a GatewayClass resource.
-	Class string `json:"class"`
+	Class string `json:"class" protobuf:"bytes,1,opt,name=class"`
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
-	Listeners []Listener `json:"listeners"`
+	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
 	// Routes is a list of resources to associate with the Gateway. A route is a
 	// resource capable of servicing a request and allows a cluster operator to
 	// expose a cluster resource (i.e. Service) by externally-reachable URL,
@@ -68,7 +68,7 @@ type GatewaySpec struct {
 	// Support: Core
 	//
 	// +optional
-	Routes []RouteObjectReference `json:"routes"`
+	Routes []RouteObjectReference `json:"routes" protobuf:"bytes,3,rep,name=routes"`
 }
 
 const (
@@ -91,7 +91,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
-	Name string `json:"name"`
+	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
 	// Address requested for this listener. This is optional and behavior
 	// can depend on GatewayClass. If a value is set in the spec and
 	// the request address is invalid, the GatewayClass MUST indicate
@@ -100,31 +100,31 @@ type Listener struct {
 	// Support:
 	//
 	// +optional
-	Address *ListenerAddress `json:"address,omitempty"`
+	Address *ListenerAddress `json:"address,omitempty" protobuf:"bytes,2,opt,name=address"`
 	// Port is a list of ports associated with the Address.
 	//
 	// Support:
 	// +optional
-	Port *int32 `json:"port,omitempty"`
+	Port *int32 `json:"port,omitempty" protobuf:"varint,3,opt,name=port"`
 	// Protocol to use.
 	//
 	// Support:
 	// +optional
-	Protocol *string `json:"protocol,omitempty"`
+	Protocol *string `json:"protocol,omitempty" protobuf:"bytes,4,opt,name=protocol"`
 	// TLS is the TLS configuration for the Listener. If unspecified,
 	// the listener will not support TLS connections.
 	//
 	// Support: Core
 	//
 	// +optional
-	TLS *ListenerTLS `json:"tls,omitempty"`
+	TLS *ListenerTLS `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
 	// Extension for this Listener.  The resource may be "configmap" (use
 	// the empty string for the group) or an implementation-defined resource
 	// (for example, resource "mylistener" in group "networking.acme.io").
 	//
 	// Support: custom.
 	// +optional
-	Extension *ListenerExtensionObjectReference `json:"extension,omitempty"`
+	Extension *ListenerExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,6,opt,name=extension"`
 }
 
 // AddressType defines how a network address is represented as a text string.
@@ -153,10 +153,10 @@ type ListenerAddress struct {
 	// Type of the Address. This is one of the *AddressType constants.
 	//
 	// Support: Extended
-	Type AddressType `json:"type"`
+	Type AddressType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=AddressType"`
 	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
 	// values will depend on `Type` and support by the controller.
-	Value string `json:"value"`
+	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
 }
 
 const (
@@ -194,7 +194,7 @@ type ListenerTLS struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	Certificates []CertificateObjectReference `json:"certificates,omitempty"`
+	Certificates []CertificateObjectReference `json:"certificates,omitempty" protobuf:"bytes,1,rep,name=certificates"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without
@@ -205,7 +205,7 @@ type ListenerTLS struct {
 	// values.
 	//
 	// +optional
-	MinimumVersion *string `json:"minimumVersion"`
+	MinimumVersion *string `json:"minimumVersion" protobuf:"bytes,2,opt,name=minimumVersion"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//
@@ -215,7 +215,7 @@ type ListenerTLS struct {
 	// construct.
 	//
 	// Support: Implementation-specific.
-	Options map[string]string `json:"options"`
+	Options map[string]string `json:"options" protobuf:"bytes,3,rep,name=options"`
 }
 
 // LocalObjectReference identifies an API object within a known namespace.
@@ -225,29 +225,31 @@ type LocalObjectReference struct {
 	//
 	// +kubebuilder:validation:Required
 	// +required
-	Group string `json:"group"`
+	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the resource of the referent.
 	//
 	// +kubebuilder:validation:Required
 	// +required
-	Resource string `json:"resource"`
+	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
 	// +required
-	Name string `json:"name"`
+	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
 }
 
 // CertificateObjectReference identifies a certificate object within a known
 // namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type CertificateObjectReference = LocalObjectReference
 
 // ListenerExtensionObjectReference identifies a listener extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type ListenerExtensionObjectReference = LocalObjectReference
 
 // RouteObjectReference identifies a route object within a known namespace.
@@ -258,10 +260,10 @@ type RouteObjectReference = LocalObjectReference
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
 	// Conditions describe the current conditions of the Gateway.
-	Conditions []GatewayCondition `json:"conditions"`
+	Conditions []GatewayCondition `json:"conditions" protobuf:"bytes,1,rep,name=conditions"`
 	// Listeners provide status for each listener defined in the Spec. The name
 	// in ListenerStatus refers to the corresponding Listener of the same name.
-	Listeners []ListenerStatus `json:"listeners"`
+	Listeners []ListenerStatus `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
 }
 
 // GatewayConditionType is a type of condition associated with a Gateway.
@@ -295,29 +297,29 @@ const (
 // GatewayCondition is an error status for a given route.
 type GatewayCondition struct {
 	// Type indicates the type of condition.
-	Type GatewayConditionType `json:"type"`
+	Type GatewayConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=GatewayConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
-	Status core.ConditionStatus `json:"status"`
+	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
 	// +optional
-	Message string `json:"message,omitempty"`
+	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
 	// +optional
-	Reason string `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
 	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
 // ListenerStatus is the status associated with each listener block.
 type ListenerStatus struct {
 	// Name is the name of the listener this status refers to.
-	Name string `json:"name"`
+	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
 	// Address bound on this listener.
-	Address *ListenerAddress `json:"address"`
+	Address *ListenerAddress `json:"address" protobuf:"bytes,2,opt,name=address"`
 	// Conditions describe the current condition of this listener.
-	Conditions []ListenerCondition `json:"conditions"`
+	Conditions []ListenerCondition `json:"conditions" protobuf:"bytes,3,rep,name=conditions"`
 }
 
 // ListenerConditionType is a type of condition associated with the listener.
@@ -338,19 +340,19 @@ const (
 // ListenerCondition is an error status for a given listener.
 type ListenerCondition struct {
 	// Type indicates the type of condition.
-	Type ListenerConditionType `json:"type"`
+	Type ListenerConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=ListenerConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
-	Status core.ConditionStatus `json:"status"`
+	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
 	// +optional
-	Message string `json:"message,omitempty"`
+	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
 	// +optional
-	Reason string `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
 	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
 func init() {

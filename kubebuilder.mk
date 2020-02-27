@@ -85,6 +85,7 @@ generate:
 proto:
 	$(DOCKER) run -it \
 		--mount type=bind,source=$(ROOT),target=/go/src/sigs.k8s.io/service-apis  \
+		--mount type=bind,source=$(GOPATH)/pkg/mod,target=/go/pkg/mod  \
 		--env GOPATH=/go \
 		--env GOCACHE=/go/.cache \
 		--rm \

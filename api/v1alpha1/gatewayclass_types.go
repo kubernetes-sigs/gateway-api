@@ -73,6 +73,7 @@ type GatewayClassSpec struct {
 	// Support: Custom
 	//
 	// +optional
+	// +protobuf=false
 	ParametersRef *GatewayClassParametersObjectReference `json:"parameters,omitempty" protobuf:"bytes,2,opt,name=parametersRef"`
 }
 
@@ -80,6 +81,7 @@ type GatewayClassSpec struct {
 // gateway class within a known namespace.
 //
 // +k8s:deepcopy-gen=false
+// +protobuf=false
 type GatewayClassParametersObjectReference = LocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions.
