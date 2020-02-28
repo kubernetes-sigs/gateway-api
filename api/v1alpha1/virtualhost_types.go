@@ -19,20 +19,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// HTTPRouteSpec defines the desired state of HTTPRoute
-type HTTPRouteSpec struct {
-	// Hosts is a list of Host definitions.
-	Hosts []HTTPRouteHost `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
+// +kubebuilder:object:root=true
 
-	// Default is the default host to use. Default.Hostnames must
-	// be an empty list.
-	//
-	// +optional
-	Default *HTTPRouteHost `json:"default" protobuf:"bytes,2,opt,name=default"`
+// VirtualHost is the Schema for the virtualhosts API.
+type VirtualHost struct {
+	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
+	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+
+	Spec   VirtualHostSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status VirtualHostStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
-// HTTPRouteHost is the configuration for a given host.
-type HTTPRouteHost struct {
+// VirtualHostSpec defines the desired state of VirtualHost.
+type VirtualHostSpec struct {
 	// Hostname is the fully qualified domain name of a network host,
 	// as defined by RFC 3986. Note the following deviations from the
 	// "host" part of the URI as defined in the RFC:
@@ -44,39 +43,51 @@ type HTTPRouteHost struct {
 	// rules. For example, if the request header contains host: foo.example.com,
 	// an HTTPRoute with hostname foo.example.com will match. However, an
 	// HTTPRoute with hostname example.com or bar.example.com will not match.
-	// If Hostname is unspecified, the Gateway routes all traffic based on
-	// the specified rules.
+	// If Hostname is unspecified, all traffic is routed to the VirtualHost based
+	// on the specified rules.
 	//
 	// Support: Core
 	//
 	// +optional
 	Hostname string `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
-
-	// Rules are a list of HTTP matchers, filters and actions.
-	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
-
+	// Rules are rules to match, filter and perform actions on requests of a VirtualHost.
+	//
+	// Support: Core
+	//
+	// +required
+	Rules []VirtualHostRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 	// Extension is an optional, implementation-specific extension to the
 	// "host" block.  The resource may be "configmap" (use the empty string
 	// for the group) or an implementation-defined resource (for example,
-	// resource "myroutehost" in group "networking.acme.io").
+	// resource "myextension" in group "networking.acme.io").
 	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
-	Extension *RouteHostExtensionObjectReference `json:"extension" protobuf:"bytes,3,opt,name=extension"`
+	Extension *VirtualServerExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,4,opt,name=extension"`
 }
 
-// HTTPRouteRule is the configuration for a given path.
-type HTTPRouteRule struct {
-	// Match defines which requests match this path.
-	// +optional
-	Match *HTTPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
+// VirtualHostRule is a rule to match, filter and perform actions on requests
+// to a VirtualHost.
+type VirtualHostRule struct {
+	// Match defines criteria for matching a request.
+	//
+	// Support: Core
+	//
+	// +required
+	Match *VirtualHostMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
 	// Filter defines what filters are applied to the request.
+	//
+	// Support: Core
+	//
 	// +optional
-	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
+	Filter *VirtualHostFilter `json:"filter,omitempty" protobuf:"bytes,2,opt,name=filter"`
 	// Action defines what happens to the request.
-	// +optional
-	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
+	//
+	// Support: Core
+	//
+	// +required
+	Action *VirtualHostAction `json:"action" protobuf:"bytes,3,opt,name=action"`
 }
 
 // PathType constants.
@@ -92,9 +103,9 @@ const (
 	HeaderTypeExact = "Exact"
 )
 
-// HTTPRouteMatch defines the predicate used to match requests to a
-// given action.
-type HTTPRouteMatch struct {
+// VirtualHostMatch defines the predicate used to match requests to a
+// VirtualHost.
+type VirtualHostMatch struct {
 	// PathType is defines the semantics of the `Path` matcher.
 	//
 	// Support: core (Exact, Prefix)
@@ -104,23 +115,29 @@ type HTTPRouteMatch struct {
 	// Default: "Exact"
 	//
 	// +optional
-	PathType string `json:"pathType" protobuf:"bytes,1,opt,name=pathType"`
+	PathType string `json:"pathType,omitempty" protobuf:"bytes,1,opt,name=pathType"`
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
 	//
 	// Default: "/"
-	Path *string `json:"path" protobuf:"bytes,2,opt,name=path"`
-
-	// HeaderType defines the semantics of the `Header` matcher.
+	//
+	// Support: ?
 	//
 	// +optional
-	HeaderType *string `json:"headerType" protobuf:"bytes,3,opt,name=headerType"`
+	Path *string `json:"path,omitempty" protobuf:"bytes,2,opt,name=path"`
+	// HeaderType defines the semantics of the `Header` matcher.
+	//
+	// Support: ?
+	//
+	// +optional
+	HeaderType *string `json:"headerType,omitempty" protobuf:"bytes,3,opt,name=headerType"`
 	// Header are the Header matches as interpreted via
 	// HeaderType.
 	//
+	// Support: ?
+	//
 	// +optional
-	Header map[string]string `json:"header" protobuf:"bytes,4,rep,name=header"`
-
+	Header map[string]string `json:"header,omitempty" protobuf:"bytes,4,rep,name=header"`
 	// Extension is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
@@ -129,24 +146,23 @@ type HTTPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteMatchExtensionObjectReference `json:"extension" protobuf:"bytes,5,opt,name=extension"`
+	Extension *VirtualHostMatchExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,5,opt,name=extension"`
 }
 
-// RouteMatchExtensionObjectReference identifies a route-match extension object
-// within a known namespace.
+// VirtualHostMatchExtensionObjectReference identifies a VirtualHost match extension
+// object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
-type RouteMatchExtensionObjectReference = LocalObjectReference
+type VirtualHostMatchExtensionObjectReference = LocalObjectReference
 
-// HTTPRouteFilter defines a filter-like action to be applied to
+// VirtualHostFilter defines a filter-like action to be applied to
 // requests.
-type HTTPRouteFilter struct {
+type VirtualHostFilter struct {
 	// Headers related filters.
 	//
 	// Support: extended
 	// +optional
-	Headers *HTTPHeaderFilter `json:"headers" protobuf:"bytes,1,opt,name=headers"`
+	Headers *HTTPHeaderFilter `json:"headers,omitempty" protobuf:"bytes,1,opt,name=headers"`
 
 	// Extension is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
@@ -156,15 +172,14 @@ type HTTPRouteFilter struct {
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteFilterExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
+	Extension *VirtualHostFilterExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,2,opt,name=extension"`
 }
 
-// RouteFilterExtensionObjectReference identifies a route-filter extension
-// object within a known namespace.
+// VirtualHostFilterExtensionObjectReference identifies a VirtualHost
+// filter extension object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
-type RouteFilterExtensionObjectReference = LocalObjectReference
+type VirtualHostFilterExtensionObjectReference = LocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
 type HTTPHeaderFilter struct {
@@ -182,8 +197,9 @@ type HTTPHeaderFilter struct {
 	//   my-header: foo
 	//
 	// Support: extended?
-	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
-
+	//
+	// +optional
+	Add map[string]string `json:"add,omitempty" protobuf:"bytes,1,rep,name=add"`
 	// Remove the given header(s) on the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
 	// names. Note that the header names are case-insensitive
@@ -203,55 +219,50 @@ type HTTPHeaderFilter struct {
 	//   My-Header2: DEF
 	//
 	// Support: extended?
-	Remove []string `json:"remove" protobuf:"bytes,2,rep,name=remove"`
-
-	// TODO
+	//
+	// +optional
+	Remove []string `json:"remove,omitempty" protobuf:"bytes,2,rep,name=remove"`
 }
 
-// HTTPRouteAction is the action taken given a match.
-type HTTPRouteAction struct {
+// VirtualHostAction is the action taken given a match.
+type VirtualHostAction struct {
 	// ForwardTo sends requests to the referenced object.  The resource may
 	// be "service" (use the empty string for the group), or an
 	// implementation may support other resources (for example, resource
-	// "myroutetarget" in group "networking.acme.io").
-	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
-
+	// "my-virtualserver-target" in group "networking.acme.io").
+	//
+	// Support: Core
+	//
+	// +optional
+	ForwardTo *VirtualHostActionTargetObjectReference `json:"forwardTo,omitempty" protobuf:"bytes,1,opt,name=forwardTo"`
 	// Extension is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteaction" in group "networking.acme.io").
+	// example, resource "my-virtualserver-action" in group "networking.acme.io").
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteActionExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
+	Extension *VirtualHostActionExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,2,opt,name=extension"`
 }
 
-// RouteActionTargetObjectReference identifies a target object for a route
-// action within a known namespace.
+// VirtualHostActionTargetObjectReference identifies a target object for a
+// VirtualHost action within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
-type RouteActionTargetObjectReference = LocalObjectReference
+type VirtualHostActionTargetObjectReference = LocalObjectReference
 
-// RouteActionExtensionObjectReference identifies a route-action extension
-// object within a known namespace.
+// VirtualHostActionExtensionObjectReference identifies a VirtualHost
+// action extension object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
-type RouteActionExtensionObjectReference = LocalObjectReference
+type VirtualHostActionExtensionObjectReference = LocalObjectReference
 
-// RouteHostExtensionObjectReference identifies a route-host extension object
-// within a known namespace.
+// VirtualServerExtensionObjectReference identifies an extension object
+// for a VirtualHost within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
-type RouteHostExtensionObjectReference = LocalObjectReference
-
-// HTTPRouteStatus defines the observed state of HTTPRoute.
-type HTTPRouteStatus struct {
-	Gateways []GatewayObjectReference `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
-}
+type VirtualServerExtensionObjectReference = LocalObjectReference
 
 // GatewayObjectReference identifies a Gateway object.
 type GatewayObjectReference struct {
@@ -265,26 +276,20 @@ type GatewayObjectReference struct {
 	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 }
 
-// +kubebuilder:object:root=true
-
-// HTTPRoute is the Schema for the httproutes API
-type HTTPRoute struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-
-	Spec   HTTPRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status HTTPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+// VirtualHostStatus defines the observed state of VirtualHost.
+type VirtualHostStatus struct {
+	Gateways []GatewayObjectReference `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
 }
 
 // +kubebuilder:object:root=true
 
-// HTTPRouteList contains a list of HTTPRoute
-type HTTPRouteList struct {
+// VirtualHostList contains a list of VirtualHost.
+type VirtualHostList struct {
 	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []HTTPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
+	Items           []VirtualHost `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&HTTPRoute{}, &HTTPRouteList{})
+	SchemeBuilder.Register(&VirtualHost{}, &VirtualHostList{})
 }

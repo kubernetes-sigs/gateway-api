@@ -139,7 +139,7 @@ message GatewayClassStatus {
   repeated GatewayClassCondition conditions = 1;
 }
 
-// GatewayCondition is an error status for a given route.
+// GatewayCondition is an error status for a given VirtualHost.
 message GatewayCondition {
   // Type indicates the type of condition.
   optional string type = 1;
@@ -186,7 +186,7 @@ message GatewayObjectReference {
 // GatewaySpec defines the desired state of Gateway.
 //
 // The Spec is split into two major pieces: listeners describing
-// client-facing properties and routes that describe application-level
+// client-facing properties and virtual hosts that describe application-level
 // routing.
 //
 // Not all possible combinations of options specified in the Spec are
@@ -195,25 +195,19 @@ message GatewayObjectReference {
 // signaling via the GatewayStatus block.
 message GatewaySpec {
   // Class used for this Gateway. This is the name of a GatewayClass resource.
-  optional string class = 1;
-
-  // Listeners associated with this Gateway. Listeners define what addresses,
-  // ports, protocols are bound on this Gateway.
-  repeated Listener listeners = 2;
-
-  // Routes is a list of resources to associate with the Gateway. A route is a
-  // resource capable of servicing a request and allows a cluster operator to
-  // expose a cluster resource (i.e. Service) by externally-reachable URL,
-  // load-balance traffic and terminate SSL/TLS. Typically, a route is a
-  // "httproute" or "tcproute" in group "networking.x.k8s.io". However, an
-  // implementation may support other resources.
-  //
-  // If unspecified, no routes will be associated to the Gateway.
   //
   // Support: Core
   //
-  // +optional
-  repeated LocalObjectReference routes = 3;
+  // +required
+  optional string class = 1;
+
+  // Listeners associated with this Gateway. Listeners define what addresses,
+  // ports, protocols are bound on the Gateway.
+  //
+  // Support: Core
+  //
+  // +required
+  repeated Listener listeners = 2;
 }
 
 // GatewayStatus defines the observed state of Gateway.
@@ -242,6 +236,8 @@ message HTTPHeaderFilter {
   //   my-header: foo
   //
   // Support: extended?
+  //
+  // +optional
   map<string, string> add = 1;
 
   // Remove the given header(s) on the HTTP request before the
@@ -263,178 +259,12 @@ message HTTPHeaderFilter {
   //   My-Header2: DEF
   //
   // Support: extended?
+  //
+  // +optional
   repeated string remove = 2;
 }
 
-// HTTPRoute is the Schema for the httproutes API
-message HTTPRoute {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
-
-  optional HTTPRouteSpec spec = 3;
-
-  optional HTTPRouteStatus status = 4;
-}
-
-// HTTPRouteAction is the action taken given a match.
-message HTTPRouteAction {
-  // ForwardTo sends requests to the referenced object.  The resource may
-  // be "service" (use the empty string for the group), or an
-  // implementation may support other resources (for example, resource
-  // "myroutetarget" in group "networking.acme.io").
-  optional LocalObjectReference forwardTo = 1;
-
-  // Extension is an optional, implementation-specific extension to the
-  // "action" behavior.  The resource may be "configmap" (use the empty
-  // string for the group) or an implementation-defined resource (for
-  // example, resource "myrouteaction" in group "networking.acme.io").
-  //
-  // Support: custom
-  //
-  // +optional
-  optional LocalObjectReference extension = 2;
-}
-
-// HTTPRouteFilter defines a filter-like action to be applied to
-// requests.
-message HTTPRouteFilter {
-  // Headers related filters.
-  //
-  // Support: extended
-  // +optional
-  optional HTTPHeaderFilter headers = 1;
-
-  // Extension is an optional, implementation-specific extension to the
-  // "filter" behavior.  The resource may be "configmap" (use the empty
-  // string for the group) or an implementation-defined resource (for
-  // example, resource "myroutefilter" in group "networking.acme.io").
-  //
-  // Support: custom
-  //
-  // +optional
-  optional LocalObjectReference extension = 2;
-}
-
-// HTTPRouteHost is the configuration for a given host.
-message HTTPRouteHost {
-  // Hostname is the fully qualified domain name of a network host,
-  // as defined by RFC 3986. Note the following deviations from the
-  // "host" part of the URI as defined in the RFC:
-  //
-  // 1. IPs are not allowed.
-  // 2. The `:` delimiter is not respected because ports are not allowed.
-  //
-  // Incoming requests are matched against Hostname before processing HTTPRoute
-  // rules. For example, if the request header contains host: foo.example.com,
-  // an HTTPRoute with hostname foo.example.com will match. However, an
-  // HTTPRoute with hostname example.com or bar.example.com will not match.
-  // If Hostname is unspecified, the Gateway routes all traffic based on
-  // the specified rules.
-  //
-  // Support: Core
-  //
-  // +optional
-  optional string hostname = 1;
-
-  // Rules are a list of HTTP matchers, filters and actions.
-  repeated HTTPRouteRule rules = 2;
-
-  // Extension is an optional, implementation-specific extension to the
-  // "host" block.  The resource may be "configmap" (use the empty string
-  // for the group) or an implementation-defined resource (for example,
-  // resource "myroutehost" in group "networking.acme.io").
-  //
-  // Support: custom
-  //
-  // +optional
-  optional LocalObjectReference extension = 3;
-}
-
-// HTTPRouteList contains a list of HTTPRoute
-message HTTPRouteList {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
-
-  repeated HTTPRoute items = 3;
-}
-
-// HTTPRouteMatch defines the predicate used to match requests to a
-// given action.
-message HTTPRouteMatch {
-  // PathType is defines the semantics of the `Path` matcher.
-  //
-  // Support: core (Exact, Prefix)
-  // Support: extended (RegularExpression)
-  // Support: custom (ImplementationSpecific)
-  //
-  // Default: "Exact"
-  //
-  // +optional
-  optional string pathType = 1;
-
-  // Path is the value of the HTTP path as interpreted via
-  // PathType.
-  //
-  // Default: "/"
-  optional string path = 2;
-
-  // HeaderType defines the semantics of the `Header` matcher.
-  //
-  // +optional
-  optional string headerType = 3;
-
-  // Header are the Header matches as interpreted via
-  // HeaderType.
-  //
-  // +optional
-  map<string, string> header = 4;
-
-  // Extension is an optional, implementation-specific extension to the
-  // "match" behavior.  The resource may be "configmap" (use the empty
-  // string for the group) or an implementation-defined resource (for
-  // example, resource "myroutematcher" in group "networking.acme.io").
-  //
-  // Support: custom
-  //
-  // +optional
-  optional LocalObjectReference extension = 5;
-}
-
-// HTTPRouteRule is the configuration for a given path.
-message HTTPRouteRule {
-  // Match defines which requests match this path.
-  // +optional
-  optional HTTPRouteMatch match = 1;
-
-  // Filter defines what filters are applied to the request.
-  // +optional
-  optional HTTPRouteFilter filter = 2;
-
-  // Action defines what happens to the request.
-  // +optional
-  optional HTTPRouteAction action = 3;
-}
-
-// HTTPRouteSpec defines the desired state of HTTPRoute
-message HTTPRouteSpec {
-  // Hosts is a list of Host definitions.
-  repeated HTTPRouteHost hosts = 1;
-
-  // Default is the default host to use. Default.Hostnames must
-  // be an empty list.
-  //
-  // +optional
-  optional HTTPRouteHost default = 2;
-}
-
-// HTTPRouteStatus defines the observed state of HTTPRoute.
-message HTTPRouteStatus {
-  repeated GatewayObjectReference gateways = 1;
-}
-
-// Listener defines a
+// Listener defines a socket for a Gateway to process network connections.
 message Listener {
   // Name is the listener's name and should be specified as an
   // RFC 1035 DNS_LABEL [1]:
@@ -465,19 +295,21 @@ message Listener {
   // +optional
   optional int32 port = 3;
 
-  // Protocol to use.
+  // Protocol defines the network protocol to use.
   //
-  // Support:
-  // +optional
-  optional string protocol = 4;
-
-  // TLS is the TLS configuration for the Listener. If unspecified,
-  // the listener will not support TLS connections.
+  // If unset, defaults to "TCP".
   //
   // Support: Core
   //
   // +optional
-  optional ListenerTLS tls = 5;
+  optional string protocol = 4;
+
+  // VirtualHosts binds a list of VirtualHosts to a Gateway listener.
+  //
+  // Support: Core
+  //
+  // +required
+  repeated VirtualHostBinding virtualHosts = 5;
 
   // Extension for this Listener.  The resource may be "configmap" (use
   // the empty string for the group) or an implementation-defined resource
@@ -493,10 +325,16 @@ message ListenerAddress {
   // Type of the Address. This is one of the *AddressType constants.
   //
   // Support: Extended
+  //
+  // +required
   optional string type = 1;
 
   // Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
   // values will depend on `Type` and support by the controller.
+  //
+  // Support: Extended
+  //
+  // +required
   optional string value = 2;
 }
 
@@ -534,7 +372,32 @@ message ListenerStatus {
   repeated ListenerCondition conditions = 3;
 }
 
-// ListenerTLS describes the TLS configuration for a given port.
+// VirtualServerExtensionObjectReference identifies an extension object
+// for a VirtualHost within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+message LocalObjectReference {
+  // Group is the group of the referent.  The empty string represents
+  // the core API group.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string group = 1;
+
+  // Resource is the resource of the referent.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string resource = 2;
+
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string name = 3;
+}
+
+// TLSConfig describes a TLS configuration.
 //
 // References
 // - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
@@ -543,13 +406,13 @@ message ListenerStatus {
 // - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-message ListenerTLS {
+message TLSConfig {
   // Certificates is a list of references to Kubernetes objects that each
   // contain an identity certificate that is bound to the listener.  The
   // host name in a TLS SNI client hello message is used for certificate
-  // matching and route host name selection.  The SNI server_name must
-  // match a route host name for the Gateway to route the TLS request.  If
-  // an entry in this list specifies the empty string for both the group
+  // matching and VirtualHost name selection.  The SNI server_name must
+  // match a VirtualHost hostname for the Gateway to route the TLS request.
+  // If an entry in this list specifies the empty string for both the group
   // and the resource, the resource defaults to "secret".  An
   // implementation may support other resources (for example, resource
   // "mycertificate" in group "networking.acme.io").
@@ -584,58 +447,6 @@ message ListenerTLS {
   map<string, string> options = 3;
 }
 
-// RouteObjectReference identifies a route object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-message LocalObjectReference {
-  // Group is the group of the referent.  The empty string represents
-  // the core API group.
-  //
-  // +kubebuilder:validation:Required
-  // +required
-  optional string group = 1;
-
-  // Resource is the resource of the referent.
-  //
-  // +kubebuilder:validation:Required
-  // +required
-  optional string resource = 2;
-
-  // Name is the name of the referent.
-  //
-  // +kubebuilder:validation:Required
-  // +required
-  optional string name = 3;
-}
-
-// TcpRoute is the Schema for the tcproutes API
-message TcpRoute {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
-
-  optional TcpRouteSpec spec = 3;
-
-  optional TcpRouteStatus status = 4;
-}
-
-// TcpRouteList contains a list of TcpRoute
-message TcpRouteList {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
-
-  repeated TcpRoute items = 3;
-}
-
-// TcpRouteSpec defines the desired state of TcpRoute
-message TcpRouteSpec {
-}
-
-// TcpRouteStatus defines the observed state of TcpRoute
-message TcpRouteStatus {
-}
-
 // TrafficSplit is the Schema for the trafficsplits API
 message TrafficSplit {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
@@ -662,5 +473,223 @@ message TrafficSplitSpec {
 
 // TrafficSplitStatus defines the observed state of TrafficSplit
 message TrafficSplitStatus {
+}
+
+// VirtualHost is the Schema for the virtualhosts API.
+message VirtualHost {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
+
+  optional VirtualHostSpec spec = 3;
+
+  optional VirtualHostStatus status = 4;
+}
+
+// VirtualHostAction is the action taken given a match.
+message VirtualHostAction {
+  // ForwardTo sends requests to the referenced object.  The resource may
+  // be "service" (use the empty string for the group), or an
+  // implementation may support other resources (for example, resource
+  // "my-virtualserver-target" in group "networking.acme.io").
+  //
+  // Support: Core
+  //
+  // +optional
+  optional LocalObjectReference forwardTo = 1;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "action" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "my-virtualserver-action" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 2;
+}
+
+// VirtualHostBinding specifies which listener a VirtualHost should
+// bind to. A VirtualHost can be bound to 1 or more listeners.
+message VirtualHostBinding {
+  // VirtualHost is a VirtualHost reference.
+  //
+  // Support: Core
+  //
+  // +required
+  optional VirtualHostObjectReference virtualHost = 1;
+
+  // TLS is the TLS configuration used by the listener for the VirtualHost.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional TLSConfig tls = 2;
+}
+
+// VirtualHostFilter defines a filter-like action to be applied to
+// requests.
+message VirtualHostFilter {
+  // Headers related filters.
+  //
+  // Support: extended
+  // +optional
+  optional HTTPHeaderFilter headers = 1;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "filter" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myroutefilter" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 2;
+}
+
+// VirtualHostList contains a list of VirtualHost.
+message VirtualHostList {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
+
+  repeated VirtualHost items = 3;
+}
+
+// VirtualHostMatch defines the predicate used to match requests to a
+// VirtualHost.
+message VirtualHostMatch {
+  // PathType is defines the semantics of the `Path` matcher.
+  //
+  // Support: core (Exact, Prefix)
+  // Support: extended (RegularExpression)
+  // Support: custom (ImplementationSpecific)
+  //
+  // Default: "Exact"
+  //
+  // +optional
+  optional string pathType = 1;
+
+  // Path is the value of the HTTP path as interpreted via
+  // PathType.
+  //
+  // Default: "/"
+  //
+  // Support: ?
+  //
+  // +optional
+  optional string path = 2;
+
+  // HeaderType defines the semantics of the `Header` matcher.
+  //
+  // Support: ?
+  //
+  // +optional
+  optional string headerType = 3;
+
+  // Header are the Header matches as interpreted via
+  // HeaderType.
+  //
+  // Support: ?
+  //
+  // +optional
+  map<string, string> header = 4;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "match" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myroutematcher" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 5;
+}
+
+// VirtualHostObjectReference identifies a VirtualHost object by name
+// and namespace.
+message VirtualHostObjectReference {
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string name = 1;
+
+  // Namespace is the namespace of the referent.
+  //
+  // If unset, the Gateway namespace is used.
+  //
+  // +kubebuilder:validation:Required
+  // +optional
+  optional string namespace = 2;
+}
+
+// VirtualHostRule is a rule to match, filter and perform actions on requests
+// to a VirtualHost.
+message VirtualHostRule {
+  // Match defines criteria for matching a request.
+  //
+  // Support: Core
+  //
+  // +required
+  optional VirtualHostMatch match = 1;
+
+  // Filter defines what filters are applied to the request.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional VirtualHostFilter filter = 2;
+
+  // Action defines what happens to the request.
+  //
+  // Support: Core
+  //
+  // +required
+  optional VirtualHostAction action = 3;
+}
+
+// VirtualHostSpec defines the desired state of VirtualHost.
+message VirtualHostSpec {
+  // Hostname is the fully qualified domain name of a network host,
+  // as defined by RFC 3986. Note the following deviations from the
+  // "host" part of the URI as defined in the RFC:
+  //
+  // 1. IPs are not allowed.
+  // 2. The `:` delimiter is not respected because ports are not allowed.
+  //
+  // Incoming requests are matched against Hostname before processing HTTPRoute
+  // rules. For example, if the request header contains host: foo.example.com,
+  // an HTTPRoute with hostname foo.example.com will match. However, an
+  // HTTPRoute with hostname example.com or bar.example.com will not match.
+  // If Hostname is unspecified, all traffic is routed to the VirtualHost based
+  // on the specified rules.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional string hostname = 1;
+
+  // Rules are rules to match, filter and perform actions on requests of a VirtualHost.
+  //
+  // Support: Core
+  //
+  // +required
+  repeated VirtualHostRule rules = 2;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "host" block.  The resource may be "configmap" (use the empty string
+  // for the group) or an implementation-defined resource (for example,
+  // resource "myextension" in group "networking.acme.io").
+  //
+  // Support: Custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 4;
+}
+
+// VirtualHostStatus defines the observed state of VirtualHost.
+message VirtualHostStatus {
+  repeated GatewayObjectReference gateways = 1;
 }
 

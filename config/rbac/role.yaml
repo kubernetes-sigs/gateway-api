@@ -49,46 +49,6 @@ rules:
 - apiGroups:
   - networking.x.k8s.io
   resources:
-  - httproutes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.x.k8s.io
-  resources:
-  - httproutes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.x.k8s.io
-  resources:
-  - tcproutes
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - networking.x.k8s.io
-  resources:
-  - tcproutes/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - networking.x.k8s.io
-  resources:
   - trafficsplits
   verbs:
   - create
@@ -102,6 +62,26 @@ rules:
   - networking.x.k8s.io
   resources:
   - trafficsplits/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - networking.x.k8s.io
+  resources:
+  - virtualhosts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.x.k8s.io
+  resources:
+  - virtualhosts/status
   verbs:
   - get
   - patch

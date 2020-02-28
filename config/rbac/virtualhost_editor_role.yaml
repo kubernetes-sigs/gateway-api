@@ -1,0 +1,26 @@
+# permissions to do edit virtualhosts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: virtualhost-editor-role
+rules:
+- apiGroups:
+  - networking.x.k8s.io
+  resources:
+  - virtualhosts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - networking.x.k8s.io
+  resources:
+  - virtualhosts/status
+  verbs:
+  - get
+  - patch
+  - update

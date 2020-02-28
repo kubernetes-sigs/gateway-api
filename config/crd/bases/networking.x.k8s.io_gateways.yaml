@@ -35,21 +35,23 @@ spec:
         spec:
           description: "GatewaySpec defines the desired state of Gateway. \n The Spec
             is split into two major pieces: listeners describing client-facing properties
-            and routes that describe application-level routing. \n Not all possible
-            combinations of options specified in the Spec are valid. Some invalid
-            configurations can be caught synchronously via a webhook, but there are
-            many cases that will require asynchronous signaling via the GatewayStatus
-            block."
+            and virtual hosts that describe application-level routing. \n Not all
+            possible combinations of options specified in the Spec are valid. Some
+            invalid configurations can be caught synchronously via a webhook, but
+            there are many cases that will require asynchronous signaling via the
+            GatewayStatus block."
           properties:
             class:
-              description: Class used for this Gateway. This is the name of a GatewayClass
-                resource.
+              description: "Class used for this Gateway. This is the name of a GatewayClass
+                resource. \n Support: Core"
               type: string
             listeners:
-              description: Listeners associated with this Gateway. Listeners define
-                what addresses, ports, protocols are bound on this Gateway.
+              description: "Listeners associated with this Gateway. Listeners define
+                what addresses, ports, protocols are bound on the Gateway. \n Support:
+                Core"
               items:
-                description: Listener defines a
+                description: Listener defines a socket for a Gateway to process network
+                  connections.
                 properties:
                   address:
                     description: "Address requested for this listener. This is optional
@@ -63,9 +65,9 @@ spec:
                           constants. \n Support: Extended"
                         type: string
                       value:
-                        description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address".
+                        description: "Value. Examples: \"1.2.3.4\", \"128::1\", \"my-ip-address\".
                           Validity of the values will depend on `Type` and support
-                          by the controller.'
+                          by the controller. \n Support: Extended"
                         type: string
                     required:
                     - type
@@ -105,98 +107,90 @@ spec:
                     format: int32
                     type: integer
                   protocol:
-                    description: "Protocol to use. \n Support:"
+                    description: "Protocol defines the network protocol to use. \n
+                      If unset, defaults to \"TCP\". \n Support: Core"
                     type: string
-                  tls:
-                    description: "TLS is the TLS configuration for the Listener. If
-                      unspecified, the listener will not support TLS connections.
-                      \n Support: Core"
-                    properties:
-                      certificates:
-                        description: "Certificates is a list of references to Kubernetes
-                          objects that each contain an identity certificate that is
-                          bound to the listener.  The host name in a TLS SNI client
-                          hello message is used for certificate matching and route
-                          host name selection.  The SNI server_name must match a route
-                          host name for the Gateway to route the TLS request.  If
-                          an entry in this list specifies the empty string for both
-                          the group and the resource, the resource defaults to \"secret\".
-                          \ An implementation may support other resources (for example,
-                          resource \"mycertificate\" in group \"networking.acme.io\").
-                          \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
-                          (Other resource types)"
-                        items:
-                          description: LocalObjectReference identifies an API object
-                            within a known namespace.
-                          properties:
-                            group:
-                              description: Group is the group of the referent.  The
-                                empty string represents the core API group.
-                              type: string
-                            name:
-                              description: Name is the name of the referent.
-                              type: string
-                            resource:
-                              description: Resource is the resource of the referent.
-                              type: string
-                          required:
-                          - group
-                          - name
-                          - resource
-                          type: object
-                        type: array
-                      minimumVersion:
-                        description: "MinimumVersion of TLS allowed. It is recommended
-                          to use one of the TLS_* constants above. Note: this is not
-                          strongly typed to allow implementation-specific versions
-                          to be used without requiring updates to the API types. String
-                          must be of the form \"<protocol><major>_<minor>\". \n Support:
-                          Core for TLS1_{1,2,3}. Implementation-specific for all other
-                          values."
-                        type: string
-                      options:
-                        additionalProperties:
+                  virtualHosts:
+                    description: "VirtualHosts binds a list of VirtualHosts to a Gateway
+                      listener. \n Support: Core"
+                    items:
+                      description: VirtualHostBinding specifies which listener a VirtualHost
+                        should bind to. A VirtualHost can be bound to 1 or more listeners.
+                      properties:
+                        name:
+                          description: Name is the name of the referent.
                           type: string
-                        description: "Options are a list of key/value pairs to give
-                          extended options to the provider. \n There variation among
-                          providers as to how ciphersuites are expressed. If there
-                          is a common subset for expressing ciphers then it will make
-                          sense to loft that as a core API construct. \n Support:
-                          Implementation-specific."
-                        type: object
-                    required:
-                    - options
-                    type: object
+                        namespace:
+                          description: "Namespace is the namespace of the referent.
+                            \n If unset, the Gateway namespace is used."
+                          type: string
+                        tls:
+                          description: "TLS is the TLS configuration used by the listener
+                            for the VirtualHost. \n Support: Core"
+                          properties:
+                            certificates:
+                              description: "Certificates is a list of references to
+                                Kubernetes objects that each contain an identity certificate
+                                that is bound to the listener.  The host name in a
+                                TLS SNI client hello message is used for certificate
+                                matching and VirtualHost name selection.  The SNI
+                                server_name must match a VirtualHost hostname for
+                                the Gateway to route the TLS request. If an entry
+                                in this list specifies the empty string for both the
+                                group and the resource, the resource defaults to \"secret\".
+                                \ An implementation may support other resources (for
+                                example, resource \"mycertificate\" in group \"networking.acme.io\").
+                                \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
+                                (Other resource types)"
+                              items:
+                                description: LocalObjectReference identifies an API
+                                  object within a known namespace.
+                                properties:
+                                  group:
+                                    description: Group is the group of the referent.  The
+                                      empty string represents the core API group.
+                                    type: string
+                                  name:
+                                    description: Name is the name of the referent.
+                                    type: string
+                                  resource:
+                                    description: Resource is the resource of the referent.
+                                    type: string
+                                required:
+                                - group
+                                - name
+                                - resource
+                                type: object
+                              type: array
+                            minimumVersion:
+                              description: "MinimumVersion of TLS allowed. It is recommended
+                                to use one of the TLS_* constants above. Note: this
+                                is not strongly typed to allow implementation-specific
+                                versions to be used without requiring updates to the
+                                API types. String must be of the form \"<protocol><major>_<minor>\".
+                                \n Support: Core for TLS1_{1,2,3}. Implementation-specific
+                                for all other values."
+                              type: string
+                            options:
+                              additionalProperties:
+                                type: string
+                              description: "Options are a list of key/value pairs
+                                to give extended options to the provider. \n There
+                                variation among providers as to how ciphersuites are
+                                expressed. If there is a common subset for expressing
+                                ciphers then it will make sense to loft that as a
+                                core API construct. \n Support: Implementation-specific."
+                              type: object
+                          required:
+                          - certificates
+                          type: object
+                      required:
+                      - name
+                      type: object
+                    type: array
                 required:
                 - name
-                type: object
-              type: array
-            routes:
-              description: "Routes is a list of resources to associate with the Gateway.
-                A route is a resource capable of servicing a request and allows a
-                cluster operator to expose a cluster resource (i.e. Service) by externally-reachable
-                URL, load-balance traffic and terminate SSL/TLS. Typically, a route
-                is a \"httproute\" or \"tcproute\" in group \"networking.x.k8s.io\".
-                However, an implementation may support other resources. \n If unspecified,
-                no routes will be associated to the Gateway. \n Support: Core"
-              items:
-                description: LocalObjectReference identifies an API object within
-                  a known namespace.
-                properties:
-                  group:
-                    description: Group is the group of the referent.  The empty string
-                      represents the core API group.
-                    type: string
-                  name:
-                    description: Name is the name of the referent.
-                    type: string
-                  resource:
-                    description: Resource is the resource of the referent.
-                    type: string
-                required:
-                - group
-                - name
-                - resource
+                - virtualHosts
                 type: object
               type: array
           required:
@@ -209,7 +203,7 @@ spec:
             conditions:
               description: Conditions describe the current conditions of the Gateway.
               items:
-                description: GatewayCondition is an error status for a given route.
+                description: GatewayCondition is an error status for a given VirtualHost.
                 properties:
                   lastTransitionTime:
                     description: LastTransitionTime indicates the last time this condition
@@ -251,9 +245,9 @@ spec:
                           constants. \n Support: Extended"
                         type: string
                       value:
-                        description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address".
+                        description: "Value. Examples: \"1.2.3.4\", \"128::1\", \"my-ip-address\".
                           Validity of the values will depend on `Type` and support
-                          by the controller.'
+                          by the controller. \n Support: Extended"
                         type: string
                     required:
                     - type

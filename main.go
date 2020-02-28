@@ -25,6 +25,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/service-apis/api/v1alpha1"
+	networkingv1alpha1 "sigs.k8s.io/service-apis/api/v1alpha1"
 	"sigs.k8s.io/service-apis/controllers"
 	// +kubebuilder:scaffold:imports
 )
@@ -38,6 +39,7 @@ func init() {
 	_ = clientgoscheme.AddToScheme(scheme)
 
 	_ = v1alpha1.AddToScheme(scheme)
+	_ = networkingv1alpha1.AddToScheme(scheme)
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -76,13 +78,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "Gateway")
 		os.Exit(1)
 	}
-	if err = (&controllers.HTTPRouteReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("HTTPRoute"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "HTTPRoute")
-		os.Exit(1)
-	}
 	if err = (&controllers.TrafficSplitReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("TrafficSplit"),
@@ -90,11 +85,12 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "TrafficSplit")
 		os.Exit(1)
 	}
-	if err = (&controllers.TcpRouteReconciler{
+	if err = (&controllers.VirtualHostReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("TcpRoute"),
+		Log:    ctrl.Log.WithName("controllers").WithName("VirtualHost"),
+		Scheme: mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "TcpRoute")
+		setupLog.Error(err, "unable to create controller", "controller", "VirtualHost")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

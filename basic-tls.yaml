@@ -1,0 +1,54 @@
+kind: GatewayClass
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: acme-tls-lb
+controller: acme.io/gateway-controller
+parameters:
+  apiGroup: networking.acme.io
+  kind: AcmeLBConfig
+  name: acme-tls-lb-config
+---
+kind: Gateway
+apiVersion: networking.x.k8s.io/v1alpha1
+metadata:
+  name: my-tls-gateway
+  namespace: default
+spec:
+  class: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+    - name: my-tls-listener
+      protocol: TCP
+  virtualServers:
+    - virtualServer:
+        group: networking.x.k8s.io
+        resource: VirtualServer
+        name: my-https-virtualserver
+      listenerName:  my-tls-listener
+      tls:
+        certificates:
+          - group: core
+            resource: Secret
+            name: my-virtualserver-cert
+        minimumVersion: TLS1_3
+---
+apiVersion: networking.x.k8s.io/v1alpha1
+kind: VirtualServer
+metadata:
+  name: my-tls-virtualserver
+spec:
+  hostnames:
+    - my.virtualserver.com
+  rules:
+    - match:
+        path: /bar
+      filter:
+        headers:
+          add:
+            my-added-header: foo
+          remove:
+            - bar
+      action:
+        forwardTo:
+          resource: Service
+          group: core
+          name: my-tls-service
