@@ -274,6 +274,40 @@
     Resource model
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass" class="md-nav__link">
+    GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    Gateway
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#httptcpfooroute" class="md-nav__link">
+    {HTTP,TCP,Foo}Route
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combined-types" class="md-nav__link">
+    Combined types
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -319,7 +353,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gatewayclass" class="md-nav__link">
+  <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
   
@@ -346,7 +380,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gateway" class="md-nav__link">
+  <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
   
@@ -547,6 +581,40 @@
     Resource model
   </a>
   
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass" class="md-nav__link">
+    GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    Gateway
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#httptcpfooroute" class="md-nav__link">
+    {HTTP,TCP,Foo}Route
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#combined-types" class="md-nav__link">
+    Combined types
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -592,7 +660,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gatewayclass" class="md-nav__link">
+  <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
   
@@ -619,7 +687,7 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#gateway" class="md-nav__link">
+  <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
   
@@ -740,7 +808,7 @@ limitations under the License.
 
 <h1 id="api-concepts">API Concepts</h1>
 <p>This document is a deep dive into the reasoning and design for the API. The
-content of this document is taken from the <a href="https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview">API sketch</a>.</p>
+content of this document was originally taken from the <a href="https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview">API sketch</a>.</p>
 <blockquote>
 <p>We will try to keep the two documents in sync as the sketch document has to
 lowest bar to contribution, but this document is easier to format well and
@@ -778,19 +846,35 @@ model.</p>
 Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
 be assumed to be part of this API group.</p>
 </blockquote>
-<p>Our resource model is based around a separation of concerns for a service
-producer. Each resource is intended to be (mostly) independently-evolvable and
-self-consistent:</p>
-<ul>
-<li>A way to group pods (backends) into a set via label selection: Kubernetes
-  <code>core.Service</code>, independent of application-level routing.</li>
-<li>A way to describe application-level routing: <code>xxxxRoute</code>, e.g. <code>HTTPRoute</code>,
-  <code>TCPRoute</code> independent of traffic access and consumption.</li>
-<li>A way to describe traffic access and consumption: <code>Gateway</code>, independent of
-  implementation.</li>
-<li>A way to describe which implementations of traffic access are available:
-  <code>GatewayClass</code>.</li>
-</ul>
+<p>There are three main types of object in our resource model:</p>
+<p><em>GatewayClass</em> defines a set of gateways with a common configuration and behavior. </p>
+<p><em>Gateway</em> requests a point where traffic can be translated to Services within the cluster.</p>
+<p><em>Routes</em> describe how traffic coming via the Gateway maps to the Services.</p>
+<h3 id="gatewayclass">GatewayClass</h3>
+<p>GatewayClass defines a set of Gateways that share a common configuration and behaviour.
+Each GatewayClass will be handled by a single controller, although controllers MAY handle more than one.</p>
+<p>GatewayClass is a cluster-scoped resource.
+There MUST be at least one GatewayClass defined in order to be able to have functional Gateways.
+A controller that implements the Gateway API does so by providing an associated GatewayClass resource that the user can reference from their Gateway(s).</p>
+<p>This is similar to <a href="https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingress-class">IngressClass</a> for Ingress and <a href="https://kubernetes.io/docs/concepts/storage/storage-classes/">StorageClass</a> for PersistentVolumes.
+In Ingress v1beta1, the closest analog to GatewayClass is the <code>ingress-class</code> annotation, and in IngressV1, the closest analog is the IngressClass object.</p>
+<h3 id="gateway">Gateway</h3>
+<p>A Gateway describes how traffic can be translated to Services within the cluster.
+That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
+For example: HTTP/S traffic sent to K8S Services via the Gateway, which may be a Cloud LB, in-cluster proxy or external hardware LB.
+While many use cases have client traffic originating “outside” the cluster, this is not a requirement. </p>
+<p>It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
+The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.</p>
+<p>As the Gateway spec captures user intent, it may not contain a complete specification for all attributes in the spec.
+For example, the user may omit fields such as addresses, ports, TLS settings.
+This allows the controller managing the GatewayClass to provide these settings for the user, resulting in a more portable spec.
+This behaviour will be made clear using the GatewayClass Status object.</p>
+<p>A Gateway MAY contain one or more *Route references which serve to direct traffic for a subset of traffic to a specific service.</p>
+<h3 id="httptcpfooroute">{HTTP,TCP,Foo}Route</h3>
+<p>Various types of Route objects define how traffic via the Gateway is mapped to Kubernetes Services.</p>
+<p>Currently the two Route object types are <code>HTTPRoute</code> and <code>TCPRoute</code>, to cover the two most common uses for this sort of traffic.</p>
+<p>This design is intended to be extensible at this point - it’s possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.</p>
+<h3 id="combined-types">Combined types</h3>
 <p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xxxxRoute</code> and <code>Service</code>(s) will
 define an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:</p>
@@ -841,7 +925,7 @@ handling this:</p>
 </ul>
 <h4 id="extensibility">Extensibility</h4>
 <p>TODO</p>
-<h3 id="gatewayclass">GatewayClass</h3>
+<h3 id="gatewayclass_1">GatewayClass</h3>
 <p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/api/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
 defined by the infrastructure provider. This resource represents a class of
 Gateways that can be instantiated.</p>
@@ -941,7 +1025,7 @@ status:
     Message: &quot;foobar&quot; is an FooBar.
 </code></pre>
 
-<h3 id="gateway">Gateway</h3>
+<h3 id="gateway_1">Gateway</h3>
 <p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of
 infrastructure. When a user creates a <code>Gateway</code>, a load balancer is provisioned
 (see below for details) by the <code>GatewayClass</code> controller. <code>Gateway</code> is the

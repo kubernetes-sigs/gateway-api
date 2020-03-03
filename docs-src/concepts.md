@@ -17,7 +17,7 @@ limitations under the License.
 # API Concepts
 
 This document is a deep dive into the reasoning and design for the API. The
-content of this document is taken from the [API sketch][api-sketch].
+content of this document was originally taken from the [API sketch][api-sketch].
 
 > We will try to keep the two documents in sync as the sketch document has to
 > lowest bar to contribution, but this document is easier to format well and
@@ -61,18 +61,53 @@ model.
 > Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
 > be assumed to be part of this API group.
 
-Our resource model is based around a separation of concerns for a service
-producer. Each resource is intended to be (mostly) independently-evolvable and
-self-consistent:
 
-* A way to group pods (backends) into a set via label selection: Kubernetes
-  `core.Service`, independent of application-level routing.
-* A way to describe application-level routing: `xxxxRoute`, e.g. `HTTPRoute`,
-  `TCPRoute` independent of traffic access and consumption.
-* A way to describe traffic access and consumption: `Gateway`, independent of
-  implementation.
-* A way to describe which implementations of traffic access are available:
-  `GatewayClass`.
+There are three main types of object in our resource model:
+
+*GatewayClass* defines a set of gateways with a common configuration and behavior. 
+
+*Gateway* requests a point where traffic can be translated to Services within the cluster.
+
+*Routes* describe how traffic coming via the Gateway maps to the Services.
+
+### GatewayClass
+
+GatewayClass defines a set of Gateways that share a common configuration and behaviour.
+Each GatewayClass will be handled by a single controller, although controllers MAY handle more than one.
+
+GatewayClass is a cluster-scoped resource.
+There MUST be at least one GatewayClass defined in order to be able to have functional Gateways.
+A controller that implements the Gateway API does so by providing an associated GatewayClass resource that the user can reference from their Gateway(s).
+
+This is similar to [IngressClass](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingress-class) for Ingress and [StorageClass](https://kubernetes.io/docs/concepts/storage/storage-classes/) for PersistentVolumes.
+In Ingress v1beta1, the closest analog to GatewayClass is the `ingress-class` annotation, and in IngressV1, the closest analog is the IngressClass object.
+
+### Gateway
+
+A Gateway describes how traffic can be translated to Services within the cluster.
+That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
+For example: HTTP/S traffic sent to K8S Services via the Gateway, which may be a Cloud LB, in-cluster proxy or external hardware LB.
+While many use cases have client traffic originating “outside” the cluster, this is not a requirement. 
+
+It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
+The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.
+
+As the Gateway spec captures user intent, it may not contain a complete specification for all attributes in the spec.
+For example, the user may omit fields such as addresses, ports, TLS settings.
+This allows the controller managing the GatewayClass to provide these settings for the user, resulting in a more portable spec.
+This behaviour will be made clear using the GatewayClass Status object.
+
+A Gateway MAY contain one or more *Route references which serve to direct traffic for a subset of traffic to a specific service.
+
+### {HTTP,TCP,Foo}Route
+
+Various types of Route objects define how traffic via the Gateway is mapped to Kubernetes Services.
+
+Currently the two Route object types are `HTTPRoute` and `TCPRoute`, to cover the two most common uses for this sort of traffic.
+
+This design is intended to be extensible at this point - it’s possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.
+
+### Combined types
 
 The combination of `GatewayClass`, `Gateway`, `xxxxRoute` and `Service`(s) will
 define an implementable load-balancer. The diagram below illustrates the
