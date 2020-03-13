@@ -47,10 +47,19 @@ accommodate participants from various time zones:
     src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 * Thursday 4:30 (16:30) PM Pacific (APAC Friendly Time) <a target="_blank" href="https://zoom.us/j/441530404">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=bGVvMWduMWE2dnVxcDRsMTc5NmVlcDIxaTFfMjAyMDAxMTdUMDAzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&amp;tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&amp;scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 
+### Office Hours
+
+In addition to weekly meetings, we have informal weekly office hours meetings
+on Wednesdays.
+
+* Wednesday 3:00 (15:00) PM Pacific <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MTI0dnVlbW90NXI1cW1vM2s0Y3U5bzQzaWhfMjAyMDAzMTFUMjIwMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+
 ### Meeting notes
 
 [Meeting schedule scratch pad][meeting-sched-scratch]
 [meeting-sched-scratch]: https://docs.google.com/spreadsheets/d/1_jXy5hHLAmLTVN9rTNsI3Xx_Dzc0JvLqNqjS9hdzryI
+
+[Meeting recordings](https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb).
 
 | Date               |                                |
 |--------------------|--------------------------------|
