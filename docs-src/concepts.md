@@ -55,6 +55,9 @@ Depending on the environment, multiple roles can map to the same user.
 For example, giving the user all of the above role replicates the self-service
 model.
 
+For more information on the roles and personas considered in the Service API
+design, refer to the [Security Model](/security-model). 
+
 ## Resource model
 
 > Note: Resource will initially live in the `networking.x-k8s.io` API group as
