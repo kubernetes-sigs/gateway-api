@@ -19,9 +19,9 @@ spec:
   - name: my-http-listener
     protocol: HTTP
   routes:
-  - name: http-app-1
-    group: networking.x.k8s.io
-    resource: HTTPRoute
+    namespaceSelector:
+      matchLabels:
+        "": ""
 ---
 kind: HTTPRoute
 apiVersion: networking.x.k8s.io/v1alpha1
