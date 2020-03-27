@@ -56,19 +56,16 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define what addresses,
 	// ports, protocols are bound on this Gateway.
 	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
-	// Routes is a list of resources to associate with the Gateway. A route is a
-	// resource capable of servicing a request and allows a cluster operator to
-	// expose a cluster resource (i.e. Service) by externally-reachable URL,
-	// load-balance traffic and terminate SSL/TLS. Typically, a route is a
-	// "httproute" or "tcproute" in group "networking.x.k8s.io". However, an
-	// implementation may support other resources.
-	//
-	// If unspecified, no routes will be associated to the Gateway.
+	// Routes specifies a schema for associating routes with the Gateway using
+	// selectors. A route is a resource capable of servicing a request and allows
+	// a cluster operator to expose a cluster resource (i.e. Service) by
+	// externally-reachable URL, load-balance traffic and terminate SSL/TLS.
+	// Typically, a route is a "httproute" or "tcproute" in group
+	// "networking.x.k8s.io". However, an implementation may support other resources.
 	//
 	// Support: Core
 	//
-	// +optional
-	Routes []RouteObjectReference `json:"routes" protobuf:"bytes,3,rep,name=routes"`
+	Routes RouteBindingSelector `json:"routes" protobuf:"bytes,3,opt,name=routes"`
 }
 
 const (
@@ -236,6 +233,37 @@ type LocalObjectReference struct {
 	// +kubebuilder:validation:Required
 	// +required
 	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
+}
+
+// RouteBindingSelector defines a schema for associating routes with the Gateway.
+// If NamespaceSelector and RouteSelector are defined, only routes matching both
+// selectors are associated with the Gateway.
+type RouteBindingSelector struct {
+	// NamespaceSelector specifies a set of namespace labels used for selecting
+	// routes to associate with the Gateway. If NamespaceSelector is defined,
+	// all routes in namespaces matching the NamespaceSelector are associated
+	// to the Gateway.
+	//
+	// An empty NamespaceSelector (default) indicates that routes from any
+	// namespace will be associated to this Gateway. This field is intentionally
+	// not a pointer because the nil behavior (no namespaces) is undesirable here.
+	//
+	// Support: Core
+	//
+	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector" protobuf:"bytes,1,opt,name=namespaceSelector"`
+	// RouteSelector specifies a set of route labels used for selecting
+	// routes to associate with the Gateway. If RouteSelector is defined,
+	// only routes matching the RouteSelector are associated with the Gateway.
+	// An empty RouteSelector matches all routes.
+	//
+	//
+	// If undefined, route labels are not used for associating routes to
+	// the gateway.
+	//
+	// Support: Core
+	//
+	// +optional
+	RouteSelector *metav1.LabelSelector `json:"routeSelector,omitempty" protobuf:"bytes,2,opt,name=routeSelector"`
 }
 
 // CertificateObjectReference identifies a certificate object within a known
