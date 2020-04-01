@@ -30,8 +30,8 @@ type GatewayReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=gateways,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=gateways/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=networking.x-k8s.io,resources=gateways,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=networking.x-k8s.io,resources=gateways/status,verbs=get;update;patch
 
 // Reconcile the changes.
 func (r *GatewayReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {

@@ -30,8 +30,8 @@ type TcpRouteReconciler struct {
 	Log logr.Logger
 }
 
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=tcproutes,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=networking.x.k8s.io,resources=tcproutes/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=networking.x-k8s.io,resources=tcproutes,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=networking.x-k8s.io,resources=tcproutes/status,verbs=get;update;patch
 
 // Reconcile the changes.
 func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {

@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.4
   creationTimestamp: null
-  name: httproutes.networking.x.k8s.io
+  name: httproutes.networking.x-k8s.io
 spec:
-  group: networking.x.k8s.io
+  group: networking.x-k8s.io
   names:
     kind: HTTPRoute
     listKind: HTTPRouteList

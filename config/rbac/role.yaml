@@ -7,7 +7,7 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - gatewayclasses
   verbs:
@@ -19,7 +19,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - gatewayclasses/status
   verbs:
@@ -27,7 +27,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - gateways
   verbs:
@@ -39,7 +39,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - gateways/status
   verbs:
@@ -47,7 +47,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - httproutes
   verbs:
@@ -59,7 +59,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - httproutes/status
   verbs:
@@ -67,7 +67,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - tcproutes
   verbs:
@@ -79,7 +79,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - tcproutes/status
   verbs:
@@ -87,7 +87,7 @@ rules:
   - patch
   - update
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - trafficsplits
   verbs:
@@ -99,7 +99,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - networking.x.k8s.io
+  - networking.x-k8s.io
   resources:
   - trafficsplits/status
   verbs:
