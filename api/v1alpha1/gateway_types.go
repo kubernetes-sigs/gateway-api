@@ -98,11 +98,11 @@ type Listener struct {
 	//
 	// +optional
 	Address *ListenerAddress `json:"address,omitempty" protobuf:"bytes,2,opt,name=address"`
-	// Port is a list of ports associated with the Address.
+	// Ports is a list of ports associated with the Address.
 	//
 	// Support:
 	// +optional
-	Port *int32 `json:"port,omitempty" protobuf:"varint,3,opt,name=port"`
+	Ports []int32 `json:"ports,omitempty" protobuf:"bytes,3,rep,name=ports"`
 	// Protocol to use.
 	//
 	// Support:

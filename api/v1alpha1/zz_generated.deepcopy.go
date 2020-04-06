@@ -587,10 +587,10 @@ func (in *Listener) DeepCopyInto(out *Listener) {
 		*out = new(ListenerAddress)
 		**out = **in
 	}
-	if in.Port != nil {
-		in, out := &in.Port, &out.Port
-		*out = new(int32)
-		**out = **in
+	if in.Ports != nil {
+		in, out := &in.Ports, &out.Ports
+		*out = make([]int32, len(*in))
+		copy(*out, *in)
 	}
 	if in.Protocol != nil {
 		in, out := &in.Protocol, &out.Protocol

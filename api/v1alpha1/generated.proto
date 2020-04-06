@@ -487,11 +487,11 @@ message Listener {
   // +optional
   optional ListenerAddress address = 2;
 
-  // Port is a list of ports associated with the Address.
+  // Ports is a list of ports associated with the Address.
   //
   // Support:
   // +optional
-  optional int32 port = 3;
+  repeated int32 ports = 3;
 
   // Protocol to use.
   //
