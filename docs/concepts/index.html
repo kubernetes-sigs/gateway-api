@@ -319,6 +319,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#with-tcproutes" class="md-nav__link">
+    With TcpRoutes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#design-considerations" class="md-nav__link">
     Design considerations
   </a>
@@ -638,6 +645,13 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#with-tcproutes" class="md-nav__link">
+    With TcpRoutes
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#design-considerations" class="md-nav__link">
     Design considerations
   </a>
@@ -912,6 +926,22 @@ relationships between the different resources:</p>
  <strong>Note:</strong> Whether <code>hosts</code> should be singular is still <a href="https://github.com/kubernetes-sigs/service-apis/pull/43">under review</a>.</li>
 <li>The Gateway implementation performs filtering (optional) and forwarding based on
  <code>httpRoute.spec.hosts[x].rules[x].match</code> . The match can be based on the request path and/or header.</li>
+<li>Lastly, the request is forwarded to an object within the cluster.</li>
+</ol>
+<h3 id="with-tcproutes">With TcpRoutes</h3>
+<p>A typical client/gateway API request flow for a gateway implemented using a reverse proxy and TcpRoutes is:</p>
+<ol>
+<li>A client makes a request to an FQDN, i.e. "foo.example.com".</li>
+<li>The FQDN gets resolved to <code>gateway.status.listeners[x].address</code>.</li>
+<li>The request is received by the Gateway implementation, i.e. reverse proxy, on <code>gateway.status.listeners[x].address</code>
+ and <code>gateway.spec.listeners[x].port</code>.</li>
+<li>If the request uses TLS then <code>gateway.spec.listeners[x].tls</code> is used for establishing the connection.</li>
+<li>If the request does not use TLS or if the <code>Gateway</code> is configured to terminate the TLS connection,
+ a <code>TcpRoute</code> is selected based on the name of the <code>Listener</code> that received the request.</li>
+<li>If the <code>Gateway</code> is configured to pass the TLS connection through to the backend object,
+ i.e. Service, SNI is used to match the request with a <code>TcpRoute</code> based on <code>tcpRoute.spec.hosts[x].hostname</code>.</li>
+<li>The Gateway implementation performs filtering (optional) and forwarding based on
+ <code>tcpRoute.spec.hosts[x].rules[x].match</code> . The match can be based on the name of the <code>Listener</code> and/or port.</li>
 <li>Lastly, the request is forwarded to an object within the cluster.</li>
 </ol>
 <h3 id="design-considerations">Design considerations</h3>

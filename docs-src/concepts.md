@@ -139,6 +139,23 @@ A typical client/gateway API request flow for a gateway implemented using a reve
  `httpRoute.spec.hosts[x].rules[x].match` . The match can be based on the request path and/or header.
  7. Lastly, the request is forwarded to an object within the cluster.
 
+### With TcpRoutes
+
+A typical client/gateway API request flow for a gateway implemented using a reverse proxy and TcpRoutes is:
+
+ 1. A client makes a request to an FQDN, i.e. "foo.example.com".
+ 2. The FQDN gets resolved to `gateway.status.listeners[x].address`.
+ 3. The request is received by the Gateway implementation, i.e. reverse proxy, on `gateway.status.listeners[x].address`
+ and `gateway.spec.listeners[x].port`.
+ 4. If the request uses TLS then `gateway.spec.listeners[x].tls` is used for establishing the connection.
+ 5. If the request does not use TLS or if the `Gateway` is configured to terminate the TLS connection,
+ a `TcpRoute` is selected based on the name of the `Listener` that received the request.
+ 6. If the `Gateway` is configured to pass the TLS connection through to the backend object,
+ i.e. Service, SNI is used to match the request with a `TcpRoute` based on `tcpRoute.spec.hosts[x].hostname`.
+ 7. The Gateway implementation performs filtering (optional) and forwarding based on
+ `tcpRoute.spec.hosts[x].rules[x].match` . The match can be based on the name of the `Listener` and/or port.
+ 8. Lastly, the request is forwarded to an object within the cluster.
+
 ### Design considerations
 
 There are some general design guidelines used throughout this API.
