@@ -677,6 +677,63 @@ message TcpRoute {
   optional TcpRouteStatus status = 4;
 }
 
+// TcpRouteAction is the action taken given a match.
+message TcpRouteAction {
+  // ForwardTo sends requests to the referenced object.  The resource may
+  // be "service" (use the empty string for the group), or an
+  // implementation may support other resources (for example, resource
+  // "myroutetarget" in group "networking.acme.io").
+  optional LocalObjectReference forwardTo = 1;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "action" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myrouteaction" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 2;
+}
+
+// TcpRouteHost is the configuration for a given host.
+message TcpRouteHost {
+  // Hostname is the fully qualified domain name of a network host,
+  // as defined by RFC 3986. Note the following deviations from the
+  // "host" part of the URI as defined in the RFC:
+  //
+  // 1. The `:` delimiter is not respected because ports are not allowed.
+  //
+  // This field is only available for TcpRoutes that used with TLS-enabled
+  // Listeners. The value of this field is matched against the TLS Server
+  // Name Indication (SNI) value.
+  //
+  // Incoming requests are matched against Hostname before processing TcpRoute
+  // rules. For example, if the request header contains host: foo.example.com,
+  // an HTTPRoute with hostname foo.example.com will match. However, an
+  // HTTPRoute with hostname example.com or bar.example.com will not match.
+  // If Hostname is unspecified, the Gateway routes all traffic based on
+  // the specified rules.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional string hostname = 1;
+
+  // Rules are a list of matchers and actions.
+  repeated TcpRouteRule rules = 2;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "host" block.  The resource may be "configmap" (use the empty string
+  // for the group) or an implementation-defined resource (for example,
+  // resource "myroutehost" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 3;
+}
+
 // TcpRouteList contains a list of TcpRoute
 message TcpRouteList {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
@@ -686,12 +743,58 @@ message TcpRouteList {
   repeated TcpRoute items = 3;
 }
 
-// TcpRouteSpec defines the desired state of TcpRoute
+// TcpRouteMatch defines the predicate used to match requests to a given action.
+message TcpRouteMatch {
+  // Listener is the name of the Listener that received the routed traffic.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional string listener = 1;
+
+  // Port is the TCP port on a Listener that received the routed traffic.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional int32 port = 2;
+
+  // Extension is an optional, implementation-specific extension to the
+  // "match" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myroutematcher" in group "networking.acme.io").
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extension = 3;
+}
+
+// TcpRouteRule is the configuration for a given route.
+message TcpRouteRule {
+  // Match defines which requests match this path.
+  // +optional
+  optional TcpRouteMatch match = 1;
+
+  // Action defines what happens to the request.
+  // +optional
+  optional TcpRouteAction action = 2;
+}
+
+// TcpRouteSpec defines the desired state of TcpRoute.
 message TcpRouteSpec {
+  // Hosts is a list of Host definitions.
+  repeated TcpRouteHost hosts = 1;
+
+  // Default is the default host to use. Default.Hostname must be empty.
+  //
+  // +optional
+  optional TcpRouteHost default = 2;
 }
 
 // TcpRouteStatus defines the observed state of TcpRoute
 message TcpRouteStatus {
+  repeated GatewayObjectReference gateways = 1;
 }
 
 // TrafficSplit is the Schema for the trafficsplits API
