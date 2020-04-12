@@ -38,10 +38,10 @@ Gateway/Routes API will target the following personas:
 
 * **Infrastructure provider**: The infrastructure provider (infra) is
   responsible for the overall environment that the cluster(s) are operating in.
-  Examples include: the cloud provider (AWS, Azure, GCP, ...), the PaaS provider
-  in a company.
+  Examples include public cloud providers (AWS, Azure, GCP, ...), or PaaS providers
+  within an organization.
 * **Cluster operator**: The cluster operator (ops) is responsible for
-  administration of entire clusters. They manage policies, network access,
+  administration of entire clusters. They manage policies, network access, and
   application permissions.
 * **Application developer**: The application developer (dev) is responsible for
   defining their application configuration (e.g. timeouts, request
@@ -89,7 +89,7 @@ In Ingress v1beta1, the closest analog to GatewayClass is the `ingress-class` an
 
 A Gateway describes how traffic can be translated to Services within the cluster.
 That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
-For example: HTTP/S traffic sent to K8S Services via the Gateway, which may be a Cloud LB, in-cluster proxy or external hardware LB.
+For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
 While many use cases have client traffic originating “outside” the cluster, this is not a requirement. 
 
 It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
@@ -108,7 +108,7 @@ Various types of Route objects define how traffic via the Gateway is mapped to K
 
 Currently the two Route object types are `HTTPRoute` and `TCPRoute`, to cover the two most common uses for this sort of traffic.
 
-This design is intended to be extensible at this point - it’s possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.
+This design is intended to be extensible at this point - it is possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.
 
 ### Combined types
 
@@ -123,7 +123,7 @@ relationships between the different resources:
 
 A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
 
- 1. A client makes a request to an FQDN, i.e. "foo.example.com".
+ 1. A client makes a request to a FQDN, i.e. "foo.example.com".
  2. The FQDN gets resolved to `gateway.status.listeners[x].address`.
  3. The request is received by the Gateway implementation, i.e. reverse proxy, on `gateway.status.listeners[x].address`
  and `gateway.spec.listeners[x].port`.
@@ -139,7 +139,7 @@ A typical client/gateway API request flow for a gateway implemented using a reve
  `httpRoute.spec.hosts[x].rules[x].match` . The match can be based on the request path and/or header.
  7. Lastly, the request is forwarded to an object within the cluster.
 
-### TLS Configuration
+## TLS Configuration
 
 TLS configuration is tied to Gateway listeners. Although adding the option to
 configure TLS on other resources was considered, ultimately TLS configuration on
@@ -155,11 +155,11 @@ Gateway listeners was deemed sufficient for the following reasons:
   security model outlined a potential approach to enable this in the future, but
   there does not seem to be a sufficient reason to work towards that now.
 
-### Design considerations
+## Design considerations
 
 There are some general design guidelines used throughout this API.
 
-#### Single resource consistency
+### Single resource consistency
 
 The Kubernetes API guarantees consistency only on a single resource level. There
 are a couple of consequences for complex resource graphs as opposed to single
@@ -172,7 +172,7 @@ resources:
 *   Controllers will need to handle broken links between resources and/or
     mismatched configuration.
 
-#### Conflicts
+### Conflicts
 
 Separation and delegation of responsibility among independent actors (e.g
 between cluster ops and application developers) can result in conflicts in the
@@ -182,11 +182,11 @@ handling this:
 
 * TODO
 
-#### Extensibility
+### Extensibility
 
 TODO
 
-### GatewayClass
+## GatewayClass
 
 `GatewayClass` ([source code][gatewayclass-src]) is cluster-scoped resource
 defined by the infrastructure provider. This resource represents a class of
@@ -229,9 +229,9 @@ The user of the classes will not need to know *how* `internet` and `private` are
 implemented. Instead, the user will only need to understand the resulting
 properties of the class that the `Gateway` was created with.
 
-#### GatewayClass parameters
+### GatewayClass parameters
 
-Providers of the `Gateway API` may need to pass parameters to their controller
+Providers of the `Gateway` API may need to pass parameters to their controller
 as part of the class definition. This is done using the
 `GatewayClass.spec.parametersRef` field:
 
@@ -261,7 +261,7 @@ The type of object referenced by `GatewayClass.spec.parametersRef` will depend
 on the provider itself. A `core.ConfigMap` is used in the example above, but
 controllers may opt to use a `CustomResource` for better schema validation.
 
-#### GatewayClass status
+### GatewayClass status
 
 `GatewayClasses` MUST be validated by the provider to ensure that the configured
 parameters are valid. The validity of the class will be signaled to the user via
@@ -306,10 +306,11 @@ status:
     Message: "foobar" is an FooBar.
 ```
 
-### Gateway
+## Gateway
 
 A `Gateway` is 1:1 with the life cycle of the configuration of
-infrastructure. When a user creates a `Gateway`, a load balancer is provisioned
+infrastructure. When a user creates a `Gateway`, some load balancing
+infrastructure is provisioned or configured
 (see below for details) by the `GatewayClass` controller. `Gateway` is the
 resource that triggers actions in this API. Other resources in this API are
 configuration snippets until a Gateway has been created to link the resources
@@ -317,20 +318,17 @@ together.
 
 The `Gateway` spec defines the following:
 
-*   `GatewayClass` used to instantiate this Gateway.
-*   Listener bindings, which define addresses and ports, protocol termination,
-    TLS-settings. Listener configuration requested by a Gateway definition can
+*   The `GatewayClass` used to instantiate this Gateway.
+*   The Listener bindings, which define addresses and ports, protocol termination,
+    and TLS settings. The Listener configuration requested by a Gateway definition can
     be incompatible with a given `GatewayClass` (e.g. port/protocol combination
-    is not supported)
+    is not supported).
+*   The Routes, which describe how traffic is processed and forwarded.
 
-Listener configuration requested by a Gateway definition can be incompatible
-with a given GatewayClass (e.g. port/protocol combination is not supported). In
-this case, the Gateway will be in an error state, signaled by the status field.
-Routes, which point to a set of protocol-specific routing served by the Gateway.
-A Gateway can point directly to Kubernetes Service if no advanced routing is
-required.
+If the Listener configuration requested by a Gateway definition is incompatible
+with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.
 
-#### Deployment models
+### Deployment models
 
 Depending on the `GatewayClass`, the creation of the `Gateway` could do any of
 the following actions:
@@ -346,7 +344,7 @@ The API does not specify which one of these actions will be taken. Note that a
 GatewayClass controller that manages in-cluster proxy processes MAY restrict
 Gateway configuration scope, e.g. only be served in the same namespace.
 
-#### Gateway Status
+### Gateway Status
 
 Gateways track status for the `Gateway` resource as a whole as well as each
 `Listener` it contains. The status for a specific Route is reported in the
