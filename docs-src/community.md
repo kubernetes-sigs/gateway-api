@@ -33,26 +33,24 @@ questions, discussions.
 ## Meetings
 
 Meetings discussing the evolution of the service APIs will alternate times to
-accommodate participants from various time zones:
+accommodate participants from various time zones. This calendar includes all
+Service APIs meetings as well as any other SIG-Network meetings.
 
 <iframe
-  src="https://calendar.google.com/calendar/embed?src=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&ctz=America%2FLos_Angeles"
+  src="https://calendar.google.com/calendar/embed?src=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&ctz=America%2FLos_Angeles"
   style="border: 0" width="800" height="600" frameborder="0"
   scrolling="no">
 </iframe>
 
-* Thursday 10:30 AM Pacific (EMEA Friendly Time) <a target="_blank" href="https://zoom.us/j/140577552">[Zoom Link]</a> <a target="_blank"
-    href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=NDR2NDRyMDg4bjFidGV1ZDE2YTY2dGw2NDdfMjAyMDAxMjNUMTgzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&amp;tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&amp;scp=ALL"><img
-    border="0"
-    src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
-* Thursday 4:30 (16:30) PM Pacific (APAC Friendly Time) <a target="_blank" href="https://zoom.us/j/441530404">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&amp;tmeid=bGVvMWduMWE2dnVxcDRsMTc5NmVlcDIxaTFfMjAyMDAxMTdUMDAzMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&amp;tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&amp;scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+* Thursday 10:30 AM Pacific (EMEA Friendly Time) <a target="_blank" href="https://zoom.us/j/140577552">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=NHY3dDhnN2tiM242M2Rqbzc0cTQ3cWI5dXNfMjAyMDA0MTZUMTczMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+* Thursday 4:30 (16:30) PM Pacific (APAC Friendly Time) <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MTVxNzV2YzIzdTQwdHA2azRicTdoYnZvZDFfMjAyMDA0MDlUMjMzMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 
 ### Office Hours
 
 In addition to weekly meetings, we have informal weekly office hours meetings
 on Wednesdays.
 
-* Wednesday 3:00 (15:00) PM Pacific <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MTI0dnVlbW90NXI1cW1vM2s0Y3U5bzQzaWhfMjAyMDAzMTFUMjIwMDAwWiBzbGpwY3NsNzR2Zmhla292Y2NiMWZzdGxqY0Bn&tmsrc=sljpcsl74vfhekovccb1fstljc%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+* Wednesday 3:00 (15:00) PM Pacific <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VlZWhzanNlbjhvcjRsZjdyZ25kZG9tMTYgODhmZTFsM3FmbjJiNnIxMWs4dW01YW03NmNAZw&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 
 ### Meeting notes
 
