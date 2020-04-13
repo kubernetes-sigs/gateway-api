@@ -114,6 +114,38 @@ message GatewayClassSpec {
   // +required
   optional string controller = 1;
 
+  // AllowedGatewayNamespaces is a selector of namespaces that Gateways can
+  // use this GatewayClass from. This is a standard Kubernetes LabelSelector,
+  // a label query over a set of resources. The result of matchLabels and
+  // matchExpressions are ANDed. Controllers must not support Gateways in
+  // namespaces outside this selector.
+  //
+  // An empty selector (default) indicates that Gateways can use this
+  // GatewayClass from any namespace. This field is intentionally not a
+  // pointer because the nil behavior (no namespaces) is undesirable here.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector allowedGatewayNamespaces = 2;
+
+  // AllowedRouteNamespaces is a selector of namespaces that Gateways of this
+  // class can reference Routes in. This is a standard Kubernetes
+  // LabelSelector, a label query over a set of resources. The result of
+  // matchLabels and matchExpressions are ANDed. Controllers must not support
+  // Routes in namespaces outside this selector.
+  //
+  // A nil selector (default) indicates that Gateways of this class can
+  // reference Routes within the same namespace. An empty selector indicates
+  // that Gateways can reference Routes in any namespace. This field is
+  // intentionally a pointer to support the nil behavior (only local Routes
+  // allowed).
+  //
+  // Support: Core
+  //
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector allowedRouteNamespaces = 3;
+
   // ParametersRef is a controller specific resource containing
   // the configuration parameters corresponding to this
   // class. This is optional if the controller does not require
@@ -127,7 +159,7 @@ message GatewayClassSpec {
   //
   // +optional
   // +protobuf=false
-  optional LocalObjectReference parametersRef = 2;
+  optional LocalObjectReference parametersRef = 4;
 }
 
 // GatewayClassStatus is the current status for the GatewayClass.
