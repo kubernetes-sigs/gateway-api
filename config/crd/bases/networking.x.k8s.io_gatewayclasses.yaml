@@ -36,6 +36,108 @@ spec:
         spec:
           description: Spec for this GatewayClass.
           properties:
+            allowedGatewayNamespaces:
+              description: "AllowedGatewayNamespaces is a selector of namespaces that
+                Gateways can use this GatewayClass from. This is a standard Kubernetes
+                LabelSelector, a label query over a set of resources. The result of
+                matchLabels and matchExpressions are ANDed. Controllers must not support
+                Gateways in namespaces outside this selector. \n An empty selector
+                (default) indicates that Gateways can use this GatewayClass from any
+                namespace. This field is intentionally not a pointer because the nil
+                behavior (no namespaces) is undesirable here. \n Support: Core"
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
+            allowedRouteNamespaces:
+              description: "AllowedRouteNamespaces is a selector of namespaces that
+                Gateways of this class can reference Routes in. This is a standard
+                Kubernetes LabelSelector, a label query over a set of resources. The
+                result of matchLabels and matchExpressions are ANDed. Controllers
+                must not support Routes in namespaces outside this selector. \n A
+                nil selector (default) indicates that Gateways of this class can reference
+                Routes within the same namespace. An empty selector indicates that
+                Gateways can reference Routes in any namespace. This field is intentionally
+                a pointer to support the nil behavior (only local Routes allowed).
+                \n Support: Core"
+              properties:
+                matchExpressions:
+                  description: matchExpressions is a list of label selector requirements.
+                    The requirements are ANDed.
+                  items:
+                    description: A label selector requirement is a selector that contains
+                      values, a key, and an operator that relates the key and values.
+                    properties:
+                      key:
+                        description: key is the label key that the selector applies
+                          to.
+                        type: string
+                      operator:
+                        description: operator represents a key's relationship to a
+                          set of values. Valid operators are In, NotIn, Exists and
+                          DoesNotExist.
+                        type: string
+                      values:
+                        description: values is an array of string values. If the operator
+                          is In or NotIn, the values array must be non-empty. If the
+                          operator is Exists or DoesNotExist, the values array must
+                          be empty. This array is replaced during a strategic merge
+                          patch.
+                        items:
+                          type: string
+                        type: array
+                    required:
+                    - key
+                    - operator
+                    type: object
+                  type: array
+                matchLabels:
+                  additionalProperties:
+                    type: string
+                  description: matchLabels is a map of {key,value} pairs. A single
+                    {key,value} in the matchLabels map is equivalent to an element
+                    of matchExpressions, whose key field is "key", the operator is
+                    "In", and the values array contains only "value". The requirements
+                    are ANDed.
+                  type: object
+              type: object
             controller:
               description: "Controller is a domain/path string that indicates the
                 controller that managing Gateways of this class. \n Example: \"acme.io/gateway-controller\".
