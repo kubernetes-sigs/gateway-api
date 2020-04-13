@@ -2,11 +2,11 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-- bases/networking.x.k8s.io_gatewayclasses.yaml
-- bases/networking.x.k8s.io_gateways.yaml
-- bases/networking.x.k8s.io_httproutes.yaml
-- bases/networking.x.k8s.io_trafficsplits.yaml
-- bases/networking.x.k8s.io_tcproutes.yaml
+- bases/networking.x-k8s.io_gatewayclasses.yaml
+- bases/networking.x-k8s.io_gateways.yaml
+- bases/networking.x-k8s.io_httproutes.yaml
+- bases/networking.x-k8s.io_trafficsplits.yaml
+- bases/networking.x-k8s.io_tcproutes.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

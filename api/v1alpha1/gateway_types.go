@@ -61,7 +61,7 @@ type GatewaySpec struct {
 	// a cluster operator to expose a cluster resource (i.e. Service) by
 	// externally-reachable URL, load-balance traffic and terminate SSL/TLS.
 	// Typically, a route is a "httproute" or "tcproute" in group
-	// "networking.x.k8s.io". However, an implementation may support other resources.
+	// "networking.x-k8s.io". However, an implementation may support other resources.
 	//
 	// Support: Core
 	//

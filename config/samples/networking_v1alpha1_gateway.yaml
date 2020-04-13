@@ -1,4 +1,4 @@
-apiVersion: networking.x.k8s.io/v1alpha1
+apiVersion: networking.x-k8s.io/v1alpha1
 kind: Gateway
 metadata:
   name: gateway-sample
@@ -21,8 +21,8 @@ spec:
           name: gateway-sample
         minimumVersion: TLS_1_0
         options:
-          gateway-controller.vendor.x.k8s.io/tls-option-1: value1
-          gateway-controller.vendor.x.k8s.io/tls-option-2: value2
+          gateway-controller.vendor.x-k8s.io/tls-option-1: value1
+          gateway-controller.vendor.x-k8s.io/tls-option-2: value2
       extension:
         apiGroup: sample.vendor.io
         kind: MyProtocolListener

@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.4
   creationTimestamp: null
-  name: gateways.networking.x.k8s.io
+  name: gateways.networking.x-k8s.io
 spec:
-  group: networking.x.k8s.io
+  group: networking.x-k8s.io
   names:
     kind: Gateway
     listKind: GatewayList
@@ -177,7 +177,7 @@ spec:
                 a request and allows a cluster operator to expose a cluster resource
                 (i.e. Service) by externally-reachable URL, load-balance traffic and
                 terminate SSL/TLS. Typically, a route is a \"httproute\" or \"tcproute\"
-                in group \"networking.x.k8s.io\". However, an implementation may support
+                in group \"networking.x-k8s.io\". However, an implementation may support
                 other resources. \n Support: Core"
               properties:
                 namespaceSelector:

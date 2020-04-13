@@ -6,9 +6,9 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.2.4
   creationTimestamp: null
-  name: trafficsplits.networking.x.k8s.io
+  name: trafficsplits.networking.x-k8s.io
 spec:
-  group: networking.x.k8s.io
+  group: networking.x-k8s.io
   names:
     kind: TrafficSplit
     listKind: TrafficSplitList

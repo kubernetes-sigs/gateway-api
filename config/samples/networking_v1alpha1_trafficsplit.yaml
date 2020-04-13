@@ -1,4 +1,4 @@
-apiVersion: networking.x.k8s.io/v1alpha1
+apiVersion: networking.x-k8s.io/v1alpha1
 kind: TrafficSplit
 metadata:
   name: trafficsplit-sample

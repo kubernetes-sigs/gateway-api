@@ -1,5 +1,5 @@
 kind: GatewayClass
-apiVersion: networking.x.k8s.io/v1alpha1
+apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: acme-lb
 controller: acme.io/gateway-controller
@@ -9,7 +9,7 @@ parameters:
   name: acme-lb-config
 ---
 kind: Gateway
-apiVersion: networking.x.k8s.io/v1alpha1
+apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: my-gateway
   namespace: default
@@ -25,7 +25,7 @@ spec:
         "app": "foo"
 ---
 kind: HTTPRoute
-apiVersion: networking.x.k8s.io/v1alpha1
+apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-1
   namespace: default

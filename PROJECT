@@ -1,5 +1,5 @@
 version: "2"
-domain: x.k8s.io
+domain: x-k8s.io
 repo: sigs.k8s.io/service-apis
 resources:
 - group: networking
