@@ -19,15 +19,18 @@ spec:
   - name: my-http-listener
     protocol: HTTP
   routes:
-    namespaceSelector:
+    namespaceSelector: {}
+    routeSelector:
       matchLabels:
-        "": ""
+        "app": "foo"
 ---
 kind: HTTPRoute
 apiVersion: networking.x.k8s.io/v1alpha1
 metadata:
   name: http-app-1
   namespace: default
+  labels:
+    app: foo
 spec:
   hosts:
     - hostnames:
