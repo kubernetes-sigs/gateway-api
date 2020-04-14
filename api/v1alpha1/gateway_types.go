@@ -138,8 +138,8 @@ const (
 	//
 	// Support: Extended.
 	IPAddressType AddressType = "IPAddress"
-	// NamedAddress is an address selected by name. The interpretation of
-	// the name is depenedent on the controller.
+	// NamedAddressType is an address selected by name. The interpretation of
+	// the name is dependent on the controller.
 	//
 	// Support: Implementation-specific.
 	NamedAddressType AddressType = "NamedAddress"
