@@ -14,8 +14,8 @@
 
 # Image URL to use all building/pushing image targets
 IMG ?= controller:latest
-# Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true"
+# Need v1 to support defaults in CRDs, unfortunately limiting us to k8s 1.16+
+CRD_OPTIONS ?= "crd:crdVersions=v1"
 
 DOCKER ?= docker
 # Image to build protobugs

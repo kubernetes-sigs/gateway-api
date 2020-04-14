@@ -22,6 +22,7 @@ import (
 
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:scope=Cluster
+// +kubebuilder:subresource:status
 // +genclient
 // +genclient:nonNamespaced
 // +k8s:openapi-gen=true
@@ -40,6 +41,7 @@ type GatewayClass struct {
 	// Spec for this GatewayClass.
 	Spec GatewayClassSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
 	// Status of the GatewayClass.
+	// +kubebuilder:default={conditions: {{type: "InvalidParameters", status: "Unknown"}}}
 	Status GatewayClassStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
 }
 
@@ -133,11 +135,10 @@ const (
 type GatewayClassConditionStatus = core.ConditionStatus
 
 // GatewayClassStatus is the current status for the GatewayClass.
-//
-// +kubebuilder:subresource:status
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
+	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
 	Conditions []GatewayClassCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
 }
 

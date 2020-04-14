@@ -1,6 +1,6 @@
 
 ---
-apiVersion: apiextensions.k8s.io/v1beta1
+apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
@@ -15,213 +15,224 @@ spec:
     plural: gatewayclasses
     singular: gatewayclass
   scope: Cluster
-  validation:
-    openAPIV3Schema:
-      description: "GatewayClass describes a class of Gateways available to the user
-        for creating Gateway resources. \n GatewayClass is a Cluster level resource.
-        \n Support: Core."
-      properties:
-        apiVersion:
-          description: 'APIVersion defines the versioned schema of this representation
-            of an object. Servers should convert recognized schemas to the latest
-            internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-          type: string
-        kind:
-          description: 'Kind is a string value representing the REST resource this
-            object represents. Servers may infer this from the endpoint the client
-            submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-          type: string
-        metadata:
-          type: object
-        spec:
-          description: Spec for this GatewayClass.
-          properties:
-            allowedGatewayNamespaces:
-              description: "AllowedGatewayNamespaces is a selector of namespaces that
-                Gateways can use this GatewayClass from. This is a standard Kubernetes
-                LabelSelector, a label query over a set of resources. The result of
-                matchLabels and matchExpressions are ANDed. Controllers must not support
-                Gateways in namespaces outside this selector. \n An empty selector
-                (default) indicates that Gateways can use this GatewayClass from any
-                namespace. This field is intentionally not a pointer because the nil
-                behavior (no namespaces) is undesirable here. \n Support: Core"
-              properties:
-                matchExpressions:
-                  description: matchExpressions is a list of label selector requirements.
-                    The requirements are ANDed.
-                  items:
-                    description: A label selector requirement is a selector that contains
-                      values, a key, and an operator that relates the key and values.
-                    properties:
-                      key:
-                        description: key is the label key that the selector applies
-                          to.
-                        type: string
-                      operator:
-                        description: operator represents a key's relationship to a
-                          set of values. Valid operators are In, NotIn, Exists and
-                          DoesNotExist.
-                        type: string
-                      values:
-                        description: values is an array of string values. If the operator
-                          is In or NotIn, the values array must be non-empty. If the
-                          operator is Exists or DoesNotExist, the values array must
-                          be empty. This array is replaced during a strategic merge
-                          patch.
-                        items:
-                          type: string
-                        type: array
-                    required:
-                    - key
-                    - operator
-                    type: object
-                  type: array
-                matchLabels:
-                  additionalProperties:
-                    type: string
-                  description: matchLabels is a map of {key,value} pairs. A single
-                    {key,value} in the matchLabels map is equivalent to an element
-                    of matchExpressions, whose key field is "key", the operator is
-                    "In", and the values array contains only "value". The requirements
-                    are ANDed.
-                  type: object
-              type: object
-            allowedRouteNamespaces:
-              description: "AllowedRouteNamespaces is a selector of namespaces that
-                Gateways of this class can reference Routes in. This is a standard
-                Kubernetes LabelSelector, a label query over a set of resources. The
-                result of matchLabels and matchExpressions are ANDed. Controllers
-                must not support Routes in namespaces outside this selector. \n A
-                nil selector (default) indicates that Gateways of this class can reference
-                Routes within the same namespace. An empty selector indicates that
-                Gateways can reference Routes in any namespace. This field is intentionally
-                a pointer to support the nil behavior (only local Routes allowed).
-                \n Support: Core"
-              properties:
-                matchExpressions:
-                  description: matchExpressions is a list of label selector requirements.
-                    The requirements are ANDed.
-                  items:
-                    description: A label selector requirement is a selector that contains
-                      values, a key, and an operator that relates the key and values.
-                    properties:
-                      key:
-                        description: key is the label key that the selector applies
-                          to.
-                        type: string
-                      operator:
-                        description: operator represents a key's relationship to a
-                          set of values. Valid operators are In, NotIn, Exists and
-                          DoesNotExist.
-                        type: string
-                      values:
-                        description: values is an array of string values. If the operator
-                          is In or NotIn, the values array must be non-empty. If the
-                          operator is Exists or DoesNotExist, the values array must
-                          be empty. This array is replaced during a strategic merge
-                          patch.
-                        items:
-                          type: string
-                        type: array
-                    required:
-                    - key
-                    - operator
-                    type: object
-                  type: array
-                matchLabels:
-                  additionalProperties:
-                    type: string
-                  description: matchLabels is a map of {key,value} pairs. A single
-                    {key,value} in the matchLabels map is equivalent to an element
-                    of matchExpressions, whose key field is "key", the operator is
-                    "In", and the values array contains only "value". The requirements
-                    are ANDed.
-                  type: object
-              type: object
-            controller:
-              description: "Controller is a domain/path string that indicates the
-                controller that managing Gateways of this class. \n Example: \"acme.io/gateway-controller\".
-                \n This field is not mutable and cannot be empty. \n The format of
-                this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes
-                names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-                \n Support: Core"
-              type: string
-            parametersRef:
-              description: "ParametersRef is a controller specific resource containing
-                the configuration parameters corresponding to this class. This is
-                optional if the controller does not require any additional configuration.
-                \n Valid resources for reference are up to the Controller. Examples
-                include \"configmaps\" (omit or specify the empty string for the group
-                to indicate the core API group) or a custom resource (CRD).  Omitting
-                or specifying the empty string for both the resource and group indicates
-                that the resource is \"configmaps\".  If the referent cannot be found,
-                the GatewayClass's \"InvalidParameters\" status condition will be
-                true. \n Support: Custom"
-              properties:
-                group:
-                  description: "Group is the group of the referent.  Omitting the
-                    value or specifying the empty string indicates the core API group.
-                    \ For example, use the following to specify a service: \n fooRef:
-                    \  resource: services   name: myservice \n Otherwise, if the core
-                    API group is not desired, specify the desired group: \n fooRef:
-                    \  group: acme.io   resource: foos   name: myfoo"
-                  type: string
-                name:
-                  description: Name is the name of the referent.
-                  type: string
-                resource:
-                  description: Resource is the resource of the referent.
-                  type: string
-              required:
-              - name
-              - resource
-              type: object
-          required:
-          - controller
-          type: object
-        status:
-          description: Status of the GatewayClass.
-          properties:
-            conditions:
-              description: Conditions is the current status from the controller for
-                this GatewayClass.
-              items:
-                description: "GatewayClassCondition contains the details for the current
-                  condition of this GatewayClass. \n Support: Core, unless otherwise
-                  specified."
-                properties:
-                  lastTransitionTime:
-                    description: LastTransitionTime is the time of the last change
-                      to this condition.
-                    format: date-time
-                    type: string
-                  message:
-                    description: Message is a human readable reason for last transition.
-                    type: string
-                  reason:
-                    description: "Reason is a machine consumable string for the last
-                      transition. It should be a one-word, CamelCase string. Reason
-                      will be defined by the controller. \n Support: Custom; values
-                      will be controller-specific."
-                    type: string
-                  status:
-                    description: Status of this condition.
-                    type: string
-                  type:
-                    description: Type of this condition.
-                    type: string
-                required:
-                - status
-                - type
-                type: object
-              type: array
-          type: object
-      type: object
-  version: v1alpha1
   versions:
   - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: "GatewayClass describes a class of Gateways available to the
+          user for creating Gateway resources. \n GatewayClass is a Cluster level
+          resource. \n Support: Core."
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: Spec for this GatewayClass.
+            properties:
+              allowedGatewayNamespaces:
+                description: "AllowedGatewayNamespaces is a selector of namespaces
+                  that Gateways can use this GatewayClass from. This is a standard
+                  Kubernetes LabelSelector, a label query over a set of resources.
+                  The result of matchLabels and matchExpressions are ANDed. Controllers
+                  must not support Gateways in namespaces outside this selector. \n
+                  An empty selector (default) indicates that Gateways can use this
+                  GatewayClass from any namespace. This field is intentionally not
+                  a pointer because the nil behavior (no namespaces) is undesirable
+                  here. \n Support: Core"
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: A label selector requirement is a selector that
+                        contains values, a key, and an operator that relates the key
+                        and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: operator represents a key's relationship to
+                            a set of values. Valid operators are In, NotIn, Exists
+                            and DoesNotExist.
+                          type: string
+                        values:
+                          description: values is an array of string values. If the
+                            operator is In or NotIn, the values array must be non-empty.
+                            If the operator is Exists or DoesNotExist, the values
+                            array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: matchLabels is a map of {key,value} pairs. A single
+                      {key,value} in the matchLabels map is equivalent to an element
+                      of matchExpressions, whose key field is "key", the operator
+                      is "In", and the values array contains only "value". The requirements
+                      are ANDed.
+                    type: object
+                type: object
+              allowedRouteNamespaces:
+                description: "AllowedRouteNamespaces is a selector of namespaces that
+                  Gateways of this class can reference Routes in. This is a standard
+                  Kubernetes LabelSelector, a label query over a set of resources.
+                  The result of matchLabels and matchExpressions are ANDed. Controllers
+                  must not support Routes in namespaces outside this selector. \n
+                  A nil selector (default) indicates that Gateways of this class can
+                  reference Routes within the same namespace. An empty selector indicates
+                  that Gateways can reference Routes in any namespace. This field
+                  is intentionally a pointer to support the nil behavior (only local
+                  Routes allowed). \n Support: Core"
+                properties:
+                  matchExpressions:
+                    description: matchExpressions is a list of label selector requirements.
+                      The requirements are ANDed.
+                    items:
+                      description: A label selector requirement is a selector that
+                        contains values, a key, and an operator that relates the key
+                        and values.
+                      properties:
+                        key:
+                          description: key is the label key that the selector applies
+                            to.
+                          type: string
+                        operator:
+                          description: operator represents a key's relationship to
+                            a set of values. Valid operators are In, NotIn, Exists
+                            and DoesNotExist.
+                          type: string
+                        values:
+                          description: values is an array of string values. If the
+                            operator is In or NotIn, the values array must be non-empty.
+                            If the operator is Exists or DoesNotExist, the values
+                            array must be empty. This array is replaced during a strategic
+                            merge patch.
+                          items:
+                            type: string
+                          type: array
+                      required:
+                      - key
+                      - operator
+                      type: object
+                    type: array
+                  matchLabels:
+                    additionalProperties:
+                      type: string
+                    description: matchLabels is a map of {key,value} pairs. A single
+                      {key,value} in the matchLabels map is equivalent to an element
+                      of matchExpressions, whose key field is "key", the operator
+                      is "In", and the values array contains only "value". The requirements
+                      are ANDed.
+                    type: object
+                type: object
+              controller:
+                description: "Controller is a domain/path string that indicates the
+                  controller that managing Gateways of this class. \n Example: \"acme.io/gateway-controller\".
+                  \n This field is not mutable and cannot be empty. \n The format
+                  of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid
+                  Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+                  \n Support: Core"
+                type: string
+              parametersRef:
+                description: "ParametersRef is a controller specific resource containing
+                  the configuration parameters corresponding to this class. This is
+                  optional if the controller does not require any additional configuration.
+                  \n Valid resources for reference are up to the Controller. Examples
+                  include \"configmaps\" (omit or specify the empty string for the
+                  group to indicate the core API group) or a custom resource (CRD).
+                  \ Omitting or specifying the empty string for both the resource
+                  and group indicates that the resource is \"configmaps\".  If the
+                  referent cannot be found, the GatewayClass's \"InvalidParameters\"
+                  status condition will be true. \n Support: Custom"
+                properties:
+                  group:
+                    description: "Group is the group of the referent.  Omitting the
+                      value or specifying the empty string indicates the core API
+                      group.  For example, use the following to specify a service:
+                      \n fooRef:   resource: services   name: myservice \n Otherwise,
+                      if the core API group is not desired, specify the desired group:
+                      \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                    type: string
+                  name:
+                    description: Name is the name of the referent.
+                    type: string
+                  resource:
+                    description: Resource is the resource of the referent.
+                    type: string
+                required:
+                - name
+                - resource
+                type: object
+            required:
+            - controller
+            type: object
+          status:
+            default:
+              conditions:
+              - status: Unknown
+                type: InvalidParameters
+            description: Status of the GatewayClass.
+            properties:
+              conditions:
+                default:
+                - status: Unknown
+                  type: InvalidParameters
+                description: Conditions is the current status from the controller
+                  for this GatewayClass.
+                items:
+                  description: "GatewayClassCondition contains the details for the
+                    current condition of this GatewayClass. \n Support: Core, unless
+                    otherwise specified."
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the time of the last change
+                        to this condition.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Message is a human readable reason for last transition.
+                      type: string
+                    reason:
+                      description: "Reason is a machine consumable string for the
+                        last transition. It should be a one-word, CamelCase string.
+                        Reason will be defined by the controller. \n Support: Custom;
+                        values will be controller-specific."
+                      type: string
+                    status:
+                      description: Status of this condition.
+                      type: string
+                    type:
+                      description: Type of this condition.
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        type: object
     served: true
     storage: true
+    subresources:
+      status: {}
 status:
   acceptedNames:
     kind: ""
