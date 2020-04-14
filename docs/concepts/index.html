@@ -315,17 +315,16 @@
     Request flow
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tls-configuration" class="md-nav__link">
     TLS Configuration
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#design-considerations" class="md-nav__link">
     Design considerations
   </a>
@@ -358,8 +357,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
@@ -385,8 +384,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
@@ -406,7 +405,8 @@
     Gateway Status
   </a>
   
-</li>
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#listeners" class="md-nav__link">
@@ -641,17 +641,16 @@
     Request flow
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
+</li>
+      
+        <li class="md-nav__item">
   <a href="#tls-configuration" class="md-nav__link">
     TLS Configuration
   </a>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#design-considerations" class="md-nav__link">
     Design considerations
   </a>
@@ -684,8 +683,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
@@ -711,8 +710,8 @@
     </nav>
   
 </li>
-        
-          <li class="md-nav__item">
+      
+        <li class="md-nav__item">
   <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
@@ -732,7 +731,8 @@
     Gateway Status
   </a>
   
-</li>
+    <nav class="md-nav">
+      <ul class="md-nav__list">
         
           <li class="md-nav__item">
   <a href="#listeners" class="md-nav__link">
@@ -851,10 +851,10 @@ Gateway/Routes API will target the following personas:</p>
 <ul>
 <li><strong>Infrastructure provider</strong>: The infrastructure provider (infra) is
   responsible for the overall environment that the cluster(s) are operating in.
-  Examples include: the cloud provider (AWS, Azure, GCP, ...), the PaaS provider
-  in a company.</li>
+  Examples include public cloud providers (AWS, Azure, GCP, ...), or PaaS providers
+  within an organization.</li>
 <li><strong>Cluster operator</strong>: The cluster operator (ops) is responsible for
-  administration of entire clusters. They manage policies, network access,
+  administration of entire clusters. They manage policies, network access, and
   application permissions.</li>
 <li><strong>Application developer</strong>: The application developer (dev) is responsible for
   defining their application configuration (e.g. timeouts, request
@@ -889,7 +889,7 @@ In Ingress v1beta1, the closest analog to GatewayClass is the <code>ingress-clas
 <h3 id="gateway">Gateway</h3>
 <p>A Gateway describes how traffic can be translated to Services within the cluster.
 That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
-For example: HTTP/S traffic sent to K8S Services via the Gateway, which may be a Cloud LB, in-cluster proxy or external hardware LB.
+For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
 While many use cases have client traffic originating “outside” the cluster, this is not a requirement. </p>
 <p>It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
 The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.</p>
@@ -901,7 +901,7 @@ This behaviour will be made clear using the GatewayClass Status object.</p>
 <h3 id="httptcpfooroute">{HTTP,TCP,Foo}Route</h3>
 <p>Various types of Route objects define how traffic via the Gateway is mapped to Kubernetes Services.</p>
 <p>Currently the two Route object types are <code>HTTPRoute</code> and <code>TCPRoute</code>, to cover the two most common uses for this sort of traffic.</p>
-<p>This design is intended to be extensible at this point - it’s possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.</p>
+<p>This design is intended to be extensible at this point - it is possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.</p>
 <h3 id="combined-types">Combined types</h3>
 <p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xxxxRoute</code> and <code>Service</code>(s) will
 define an implementable load-balancer. The diagram below illustrates the
@@ -912,7 +912,7 @@ relationships between the different resources:</p>
 <h2 id="request-flow">Request flow</h2>
 <p>A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:</p>
 <ol>
-<li>A client makes a request to an FQDN, i.e. "foo.example.com".</li>
+<li>A client makes a request to a FQDN, i.e. "foo.example.com".</li>
 <li>The FQDN gets resolved to <code>gateway.status.listeners[x].address</code>.</li>
 <li>The request is received by the Gateway implementation, i.e. reverse proxy, on <code>gateway.status.listeners[x].address</code>
  and <code>gateway.spec.listeners[x].port</code>.</li>
@@ -928,7 +928,7 @@ relationships between the different resources:</p>
  <code>httpRoute.spec.hosts[x].rules[x].match</code> . The match can be based on the request path and/or header.</li>
 <li>Lastly, the request is forwarded to an object within the cluster.</li>
 </ol>
-<h3 id="tls-configuration">TLS Configuration</h3>
+<h2 id="tls-configuration">TLS Configuration</h2>
 <p>TLS configuration is tied to Gateway listeners. Although adding the option to
 configure TLS on other resources was considered, ultimately TLS configuration on
 Gateway listeners was deemed sufficient for the following reasons:</p>
@@ -943,9 +943,9 @@ Gateway listeners was deemed sufficient for the following reasons:</p>
   security model outlined a potential approach to enable this in the future, but
   there does not seem to be a sufficient reason to work towards that now.</li>
 </ul>
-<h3 id="design-considerations">Design considerations</h3>
+<h2 id="design-considerations">Design considerations</h2>
 <p>There are some general design guidelines used throughout this API.</p>
-<h4 id="single-resource-consistency">Single resource consistency</h4>
+<h3 id="single-resource-consistency">Single resource consistency</h3>
 <p>The Kubernetes API guarantees consistency only on a single resource level. There
 are a couple of consequences for complex resource graphs as opposed to single
 resources:</p>
@@ -957,7 +957,7 @@ resources:</p>
 <li>Controllers will need to handle broken links between resources and/or
     mismatched configuration.</li>
 </ul>
-<h4 id="conflicts">Conflicts</h4>
+<h3 id="conflicts">Conflicts</h3>
 <p>Separation and delegation of responsibility among independent actors (e.g
 between cluster ops and application developers) can result in conflicts in the
 configuration. For example, two application teams may inadvertently submit
@@ -966,9 +966,9 @@ handling this:</p>
 <ul>
 <li>TODO</li>
 </ul>
-<h4 id="extensibility">Extensibility</h4>
+<h3 id="extensibility">Extensibility</h3>
 <p>TODO</p>
-<h3 id="gatewayclass_1">GatewayClass</h3>
+<h2 id="gatewayclass_1">GatewayClass</h2>
 <p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/api/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
 defined by the infrastructure provider. This resource represents a class of
 Gateways that can be instantiated.</p>
@@ -1002,8 +1002,8 @@ metadata:
 <p>The user of the classes will not need to know <em>how</em> <code>internet</code> and <code>private</code> are
 implemented. Instead, the user will only need to understand the resulting
 properties of the class that the <code>Gateway</code> was created with.</p>
-<h4 id="gatewayclass-parameters">GatewayClass parameters</h4>
-<p>Providers of the <code>Gateway API</code> may need to pass parameters to their controller
+<h3 id="gatewayclass-parameters">GatewayClass parameters</h3>
+<p>Providers of the <code>Gateway</code> API may need to pass parameters to their controller
 as part of the class definition. This is done using the
 <code>GatewayClass.spec.parametersRef</code> field:</p>
 <pre><code class="yaml"># GatewayClass for Gateways that define Internet-facing applications.
@@ -1030,7 +1030,7 @@ data:
 <p>The type of object referenced by <code>GatewayClass.spec.parametersRef</code> will depend
 on the provider itself. A <code>core.ConfigMap</code> is used in the example above, but
 controllers may opt to use a <code>CustomResource</code> for better schema validation.</p>
-<h4 id="gatewayclass-status">GatewayClass status</h4>
+<h3 id="gatewayclass-status">GatewayClass status</h3>
 <p><code>GatewayClasses</code> MUST be validated by the provider to ensure that the configured
 parameters are valid. The validity of the class will be signaled to the user via
 <code>GatewayClass.status</code>:</p>
@@ -1068,28 +1068,26 @@ status:
     Message: &quot;foobar&quot; is an FooBar.
 </code></pre>
 
-<h3 id="gateway_1">Gateway</h3>
+<h2 id="gateway_1">Gateway</h2>
 <p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of
-infrastructure. When a user creates a <code>Gateway</code>, a load balancer is provisioned
+infrastructure. When a user creates a <code>Gateway</code>, some load balancing
+infrastructure is provisioned or configured
 (see below for details) by the <code>GatewayClass</code> controller. <code>Gateway</code> is the
 resource that triggers actions in this API. Other resources in this API are
 configuration snippets until a Gateway has been created to link the resources
 together.</p>
 <p>The <code>Gateway</code> spec defines the following:</p>
 <ul>
-<li><code>GatewayClass</code> used to instantiate this Gateway.</li>
-<li>Listener bindings, which define addresses and ports, protocol termination,
-    TLS-settings. Listener configuration requested by a Gateway definition can
+<li>The <code>GatewayClass</code> used to instantiate this Gateway.</li>
+<li>The Listener bindings, which define addresses and ports, protocol termination,
+    and TLS settings. The Listener configuration requested by a Gateway definition can
     be incompatible with a given <code>GatewayClass</code> (e.g. port/protocol combination
-    is not supported)</li>
+    is not supported).</li>
+<li>The Routes, which describe how traffic is processed and forwarded.</li>
 </ul>
-<p>Listener configuration requested by a Gateway definition can be incompatible
-with a given GatewayClass (e.g. port/protocol combination is not supported). In
-this case, the Gateway will be in an error state, signaled by the status field.
-Routes, which point to a set of protocol-specific routing served by the Gateway.
-A Gateway can point directly to Kubernetes Service if no advanced routing is
-required.</p>
-<h4 id="deployment-models">Deployment models</h4>
+<p>If the Listener configuration requested by a Gateway definition is incompatible
+with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.</p>
+<h3 id="deployment-models">Deployment models</h3>
 <p>Depending on the <code>GatewayClass</code>, the creation of the <code>Gateway</code> could do any of
 the following actions:</p>
 <ul>
@@ -1103,7 +1101,7 @@ the following actions:</p>
 <p>The API does not specify which one of these actions will be taken. Note that a
 GatewayClass controller that manages in-cluster proxy processes MAY restrict
 Gateway configuration scope, e.g. only be served in the same namespace.</p>
-<h4 id="gateway-status">Gateway Status</h4>
+<h3 id="gateway-status">Gateway Status</h3>
 <p>Gateways track status for the <code>Gateway</code> resource as a whole as well as each
 <code>Listener</code> it contains. The status for a specific Route is reported in the
 status of the <code>Route</code> resource. Within <code>GatewayStatus</code>, Listeners will have
