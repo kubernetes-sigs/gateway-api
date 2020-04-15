@@ -311,17 +311,17 @@ message HTTPRoute {
 
 // HTTPRouteAction is the action taken given a match.
 message HTTPRouteAction {
-  // ForwardTo sends requests to the referenced object.  The resource may
-  // be "services" (omit or use the empty string for the group), or an
-  // implementation may support other resources (for example, resource
-  // "myroutetargets" in group "networking.acme.io").  Omitting or
-  // specifying the empty string for both the resource and group indicates
-  // that the resource is "services".  If the referent cannot be found,
-  // the "InvalidRoutes" status condition on any Gateway that includes the
-  // HTTPRoute will be true.
-  optional LocalObjectReference forwardTo = 1;
+  // ForwardTargetRef sends requests to the referenced object.  The
+  // resource may be "services" (omit or use the empty string for the
+  // group), or an implementation may support other resources (for
+  // example, resource "myroutetargets" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "services".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the HTTPRoute will be true.
+  optional LocalObjectReference forwardTargetRef = 1;
 
-  // Extension is an optional, implementation-specific extension to the
+  // ExtensionRef is an optional, implementation-specific extension to the
   // "action" behavior.  The resource may be "configmaps" (use the empty
   // string for the group) or an implementation-defined resource (for
   // example, resource "myrouteactions" in group "networking.acme.io").
@@ -333,7 +333,7 @@ message HTTPRouteAction {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extension = 2;
+  optional LocalObjectReference extensionRef = 2;
 }
 
 // HTTPRouteFilter defines a filter-like action to be applied to
@@ -345,7 +345,7 @@ message HTTPRouteFilter {
   // +optional
   optional HTTPHeaderFilter headers = 1;
 
-  // Extension is an optional, implementation-specific extension to the
+  // ExtensionRef is an optional, implementation-specific extension to the
   // "filter" behavior.  The resource may be "configmap" (use the empty
   // string for the group) or an implementation-defined resource (for
   // example, resource "myroutefilters" in group "networking.acme.io").
@@ -357,7 +357,7 @@ message HTTPRouteFilter {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extension = 2;
+  optional LocalObjectReference extensionRef = 2;
 }
 
 // HTTPRouteHost is the configuration for a given host.
@@ -384,7 +384,7 @@ message HTTPRouteHost {
   // Rules are a list of HTTP matchers, filters and actions.
   repeated HTTPRouteRule rules = 2;
 
-  // Extension is an optional, implementation-specific extension to the
+  // ExtensionRef is an optional, implementation-specific extension to the
   // "host" block.  The resource may be "configmaps" (omit or specify the
   // empty string for the group) or an implementation-defined resource
   // (for example, resource "myroutehosts" in group "networking.acme.io").
@@ -396,7 +396,7 @@ message HTTPRouteHost {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extension = 3;
+  optional LocalObjectReference extensionRef = 3;
 }
 
 // HTTPRouteList contains a list of HTTPRoute
@@ -439,7 +439,7 @@ message HTTPRouteMatch {
   // +optional
   map<string, string> header = 4;
 
-  // Extension is an optional, implementation-specific extension to the
+  // ExtensionRef is an optional, implementation-specific extension to the
   // "match" behavior.  The resource may be "configmap" (use the empty
   // string for the group) or an implementation-defined resource (for
   // example, resource "myroutematchers" in group "networking.acme.io").
@@ -451,7 +451,7 @@ message HTTPRouteMatch {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extension = 5;
+  optional LocalObjectReference extensionRef = 5;
 }
 
 // HTTPRouteRule is the configuration for a given path.
@@ -483,7 +483,7 @@ message HTTPRouteSpec {
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 message HTTPRouteStatus {
-  repeated GatewayObjectReference gateways = 1;
+  repeated GatewayObjectReference gatewayRefs = 1;
 }
 
 // Listener defines a
@@ -531,16 +531,16 @@ message Listener {
   // +optional
   optional ListenerTLS tls = 5;
 
-  // Extension for this Listener.  The resource may be "configmaps" or an
-  // implementation-defined resource (for example, resource "mylisteners"
-  // in group "networking.acme.io").  Omitting or specifying the empty
-  // string for both the resource and group indicates that the resource is
-  // "configmaps".  If the referent cannot be found, the listener's
-  // "InvalidListener" status condition will be true.
+  // ExtensionRef for this Listener.  The resource may be "configmaps" or
+  // an implementation-defined resource (for example, resource
+  // "mylisteners" in group "networking.acme.io").  Omitting or specifying
+  // the empty string for both the resource and group indicates that the
+  // resource is "configmaps".  If the referent cannot be found, the
+  // listener's "InvalidListener" status condition will be true.
   //
   // Support: custom.
   // +optional
-  optional LocalObjectReference extension = 6;
+  optional LocalObjectReference extensionRef = 6;
 }
 
 // ListenerAddress describes an address for the Listener.
@@ -599,7 +599,7 @@ message ListenerStatus {
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 message ListenerTLS {
-  // Certificates is a list of references to Kubernetes objects that each
+  // CertificateRefs is a list of references to Kubernetes objects that each
   // contain an identity certificate that is bound to the listener.  The
   // host name in a TLS SNI client hello message is used for certificate
   // matching and route host name selection.  The SNI server_name must
@@ -615,7 +615,7 @@ message ListenerTLS {
   // Support: Implementation-specific (Other resource types)
   //
   // +required
-  repeated LocalObjectReference certificates = 1;
+  repeated LocalObjectReference certificateRefs = 1;
 
   // MinimumVersion of TLS allowed. It is recommended to use one of
   // the TLS_* constants above. Note: this is not strongly

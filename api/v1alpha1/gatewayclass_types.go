@@ -110,7 +110,7 @@ type GatewayClassSpec struct {
 	//
 	// +optional
 	// +protobuf=false
-	ParametersRef *GatewayClassParametersObjectReference `json:"parameters,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
+	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a

@@ -146,7 +146,7 @@ spec:
                 names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
                 \n Support: Core"
               type: string
-            parameters:
+            parametersRef:
               description: "ParametersRef is a controller specific resource containing
                 the configuration parameters corresponding to this class. This is
                 optional if the controller does not require any additional configuration.

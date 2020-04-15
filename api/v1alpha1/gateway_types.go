@@ -115,16 +115,16 @@ type Listener struct {
 	//
 	// +optional
 	TLS *ListenerTLS `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
-	// Extension for this Listener.  The resource may be "configmaps" or an
-	// implementation-defined resource (for example, resource "mylisteners"
-	// in group "networking.acme.io").  Omitting or specifying the empty
-	// string for both the resource and group indicates that the resource is
-	// "configmaps".  If the referent cannot be found, the listener's
-	// "InvalidListener" status condition will be true.
+	// ExtensionRef for this Listener.  The resource may be "configmaps" or
+	// an implementation-defined resource (for example, resource
+	// "mylisteners" in group "networking.acme.io").  Omitting or specifying
+	// the empty string for both the resource and group indicates that the
+	// resource is "configmaps".  If the referent cannot be found, the
+	// listener's "InvalidListener" status condition will be true.
 	//
 	// Support: custom.
 	// +optional
-	Extension *ListenerExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,6,opt,name=extension"`
+	ExtensionRef *ListenerExtensionObjectReference `json:"extensionRef,omitempty" protobuf:"bytes,6,opt,name=extensionRef"`
 }
 
 // AddressType defines how a network address is represented as a text string.
@@ -180,7 +180,7 @@ const (
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type ListenerTLS struct {
-	// Certificates is a list of references to Kubernetes objects that each
+	// CertificateRefs is a list of references to Kubernetes objects that each
 	// contain an identity certificate that is bound to the listener.  The
 	// host name in a TLS SNI client hello message is used for certificate
 	// matching and route host name selection.  The SNI server_name must
@@ -196,7 +196,7 @@ type ListenerTLS struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	Certificates []CertificateObjectReference `json:"certificates,omitempty" protobuf:"bytes,1,rep,name=certificates"`
+	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty" protobuf:"bytes,1,rep,name=certificateRefs"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without
