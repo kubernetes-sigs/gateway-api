@@ -223,7 +223,20 @@ type ListenerTLS struct {
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
 	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.
+	// the empty string indicates the core API group.  For example, use the
+	// following to specify a service:
+	//
+	// fooRef:
+	//   resource: services
+	//   name: myservice
+	//
+	// Otherwise, if the core API group is not desired, specify the desired
+	// group:
+	//
+	// fooRef:
+	//   group: acme.io
+	//   resource: foos
+	//   name: myfoo
 	//
 	// +optional
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`

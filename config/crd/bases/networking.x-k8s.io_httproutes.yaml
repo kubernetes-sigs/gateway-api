@@ -50,9 +50,13 @@ spec:
                     custom"
                   properties:
                     group:
-                      description: Group is the group of the referent.  Omitting the
-                        value or specifying the empty string indicates the core API
-                        group.
+                      description: "Group is the group of the referent.  Omitting
+                        the value or specifying the empty string indicates the core
+                        API group.  For example, use the following to specify a service:
+                        \n fooRef:   resource: services   name: myservice \n Otherwise,
+                        if the core API group is not desired, specify the desired
+                        group: \n fooRef:   group: acme.io   resource: foos   name:
+                        myfoo"
                       type: string
                     name:
                       description: Name is the name of the referent.
@@ -98,9 +102,14 @@ spec:
                               will be true. \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  Omitting
-                                  the value or specifying the empty string indicates
-                                  the core API group.
+                                description: "Group is the group of the referent.
+                                  \ Omitting the value or specifying the empty string
+                                  indicates the core API group.  For example, use
+                                  the following to specify a service: \n fooRef:   resource:
+                                  services   name: myservice \n Otherwise, if the
+                                  core API group is not desired, specify the desired
+                                  group: \n fooRef:   group: acme.io   resource: foos
+                                  \  name: myfoo"
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -124,9 +133,14 @@ spec:
                               Gateway that includes the HTTPRoute will be true.
                             properties:
                               group:
-                                description: Group is the group of the referent.  Omitting
-                                  the value or specifying the empty string indicates
-                                  the core API group.
+                                description: "Group is the group of the referent.
+                                  \ Omitting the value or specifying the empty string
+                                  indicates the core API group.  For example, use
+                                  the following to specify a service: \n fooRef:   resource:
+                                  services   name: myservice \n Otherwise, if the
+                                  core API group is not desired, specify the desired
+                                  group: \n fooRef:   group: acme.io   resource: foos
+                                  \  name: myfoo"
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -158,9 +172,14 @@ spec:
                               will be true. \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  Omitting
-                                  the value or specifying the empty string indicates
-                                  the core API group.
+                                description: "Group is the group of the referent.
+                                  \ Omitting the value or specifying the empty string
+                                  indicates the core API group.  For example, use
+                                  the following to specify a service: \n fooRef:   resource:
+                                  services   name: myservice \n Otherwise, if the
+                                  core API group is not desired, specify the desired
+                                  group: \n fooRef:   group: acme.io   resource: foos
+                                  \  name: myfoo"
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -217,9 +236,14 @@ spec:
                               will be true. \n Support: custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.  Omitting
-                                  the value or specifying the empty string indicates
-                                  the core API group.
+                                description: "Group is the group of the referent.
+                                  \ Omitting the value or specifying the empty string
+                                  indicates the core API group.  For example, use
+                                  the following to specify a service: \n fooRef:   resource:
+                                  services   name: myservice \n Otherwise, if the
+                                  core API group is not desired, specify the desired
+                                  group: \n fooRef:   group: acme.io   resource: foos
+                                  \  name: myfoo"
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -276,9 +300,13 @@ spec:
                       Support: custom"
                     properties:
                       group:
-                        description: Group is the group of the referent.  Omitting
+                        description: "Group is the group of the referent.  Omitting
                           the value or specifying the empty string indicates the core
-                          API group.
+                          API group.  For example, use the following to specify a
+                          service: \n fooRef:   resource: services   name: myservice
+                          \n Otherwise, if the core API group is not desired, specify
+                          the desired group: \n fooRef:   group: acme.io   resource:
+                          foos   name: myfoo"
                         type: string
                       name:
                         description: Name is the name of the referent.
@@ -326,9 +354,14 @@ spec:
                                 custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  Omitting
-                                    the value or specifying the empty string indicates
-                                    the core API group.
+                                  description: "Group is the group of the referent.
+                                    \ Omitting the value or specifying the empty string
+                                    indicates the core API group.  For example, use
+                                    the following to specify a service: \n fooRef:
+                                    \  resource: services   name: myservice \n Otherwise,
+                                    if the core API group is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -353,9 +386,14 @@ spec:
                                 HTTPRoute will be true.
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  Omitting
-                                    the value or specifying the empty string indicates
-                                    the core API group.
+                                  description: "Group is the group of the referent.
+                                    \ Omitting the value or specifying the empty string
+                                    indicates the core API group.  For example, use
+                                    the following to specify a service: \n fooRef:
+                                    \  resource: services   name: myservice \n Otherwise,
+                                    if the core API group is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -388,9 +426,14 @@ spec:
                                 custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  Omitting
-                                    the value or specifying the empty string indicates
-                                    the core API group.
+                                  description: "Group is the group of the referent.
+                                    \ Omitting the value or specifying the empty string
+                                    indicates the core API group.  For example, use
+                                    the following to specify a service: \n fooRef:
+                                    \  resource: services   name: myservice \n Otherwise,
+                                    if the core API group is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
@@ -449,9 +492,14 @@ spec:
                                 custom"
                               properties:
                                 group:
-                                  description: Group is the group of the referent.  Omitting
-                                    the value or specifying the empty string indicates
-                                    the core API group.
+                                  description: "Group is the group of the referent.
+                                    \ Omitting the value or specifying the empty string
+                                    indicates the core API group.  For example, use
+                                    the following to specify a service: \n fooRef:
+                                    \  resource: services   name: myservice \n Otherwise,
+                                    if the core API group is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
