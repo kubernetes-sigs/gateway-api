@@ -56,7 +56,7 @@ For example, giving the user all of the above role replicates the self-service
 model.
 
 For more information on the roles and personas considered in the Service API
-design, refer to the [Security Model](/security-model). 
+design, refer to the [Security Model](security-model.md). 
 
 ## Resource model
 
