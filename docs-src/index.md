@@ -43,6 +43,7 @@ For everyone:
 * [API specification](spec.md)
 * [Releases](releases.md)
 * [Security Model](security-model.md)
+* [Design Decisions](design-decisions.md)
 * [Enhancement requests](enhancement-requests.md)
 * [Feedback and bug reports](feedback.md)
 

@@ -36,7 +36,7 @@
     
     
       
-        <title>Developer guide - Kubernetes Service API Evolution</title>
+        <title>Design Decisions - Kubernetes Service API Evolution</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#building-testing-and-deploying" tabindex="1" class="md-skip">
+      <a href="#design-decisions" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Developer guide
+                Design Decisions
               
             </span>
           
@@ -258,110 +258,11 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Developer guide
-      </label>
-    
-    <a href="./" title="Developer guide" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../devguide/" title="Developer guide" class="md-nav__link">
       Developer guide
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#project-management" class="md-nav__link">
-    Project management
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-cadence" class="md-nav__link">
-    Release cadence
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-the-code" class="md-nav__link">
-    Building the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-the-code" class="md-nav__link">
-    Testing the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#submitting-a-review" class="md-nav__link">
-    Submitting a review
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
     
@@ -393,11 +294,83 @@
       
       
 
+  
 
-  <li class="md-nav__item">
-    <a href="../design-decisions/" title="Design Decisions" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Design Decisions
+      </label>
+    
+    <a href="./" title="Design Decisions" class="md-nav__link md-nav__link--active">
       Design Decisions
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gatewayclass-scope" class="md-nav__link">
+    GatewayClass Scope
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#problem" class="md-nav__link">
+    Problem
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages-of-a-namespace-scoped-gatewayclass" class="md-nav__link">
+    Advantages of a Namespace-Scoped GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages-of-a-cluster-scoped-gatewayclass" class="md-nav__link">
+    Advantages of a Cluster-Scoped GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    Decision
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
     
@@ -458,64 +431,37 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#project-management" class="md-nav__link">
-    Project management
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-cadence" class="md-nav__link">
-    Release cadence
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-the-code" class="md-nav__link">
-    Building the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-the-code" class="md-nav__link">
-    Testing the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#submitting-a-review" class="md-nav__link">
-    Submitting a review
+  <a href="#gatewayclass-scope" class="md-nav__link">
+    GatewayClass Scope
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
+  <a href="#problem" class="md-nav__link">
+    Problem
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
+  <a href="#advantages-of-a-namespace-scoped-gatewayclass" class="md-nav__link">
+    Advantages of a Namespace-Scoped GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#advantages-of-a-cluster-scoped-gatewayclass" class="md-nav__link">
+    Advantages of a Cluster-Scoped GatewayClass
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decision" class="md-nav__link">
+    Decision
   </a>
   
 </li>
@@ -542,92 +488,56 @@
               
                 
                 
-                <!--
-Copyright 2019 The Kubernetes Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
-
-<h1 id="building-testing-and-deploying">Building, testing and deploying</h1>
-<p>You will need to have Docker installed to perform the steps below.</p>
-<h2 id="project-management">Project management</h2>
-<p>We are using the Github issues and project dashboard to manage the list of TODOs
-for this project:</p>
+                <h1 id="design-decisions">Design Decisions</h1>
+<p>Throughout the design of these APIs some significant design decisions have been
+made. This provides some background on the factors considered when making these
+decisions.</p>
+<h2 id="gatewayclass-scope">GatewayClass Scope</h2>
+<h3 id="problem">Problem</h3>
+<p>Moving to a namespace-scoped GatewayClass would provide more flexibility for
+RBAC configuration and simplify some use cases. This would also contradict the
+existing pattern for class resources to be cluster-scoped.</p>
+<h3 id="advantages-of-a-namespace-scoped-gatewayclass">Advantages of a Namespace-Scoped GatewayClass</h3>
 <ul>
-<li><a href="https://github.com/kubernetes-sigs/service-apis/issues">Open issues</a></li>
-<li><a href="https://github.com/kubernetes-sigs/service-apis/projects/1">Project dashboard</a></li>
+<li>Namespaces could be used to separate different GatewayClasses, enabling admins
+  to more closely restrict who can modify individual GatewayClasses.</li>
+<li>A full Gateway stack, including a GatewayClass, can be created by users with
+  only namespace level access, similar to the initial implementation of Ingress.</li>
+<li>Enables a more restrictive (and potentially more secure) default for where a
+  GatewayClass could be used. This could mean only allowing Gateways and Routes
+  in the same namespace by default.</li>
+<li>Provides better model for using Service APIs on a <a href="mc">management cluster</a>
+  designed to provision and manage other clusters and infrastructure needed by
+  other clusters.</li>
 </ul>
-<p>Issues labeled <code>good first issue</code> and <code>help wanted</code> are especially good for a
-first contribution.</p>
-<h2 id="release-cadence">Release cadence</h2>
-<p>During the development phase, we expect to release on a monthly cadence. We are
-explicitly decoupling ourselves from the Kubernetes API versioning cycle to
-give us more flexibility to evolve the specification. As the specification solidifies,
-we will slow down our release cycle.</p>
-<p>General target timeline:</p>
+<h3 id="advantages-of-a-cluster-scoped-gatewayclass">Advantages of a Cluster-Scoped GatewayClass</h3>
 <ul>
-<li>1H 2020: Monthly release cycle, with first release targeted for January 31</li>
-<li>2H 2020: Slower release cycle</li>
+<li>Consistent with existing class resources, including StorageClass and
+  IngressClass, that are all cluster-scoped.</li>
+<li>Discussions with sig-storage showed that StorageClass had worked well as a
+  cluster-scoped resource and that they were continuing to follow that pattern
+  for new Class resources.</li>
+<li>Follows general pattern that resources managed by infrastructure provider
+  and/or cluster administrators are cluster scoped. This matches the proposed
+  <a href="sm">security model</a> for GatewayClass.</li>
+<li>Impossible for namespace level admins to grant RBAC permissions for
+  GatewayClass resources. With a namespace-scoped resource, anyone that could
+  configure RBAC within a namespace could grant GatewayClass access.</li>
+<li>Although both a namespace-scoped or cluster-scoped GatewayClass could be
+  referenced from multiple namespaces, it's significantly more common for a
+  cluster-scoped resource to be accessible from multiple namespaces.</li>
+<li>Works well when there are only a few total GatewayClasses per cluster, likely
+  the majority of use cases.</li>
+<li>Simple globally unique names with no need to specify a namespace when
+  referencing a GatewayClass.</li>
 </ul>
-<h2 id="building-the-code">Building the code</h2>
-<p>The project uses <code>make</code> to drive the build. <code>make</code> will build the manager binary, run code generators, and run static
-analysis against the code. You can kick off an overall build from the top-level makefile:</p>
-<pre><code class="shell">make
-</code></pre>
-
-<h2 id="testing-the-code">Testing the code</h2>
-<p>The easiest way to test the code is to use the <a href="https://book.kubebuilder.io/">kubebuilder</a>
-created CRD with a <a href="https://github.com/kubernetes-sigs/kind">kind</a> cluster. Follow the installation instructions
-for <code>kind</code> in the README in the repo.</p>
-<pre><code class="shell">kind create cluster
-...
-# Install the CRDs
-make install
-
-# Remove the CRDs and associated CRs
-make uninstall
-</code></pre>
-
-<h2 id="submitting-a-review">Submitting a review</h2>
-<p>TODO</p>
-<h3 id="verify">Verify</h3>
-<p>Make sure you run the static analysis over the repo before submitting your
-changes. The <a href="https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis">Prow presubmit</a> will not let your change merge if
-verification fails.</p>
-<pre><code class="shell">make verify
-</code></pre>
-
-<h2 id="documentation">Documentation</h2>
-<p>The site documentation is written in <a href="https://www.mkdocs.org/">mkdocs</a> format. The files are
-contained in <code>docs-src/</code>. Generated files are in <code>docs/</code> and published to
-Github Pages.</p>
-<p>Building the docs:</p>
-<pre><code class="shell">make docs
-</code></pre>
-
-<p>Live preview for editing (view on <a href="">http://localhost:8000</a>, CTRL-C to quit):</p>
-<pre><code class="shell">make serve
-</code></pre>
-
-<p>Remove generated documentation files:</p>
-<pre><code class="shell">make clean
-</code></pre>
-
-<h3 id="publishing">Publishing</h3>
-<p>The docs are published automatically to <a href="https://kubernetes-sigs.github.io/service-apis/">Github pages</a>. When making changes to the
-documentation, generate the new documentation and make the generated code a
-self-contained commit (e.g. the changes to <code>docs/</code>). This will keep the code
-reviews simple and clearly delineate user vs generated content.</p>
+<h3 id="decision">Decision</h3>
+<p>The advantages of the cluster-scoped GatewayClass ended up outweighing the
+advantages of a namespace-scoped resource. This was primarily driven by the
+desire to maintain consistency with previous class resources. There was a high
+bar to move away from the established pattern here and we determined that these
+reasons did not quite reach that.</p>
+<p>For more context on this decision, refer to the <a href="pr">corresponding pull request</a>.</p>
                 
                   
                 
@@ -649,7 +559,7 @@ reviews simple and clearly delineate user vs generated content.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../spec/" title="API specification" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../security-model/" title="Security Model" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -658,19 +568,19 @@ reviews simple and clearly delineate user vs generated content.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                API specification
+                Security Model
               </span>
             </div>
           </a>
         
         
-          <a href="../releases/" title="Releases" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../feedback/" title="Feedback" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Releases
+                Feedback
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
