@@ -15,7 +15,7 @@ The Service APIs group is a part of the [Networking SIG][sn], and this repositor
 
 [cm]: https://kubernetes-sigs.github.io/service-apis/community
 
-Our public Slack Channel is at https://kubernetes.slack.com/messages/sig-network-service-apis/details/.
+Our Kubernetes Slack channel is [#sig-network-service-apis](https://kubernetes.slack.com/messages/sig-network-service-apis).
 
 ## Technical Leads
 
