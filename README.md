@@ -1,20 +1,26 @@
 # Kubernetes Service/Ingress API evolution
 
-This repository is the home of the Kubernetes Service/Ingress API evolution
-work.
+The Service APIs group is a part of the [Networking SIG][sn], and this repository is the home of the Kubernetes Service/Ingress API evolution work.
 
-[The primary documentation is available here in Github Pages][ghp].
+- The goal of this group is to flesh out and extend the original concepts in the [API sketch][apisketch] which was completed in September of 2019 by members of the sig-network group.
+- [The primary documentation is available here in Github Pages][ghp], and is still heavily under development.
 
 [ghp]: https://kubernetes-sigs.github.io/service-apis/
+[apisketch]: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview#
+[sn]: https://github.com/kubernetes/community/tree/master/sig-network
 
 ## Community, discussion, contribution, and support
 
-Learn how to engage with the Kubernetes community on the [community page](http://kubernetes.io/community/).
+[Our community meeting schedule is here][cm].
 
-You can reach the maintainers of this project at:
+[cm]: https://kubernetes-sigs.github.io/service-apis/community
 
-- [Slack](http://slack.k8s.io/)
-- [Mailing List](https://groups.google.com/forum/#!forum/kubernetes-dev)
+Our Kubernetes Slack channel is [#sig-network-service-apis](https://kubernetes.slack.com/messages/sig-network-service-apis).
+
+## Technical Leads
+
+- @bowei
+- @thockin 
 
 ### Code of conduct
 
