@@ -55,15 +55,19 @@ type HTTPRouteHost struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
-	// Extension is an optional, implementation-specific extension to the
-	// "host" block.  The resource may be "configmap" (use the empty string
-	// for the group) or an implementation-defined resource (for example,
-	// resource "myroutehost" in group "networking.acme.io").
+	// ExtensionRef is an optional, implementation-specific extension to the
+	// "host" block.  The resource may be "configmaps" (omit or specify the
+	// empty string for the group) or an implementation-defined resource
+	// (for example, resource "myroutehosts" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteHostExtensionObjectReference `json:"extension" protobuf:"bytes,3,opt,name=extension"`
+	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
 // HTTPRouteRule is the configuration for a given path.
@@ -121,22 +125,25 @@ type HTTPRouteMatch struct {
 	// +optional
 	Header map[string]string `json:"header" protobuf:"bytes,4,rep,name=header"`
 
-	// Extension is an optional, implementation-specific extension to the
+	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematcher" in group "networking.acme.io").
+	// example, resource "myroutematchers" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteMatchExtensionObjectReference `json:"extension" protobuf:"bytes,5,opt,name=extension"`
+	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,5,opt,name=extensionRef"`
 }
 
 // RouteMatchExtensionObjectReference identifies a route-match extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteMatchExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteFilter defines a filter-like action to be applied to
@@ -148,22 +155,25 @@ type HTTPRouteFilter struct {
 	// +optional
 	Headers *HTTPHeaderFilter `json:"headers" protobuf:"bytes,1,opt,name=headers"`
 
-	// Extension is an optional, implementation-specific extension to the
+	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutefilter" in group "networking.acme.io").
+	// example, resource "myroutefilters" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteFilterExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
+	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
 
 // RouteFilterExtensionObjectReference identifies a route-filter extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteFilterExtensionObjectReference = LocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
@@ -210,47 +220,52 @@ type HTTPHeaderFilter struct {
 
 // HTTPRouteAction is the action taken given a match.
 type HTTPRouteAction struct {
-	// ForwardTo sends requests to the referenced object.  The resource may
-	// be "service" (use the empty string for the group), or an
-	// implementation may support other resources (for example, resource
-	// "myroutetarget" in group "networking.acme.io").
-	ForwardTo *RouteActionTargetObjectReference `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
+	// ForwardTargetRef sends requests to the referenced object.  The
+	// resource may be "services" (omit or use the empty string for the
+	// group), or an implementation may support other resources (for
+	// example, resource "myroutetargets" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "services".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
+	ForwardTargetRef *RouteActionTargetObjectReference `json:"forwardTargetRef" protobuf:"bytes,1,opt,name=forwardTargetRef"`
 
-	// Extension is an optional, implementation-specific extension to the
-	// "action" behavior.  The resource may be "configmap" (use the empty
+	// ExtensionRef is an optional, implementation-specific extension to the
+	// "action" behavior.  The resource may be "configmaps" (use the empty
 	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteaction" in group "networking.acme.io").
+	// example, resource "myrouteactions" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
 	//
 	// Support: custom
 	//
 	// +optional
-	Extension *RouteActionExtensionObjectReference `json:"extension" protobuf:"bytes,2,opt,name=extension"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
 
 // RouteActionTargetObjectReference identifies a target object for a route
 // action within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteActionTargetObjectReference = LocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteActionExtensionObjectReference = LocalObjectReference
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type RouteHostExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
-	Gateways []GatewayObjectReference `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
+	GatewayRefs []GatewayObjectReference `json:"gatewayRefs" protobuf:"bytes,1,rep,name=gatewayRefs"`
 }
 
 // GatewayObjectReference identifies a Gateway object.

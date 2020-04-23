@@ -99,21 +99,24 @@ type GatewayClassSpec struct {
 	// any additional configuration.
 	//
 	// Valid resources for reference are up to the Controller. Examples
-	// include "configmap" (using the empty string to indicate the core API
-	// group) or a custom resource (CRD).
+	// include "configmaps" (omit or specify the empty string for the group
+	// to indicate the core API group) or a custom resource (CRD).  Omitting
+	// or specifying the empty string for both the resource and group
+	// indicates that the resource is "configmaps".  If the referent cannot
+	// be found, the GatewayClass's "InvalidParameters" status condition
+	// will be true.
 	//
 	// Support: Custom
 	//
 	// +optional
 	// +protobuf=false
-	ParametersRef *GatewayClassParametersObjectReference `json:"parameters,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
+	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a
 // gateway class within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type GatewayClassParametersObjectReference = LocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions.

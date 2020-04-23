@@ -115,13 +115,16 @@ type Listener struct {
 	//
 	// +optional
 	TLS *ListenerTLS `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
-	// Extension for this Listener.  The resource may be "configmap" (use
-	// the empty string for the group) or an implementation-defined resource
-	// (for example, resource "mylistener" in group "networking.acme.io").
+	// ExtensionRef for this Listener.  The resource may be "configmaps" or
+	// an implementation-defined resource (for example, resource
+	// "mylisteners" in group "networking.acme.io").  Omitting or specifying
+	// the empty string for both the resource and group indicates that the
+	// resource is "configmaps".  If the referent cannot be found, the
+	// listener's "InvalidListener" status condition will be true.
 	//
 	// Support: custom.
 	// +optional
-	Extension *ListenerExtensionObjectReference `json:"extension,omitempty" protobuf:"bytes,6,opt,name=extension"`
+	ExtensionRef *ListenerExtensionObjectReference `json:"extensionRef,omitempty" protobuf:"bytes,6,opt,name=extensionRef"`
 }
 
 // AddressType defines how a network address is represented as a text string.
@@ -177,21 +180,23 @@ const (
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type ListenerTLS struct {
-	// Certificates is a list of references to Kubernetes objects that each
+	// CertificateRefs is a list of references to Kubernetes objects that each
 	// contain an identity certificate that is bound to the listener.  The
 	// host name in a TLS SNI client hello message is used for certificate
 	// matching and route host name selection.  The SNI server_name must
 	// match a route host name for the Gateway to route the TLS request.  If
-	// an entry in this list specifies the empty string for both the group
-	// and the resource, the resource defaults to "secret".  An
+	// an entry in this list omits or specifies the empty string for both
+	// the group and the resource, the resource defaults to "secrets".  An
 	// implementation may support other resources (for example, resource
-	// "mycertificate" in group "networking.acme.io").
+	// "mycertificates" in group "networking.acme.io").  If a referent
+	// cannot be found, the listener's "InvalidListener" status condition
+	// will be true.
 	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	Certificates []CertificateObjectReference `json:"certificates,omitempty" protobuf:"bytes,1,rep,name=certificates"`
+	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty" protobuf:"bytes,1,rep,name=certificateRefs"`
 	// MinimumVersion of TLS allowed. It is recommended to use one of
 	// the TLS_* constants above. Note: this is not strongly
 	// typed to allow implementation-specific versions to be used without
@@ -217,11 +222,23 @@ type ListenerTLS struct {
 
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
-	// Group is the group of the referent.  The empty string represents
-	// the core API group.
+	// Group is the group of the referent.  Omitting the value or specifying
+	// the empty string indicates the core API group.  For example, use the
+	// following to specify a service:
 	//
-	// +kubebuilder:validation:Required
-	// +required
+	// fooRef:
+	//   resource: services
+	//   name: myservice
+	//
+	// Otherwise, if the core API group is not desired, specify the desired
+	// group:
+	//
+	// fooRef:
+	//   group: acme.io
+	//   resource: foos
+	//   name: myfoo
+	//
+	// +optional
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the resource of the referent.
 	//
@@ -270,20 +287,13 @@ type RouteBindingSelector struct {
 // namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type CertificateObjectReference = LocalObjectReference
 
 // ListenerExtensionObjectReference identifies a listener extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-// +protobuf=false
 type ListenerExtensionObjectReference = LocalObjectReference
-
-// RouteObjectReference identifies a route object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
