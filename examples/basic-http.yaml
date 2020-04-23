@@ -2,11 +2,12 @@ kind: GatewayClass
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: acme-lb
-controller: acme.io/gateway-controller
-parameters:
-  apiGroup: networking.acme.io
-  kind: AcmeLBConfig
-  name: acme-lb-config
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    group: networking.acme.io
+    resource: AcmeLBConfig
+    name: acme-lb-config
 ---
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
