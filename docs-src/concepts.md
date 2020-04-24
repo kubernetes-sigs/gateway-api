@@ -181,10 +181,12 @@ configuration for the same HTTP path. There are several different strategies for
 handling this:
 
 * A controller may detect this situation during reconciliation and choose to honor
-  one resource or other, perhaps based on a timestamp (e.g. first write wins).
+  one resource or other, perhaps based on a creation timestamp (e.g. oldest resource wins).
   Resource `status` fields would reflect the result.
 * A [validating admission webhook](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
   might maintain a global view of all configuration and reject changes that would cause a conflict with existing configuration.
+    * Note: it may be challenging for a webhook implementation to maintain a consistent global view of all potentially-conflicting
+      resources, [e.g. this](https://github.com/open-policy-agent/opa/pull/2065/files)
 * TODO: others?
 
 ### Extensibility
