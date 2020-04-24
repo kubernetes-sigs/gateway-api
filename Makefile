@@ -17,7 +17,7 @@ CONTROLLER_GEN=GOFLAGS=-mod=vendor go run sigs.k8s.io/controller-tools/cmd/contr
 # The output directory for generated CRDs.
 CRD_OUTPUT_DIR ?= "config/crd/bases"
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
-CRD_OPTIONS ?= "crd:trivialVersions=true"
+CRD_OPTIONS ?= "crd:crdVersions=v1"
 
 all: controller docs
 
