@@ -53,6 +53,7 @@ message GatewayClass {
   optional GatewayClassSpec spec = 2;
 
   // Status of the GatewayClass.
+  // +kubebuilder:default={conditions: {{type: "InvalidParameters", status: "Unknown"}}}
   optional GatewayClassStatus status = 3;
 }
 
@@ -167,11 +168,10 @@ message GatewayClassSpec {
 }
 
 // GatewayClassStatus is the current status for the GatewayClass.
-//
-// +kubebuilder:subresource:status
 message GatewayClassStatus {
   // Conditions is the current status from the controller for
   // this GatewayClass.
+  // +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
   repeated GatewayClassCondition conditions = 1;
 }
 
