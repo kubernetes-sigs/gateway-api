@@ -22,4 +22,4 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
 
-make -f kubebuilder.mk verify-proto
+make verify-proto

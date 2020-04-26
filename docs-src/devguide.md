@@ -46,8 +46,8 @@ General target timeline:
 
 ## Building the code
 
-The project uses `make` to drive the build. You can kick off an overall build
-from the top-level makefile:
+The project uses `make` to drive the build. `make` will build the manager binary, run code generators, and run static
+analysis against the code. You can kick off an overall build from the top-level makefile:
 
 ```shell
 make
@@ -104,6 +104,12 @@ Live preview for editing (view on [http://localhost:8000](), CTRL-C to quit):
 
 ```shell
 make serve
+```
+
+Remove generated documentation files:
+
+```shell
+make clean
 ```
 
 ### Publishing
