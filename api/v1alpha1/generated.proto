@@ -549,7 +549,7 @@ message Listener {
   // Support: Core
   //
   // +optional
-  optional ListenerTLS tls = 5;
+  optional TLSConfig tls = 5;
 
   // ExtensionRef for this Listener.  The resource may be "configmaps" or
   // an implementation-defined resource (for example, resource
@@ -607,58 +607,6 @@ message ListenerStatus {
 
   // Conditions describe the current condition of this listener.
   repeated ListenerCondition conditions = 3;
-}
-
-// ListenerTLS describes the TLS configuration for a given port.
-//
-// References
-// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
-// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
-// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
-// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
-// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-message ListenerTLS {
-  // CertificateRefs is a list of references to Kubernetes objects that each
-  // contain an identity certificate that is bound to the listener.  The
-  // host name in a TLS SNI client hello message is used for certificate
-  // matching and route host name selection.  The SNI server_name must
-  // match a route host name for the Gateway to route the TLS request.  If
-  // an entry in this list omits or specifies the empty string for both
-  // the group and the resource, the resource defaults to "secrets".  An
-  // implementation may support other resources (for example, resource
-  // "mycertificates" in group "networking.acme.io").  If a referent
-  // cannot be found, the listener's "InvalidListener" status condition
-  // will be true.
-  //
-  // Support: Core (Kubernetes Secrets)
-  // Support: Implementation-specific (Other resource types)
-  //
-  // +required
-  repeated LocalObjectReference certificateRefs = 1;
-
-  // MinimumVersion of TLS allowed. It is recommended to use one of
-  // the TLS_* constants above. Note: this is not strongly
-  // typed to allow implementation-specific versions to be used without
-  // requiring updates to the API types. String must be of the form
-  // "<protocol><major>_<minor>".
-  //
-  // Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
-  // values.
-  //
-  // +optional
-  optional string minimumVersion = 2;
-
-  // Options are a list of key/value pairs to give extended options
-  // to the provider.
-  //
-  // There variation among providers as to how ciphersuites are
-  // expressed. If there is a common subset for expressing ciphers
-  // then it will make sense to loft that as a core API
-  // construct.
-  //
-  // Support: Implementation-specific.
-  map<string, string> options = 3;
 }
 
 // RouteMatchExtensionObjectReference identifies a route-match extension object
@@ -726,6 +674,55 @@ message RouteBindingSelector {
   //
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
+}
+
+// TLSConfig describes a TLS configuration.
+//
+// References
+// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
+// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
+// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
+// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
+// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
+// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
+message TLSConfig {
+  // CertificateRefs is a list of references to Kubernetes objects that each
+  // contain an identity certificate.  The host name in a TLS SNI client hello
+  // message is used for certificate matching and route host name selection.
+  // The SNI server_name must match a route host name for the Gateway to route
+  // the TLS request.  If an entry in this list omits or specifies the empty
+  // string for both the group and the resource, the resource defaults to "secrets".
+  // An implementation may support other resources (for example, resource
+  // "mycertificates" in group "networking.acme.io").
+  //
+  // Support: Core (Kubernetes Secrets)
+  // Support: Implementation-specific (Other resource types)
+  //
+  // +required
+  repeated LocalObjectReference certificateRefs = 1;
+
+  // MinimumVersion of TLS allowed. It is recommended to use one of
+  // the TLS_* constants above. Note: MinimumVersion is not strongly
+  // typed to allow implementation-specific versions to be used without
+  // requiring updates to the API types. String must be of the form
+  // "<protocol><major>_<minor>".
+  //
+  // Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
+  // values.
+  //
+  // +optional
+  optional string minimumVersion = 2;
+
+  // Options are a list of key/value pairs to give extended options
+  // to the provider.
+  //
+  // There variation among providers as to how ciphersuites are
+  // expressed. If there is a common subset for expressing ciphers
+  // then it will make sense to loft that as a core API
+  // construct.
+  //
+  // Support: Implementation-specific.
+  map<string, string> options = 3;
 }
 
 // TcpRoute is the Schema for the tcproutes API
