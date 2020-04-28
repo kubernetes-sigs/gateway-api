@@ -209,12 +209,14 @@ spec:
                       type: string
                     message:
                       description: Message is a human readable reason for last transition.
+                        This field may be empty.
                       type: string
                     reason:
                       description: "Reason is a machine consumable string for the
                         last transition. It should be a one-word, CamelCase string.
                         Reason will be defined by the controller. \n Support: Custom;
-                        values will be controller-specific."
+                        values will be controller-specific. This field must not be
+                        empty."
                       type: string
                     status:
                       description: Status of this condition.

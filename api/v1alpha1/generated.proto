@@ -83,9 +83,11 @@ message GatewayClass {
 // Support: Core, unless otherwise specified.
 message GatewayClassCondition {
   // Type of this condition.
+  // +required
   optional string type = 1;
 
   // Status of this condition.
+  // +required
   optional string status = 2;
 
   // Reason is a machine consumable string for the last
@@ -93,18 +95,20 @@ message GatewayClassCondition {
   // string. Reason will be defined by the controller.
   //
   // Support: Custom; values will be controller-specific.
+  // This field must not be empty.
   //
-  // +optional
+  // +required
   optional string reason = 3;
 
   // Message is a human readable reason for last transition.
+  // This field may be empty.
   //
-  // +optional
+  // +required
   optional string message = 4;
 
   // LastTransitionTime is the time of the last change to this condition.
   //
-  // +optional
+  // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
 }
 
@@ -198,22 +202,26 @@ message GatewayClassStatus {
 // GatewayCondition is an error status for a given route.
 message GatewayCondition {
   // Type indicates the type of condition.
+  // +required
   optional string type = 1;
 
   // Status describes the current state of this condition. Can be "True",
   // "False", or "Unknown".
+  // +required
   optional string status = 2;
 
   // Message is a human-understandable message describing the condition.
-  // +optional
+  // This field may be empty.
+  // +required
   optional string message = 3;
 
   // Reason indicates why the condition is in this state.
-  // +optional
+  // This field must not be empty.
+  // +required
   optional string reason = 4;
 
   // LastTransitionTime indicates the last time this condition changed.
-  // +optional
+  // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
 }
 
@@ -578,22 +586,26 @@ message ListenerAddress {
 // ListenerCondition is an error status for a given listener.
 message ListenerCondition {
   // Type indicates the type of condition.
+  // +required
   optional string type = 1;
 
   // Status describes the current state of this condition. Can be "True",
   // "False", or "Unknown".
+  // +required
   optional string status = 2;
 
   // Message is a human-understandable message describing the condition.
-  // +optional
+  // This field may be empty.
+  // +required
   optional string message = 3;
 
   // Reason indicates why the condition is in this state.
-  // +optional
+  // This field must not be empty.
+  // +required
   optional string reason = 4;
 
   // LastTransitionTime indicates the last time this condition changed.
-  // +optional
+  // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
 }
 
