@@ -269,18 +269,22 @@ const (
 // GatewayCondition is an error status for a given route.
 type GatewayCondition struct {
 	// Type indicates the type of condition.
+	// +required
 	Type GatewayConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=GatewayConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
+	// +required
 	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
-	// +optional
+	// This field may be empty.
+	// +required
 	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
-	// +optional
+	// This field must not be empty.
+	// +required
 	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
-	// +optional
+	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
@@ -321,18 +325,22 @@ const (
 // ListenerCondition is an error status for a given listener.
 type ListenerCondition struct {
 	// Type indicates the type of condition.
+	// +required
 	Type ListenerConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=ListenerConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
+	// +required
 	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
-	// +optional
+	// This field may be empty.
+	// +required
 	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
-	// +optional
+	// This field must not be empty.
+	// +required
 	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
-	// +optional
+	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
