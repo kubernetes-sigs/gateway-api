@@ -41,6 +41,7 @@ spec:
             path: /bar
           action:
             forwardTo:
-              resource: Service
-              group: core
-              name: my-service
+              targetRef:
+                resource: Service
+                group: core
+                name: my-service

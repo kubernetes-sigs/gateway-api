@@ -220,7 +220,7 @@ type HTTPHeaderFilter struct {
 
 // HTTPRouteAction is the action taken given a match.
 type HTTPRouteAction struct {
-	// ForwardTargetRef sends requests to the referenced object.  The
+	// ForwardTo sends requests to the referenced object.  The
 	// resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
 	// example, resource "myroutetargets" in group "networking.acme.io").
@@ -228,7 +228,7 @@ type HTTPRouteAction struct {
 	// group indicates that the resource is "services".  If the referent
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the HTTPRoute will be true.
-	ForwardTargetRef *RouteActionTargetObjectReference `json:"forwardTargetRef" protobuf:"bytes,1,opt,name=forwardTargetRef"`
+	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -245,11 +245,35 @@ type HTTPRouteAction struct {
 	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
 
-// RouteActionTargetObjectReference identifies a target object for a route
-// action within a known namespace.
+// ForwardToTarget identifies a target object within a known namespace.
+type ForwardToTarget struct {
+	// TargetRef is an object reference to forward matched requests to.
+	//
+	// Support: Core (Kubernetes Services)
+	// Support: Implementation-specific (Other resource types)
+	//
+	TargetRef ForwardToTargetObjectReference `json:"targetRef" protobuf:"bytes,1,opt,name=targetRef"`
+
+	// TargetPort specifies the destination port number to use for the TargetRef.
+	// If unspecified and TargetRef is a Service object consisting of a single
+	// port definition, that port will be used. If unspecified and TargetRef is
+	// a Service object consisting of multiple port definitions, an error is
+	// surfaced in status.
+	//
+	// Support: Core
+	//
+	// +optional
+	TargetPort *TargetPort `json:"targetPort" protobuf:"bytes,2,opt,name=targetPort"`
+}
+
+// TargetPort specifies the destination port number to use for a TargetRef.
+type TargetPort int32
+
+// ForwardToTargetObjectReference identifies a target object of a ForwardTo
+// route action within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteActionTargetObjectReference = LocalObjectReference
+type ForwardToTargetObjectReference = LocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.
