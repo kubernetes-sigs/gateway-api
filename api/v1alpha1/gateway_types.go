@@ -373,6 +373,12 @@ const (
 	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
 	// ConditionInvalidAddress indicates the Address is invalid.
 	ConditionInvalidAddress ListenerConditionType = "InvalidAddress"
+	// ConditionInvalidName indicates that the name given to the Listener
+	// did not meet the requirements of the gateway controller.
+	ConditionInvalidName ListenerConditionType = "InvalidName"
+	// ConditionNameConflict indicates that two or more Listeners with
+	// the same name were bound to this gateway.
+	ConditionNameConflict ListenerConditionType = "NameConflict"
 )
 
 // ListenerCondition is an error status for a given listener.
