@@ -83,21 +83,30 @@ spec:
                         status condition will be true. \n Support: custom."
                       properties:
                         group:
+                          default: core
                           description: "Group is the group of the referent.  Omitting
                             the value or specifying the empty string indicates the
                             core API group.  For example, use the following to specify
-                            a service: \n fooRef:   resource: services   name: myservice
-                            \n Otherwise, if the core API group is not desired, specify
-                            the desired group: \n fooRef:   group: acme.io   resource:
-                            foos   name: myfoo"
+                            a configmaps: \n fooRef:   resource: configmaps   name:
+                            myconfigmap \n Otherwise, if the core API group is not
+                            desired, specify the desired group: \n fooRef:   group:
+                            acme.io   resource: foos   name: myfoo"
                           type: string
                         name:
                           description: Name is the name of the referent.
                           type: string
                         resource:
-                          description: Resource is the resource of the referent.
+                          default: configmaps
+                          description: "Resource is the API resource name of the referent.
+                            Omitting the value or specifying the empty string indicates
+                            the configmaps resource. For example, use the following
+                            to specify a configmaps resource: \n fooRef:   name: myconfigmap
+                            \n Otherwise, if the configmaps resource is not desired,
+                            specify the desired group: \n fooRef:   group: acme.io
+                            \  resource: foos   name: myfoo"
                           type: string
                       required:
+                      - group
                       - name
                       - resource
                       type: object
@@ -135,26 +144,37 @@ spec:
                             \n Support: Core (Kubernetes Secrets) Support: Implementation-specific
                             (Other resource types)"
                           items:
-                            description: LocalObjectReference identifies an API object
-                              within a known namespace.
+                            description: SecretsDefaultLocalObjectReference identifies
+                              an API object within a known namespace that defaults
+                              group to core and resource to secrets if unspecified.
                             properties:
                               group:
+                                default: core
                                 description: "Group is the group of the referent.
                                   \ Omitting the value or specifying the empty string
                                   indicates the core API group.  For example, use
-                                  the following to specify a service: \n fooRef:   resource:
-                                  services   name: myservice \n Otherwise, if the
-                                  core API group is not desired, specify the desired
-                                  group: \n fooRef:   group: acme.io   resource: foos
-                                  \  name: myfoo"
+                                  the following to specify a secrets resource: \n
+                                  fooRef:   resource: secrets   name: mysecret \n
+                                  Otherwise, if the core API group is not desired,
+                                  specify the desired group: \n fooRef:   group: acme.io
+                                  \  resource: foos   name: myfoo"
                                 type: string
                               name:
                                 description: Name is the name of the referent.
                                 type: string
                               resource:
-                                description: Resource is the resource of the referent.
+                                default: secrets
+                                description: "Resource is the API resource name of
+                                  the referent. Omitting the value or specifying the
+                                  empty string indicates the secrets resource. For
+                                  example, use the following to specify a secrets
+                                  resource: \n fooRef:   name: mysecret \n Otherwise,
+                                  if the secrets resource is not desired, specify
+                                  the desired group: \n fooRef:   group: acme.io   resource:
+                                  foos   name: myfoo"
                                 type: string
                             required:
+                            - group
                             - name
                             - resource
                             type: object
