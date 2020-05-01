@@ -3,6 +3,7 @@ module sigs.k8s.io/service-apis
 go 1.13
 
 require (
+	github.com/ahmetb/gen-crd-api-reference-docs v0.2.0
 	github.com/go-logr/logr v0.1.0
 	github.com/gogo/protobuf v1.2.2-0.20190723190241-65acae22fc9d
 	github.com/onsi/ginkgo v1.10.1
