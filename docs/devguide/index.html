@@ -568,8 +568,8 @@ we will slow down our release cycle.</p>
 <li>2H 2020: Slower release cycle</li>
 </ul>
 <h2 id="building-the-code">Building the code</h2>
-<p>The project uses <code>make</code> to drive the build. You can kick off an overall build
-from the top-level makefile:</p>
+<p>The project uses <code>make</code> to drive the build. <code>make</code> will build the manager binary, run code generators, and run static
+analysis against the code. You can kick off an overall build from the top-level makefile:</p>
 <pre><code class="shell">make
 </code></pre>
 
@@ -605,6 +605,10 @@ Github Pages.</p>
 
 <p>Live preview for editing (view on <a href="">http://localhost:8000</a>, CTRL-C to quit):</p>
 <pre><code class="shell">make serve
+</code></pre>
+
+<p>Remove generated documentation files:</p>
+<pre><code class="shell">make clean
 </code></pre>
 
 <h3 id="publishing">Publishing</h3>
