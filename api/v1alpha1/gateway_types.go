@@ -21,6 +21,7 @@ import (
 )
 
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // Gateway represents an instantiation of a service-traffic handling infrastructure.
 type Gateway struct {
