@@ -264,6 +264,59 @@ type ForwardToTarget struct {
 	//
 	// +optional
 	TargetPort *TargetPort `json:"targetPort" protobuf:"bytes,2,opt,name=targetPort"`
+
+	// TimeoutPolicy describes a policy for configuring connection timeouts to targetRef.
+	//
+	// Support: Core
+	//
+	// +optional
+	TimeoutPolicy *TimeoutPolicy `json:"timeoutPolicy,omitempty" protobuf:"bytes,3,opt,name=timeoutPolicy"`
+
+	// RetryPolicy describes a policy for retrying a connection to a targetRef.
+	//
+	// Support: Core
+	//
+	// +optional
+	RetryPolicy *RetryPolicy `json:"retryPolicy,omitempty" protobuf:"bytes,4,opt,name=retryPolicy"`
+}
+
+// TimeoutPolicy defines a schema for configuring connection timeouts.
+// The format is: h/m/s/ms with 1ms being the smallest interval.
+type TimeoutPolicy struct {
+	// Response is the time allowed for receiving a response after a
+	// request has been forwarded.
+	//
+	// Support: Core
+	//
+	Response metav1.Duration `json:"response" protobuf:"bytes,1,opt,name=response"`
+
+	// Idle is the maximum time of inactivity for a given connection.
+	// If a connection is open but no request/response is being written
+	// to it for over the Idle time, the connection will be closed.
+	//
+	// Support: Core
+	//
+	Idle metav1.Duration `json:"idle" protobuf:"bytes,2,opt,name=idle"`
+}
+
+// RetryPolicy describes a policy for retrying a connection until the
+// connection is either refused or times out.
+type RetryPolicy struct {
+	// Attempts is the number of times a connection attempt should be
+	// retried. Attempts applies to the number of connection attempts,
+	// not full requests. When a connection has been established, there
+	// will be no more retry attempts.
+	//
+	// Support: Core
+	//
+	Attempts int32 `json:"attempts" protobuf:"bytes,1,opt,name=attempts"`
+
+	// Interval is the amount of time between connection attempts. The format
+	// is: 1h/1m/1s/1ms with 1ms being the smallest interval.
+	//
+	// Support: Core
+	//
+	Interval metav1.Duration `json:"interval" protobuf:"bytes,2,opt,name=interval"`
 }
 
 // TargetPort specifies the destination port number to use for a TargetRef.

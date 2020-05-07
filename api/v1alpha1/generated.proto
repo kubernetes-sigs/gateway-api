@@ -45,6 +45,20 @@ message ForwardToTarget {
   //
   // +optional
   optional int32 targetPort = 2;
+
+  // TimeoutPolicy describes a policy for configuring connection timeouts to targetRef.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional TimeoutPolicy timeoutPolicy = 3;
+
+  // RetryPolicy describes a policy for retrying a connection to a targetRef.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional RetryPolicy retryPolicy = 4;
 }
 
 // Gateway represents an instantiation of a service-traffic handling infrastructure.
@@ -658,6 +672,24 @@ message LocalObjectReference {
   optional string name = 3;
 }
 
+// RetryPolicy describes a policy for retrying a connection until the
+// connection is either refused or times out.
+message RetryPolicy {
+  // Attempts is the number of times a connection attempt should be
+  // retried. Attempts applies to the number of connection attempts,
+  // not full requests. When a connection has been established, there
+  // will be no more retry attempts.
+  //
+  // Support: Core
+  optional int32 attempts = 1;
+
+  // Interval is the amount of time between connection attempts. The format
+  // is: 1h/1m/1s/1ms with 1ms being the smallest interval.
+  //
+  // Support: Core
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Duration interval = 2;
+}
+
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
@@ -763,6 +795,23 @@ message TcpRouteSpec {
 
 // TcpRouteStatus defines the observed state of TcpRoute
 message TcpRouteStatus {
+}
+
+// TimeoutPolicy defines a schema for configuring connection timeouts.
+// The format is: h/m/s/ms with 1ms being the smallest interval.
+message TimeoutPolicy {
+  // Response is the time allowed for receiving a response after a
+  // request has been forwarded.
+  //
+  // Support: Core
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Duration response = 1;
+
+  // Idle is the maximum time of inactivity for a given connection.
+  // If a connection is open but no request/response is being written
+  // to it for over the Idle time, the connection will be closed.
+  //
+  // Support: Core
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Duration idle = 2;
 }
 
 // TrafficSplit is the Schema for the trafficsplits API
