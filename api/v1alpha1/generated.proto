@@ -195,6 +195,7 @@ message GatewayClassSpec {
 message GatewayClassStatus {
   // Conditions is the current status from the controller for
   // this GatewayClass.
+  // +optional
   // +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
   repeated GatewayClassCondition conditions = 1;
 }
@@ -279,10 +280,12 @@ message GatewaySpec {
 // GatewayStatus defines the observed state of Gateway.
 message GatewayStatus {
   // Conditions describe the current conditions of the Gateway.
+  // +optional
   repeated GatewayCondition conditions = 1;
 
   // Listeners provide status for each listener defined in the Spec. The name
   // in ListenerStatus refers to the corresponding Listener of the same name.
+  // +optional
   repeated ListenerStatus listeners = 2;
 }
 

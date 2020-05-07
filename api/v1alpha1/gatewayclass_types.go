@@ -138,6 +138,7 @@ type GatewayClassConditionStatus = core.ConditionStatus
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
+	// +optional
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
 	Conditions []GatewayClassCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
 }

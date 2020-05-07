@@ -232,10 +232,12 @@ type ListenerExtensionObjectReference = LocalObjectReference
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
 	// Conditions describe the current conditions of the Gateway.
-	Conditions []GatewayCondition `json:"conditions" protobuf:"bytes,1,rep,name=conditions"`
+	// +optional
+	Conditions []GatewayCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
 	// Listeners provide status for each listener defined in the Spec. The name
 	// in ListenerStatus refers to the corresponding Listener of the same name.
-	Listeners []ListenerStatus `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
+	// +optional
+	Listeners []ListenerStatus `json:"listeners,omitempty" protobuf:"bytes,2,rep,name=listeners"`
 }
 
 // GatewayConditionType is a type of condition associated with a Gateway.
