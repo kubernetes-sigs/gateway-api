@@ -70,10 +70,10 @@ type GatewaySpec struct {
 }
 
 const (
-	// HTTPProcotol constant.
-	HTTPProcotol = "HTTP"
-	// HTTPSProcotol constant.
-	HTTPSProcotol = "HTTPS"
+	// HTTPProtocol constant.
+	HTTPProtocol = "HTTP"
+	// HTTPSProtocol constant.
+	HTTPSProtocol = "HTTPS"
 )
 
 // Listener defines a
