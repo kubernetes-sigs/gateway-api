@@ -117,6 +117,47 @@ message GatewayClassList {
   repeated GatewayClass items = 2;
 }
 
+// GatewayClassParametersObjectReference identifies a parameters object for a
+// GatewayClass.
+message GatewayClassParametersObjectReference {
+  // Group is the group of the referent.  Omitting the value or specifying
+  // the empty string indicates the core API group.  For example, use the
+  // following to specify a service:
+  //
+  // fooRef:
+  //   resource: services
+  //   name: myservice
+  //
+  // Otherwise, if the core API group is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +optional
+  optional string group = 1;
+
+  // Resource is the resource of the referent.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string resource = 2;
+
+  // Namespace is the namespace of the referent. When nil, this refers to a
+  // cluster-scoped API resource.
+  //
+  // +optional
+  optional string namespace = 3;
+
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  // +required
+  optional string name = 4;
+}
+
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 message GatewayClassSpec {
   // Controller is a domain/path string that indicates the
@@ -184,7 +225,7 @@ message GatewayClassSpec {
   //
   // +optional
   // +protobuf=false
-  optional LocalObjectReference parametersRef = 4;
+  optional GatewayClassParametersObjectReference parametersRef = 4;
 }
 
 // GatewayClassStatus is the current status for the GatewayClass.
