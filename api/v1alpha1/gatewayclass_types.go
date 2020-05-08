@@ -148,8 +148,10 @@ type GatewayClassStatus struct {
 // Support: Core, unless otherwise specified.
 type GatewayClassCondition struct {
 	// Type of this condition.
+	// +required
 	Type GatewayClassConditionType `json:"type" protobuf:"bytes,1,opt,name=type"`
 	// Status of this condition.
+	// +required
 	Status GatewayClassConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
 
 	// Reason is a machine consumable string for the last
@@ -157,17 +159,19 @@ type GatewayClassCondition struct {
 	// string. Reason will be defined by the controller.
 	//
 	// Support: Custom; values will be controller-specific.
+	// This field must not be empty.
 	//
-	// +optional
-	Reason *string `json:"reason,omitempty" protobuf:"bytes,3,opt,name=reason"`
+	// +required
+	Reason string `json:"reason,omitempty" protobuf:"bytes,3,opt,name=reason"`
 	// Message is a human readable reason for last transition.
+	// This field may be empty.
 	//
-	// +optional
-	Message *string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
+	// +required
+	Message string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
 	// LastTransitionTime is the time of the last change to this condition.
 	//
-	// +optional
-	LastTransitionTime *metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	// +required
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
 // +kubebuilder:object:root=true
