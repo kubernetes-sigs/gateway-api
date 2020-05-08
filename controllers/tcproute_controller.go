@@ -46,6 +46,6 @@ func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 // SetupWithManager wires up the controller.
 func (r *TcpRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1alpha1.TcpRoute{}).
+		For(&v1alpha1.TCPRoute{}).
 		Complete(r)
 }

@@ -74,6 +74,8 @@ const (
 	HTTPProtocol = "HTTP"
 	// HTTPSProtocol constant.
 	HTTPSProtocol = "HTTPS"
+	// TCPProtocol constant.
+	TCPProtocol = "TCP"
 )
 
 // Listener defines a

@@ -70,6 +70,12 @@ type HTTPRouteHost struct {
 	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
+// RouteHostExtensionObjectReference identifies a route-match extension
+// object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteHostExtensionObjectReference = LocalObjectReference
+
 // HTTPRouteRule is the configuration for a given path.
 type HTTPRouteRule struct {
 	// Match defines which requests match this path.
@@ -167,16 +173,16 @@ type HTTPRouteFilter struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *HTTPRouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
 
-// RouteFilterExtensionObjectReference identifies a route-filter extension
+// HTTPRouteFilterExtensionObjectReference identifies a route-filter extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteFilterExtensionObjectReference = LocalObjectReference
+type HTTPRouteFilterExtensionObjectReference = LocalObjectReference
 
-// HTTPHeaderFilter defines the filter behavior for a request match.
+// HTTPHeaderFilter defines the filter behavior for an HTTP request match.
 type HTTPHeaderFilter struct {
 	// Add adds the given header (name, value) to the request
 	// before the action.
@@ -228,7 +234,7 @@ type HTTPRouteAction struct {
 	// group indicates that the resource is "services".  If the referent
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the HTTPRoute will be true.
-	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
+	ForwardTo *ForwardToHTTPTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -245,8 +251,14 @@ type HTTPRouteAction struct {
 	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
 
-// ForwardToTarget identifies a target object within a known namespace.
-type ForwardToTarget struct {
+// RouteActionExtensionObjectReference identifies a route-action extension
+// object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteActionExtensionObjectReference = LocalObjectReference
+
+// ForwardToHTTPTarget identifies an HTTP target object within a known namespace.
+type ForwardToHTTPTarget struct {
 	// TargetRef is an object reference to forward matched requests to.
 	//
 	// Support: Core (Kubernetes Services)
@@ -274,18 +286,6 @@ type TargetPort int32
 //
 // +k8s:deepcopy-gen=false
 type ForwardToTargetObjectReference = LocalObjectReference
-
-// RouteActionExtensionObjectReference identifies a route-action extension
-// object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteActionExtensionObjectReference = LocalObjectReference
-
-// RouteHostExtensionObjectReference identifies a route-host extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteHostExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {

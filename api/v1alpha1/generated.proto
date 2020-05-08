@@ -27,8 +27,28 @@ import "sigs.k8s.io/controller-runtime/pkg/scheme/generated.proto";
 // Package-wide variables from generator "generated".
 option go_package = "v1alpha1";
 
-// ForwardToTarget identifies a target object within a known namespace.
-message ForwardToTarget {
+// ForwardToHTTPTarget identifies an HTTP target object within a known namespace.
+message ForwardToHTTPTarget {
+  // TargetRef is an object reference to forward matched requests to.
+  //
+  // Support: Core (Kubernetes Services)
+  // Support: Implementation-specific (Other resource types)
+  optional LocalObjectReference targetRef = 1;
+
+  // TargetPort specifies the destination port number to use for the TargetRef.
+  // If unspecified and TargetRef is a Service object consisting of a single
+  // port definition, that port will be used. If unspecified and TargetRef is
+  // a Service object consisting of multiple port definitions, an error is
+  // surfaced in status.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional int32 targetPort = 2;
+}
+
+// ForwardToTCPTarget identifies a TCP target object within a known namespace.
+message ForwardToTCPTarget {
   // TargetRef is an object reference to forward matched requests to.
   //
   // Support: Core (Kubernetes Services)
@@ -286,7 +306,7 @@ message GatewayStatus {
   repeated ListenerStatus listeners = 2;
 }
 
-// HTTPHeaderFilter defines the filter behavior for a request match.
+// HTTPHeaderFilter defines the filter behavior for an HTTP request match.
 message HTTPHeaderFilter {
   // Add adds the given header (name, value) to the request
   // before the action.
@@ -347,7 +367,7 @@ message HTTPRouteAction {
   // group indicates that the resource is "services".  If the referent
   // cannot be found, the "InvalidRoutes" status condition on any Gateway
   // that includes the HTTPRoute will be true.
-  optional ForwardToTarget forwardTo = 1;
+  optional ForwardToHTTPTarget forwardTo = 1;
 
   // ExtensionRef is an optional, implementation-specific extension to the
   // "action" behavior.  The resource may be "configmaps" (use the empty
@@ -688,6 +708,110 @@ message RouteBindingSelector {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
 }
 
+// TCPRoute is the Schema for the tcproutes API.
+message TCPRoute {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
+
+  optional TCPRouteSpec spec = 3;
+
+  optional TCPRouteStatus status = 4;
+}
+
+// TCPRouteAction is the action taken given a matched TCP request.
+message TCPRouteAction {
+  // ForwardTo sends requests to the referenced object.  The
+  // resource may be "services" (omit or use the empty string for the
+  // group), or an implementation may support other resources (for
+  // example, resource "myroutetargets" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "services".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  optional ForwardToTCPTarget forwardTo = 1;
+
+  // ExtensionRef is an optional, implementation-specific extension to the
+  // "action" behavior.  The resource may be "configmaps" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myrouteactions" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "configmaps".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extensionRef = 2;
+}
+
+// TCPRouteHost is the configuration for a given TCP host.
+message TCPRouteHost {
+  // Hostname is the fully qualified domain name of a network host,
+  // as defined by RFC 3986. Note the following deviations from the
+  // "host" part of the URI as defined in the RFC:
+  //
+  // 1. IPs are not allowed.
+  // 2. The `:` delimiter is not respected because ports are not allowed.
+  //
+  // The server_name in a TLS SNI client hello message is used for matching
+  // a TCPRoute Hostname. Incoming requests are matched against Hostname
+  // before processing TCPRoute rules. For example, if the SNI server_name
+  // is foo.example.com, a TCPRoute with hostname foo.example.com will match,
+  // but a TCPRoute with hostname example.com or bar.example.com will not.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional string hostname = 1;
+
+  // Rules are a list of actions to take against a matched TCP request.
+  repeated TCPRouteRule rules = 2;
+
+  // ExtensionRef is an optional, implementation-specific extension to the
+  // "host" block.  The resource may be "configmaps" (omit or specify the
+  // empty string for the group) or an implementation-defined resource
+  // (for example, resource "myroutehosts" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "configmaps".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  //
+  // Support: custom
+  //
+  // +optional
+  optional LocalObjectReference extensionRef = 3;
+}
+
+// TCPRouteList contains a list of TCPRoute.
+message TCPRouteList {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
+
+  repeated TCPRoute items = 3;
+}
+
+// TCPRouteRule is the configuration for a given TCP host.
+message TCPRouteRule {
+  // Action defines what happens to the TCP request.
+  //
+  // +optional
+  optional TCPRouteAction action = 2;
+}
+
+// TCPRouteSpec defines the desired state of TCPRoute.
+message TCPRouteSpec {
+  // Hosts is a list of TCP host definitions.
+  repeated TCPRouteHost hosts = 1;
+}
+
+// TCPRouteStatus defines the observed state of TCPRoute.
+message TCPRouteStatus {
+  repeated GatewayObjectReference gatewayRefs = 1;
+}
+
 // TLSConfig describes a TLS configuration.
 //
 // References
@@ -735,34 +859,6 @@ message TLSConfig {
   //
   // Support: Implementation-specific.
   map<string, string> options = 3;
-}
-
-// TcpRoute is the Schema for the tcproutes API
-message TcpRoute {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
-
-  optional TcpRouteSpec spec = 3;
-
-  optional TcpRouteStatus status = 4;
-}
-
-// TcpRouteList contains a list of TcpRoute
-message TcpRouteList {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
-
-  repeated TcpRoute items = 3;
-}
-
-// TcpRouteSpec defines the desired state of TcpRoute
-message TcpRouteSpec {
-}
-
-// TcpRouteStatus defines the observed state of TcpRoute
-message TcpRouteStatus {
 }
 
 // TrafficSplit is the Schema for the trafficsplits API
