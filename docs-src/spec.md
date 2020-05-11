@@ -21,7 +21,8 @@ Resource Types:
 <h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
 </h3>
 <p>
-<p>Gateway represents an instantiation of a service-traffic handling infrastructure.</p>
+<p>Gateway represents an instantiation of a service-traffic handling
+infrastructure by binding Listeners to a set of IP addresses.</p>
 </p>
 <table>
 <thead>
@@ -96,26 +97,55 @@ string
 </em>
 </td>
 <td>
-<p>Listeners associated with this Gateway. Listeners define what addresses,
-ports, protocols are bound on this Gateway.</p>
+<p>Listeners associated with this Gateway. Listeners define
+logical endpoints that are bound on this Gateway&rsquo;s addresses.
+At least one Listener MUST be specified.</p>
+<p>Each Listener in this array must have a unique Port field,
+however a GatewayClass may collapse compatible Listener
+definitions into single implementation-defined acceptor
+configuration even if their Port fields would otherwise conflict.</p>
+<p>Listeners are compatible if all of the following conditions are true:</p>
+<ol>
+<li>all their Protocol fields are &ldquo;HTTP&rdquo;, or all their Protocol fields are &ldquo;HTTPS&rdquo; or TLS&rdquo;</li>
+<li>their Hostname fields are specified with a match type other than &ldquo;Any&rdquo;</li>
+<li>their Hostname fields are not an exact match for any other Listener</li>
+</ol>
+<p>As a special case, each group of compatible listeners
+may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
+<p>If the GatewayClass collapses compatible Listeners, the
+host name provided in the incoming client request MUST be
+matched to a Listener to find the correct set of Routes.
+The incoming host name MUST be matched using the Hostname
+field for each Listener in order of most to least specific.
+That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
+matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
+<p>If this field specifies multiple Listeners that have the same
+Port value but are not compatible, the GatewayClass must raise
+a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>routes</code></br>
+<code>addresses</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">
-RouteBindingSelector
+<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
+[]ListenerAddress
 </a>
 </em>
 </td>
 <td>
-<p>Routes specifies a schema for associating routes with the Gateway using
-selectors. A route is a resource capable of servicing a request and allows
-a cluster operator to expose a cluster resource (i.e. Service) by
-externally-reachable URL, load-balance traffic and terminate SSL/TLS.
-Typically, a route is a &ldquo;httproute&rdquo; or &ldquo;tcproute&rdquo; in group
-&ldquo;networking.x-k8s.io&rdquo;. However, an implementation may support other resources.</p>
+<em>(Optional)</em>
+<p>Addresses requested for this gateway. This is optional and
+behavior can depend on the GatewayClass. If a value is set
+in the spec and the requested address is invalid, the
+GatewayClass MUST indicate this in the associated entry in
+GatewayStatus.Listeners.</p>
+<p>If no ListenerAddresses are specified, the GatewayClass may
+schedule the Gateway in an implementation-defined manner,
+assigning an appropriate set of ListenerAddresses.</p>
+<p>The GatewayClass MUST bind all Listeners to every
+ListenerAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -469,8 +499,7 @@ TrafficSplitStatus
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
 </p>
 <p>
 <p>RouteMatchExtensionObjectReference identifies a route-match extension object
@@ -1010,26 +1039,55 @@ string
 </em>
 </td>
 <td>
-<p>Listeners associated with this Gateway. Listeners define what addresses,
-ports, protocols are bound on this Gateway.</p>
+<p>Listeners associated with this Gateway. Listeners define
+logical endpoints that are bound on this Gateway&rsquo;s addresses.
+At least one Listener MUST be specified.</p>
+<p>Each Listener in this array must have a unique Port field,
+however a GatewayClass may collapse compatible Listener
+definitions into single implementation-defined acceptor
+configuration even if their Port fields would otherwise conflict.</p>
+<p>Listeners are compatible if all of the following conditions are true:</p>
+<ol>
+<li>all their Protocol fields are &ldquo;HTTP&rdquo;, or all their Protocol fields are &ldquo;HTTPS&rdquo; or TLS&rdquo;</li>
+<li>their Hostname fields are specified with a match type other than &ldquo;Any&rdquo;</li>
+<li>their Hostname fields are not an exact match for any other Listener</li>
+</ol>
+<p>As a special case, each group of compatible listeners
+may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
+<p>If the GatewayClass collapses compatible Listeners, the
+host name provided in the incoming client request MUST be
+matched to a Listener to find the correct set of Routes.
+The incoming host name MUST be matched using the Hostname
+field for each Listener in order of most to least specific.
+That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
+matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
+<p>If this field specifies multiple Listeners that have the same
+Port value but are not compatible, the GatewayClass must raise
+a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>routes</code></br>
+<code>addresses</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">
-RouteBindingSelector
+<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
+[]ListenerAddress
 </a>
 </em>
 </td>
 <td>
-<p>Routes specifies a schema for associating routes with the Gateway using
-selectors. A route is a resource capable of servicing a request and allows
-a cluster operator to expose a cluster resource (i.e. Service) by
-externally-reachable URL, load-balance traffic and terminate SSL/TLS.
-Typically, a route is a &ldquo;httproute&rdquo; or &ldquo;tcproute&rdquo; in group
-&ldquo;networking.x-k8s.io&rdquo;. However, an implementation may support other resources.</p>
+<em>(Optional)</em>
+<p>Addresses requested for this gateway. This is optional and
+behavior can depend on the GatewayClass. If a value is set
+in the spec and the requested address is invalid, the
+GatewayClass MUST indicate this in the associated entry in
+GatewayStatus.Listeners.</p>
+<p>If no ListenerAddresses are specified, the GatewayClass may
+schedule the Gateway in an implementation-defined manner,
+assigning an appropriate set of ListenerAddresses.</p>
+<p>The GatewayClass MUST bind all Listeners to every
+ListenerAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1664,14 +1722,17 @@ be an empty list.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.Listener">Listener
+<h3 id="networking.x-k8s.io/v1alpha1.HostnameMatch">HostnameMatch
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>)
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
 </p>
 <p>
-<p>Listener defines a</p>
+<p>HostnameMatch specifies how a Listener should match the incoming
+host name from a client request. Depending on the incoming protocol,
+the match must apply to names provided by the client at both the
+TLS and the HTTP protocol layers.</p>
 </p>
 <table>
 <thead>
@@ -1683,36 +1744,89 @@ be an empty list.</p>
 <tbody>
 <tr>
 <td>
+<code>match</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HostnameMatchType">
+HostnameMatchType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Match specifies how the host name provided by the client should be
+matched against the given value.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>name</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Name is the listener&rsquo;s name and should be specified as an
-RFC 1035 DNS_LABEL [1]:</p>
-<p>[1] <a href="https://tools.ietf.org/html/rfc1035">https://tools.ietf.org/html/rfc1035</a></p>
-<p>Each listener of a Gateway must have a unique name. Name is used
-for associating a listener in Gateway status.</p>
-<p>Support: Core</p>
+<em>(Optional)</em>
+<p>Name contains the name to match against. This value must
+be a fully qualified host or domain name conforming to the
+preferred name syntax defined in
+<a href="https://tools.ietf.org/html/rfc1034#section-3.5">RFC 1034</a></p>
+<p>In addition to any RFC rules, this field MUST NOT contain</p>
+<ol>
+<li>IP address literals</li>
+<li>Colon-delimited port numbers</li>
+<li>Percent-encoded octets</li>
+</ol>
+<p>This field is required for the &ldquo;Domain&rdquo; and &ldquo;Exact&rdquo; match types.</p>
 </td>
 </tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HostnameMatchType">HostnameMatchType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HostnameMatch">HostnameMatch</a>)
+</p>
+<p>
+<p>HostnameMatchType specifies the types of matches that are valid
+for host names.</p>
+</p>
+<h3 id="networking.x-k8s.io/v1alpha1.Listener">Listener
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>)
+</p>
+<p>
+<p>Listener embodies the concept of a logical endpoint where a
+Gateway can accept network connections.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
 <tr>
 <td>
-<code>address</code></br>
+<code>hostname</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
-ListenerAddress
+<a href="#networking.x-k8s.io/v1alpha1.HostnameMatch">
+HostnameMatch
 </a>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>Address requested for this listener. This is optional and behavior
-can depend on GatewayClass. If a value is set in the spec and
-the request address is invalid, the GatewayClass MUST indicate
-this in the associated entry in GatewayStatus.Listeners.</p>
-<p>Support:</p>
+<p>Hostname specifies to match the virtual host name for
+protocol types that define this concept.</p>
+<p>Incoming requests that include a host name are matched
+according to the given HostnameMatchType to select
+the Routes from this Listener.</p>
+<p>If a match type other than &ldquo;Any&rdquo; is supplied, it MUST
+be compatible with the specified Protocol field.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
@@ -1723,22 +1837,37 @@ int32
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>Port is a list of ports associated with the Address.</p>
-<p>Support:</p>
+<p>Port is the network port. Multiple listeners may use the
+same port, subject to the Listener compatibility rules.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>protocol</code></br>
 <em>
-string
+<a href="#networking.x-k8s.io/v1alpha1.ProtocolType">
+ProtocolType
+</a>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>Protocol to use.</p>
-<p>Support:</p>
+<p>Protocol specifies the network protocol this listener
+expects to receive. The GatewayClass MUST validate that
+match type specified in the Hostname field is appropriate
+for the protocol.</p>
+<ul>
+<li>For the &ldquo;TLS&rdquo; protocol, the Hostname match MUST be
+applied to the <a href="https://tools.ietf.org/html/rfc6066#section-3">SNI</a>
+server name offered by the client.</li>
+<li>For the &ldquo;HTTP&rdquo; protocol, the Hostname match MUST be
+applied to the host portion of the
+<a href="https://tools.ietf.org/html/rfc7230#section-5.5">effective request URI</a>
+or the <a href="https://tools.ietf.org/html/rfc7540#section-8.1.2.3">:authority pseudo-header</a></li>
+<li>For the &ldquo;HTTPS&rdquo; protocol, the Hostname match MUST be
+applied at both the TLS and HTTP protocol layers.</li>
+</ul>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
@@ -1752,29 +1881,33 @@ TLSConfig
 </td>
 <td>
 <em>(Optional)</em>
-<p>TLS is the TLS configuration for the Listener. If unspecified,
-the listener will not support TLS connections.</p>
+<p>TLS is the TLS configuration for the Listener. This field
+is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo;.</p>
 <p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>extensionRef</code></br>
+<code>routes</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">
+RouteBindingSelector
 </a>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>ExtensionRef for this Listener.  The resource may be &ldquo;configmaps&rdquo; or
-an implementation-defined resource (for example, resource
-&ldquo;mylisteners&rdquo; in group &ldquo;networking.acme.io&rdquo;).  Omitting or specifying
-the empty string for both the resource and group indicates that the
-resource is &ldquo;configmaps&rdquo;.  If the referent cannot be found, the
-listener&rsquo;s &ldquo;InvalidListener&rdquo; status condition will be true.</p>
-<p>Support: custom.</p>
+<p>Routes specifies a schema for associating routes with the
+Listener using selectors. A Route is a resource capable of
+servicing a request and allows a cluster operator to expose
+a cluster resource (i.e. Service) by externally-reachable
+URL, load-balance traffic and terminate SSL/TLS.  Typically,
+a route is a &ldquo;HTTPRoute&rdquo; or &ldquo;TCPRoute&rdquo; in group
+&ldquo;networking.x-k8s.io&rdquo;, however, an implementation may support
+other types of resources.</p>
+<p>The Routes selector MUST select a set of objects that
+are compatible with the application protocol specified in
+the Protocol field.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 </tbody>
@@ -1783,7 +1916,7 @@ listener&rsquo;s &ldquo;InvalidListener&rdquo; status condition will be true.</p
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>)
 </p>
 <p>
@@ -1942,7 +2075,9 @@ string
 </em>
 </td>
 <td>
-<p>Name is the name of the listener this status refers to.</p>
+<p>Name is the name of the listener this status refers to.
+TODO(jpeach) Listeners are not indexed by a unique name any more,
+so this field probably doesn&rsquo;t make sense.</p>
 </td>
 </tr>
 <tr>
@@ -1955,7 +2090,9 @@ ListenerAddress
 </em>
 </td>
 <td>
-<p>Address bound on this listener.</p>
+<p>Address bound on this listener.
+TODO(jpeach) Listeners don&rsquo;t have addresses anymore so this field
+should move to the GatewayStatus.</p>
 </td>
 </tr>
 <tr>
@@ -1973,11 +2110,20 @@ ListenerAddress
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.ProtocolType">ProtocolType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
+</p>
+<p>
+<p>ProtocolType defines the application protocol accepted by a Listener.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>)
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
 </p>
 <p>
 <p>RouteBindingSelector defines a schema for associating routes with the Gateway.

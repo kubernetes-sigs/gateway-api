@@ -2,11 +2,15 @@ kind: GatewayClass
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: acme-lb
-spec: 
+spec:
   controller: acme.io/gateway-controller
   parametersRef:
     name: acme-lb-configmap
+    group: core
+    resource: configmaps
+
 ---
+
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
@@ -15,14 +19,15 @@ metadata:
 spec:
   class: acme-lb
   listeners:  # Use GatewayClass defaults for listener definition.
-  - name: my-http-listener
-    protocol: HTTP
-  routes:
-    namespaceSelector: {}
-    routeSelector:
-      matchLabels:
-        "app": "foo"
+  - protocol: HTTP
+    routes:
+      namespaceSelector: {}
+      routeSelector:
+        matchLabels:
+          "app": "foo"
+
 ---
+
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
@@ -32,11 +37,13 @@ metadata:
     app: foo
 spec:
   hosts:
-    - hostname: "foo.com"
-      rules:
-        - match:
-            path: /bar
-          action:
-            forwardTo:
-              targetRef:
-                name: my-service
+  - hostname: "foo.com"
+    rules:
+    - match:
+        path: /bar
+      action:
+        forwardTo:
+          targetRef:
+            name: my-service
+            group: core
+            resource: services
