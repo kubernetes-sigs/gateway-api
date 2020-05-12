@@ -34,8 +34,7 @@ metadata:
     app: foo
 spec:
   hosts:
-    - hostnames:
-        - "foo.com"
+    - hostname: "foo.com"
       rules:
         - match:
             path: /bar
