@@ -17,17 +17,13 @@ limitations under the License.
 # API Concepts
 
 This document is a deep dive into the reasoning and design for the API. The
-content of this document was originally taken from the [API sketch][api-sketch].
-
-> We will try to keep the two documents in sync as the sketch document has to
-> lowest bar to contribution, but this document is easier to format well and
-> review.
+content of this document started from this [API sketch][api-sketch].
 
 [api-sketch]: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview
 
 ## Roles and personas
 
-In the original design of Kubernetes, the Ingress and Service resources were
+In the original design of Kubernetes, Ingress and Service resources were
 based on a self-service model of usage; developers who create Services and
 Ingresses control all aspects of defining and exposing their applications to
 their users.
@@ -52,7 +48,7 @@ Role-Based Authentication (RBAC) system and will define resource model
 responsibility and separation.
 
 Depending on the environment, multiple roles can map to the same user.
-For example, giving the user all of the above role replicates the self-service
+For example, giving the user all the above roles replicates the self-service
 model.
 
 For more information on the roles and personas considered in the Service API
@@ -60,12 +56,11 @@ design, refer to the [Security Model](security-model.md).
 
 ## Resource model
 
-> Note: Resource will initially live in the `networking.x-k8s.io` API group as
+> Note: Resources will initially live in the `networking.x-k8s.io` API group as
 > Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
-> be assumed to be part of this API group.
+> be in this API group.
 
-
-There are three main types of object in our resource model:
+There are three main types of objects in our resource model:
 
 *GatewayClass* defines a set of gateways with a common configuration and behavior. 
 
@@ -104,15 +99,14 @@ A Gateway MAY contain one or more *Route references which serve to direct traffi
 
 ### {HTTP,TCP,Foo}Route
 
-Various types of Route objects define how traffic via the Gateway is mapped to Kubernetes Services.
+Route objects define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services.
 
-Currently the two Route object types are `HTTPRoute` and `TCPRoute`, to cover the two most common uses for this sort of traffic.
-
-This design is intended to be extensible at this point - it is possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.
+`HTTPRoute` and `TCPRoute` are currently the only defined Route objects. Additional protocol-specific Route
+objects may be added in the future.
 
 ### Combined types
 
-The combination of `GatewayClass`, `Gateway`, `xxxxRoute` and `Service`(s) will
+The combination of `GatewayClass`, `Gateway`, `xRoute` and `Service`(s) will
 define an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:
 
@@ -123,21 +117,18 @@ relationships between the different resources:
 
 A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
 
- 1. A client makes a request to a FQDN, i.e. "foo.example.com".
- 2. The FQDN gets resolved to `gateway.status.listeners[x].address`.
- 3. The request is received by the Gateway implementation, i.e. reverse proxy, on `gateway.status.listeners[x].address`
- and `gateway.spec.listeners[x].port`.
- 4. If the request uses TLS, then `gateway.spec.listeners[x].tls` is used for establishing the connection.
- __Note:__ The details for modeling a "virtual host" is still [under review](https://github.com/kubernetes-sigs/service-apis/issues/49).
- Therefore, how TLS is configured may change in the future.
- 5. If the `Gateway` is configured to terminate the TLS connection, an `HTTPRoute` is selected based on the request’s
- [Host header](https://tools.ietf.org/html/rfc7230#section-5.4), i.e. FQDN in step 1, matching
- `httpRoute.spec.hosts[x].hostname`. If the `Gateway` is configured to pass the TLS connection through to the backend
- object, i.e. Service, SNI is used to match the request with an `HTTPRoute` based on `httpRoute.spec.hosts[x].hostname`.
- __Note:__ Whether `hosts` should be singular is still [under review](https://github.com/kubernetes-sigs/service-apis/pull/43).
- 6. The Gateway implementation performs filtering (optional) and forwarding based on
- `httpRoute.spec.hosts[x].rules[x].match` . The match can be based on the request path and/or header.
- 7. Lastly, the request is forwarded to an object within the cluster.
+ 1. A client makes a request to http://foo.example.com.
+ 2. DNS resolves the name to `gateway.status.listeners[x].address`.
+ 3. The reverse proxy receives the request on `gateway.status.listeners[x].address`:
+ `gateway.spec.listeners[x].port` and uses the [Host header](https://tools.ietf.org/html/rfc7230#section-5.4) to
+ match an `HTTPRoute`.
+ 5. Optionally, the reverse proxy can perform request header and/or path matching based
+ on `match` rules of the `HTTPRoute`.
+ 6. Optionally, the reverse proxy can manipulate the request, i.e. add/remove headers,
+ etc. based on `filter` rules of the `HTTPRoute`.
+ 7. Lastly, the reverse proxy forwards the request to one or more objects in the cluster
+ based on `action` rules of the `HTTPRoute`. When specifying multiple `forwardTo`
+ objects, the request is split, i.e. forwarded to each object.
 
 ## TLS Configuration
 
@@ -243,9 +234,6 @@ metadata:
 spec:
   controller: "acme.io/gateway-controller"
   parametersRef:
-    apiVersion: core/v1
-    kind: ConfigMap
-    namespace: acme-system
     name: internet-gateway
 ---
 kind: ConfigMap
@@ -257,6 +245,9 @@ data:
   ...
 ```
 
+**Note:**  parametersRef will expect a ConfigMap as a referenced object if
+`resource` and `group` are omitted.
+ 
 The type of object referenced by `GatewayClass.spec.parametersRef` will depend
 on the provider itself. A `core.ConfigMap` is used in the example above, but
 controllers may opt to use a `CustomResource` for better schema validation.

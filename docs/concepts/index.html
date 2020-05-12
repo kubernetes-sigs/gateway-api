@@ -834,14 +834,9 @@ limitations under the License.
 
 <h1 id="api-concepts">API Concepts</h1>
 <p>This document is a deep dive into the reasoning and design for the API. The
-content of this document was originally taken from the <a href="https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview">API sketch</a>.</p>
-<blockquote>
-<p>We will try to keep the two documents in sync as the sketch document has to
-lowest bar to contribution, but this document is easier to format well and
-review.</p>
-</blockquote>
+content of this document started from this <a href="https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview">API sketch</a>.</p>
 <h2 id="roles-and-personas">Roles and personas</h2>
-<p>In the original design of Kubernetes, the Ingress and Service resources were
+<p>In the original design of Kubernetes, Ingress and Service resources were
 based on a self-service model of usage; developers who create Services and
 Ingresses control all aspects of defining and exposing their applications to
 their users.</p>
@@ -864,17 +859,17 @@ Gateway/Routes API will target the following personas:</p>
 Role-Based Authentication (RBAC) system and will define resource model
 responsibility and separation.</p>
 <p>Depending on the environment, multiple roles can map to the same user.
-For example, giving the user all of the above role replicates the self-service
+For example, giving the user all the above roles replicates the self-service
 model.</p>
 <p>For more information on the roles and personas considered in the Service API
 design, refer to the <a href="../security-model/">Security Model</a>. </p>
 <h2 id="resource-model">Resource model</h2>
 <blockquote>
-<p>Note: Resource will initially live in the <code>networking.x-k8s.io</code> API group as
+<p>Note: Resources will initially live in the <code>networking.x-k8s.io</code> API group as
 Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
-be assumed to be part of this API group.</p>
+be in this API group.</p>
 </blockquote>
-<p>There are three main types of object in our resource model:</p>
+<p>There are three main types of objects in our resource model:</p>
 <p><em>GatewayClass</em> defines a set of gateways with a common configuration and behavior. </p>
 <p><em>Gateway</em> requests a point where traffic can be translated to Services within the cluster.</p>
 <p><em>Routes</em> describe how traffic coming via the Gateway maps to the Services.</p>
@@ -899,11 +894,11 @@ This allows the controller managing the GatewayClass to provide these settings f
 This behaviour will be made clear using the GatewayClass Status object.</p>
 <p>A Gateway MAY contain one or more *Route references which serve to direct traffic for a subset of traffic to a specific service.</p>
 <h3 id="httptcpfooroute">{HTTP,TCP,Foo}Route</h3>
-<p>Various types of Route objects define how traffic via the Gateway is mapped to Kubernetes Services.</p>
-<p>Currently the two Route object types are <code>HTTPRoute</code> and <code>TCPRoute</code>, to cover the two most common uses for this sort of traffic.</p>
-<p>This design is intended to be extensible at this point - it is possible that the service-apis team may create a UDPRoute, or even an IPRoute in the future.</p>
+<p>Route objects define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services.</p>
+<p><code>HTTPRoute</code> and <code>TCPRoute</code> are currently the only defined Route objects. Additional protocol-specific Route
+objects may be added in the future.</p>
 <h3 id="combined-types">Combined types</h3>
-<p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xxxxRoute</code> and <code>Service</code>(s) will
+<p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xRoute</code> and <code>Service</code>(s) will
 define an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:</p>
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
@@ -912,21 +907,18 @@ relationships between the different resources:</p>
 <h2 id="request-flow">Request flow</h2>
 <p>A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:</p>
 <ol>
-<li>A client makes a request to a FQDN, i.e. "foo.example.com".</li>
-<li>The FQDN gets resolved to <code>gateway.status.listeners[x].address</code>.</li>
-<li>The request is received by the Gateway implementation, i.e. reverse proxy, on <code>gateway.status.listeners[x].address</code>
- and <code>gateway.spec.listeners[x].port</code>.</li>
-<li>If the request uses TLS, then <code>gateway.spec.listeners[x].tls</code> is used for establishing the connection.
- <strong>Note:</strong> The details for modeling a "virtual host" is still <a href="https://github.com/kubernetes-sigs/service-apis/issues/49">under review</a>.
- Therefore, how TLS is configured may change in the future.</li>
-<li>If the <code>Gateway</code> is configured to terminate the TLS connection, an <code>HTTPRoute</code> is selected based on the request’s
- <a href="https://tools.ietf.org/html/rfc7230#section-5.4">Host header</a>, i.e. FQDN in step 1, matching
- <code>httpRoute.spec.hosts[x].hostname</code>. If the <code>Gateway</code> is configured to pass the TLS connection through to the backend
- object, i.e. Service, SNI is used to match the request with an <code>HTTPRoute</code> based on <code>httpRoute.spec.hosts[x].hostname</code>.
- <strong>Note:</strong> Whether <code>hosts</code> should be singular is still <a href="https://github.com/kubernetes-sigs/service-apis/pull/43">under review</a>.</li>
-<li>The Gateway implementation performs filtering (optional) and forwarding based on
- <code>httpRoute.spec.hosts[x].rules[x].match</code> . The match can be based on the request path and/or header.</li>
-<li>Lastly, the request is forwarded to an object within the cluster.</li>
+<li>A client makes a request to http://foo.example.com.</li>
+<li>DNS resolves the name to <code>gateway.status.listeners[x].address</code>.</li>
+<li>The reverse proxy receives the request on <code>gateway.status.listeners[x].address</code>:
+ <code>gateway.spec.listeners[x].port</code> and uses the <a href="https://tools.ietf.org/html/rfc7230#section-5.4">Host header</a> to
+ match an <code>HTTPRoute</code>.</li>
+<li>Optionally, the reverse proxy can perform request header and/or path matching based
+ on <code>match</code> rules of the <code>HTTPRoute</code>.</li>
+<li>Optionally, the reverse proxy can manipulate the request, i.e. add/remove headers,
+ etc. based on <code>filter</code> rules of the <code>HTTPRoute</code>.</li>
+<li>Lastly, the reverse proxy forwards the request to one or more objects in the cluster
+ based on <code>action</code> rules of the <code>HTTPRoute</code>. When specifying multiple <code>forwardTo</code>
+ objects, the request is split, i.e. forwarded to each object.</li>
 </ol>
 <h2 id="tls-configuration">TLS Configuration</h2>
 <p>TLS configuration is tied to Gateway listeners. Although adding the option to
@@ -1013,9 +1005,6 @@ metadata:
 spec:
   controller: &quot;acme.io/gateway-controller&quot;
   parametersRef:
-    apiVersion: core/v1
-    kind: ConfigMap
-    namespace: acme-system
     name: internet-gateway
 ---
 kind: ConfigMap
@@ -1027,6 +1016,8 @@ data:
   ...
 </code></pre>
 
+<p><strong>Note:</strong>  parametersRef will expect a ConfigMap as a referenced object if
+<code>resource</code> and <code>group</code> are omitted.</p>
 <p>The type of object referenced by <code>GatewayClass.spec.parametersRef</code> will depend
 on the provider itself. A <code>core.ConfigMap</code> is used in the example above, but
 controllers may opt to use a <code>CustomResource</code> for better schema validation.</p>
