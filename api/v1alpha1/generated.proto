@@ -27,13 +27,61 @@ import "sigs.k8s.io/controller-runtime/pkg/scheme/generated.proto";
 // Package-wide variables from generator "generated".
 option go_package = "v1alpha1";
 
+// RouteMatchExtensionObjectReference identifies a route-match extension object
+// within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+message ConfigMapsDefaultLocalObjectReference {
+  // Group is the group of the referent.  Omitting the value or specifying
+  // the empty string indicates the core API group.  For example, use the
+  // following to specify a configmaps:
+  //
+  // fooRef:
+  //   resource: configmaps
+  //   name: myconfigmap
+  //
+  // Otherwise, if the core API group is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=core
+  optional string group = 1;
+
+  // Resource is the API resource name of the referent. Omitting the value
+  // or specifying the empty string indicates the configmaps resource. For
+  // example, use the following to specify a configmaps resource:
+  //
+  // fooRef:
+  //   name: myconfigmap
+  //
+  // Otherwise, if the configmaps resource is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=configmaps
+  optional string resource = 2;
+
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  optional string name = 3;
+}
+
 // ForwardToTarget identifies a target object within a known namespace.
 message ForwardToTarget {
   // TargetRef is an object reference to forward matched requests to.
   //
   // Support: Core (Kubernetes Services)
   // Support: Implementation-specific (Other resource types)
-  optional LocalObjectReference targetRef = 1;
+  optional ServicesDefaultLocalObjectReference targetRef = 1;
 
   // TargetPort specifies the destination port number to use for the TargetRef.
   // If unspecified and TargetRef is a Service object consisting of a single
@@ -188,7 +236,7 @@ message GatewayClassSpec {
   //
   // +optional
   // +protobuf=false
-  optional LocalObjectReference parametersRef = 4;
+  optional ConfigMapsDefaultLocalObjectReference parametersRef = 4;
 }
 
 // GatewayClassStatus is the current status for the GatewayClass.
@@ -361,7 +409,7 @@ message HTTPRouteAction {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extensionRef = 2;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 2;
 }
 
 // HTTPRouteFilter defines a filter-like action to be applied to
@@ -385,7 +433,7 @@ message HTTPRouteFilter {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extensionRef = 2;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 2;
 }
 
 // HTTPRouteHost is the configuration for a given host.
@@ -424,7 +472,7 @@ message HTTPRouteHost {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extensionRef = 3;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 3;
 }
 
 // HTTPRouteList contains a list of HTTPRoute
@@ -479,7 +527,7 @@ message HTTPRouteMatch {
   // Support: custom
   //
   // +optional
-  optional LocalObjectReference extensionRef = 5;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 5;
 }
 
 // HTTPRouteRule is the configuration for a given path.
@@ -568,7 +616,7 @@ message Listener {
   //
   // Support: custom.
   // +optional
-  optional LocalObjectReference extensionRef = 6;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 6;
 }
 
 // ListenerAddress describes an address for the Listener.
@@ -621,43 +669,6 @@ message ListenerStatus {
   repeated ListenerCondition conditions = 3;
 }
 
-// RouteMatchExtensionObjectReference identifies a route-match extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-message LocalObjectReference {
-  // Group is the group of the referent.  Omitting the value or specifying
-  // the empty string indicates the core API group.  For example, use the
-  // following to specify a service:
-  //
-  // fooRef:
-  //   resource: services
-  //   name: myservice
-  //
-  // Otherwise, if the core API group is not desired, specify the desired
-  // group:
-  //
-  // fooRef:
-  //   group: acme.io
-  //   resource: foos
-  //   name: myfoo
-  //
-  // +optional
-  optional string group = 1;
-
-  // Resource is the resource of the referent.
-  //
-  // +kubebuilder:validation:Required
-  // +required
-  optional string resource = 2;
-
-  // Name is the name of the referent.
-  //
-  // +kubebuilder:validation:Required
-  // +required
-  optional string name = 3;
-}
-
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
@@ -688,6 +699,100 @@ message RouteBindingSelector {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
 }
 
+// SecretsDefaultLocalObjectReference identifies an API object within a
+// known namespace that defaults group to core and resource to secrets
+// if unspecified.
+message SecretsDefaultLocalObjectReference {
+  // Group is the group of the referent.  Omitting the value or specifying
+  // the empty string indicates the core API group.  For example, use the
+  // following to specify a secrets resource:
+  //
+  // fooRef:
+  //   resource: secrets
+  //   name: mysecret
+  //
+  // Otherwise, if the core API group is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=core
+  optional string group = 1;
+
+  // Resource is the API resource name of the referent. Omitting the value
+  // or specifying the empty string indicates the secrets resource. For
+  // example, use the following to specify a secrets resource:
+  //
+  // fooRef:
+  //   name: mysecret
+  //
+  // Otherwise, if the secrets resource is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=secrets
+  optional string resource = 2;
+
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  optional string name = 3;
+}
+
+// ServicesDefaultLocalObjectReference identifies an API object within a
+// known namespace that defaults group to core and resource to services
+// if unspecified.
+message ServicesDefaultLocalObjectReference {
+  // Group is the group of the referent.  Omitting the value or specifying
+  // the empty string indicates the core API group.  For example, use the
+  // following to specify a service:
+  //
+  // fooRef:
+  //   resource: services
+  //   name: myservice
+  //
+  // Otherwise, if the core API group is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=core
+  optional string group = 1;
+
+  // Resource is the API resource name of the referent. Omitting the value
+  // or specifying the empty string indicates the services resource. For example,
+  // use the following to specify a services resource:
+  //
+  // fooRef:
+  //   name: myservice
+  //
+  // Otherwise, if the services resource is not desired, specify the desired
+  // group:
+  //
+  // fooRef:
+  //   group: acme.io
+  //   resource: foos
+  //   name: myfoo
+  //
+  // +kubebuilder:default=services
+  optional string resource = 2;
+
+  // Name is the name of the referent.
+  //
+  // +kubebuilder:validation:Required
+  optional string name = 3;
+}
+
 // TLSConfig describes a TLS configuration.
 //
 // References
@@ -711,7 +816,7 @@ message TLSConfig {
   // Support: Implementation-specific (Other resource types)
   //
   // +required
-  repeated LocalObjectReference certificateRefs = 1;
+  repeated SecretsDefaultLocalObjectReference certificateRefs = 1;
 
   // MinimumVersion of TLS allowed. It is recommended to use one of
   // the TLS_* constants above. Note: MinimumVersion is not strongly

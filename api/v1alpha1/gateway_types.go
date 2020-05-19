@@ -160,38 +160,6 @@ type ListenerAddress struct {
 	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
 }
 
-// LocalObjectReference identifies an API object within a known namespace.
-type LocalObjectReference struct {
-	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.  For example, use the
-	// following to specify a service:
-	//
-	// fooRef:
-	//   resource: services
-	//   name: myservice
-	//
-	// Otherwise, if the core API group is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +optional
-	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
-	// Resource is the resource of the referent.
-	//
-	// +kubebuilder:validation:Required
-	// +required
-	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
-	// +required
-	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
-}
-
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
@@ -227,7 +195,7 @@ type RouteBindingSelector struct {
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type ListenerExtensionObjectReference = LocalObjectReference
+type ListenerExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

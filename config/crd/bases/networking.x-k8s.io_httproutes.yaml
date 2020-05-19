@@ -52,10 +52,11 @@ spec:
                       Support: custom"
                     properties:
                       group:
+                        default: core
                         description: "Group is the group of the referent.  Omitting
                           the value or specifying the empty string indicates the core
                           API group.  For example, use the following to specify a
-                          service: \n fooRef:   resource: services   name: myservice
+                          configmaps: \n fooRef:   resource: configmaps   name: myconfigmap
                           \n Otherwise, if the core API group is not desired, specify
                           the desired group: \n fooRef:   group: acme.io   resource:
                           foos   name: myfoo"
@@ -64,9 +65,17 @@ spec:
                         description: Name is the name of the referent.
                         type: string
                       resource:
-                        description: Resource is the resource of the referent.
+                        default: configmaps
+                        description: "Resource is the API resource name of the referent.
+                          Omitting the value or specifying the empty string indicates
+                          the configmaps resource. For example, use the following
+                          to specify a configmaps resource: \n fooRef:   name: myconfigmap
+                          \n Otherwise, if the configmaps resource is not desired,
+                          specify the desired group: \n fooRef:   group: acme.io   resource:
+                          foos   name: myfoo"
                         type: string
                     required:
+                    - group
                     - name
                     - resource
                     type: object
@@ -106,22 +115,32 @@ spec:
                                 custom"
                               properties:
                                 group:
+                                  default: core
                                   description: "Group is the group of the referent.
                                     \ Omitting the value or specifying the empty string
                                     indicates the core API group.  For example, use
-                                    the following to specify a service: \n fooRef:
-                                    \  resource: services   name: myservice \n Otherwise,
-                                    if the core API group is not desired, specify
-                                    the desired group: \n fooRef:   group: acme.io
-                                    \  resource: foos   name: myfoo"
+                                    the following to specify a configmaps: \n fooRef:
+                                    \  resource: configmaps   name: myconfigmap \n
+                                    Otherwise, if the core API group is not desired,
+                                    specify the desired group: \n fooRef:   group:
+                                    acme.io   resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
                                   type: string
                                 resource:
-                                  description: Resource is the resource of the referent.
+                                  default: configmaps
+                                  description: "Resource is the API resource name
+                                    of the referent. Omitting the value or specifying
+                                    the empty string indicates the configmaps resource.
+                                    For example, use the following to specify a configmaps
+                                    resource: \n fooRef:   name: myconfigmap \n Otherwise,
+                                    if the configmaps resource is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                               required:
+                              - group
                               - name
                               - resource
                               type: object
@@ -154,6 +173,7 @@ spec:
                                     (Other resource types)"
                                   properties:
                                     group:
+                                      default: core
                                       description: "Group is the group of the referent.
                                         \ Omitting the value or specifying the empty
                                         string indicates the core API group.  For
@@ -168,10 +188,19 @@ spec:
                                       description: Name is the name of the referent.
                                       type: string
                                     resource:
-                                      description: Resource is the resource of the
-                                        referent.
+                                      default: services
+                                      description: "Resource is the API resource name
+                                        of the referent. Omitting the value or specifying
+                                        the empty string indicates the services resource.
+                                        For example, use the following to specify
+                                        a services resource: \n fooRef:   name: myservice
+                                        \n Otherwise, if the services resource is
+                                        not desired, specify the desired group: \n
+                                        fooRef:   group: acme.io   resource: foos
+                                        \  name: myfoo"
                                       type: string
                                   required:
+                                  - group
                                   - name
                                   - resource
                                   type: object
@@ -199,22 +228,32 @@ spec:
                                 custom"
                               properties:
                                 group:
+                                  default: core
                                   description: "Group is the group of the referent.
                                     \ Omitting the value or specifying the empty string
                                     indicates the core API group.  For example, use
-                                    the following to specify a service: \n fooRef:
-                                    \  resource: services   name: myservice \n Otherwise,
-                                    if the core API group is not desired, specify
-                                    the desired group: \n fooRef:   group: acme.io
-                                    \  resource: foos   name: myfoo"
+                                    the following to specify a configmaps: \n fooRef:
+                                    \  resource: configmaps   name: myconfigmap \n
+                                    Otherwise, if the core API group is not desired,
+                                    specify the desired group: \n fooRef:   group:
+                                    acme.io   resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
                                   type: string
                                 resource:
-                                  description: Resource is the resource of the referent.
+                                  default: configmaps
+                                  description: "Resource is the API resource name
+                                    of the referent. Omitting the value or specifying
+                                    the empty string indicates the configmaps resource.
+                                    For example, use the following to specify a configmaps
+                                    resource: \n fooRef:   name: myconfigmap \n Otherwise,
+                                    if the configmaps resource is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                               required:
+                              - group
                               - name
                               - resource
                               type: object
@@ -265,22 +304,32 @@ spec:
                                 custom"
                               properties:
                                 group:
+                                  default: core
                                   description: "Group is the group of the referent.
                                     \ Omitting the value or specifying the empty string
                                     indicates the core API group.  For example, use
-                                    the following to specify a service: \n fooRef:
-                                    \  resource: services   name: myservice \n Otherwise,
-                                    if the core API group is not desired, specify
-                                    the desired group: \n fooRef:   group: acme.io
-                                    \  resource: foos   name: myfoo"
+                                    the following to specify a configmaps: \n fooRef:
+                                    \  resource: configmaps   name: myconfigmap \n
+                                    Otherwise, if the core API group is not desired,
+                                    specify the desired group: \n fooRef:   group:
+                                    acme.io   resource: foos   name: myfoo"
                                   type: string
                                 name:
                                   description: Name is the name of the referent.
                                   type: string
                                 resource:
-                                  description: Resource is the resource of the referent.
+                                  default: configmaps
+                                  description: "Resource is the API resource name
+                                    of the referent. Omitting the value or specifying
+                                    the empty string indicates the configmaps resource.
+                                    For example, use the following to specify a configmaps
+                                    resource: \n fooRef:   name: myconfigmap \n Otherwise,
+                                    if the configmaps resource is not desired, specify
+                                    the desired group: \n fooRef:   group: acme.io
+                                    \  resource: foos   name: myfoo"
                                   type: string
                               required:
+                              - group
                               - name
                               - resource
                               type: object
@@ -329,21 +378,30 @@ spec:
                         includes the HTTPRoute will be true. \n Support: custom"
                       properties:
                         group:
+                          default: core
                           description: "Group is the group of the referent.  Omitting
                             the value or specifying the empty string indicates the
                             core API group.  For example, use the following to specify
-                            a service: \n fooRef:   resource: services   name: myservice
-                            \n Otherwise, if the core API group is not desired, specify
-                            the desired group: \n fooRef:   group: acme.io   resource:
-                            foos   name: myfoo"
+                            a configmaps: \n fooRef:   resource: configmaps   name:
+                            myconfigmap \n Otherwise, if the core API group is not
+                            desired, specify the desired group: \n fooRef:   group:
+                            acme.io   resource: foos   name: myfoo"
                           type: string
                         name:
                           description: Name is the name of the referent.
                           type: string
                         resource:
-                          description: Resource is the resource of the referent.
+                          default: configmaps
+                          description: "Resource is the API resource name of the referent.
+                            Omitting the value or specifying the empty string indicates
+                            the configmaps resource. For example, use the following
+                            to specify a configmaps resource: \n fooRef:   name: myconfigmap
+                            \n Otherwise, if the configmaps resource is not desired,
+                            specify the desired group: \n fooRef:   group: acme.io
+                            \  resource: foos   name: myfoo"
                           type: string
                       required:
+                      - group
                       - name
                       - resource
                       type: object
@@ -384,22 +442,32 @@ spec:
                                   HTTPRoute will be true. \n Support: custom"
                                 properties:
                                   group:
+                                    default: core
                                     description: "Group is the group of the referent.
                                       \ Omitting the value or specifying the empty
                                       string indicates the core API group.  For example,
-                                      use the following to specify a service: \n fooRef:
-                                      \  resource: services   name: myservice \n Otherwise,
-                                      if the core API group is not desired, specify
-                                      the desired group: \n fooRef:   group: acme.io
-                                      \  resource: foos   name: myfoo"
+                                      use the following to specify a configmaps: \n
+                                      fooRef:   resource: configmaps   name: myconfigmap
+                                      \n Otherwise, if the core API group is not desired,
+                                      specify the desired group: \n fooRef:   group:
+                                      acme.io   resource: foos   name: myfoo"
                                     type: string
                                   name:
                                     description: Name is the name of the referent.
                                     type: string
                                   resource:
-                                    description: Resource is the resource of the referent.
+                                    default: configmaps
+                                    description: "Resource is the API resource name
+                                      of the referent. Omitting the value or specifying
+                                      the empty string indicates the configmaps resource.
+                                      For example, use the following to specify a
+                                      configmaps resource: \n fooRef:   name: myconfigmap
+                                      \n Otherwise, if the configmaps resource is
+                                      not desired, specify the desired group: \n fooRef:
+                                      \  group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
+                                - group
                                 - name
                                 - resource
                                 type: object
@@ -433,6 +501,7 @@ spec:
                                       (Other resource types)"
                                     properties:
                                       group:
+                                        default: core
                                         description: "Group is the group of the referent.
                                           \ Omitting the value or specifying the empty
                                           string indicates the core API group.  For
@@ -447,10 +516,19 @@ spec:
                                         description: Name is the name of the referent.
                                         type: string
                                       resource:
-                                        description: Resource is the resource of the
-                                          referent.
+                                        default: services
+                                        description: "Resource is the API resource
+                                          name of the referent. Omitting the value
+                                          or specifying the empty string indicates
+                                          the services resource. For example, use
+                                          the following to specify a services resource:
+                                          \n fooRef:   name: myservice \n Otherwise,
+                                          if the services resource is not desired,
+                                          specify the desired group: \n fooRef:   group:
+                                          acme.io   resource: foos   name: myfoo"
                                         type: string
                                     required:
+                                    - group
                                     - name
                                     - resource
                                     type: object
@@ -478,22 +556,32 @@ spec:
                                   custom"
                                 properties:
                                   group:
+                                    default: core
                                     description: "Group is the group of the referent.
                                       \ Omitting the value or specifying the empty
                                       string indicates the core API group.  For example,
-                                      use the following to specify a service: \n fooRef:
-                                      \  resource: services   name: myservice \n Otherwise,
-                                      if the core API group is not desired, specify
-                                      the desired group: \n fooRef:   group: acme.io
-                                      \  resource: foos   name: myfoo"
+                                      use the following to specify a configmaps: \n
+                                      fooRef:   resource: configmaps   name: myconfigmap
+                                      \n Otherwise, if the core API group is not desired,
+                                      specify the desired group: \n fooRef:   group:
+                                      acme.io   resource: foos   name: myfoo"
                                     type: string
                                   name:
                                     description: Name is the name of the referent.
                                     type: string
                                   resource:
-                                    description: Resource is the resource of the referent.
+                                    default: configmaps
+                                    description: "Resource is the API resource name
+                                      of the referent. Omitting the value or specifying
+                                      the empty string indicates the configmaps resource.
+                                      For example, use the following to specify a
+                                      configmaps resource: \n fooRef:   name: myconfigmap
+                                      \n Otherwise, if the configmaps resource is
+                                      not desired, specify the desired group: \n fooRef:
+                                      \  group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
+                                - group
                                 - name
                                 - resource
                                 type: object
@@ -545,22 +633,32 @@ spec:
                                   custom"
                                 properties:
                                   group:
+                                    default: core
                                     description: "Group is the group of the referent.
                                       \ Omitting the value or specifying the empty
                                       string indicates the core API group.  For example,
-                                      use the following to specify a service: \n fooRef:
-                                      \  resource: services   name: myservice \n Otherwise,
-                                      if the core API group is not desired, specify
-                                      the desired group: \n fooRef:   group: acme.io
-                                      \  resource: foos   name: myfoo"
+                                      use the following to specify a configmaps: \n
+                                      fooRef:   resource: configmaps   name: myconfigmap
+                                      \n Otherwise, if the core API group is not desired,
+                                      specify the desired group: \n fooRef:   group:
+                                      acme.io   resource: foos   name: myfoo"
                                     type: string
                                   name:
                                     description: Name is the name of the referent.
                                     type: string
                                   resource:
-                                    description: Resource is the resource of the referent.
+                                    default: configmaps
+                                    description: "Resource is the API resource name
+                                      of the referent. Omitting the value or specifying
+                                      the empty string indicates the configmaps resource.
+                                      For example, use the following to specify a
+                                      configmaps resource: \n fooRef:   name: myconfigmap
+                                      \n Otherwise, if the configmaps resource is
+                                      not desired, specify the desired group: \n fooRef:
+                                      \  group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
+                                - group
                                 - name
                                 - resource
                                 type: object

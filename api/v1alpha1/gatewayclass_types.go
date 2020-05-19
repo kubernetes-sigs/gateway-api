@@ -119,7 +119,7 @@ type GatewayClassSpec struct {
 // gateway class within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type GatewayClassParametersObjectReference = LocalObjectReference
+type GatewayClassParametersObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions.
 type GatewayClassConditionType string

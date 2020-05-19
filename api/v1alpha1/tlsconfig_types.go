@@ -77,4 +77,4 @@ type TLSConfig struct {
 // namespace.
 //
 // +k8s:deepcopy-gen=false
-type CertificateObjectReference = LocalObjectReference
+type CertificateObjectReference = SecretsDefaultLocalObjectReference
