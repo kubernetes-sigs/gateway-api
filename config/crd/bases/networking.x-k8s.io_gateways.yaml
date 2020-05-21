@@ -212,17 +212,17 @@ spec:
                   (i.e. Service) by externally-reachable URL, load-balance traffic
                   and terminate SSL/TLS. Typically, a route is a \"httproute\" or
                   \"tcproute\" in group \"networking.x-k8s.io\". However, an implementation
-                  may support other resources. \n Support: Core"
+                  may support other resources. \n A nil Routes field (default) indicates
+                  that no routes should be associated with this Gateway. \n Support:
+                  Core"
                 properties:
                   namespaceSelector:
                     description: "NamespaceSelector specifies a set of namespace labels
-                      used for selecting routes to associate with the Gateway. If
-                      NamespaceSelector is defined, all routes in namespaces matching
-                      the NamespaceSelector are associated to the Gateway. \n An empty
-                      NamespaceSelector (default) indicates that routes from any namespace
-                      will be associated to this Gateway. This field is intentionally
-                      not a pointer because the nil behavior (no namespaces) is undesirable
-                      here. \n Support: Core"
+                      used for selecting routes to associate with the Gateway. \n
+                      An empty NamespaceSelector (default) indicates that routes from
+                      any Namespace can be selected by this Gateway. \n The OnlyLocalRoutes
+                      field takes precedence over this field. This selector will only
+                      take effect when OnlyLocalRoutes is false. \n Support: Core"
                     properties:
                       matchExpressions:
                         description: matchExpressions is a list of label selector
@@ -265,13 +265,22 @@ spec:
                           "value". The requirements are ANDed.
                         type: object
                     type: object
+                  onlyLocalRoutes:
+                    default: true
+                    description: "OnlyLocalRoutes is a boolean used to indicate if
+                      routes should only be selected from within the same namespace.
+                      \n When true (default) only routes in the same namespace as
+                      the Gateway will be selected. \n This field takes precedence
+                      over the NamespaceSelector field. That selector should only
+                      take effect when this field is set to false. \n Support: Core"
+                    type: boolean
                   routeSelector:
                     description: "RouteSelector specifies a set of route labels used
                       for selecting routes to associate with the Gateway. If RouteSelector
                       is defined, only routes matching the RouteSelector are associated
-                      with the Gateway. An empty RouteSelector matches all routes.
-                      \n If undefined, route labels are not used for associating routes
-                      to the gateway. \n Support: Core"
+                      with the Gateway. This selector only applies to namespaces allowed
+                      by OnlyLocalRoutes or NamespaceSelector. \n An empty RouteSelector
+                      (default) selects all routes. \n Support: Core"
                     properties:
                       matchExpressions:
                         description: matchExpressions is a list of label selector
@@ -314,13 +323,10 @@ spec:
                           "value". The requirements are ANDed.
                         type: object
                     type: object
-                required:
-                - namespaceSelector
                 type: object
             required:
             - class
             - listeners
-            - routes
             type: object
           status:
             description: GatewayStatus defines the observed state of Gateway.

@@ -314,13 +314,19 @@ message GatewaySpec {
   repeated Listener listeners = 2;
 
   // Routes specifies a schema for associating routes with the Gateway using
-  // selectors. A route is a resource capable of servicing a request and allows
-  // a cluster operator to expose a cluster resource (i.e. Service) by
+  // selectors. A route is a resource capable of servicing a request and
+  // allows a cluster operator to expose a cluster resource (i.e. Service) by
   // externally-reachable URL, load-balance traffic and terminate SSL/TLS.
   // Typically, a route is a "httproute" or "tcproute" in group
-  // "networking.x-k8s.io". However, an implementation may support other resources.
+  // "networking.x-k8s.io". However, an implementation may support other
+  // resources.
+  //
+  // A nil Routes field (default) indicates that no routes should be
+  // associated with this Gateway.
   //
   // Support: Core
+  //
+  // +optional
   optional RouteBindingSelector routes = 3;
 }
 
@@ -674,29 +680,46 @@ message ListenerStatus {
 // selectors are associated with the Gateway.
 message RouteBindingSelector {
   // NamespaceSelector specifies a set of namespace labels used for selecting
-  // routes to associate with the Gateway. If NamespaceSelector is defined,
-  // all routes in namespaces matching the NamespaceSelector are associated
-  // to the Gateway.
+  // routes to associate with the Gateway.
   //
   // An empty NamespaceSelector (default) indicates that routes from any
-  // namespace will be associated to this Gateway. This field is intentionally
-  // not a pointer because the nil behavior (no namespaces) is undesirable here.
+  // Namespace can be selected by this Gateway.
   //
-  // Support: Core
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 1;
-
-  // RouteSelector specifies a set of route labels used for selecting
-  // routes to associate with the Gateway. If RouteSelector is defined,
-  // only routes matching the RouteSelector are associated with the Gateway.
-  // An empty RouteSelector matches all routes.
-  //
-  // If undefined, route labels are not used for associating routes to
-  // the gateway.
+  // The OnlyLocalRoutes field takes precedence over this field. This selector
+  // will only take effect when OnlyLocalRoutes is false.
   //
   // Support: Core
   //
   // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 1;
+
+  // OnlyLocalRoutes is a boolean used to indicate if routes should only be
+  // selected from within the same namespace.
+  //
+  // When true (default) only routes in the same namespace as the Gateway
+  // will be selected.
+  //
+  // This field takes precedence over the NamespaceSelector field. That
+  // selector should only take effect when this field is set to false.
+  //
+  // Support: Core
+  //
+  // +kubebuilder:default=true
+  // +optional
+  optional bool onlyLocalRoutes = 2;
+
+  // RouteSelector specifies a set of route labels used for selecting
+  // routes to associate with the Gateway. If RouteSelector is defined,
+  // only routes matching the RouteSelector are associated with the Gateway.
+  // This selector only applies to namespaces allowed by OnlyLocalRoutes or
+  // NamespaceSelector.
+  //
+  // An empty RouteSelector (default) selects all routes.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 3;
 }
 
 // SecretsDefaultLocalObjectReference identifies an API object within a
