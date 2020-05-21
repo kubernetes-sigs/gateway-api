@@ -1,0 +1,61 @@
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: modifiers-example-class
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: modifiers-example-configmap
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: modifiers-example
+  namespace: default
+spec:
+  class: modifiers-example-class
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - name: my-http-listener
+    protocol: HTTP
+  routes:
+    namespaceSelector: {}
+    routeSelector:
+      matchLabels:
+        "app": "foo"
+---
+# This example matches HTTP requests to mod.com/foo and splits the traffic
+# between Services foo and bar, removing header "baz" for both and adding
+# header "example: foo" before forwarding the request to Service foo and
+# adding header "example: foo" before sending the request to Service bar.
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: modifiers-example
+  namespace: default
+  labels:
+    app: foo
+spec:
+  hosts:
+    - hostname: "mod.com"
+      rules:
+        - match:
+            path: /foo
+          actions:
+            - modify:
+                headers:
+                  add:
+                    example: foo
+                  remove:
+                  - baz
+              forwardTo:
+                targetRef:
+                  name: foo
+            - modify:
+                headers:
+                  add:
+                    example: bar
+                  remove:
+                  - baz
+              forwardTo:
+                targetRef:
+                  name: bar

@@ -34,10 +34,10 @@ spec:
   hosts:
     - hostnames:
         - "foo.com"
-      rules:
-        - match:
-            path: /bar
-          action:
-            forwardTo:
-              targetRef:
-                name: my-service
+    rules:
+    - match:
+        path: /bar
+      actions:
+      - forwardTo:
+          targetRef:
+            name: my-service

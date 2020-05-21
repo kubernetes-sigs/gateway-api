@@ -52,7 +52,7 @@ type HTTPRouteHost struct {
 	// +optional
 	Hostname string `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
 
-	// Rules are a list of HTTP matchers, filters and actions.
+	// Rules are a list of HTTP matchers and actions.
 	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
@@ -72,15 +72,20 @@ type HTTPRouteHost struct {
 
 // HTTPRouteRule is the configuration for a given path.
 type HTTPRouteRule struct {
-	// Match defines which requests match this path.
+	// Match defines a schema for matching an HTTP request.
+	//
+	// Support: core
+	//
 	// +optional
-	Match *HTTPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
-	// Filter defines what filters are applied to the request.
+	Match *HTTPRequestMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
+
+	// Actions define a schema for doing something to a matched HTTP request.
+	// The most common action is to forward the HTTP request to a Service resource.
+	//
+	// Support: core
+	//
 	// +optional
-	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
-	// Action defines what happens to the request.
-	// +optional
-	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
+	Actions []HTTPRequestAction `json:"actions" protobuf:"bytes,2,rep,name=actions"`
 }
 
 // PathType constants.
@@ -96,9 +101,8 @@ const (
 	HeaderTypeExact = "Exact"
 )
 
-// HTTPRouteMatch defines the predicate used to match requests to a
-// given action.
-type HTTPRouteMatch struct {
+// HTTPRequestMatch defines a schema for matching an HTTP request.
+type HTTPRequestMatch struct {
 	// PathType is defines the semantics of the `Path` matcher.
 	//
 	// Support: core (Exact, Prefix)
@@ -146,80 +150,9 @@ type HTTPRouteMatch struct {
 // +k8s:deepcopy-gen=false
 type RouteMatchExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
-// HTTPRouteFilter defines a filter-like action to be applied to
-// requests.
-type HTTPRouteFilter struct {
-	// Headers related filters.
-	//
-	// Support: extended
-	// +optional
-	Headers *HTTPHeaderFilter `json:"headers" protobuf:"bytes,1,opt,name=headers"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "filter" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutefilters" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
-	//
-	// Support: custom
-	//
-	// +optional
-	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
-}
-
-// RouteFilterExtensionObjectReference identifies a route-filter extension
-// object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteFilterExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
-
-// HTTPHeaderFilter defines the filter behavior for a request match.
-type HTTPHeaderFilter struct {
-	// Add adds the given header (name, value) to the request
-	// before the action.
-	//
-	// Input:
-	//   GET /foo HTTP/1.1
-	//
-	// Config:
-	//   add: {"my-header": "foo"}
-	//
-	// Output:
-	//   GET /foo HTTP/1.1
-	//   my-header: foo
-	//
-	// Support: extended?
-	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
-
-	// Remove the given header(s) on the HTTP request before the
-	// action. The value of RemoveHeader is a list of HTTP header
-	// names. Note that the header names are case-insensitive
-	// [RFC-2616 4.2].
-	//
-	// Input:
-	//   GET /foo HTTP/1.1
-	//   My-Header1: ABC
-	//   My-Header2: DEF
-	//   My-Header2: GHI
-	//
-	// Config:
-	//   remove: ["my-header1", "my-header3"]
-	//
-	// Output:
-	//   GET /foo HTTP/1.1
-	//   My-Header2: DEF
-	//
-	// Support: extended?
-	Remove []string `json:"remove" protobuf:"bytes,2,rep,name=remove"`
-
-	// TODO
-}
-
-// HTTPRouteAction is the action taken given a match.
-type HTTPRouteAction struct {
+// HTTPRequestAction defines a schema for doing something with an HTTP request.
+// The most common action is to forward the HTTP request to a Service resource.
+type HTTPRequestAction struct {
 	// ForwardTo sends requests to the referenced object.  The
 	// resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
@@ -229,6 +162,16 @@ type HTTPRouteAction struct {
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the HTTPRoute will be true.
 	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
+
+	// Modify defines a schema for changing something in an HTTP request
+	// that must be executed prior to forwarding the request to a targetRef.
+	// For example, add header "my-header: foo" to the matched request before
+	// forwarding the request to Service "foobar".
+	//
+	// Support: Core
+	//
+	// +optional
+	Modify *HTTPRequestModifier `json:"modify" protobuf:"bytes,2,opt,name=modify"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -242,7 +185,7 @@ type HTTPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
 // ForwardToTarget identifies a target object within a known namespace.
@@ -264,6 +207,75 @@ type ForwardToTarget struct {
 	//
 	// +optional
 	TargetPort *TargetPort `json:"targetPort" protobuf:"bytes,2,opt,name=targetPort"`
+}
+
+// HTTPRequestModifier defines a schema for changing something in an HTTP request
+// that must be executed. For example, add header "my-header: foo" to a request.
+type HTTPRequestModifier struct {
+	// Headers defines the schema for HTTP header-related modifiers.
+	//
+	// Support: extended
+	// +optional
+	Headers *HTTPHeaderModifier `json:"headers" protobuf:"bytes,1,opt,name=headers"`
+
+	// ExtensionRef is an optional, implementation-specific extension to the
+	// "modifier" behavior.  The resource may be "configmap" (use the empty
+	// string for the group) or an implementation-defined resource (for
+	// example, resource "myroutemodifiers" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "configmaps".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
+	//
+	// Support: custom
+	//
+	// +optional
+	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+}
+
+// RouteFilterExtensionObjectReference identifies a route-modifier extension
+// object within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type RouteFilterExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+
+// HTTPHeaderModifier defines a schema for changing the Header of an HTTP request
+// that must be executed. For example, add HTTP header "my-header": "foo" to a request.
+type HTTPHeaderModifier struct {
+	// Add adds the given header (name, value) to the HTTP request.
+	//
+	// Input:
+	//   GET /foo HTTP/1.1
+	//
+	// Config:
+	//   add: {"my-header": "foo"}
+	//
+	// Output:
+	//   GET /foo HTTP/1.1
+	//   my-header: foo
+	//
+	// Support: extended?
+	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
+
+	// Remove the given header(s) on the HTTP request. The value of RemoveHeader
+	// is a list of HTTP header names. Note that the header names are case-insensitive
+	// [RFC-2616 4.2].
+	//
+	// Input:
+	//   GET /foo HTTP/1.1
+	//   My-Header1: ABC
+	//   My-Header2: DEF
+	//   My-Header2: GHI
+	//
+	// Config:
+	//   remove: ["my-header1", "my-header3"]
+	//
+	// Output:
+	//   GET /foo HTTP/1.1
+	//   My-Header2: DEF
+	//
+	// Support: extended?
+	Remove []string `json:"remove" protobuf:"bytes,2,rep,name=remove"`
 }
 
 // TargetPort specifies the destination port number to use for a TargetRef.
