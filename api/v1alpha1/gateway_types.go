@@ -300,31 +300,24 @@ type ListenerAddress struct {
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
 type RouteBindingSelector struct {
-	// NamespaceSelector specifies a set of namespace labels used for selecting
-	// routes to associate with the Gateway. If NamespaceSelector is defined,
-	// all routes in namespaces matching the NamespaceSelector are associated
-	// to the Gateway.
-	//
-	// An empty NamespaceSelector (default) indicates that routes from any
-	// namespace will be associated to this Gateway. This field is intentionally
-	// not a pointer because the nil behavior (no namespaces) is undesirable here.
+	// RouteNamespaces indicates in which namespaces Routes should be selected
+	// for this Gateway. This is restricted to the namespace of this Gateway by
+	// default.
 	//
 	// Support: Core
 	//
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector" protobuf:"bytes,1,opt,name=namespaceSelector"`
+	// +kubebuilder:default={OnlySameNamespace:true}
+	// +optional
+	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty" protobuf:"bytes,1,opt,name=routeNamespaces"`
 	// RouteSelector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
 	// only routes matching the RouteSelector are associated with the Gateway.
 	// An empty RouteSelector matches all routes.
 	//
-	//
-	// If undefined, route labels are not used for associating routes to
-	// the gateway.
-	//
 	// Support: Core
 	//
 	// +optional
-	RouteSelector *metav1.LabelSelector `json:"routeSelector,omitempty" protobuf:"bytes,2,opt,name=routeSelector"`
+	RouteSelector metav1.LabelSelector `json:"routeSelector,omitempty" protobuf:"bytes,2,opt,name=routeSelector"`
 }
 
 // ListenerExtensionObjectReference identifies a listener extension object

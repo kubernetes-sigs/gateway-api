@@ -3,5 +3,12 @@ kind: GatewayClass
 metadata:
   name: gatewayclass-sample
 spec:
-  # Add fields here
-  foo: bar
+  controller: example.com/service-apis-controller
+  allowedGatewayNamespaceSelector: 
+    matchLabels:
+      env: prod
+  allowedRouteNamespaces: 
+    namespaceSelector: 
+      matchLabels:
+        env: prod
+    OnlySameNamespace: false
