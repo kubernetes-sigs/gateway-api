@@ -387,6 +387,11 @@ func (in *HTTPRouteAction) DeepCopyInto(out *HTTPRouteAction) {
 		*out = new(ForwardToTarget)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.MirrorTo != nil {
+		in, out := &in.MirrorTo, &out.MirrorTo
+		*out = new(ServicesDefaultLocalObjectReference)
+		**out = **in
+	}
 	if in.ExtensionRef != nil {
 		in, out := &in.ExtensionRef, &out.ExtensionRef
 		*out = new(ConfigMapsDefaultLocalObjectReference)

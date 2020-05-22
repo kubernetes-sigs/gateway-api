@@ -230,6 +230,20 @@ type HTTPRouteAction struct {
 	// that includes the HTTPRoute will be true.
 	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
 
+	// MirrorTo sends a copy of the request to the referenced object in addition
+	// to forwarding the request to a ForwardTo target. A response is ignored from
+	// the MirrorTo target. The resource may be "services" (omit or use the empty
+	// string for the group), or an implementation may support other resources
+	// (for example, resource "mymirrortargets" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and group
+	// indicates that the resource is "services".
+	//
+	// Support: Core (Kubernetes Services)
+	// Support: Implementation-specific (Other resource types)
+	//
+	// +optional
+	MirrorTo *MirrorToTargetObjectReference `json:"mirrorTo,omitempty" protobuf:"bytes,2,opt,name=mirrorTo"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
 	// string for the group) or an implementation-defined resource (for
@@ -242,7 +256,7 @@ type HTTPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
 // ForwardToTarget identifies a target object within a known namespace.
@@ -274,6 +288,12 @@ type TargetPort int32
 //
 // +k8s:deepcopy-gen=false
 type ForwardToTargetObjectReference = ServicesDefaultLocalObjectReference
+
+// MirrorToTargetObjectReference identifies a target object of a MirrorTo
+// route action within a known namespace.
+//
+// +k8s:deepcopy-gen=false
+type MirrorToTargetObjectReference = ServicesDefaultLocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.

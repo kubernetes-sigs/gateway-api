@@ -397,6 +397,20 @@ message HTTPRouteAction {
   // that includes the HTTPRoute will be true.
   optional ForwardToTarget forwardTo = 1;
 
+  // MirrorTo sends a copy of the request to the referenced object in addition
+  // to forwarding the request to a ForwardTo target. A response is ignored from
+  // the MirrorTo target. The resource may be "services" (omit or use the empty
+  // string for the group), or an implementation may support other resources
+  // (for example, resource "mymirrortargets" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and group
+  // indicates that the resource is "services".
+  //
+  // Support: Core (Kubernetes Services)
+  // Support: Implementation-specific (Other resource types)
+  //
+  // +optional
+  optional ServicesDefaultLocalObjectReference mirrorTo = 2;
+
   // ExtensionRef is an optional, implementation-specific extension to the
   // "action" behavior.  The resource may be "configmaps" (use the empty
   // string for the group) or an implementation-defined resource (for
@@ -409,7 +423,7 @@ message HTTPRouteAction {
   // Support: custom
   //
   // +optional
-  optional ConfigMapsDefaultLocalObjectReference extensionRef = 2;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 3;
 }
 
 // HTTPRouteFilter defines a filter-like action to be applied to
