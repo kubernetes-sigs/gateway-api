@@ -421,9 +421,6 @@ spec:
                   - name
                   type: object
                 type: array
-            required:
-            - conditions
-            - listeners
             type: object
         type: object
     served: true
