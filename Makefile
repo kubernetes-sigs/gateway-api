@@ -33,6 +33,7 @@ generate:
 	$(MAKE) proto
 	$(MAKE) -f kubebuilder.mk generate
 	$(MAKE) manifests
+	$(MAKE) apidocs
 
 # Generate manifests e.g. CRD, RBAC etc.
 .PHONY: manifests
@@ -69,6 +70,10 @@ verify-proto:
 			cd src/sigs.k8s.io/service-apis && \
 			hack/update-proto.sh && \
 			diff -r api /realgo/src/sigs.k8s.io/service-apis/api"
+
+.PHONY: apidocs
+apidocs:
+	./hack/api-docs/generate.sh docs-src/spec.md
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
