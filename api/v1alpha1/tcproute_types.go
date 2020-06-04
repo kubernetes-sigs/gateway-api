@@ -34,6 +34,8 @@ type TcpRouteStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
+// +genclient
+// +genclient:Namespaced
 // +kubebuilder:object:root=true
 
 // TcpRoute is the Schema for the tcproutes API

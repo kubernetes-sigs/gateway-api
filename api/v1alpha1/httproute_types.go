@@ -315,6 +315,8 @@ type HTTPRoute struct {
 	Status HTTPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
+// +genclient
+// +genclient:Namespaced
 // +kubebuilder:object:root=true
 
 // HTTPRouteList contains a list of HTTPRoute

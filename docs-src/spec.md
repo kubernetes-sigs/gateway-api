@@ -10,8 +10,132 @@
 </p>
 Resource Types:
 <ul><li>
+<a href="#networking.x-k8s.io/v1alpha1.Gateway">Gateway</a>
+</li><li>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClass">GatewayClass</a>
+</li><li>
+<a href="#networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute</a>
+</li><li>
+<a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>
 </li></ul>
+<h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
+</h3>
+<p>
+<p>Gateway represents an instantiation of a service-traffic handling infrastructure.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>Gateway</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">
+GatewaySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>class</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Class used for this Gateway. This is the name of a GatewayClass resource.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>listeners</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.Listener">
+[]Listener
+</a>
+</em>
+</td>
+<td>
+<p>Listeners associated with this Gateway. Listeners define what addresses,
+ports, protocols are bound on this Gateway.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>routes</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">
+RouteBindingSelector
+</a>
+</em>
+</td>
+<td>
+<p>Routes specifies a schema for associating routes with the Gateway using
+selectors. A route is a resource capable of servicing a request and allows
+a cluster operator to expose a cluster resource (i.e. Service) by
+externally-reachable URL, load-balance traffic and terminate SSL/TLS.
+Typically, a route is a &ldquo;httproute&rdquo; or &ldquo;tcproute&rdquo; in group
+&ldquo;networking.x-k8s.io&rdquo;. However, an implementation may support other resources.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">
+GatewayStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClass">GatewayClass
 </h3>
 <p>
@@ -180,6 +304,154 @@ GatewayClassStatus
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute
+</h3>
+<p>
+<p>TcpRoute is the Schema for the tcproutes API</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>TcpRoute</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TcpRouteSpec">
+TcpRouteSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TcpRouteStatus">
+TcpRouteStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit
+</h3>
+<p>
+<p>TrafficSplit is the Schema for the trafficsplits API</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>TrafficSplit</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitSpec">
+TrafficSplitSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitStatus">
+TrafficSplitStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.AddressType">AddressType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -317,107 +589,6 @@ port definition, that port will be used. If unspecified and TargetRef is
 a Service object consisting of multiple port definitions, an error is
 surfaced in status.</p>
 <p>Support: Core</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
-</h3>
-<p>
-<p>Gateway represents an instantiation of a service-traffic handling infrastructure.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">
-GatewaySpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>class</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Class used for this Gateway. This is the name of a GatewayClass resource.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>listeners</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.Listener">
-[]Listener
-</a>
-</em>
-</td>
-<td>
-<p>Listeners associated with this Gateway. Listeners define what addresses,
-ports, protocols are bound on this Gateway.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>routes</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">
-RouteBindingSelector
-</a>
-</em>
-</td>
-<td>
-<p>Routes specifies a schema for associating routes with the Gateway using
-selectors. A route is a resource capable of servicing a request and allows
-a cluster operator to expose a cluster resource (i.e. Service) by
-externally-reachable URL, load-balance traffic and terminate SSL/TLS.
-Typically, a route is a &ldquo;httproute&rdquo; or &ldquo;tcproute&rdquo; in group
-&ldquo;networking.x-k8s.io&rdquo;. However, an implementation may support other resources.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">
-GatewayStatus
-</a>
-</em>
-</td>
-<td>
 </td>
 </tr>
 </tbody>
@@ -2105,63 +2276,6 @@ construct.</p>
 <p>
 <p>TargetPort specifies the destination port number to use for a TargetRef.</p>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute
-</h3>
-<p>
-<p>TcpRoute is the Schema for the tcproutes API</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRouteSpec">
-TcpRouteSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRouteStatus">
-TcpRouteStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TcpRouteSpec">TcpRouteSpec
 </h3>
 <p>
@@ -2180,63 +2294,6 @@ TcpRouteStatus
 <p>
 <p>TcpRouteStatus defines the observed state of TcpRoute</p>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit
-</h3>
-<p>
-<p>TrafficSplit is the Schema for the trafficsplits API</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitSpec">
-TrafficSplitSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitStatus">
-TrafficSplitStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TrafficSplitSpec">TrafficSplitSpec
 </h3>
 <p>
