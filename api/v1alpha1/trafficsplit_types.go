@@ -34,6 +34,8 @@ type TrafficSplitStatus struct {
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
+// +genclient
+// +genclient:Namespaced
 // +kubebuilder:object:root=true
 
 // TrafficSplit is the Schema for the trafficsplits API
