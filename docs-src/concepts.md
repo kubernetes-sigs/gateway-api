@@ -52,7 +52,7 @@ For example, giving the user all the above roles replicates the self-service
 model.
 
 For more information on the roles and personas considered in the Service API
-design, refer to the [Security Model](security-model.md). 
+design, refer to the [Security Model](security-model.md).
 
 ## Resource model
 
@@ -62,7 +62,7 @@ design, refer to the [Security Model](security-model.md).
 
 There are three main types of objects in our resource model:
 
-*GatewayClass* defines a set of gateways with a common configuration and behavior. 
+*GatewayClass* defines a set of gateways with a common configuration and behavior.
 
 *Gateway* requests a point where traffic can be translated to Services within the cluster.
 
@@ -85,7 +85,7 @@ In Ingress v1beta1, the closest analog to GatewayClass is the `ingress-class` an
 A Gateway describes how traffic can be translated to Services within the cluster.
 That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
 For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
-While many use cases have client traffic originating “outside” the cluster, this is not a requirement. 
+While many use cases have client traffic originating “outside” the cluster, this is not a requirement.
 
 It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
 The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.
@@ -173,7 +173,53 @@ handling this:
 
 * TODO
 
-### Extensibility
+### Conformance
+
+As this API aims to cover a wide set of implementations and use cases,
+it will not be possible for all implementations to support *all*
+features at the present. However, we do expect the set of features
+supported to converge eventually. For a given feature, users will be
+guaranteed that features in the API will be portable between providers
+if the feature is supported.
+
+To model this in the API, we are taking a similar approach as with
+[sig-arch][sig-arch-bdd] work on conformance profiles. Features as
+described in the API spec will be divided into three major categories:
+
+[sig-arch-bdd]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-architecture/960-conformance-behaviors
+
+* **CORE** features will be portable and we expect that there is a
+  reasonable roadmap for ALL implementations towards support of APIs
+  in this category.
+* **EXTENDED** features are those that are portable but not
+  universally supported across implementations. Those implementations
+  that support the feature will have the same behavior and
+  semantics. It is expected that some number of EXTENDED features will
+  eventually migrate into the CORE. EXTENDED features will be part of
+  the API types and schema.
+* **CUSTOM** features are those that are not portable and are
+  vendor-specific. CUSTOM features will not have API types and schema
+  except via generic extension points.
+
+Behavior and feature in the CORE and EXTENDED set will be defined and
+validated via behavior-driven conformance tests. CUSTOM features will
+not be covered by conformance tests.
+
+By including and standardizing EXTENDED features in the API spec, we
+expect to be able to converge on portable subsets of the API among
+implementations without compromising overall API support. Lack of
+universal support will not be a blocker towards developing portable
+feature sets. Standardizing on spec will make it easier to eventually
+graduate to CORE when support is widespread.
+
+#### Conformance expectations
+
+We expect there will be varying levels of conformance among the
+different providers in the early days of this API. Users can use the
+results of the conformance tests to understand areas where there may
+be differences in behavior from the spec.
+
+### Extension points
 
 TODO
 
@@ -247,7 +293,7 @@ data:
 
 **Note:**  parametersRef will expect a ConfigMap as a referenced object if
 `resource` and `group` are omitted.
- 
+
 The type of object referenced by `GatewayClass.spec.parametersRef` will depend
 on the provider itself. A `core.ConfigMap` is used in the example above, but
 controllers may opt to use a `CustomResource` for better schema validation.
