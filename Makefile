@@ -27,13 +27,13 @@ all: controller generate verify
 controller:
 	$(MAKE) -f kubebuilder.mk manager
 
-# Run code generators for protos, Deepcopy funcs, CRDs, etc..
+# Run generators for protos, Deepcopy funcs, CRDs, and docs..
 .PHONY: generate
 generate:
 	$(MAKE) proto
 	$(MAKE) -f kubebuilder.mk generate
 	$(MAKE) manifests
-	$(MAKE) apidocs
+	$(MAKE) docs
 
 # Generate manifests e.g. CRD, RBAC etc.
 .PHONY: manifests
@@ -71,10 +71,6 @@ verify-proto:
 			hack/update-proto.sh && \
 			diff -r api /realgo/src/sigs.k8s.io/service-apis/api"
 
-.PHONY: apidocs
-apidocs:
-	./hack/api-docs/generate.sh docs-src/spec.md
-
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
 install: manifests crd example
@@ -102,6 +98,8 @@ verify:
 # Build the documentation.
 .PHONY: docs
 docs:
+	# Generate API docs first
+	./hack/api-docs/generate.sh docs-src/spec.md
 	# The docs image must be built locally until issue #141 is fixed.
 	docker build --tag k8s.gcr.io/service-apis-mkdocs:latest -f mkdocs.dockerfile .
 	$(MAKE) -f docs.mk
