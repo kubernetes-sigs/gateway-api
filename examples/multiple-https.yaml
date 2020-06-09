@@ -1,0 +1,41 @@
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: gateway
+  namespace: default
+spec:
+  class: default-class
+  addresses:
+  - type: NamedAddress
+    value: auto-assign
+  listeners:
+  - hostname:
+      name: httpbin.example.com
+    port: 443
+    protocol: HTTPS
+    tls:
+      options: {}
+      certificateRefs:
+      - resource: secrets
+        group: core
+        name: httpbin
+    routes:
+      namespaceSelector: {}
+      routeSelector:
+        matchLabels:
+          app: httpbin
+  - hostname:
+      name: conformance.example.com
+    port: 443
+    protocol: HTTPS
+    tls:
+      options: {}
+      certificateRefs:
+      - resource: secrets
+        group: core
+        name: conformance
+    routes:
+      namespaceSelector: {}
+      routeSelector:
+        matchLabels:
+          app: conformance

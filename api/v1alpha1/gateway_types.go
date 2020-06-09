@@ -25,7 +25,8 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// Gateway represents an instantiation of a service-traffic handling infrastructure.
+// Gateway represents an instantiation of a service-traffic handling
+// infrastructure by binding Listeners to a set of IP addresses.
 type Gateway struct {
 	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
@@ -56,78 +57,212 @@ type GatewayList struct {
 type GatewaySpec struct {
 	// Class used for this Gateway. This is the name of a GatewayClass resource.
 	Class string `json:"class" protobuf:"bytes,1,opt,name=class"`
-	// Listeners associated with this Gateway. Listeners define what addresses,
-	// ports, protocols are bound on this Gateway.
-	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
-	// Routes specifies a schema for associating routes with the Gateway using
-	// selectors. A route is a resource capable of servicing a request and allows
-	// a cluster operator to expose a cluster resource (i.e. Service) by
-	// externally-reachable URL, load-balance traffic and terminate SSL/TLS.
-	// Typically, a route is a "httproute" or "tcproute" in group
-	// "networking.x-k8s.io". However, an implementation may support other resources.
-	//
-	// Support: Core
-	//
-	Routes RouteBindingSelector `json:"routes" protobuf:"bytes,3,opt,name=routes"`
-}
 
-const (
-	// HTTPProtocol constant.
-	HTTPProtocol = "HTTP"
-	// HTTPSProtocol constant.
-	HTTPSProtocol = "HTTPS"
-)
-
-// Listener defines a
-type Listener struct {
-	// Name is the listener's name and should be specified as an
-	// RFC 1035 DNS_LABEL [1]:
+	// Listeners associated with this Gateway. Listeners define
+	// logical endpoints that are bound on this Gateway's addresses.
+	// At least one Listener MUST be specified.
 	//
-	// [1] https://tools.ietf.org/html/rfc1035
+	// Each Listener in this array must have a unique Port field,
+	// however a GatewayClass may collapse compatible Listener
+	// definitions into single implementation-defined acceptor
+	// configuration even if their Port fields would otherwise conflict.
 	//
-	// Each listener of a Gateway must have a unique name. Name is used
-	// for associating a listener in Gateway status.
+	// Listeners are compatible if all of the following conditions are true:
+	//
+	// 1. all their Protocol fields are "HTTP", or all their Protocol fields are "HTTPS" or TLS"
+	// 2. their Hostname fields are specified with a match type other than "Any"
+	// 3. their Hostname fields are not an exact match for any other Listener
+	//
+	// As a special case, each group of compatible listeners
+	// may contain exactly one Listener with a match type of "Any".
+	//
+	// If the GatewayClass collapses compatible Listeners, the
+	// host name provided in the incoming client request MUST be
+	// matched to a Listener to find the correct set of Routes.
+	// The incoming host name MUST be matched using the Hostname
+	// field for each Listener in order of most to least specific.
+	// That is, "Exact" matches must be processed before "Domain"
+	// matches, which must be processed before "Any" matches.
+	//
+	// If this field specifies multiple Listeners that have the same
+	// Port value but are not compatible, the GatewayClass must raise
+	// a "PortConflict" condition on the Gateway.
 	//
 	// Support: Core
 	//
 	// +required
-	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
-	// Address requested for this listener. This is optional and behavior
-	// can depend on GatewayClass. If a value is set in the spec and
-	// the request address is invalid, the GatewayClass MUST indicate
-	// this in the associated entry in GatewayStatus.Listeners.
+	// +kubebuilder:validation:MinItems=1
+	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
+
+	// Addresses requested for this gateway. This is optional and
+	// behavior can depend on the GatewayClass. If a value is set
+	// in the spec and the requested address is invalid, the
+	// GatewayClass MUST indicate this in the associated entry in
+	// GatewayStatus.Listeners.
 	//
-	// Support:
+	// If no ListenerAddresses are specified, the GatewayClass may
+	// schedule the Gateway in an implementation-defined manner,
+	// assigning an appropriate set of ListenerAddresses.
 	//
-	// +optional
-	Address *ListenerAddress `json:"address,omitempty" protobuf:"bytes,2,opt,name=address"`
-	// Port is a list of ports associated with the Address.
-	//
-	// Support:
-	// +optional
-	Port *int32 `json:"port,omitempty" protobuf:"varint,3,opt,name=port"`
-	// Protocol to use.
-	//
-	// Support:
-	// +optional
-	Protocol *string `json:"protocol,omitempty" protobuf:"bytes,4,opt,name=protocol"`
-	// TLS is the TLS configuration for the Listener. If unspecified,
-	// the listener will not support TLS connections.
+	// The GatewayClass MUST bind all Listeners to every
+	// ListenerAddress that it assigns to the Gateway.
 	//
 	// Support: Core
 	//
 	// +optional
-	TLS *TLSConfig `json:"tls,omitempty" protobuf:"bytes,5,opt,name=tls"`
-	// ExtensionRef for this Listener.  The resource may be "configmaps" or
-	// an implementation-defined resource (for example, resource
-	// "mylisteners" in group "networking.acme.io").  Omitting or specifying
-	// the empty string for both the resource and group indicates that the
-	// resource is "configmaps".  If the referent cannot be found, the
-	// listener's "InvalidListener" status condition will be true.
+	Addresses []ListenerAddress `json:"addresses" protobuf:"bytes,3,rep,name=addresses"`
+}
+
+// ProtocolType defines the application protocol accepted by a Listener.
+type ProtocolType string
+
+const (
+	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
+	HTTPProtocolType ProtocolType = "HTTP"
+
+	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
+	HTTPSProtocolType ProtocolType = "HTTPS"
+
+	// TLSProtocolType accepts TLS sessions over TCP.
+	TLSProtocolType ProtocolType = "TLS"
+
+	// TCPProtocolType accepts TCP sessions.
+	TCPProtocolType ProtocolType = "TCP"
+)
+
+// HostnameMatchType specifies the types of matches that are valid
+// for host names.
+type HostnameMatchType string
+
+const (
+	// HostnameMatchDomain specifies that the host name provided
+	// by the client should be matched against a DNS domain value.
+	// The domain match removes the leftmost DNS label from the
+	// host name provided by the client and compares the resulting
+	// value.
 	//
-	// Support: custom.
+	// For example, "example.com" is a "Domain" match for the host
+	// name "foo.example.com", but not for "foo.bar.example.com"
+	// or for "example.foo.com".
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchDomain HostnameMatchType = "Domain"
+
+	// HostnameMatchExact specifies that the host name provided
+	// by the client must exactly match the specified value.
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchExact HostnameMatchType = "Exact"
+
+	// HostnameMatchAny specifies that this Listener accepts
+	// all client traffic regardless of the presence or value of
+	// any host name supplied by the client.
+	HostnameMatchAny HostnameMatchType = "Any"
+)
+
+// HostnameMatch specifies how a Listener should match the incoming
+// host name from a client request. Depending on the incoming protocol,
+// the match must apply to names provided by the client at both the
+// TLS and the HTTP protocol layers.
+type HostnameMatch struct {
+	// Match specifies how the host name provided by the client should be
+	// matched against the given value.
+	//
 	// +optional
-	ExtensionRef *ListenerExtensionObjectReference `json:"extensionRef,omitempty" protobuf:"bytes,6,opt,name=extensionRef"`
+	// +kubebuilder:validation:Enum=Domain;Exact;Any
+	// +kubebuilder:default=Exact
+	Match HostnameMatchType `json:"match" protobuf:"bytes,1,name=match"`
+
+	// Name contains the name to match against. This value must
+	// be a fully qualified host or domain name conforming to the
+	// preferred name syntax defined in
+	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
+	//
+	// In addition to any RFC rules, this field MUST NOT contain
+	//
+	// 1. IP address literals
+	// 2. Colon-delimited port numbers
+	// 3. Percent-encoded octets
+	//
+	// This field is required for the "Domain" and "Exact" match types.
+	//
+	// +optional
+	Name string `json:"name" protobuf:"bytes,2,name=name"`
+}
+
+// Listener embodies the concept of a logical endpoint where a
+// Gateway can accept network connections.
+type Listener struct {
+	// Hostname specifies to match the virtual host name for
+	// protocol types that define this concept.
+	//
+	// Incoming requests that include a host name are matched
+	// according to the given HostnameMatchType to select
+	// the Routes from this Listener.
+	//
+	// If a match type other than "Any" is supplied, it MUST
+	// be compatible with the specified Protocol field.
+	//
+	// Support: Core
+	//
+	// +required
+	// +kubebuilder:default={match: "Any"}
+	Hostname HostnameMatch `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
+
+	// Port is the network port. Multiple listeners may use the
+	// same port, subject to the Listener compatibility rules.
+	//
+	// Support: Core
+	//
+	// +required
+	Port int32 `json:"port,omitempty" protobuf:"varint,2,opt,name=port"`
+
+	// Protocol specifies the network protocol this listener
+	// expects to receive. The GatewayClass MUST validate that
+	// match type specified in the Hostname field is appropriate
+	// for the protocol.
+	//
+	// * For the "TLS" protocol, the Hostname match MUST be
+	//   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)
+	//   server name offered by the client.
+	// * For the "HTTP" protocol, the Hostname match MUST be
+	//   applied to the host portion of the
+	//   [effective request URI](https://tools.ietf.org/html/rfc7230#section-5.5)
+	//   or the [:authority pseudo-header](https://tools.ietf.org/html/rfc7540#section-8.1.2.3)
+	// * For the "HTTPS" protocol, the Hostname match MUST be
+	//   applied at both the TLS and HTTP protocol layers.
+	//
+	// Support: Core
+	//
+	// +required
+	// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
+	Protocol ProtocolType `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol"`
+
+	// TLS is the TLS configuration for the Listener. This field
+	// is required if the Protocol field is "HTTPS" or "TLS".
+	//
+	// Support: Core
+	//
+	// +optional
+	TLS *TLSConfig `json:"tls,omitempty" protobuf:"bytes,4,opt,name=tls"`
+
+	// Routes specifies a schema for associating routes with the
+	// Listener using selectors. A Route is a resource capable of
+	// servicing a request and allows a cluster operator to expose
+	// a cluster resource (i.e. Service) by externally-reachable
+	// URL, load-balance traffic and terminate SSL/TLS.  Typically,
+	// a route is a "HTTPRoute" or "TCPRoute" in group
+	// "networking.x-k8s.io", however, an implementation may support
+	// other types of resources.
+	//
+	// The Routes selector MUST select a set of objects that
+	// are compatible with the application protocol specified in
+	// the Protocol field.
+	//
+	// Support: Core
+	//
+	// +required
+	Routes RouteBindingSelector `json:"routes" protobuf:"bytes,5,opt,name=routes"`
 }
 
 // AddressType defines how a network address is represented as a text string.
@@ -263,8 +398,12 @@ type GatewayCondition struct {
 // ListenerStatus is the status associated with each listener block.
 type ListenerStatus struct {
 	// Name is the name of the listener this status refers to.
+	// TODO(jpeach) Listeners are not indexed by a unique name any more,
+	// so this field probably doesn't make sense.
 	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
 	// Address bound on this listener.
+	// TODO(jpeach) Listeners don't have addresses anymore so this field
+	// should move to the GatewayStatus.
 	Address *ListenerAddress `json:"address" protobuf:"bytes,2,opt,name=address"`
 	// Conditions describe the current condition of this listener.
 	Conditions []ListenerCondition `json:"conditions" protobuf:"bytes,3,rep,name=conditions"`
@@ -289,6 +428,10 @@ const (
 	// ConditionNameConflict indicates that two or more Listeners with
 	// the same name were bound to this gateway.
 	ConditionNameConflict ListenerConditionType = "NameConflict"
+	// ConditionPortConflict indicates that two or more Listeners with
+	// the same port were bound to this gateway and they could not be
+	// collapsed into a single configuration.
+	ConditionPortConflict ListenerConditionType = "PortConflict"
 	// ConditionInvalidCertificateRef indicates the certificate reference of the
 	// listener's TLS configuration is invalid.
 	ConditionInvalidCertificateRef ListenerConditionType = "InvalidCertificateRef"

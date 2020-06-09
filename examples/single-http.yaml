@@ -1,0 +1,20 @@
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: gateway
+  namespace: default
+spec:
+  class: default-class
+  addresses:
+  - type: NamedAddress
+    value: auto-assign
+  listeners:
+  - hostname:
+      name: httpbin.example.com
+    port: 80
+    protocol: HTTP
+    routes:
+      namespaceSelector: {}
+      routeSelector:
+        matchLabels:
+          app: httpbin
