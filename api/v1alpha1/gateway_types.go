@@ -352,6 +352,9 @@ const (
 	// ConditionNoSuchGatewayClass indicates that the specified GatewayClass
 	// does not exist.
 	ConditionNoSuchGatewayClass GatewayConditionType = "NoSuchGatewayClass"
+	// ConditionForbiddenNamespaceForClass indicates that this Gateway is in
+	// a namespace forbidden by the GatewayClass.
+	ConditionForbiddenNamespaceForClass GatewayConditionType = "ForbiddenNamespaceForClass"
 	// ConditionGatewayNotScheduled indicates that the Gateway has not been
 	// scheduled.
 	ConditionGatewayNotScheduled GatewayConditionType = "GatewayNotScheduled"
@@ -371,6 +374,9 @@ const (
 	// ConditionInvalidRoutes indicates that at least one of the specified
 	// routes is invalid.
 	ConditionInvalidRoutes GatewayConditionType = "InvalidRoutes"
+	// ConditionForbiddenRoutesForClass indicates that at least one of the
+	// routes is in a namespace forbidden by the GatewayClass.
+	ConditionForbiddenRoutesForClass GatewayConditionType = "ForbiddenRoutesForClass"
 )
 
 // GatewayCondition is an error status for a given route.

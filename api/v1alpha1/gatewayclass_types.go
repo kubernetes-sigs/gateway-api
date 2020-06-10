@@ -73,6 +73,12 @@ type GatewayClassSpec struct {
 	// GatewayClass from any namespace. This field is intentionally not a
 	// pointer because the nil behavior (no namespaces) is undesirable here.
 	//
+	// When a Gateway attempts to use this class from a namespace that is not
+	// allowed by this selector, the controller implementing the GatewayClass
+	// may add a new "ForbiddenNamespaceForClass" condition to the Gateway
+	// status. Adding this condition is considered optional since not all
+	// controllers will have access to all namespaces.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -89,6 +95,12 @@ type GatewayClassSpec struct {
 	// that Gateways can reference Routes in any namespace. This field is
 	// intentionally a pointer to support the nil behavior (only local Routes
 	// allowed).
+	//
+	// When any Routes are selected by a Gateway in a namespace that is not
+	// allowed by this selector, the controller implementing the GatewayClass
+	// may add a new "ForbiddenRoutesForClass" condition to the Gateway status.
+	// Adding this condition is considered optional since not all controllers
+	// will have access to all namespaces.
 	//
 	// Support: Core
 	//

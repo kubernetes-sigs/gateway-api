@@ -264,6 +264,11 @@ namespaces outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
 GatewayClass from any namespace. This field is intentionally not a
 pointer because the nil behavior (no namespaces) is undesirable here.</p>
+<p>When a Gateway attempts to use this class from a namespace that is not
+allowed by this selector, the controller implementing the GatewayClass
+may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
+status. Adding this condition is considered optional since not all
+controllers will have access to all namespaces.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -288,6 +293,11 @@ reference Routes within the same namespace. An empty selector indicates
 that Gateways can reference Routes in any namespace. This field is
 intentionally a pointer to support the nil behavior (only local Routes
 allowed).</p>
+<p>When any Routes are selected by a Gateway in a namespace that is not
+allowed by this selector, the controller implementing the GatewayClass
+may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
+Adding this condition is considered optional since not all controllers
+will have access to all namespaces.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -772,6 +782,11 @@ namespaces outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
 GatewayClass from any namespace. This field is intentionally not a
 pointer because the nil behavior (no namespaces) is undesirable here.</p>
+<p>When a Gateway attempts to use this class from a namespace that is not
+allowed by this selector, the controller implementing the GatewayClass
+may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
+status. Adding this condition is considered optional since not all
+controllers will have access to all namespaces.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -796,6 +811,11 @@ reference Routes within the same namespace. An empty selector indicates
 that Gateways can reference Routes in any namespace. This field is
 intentionally a pointer to support the nil behavior (only local Routes
 allowed).</p>
+<p>When any Routes are selected by a Gateway in a namespace that is not
+allowed by this selector, the controller implementing the GatewayClass
+may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
+Adding this condition is considered optional since not all controllers
+will have access to all namespaces.</p>
 <p>Support: Core</p>
 </td>
 </tr>
