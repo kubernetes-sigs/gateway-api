@@ -369,13 +369,23 @@ spec:
                   properties:
                     lastTransitionTime:
                       description: LastTransitionTime indicates the last time this
-                        condition changed.
+                        condition changed. This should be when the underlying condition
+                        changed. If that is not known, then using the time when the
+                        API field changed is acceptable.
                       format: date-time
                       type: string
                     message:
                       description: Message is a human-understandable message describing
                         the condition. This field may be empty.
                       type: string
+                    observedGeneration:
+                      description: If set, this represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.condition[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the instance.
+                      format: int64
+                      type: integer
                     reason:
                       description: Reason indicates why the condition is in this state.
                         This field must not be empty.
@@ -427,13 +437,23 @@ spec:
                         properties:
                           lastTransitionTime:
                             description: LastTransitionTime indicates the last time
-                              this condition changed.
+                              this condition changed. This should be when the underlying
+                              condition changed. If that is not known, then using
+                              the time when the API field changed is acceptable.
                             format: date-time
                             type: string
                           message:
                             description: Message is a human-understandable message
                               describing the condition. This field may be empty.
                             type: string
+                          observedGeneration:
+                            description: If set, this represents the .metadata.generation
+                              that the condition was set based upon. For instance,
+                              if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration
+                              is 9, the condition is out of date with respect to the
+                              current state of the instance.
+                            format: int64
+                            type: integer
                           reason:
                             description: Reason indicates why the condition is in
                               this state. This field must not be empty.

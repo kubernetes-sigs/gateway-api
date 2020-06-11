@@ -382,23 +382,36 @@ const (
 // GatewayCondition is an error status for a given route.
 type GatewayCondition struct {
 	// Type indicates the type of condition.
+	//
 	// +required
 	Type GatewayConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=GatewayConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
+	//
 	// +required
 	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
 	// This field may be empty.
+	//
 	// +required
 	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
 	// This field must not be empty.
+	//
 	// +required
 	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
+	// This should be when the underlying condition changed.
+	// If that is not known, then using the time when the API field changed is acceptable.
+	//
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	// If set, this represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	//
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
 }
 
 // ListenerStatus is the status associated with each listener block.
@@ -446,23 +459,36 @@ const (
 // ListenerCondition is an error status for a given listener.
 type ListenerCondition struct {
 	// Type indicates the type of condition.
+	//
 	// +required
 	Type ListenerConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=ListenerConditionType"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
+	//
 	// +required
 	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
 	// Message is a human-understandable message describing the condition.
 	// This field may be empty.
+	//
 	// +required
 	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
 	// Reason indicates why the condition is in this state.
 	// This field must not be empty.
+	//
 	// +required
 	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
 	// LastTransitionTime indicates the last time this condition changed.
+	// This should be when the underlying condition changed.
+	// If that is not known, then using the time when the API field changed is acceptable.
+	//
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	// If set, this represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	//
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
 }
 
 func init() {

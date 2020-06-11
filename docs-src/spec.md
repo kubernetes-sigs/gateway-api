@@ -714,7 +714,23 @@ Kubernetes meta/v1.Time
 </em>
 </td>
 <td>
-<p>LastTransitionTime is the time of the last change to this condition.</p>
+<p>LastTransitionTime is the time of the last change to this condition.
+This should be when the underlying condition changed.
+If that is not known, then using the time when the API field changed is acceptable.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code></br>
+<em>
+int64
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>If set, this represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.</p>
 </td>
 </tr>
 </tbody>
@@ -958,7 +974,23 @@ Kubernetes meta/v1.Time
 </em>
 </td>
 <td>
-<p>LastTransitionTime indicates the last time this condition changed.</p>
+<p>LastTransitionTime indicates the last time this condition changed.
+This should be when the underlying condition changed.
+If that is not known, then using the time when the API field changed is acceptable.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code></br>
+<em>
+int64
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>If set, this represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.</p>
 </td>
 </tr>
 </tbody>
@@ -2056,7 +2088,23 @@ Kubernetes meta/v1.Time
 </em>
 </td>
 <td>
-<p>LastTransitionTime indicates the last time this condition changed.</p>
+<p>LastTransitionTime indicates the last time this condition changed.
+This should be when the underlying condition changed.
+If that is not known, then using the time when the API field changed is acceptable.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>observedGeneration</code></br>
+<em>
+int64
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>If set, this represents the .metadata.generation that the condition was set based upon.
+For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+with respect to the current state of the instance.</p>
 </td>
 </tr>
 </tbody>
