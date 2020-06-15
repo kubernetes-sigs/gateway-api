@@ -142,9 +142,6 @@ const (
 	GatewayClassConditionStatusInvalidParameters GatewayClassConditionType = "InvalidParameters"
 )
 
-// GatewayClassConditionStatus is the status for a condition.
-type GatewayClassConditionStatus = core.ConditionStatus
-
 // GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
@@ -160,12 +157,13 @@ type GatewayClassStatus struct {
 // Support: Core, unless otherwise specified.
 type GatewayClassCondition struct {
 	// Type of this condition.
+	//
 	// +required
 	Type GatewayClassConditionType `json:"type" protobuf:"bytes,1,opt,name=type"`
 	// Status of this condition.
+	//
 	// +required
-	Status GatewayClassConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
-
+	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
 	// Reason is a machine consumable string for the last
 	// transition. It should be a one-word, CamelCase
 	// string. Reason will be defined by the controller.
@@ -181,9 +179,17 @@ type GatewayClassCondition struct {
 	// +required
 	Message string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
 	// LastTransitionTime is the time of the last change to this condition.
+	// This should be when the underlying condition changed.
+	// If that is not known, then using the time when the API field changed is acceptable.
 	//
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	// If set, this represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	//
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
 }
 
 // +kubebuilder:object:root=true

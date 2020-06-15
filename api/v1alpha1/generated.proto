@@ -132,10 +132,12 @@ message GatewayClass {
 // Support: Core, unless otherwise specified.
 message GatewayClassCondition {
   // Type of this condition.
+  //
   // +required
   optional string type = 1;
 
   // Status of this condition.
+  //
   // +required
   optional string status = 2;
 
@@ -156,9 +158,18 @@ message GatewayClassCondition {
   optional string message = 4;
 
   // LastTransitionTime is the time of the last change to this condition.
+  // This should be when the underlying condition changed.
+  // If that is not known, then using the time when the API field changed is acceptable.
   //
   // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
+
+  // If set, this represents the .metadata.generation that the condition was set based upon.
+  // For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+  // with respect to the current state of the instance.
+  //
+  // +optional
+  optional int64 observedGeneration = 6;
 }
 
 // GatewayClassList contains a list of GatewayClass
@@ -264,27 +275,41 @@ message GatewayClassStatus {
 // GatewayCondition is an error status for a given route.
 message GatewayCondition {
   // Type indicates the type of condition.
+  //
   // +required
   optional string type = 1;
 
   // Status describes the current state of this condition. Can be "True",
   // "False", or "Unknown".
+  //
   // +required
   optional string status = 2;
 
   // Message is a human-understandable message describing the condition.
   // This field may be empty.
+  //
   // +required
   optional string message = 3;
 
   // Reason indicates why the condition is in this state.
   // This field must not be empty.
+  //
   // +required
   optional string reason = 4;
 
   // LastTransitionTime indicates the last time this condition changed.
+  // This should be when the underlying condition changed.
+  // If that is not known, then using the time when the API field changed is acceptable.
+  //
   // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
+
+  // If set, this represents the .metadata.generation that the condition was set based upon.
+  // For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+  // with respect to the current state of the instance.
+  //
+  // +optional
+  optional int64 observedGeneration = 6;
 }
 
 // GatewayList contains a list of Gateway
@@ -738,27 +763,41 @@ message ListenerAddress {
 // ListenerCondition is an error status for a given listener.
 message ListenerCondition {
   // Type indicates the type of condition.
+  //
   // +required
   optional string type = 1;
 
   // Status describes the current state of this condition. Can be "True",
   // "False", or "Unknown".
+  //
   // +required
   optional string status = 2;
 
   // Message is a human-understandable message describing the condition.
   // This field may be empty.
+  //
   // +required
   optional string message = 3;
 
   // Reason indicates why the condition is in this state.
   // This field must not be empty.
+  //
   // +required
   optional string reason = 4;
 
   // LastTransitionTime indicates the last time this condition changed.
+  // This should be when the underlying condition changed.
+  // If that is not known, then using the time when the API field changed is acceptable.
+  //
   // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
+
+  // If set, this represents the .metadata.generation that the condition was set based upon.
+  // For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+  // with respect to the current state of the instance.
+  //
+  // +optional
+  optional int64 observedGeneration = 6;
 }
 
 // ListenerStatus is the status associated with each listener block.
