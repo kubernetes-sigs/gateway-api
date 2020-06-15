@@ -339,6 +339,8 @@
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClass">GatewayClass</a>
 </li><li>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>
+</li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute</a>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>
@@ -665,6 +667,108 @@ GatewayClassStatus
 </td>
 <td>
 <p>Status of the GatewayClass.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute
+</h3>
+<p>
+<p>HTTPRoute is the Schema for the httproutes API</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>HTTPRoute</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">
+HTTPRouteSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>hosts</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
+[]HTTPRouteHost
+</a>
+</em>
+</td>
+<td>
+<p>Hosts is a list of Host definitions.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>default</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
+HTTPRouteHost
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Default is the default host to use. Default.Hostnames must
+be an empty list.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">
+HTTPRouteStatus
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -1546,91 +1650,6 @@ remove: [&ldquo;my-header1&rdquo;, &ldquo;my-header3&rdquo;]</p>
 GET /foo HTTP/1.1
 My-Header2: DEF</p>
 <p>Support: extended?</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute
-</h3>
-<p>
-<p>HTTPRoute is the Schema for the httproutes API</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>metadata</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">
-HTTPRouteSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-<tr>
-<td>
-<code>hosts</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-[]HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<p>Hosts is a list of Host definitions.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>default</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Default is the default host to use. Default.Hostnames must
-be an empty list.</p>
-</td>
-</tr>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">
-HTTPRouteStatus
-</a>
-</em>
-</td>
-<td>
 </td>
 </tr>
 </tbody>

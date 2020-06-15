@@ -35,7 +35,6 @@ type TrafficSplitStatus struct {
 }
 
 // +genclient
-// +genclient:Namespaced
 // +kubebuilder:object:root=true
 
 // TrafficSplit is the Schema for the trafficsplits API

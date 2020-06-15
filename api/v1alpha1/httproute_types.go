@@ -304,6 +304,7 @@ type GatewayObjectReference struct {
 	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
 }
 
+// +genclient
 // +kubebuilder:object:root=true
 
 // HTTPRoute is the Schema for the httproutes API
@@ -315,8 +316,6 @@ type HTTPRoute struct {
 	Status HTTPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
-// +genclient
-// +genclient:Namespaced
 // +kubebuilder:object:root=true
 
 // HTTPRouteList contains a list of HTTPRoute
