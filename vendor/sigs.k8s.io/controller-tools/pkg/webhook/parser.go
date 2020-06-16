@@ -19,7 +19,7 @@ limitations under the License.
 //
 // The markers take the form:
 //
-//  +kubebuilder:webhook:failurePolicy=<string>,groups=<[]string>,resources=<[]string>,verbs=<[]string>,versions=<[]string>,name=<string>,path=<string>,mutating=<bool>
+//  +kubebuilder:webhook:failurePolicy=<string>,matchPolicy=<string>,groups=<[]string>,resources=<[]string>,verbs=<[]string>,versions=<[]string>,name=<string>,path=<string>,mutating=<bool>,sideEffects=<string>
 package webhook
 
 import (
@@ -57,6 +57,17 @@ type Config struct {
 	// It may be either "ignore" (to skip the webhook and continue on) or "fail" (to reject
 	// the object in question).
 	FailurePolicy string
+	// MatchPolicy defines how the "rules" list is used to match incoming requests.
+	// Allowed values are "Exact" (match only if it exactly matches the specified rule)
+	// or "Equivalent" (match a request if it modifies a resource listed in rules, even via another API group or version).
+	MatchPolicy string `marker:",optional"`
+	// SideEffects specify whether calling the webhook will have side effects.
+	// This has an impact on dry runs and `kubectl diff`: if the sideEffect is "Unknown" (the default) or "Some", then
+	// the API server will not call the webhook on a dry-run request and fails instead.
+	// If the value is "None", then the webhook has no side effects and the API server will call it on dry-run.
+	// If the value is "NoneOnDryRun", then the webhook is responsible for inspecting the "dryRun" property of the
+	// AdmissionReview sent in the request, and avoiding side effects if that value is "true."
+	SideEffects string `marker:",optional"`
 
 	// Groups specifies the API groups that this webhook receives requests for.
 	Groups []string
@@ -70,9 +81,15 @@ type Config struct {
 	// Versions specifies the API versions that this webhook receives requests for.
 	Versions []string
 
-	// Name indicates the name of this webhook configuration.
+	// Name indicates the name of this webhook configuration. Should be a domain with at least three segments separated by dots
 	Name string
-	// Path specifies that path that the API server should connect to this webhook on.
+
+	// Path specifies that path that the API server should connect to this webhook on. Must be
+	// prefixed with a '/validate-' or '/mutate-' depending on the type, and followed by
+	// $GROUP-$VERSION-$KIND where all values are lower-cased and the periods in the group
+	// are substituted for hyphens. For example, a validating webhook path for type
+	// batch.tutorial.kubebuilder.io/v1,Kind=CronJob would be
+	// /validate-batch-tutorial-kubebuilder-io-v1-cronjob
 	Path string
 }
 
@@ -101,11 +118,18 @@ func (c Config) ToMutatingWebhook() (admissionreg.MutatingWebhook, error) {
 		return admissionreg.MutatingWebhook{}, fmt.Errorf("%s is a validating webhook", c.Name)
 	}
 
+	matchPolicy, err := c.matchPolicy()
+	if err != nil {
+		return admissionreg.MutatingWebhook{}, err
+	}
+
 	return admissionreg.MutatingWebhook{
 		Name:          c.Name,
 		Rules:         c.rules(),
 		FailurePolicy: c.failurePolicy(),
+		MatchPolicy:   matchPolicy,
 		ClientConfig:  c.clientConfig(),
+		SideEffects:   c.sideEffects(),
 	}, nil
 }
 
@@ -115,11 +139,18 @@ func (c Config) ToValidatingWebhook() (admissionreg.ValidatingWebhook, error) {
 		return admissionreg.ValidatingWebhook{}, fmt.Errorf("%s is a mutating webhook", c.Name)
 	}
 
+	matchPolicy, err := c.matchPolicy()
+	if err != nil {
+		return admissionreg.ValidatingWebhook{}, err
+	}
+
 	return admissionreg.ValidatingWebhook{
 		Name:          c.Name,
 		Rules:         c.rules(),
 		FailurePolicy: c.failurePolicy(),
+		MatchPolicy:   matchPolicy,
 		ClientConfig:  c.clientConfig(),
+		SideEffects:   c.sideEffects(),
 	}, nil
 }
 
@@ -164,6 +195,22 @@ func (c Config) failurePolicy() *admissionreg.FailurePolicyType {
 	return &failurePolicy
 }
 
+// matchPolicy converts the string value to the proper value for the API.
+func (c Config) matchPolicy() (*admissionreg.MatchPolicyType, error) {
+	var matchPolicy admissionreg.MatchPolicyType
+	switch strings.ToLower(c.MatchPolicy) {
+	case strings.ToLower(string(admissionreg.Exact)):
+		matchPolicy = admissionreg.Exact
+	case strings.ToLower(string(admissionreg.Equivalent)):
+		matchPolicy = admissionreg.Equivalent
+	case "":
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("unknown value %q for matchPolicy", c.MatchPolicy)
+	}
+	return &matchPolicy, nil
+}
+
 // clientConfig returns the client config for a webhook.
 func (c Config) clientConfig() admissionreg.WebhookClientConfig {
 	path := c.Path
@@ -178,6 +225,24 @@ func (c Config) clientConfig() admissionreg.WebhookClientConfig {
 		// Put "\n" as an placeholder as a workaround til 1.13+ is almost everywhere.
 		CABundle: []byte("\n"),
 	}
+}
+
+// sideEffects returns the sideEffects config for a webhook.
+func (c Config) sideEffects() *admissionreg.SideEffectClass {
+	var sideEffects admissionreg.SideEffectClass
+	switch strings.ToLower(c.SideEffects) {
+	case strings.ToLower(string(admissionreg.SideEffectClassNone)):
+		sideEffects = admissionreg.SideEffectClassNone
+	case strings.ToLower(string(admissionreg.SideEffectClassNoneOnDryRun)):
+		sideEffects = admissionreg.SideEffectClassNoneOnDryRun
+	case strings.ToLower(string(admissionreg.SideEffectClassSome)):
+		sideEffects = admissionreg.SideEffectClassSome
+	case "":
+		return nil
+	default:
+		return nil
+	}
+	return &sideEffects
 }
 
 // +controllertools:marker:generateHelp
@@ -242,8 +307,8 @@ func (Generator) Generate(ctx *genall.GenerationContext) error {
 
 	}
 
-	if err := ctx.WriteYAML("manifests.yaml", objs...); err != nil {
-		return err
+	if len(objs) > 0 {
+		return ctx.WriteYAML("manifests.yaml", objs...)
 	}
 
 	return nil
