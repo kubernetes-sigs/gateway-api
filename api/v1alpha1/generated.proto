@@ -107,6 +107,24 @@ message Gateway {
   optional GatewayStatus status = 4;
 }
 
+// GatewayAddress describes an address that can be bound to a Gateway.
+message GatewayAddress {
+  // Type of the Address. This is either "IPAddress" or "NamedAddress".
+  //
+  // Support: Extended
+  //
+  // +optional
+  // +kubebuilder:validation:Enum=IPAddress;NamedAddress
+  // +kubebuilder:default=IPAddress
+  optional string type = 1;
+
+  // Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
+  // values will depend on `Type` and support by the controller.
+  //
+  // +required
+  optional string value = 2;
+}
+
 // GatewayClass describes a class of Gateways available to the user
 // for creating Gateway resources.
 //
@@ -387,24 +405,33 @@ message GatewaySpec {
   // assigning an appropriate set of ListenerAddresses.
   //
   // The GatewayClass MUST bind all Listeners to every
-  // ListenerAddress that it assigns to the Gateway.
+  // GatewayAddress that it assigns to the Gateway.
   //
   // Support: Core
   //
   // +optional
-  repeated ListenerAddress addresses = 3;
+  repeated GatewayAddress addresses = 3;
 }
 
 // GatewayStatus defines the observed state of Gateway.
 message GatewayStatus {
+  // Addresses lists the IP addresses that have actually been
+  // bound to the Gateway. These addresses may differ from the
+  // addresses in the Spec, e.g. if the Gateway automatically
+  // assigns an address from a reserved pool.
+  //
+  // These addresses should all be of type "IPAddress".
+  //
+  // +required
+  repeated GatewayAddress addresses = 1;
+
   // Conditions describe the current conditions of the Gateway.
   // +optional
-  repeated GatewayCondition conditions = 1;
+  repeated GatewayCondition conditions = 2;
 
-  // Listeners provide status for each listener defined in the Spec. The name
-  // in ListenerStatus refers to the corresponding Listener of the same name.
+  // Listeners provides status for each unique listener port defined in the Spec.
   // +optional
-  repeated ListenerStatus listeners = 2;
+  repeated ListenerStatus listeners = 3;
 }
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
@@ -708,6 +735,10 @@ message Listener {
   // Support: Core
   //
   // +required
+  // +kubebuilder:validation:Minimum=0
+  // +kubebuilder:validation:Maximum=65536
+  // +kubebuilder:validation:ExclusiveMinimum=true
+  // +kubebuilder:validation:ExclusiveMaximum=true
   optional int32 port = 2;
 
   // Protocol specifies the network protocol this listener
@@ -758,18 +789,6 @@ message Listener {
   optional RouteBindingSelector routes = 5;
 }
 
-// ListenerAddress describes an address for the Listener.
-message ListenerAddress {
-  // Type of the Address. This is one of the *AddressType constants.
-  //
-  // Support: Extended
-  optional string type = 1;
-
-  // Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
-  // values will depend on `Type` and support by the controller.
-  optional string value = 2;
-}
-
 // ListenerCondition is an error status for a given listener.
 message ListenerCondition {
   // Type indicates the type of condition.
@@ -810,19 +829,19 @@ message ListenerCondition {
   optional int64 observedGeneration = 6;
 }
 
-// ListenerStatus is the status associated with each listener block.
+// ListenerStatus is the status associated with a Listener port.
 message ListenerStatus {
-  // Name is the name of the listener this status refers to.
-  // TODO(jpeach) Listeners are not indexed by a unique name any more,
-  // so this field probably doesn't make sense.
-  optional string name = 1;
-
-  // Address bound on this listener.
-  // TODO(jpeach) Listeners don't have addresses anymore so this field
-  // should move to the GatewayStatus.
-  optional ListenerAddress address = 2;
+  // Port is the unique Listener port value for which this message
+  // is reporting the status. If more than one Gateway Listener
+  // shares the same port value, this message reports the combined
+  // status of all such Listeners.
+  //
+  // +required
+  optional string port = 1;
 
   // Conditions describe the current condition of this listener.
+  //
+  // +required
   repeated ListenerCondition conditions = 3;
 }
 

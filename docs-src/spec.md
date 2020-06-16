@@ -131,8 +131,8 @@ a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
 <td>
 <code>addresses</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
-[]ListenerAddress
+<a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">
+[]GatewayAddress
 </a>
 </em>
 </td>
@@ -147,7 +147,7 @@ GatewayStatus.Listeners.</p>
 schedule the Gateway in an implementation-defined manner,
 assigning an appropriate set of ListenerAddresses.</p>
 <p>The GatewayClass MUST bind all Listeners to every
-ListenerAddress that it assigns to the Gateway.</p>
+GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -592,7 +592,7 @@ TrafficSplitStatus
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">ListenerAddress</a>)
+<a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress</a>)
 </p>
 <p>
 <p>AddressType defines how a network address is represented as a text string.</p>
@@ -724,6 +724,53 @@ port definition, that port will be used. If unspecified and TargetRef is
 a Service object consisting of multiple port definitions, an error is
 surfaced in status.</p>
 <p>Support: Core</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">GatewayStatus</a>)
+</p>
+<p>
+<p>GatewayAddress describes an address that can be bound to a Gateway.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.AddressType">
+AddressType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Type of the Address. This is either &ldquo;IPAddress&rdquo; or &ldquo;NamedAddress&rdquo;.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>value</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Value. Examples: &ldquo;1.2.3.4&rdquo;, &ldquo;128::1&rdquo;, &ldquo;my-ip-address&rdquo;. Validity of the
+values will depend on <code>Type</code> and support by the controller.</p>
 </td>
 </tr>
 </tbody>
@@ -1211,8 +1258,8 @@ a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
 <td>
 <code>addresses</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
-[]ListenerAddress
+<a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">
+[]GatewayAddress
 </a>
 </em>
 </td>
@@ -1227,7 +1274,7 @@ GatewayStatus.Listeners.</p>
 schedule the Gateway in an implementation-defined manner,
 assigning an appropriate set of ListenerAddresses.</p>
 <p>The GatewayClass MUST bind all Listeners to every
-ListenerAddress that it assigns to the Gateway.</p>
+GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1250,6 +1297,23 @@ ListenerAddress that it assigns to the Gateway.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>addresses</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">
+[]GatewayAddress
+</a>
+</em>
+</td>
+<td>
+<p>Addresses lists the IP addresses that have actually been
+bound to the Gateway. These addresses may differ from the
+addresses in the Spec, e.g. if the Gateway automatically
+assigns an address from a reserved pool.</p>
+<p>These addresses should all be of type &ldquo;IPAddress&rdquo;.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>conditions</code></br>
@@ -1275,8 +1339,7 @@ ListenerAddress that it assigns to the Gateway.</p>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Listeners provide status for each listener defined in the Spec. The name
-in ListenerStatus refers to the corresponding Listener of the same name.</p>
+<p>Listeners provides status for each unique listener port defined in the Spec.</p>
 </td>
 </tr>
 </tbody>
@@ -1982,52 +2045,6 @@ the Protocol field.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.ListenerAddress">ListenerAddress
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>)
-</p>
-<p>
-<p>ListenerAddress describes an address for the Listener.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.AddressType">
-AddressType
-</a>
-</em>
-</td>
-<td>
-<p>Type of the Address. This is one of the *AddressType constants.</p>
-<p>Support: Extended</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>value</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Value. Examples: &ldquo;1.2.3.4&rdquo;, &ldquo;128::1&rdquo;, &ldquo;my-ip-address&rdquo;. Validity of the
-values will depend on <code>Type</code> and support by the controller.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerCondition">ListenerCondition
 </h3>
 <p>
@@ -2143,7 +2160,7 @@ with respect to the current state of the instance.</p>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">GatewayStatus</a>)
 </p>
 <p>
-<p>ListenerStatus is the status associated with each listener block.</p>
+<p>ListenerStatus is the status associated with a Listener port.</p>
 </p>
 <table>
 <thead>
@@ -2155,30 +2172,16 @@ with respect to the current state of the instance.</p>
 <tbody>
 <tr>
 <td>
-<code>name</code></br>
+<code>port</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Name is the name of the listener this status refers to.
-TODO(jpeach) Listeners are not indexed by a unique name any more,
-so this field probably doesn&rsquo;t make sense.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>address</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerAddress">
-ListenerAddress
-</a>
-</em>
-</td>
-<td>
-<p>Address bound on this listener.
-TODO(jpeach) Listeners don&rsquo;t have addresses anymore so this field
-should move to the GatewayStatus.</p>
+<p>Port is the unique Listener port value for which this message
+is reporting the status. If more than one Gateway Listener
+shares the same port value, this message reports the combined
+status of all such Listeners.</p>
 </td>
 </tr>
 <tr>
