@@ -333,16 +333,21 @@ spec:
                               - name
                               - resource
                               type: object
-                            header:
+                            headerMatchType:
+                              description: "HeaderMatchType defines the semantics
+                                of the `Header` matcher. \n Support: core (Exact)
+                                Support: custom (ImplementationSpecific) \n Default:
+                                \"Exact\""
+                              type: string
+                            headers:
                               additionalProperties:
                                 type: string
-                              description: Header are the Header matches as interpreted
-                                via HeaderType.
+                              description: Headers are the HTTP Headers to match as
+                                interpreted via HeaderMatchType. Multiple headers
+                                are ANDed together, meaning, a request must contain
+                                all the headers specified in order to select this
+                                route.
                               type: object
-                            headerType:
-                              description: HeaderType defines the semantics of the
-                                `Header` matcher.
-                              type: string
                             path:
                               description: "Path is the value of the HTTP path as
                                 interpreted via PathType. \n Default: \"/\""
@@ -662,16 +667,21 @@ spec:
                                 - name
                                 - resource
                                 type: object
-                              header:
+                              headerMatchType:
+                                description: "HeaderMatchType defines the semantics
+                                  of the `Header` matcher. \n Support: core (Exact)
+                                  Support: custom (ImplementationSpecific) \n Default:
+                                  \"Exact\""
+                                type: string
+                              headers:
                                 additionalProperties:
                                   type: string
-                                description: Header are the Header matches as interpreted
-                                  via HeaderType.
+                                description: Headers are the HTTP Headers to match
+                                  as interpreted via HeaderMatchType. Multiple headers
+                                  are ANDed together, meaning, a request must contain
+                                  all the headers specified in order to select this
+                                  route.
                                 type: object
-                              headerType:
-                                description: HeaderType defines the semantics of the
-                                  `Header` matcher.
-                                type: string
                               path:
                                 description: "Path is the value of the HTTP path as
                                   interpreted via PathType. \n Default: \"/\""

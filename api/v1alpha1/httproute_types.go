@@ -91,9 +91,13 @@ const (
 	PathTypeImplementionSpecific = "ImplementationSpecific"
 )
 
-// HeaderType constants.
+// HeaderMatchType constants.
 const (
-	HeaderTypeExact = "Exact"
+	// HeaderMatchTypeExact matches HTTP request-header fields.
+	// Field names matches are case-insensitive while field values matches
+	// are case-sensitive.
+	HeaderMatchTypeExact                = "Exact"
+	HeaderMatchTypeImplementionSpecific = "ImplementationSpecific"
 )
 
 // HTTPRouteMatch defines the predicate used to match requests to a
@@ -115,15 +119,21 @@ type HTTPRouteMatch struct {
 	// Default: "/"
 	Path *string `json:"path" protobuf:"bytes,2,opt,name=path"`
 
-	// HeaderType defines the semantics of the `Header` matcher.
+	// HeaderMatchType defines the semantics of the `Header` matcher.
+	//
+	// Support: core (Exact)
+	// Support: custom (ImplementationSpecific)
+	//
+	// Default: "Exact"
 	//
 	// +optional
-	HeaderType *string `json:"headerType" protobuf:"bytes,3,opt,name=headerType"`
-	// Header are the Header matches as interpreted via
-	// HeaderType.
+	HeaderMatchType *string `json:"headerMatchType" protobuf:"bytes,3,opt,name=headerMatchType"`
+	// Headers are the HTTP Headers to match as interpreted via
+	// HeaderMatchType. Multiple headers are ANDed together, meaning, a request
+	// must contain all the headers specified in order to select this route.
 	//
 	// +optional
-	Header map[string]string `json:"header" protobuf:"bytes,4,rep,name=header"`
+	Headers map[string]string `json:"headers" protobuf:"bytes,4,rep,name=headers"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty

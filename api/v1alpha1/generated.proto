@@ -585,16 +585,22 @@ message HTTPRouteMatch {
   // Default: "/"
   optional string path = 2;
 
-  // HeaderType defines the semantics of the `Header` matcher.
+  // HeaderMatchType defines the semantics of the `Header` matcher.
+  //
+  // Support: core (Exact)
+  // Support: custom (ImplementationSpecific)
+  //
+  // Default: "Exact"
   //
   // +optional
-  optional string headerType = 3;
+  optional string headerMatchType = 3;
 
-  // Header are the Header matches as interpreted via
-  // HeaderType.
+  // Headers are the HTTP Headers to match as interpreted via
+  // HeaderMatchType. Multiple headers are ANDed together, meaning, a request
+  // must contain all the headers specified in order to select this route.
   //
   // +optional
-  map<string, string> header = 4;
+  map<string, string> headers = 4;
 
   // ExtensionRef is an optional, implementation-specific extension to the
   // "match" behavior.  The resource may be "configmap" (use the empty
