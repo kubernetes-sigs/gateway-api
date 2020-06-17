@@ -322,8 +322,28 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#extensibility" class="md-nav__link">
-    Extensibility
+  <a href="#conformance" class="md-nav__link">
+    Conformance
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conformance-expectations" class="md-nav__link">
+    Conformance expectations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    Extension points
   </a>
   
 </li>
@@ -648,8 +668,28 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#extensibility" class="md-nav__link">
-    Extensibility
+  <a href="#conformance" class="md-nav__link">
+    Conformance
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conformance-expectations" class="md-nav__link">
+    Conformance expectations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#extension-points" class="md-nav__link">
+    Extension points
   </a>
   
 </li>
@@ -837,7 +877,7 @@ responsibility and separation.</p>
 For example, giving the user all the above roles replicates the self-service
 model.</p>
 <p>For more information on the roles and personas considered in the Service API
-design, refer to the <a href="../security-model/">Security Model</a>. </p>
+design, refer to the <a href="../security-model/">Security Model</a>.</p>
 <h2 id="resource-model">Resource model</h2>
 <blockquote>
 <p>Note: Resources will initially live in the <code>networking.x-k8s.io</code> API group as
@@ -845,7 +885,7 @@ Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
 be in this API group.</p>
 </blockquote>
 <p>There are three main types of objects in our resource model:</p>
-<p><em>GatewayClass</em> defines a set of gateways with a common configuration and behavior. </p>
+<p><em>GatewayClass</em> defines a set of gateways with a common configuration and behavior.</p>
 <p><em>Gateway</em> requests a point where traffic can be translated to Services within the cluster.</p>
 <p><em>Routes</em> describe how traffic coming via the Gateway maps to the Services.</p>
 <h3 id="gatewayclass">GatewayClass</h3>
@@ -860,7 +900,7 @@ In Ingress v1beta1, the closest analog to GatewayClass is the <code>ingress-clas
 <p>A Gateway describes how traffic can be translated to Services within the cluster.
 That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
 For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
-While many use cases have client traffic originating “outside” the cluster, this is not a requirement. </p>
+While many use cases have client traffic originating “outside” the cluster, this is not a requirement.</p>
 <p>It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
 The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.</p>
 <p>As the Gateway spec captures user intent, it may not contain a complete specification for all attributes in the spec.
@@ -933,7 +973,45 @@ handling this:</p>
 <ul>
 <li>TODO</li>
 </ul>
-<h3 id="extensibility">Extensibility</h3>
+<h3 id="conformance">Conformance</h3>
+<p>As this API aims to cover a wide set of implementations and use cases,
+it will not be possible for all implementations to support <em>all</em>
+features at the present. However, we do expect the set of features
+supported to converge eventually. For a given feature, users will be
+guaranteed that features in the API will be portable between providers
+if the feature is supported.</p>
+<p>To model this in the API, we are taking a similar approach as with
+<a href="https://github.com/kubernetes/enhancements/tree/master/keps/sig-architecture/960-conformance-behaviors">sig-arch</a> work on conformance profiles. Features as
+described in the API spec will be divided into three major categories:</p>
+<ul>
+<li><strong>CORE</strong> features will be portable and we expect that there is a
+  reasonable roadmap for ALL implementations towards support of APIs
+  in this category.</li>
+<li><strong>EXTENDED</strong> features are those that are portable but not
+  universally supported across implementations. Those implementations
+  that support the feature will have the same behavior and
+  semantics. It is expected that some number of EXTENDED features will
+  eventually migrate into the CORE. EXTENDED features will be part of
+  the API types and schema.</li>
+<li><strong>CUSTOM</strong> features are those that are not portable and are
+  vendor-specific. CUSTOM features will not have API types and schema
+  except via generic extension points.</li>
+</ul>
+<p>Behavior and feature in the CORE and EXTENDED set will be defined and
+validated via behavior-driven conformance tests. CUSTOM features will
+not be covered by conformance tests.</p>
+<p>By including and standardizing EXTENDED features in the API spec, we
+expect to be able to converge on portable subsets of the API among
+implementations without compromising overall API support. Lack of
+universal support will not be a blocker towards developing portable
+feature sets. Standardizing on spec will make it easier to eventually
+graduate to CORE when support is widespread.</p>
+<h4 id="conformance-expectations">Conformance expectations</h4>
+<p>We expect there will be varying levels of conformance among the
+different providers in the early days of this API. Users can use the
+results of the conformance tests to understand areas where there may
+be differences in behavior from the spec.</p>
+<h3 id="extension-points">Extension points</h3>
 <p>TODO</p>
 <h2 id="gatewayclass_1">GatewayClass</h2>
 <p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/api/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
