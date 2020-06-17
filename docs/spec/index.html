@@ -1932,27 +1932,31 @@ PathType.</p>
 </tr>
 <tr>
 <td>
-<code>headerType</code></br>
+<code>headerMatchType</code></br>
 <em>
 string
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>HeaderType defines the semantics of the <code>Header</code> matcher.</p>
+<p>HeaderMatchType defines the semantics of the <code>Header</code> matcher.</p>
+<p>Support: core (Exact)
+Support: custom (ImplementationSpecific)</p>
+<p>Default: &ldquo;Exact&rdquo;</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>header</code></br>
+<code>headers</code></br>
 <em>
 map[string]string
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Header are the Header matches as interpreted via
-HeaderType.</p>
+<p>Headers are the HTTP Headers to match as interpreted via
+HeaderMatchType. Multiple headers are ANDed together, meaning, a request
+must contain all the headers specified in order to select this route.</p>
 </td>
 </tr>
 <tr>

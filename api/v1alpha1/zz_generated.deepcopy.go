@@ -500,13 +500,13 @@ func (in *HTTPRouteMatch) DeepCopyInto(out *HTTPRouteMatch) {
 		*out = new(string)
 		**out = **in
 	}
-	if in.HeaderType != nil {
-		in, out := &in.HeaderType, &out.HeaderType
+	if in.HeaderMatchType != nil {
+		in, out := &in.HeaderMatchType, &out.HeaderMatchType
 		*out = new(string)
 		**out = **in
 	}
-	if in.Header != nil {
-		in, out := &in.Header, &out.Header
+	if in.Headers != nil {
+		in, out := &in.Headers, &out.Headers
 		*out = make(map[string]string, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
