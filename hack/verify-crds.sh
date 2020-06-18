@@ -39,7 +39,7 @@ cleanup
 mkdir -p "${TMP_DIFFROOT}"
 cp -a "${DIFFROOT}"/* "${TMP_DIFFROOT}"
 
-GOFLAGS=-mod=vendor ${CONTROLLER_GEN} ${CRD_OPTIONS} rbac:roleName=manager-role webhook \
+${CONTROLLER_GEN} ${CRD_OPTIONS} rbac:roleName=manager-role webhook \
 paths="./..." output:crd:artifacts:config=${TMP_DIFFROOT}
 
 echo "diffing ${DIFFROOT} against freshly generated codegen in ${TMP_DIFFROOT}"
