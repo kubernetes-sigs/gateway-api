@@ -32,7 +32,7 @@ ROOT := $(abspath $(TOP))
 # enable Go modules
 export GO111MODULE=on
 
-CONTROLLER_GEN=GOFLAGS=-mod=vendor go run sigs.k8s.io/controller-tools/cmd/controller-gen
+CONTROLLER_GEN=go run sigs.k8s.io/controller-tools/cmd/controller-gen
 
 all: manager
 
