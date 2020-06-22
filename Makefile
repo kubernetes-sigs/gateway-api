@@ -59,6 +59,7 @@ proto:
 verify-proto:
 	$(DOCKER) run \
 		--mount type=bind,source=$(ROOT),target=/realgo/src/sigs.k8s.io/service-apis \
+		--mount type=bind,source=$(GOPATH)/pkg/mod,target=/go/pkg/mod  \
 		--env GOPATH=/go \
 		--env GOCACHE=/go/.cache \
 		--rm \
