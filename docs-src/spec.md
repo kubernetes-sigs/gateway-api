@@ -1486,7 +1486,7 @@ that includes the HTTPRoute will be true.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
 </p>
 <p>
-<p>HTTPRouteHost is the configuration for a given host.</p>
+<p>HTTPRouteHost is the configuration for a given set of hosts.</p>
 </p>
 <table>
 <thead>
@@ -1498,26 +1498,37 @@ that includes the HTTPRoute will be true.</p>
 <tbody>
 <tr>
 <td>
-<code>hostname</code></br>
+<code>hostnames</code></br>
 <em>
-string
+[]string
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Hostname is the fully qualified domain name of a network host,
+<p>Hostnames defines a set of hostname that should match against
+the HTTP Host header to select a HTTPRoute to process a the request.
+Hostname is the fully qualified domain name of a network host,
 as defined by RFC 3986. Note the following deviations from the
 &ldquo;host&rdquo; part of the URI as defined in the RFC:</p>
 <ol>
 <li>IPs are not allowed.</li>
 <li>The <code>:</code> delimiter is not respected because ports are not allowed.</li>
 </ol>
-<p>Incoming requests are matched against Hostname before processing HTTPRoute
-rules. For example, if the request header contains host: foo.example.com,
-an HTTPRoute with hostname foo.example.com will match. However, an
-HTTPRoute with hostname example.com or bar.example.com will not match.
-If Hostname is unspecified, the Gateway routes all traffic based on
-the specified rules.</p>
+<p>Incoming requests are matched against the hostnames before the
+HTTPRoute rules. If no hostname is specified, traffic is routed
+based on the HTTPRouteRules.</p>
+<p>Hostname can be &ldquo;precise&rdquo; which is a domain name without the terminating
+dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rdquo;, which is
+a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
+The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
+label and matches only a single label.
+You cannot have a wildcard label by itself (e.g. Host == &ldquo;*&rdquo;).
+Requests will be matched against the Host field in the following order:
+1. If Host is precise, the request matches this rule if
+the http host header is equal to Host.
+2. If Host is a wildcard, then the request matches this rule if
+the http host header is to equal to the suffix
+(removing the first label) of the wildcard rule.</p>
 <p>Support: Core</p>
 </td>
 </tr>
