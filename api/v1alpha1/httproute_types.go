@@ -346,7 +346,3 @@ type HTTPRouteList struct {
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 	Items           []HTTPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
 }
-
-func init() {
-	SchemeBuilder.Register(&HTTPRoute{}, &HTTPRouteList{})
-}
