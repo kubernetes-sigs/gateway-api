@@ -70,7 +70,7 @@ verify-proto:
 			cp -r /realgo/src/sigs.k8s.io/service-apis/ src/sigs.k8s.io && \
 			cd src/sigs.k8s.io/service-apis && \
 			hack/update-proto.sh && \
-			diff -r api /realgo/src/sigs.k8s.io/service-apis/api"
+			diff -r apis /realgo/src/sigs.k8s.io/service-apis/apis"
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

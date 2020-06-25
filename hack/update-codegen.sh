@@ -27,7 +27,7 @@ GOBIN="$(go env GOBIN)"
 gobin="${GOBIN:-$(go env GOPATH)/bin}"
 
 OUTPUT_PKG=sigs.k8s.io/service-apis/pkg/client
-FQ_APIS=sigs.k8s.io/service-apis/api/v1alpha1
+FQ_APIS=sigs.k8s.io/service-apis/apis/v1alpha1
 APIS_PKG=sigs.k8s.io/service-apis
 CLIENTSET_NAME=versioned
 CLIENTSET_PKG_NAME=clientset
