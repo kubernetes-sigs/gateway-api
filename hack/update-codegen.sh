@@ -42,7 +42,7 @@ echo "Generating deepcopy funcs"
 "${gobin}/deepcopy-gen" --input-dirs "${FQ_APIS}" -O zz_generated.deepcopy --bounding-dirs "${APIS_PKG}" ${COMMON_FLAGS}
 
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
-"${gobin}/client-gen" --clientset-name "${CLIENTSET_NAME}" --input-base "" --input-dirs "${FQ_APIS}" --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" ${COMMON_FLAGS}
+"${gobin}/client-gen" --clientset-name "${CLIENTSET_NAME}" --input-base "" --input "${FQ_APIS}" --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
 "${gobin}/lister-gen" --input-dirs "${FQ_APIS}" --output-package "${OUTPUT_PKG}/listers" ${COMMON_FLAGS}
