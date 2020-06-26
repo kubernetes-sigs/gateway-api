@@ -2587,6 +2587,41 @@ An empty RouteSelector matches all routes.</p>
 <p>Support: Core</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>group</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Group is the group of the route resource to select. Omitting the value or specifying
+the empty string indicates the networking.x-k8s.io API group.
+For example, use the following to select an HTTPRoute:</p>
+<p>routes:
+resource: httproutes</p>
+<p>Otherwise, if an alternative API group is desired, specify the desired
+group:</p>
+<p>routes:
+group: acme.io
+resource: fooroutes</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Resource is the API resource name of the route resource to select.</p>
+<p>Resource MUST correspond to route resources that are compatible with the
+application protocol specified in the Listener&rsquo;s Protocol field.</p>
+<p>Support: Core</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteNamespaces">RouteNamespaces

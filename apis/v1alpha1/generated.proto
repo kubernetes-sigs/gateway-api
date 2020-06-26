@@ -868,6 +868,35 @@ message RouteBindingSelector {
   //
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
+
+  // Group is the group of the route resource to select. Omitting the value or specifying
+  // the empty string indicates the networking.x-k8s.io API group.
+  // For example, use the following to select an HTTPRoute:
+  //
+  // routes:
+  //   resource: httproutes
+  //
+  // Otherwise, if an alternative API group is desired, specify the desired
+  // group:
+  //
+  // routes:
+  //   group: acme.io
+  //   resource: fooroutes
+  //
+  // Support: Core
+  //
+  // +kubebuilder:default=networking.x-k8s.io
+  optional string group = 3;
+
+  // Resource is the API resource name of the route resource to select.
+  //
+  // Resource MUST correspond to route resources that are compatible with the
+  // application protocol specified in the Listener's Protocol field.
+  //
+  // Support: Core
+  //
+  // +required
+  optional string resource = 4;
 }
 
 // RouteNamespaces is used by Gateway and GatewayClass to indicate which
