@@ -735,8 +735,8 @@ readable by most roles, so instead we'll focus on write access for this model.</
 they will be controlled with configuration fields on GatewayClasses:</p>
 <ul>
 <li>
-<p><strong>allowedGatewayNamespaces</strong>: This field is a selector of namespaces that
-  Gateways can use this GatewayClass from. This is a standard Kubernetes
+<p><strong>allowedGatewayNamespaceSelector</strong>: This field is a selector of namespaces
+  that Gateways can use this GatewayClass from. This is a standard Kubernetes
   LabelSelector, a label query over a set of resources. The result of
   matchLabels and matchExpressions are ANDed. Controllers must not support
   Gateways in namespaces outside this selector. An empty selector (default)
@@ -745,15 +745,9 @@ they will be controlled with configuration fields on GatewayClasses:</p>
   is undesirable here.</p>
 </li>
 <li>
-<p><strong>allowedRouteNamespaces</strong>: This field is a selector of namespaces that
-  Gateways of this class can reference Routes in. This is a standard Kubernetes
-  LabelSelector, a label query over a set of resources. The result of
-  matchLabels and matchExpressions are ANDed. Controllers must not support
-  Routes in namespaces outside this selector. A nil selector (default) indicates
-  that Gateways of this class can reference Routes within the same namespace. An
-  empty selector indicates that Gateways can reference Routes in any namespace.
-  This field is intentionally a pointer to support the nil behavior (only local
-  Routes allowed).</p>
+<p><strong>allowedRouteNamespaces</strong>: AllowedRouteNamespaces indicates in which
+  namespaces Routes can be selected for Gateways of this class. This is
+  restricted to the namespace of the Gateway by default.</p>
 </li>
 </ul>
 <h2 id="controller-requirements">Controller Requirements</h2>

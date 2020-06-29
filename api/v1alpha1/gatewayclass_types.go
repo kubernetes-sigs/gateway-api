@@ -62,15 +62,14 @@ type GatewayClassSpec struct {
 	// +required
 	Controller string `json:"controller" protobuf:"bytes,1,opt,name=controller"`
 
-	// AllowedGatewayNamespaces is a selector of namespaces that Gateways can
-	// use this GatewayClass from. This is a standard Kubernetes LabelSelector,
-	// a label query over a set of resources. The result of matchLabels and
-	// matchExpressions are ANDed. Controllers must not support Gateways in
-	// namespaces outside this selector.
+	// AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
+	// can use this GatewayClass from. This is a standard Kubernetes
+	// LabelSelector, a label query over a set of resources. The result of
+	// matchLabels and matchExpressions are ANDed. Controllers must not support
+	// Gateways in namespaces outside this selector.
 	//
 	// An empty selector (default) indicates that Gateways can use this
-	// GatewayClass from any namespace. This field is intentionally not a
-	// pointer because the nil behavior (no namespaces) is undesirable here.
+	// GatewayClass from any namespace.
 	//
 	// When a Gateway attempts to use this class from a namespace that is not
 	// allowed by this selector, the controller implementing the GatewayClass
@@ -81,19 +80,11 @@ type GatewayClassSpec struct {
 	// Support: Core
 	//
 	// +optional
-	AllowedGatewayNamespaces metav1.LabelSelector `json:"allowedGatewayNamespaces" protobuf:"bytes,2,opt,name=allowedGatewayNamespaces"`
+	AllowedGatewayNamespaceSelector metav1.LabelSelector `json:"allowedGatewayNamespaceSelector" protobuf:"bytes,2,opt,name=allowedGatewayNamespaceSelector"`
 
-	// AllowedRouteNamespaces is a selector of namespaces that Gateways of this
-	// class can reference Routes in. This is a standard Kubernetes
-	// LabelSelector, a label query over a set of resources. The result of
-	// matchLabels and matchExpressions are ANDed. Controllers must not support
-	// Routes in namespaces outside this selector.
-	//
-	// A nil selector (default) indicates that Gateways of this class can
-	// reference Routes within the same namespace. An empty selector indicates
-	// that Gateways can reference Routes in any namespace. This field is
-	// intentionally a pointer to support the nil behavior (only local Routes
-	// allowed).
+	// AllowedRouteNamespaces indicates in which namespaces Routes can be
+	// selected for Gateways of this class. This is restricted to the namespace
+	// of the Gateway by default.
 	//
 	// When any Routes are selected by a Gateway in a namespace that is not
 	// allowed by this selector, the controller implementing the GatewayClass
@@ -103,8 +94,9 @@ type GatewayClassSpec struct {
 	//
 	// Support: Core
 	//
+	// +kubebuilder:default={OnlySameNamespace:true}
 	// +optional
-	AllowedRouteNamespaces *metav1.LabelSelector `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
+	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
 
 	// ParametersRef is a controller specific resource containing
 	// the configuration parameters corresponding to this
@@ -124,6 +116,40 @@ type GatewayClassSpec struct {
 	// +optional
 	// +protobuf=false
 	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
+}
+
+// RouteNamespaces is used by Gateway and GatewayClass to indicate which
+// namespaces Routes should be selected from.
+type RouteNamespaces struct {
+	// NamespaceSelector is a selector of namespaces that Routes should be
+	// selected from. This is a standard Kubernetes LabelSelector, a label query
+	// over a set of resources. The result of matchLabels and matchExpressions
+	// are ANDed. Controllers must not support Routes in namespaces outside this
+	// selector.
+	//
+	// An empty selector (default) indicates that Routes in any namespace can be
+	// selected.
+	//
+	// The OnlySameNamespace field takes precedence over this field. This
+	// selector will only take effect when OnlySameNamespace is false.
+	//
+	// Support: Core
+	//
+	// +optional
+	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector" protobuf:"bytes,1,opt,name=namespaceSelector"`
+
+	// OnlySameNamespace is a boolean used to indicate if Route references are
+	// limited to the same Namespace as the Gateway. When true, only Routes
+	// within the same Namespace as the Gateway should be selected.
+	//
+	// This field takes precedence over the NamespaceSelector field. That
+	// selector should only take effect when this field is set to false.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=true
+	// +optional
+	OnlySameNamespace bool `json:"OnlySameNamespace" protobuf:"bytes,2,opt,name=OnlySameNamespace"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a

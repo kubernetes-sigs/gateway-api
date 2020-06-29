@@ -249,7 +249,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaces</code></br>
+<code>allowedGatewayNamespaceSelector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -258,14 +258,13 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaces is a selector of namespaces that Gateways can
-use this GatewayClass from. This is a standard Kubernetes LabelSelector,
-a label query over a set of resources. The result of matchLabels and
-matchExpressions are ANDed. Controllers must not support Gateways in
-namespaces outside this selector.</p>
+<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
+can use this GatewayClass from. This is a standard Kubernetes
+LabelSelector, a label query over a set of resources. The result of
+matchLabels and matchExpressions are ANDed. Controllers must not support
+Gateways in namespaces outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace. This field is intentionally not a
-pointer because the nil behavior (no namespaces) is undesirable here.</p>
+GatewayClass from any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
@@ -278,23 +277,16 @@ controllers will have access to all namespaces.</p>
 <td>
 <code>allowedRouteNamespaces</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
+<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
+RouteNamespaces
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedRouteNamespaces is a selector of namespaces that Gateways of this
-class can reference Routes in. This is a standard Kubernetes
-LabelSelector, a label query over a set of resources. The result of
-matchLabels and matchExpressions are ANDed. Controllers must not support
-Routes in namespaces outside this selector.</p>
-<p>A nil selector (default) indicates that Gateways of this class can
-reference Routes within the same namespace. An empty selector indicates
-that Gateways can reference Routes in any namespace. This field is
-intentionally a pointer to support the nil behavior (only local Routes
-allowed).</p>
+<p>AllowedRouteNamespaces indicates in which namespaces Routes can be
+selected for Gateways of this class. This is restricted to the namespace
+of the Gateway by default.</p>
 <p>When any Routes are selected by a Gateway in a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
@@ -885,7 +877,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaces</code></br>
+<code>allowedGatewayNamespaceSelector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -894,14 +886,13 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaces is a selector of namespaces that Gateways can
-use this GatewayClass from. This is a standard Kubernetes LabelSelector,
-a label query over a set of resources. The result of matchLabels and
-matchExpressions are ANDed. Controllers must not support Gateways in
-namespaces outside this selector.</p>
+<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
+can use this GatewayClass from. This is a standard Kubernetes
+LabelSelector, a label query over a set of resources. The result of
+matchLabels and matchExpressions are ANDed. Controllers must not support
+Gateways in namespaces outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace. This field is intentionally not a
-pointer because the nil behavior (no namespaces) is undesirable here.</p>
+GatewayClass from any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
@@ -914,23 +905,16 @@ controllers will have access to all namespaces.</p>
 <td>
 <code>allowedRouteNamespaces</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
+<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
+RouteNamespaces
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedRouteNamespaces is a selector of namespaces that Gateways of this
-class can reference Routes in. This is a standard Kubernetes
-LabelSelector, a label query over a set of resources. The result of
-matchLabels and matchExpressions are ANDed. Controllers must not support
-Routes in namespaces outside this selector.</p>
-<p>A nil selector (default) indicates that Gateways of this class can
-reference Routes within the same namespace. An empty selector indicates
-that Gateways can reference Routes in any namespace. This field is
-intentionally a pointer to support the nil behavior (only local Routes
-allowed).</p>
+<p>AllowedRouteNamespaces indicates in which namespaces Routes can be
+selected for Gateways of this class. This is restricted to the namespace
+of the Gateway by default.</p>
 <p>When any Routes are selected by a Gateway in a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
@@ -2242,21 +2226,18 @@ selectors are associated with the Gateway.</p>
 <tbody>
 <tr>
 <td>
-<code>namespaceSelector</code></br>
+<code>routeNamespaces</code></br>
 <em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
-Kubernetes meta/v1.LabelSelector
+<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
+RouteNamespaces
 </a>
 </em>
 </td>
 <td>
-<p>NamespaceSelector specifies a set of namespace labels used for selecting
-routes to associate with the Gateway. If NamespaceSelector is defined,
-all routes in namespaces matching the NamespaceSelector are associated
-to the Gateway.</p>
-<p>An empty NamespaceSelector (default) indicates that routes from any
-namespace will be associated to this Gateway. This field is intentionally
-not a pointer because the nil behavior (no namespaces) is undesirable here.</p>
+<em>(Optional)</em>
+<p>RouteNamespaces indicates in which namespaces Routes should be selected
+for this Gateway. This is restricted to the namespace of this Gateway by
+default.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2275,8 +2256,67 @@ Kubernetes meta/v1.LabelSelector
 routes to associate with the Gateway. If RouteSelector is defined,
 only routes matching the RouteSelector are associated with the Gateway.
 An empty RouteSelector matches all routes.</p>
-<p>If undefined, route labels are not used for associating routes to
-the gateway.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteNamespaces">RouteNamespaces
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector</a>)
+</p>
+<p>
+<p>RouteNamespaces is used by Gateway and GatewayClass to indicate which
+namespaces Routes should be selected from.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>namespaceSelector</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
+Kubernetes meta/v1.LabelSelector
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>NamespaceSelector is a selector of namespaces that Routes should be
+selected from. This is a standard Kubernetes LabelSelector, a label query
+over a set of resources. The result of matchLabels and matchExpressions
+are ANDed. Controllers must not support Routes in namespaces outside this
+selector.</p>
+<p>An empty selector (default) indicates that Routes in any namespace can be
+selected.</p>
+<p>The OnlySameNamespace field takes precedence over this field. This
+selector will only take effect when OnlySameNamespace is false.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>OnlySameNamespace</code></br>
+<em>
+bool
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>OnlySameNamespace is a boolean used to indicate if Route references are
+limited to the same Namespace as the Gateway. When true, only Routes
+within the same Namespace as the Gateway should be selected.</p>
+<p>This field takes precedence over the NamespaceSelector field. That
+selector should only take effect when this field is set to false.</p>
 <p>Support: Core</p>
 </td>
 </tr>

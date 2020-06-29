@@ -199,15 +199,14 @@ message GatewayClassSpec {
   // +required
   optional string controller = 1;
 
-  // AllowedGatewayNamespaces is a selector of namespaces that Gateways can
-  // use this GatewayClass from. This is a standard Kubernetes LabelSelector,
-  // a label query over a set of resources. The result of matchLabels and
-  // matchExpressions are ANDed. Controllers must not support Gateways in
-  // namespaces outside this selector.
+  // AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
+  // can use this GatewayClass from. This is a standard Kubernetes
+  // LabelSelector, a label query over a set of resources. The result of
+  // matchLabels and matchExpressions are ANDed. Controllers must not support
+  // Gateways in namespaces outside this selector.
   //
   // An empty selector (default) indicates that Gateways can use this
-  // GatewayClass from any namespace. This field is intentionally not a
-  // pointer because the nil behavior (no namespaces) is undesirable here.
+  // GatewayClass from any namespace.
   //
   // When a Gateway attempts to use this class from a namespace that is not
   // allowed by this selector, the controller implementing the GatewayClass
@@ -218,19 +217,11 @@ message GatewayClassSpec {
   // Support: Core
   //
   // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector allowedGatewayNamespaces = 2;
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector allowedGatewayNamespaceSelector = 2;
 
-  // AllowedRouteNamespaces is a selector of namespaces that Gateways of this
-  // class can reference Routes in. This is a standard Kubernetes
-  // LabelSelector, a label query over a set of resources. The result of
-  // matchLabels and matchExpressions are ANDed. Controllers must not support
-  // Routes in namespaces outside this selector.
-  //
-  // A nil selector (default) indicates that Gateways of this class can
-  // reference Routes within the same namespace. An empty selector indicates
-  // that Gateways can reference Routes in any namespace. This field is
-  // intentionally a pointer to support the nil behavior (only local Routes
-  // allowed).
+  // AllowedRouteNamespaces indicates in which namespaces Routes can be
+  // selected for Gateways of this class. This is restricted to the namespace
+  // of the Gateway by default.
   //
   // When any Routes are selected by a Gateway in a namespace that is not
   // allowed by this selector, the controller implementing the GatewayClass
@@ -240,8 +231,9 @@ message GatewayClassSpec {
   //
   // Support: Core
   //
+  // +kubebuilder:default={OnlySameNamespace:true}
   // +optional
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector allowedRouteNamespaces = 3;
+  optional RouteNamespaces allowedRouteNamespaces = 3;
 
   // ParametersRef is a controller specific resource containing
   // the configuration parameters corresponding to this
@@ -838,30 +830,59 @@ message ListenerStatus {
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
 message RouteBindingSelector {
-  // NamespaceSelector specifies a set of namespace labels used for selecting
-  // routes to associate with the Gateway. If NamespaceSelector is defined,
-  // all routes in namespaces matching the NamespaceSelector are associated
-  // to the Gateway.
-  //
-  // An empty NamespaceSelector (default) indicates that routes from any
-  // namespace will be associated to this Gateway. This field is intentionally
-  // not a pointer because the nil behavior (no namespaces) is undesirable here.
+  // RouteNamespaces indicates in which namespaces Routes should be selected
+  // for this Gateway. This is restricted to the namespace of this Gateway by
+  // default.
   //
   // Support: Core
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 1;
+  //
+  // +kubebuilder:default={OnlySameNamespace:true}
+  // +optional
+  optional RouteNamespaces routeNamespaces = 1;
 
   // RouteSelector specifies a set of route labels used for selecting
   // routes to associate with the Gateway. If RouteSelector is defined,
   // only routes matching the RouteSelector are associated with the Gateway.
   // An empty RouteSelector matches all routes.
   //
-  // If undefined, route labels are not used for associating routes to
-  // the gateway.
-  //
   // Support: Core
   //
   // +optional
   optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector routeSelector = 2;
+}
+
+// RouteNamespaces is used by Gateway and GatewayClass to indicate which
+// namespaces Routes should be selected from.
+message RouteNamespaces {
+  // NamespaceSelector is a selector of namespaces that Routes should be
+  // selected from. This is a standard Kubernetes LabelSelector, a label query
+  // over a set of resources. The result of matchLabels and matchExpressions
+  // are ANDed. Controllers must not support Routes in namespaces outside this
+  // selector.
+  //
+  // An empty selector (default) indicates that Routes in any namespace can be
+  // selected.
+  //
+  // The OnlySameNamespace field takes precedence over this field. This
+  // selector will only take effect when OnlySameNamespace is false.
+  //
+  // Support: Core
+  //
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.LabelSelector namespaceSelector = 1;
+
+  // OnlySameNamespace is a boolean used to indicate if Route references are
+  // limited to the same Namespace as the Gateway. When true, only Routes
+  // within the same Namespace as the Gateway should be selected.
+  //
+  // This field takes precedence over the NamespaceSelector field. That
+  // selector should only take effect when this field is set to false.
+  //
+  // Support: Core
+  //
+  // +kubebuilder:default=true
+  // +optional
+  optional bool OnlySameNamespace = 2;
 }
 
 // SecretsDefaultLocalObjectReference identifies an API object within a
