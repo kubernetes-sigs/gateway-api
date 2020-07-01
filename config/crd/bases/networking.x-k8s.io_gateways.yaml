@@ -33,18 +33,21 @@ spec:
             description: "GatewaySpec defines the desired state of Gateway. \n The Spec is split into two major pieces: listeners describing client-facing properties and routes that describe application-level routing. \n Not all possible combinations of options specified in the Spec are valid. Some invalid configurations can be caught synchronously via a webhook, but there are many cases that will require asynchronous signaling via the GatewayStatus block."
             properties:
               addresses:
-                description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Listeners. \n If no ListenerAddresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of ListenerAddresses. \n The GatewayClass MUST bind all Listeners to every ListenerAddress that it assigns to the Gateway. \n Support: Core"
+                description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Listeners. \n If no ListenerAddresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of ListenerAddresses. \n The GatewayClass MUST bind all Listeners to every GatewayAddress that it assigns to the Gateway. \n Support: Core"
                 items:
-                  description: ListenerAddress describes an address for the Listener.
+                  description: GatewayAddress describes an address that can be bound to a Gateway.
                   properties:
                     type:
-                      description: "Type of the Address. This is one of the *AddressType constants. \n Support: Extended"
+                      default: IPAddress
+                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      enum:
+                      - IPAddress
+                      - NamedAddress
                       type: string
                     value:
                       description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
                       type: string
                   required:
-                  - type
                   - value
                   type: object
                 type: array
@@ -75,7 +78,11 @@ spec:
                       type: object
                     port:
                       description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules. \n Support: Core"
+                      exclusiveMaximum: true
+                      exclusiveMinimum: true
                       format: int32
+                      maximum: 65536
+                      minimum: 0
                       type: integer
                     protocol:
                       description: "Protocol specifies the network protocol this listener expects to receive. The GatewayClass MUST validate that match type specified in the Hostname field is appropriate for the protocol. \n * For the \"TLS\" protocol, the Hostname match MUST be   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)   server name offered by the client. * For the \"HTTP\" protocol, the Hostname match MUST be   applied to the host portion of the   [effective request URI](https://tools.ietf.org/html/rfc7230#section-5.5)   or the [:authority pseudo-header](https://tools.ietf.org/html/rfc7540#section-8.1.2.3) * For the \"HTTPS\" protocol, the Hostname match MUST be   applied at both the TLS and HTTP protocol layers. \n Support: Core"
@@ -207,6 +214,25 @@ spec:
           status:
             description: GatewayStatus defines the observed state of Gateway.
             properties:
+              addresses:
+                description: "Addresses lists the IP addresses that have actually been bound to the Gateway. These addresses may differ from the addresses in the Spec, e.g. if the Gateway automatically assigns an address from a reserved pool. \n These addresses should all be of type \"IPAddress\"."
+                items:
+                  description: GatewayAddress describes an address that can be bound to a Gateway.
+                  properties:
+                    type:
+                      default: IPAddress
+                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      enum:
+                      - IPAddress
+                      - NamedAddress
+                      type: string
+                    value:
+                      description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      type: string
+                  required:
+                  - value
+                  type: object
+                type: array
               conditions:
                 description: Conditions describe the current conditions of the Gateway.
                 items:
@@ -238,23 +264,10 @@ spec:
                   type: object
                 type: array
               listeners:
-                description: Listeners provide status for each listener defined in the Spec. The name in ListenerStatus refers to the corresponding Listener of the same name.
+                description: Listeners provides status for each unique listener port defined in the Spec.
                 items:
-                  description: ListenerStatus is the status associated with each listener block.
+                  description: ListenerStatus is the status associated with a Listener port.
                   properties:
-                    address:
-                      description: Address bound on this listener. TODO(jpeach) Listeners don't have addresses anymore so this field should move to the GatewayStatus.
-                      properties:
-                        type:
-                          description: "Type of the Address. This is one of the *AddressType constants. \n Support: Extended"
-                          type: string
-                        value:
-                          description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
-                          type: string
-                      required:
-                      - type
-                      - value
-                      type: object
                     conditions:
                       description: Conditions describe the current condition of this listener.
                       items:
@@ -285,15 +298,16 @@ spec:
                         - type
                         type: object
                       type: array
-                    name:
-                      description: Name is the name of the listener this status refers to. TODO(jpeach) Listeners are not indexed by a unique name any more, so this field probably doesn't make sense.
+                    port:
+                      description: Port is the unique Listener port value for which this message is reporting the status. If more than one Gateway Listener shares the same port value, this message reports the combined status of all such Listeners.
                       type: string
                   required:
-                  - address
                   - conditions
-                  - name
+                  - port
                   type: object
                 type: array
+            required:
+            - addresses
             type: object
         type: object
     served: true

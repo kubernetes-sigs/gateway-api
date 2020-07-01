@@ -104,12 +104,12 @@ type GatewaySpec struct {
 	// assigning an appropriate set of ListenerAddresses.
 	//
 	// The GatewayClass MUST bind all Listeners to every
-	// ListenerAddress that it assigns to the Gateway.
+	// GatewayAddress that it assigns to the Gateway.
 	//
 	// Support: Core
 	//
 	// +optional
-	Addresses []ListenerAddress `json:"addresses" protobuf:"bytes,3,rep,name=addresses"`
+	Addresses []GatewayAddress `json:"addresses" protobuf:"bytes,3,rep,name=addresses"`
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
@@ -214,6 +214,10 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
+	// +kubebuilder:validation:Minimum=0
+	// +kubebuilder:validation:Maximum=65536
+	// +kubebuilder:validation:ExclusiveMinimum=true
+	// +kubebuilder:validation:ExclusiveMaximum=true
 	Port int32 `json:"port,omitempty" protobuf:"varint,2,opt,name=port"`
 
 	// Protocol specifies the network protocol this listener
@@ -285,14 +289,21 @@ const (
 	NamedAddressType AddressType = "NamedAddress"
 )
 
-// ListenerAddress describes an address for the Listener.
-type ListenerAddress struct {
-	// Type of the Address. This is one of the *AddressType constants.
+// GatewayAddress describes an address that can be bound to a Gateway.
+type GatewayAddress struct {
+	// Type of the Address. This is either "IPAddress" or "NamedAddress".
 	//
 	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:validation:Enum=IPAddress;NamedAddress
+	// +kubebuilder:default=IPAddress
 	Type AddressType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=AddressType"`
+
 	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
 	// values will depend on `Type` and support by the controller.
+	//
+	// +required
 	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
 }
 
@@ -328,13 +339,23 @@ type ListenerExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
+	// Addresses lists the IP addresses that have actually been
+	// bound to the Gateway. These addresses may differ from the
+	// addresses in the Spec, e.g. if the Gateway automatically
+	// assigns an address from a reserved pool.
+	//
+	// These addresses should all be of type "IPAddress".
+	//
+	// +required
+	Addresses []GatewayAddress `json:"addresses" protobuf:"bytes,1,opt,name=addresses"`
+
 	// Conditions describe the current conditions of the Gateway.
 	// +optional
-	Conditions []GatewayCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
-	// Listeners provide status for each listener defined in the Spec. The name
-	// in ListenerStatus refers to the corresponding Listener of the same name.
+	Conditions []GatewayCondition `json:"conditions,omitempty" protobuf:"bytes,2,rep,name=conditions"`
+
+	// Listeners provides status for each unique listener port defined in the Spec.
 	// +optional
-	Listeners []ListenerStatus `json:"listeners,omitempty" protobuf:"bytes,2,rep,name=listeners"`
+	Listeners []ListenerStatus `json:"listeners,omitempty" protobuf:"bytes,3,rep,name=listeners"`
 }
 
 // GatewayConditionType is a type of condition associated with a Gateway.
@@ -344,31 +365,30 @@ const (
 	// ConditionNoSuchGatewayClass indicates that the specified GatewayClass
 	// does not exist.
 	ConditionNoSuchGatewayClass GatewayConditionType = "NoSuchGatewayClass"
+
 	// ConditionForbiddenNamespaceForClass indicates that this Gateway is in
 	// a namespace forbidden by the GatewayClass.
 	ConditionForbiddenNamespaceForClass GatewayConditionType = "ForbiddenNamespaceForClass"
+
 	// ConditionGatewayNotScheduled indicates that the Gateway has not been
 	// scheduled.
 	ConditionGatewayNotScheduled GatewayConditionType = "GatewayNotScheduled"
+
 	// ConditionListenersNotReady indicates that at least one of the specified
 	// listeners is not ready. If this condition has a status of True, a more
 	// detailed ListenerCondition should be present in the corresponding
 	// ListenerStatus.
 	ConditionListenersNotReady GatewayConditionType = "ListenersNotReady"
+
 	// ConditionInvalidListeners indicates that at least one of the specified
 	// listeners is invalid. If this condition has a status of True, a more
 	// detailed ListenerCondition should be present in the corresponding
 	// ListenerStatus.
 	ConditionInvalidListeners GatewayConditionType = "InvalidListeners"
-	// ConditionRoutesNotReady indicates that at least one of the specified
-	// routes is not ready.
-	ConditionRoutesNotReady GatewayConditionType = "RoutesNotReady"
-	// ConditionInvalidRoutes indicates that at least one of the specified
-	// routes is invalid.
-	ConditionInvalidRoutes GatewayConditionType = "InvalidRoutes"
-	// ConditionForbiddenRoutesForClass indicates that at least one of the
-	// routes is in a namespace forbidden by the GatewayClass.
-	ConditionForbiddenRoutesForClass GatewayConditionType = "ForbiddenRoutesForClass"
+
+	// ConditionInvalidAddress indicates one or more of the
+	// Gateway's Addresses is invalid or could not be assigned.
+	ConditionInvalidAddress GatewayConditionType = "InvalidAddress"
 )
 
 // GatewayCondition is an error status for a given route.
@@ -406,17 +426,19 @@ type GatewayCondition struct {
 	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
 }
 
-// ListenerStatus is the status associated with each listener block.
+// ListenerStatus is the status associated with a Listener port.
 type ListenerStatus struct {
-	// Name is the name of the listener this status refers to.
-	// TODO(jpeach) Listeners are not indexed by a unique name any more,
-	// so this field probably doesn't make sense.
-	Name string `json:"name" protobuf:"bytes,1,opt,name=name"`
-	// Address bound on this listener.
-	// TODO(jpeach) Listeners don't have addresses anymore so this field
-	// should move to the GatewayStatus.
-	Address *ListenerAddress `json:"address" protobuf:"bytes,2,opt,name=address"`
+	// Port is the unique Listener port value for which this message
+	// is reporting the status. If more than one Gateway Listener
+	// shares the same port value, this message reports the combined
+	// status of all such Listeners.
+	//
+	// +required
+	Port string `json:"port" protobuf:"varint,1,opt,name=port"`
+
 	// Conditions describe the current condition of this listener.
+	//
+	// +required
 	Conditions []ListenerCondition `json:"conditions" protobuf:"bytes,3,rep,name=conditions"`
 }
 
@@ -429,23 +451,34 @@ const (
 	// Implementors should try to use a more specific condition instead of this
 	// one to give users and automation more information.
 	ConditionInvalidListener ListenerConditionType = "InvalidListener"
+
 	// ConditionListenerNotReady indicates the listener is not ready.
-	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
-	// ConditionInvalidAddress indicates the Address is invalid.
-	ConditionInvalidAddress ListenerConditionType = "InvalidAddress"
-	// ConditionInvalidName indicates that the name given to the Listener
-	// did not meet the requirements of the gateway controller.
-	ConditionInvalidName ListenerConditionType = "InvalidName"
-	// ConditionNameConflict indicates that two or more Listeners with
-	// the same name were bound to this gateway.
-	ConditionNameConflict ListenerConditionType = "NameConflict"
+	ConditionListenerNotReady ListenerConditionType = "NotReady"
+
 	// ConditionPortConflict indicates that two or more Listeners with
 	// the same port were bound to this gateway and they could not be
 	// collapsed into a single configuration.
 	ConditionPortConflict ListenerConditionType = "PortConflict"
+
 	// ConditionInvalidCertificateRef indicates the certificate reference of the
 	// listener's TLS configuration is invalid.
 	ConditionInvalidCertificateRef ListenerConditionType = "InvalidCertificateRef"
+
+	// ConditionRoutesNotReady indicates that at least one of the specified
+	// routes is not ready.
+	ConditionRoutesNotReady ListenerConditionType = "RoutesNotReady"
+
+	// ConditionInvalidRoutes indicates that at least one of the specified
+	// routes is invalid.
+	ConditionInvalidRoutes ListenerConditionType = "InvalidRoutes"
+
+	// ConditionForbiddenRoutesForClass indicates that at least one of the
+	// routes is in a namespace forbidden by the GatewayClass.
+	ConditionForbiddenRoutesForClass ListenerConditionType = "ForbiddenRoutesForClass"
+
+	// ConditionUnsupportedProtocol indicates that an invalid
+	// or unsupported protocol type was requested.
+	ConditionUnsupportedProtocol ListenerConditionType = "UnsupportedProtocol"
 )
 
 // ListenerCondition is an error status for a given listener.
