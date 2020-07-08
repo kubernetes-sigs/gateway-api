@@ -8,9 +8,7 @@ spec:
     name: acme-lb-configmap
     group: core
     resource: configmaps
-
 ---
-
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
@@ -21,13 +19,13 @@ spec:
   listeners:  # Use GatewayClass defaults for listener definition.
   - protocol: HTTP
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           "app": "foo"
-
 ---
-
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
@@ -37,7 +35,8 @@ metadata:
     app: foo
 spec:
   hosts:
-  - hostname: "foo.com"
+  - hostnames:
+    - "foo.com"
     rules:
     - match:
         path: /bar

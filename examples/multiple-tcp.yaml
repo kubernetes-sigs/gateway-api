@@ -13,7 +13,9 @@ spec:
   - port: 22
     protocol: TCP
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           app: sshd-honeypot
@@ -21,7 +23,9 @@ spec:
   - port: 2222
     protocol: TCP
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           app: sshd-legitimate
@@ -39,7 +43,9 @@ spec:
         resource: secrets
         group: core
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           app: sshd-legitimate

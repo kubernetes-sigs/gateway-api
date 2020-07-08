@@ -21,7 +21,9 @@ spec:
         resource: secrets
         group: core
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           # This label selects httpbin.example.com and

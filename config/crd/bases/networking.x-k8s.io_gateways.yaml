@@ -97,13 +97,9 @@ spec:
                       properties:
                         routeNamespaces:
                           default:
-                            OnlySameNamespace: true
+                            onlySameNamespace: true
                           description: "RouteNamespaces indicates in which namespaces Routes should be selected for this Gateway. This is restricted to the namespace of this Gateway by default. \n Support: Core"
                           properties:
-                            OnlySameNamespace:
-                              default: true
-                              description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
-                              type: boolean
                             namespaceSelector:
                               description: "NamespaceSelector is a selector of namespaces that Routes should be selected from. This is a standard Kubernetes LabelSelector, a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. Controllers must not support Routes in namespaces outside this selector. \n An empty selector (default) indicates that Routes in any namespace can be selected. \n The OnlySameNamespace field takes precedence over this field. This selector will only take effect when OnlySameNamespace is false. \n Support: Core"
                               properties:
@@ -134,6 +130,10 @@ spec:
                                   description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                                   type: object
                               type: object
+                            onlySameNamespace:
+                              default: true
+                              description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
+                              type: boolean
                           type: object
                         routeSelector:
                           description: "RouteSelector specifies a set of route labels used for selecting routes to associate with the Gateway. If RouteSelector is defined, only routes matching the RouteSelector are associated with the Gateway. An empty RouteSelector matches all routes. \n Support: Core"

@@ -11,4 +11,4 @@ spec:
     namespaceSelector: 
       matchLabels:
         env: prod
-    OnlySameNamespace: false
+    onlySameNamespace: false
