@@ -64,13 +64,9 @@ spec:
                 type: object
               allowedRouteNamespaces:
                 default:
-                  OnlySameNamespace: true
+                  onlySameNamespace: true
                 description: "AllowedRouteNamespaces indicates in which namespaces Routes can be selected for Gateways of this class. This is restricted to the namespace of the Gateway by default. \n When any Routes are selected by a Gateway in a namespace that is not allowed by this selector, the controller implementing the GatewayClass may add a new \"ForbiddenRoutesForClass\" condition to the Gateway status. Adding this condition is considered optional since not all controllers will have access to all namespaces. \n Support: Core"
                 properties:
-                  OnlySameNamespace:
-                    default: true
-                    description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
-                    type: boolean
                   namespaceSelector:
                     description: "NamespaceSelector is a selector of namespaces that Routes should be selected from. This is a standard Kubernetes LabelSelector, a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. Controllers must not support Routes in namespaces outside this selector. \n An empty selector (default) indicates that Routes in any namespace can be selected. \n The OnlySameNamespace field takes precedence over this field. This selector will only take effect when OnlySameNamespace is false. \n Support: Core"
                     properties:
@@ -101,6 +97,10 @@ spec:
                         description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                         type: object
                     type: object
+                  onlySameNamespace:
+                    default: true
+                    description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
+                    type: boolean
                 type: object
               controller:
                 description: "Controller is a domain/path string that indicates the controller that managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"

@@ -1,7 +1,19 @@
+kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
-kind: HttpRoute
 metadata:
-  name: httproute-sample
+  name: http-route-sample
+  labels:
+    app: foo
 spec:
-  # Add fields here
-  foo: bar
+  hosts:
+  - hostnames:
+    - "foo.com"
+    rules:
+    - match:
+        path: /bar
+      action:
+        forwardTo:
+          targetRef:
+            name: my-service
+            group: core
+            resource: services

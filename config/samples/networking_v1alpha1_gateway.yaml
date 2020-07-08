@@ -4,13 +4,12 @@ metadata:
   name: gateway-sample
 spec:
   class: gatewayclass-sample
+  addresses:
+  - type: IPAddress
+    value: 1.2.3.4
   listeners:
-  - name: https-example
-    address:
-      type: IPAddress
-      value: 1.2.3.4
-    port: 443
-    protocol: https
+  - port: 443
+    protocol: HTTPS
     tls:
       certificateRefs:
       - group: v1
@@ -20,16 +19,12 @@ spec:
       options:
         gateway-controller.vendor.x-k8s.io/tls-option-1: value1
         gateway-controller.vendor.x-k8s.io/tls-option-2: value2
-    extensionRef:
-      group: sample.vendor.io
-      resource: example-listener
-      name: my-protocol-listener
-  routes:
-    routeNamespaces:
-      namespaceSelector:
+    routes:
+      routeNamespaces:
+        namespaceSelector:
+          matchLabels:
+            env: prod
+        onlySameNamespace: false
+      routeSelector:
         matchLabels:
-          env: prod
-      OnlySameNamespace: false
-    routeSelector:
-      matchLabels:
-        app: web
+          app: web

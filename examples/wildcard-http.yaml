@@ -15,7 +15,9 @@ spec:
     port: 80
     protocol: HTTP
     routes:
-      namespaceSelector: {}
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
       routeSelector:
         matchLabels:
           # This label selects httpbin.example.com and

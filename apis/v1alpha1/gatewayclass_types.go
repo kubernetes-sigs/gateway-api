@@ -95,7 +95,7 @@ type GatewayClassSpec struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default={OnlySameNamespace:true}
+	// +kubebuilder:default={onlySameNamespace:true}
 	// +optional
 	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
 
@@ -150,7 +150,7 @@ type RouteNamespaces struct {
 	//
 	// +kubebuilder:default=true
 	// +optional
-	OnlySameNamespace bool `json:"OnlySameNamespace" protobuf:"bytes,2,opt,name=OnlySameNamespace"`
+	OnlySameNamespace bool `json:"onlySameNamespace" protobuf:"bytes,2,opt,name=onlySameNamespace"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a

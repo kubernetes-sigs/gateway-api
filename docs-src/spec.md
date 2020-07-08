@@ -2308,7 +2308,7 @@ selector will only take effect when OnlySameNamespace is false.</p>
 </tr>
 <tr>
 <td>
-<code>OnlySameNamespace</code></br>
+<code>onlySameNamespace</code></br>
 <em>
 bool
 </em>

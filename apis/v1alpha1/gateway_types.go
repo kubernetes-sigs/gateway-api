@@ -317,7 +317,7 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default={OnlySameNamespace:true}
+	// +kubebuilder:default={onlySameNamespace:true}
 	// +optional
 	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty" protobuf:"bytes,1,opt,name=routeNamespaces"`
 	// RouteSelector specifies a set of route labels used for selecting
