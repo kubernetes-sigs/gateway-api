@@ -22,14 +22,14 @@ import (
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
-// TrafficSplitSpec defines the desired state of TrafficSplit
-type TrafficSplitSpec struct {
+// TcpRouteSpec defines the desired state of TcpRoute
+type TcpRouteSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
 
-// TrafficSplitStatus defines the observed state of TrafficSplit
-type TrafficSplitStatus struct {
+// TcpRouteStatus defines the observed state of TcpRoute
+type TcpRouteStatus struct {
 	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 }
@@ -37,24 +37,20 @@ type TrafficSplitStatus struct {
 // +genclient
 // +kubebuilder:object:root=true
 
-// TrafficSplit is the Schema for the trafficsplits API
-type TrafficSplit struct {
+// TcpRoute is the Schema for the tcproutes API
+type TcpRoute struct {
 	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
 
-	Spec   TrafficSplitSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status TrafficSplitStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+	Spec   TcpRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
+	Status TcpRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
 }
 
 // +kubebuilder:object:root=true
 
-// TrafficSplitList contains a list of TrafficSplit
-type TrafficSplitList struct {
+// TcpRouteList contains a list of TcpRoute
+type TcpRouteList struct {
 	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
 	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []TrafficSplit `json:"items" protobuf:"bytes,3,rep,name=items"`
-}
-
-func init() {
-	SchemeBuilder.Register(&TrafficSplit{}, &TrafficSplitList{})
+	Items           []TcpRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
 }

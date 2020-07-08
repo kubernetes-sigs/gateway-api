@@ -515,7 +515,3 @@ type ListenerCondition struct {
 	// +optional
 	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
 }
-
-func init() {
-	SchemeBuilder.Register(&Gateway{}, &GatewayList{})
-}
