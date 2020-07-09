@@ -95,6 +95,13 @@ spec:
                     routes:
                       description: "Routes specifies a schema for associating routes with the Listener using selectors. A Route is a resource capable of servicing a request and allows a cluster operator to expose a cluster resource (i.e. Service) by externally-reachable URL, load-balance traffic and terminate SSL/TLS.  Typically, a route is a \"HTTPRoute\" or \"TCPRoute\" in group \"networking.x-k8s.io\", however, an implementation may support other types of resources. \n The Routes selector MUST select a set of objects that are compatible with the application protocol specified in the Protocol field. \n Support: Core"
                       properties:
+                        group:
+                          default: networking.x-k8s.io
+                          description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   resource: httproutes \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
+                          type: string
+                        resource:
+                          description: "Resource is the API resource name of the route resource to select. \n Resource MUST correspond to route resources that are compatible with the application protocol specified in the Listener's Protocol field. \n Support: Core"
+                          type: string
                         routeNamespaces:
                           default:
                             onlySameNamespace: true
@@ -165,6 +172,9 @@ spec:
                               description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                               type: object
                           type: object
+                      required:
+                      - group
+                      - resource
                       type: object
                     tls:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\". \n Support: Core"

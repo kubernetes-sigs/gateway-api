@@ -329,6 +329,33 @@ type RouteBindingSelector struct {
 	//
 	// +optional
 	RouteSelector metav1.LabelSelector `json:"routeSelector,omitempty" protobuf:"bytes,2,opt,name=routeSelector"`
+	// Group is the group of the route resource to select. Omitting the value or specifying
+	// the empty string indicates the networking.x-k8s.io API group.
+	// For example, use the following to select an HTTPRoute:
+	//
+	// routes:
+	//   resource: httproutes
+	//
+	// Otherwise, if an alternative API group is desired, specify the desired
+	// group:
+	//
+	// routes:
+	//   group: acme.io
+	//   resource: fooroutes
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=networking.x-k8s.io
+	Group string `json:"group" protobuf:"bytes,3,opt,name=group"`
+	// Resource is the API resource name of the route resource to select.
+	//
+	// Resource MUST correspond to route resources that are compatible with the
+	// application protocol specified in the Listener's Protocol field.
+	//
+	// Support: Core
+	//
+	// +required
+	Resource string `json:"resource" protobuf:"bytes,4,opt,name=resource"`
 }
 
 // ListenerExtensionObjectReference identifies a listener extension object
