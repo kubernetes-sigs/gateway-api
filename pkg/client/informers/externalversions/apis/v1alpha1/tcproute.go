@@ -31,59 +31,59 @@ import (
 	v1alpha1 "sigs.k8s.io/service-apis/pkg/client/listers/apis/v1alpha1"
 )
 
-// TcpRouteInformer provides access to a shared informer and lister for
-// TcpRoutes.
-type TcpRouteInformer interface {
+// TCPRouteInformer provides access to a shared informer and lister for
+// TCPRoutes.
+type TCPRouteInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha1.TcpRouteLister
+	Lister() v1alpha1.TCPRouteLister
 }
 
-type tcpRouteInformer struct {
+type tCPRouteInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewTcpRouteInformer constructs a new informer for TcpRoute type.
+// NewTCPRouteInformer constructs a new informer for TCPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewTcpRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredTcpRouteInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredTCPRouteInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredTcpRouteInformer constructs a new informer for TcpRoute type.
+// NewFilteredTCPRouteInformer constructs a new informer for TCPRoute type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredTcpRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredTCPRouteInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().TcpRoutes(namespace).List(context.TODO(), options)
+				return client.NetworkingV1alpha1().TCPRoutes(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.NetworkingV1alpha1().TcpRoutes(namespace).Watch(context.TODO(), options)
+				return client.NetworkingV1alpha1().TCPRoutes(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1alpha1.TcpRoute{},
+		&apisv1alpha1.TCPRoute{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *tcpRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredTcpRouteInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *tCPRouteInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredTCPRouteInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *tcpRouteInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1alpha1.TcpRoute{}, f.defaultInformer)
+func (f *tCPRouteInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&apisv1alpha1.TCPRoute{}, f.defaultInformer)
 }
 
-func (f *tcpRouteInformer) Lister() v1alpha1.TcpRouteLister {
-	return v1alpha1.NewTcpRouteLister(f.Informer().GetIndexer())
+func (f *tCPRouteInformer) Lister() v1alpha1.TCPRouteLister {
+	return v1alpha1.NewTCPRouteLister(f.Informer().GetIndexer())
 }

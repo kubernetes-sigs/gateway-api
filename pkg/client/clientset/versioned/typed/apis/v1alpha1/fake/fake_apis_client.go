@@ -39,8 +39,8 @@ func (c *FakeNetworkingV1alpha1) HTTPRoutes(namespace string) v1alpha1.HTTPRoute
 	return &FakeHTTPRoutes{c, namespace}
 }
 
-func (c *FakeNetworkingV1alpha1) TcpRoutes(namespace string) v1alpha1.TcpRouteInterface {
-	return &FakeTcpRoutes{c, namespace}
+func (c *FakeNetworkingV1alpha1) TCPRoutes(namespace string) v1alpha1.TCPRouteInterface {
+	return &FakeTCPRoutes{c, namespace}
 }
 
 func (c *FakeNetworkingV1alpha1) TrafficSplits(namespace string) v1alpha1.TrafficSplitInterface {

@@ -1027,6 +1027,95 @@ message ServicesDefaultLocalObjectReference {
   optional string name = 3;
 }
 
+// TCPRoute is the Schema for the tcproutes API
+message TCPRoute {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
+
+  optional TCPRouteSpec spec = 3;
+
+  optional TCPRouteStatus status = 4;
+}
+
+// TCPRouteAction is the action for a given rule.
+message TCPRouteAction {
+  // ForwardTo sends requests to the referenced object.  The
+  // resource may be "services" (omit or use the empty string for the
+  // group), or an implementation may support other resources (for
+  // example, resource "myroutetargets" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "services".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  optional ForwardToTarget forwardTo = 1;
+
+  // ExtensionRef is an optional, implementation-specific extension to the
+  // "action" behavior.  The resource may be "configmaps" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myrouteactions" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "configmaps".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  //
+  // Support: custom
+  //
+  // +optional
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 2;
+}
+
+// TCPRouteList contains a list of TCPRoute
+message TCPRouteList {
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
+
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
+
+  repeated TCPRoute items = 3;
+}
+
+// TCPRouteMatch defines the predicate used to match connections to a
+// given action.
+message TCPRouteMatch {
+  // ExtensionRef is an optional, implementation-specific extension to the
+  // "match" behavior.  The resource may be "configmap" (use the empty
+  // string for the group) or an implementation-defined resource (for
+  // example, resource "myroutematchers" in group "networking.acme.io").
+  // Omitting or specifying the empty string for both the resource and
+  // group indicates that the resource is "configmaps".  If the referent
+  // cannot be found, the "InvalidRoutes" status condition on any Gateway
+  // that includes the TCPRoute will be true.
+  //
+  // Support: custom
+  //
+  // +optional
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 1;
+}
+
+// TCPRouteRule is the configuration for a given rule.
+message TCPRouteRule {
+  // Match defines which connections match this rule.
+  //
+  // +optional
+  optional TCPRouteMatch match = 1;
+
+  // Action defines what happens to the connection.
+  //
+  // +optional
+  optional TCPRouteAction action = 2;
+}
+
+// TCPRouteSpec defines the desired state of TCPRoute
+message TCPRouteSpec {
+  // Rules are a list of TCP matchers and actions.
+  repeated TCPRouteRule rules = 1;
+}
+
+// TCPRouteStatus defines the observed state of TCPRoute
+message TCPRouteStatus {
+  repeated GatewayObjectReference gatewayRefs = 1;
+}
+
 // TLSConfig describes a TLS configuration.
 //
 // References
@@ -1074,34 +1163,6 @@ message TLSConfig {
   //
   // Support: Implementation-specific.
   map<string, string> options = 3;
-}
-
-// TcpRoute is the Schema for the tcproutes API
-message TcpRoute {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta metadata = 2;
-
-  optional TcpRouteSpec spec = 3;
-
-  optional TcpRouteStatus status = 4;
-}
-
-// TcpRouteList contains a list of TcpRoute
-message TcpRouteList {
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.TypeMeta typeMeta = 1;
-
-  optional k8s.io.apimachinery.pkg.apis.meta.v1.ListMeta metadata = 2;
-
-  repeated TcpRoute items = 3;
-}
-
-// TcpRouteSpec defines the desired state of TcpRoute
-message TcpRouteSpec {
-}
-
-// TcpRouteStatus defines the observed state of TcpRoute
-message TcpRouteStatus {
 }
 
 // TrafficSplit is the Schema for the trafficsplits API

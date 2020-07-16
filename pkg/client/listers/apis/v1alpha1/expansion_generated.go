@@ -37,13 +37,13 @@ type HTTPRouteListerExpansion interface{}
 // HTTPRouteNamespaceLister.
 type HTTPRouteNamespaceListerExpansion interface{}
 
-// TcpRouteListerExpansion allows custom methods to be added to
-// TcpRouteLister.
-type TcpRouteListerExpansion interface{}
+// TCPRouteListerExpansion allows custom methods to be added to
+// TCPRouteLister.
+type TCPRouteListerExpansion interface{}
 
-// TcpRouteNamespaceListerExpansion allows custom methods to be added to
-// TcpRouteNamespaceLister.
-type TcpRouteNamespaceListerExpansion interface{}
+// TCPRouteNamespaceListerExpansion allows custom methods to be added to
+// TCPRouteNamespaceLister.
+type TCPRouteNamespaceListerExpansion interface{}
 
 // TrafficSplitListerExpansion allows custom methods to be added to
 // TrafficSplitLister.

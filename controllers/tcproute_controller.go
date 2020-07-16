@@ -24,8 +24,8 @@ import (
 	"sigs.k8s.io/service-apis/apis/v1alpha1"
 )
 
-// TcpRouteReconciler reconciles a TcpRoute object
-type TcpRouteReconciler struct {
+// TCPRouteReconciler reconciles a TCPRoute object
+type TCPRouteReconciler struct {
 	client.Client
 	Log logr.Logger
 }
@@ -34,7 +34,7 @@ type TcpRouteReconciler struct {
 // +kubebuilder:rbac:groups=networking.x-k8s.io,resources=tcproutes/status,verbs=get;update;patch
 
 // Reconcile the changes.
-func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+func (r *TCPRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	_ = context.Background()
 	_ = r.Log.WithValues("tcproute", req.NamespacedName)
 
@@ -44,8 +44,8 @@ func (r *TcpRouteReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 }
 
 // SetupWithManager wires up the controller.
-func (r *TcpRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
+func (r *TCPRouteReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
-		For(&v1alpha1.TcpRoute{}).
+		For(&v1alpha1.TCPRoute{}).
 		Complete(r)
 }

@@ -28,7 +28,7 @@ type NetworkingV1alpha1Interface interface {
 	GatewaysGetter
 	GatewayClassesGetter
 	HTTPRoutesGetter
-	TcpRoutesGetter
+	TCPRoutesGetter
 	TrafficSplitsGetter
 }
 
@@ -49,8 +49,8 @@ func (c *NetworkingV1alpha1Client) HTTPRoutes(namespace string) HTTPRouteInterfa
 	return newHTTPRoutes(c, namespace)
 }
 
-func (c *NetworkingV1alpha1Client) TcpRoutes(namespace string) TcpRouteInterface {
-	return newTcpRoutes(c, namespace)
+func (c *NetworkingV1alpha1Client) TCPRoutes(namespace string) TCPRouteInterface {
+	return newTCPRoutes(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) TrafficSplits(namespace string) TrafficSplitInterface {

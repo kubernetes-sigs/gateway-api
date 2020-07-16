@@ -29,8 +29,8 @@ type Interface interface {
 	GatewayClasses() GatewayClassInformer
 	// HTTPRoutes returns a HTTPRouteInformer.
 	HTTPRoutes() HTTPRouteInformer
-	// TcpRoutes returns a TcpRouteInformer.
-	TcpRoutes() TcpRouteInformer
+	// TCPRoutes returns a TCPRouteInformer.
+	TCPRoutes() TCPRouteInformer
 	// TrafficSplits returns a TrafficSplitInformer.
 	TrafficSplits() TrafficSplitInformer
 }
@@ -61,9 +61,9 @@ func (v *version) HTTPRoutes() HTTPRouteInformer {
 	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// TcpRoutes returns a TcpRouteInformer.
-func (v *version) TcpRoutes() TcpRouteInformer {
-	return &tcpRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// TCPRoutes returns a TCPRouteInformer.
+func (v *version) TCPRoutes() TCPRouteInformer {
+	return &tCPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TrafficSplits returns a TrafficSplitInformer.
