@@ -20,6 +20,7 @@ spec:
         group: core
         name: httpbin
     routes:
+      resource: httproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -37,6 +38,7 @@ spec:
         group: core
         name: conformance
     routes:
+      resource: httproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

@@ -2,7 +2,7 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: gateway
-  namespace: ssh-server
+  namespace: default
 spec:
   class: default-class
   addresses:
@@ -13,6 +13,7 @@ spec:
   - port: 22
     protocol: TCP
     routes:
+      resource: tcproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -23,6 +24,7 @@ spec:
   - port: 2222
     protocol: TCP
     routes:
+      resource: tcproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -43,6 +45,7 @@ spec:
         resource: secrets
         group: core
     routes:
+      resource: tcproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
