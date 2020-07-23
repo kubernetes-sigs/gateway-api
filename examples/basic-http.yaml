@@ -19,12 +19,13 @@ spec:
   listeners:  # Use GatewayClass defaults for listener definition.
   - protocol: HTTP
     routes:
+      resource: httproutes
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
       routeSelector:
         matchLabels:
-          "app": "foo"
+          app: foo
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
