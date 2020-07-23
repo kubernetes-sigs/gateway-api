@@ -23,6 +23,6 @@ type GatewayClassExpansion interface{}
 
 type HTTPRouteExpansion interface{}
 
-type TcpRouteExpansion interface{}
+type TCPRouteExpansion interface{}
 
 type TrafficSplitExpansion interface{}

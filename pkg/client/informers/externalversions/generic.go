@@ -59,7 +59,7 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 	case v1alpha1.SchemeGroupVersion.WithResource("httproutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().HTTPRoutes().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("tcproutes"):
-		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().TcpRoutes().Informer()}, nil
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().TCPRoutes().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("trafficsplits"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().TrafficSplits().Informer()}, nil
 

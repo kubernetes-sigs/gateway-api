@@ -24,64 +24,64 @@ import (
 	v1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
 )
 
-// TcpRouteLister helps list TcpRoutes.
-type TcpRouteLister interface {
-	// List lists all TcpRoutes in the indexer.
-	List(selector labels.Selector) (ret []*v1alpha1.TcpRoute, err error)
-	// TcpRoutes returns an object that can list and get TcpRoutes.
-	TcpRoutes(namespace string) TcpRouteNamespaceLister
-	TcpRouteListerExpansion
+// TCPRouteLister helps list TCPRoutes.
+type TCPRouteLister interface {
+	// List lists all TCPRoutes in the indexer.
+	List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error)
+	// TCPRoutes returns an object that can list and get TCPRoutes.
+	TCPRoutes(namespace string) TCPRouteNamespaceLister
+	TCPRouteListerExpansion
 }
 
-// tcpRouteLister implements the TcpRouteLister interface.
-type tcpRouteLister struct {
+// tCPRouteLister implements the TCPRouteLister interface.
+type tCPRouteLister struct {
 	indexer cache.Indexer
 }
 
-// NewTcpRouteLister returns a new TcpRouteLister.
-func NewTcpRouteLister(indexer cache.Indexer) TcpRouteLister {
-	return &tcpRouteLister{indexer: indexer}
+// NewTCPRouteLister returns a new TCPRouteLister.
+func NewTCPRouteLister(indexer cache.Indexer) TCPRouteLister {
+	return &tCPRouteLister{indexer: indexer}
 }
 
-// List lists all TcpRoutes in the indexer.
-func (s *tcpRouteLister) List(selector labels.Selector) (ret []*v1alpha1.TcpRoute, err error) {
+// List lists all TCPRoutes in the indexer.
+func (s *tCPRouteLister) List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error) {
 	err = cache.ListAll(s.indexer, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.TcpRoute))
+		ret = append(ret, m.(*v1alpha1.TCPRoute))
 	})
 	return ret, err
 }
 
-// TcpRoutes returns an object that can list and get TcpRoutes.
-func (s *tcpRouteLister) TcpRoutes(namespace string) TcpRouteNamespaceLister {
-	return tcpRouteNamespaceLister{indexer: s.indexer, namespace: namespace}
+// TCPRoutes returns an object that can list and get TCPRoutes.
+func (s *tCPRouteLister) TCPRoutes(namespace string) TCPRouteNamespaceLister {
+	return tCPRouteNamespaceLister{indexer: s.indexer, namespace: namespace}
 }
 
-// TcpRouteNamespaceLister helps list and get TcpRoutes.
-type TcpRouteNamespaceLister interface {
-	// List lists all TcpRoutes in the indexer for a given namespace.
-	List(selector labels.Selector) (ret []*v1alpha1.TcpRoute, err error)
-	// Get retrieves the TcpRoute from the indexer for a given namespace and name.
-	Get(name string) (*v1alpha1.TcpRoute, error)
-	TcpRouteNamespaceListerExpansion
+// TCPRouteNamespaceLister helps list and get TCPRoutes.
+type TCPRouteNamespaceLister interface {
+	// List lists all TCPRoutes in the indexer for a given namespace.
+	List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error)
+	// Get retrieves the TCPRoute from the indexer for a given namespace and name.
+	Get(name string) (*v1alpha1.TCPRoute, error)
+	TCPRouteNamespaceListerExpansion
 }
 
-// tcpRouteNamespaceLister implements the TcpRouteNamespaceLister
+// tCPRouteNamespaceLister implements the TCPRouteNamespaceLister
 // interface.
-type tcpRouteNamespaceLister struct {
+type tCPRouteNamespaceLister struct {
 	indexer   cache.Indexer
 	namespace string
 }
 
-// List lists all TcpRoutes in the indexer for a given namespace.
-func (s tcpRouteNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.TcpRoute, err error) {
+// List lists all TCPRoutes in the indexer for a given namespace.
+func (s tCPRouteNamespaceLister) List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error) {
 	err = cache.ListAllByNamespace(s.indexer, s.namespace, selector, func(m interface{}) {
-		ret = append(ret, m.(*v1alpha1.TcpRoute))
+		ret = append(ret, m.(*v1alpha1.TCPRoute))
 	})
 	return ret, err
 }
 
-// Get retrieves the TcpRoute from the indexer for a given namespace and name.
-func (s tcpRouteNamespaceLister) Get(name string) (*v1alpha1.TcpRoute, error) {
+// Get retrieves the TCPRoute from the indexer for a given namespace and name.
+func (s tCPRouteNamespaceLister) Get(name string) (*v1alpha1.TCPRoute, error) {
 	obj, exists, err := s.indexer.GetByKey(s.namespace + "/" + name)
 	if err != nil {
 		return nil, err
@@ -89,5 +89,5 @@ func (s tcpRouteNamespaceLister) Get(name string) (*v1alpha1.TcpRoute, error) {
 	if !exists {
 		return nil, errors.NewNotFound(v1alpha1.Resource("tcproute"), name)
 	}
-	return obj.(*v1alpha1.TcpRoute), nil
+	return obj.(*v1alpha1.TCPRoute), nil
 }

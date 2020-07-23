@@ -162,12 +162,6 @@ type HTTPRouteMatch struct {
 	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,5,opt,name=extensionRef"`
 }
 
-// RouteMatchExtensionObjectReference identifies a route-match extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteMatchExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
-
 // HTTPRouteFilter defines a filter-like action to be applied to
 // requests.
 type HTTPRouteFilter struct {
@@ -191,12 +185,6 @@ type HTTPRouteFilter struct {
 	// +optional
 	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
-
-// RouteFilterExtensionObjectReference identifies a route-filter extension
-// object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteFilterExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // HTTPHeaderFilter defines the filter behavior for a request match.
 type HTTPHeaderFilter struct {
@@ -266,42 +254,6 @@ type HTTPRouteAction struct {
 	// +optional
 	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
 }
-
-// ForwardToTarget identifies a target object within a known namespace.
-type ForwardToTarget struct {
-	// TargetRef is an object reference to forward matched requests to.
-	//
-	// Support: Core (Kubernetes Services)
-	// Support: Implementation-specific (Other resource types)
-	//
-	TargetRef ForwardToTargetObjectReference `json:"targetRef" protobuf:"bytes,1,opt,name=targetRef"`
-
-	// TargetPort specifies the destination port number to use for the TargetRef.
-	// If unspecified and TargetRef is a Service object consisting of a single
-	// port definition, that port will be used. If unspecified and TargetRef is
-	// a Service object consisting of multiple port definitions, an error is
-	// surfaced in status.
-	//
-	// Support: Core
-	//
-	// +optional
-	TargetPort *TargetPort `json:"targetPort" protobuf:"bytes,2,opt,name=targetPort"`
-}
-
-// TargetPort specifies the destination port number to use for a TargetRef.
-type TargetPort int32
-
-// ForwardToTargetObjectReference identifies a target object of a ForwardTo
-// route action within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type ForwardToTargetObjectReference = ServicesDefaultLocalObjectReference
-
-// RouteActionExtensionObjectReference identifies a route-action extension
-// object within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteActionExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
 // within a known namespace.

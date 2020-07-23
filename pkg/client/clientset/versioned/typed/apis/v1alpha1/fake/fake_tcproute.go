@@ -29,31 +29,31 @@ import (
 	v1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
 )
 
-// FakeTcpRoutes implements TcpRouteInterface
-type FakeTcpRoutes struct {
+// FakeTCPRoutes implements TCPRouteInterface
+type FakeTCPRoutes struct {
 	Fake *FakeNetworkingV1alpha1
 	ns   string
 }
 
 var tcproutesResource = schema.GroupVersionResource{Group: "networking.x-k8s.io", Version: "v1alpha1", Resource: "tcproutes"}
 
-var tcproutesKind = schema.GroupVersionKind{Group: "networking.x-k8s.io", Version: "v1alpha1", Kind: "TcpRoute"}
+var tcproutesKind = schema.GroupVersionKind{Group: "networking.x-k8s.io", Version: "v1alpha1", Kind: "TCPRoute"}
 
-// Get takes name of the tcpRoute, and returns the corresponding tcpRoute object, and an error if there is any.
-func (c *FakeTcpRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.TcpRoute, err error) {
+// Get takes name of the tCPRoute, and returns the corresponding tCPRoute object, and an error if there is any.
+func (c *FakeTCPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha1.TCPRoute, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(tcproutesResource, c.ns, name), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewGetAction(tcproutesResource, c.ns, name), &v1alpha1.TCPRoute{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.TcpRoute), err
+	return obj.(*v1alpha1.TCPRoute), err
 }
 
-// List takes label and field selectors, and returns the list of TcpRoutes that match those selectors.
-func (c *FakeTcpRoutes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.TcpRouteList, err error) {
+// List takes label and field selectors, and returns the list of TCPRoutes that match those selectors.
+func (c *FakeTCPRoutes) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha1.TCPRouteList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(tcproutesResource, tcproutesKind, c.ns, opts), &v1alpha1.TcpRouteList{})
+		Invokes(testing.NewListAction(tcproutesResource, tcproutesKind, c.ns, opts), &v1alpha1.TCPRouteList{})
 
 	if obj == nil {
 		return nil, err
@@ -63,8 +63,8 @@ func (c *FakeTcpRoutes) List(ctx context.Context, opts v1.ListOptions) (result *
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha1.TcpRouteList{ListMeta: obj.(*v1alpha1.TcpRouteList).ListMeta}
-	for _, item := range obj.(*v1alpha1.TcpRouteList).Items {
+	list := &v1alpha1.TCPRouteList{ListMeta: obj.(*v1alpha1.TCPRouteList).ListMeta}
+	for _, item := range obj.(*v1alpha1.TCPRouteList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -72,70 +72,70 @@ func (c *FakeTcpRoutes) List(ctx context.Context, opts v1.ListOptions) (result *
 	return list, err
 }
 
-// Watch returns a watch.Interface that watches the requested tcpRoutes.
-func (c *FakeTcpRoutes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
+// Watch returns a watch.Interface that watches the requested tCPRoutes.
+func (c *FakeTCPRoutes) Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error) {
 	return c.Fake.
 		InvokesWatch(testing.NewWatchAction(tcproutesResource, c.ns, opts))
 
 }
 
-// Create takes the representation of a tcpRoute and creates it.  Returns the server's representation of the tcpRoute, and an error, if there is any.
-func (c *FakeTcpRoutes) Create(ctx context.Context, tcpRoute *v1alpha1.TcpRoute, opts v1.CreateOptions) (result *v1alpha1.TcpRoute, err error) {
+// Create takes the representation of a tCPRoute and creates it.  Returns the server's representation of the tCPRoute, and an error, if there is any.
+func (c *FakeTCPRoutes) Create(ctx context.Context, tCPRoute *v1alpha1.TCPRoute, opts v1.CreateOptions) (result *v1alpha1.TCPRoute, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(tcproutesResource, c.ns, tcpRoute), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewCreateAction(tcproutesResource, c.ns, tCPRoute), &v1alpha1.TCPRoute{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.TcpRoute), err
+	return obj.(*v1alpha1.TCPRoute), err
 }
 
-// Update takes the representation of a tcpRoute and updates it. Returns the server's representation of the tcpRoute, and an error, if there is any.
-func (c *FakeTcpRoutes) Update(ctx context.Context, tcpRoute *v1alpha1.TcpRoute, opts v1.UpdateOptions) (result *v1alpha1.TcpRoute, err error) {
+// Update takes the representation of a tCPRoute and updates it. Returns the server's representation of the tCPRoute, and an error, if there is any.
+func (c *FakeTCPRoutes) Update(ctx context.Context, tCPRoute *v1alpha1.TCPRoute, opts v1.UpdateOptions) (result *v1alpha1.TCPRoute, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(tcproutesResource, c.ns, tcpRoute), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewUpdateAction(tcproutesResource, c.ns, tCPRoute), &v1alpha1.TCPRoute{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.TcpRoute), err
+	return obj.(*v1alpha1.TCPRoute), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeTcpRoutes) UpdateStatus(ctx context.Context, tcpRoute *v1alpha1.TcpRoute, opts v1.UpdateOptions) (*v1alpha1.TcpRoute, error) {
+func (c *FakeTCPRoutes) UpdateStatus(ctx context.Context, tCPRoute *v1alpha1.TCPRoute, opts v1.UpdateOptions) (*v1alpha1.TCPRoute, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(tcproutesResource, "status", c.ns, tcpRoute), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewUpdateSubresourceAction(tcproutesResource, "status", c.ns, tCPRoute), &v1alpha1.TCPRoute{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.TcpRoute), err
+	return obj.(*v1alpha1.TCPRoute), err
 }
 
-// Delete takes name of the tcpRoute and deletes it. Returns an error if one occurs.
-func (c *FakeTcpRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
+// Delete takes name of the tCPRoute and deletes it. Returns an error if one occurs.
+func (c *FakeTCPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(tcproutesResource, c.ns, name), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewDeleteAction(tcproutesResource, c.ns, name), &v1alpha1.TCPRoute{})
 
 	return err
 }
 
 // DeleteCollection deletes a collection of objects.
-func (c *FakeTcpRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
+func (c *FakeTCPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(tcproutesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1alpha1.TcpRouteList{})
+	_, err := c.Fake.Invokes(action, &v1alpha1.TCPRouteList{})
 	return err
 }
 
-// Patch applies the patch and returns the patched tcpRoute.
-func (c *FakeTcpRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.TcpRoute, err error) {
+// Patch applies the patch and returns the patched tCPRoute.
+func (c *FakeTCPRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha1.TCPRoute, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(tcproutesResource, c.ns, name, pt, data, subresources...), &v1alpha1.TcpRoute{})
+		Invokes(testing.NewPatchSubresourceAction(tcproutesResource, c.ns, name, pt, data, subresources...), &v1alpha1.TCPRoute{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha1.TcpRoute), err
+	return obj.(*v1alpha1.TCPRoute), err
 }

@@ -90,11 +90,11 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "TrafficSplit")
 		os.Exit(1)
 	}
-	if err = (&controllers.TcpRouteReconciler{
+	if err = (&controllers.TCPRouteReconciler{
 		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("TcpRoute"),
+		Log:    ctrl.Log.WithName("controllers").WithName("TCPRoute"),
 	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "TcpRoute")
+		setupLog.Error(err, "unable to create controller", "controller", "TCPRoute")
 		os.Exit(1)
 	}
 	// +kubebuilder:scaffold:builder

@@ -341,7 +341,7 @@
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>
 </li><li>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute</a>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>
 </li></ul>
@@ -765,10 +765,10 @@ HTTPRouteStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute
 </h3>
 <p>
-<p>TcpRoute is the Schema for the tcproutes API</p>
+<p>TCPRoute is the Schema for the tcproutes API</p>
 </p>
 <table>
 <thead>
@@ -793,7 +793,7 @@ networking.x-k8s.io/v1alpha1
 <code>kind</code></br>
 string
 </td>
-<td><code>TcpRoute</code></td>
+<td><code>TCPRoute</code></td>
 </tr>
 <tr>
 <td>
@@ -813,8 +813,8 @@ Refer to the Kubernetes API documentation for the fields of the
 <td>
 <code>spec</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRouteSpec">
-TcpRouteSpec
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteSpec">
+TCPRouteSpec
 </a>
 </em>
 </td>
@@ -822,6 +822,19 @@ TcpRouteSpec
 <br/>
 <br/>
 <table>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">
+[]TCPRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of TCP matchers and actions.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -829,8 +842,8 @@ TcpRouteSpec
 <td>
 <code>status</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRouteStatus">
-TcpRouteStatus
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">
+TCPRouteStatus
 </a>
 </em>
 </td>
@@ -930,7 +943,9 @@ TrafficSplitStatus
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>)
 </p>
 <p>
 <p>RouteMatchExtensionObjectReference identifies a route-match extension object
@@ -1004,7 +1019,8 @@ string
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>)
 </p>
 <p>
 <p>ForwardToTarget identifies a target object within a known namespace.</p>
@@ -1468,7 +1484,8 @@ with respect to the current state of the instance.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2835,6 +2852,219 @@ string
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule</a>)
+</p>
+<p>
+<p>TCPRouteAction is the action for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>forwardTo</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
+ForwardToTarget
+</a>
+</em>
+</td>
+<td>
+<p>ForwardTo sends requests to the referenced object.  The
+resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the TCPRoute will be true.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the TCPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule</a>)
+</p>
+<p>
+<p>TCPRouteMatch defines the predicate used to match connections to a
+given action.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the TCPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteSpec">TCPRouteSpec</a>)
+</p>
+<p>
+<p>TCPRouteRule is the configuration for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>match</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">
+TCPRouteMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Match defines which connections match this rule.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>action</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">
+TCPRouteAction
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Action defines what happens to the connection.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteSpec">TCPRouteSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>)
+</p>
+<p>
+<p>TCPRouteSpec defines the desired state of TCPRoute</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">
+[]TCPRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of TCP matchers and actions.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>)
+</p>
+<p>
+<p>TCPRouteStatus defines the observed state of TCPRoute</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gatewayRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
+[]GatewayObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSConfig">TLSConfig
 </h3>
 <p>
@@ -2926,24 +3156,6 @@ construct.</p>
 </p>
 <p>
 <p>TargetPort specifies the destination port number to use for a TargetRef.</p>
-</p>
-<h3 id="networking.x-k8s.io/v1alpha1.TcpRouteSpec">TcpRouteSpec
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute</a>)
-</p>
-<p>
-<p>TcpRouteSpec defines the desired state of TcpRoute</p>
-</p>
-<h3 id="networking.x-k8s.io/v1alpha1.TcpRouteStatus">TcpRouteStatus
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TcpRoute">TcpRoute</a>)
-</p>
-<p>
-<p>TcpRouteStatus defines the observed state of TcpRoute</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.TrafficSplitSpec">TrafficSplitSpec
 </h3>
