@@ -60,6 +60,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().HTTPRoutes().Informer()}, nil
 	case v1alpha1.SchemeGroupVersion.WithResource("tcproutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().TCPRoutes().Informer()}, nil
+	case v1alpha1.SchemeGroupVersion.WithResource("udproutes"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Networking().V1alpha1().UDPRoutes().Informer()}, nil
 
 	}
 
