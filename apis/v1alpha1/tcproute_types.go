@@ -97,6 +97,11 @@ type TCPRouteMatch struct {
 	//
 	// +optional
 	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,1,opt,name=extensionRef"`
+	// SNI is the name to match based on TLS Server Name Indication
+	// ([RFC6066](https://tools.ietf.org/html/rfc6066)).
+	//
+	// +optional
+	SNI *string `json:"sni" protobuf:"bytes,2,opt,name=sni"`
 }
 
 // +kubebuilder:object:root=true

@@ -119,6 +119,9 @@ spec:
                           - name
                           - resource
                           type: object
+                        sni:
+                          description: SNI is the name to match based on TLS Server Name Indication ([RFC6066](https://tools.ietf.org/html/rfc6066)).
+                          type: string
                       type: object
                   type: object
                 type: array

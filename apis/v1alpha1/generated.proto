@@ -1121,6 +1121,12 @@ message TCPRouteMatch {
   //
   // +optional
   optional ConfigMapsDefaultLocalObjectReference extensionRef = 1;
+
+  // SNI is the name to match based on TLS Server Name Indication
+  // ([RFC6066](https://tools.ietf.org/html/rfc6066)).
+  //
+  // +optional
+  optional string sni = 2;
 }
 
 // TCPRouteRule is the configuration for a given rule.
