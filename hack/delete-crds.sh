@@ -24,8 +24,7 @@ RESOURCES="
   gatewayclasses.networking.x-k8s.io
   gateways.networking.x-k8s.io
   httproutes.networking.x-k8s.io
-  tcproutes.networking.x-k8s.io
-  trafficsplits.networking.x-k8s.io"
+  tcproutes.networking.x-k8s.io"
 
 for TYPE in ${RESOURCES}; do
   kubectl delete ${TYPE} --all

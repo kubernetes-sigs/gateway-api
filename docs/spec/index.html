@@ -342,8 +342,6 @@
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>
-</li><li>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>
 </li></ul>
 <h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
 </h3>
@@ -852,80 +850,6 @@ TCPRouteStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit
-</h3>
-<p>
-<p>TrafficSplit is the Schema for the trafficsplits API</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>apiVersion</code></br>
-string</td>
-<td>
-<code>
-networking.x-k8s.io/v1alpha1
-</code>
-</td>
-</tr>
-<tr>
-<td>
-<code>kind</code></br>
-string
-</td>
-<td><code>TrafficSplit</code></td>
-</tr>
-<tr>
-<td>
-<code>metadata</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
-Kubernetes meta/v1.ObjectMeta
-</a>
-</em>
-</td>
-<td>
-Refer to the Kubernetes API documentation for the fields of the
-<code>metadata</code> field.
-</td>
-</tr>
-<tr>
-<td>
-<code>spec</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitSpec">
-TrafficSplitSpec
-</a>
-</em>
-</td>
-<td>
-<br/>
-<br/>
-<table>
-</table>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplitStatus">
-TrafficSplitStatus
-</a>
-</em>
-</td>
-<td>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.AddressType">AddressType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -1043,7 +967,14 @@ ServicesDefaultLocalObjectReference
 </em>
 </td>
 <td>
-<p>TargetRef is an object reference to forward matched requests to.</p>
+<p>TargetRef is an object reference to forward matched requests to.
+The resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
 <p>Support: Core (Kubernetes Services)
 Support: Implementation-specific (Other resource types)</p>
 </td>
@@ -1064,6 +995,33 @@ If unspecified and TargetRef is a Service object consisting of a single
 port definition, that port will be used. If unspecified and TargetRef is
 a Service object consisting of multiple port definitions, an error is
 surfaced in status.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>weight</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TargetWeight">
+TargetWeight
+</a>
+</em>
+</td>
+<td>
+<p>Weight specifies the proportion of traffic to be forwarded to a targetRef,
+computed as weight/(sum of all weights in targetRefs). Weight is not a
+percentage and the sum of weights does not need to equal 100. The following
+example (in yaml) sends 70% of traffic to service &ldquo;my-trafficsplit-sv1&rdquo; and
+30% of the traffic to service &ldquo;my-trafficsplit-sv2&rdquo;:</p>
+<p>forwardTo:
+- targetRef:
+name: my-trafficsplit-sv1
+weight: 70
+- targetRef:
+name: my-trafficsplit-sv2
+weight: 30</p>
+<p>If only one targetRef is specified, 100% of the traffic is forwarded to the
+targetRef. If unspecified, weight defaults to 1.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1772,12 +1730,12 @@ My-Header2: DEF</p>
 <code>forwardTo</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
-ForwardToTarget
+[]ForwardToTarget
 </a>
 </em>
 </td>
 <td>
-<p>ForwardTo sends requests to the referenced object.  The
+<p>ForwardTo sends requests to the referenced object(s).  The
 resource may be &ldquo;services&rdquo; (omit or use the empty string for the
 group), or an implementation may support other resources (for
 example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
@@ -1785,6 +1743,7 @@ Omitting or specifying the empty string for both the resource and
 group indicates that the resource is &ldquo;services&rdquo;.  If the referent
 cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
 that includes the HTTPRoute will be true.</p>
+<p>Support: core</p>
 </td>
 </tr>
 <tr>
@@ -3157,23 +3116,15 @@ construct.</p>
 <p>
 <p>TargetPort specifies the destination port number to use for a TargetRef.</p>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.TrafficSplitSpec">TrafficSplitSpec
-</h3>
+<h3 id="networking.x-k8s.io/v1alpha1.TargetWeight">TargetWeight
+(<code>int32</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>)
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>)
 </p>
 <p>
-<p>TrafficSplitSpec defines the desired state of TrafficSplit</p>
-</p>
-<h3 id="networking.x-k8s.io/v1alpha1.TrafficSplitStatus">TrafficSplitStatus
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TrafficSplit">TrafficSplit</a>)
-</p>
-<p>
-<p>TrafficSplitStatus defines the observed state of TrafficSplit</p>
+<p>TargetWeight specifies weight used for making a forwarding decision
+to a TargetRef.</p>
 </p>
 <hr/>
 <p><em>

@@ -1,7 +1,0 @@
-apiVersion: networking.x-k8s.io/v1alpha1
-kind: TrafficSplit
-metadata:
-  name: trafficsplit-sample
-spec:
-  # Add fields here
-  foo: bar

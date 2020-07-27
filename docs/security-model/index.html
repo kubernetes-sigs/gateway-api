@@ -606,14 +606,13 @@
 <p>The Service APIs have been designed to enable granular authorization for each
 role in a typical organization. </p>
 <h2 id="resources">Resources</h2>
-<p>The Service APIs have 4 primary API resources:</p>
+<p>The Service APIs have 3 primary API resources:</p>
 <ul>
 <li><strong>GatewayClass</strong> defines a set of gateways with a common configuration and
   behavior.</li>
 <li><strong>Gateway</strong> requests a point where traffic can be translated to Services
   within the cluster.</li>
 <li><strong>Routes</strong> describe how traffic coming via the Gateway maps to the Services.</li>
-<li><strong>TrafficSplits</strong> describe how traffic may be split from Routes.</li>
 </ul>
 <h3 id="additional-configuration">Additional Configuration</h3>
 <p>There are two additional pieces of configuration that are important in this
@@ -661,13 +660,11 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <th>GatewayClass</th>
 <th>Gateway</th>
 <th>Route</th>
-<th>TrafficSplit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Infrastructure Provider</td>
-<td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
@@ -677,13 +674,11 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <td>No</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>Yes</td>
 </tr>
 <tr>
 <td>Application Developers</td>
 <td>No</td>
 <td>No</td>
-<td>Yes</td>
 <td>Yes</td>
 </tr>
 </tbody>
@@ -696,13 +691,11 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <th>GatewayClass</th>
 <th>Gateway</th>
 <th>Route</th>
-<th>TrafficSplit</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Infrastructure Provider</td>
-<td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
 <td>Yes</td>
@@ -712,12 +705,10 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <td>Sometimes</td>
 <td>Yes</td>
 <td>Yes</td>
-<td>Yes</td>
 </tr>
 <tr>
 <td>Application Admins</td>
 <td>No</td>
-<td>In Specified Namespaces</td>
 <td>In Specified Namespaces</td>
 <td>In Specified Namespaces</td>
 </tr>
@@ -725,7 +716,6 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <td>Application Developers</td>
 <td>No</td>
 <td>No</td>
-<td>In Specified Namespaces</td>
 <td>In Specified Namespaces</td>
 </tr>
 </tbody>

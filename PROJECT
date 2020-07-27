@@ -13,7 +13,4 @@ resources:
   kind: HttpRoute
 - group: networking
   version: v1alpha1
-  kind: TrafficSplit
-- group: networking
-  version: v1alpha1
   kind: TcpRoute
