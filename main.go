@@ -83,13 +83,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "HTTPRoute")
 		os.Exit(1)
 	}
-	if err = (&controllers.TrafficSplitReconciler{
-		Client: mgr.GetClient(),
-		Log:    ctrl.Log.WithName("controllers").WithName("TrafficSplit"),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "TrafficSplit")
-		os.Exit(1)
-	}
 	if err = (&controllers.TCPRouteReconciler{
 		Client: mgr.GetClient(),
 		Log:    ctrl.Log.WithName("controllers").WithName("TCPRoute"),

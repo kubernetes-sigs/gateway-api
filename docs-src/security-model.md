@@ -5,14 +5,13 @@ The Service APIs have been designed to enable granular authorization for each
 role in a typical organization. 
 
 ## Resources
-The Service APIs have 4 primary API resources:
+The Service APIs have 3 primary API resources:
 
 * **GatewayClass** defines a set of gateways with a common configuration and
   behavior.
 * **Gateway** requests a point where traffic can be translated to Services
   within the cluster.
 * **Routes** describe how traffic coming via the Gateway maps to the Services.
-* **TrafficSplits** describe how traffic may be split from Routes.
 
 ### Additional Configuration
 There are two additional pieces of configuration that are important in this
@@ -55,19 +54,19 @@ defined above. In most cases, it will be desirable to have all resources be
 readable by most roles, so instead we'll focus on write access for this model.
 
 ### Write Permissions for Simple 3 Tier Model 
-| | GatewayClass | Gateway | Route | TrafficSplit |
-|-|-|-|-|-|
-| Infrastructure Provider | Yes | Yes | Yes | Yes |
-| Cluster Operators | No | Yes | Yes | Yes |
-| Application Developers | No | No | Yes | Yes |
+| | GatewayClass | Gateway | Route |
+|-|-|-|-|
+| Infrastructure Provider | Yes | Yes | Yes |
+| Cluster Operators | No | Yes | Yes |
+| Application Developers | No | No | Yes |
 
 ### Write Permissions for Advanced 4 Tier Model 
-| | GatewayClass | Gateway | Route | TrafficSplit |
-|-|-|-|-|-|
-| Infrastructure Provider | Yes | Yes | Yes | Yes |
-| Cluster Operators | Sometimes | Yes | Yes | Yes |
-| Application Admins | No | In Specified Namespaces | In Specified Namespaces | In Specified Namespaces |
-| Application Developers | No | No | In Specified Namespaces | In Specified Namespaces |
+| | GatewayClass | Gateway | Route |
+|-|-|-|-|
+| Infrastructure Provider | Yes | Yes | Yes |
+| Cluster Operators | Sometimes | Yes | Yes |
+| Application Admins | No | In Specified Namespaces | In Specified Namespaces |
+| Application Developers | No | No | In Specified Namespaces |
 
 ## Namespace Restrictions
 The extra configuration options are not possible to control with RBAC. Instead,

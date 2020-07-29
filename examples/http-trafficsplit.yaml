@@ -1,0 +1,51 @@
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: trafficsplit-lb
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    group: networking.acme.io
+    resource: AcmeLBConfig
+    name: acme-lb-config
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-trafficsplit-gateway
+  namespace: default
+spec:
+  class: trafficsplit-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+    - protocol: HTTP
+      routes:
+        resource: httproutes
+        routeNamespaces:
+          namespaceSelector: {}
+          onlySameNamespace: false
+        routeSelector:
+          matchLabels:
+            app: split
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-trafficsplit-1
+  namespace: default
+  labels:
+    app: split
+spec:
+  hosts:
+    - hostnames:
+        - "my.trafficsplit.com"
+      rules:
+        - match:
+            path: /bar
+          action:
+            forwardTo:
+              - targetRef:
+                  name: my-trafficsplit-sv1
+                weight: 50
+              - targetRef:
+                  name: my-trafficsplit-sv2
+                weight: 50

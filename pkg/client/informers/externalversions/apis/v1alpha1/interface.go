@@ -31,8 +31,6 @@ type Interface interface {
 	HTTPRoutes() HTTPRouteInformer
 	// TCPRoutes returns a TCPRouteInformer.
 	TCPRoutes() TCPRouteInformer
-	// TrafficSplits returns a TrafficSplitInformer.
-	TrafficSplits() TrafficSplitInformer
 }
 
 type version struct {
@@ -64,9 +62,4 @@ func (v *version) HTTPRoutes() HTTPRouteInformer {
 // TCPRoutes returns a TCPRouteInformer.
 func (v *version) TCPRoutes() TCPRouteInformer {
 	return &tCPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// TrafficSplits returns a TrafficSplitInformer.
-func (v *version) TrafficSplits() TrafficSplitInformer {
-	return &trafficSplitInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

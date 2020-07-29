@@ -44,11 +44,3 @@ type TCPRouteListerExpansion interface{}
 // TCPRouteNamespaceListerExpansion allows custom methods to be added to
 // TCPRouteNamespaceLister.
 type TCPRouteNamespaceListerExpansion interface{}
-
-// TrafficSplitListerExpansion allows custom methods to be added to
-// TrafficSplitLister.
-type TrafficSplitListerExpansion interface{}
-
-// TrafficSplitNamespaceListerExpansion allows custom methods to be added to
-// TrafficSplitNamespaceLister.
-type TrafficSplitNamespaceListerExpansion interface{}

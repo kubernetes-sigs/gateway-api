@@ -230,7 +230,7 @@ type HTTPHeaderFilter struct {
 
 // HTTPRouteAction is the action taken given a match.
 type HTTPRouteAction struct {
-	// ForwardTo sends requests to the referenced object.  The
+	// ForwardTo sends requests to the referenced object(s).  The
 	// resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
 	// example, resource "myroutetargets" in group "networking.acme.io").
@@ -238,8 +238,10 @@ type HTTPRouteAction struct {
 	// group indicates that the resource is "services".  If the referent
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the HTTPRoute will be true.
-	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
-
+	//
+	// Support: core
+	//
+	ForwardTo []ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,rep,name=forwardTo"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
 	// string for the group) or an implementation-defined resource (for
