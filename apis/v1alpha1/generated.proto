@@ -639,7 +639,7 @@ message HTTPRouteMatch {
   // Default: "Exact"
   //
   // +optional
-  optional string pathType = 1;
+  optional string pathMatchType = 1;
 
   // Path is the value of the HTTP path as interpreted via
   // PathType.

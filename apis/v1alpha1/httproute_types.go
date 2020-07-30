@@ -95,12 +95,15 @@ type HTTPRouteRule struct {
 	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
 }
 
+// PathMatchType specifies the semantics of how HTTP paths should be compared.
+type PathMatchType string
+
 // PathType constants.
 const (
-	PathTypeExact                = "Exact"
-	PathTypePrefix               = "Prefix"
-	PathTypeRegularExpression    = "RegularExpression"
-	PathTypeImplementionSpecific = "ImplementationSpecific"
+	PathMatchExact                PathMatchType = "Exact"
+	PathMatchPrefix               PathMatchType = "Prefix"
+	PathMatchRegularExpression    PathMatchType = "RegularExpression"
+	PathMatchImplementionSpecific PathMatchType = "ImplementationSpecific"
 )
 
 // HeaderMatchType constants.
@@ -124,7 +127,7 @@ type HTTPRouteMatch struct {
 	// Default: "Exact"
 	//
 	// +optional
-	PathType string `json:"pathType" protobuf:"bytes,1,opt,name=pathType"`
+	PathMatchType PathMatchType `json:"pathMatchType" protobuf:"bytes,1,opt,name=pathMatchType"`
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
 	//
