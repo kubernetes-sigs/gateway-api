@@ -121,7 +121,6 @@ spec:
                                     type: integer
                                 required:
                                 - targetRef
-                                - weight
                                 type: object
                               type: array
                           required:
@@ -302,7 +301,6 @@ spec:
                                       type: integer
                                   required:
                                   - targetRef
-                                  - weight
                                   type: object
                                 type: array
                             required:

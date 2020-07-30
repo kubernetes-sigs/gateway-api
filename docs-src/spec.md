@@ -683,6 +683,7 @@ TargetWeight
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Weight specifies the proportion of traffic to be forwarded to a targetRef,
 computed as weight/(sum of all weights in targetRefs). Weight is not a
 percentage and the sum of weights does not need to equal 100. The following

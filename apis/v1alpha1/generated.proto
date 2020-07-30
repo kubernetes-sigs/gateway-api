@@ -121,6 +121,7 @@ message ForwardToTarget {
   // Support: Core
   //
   // +kubebuilder:default=1
+  // +optional
   optional int32 weight = 3;
 }
 

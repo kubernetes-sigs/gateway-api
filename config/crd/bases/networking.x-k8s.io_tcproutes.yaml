@@ -92,7 +92,6 @@ spec:
                               type: integer
                           required:
                           - targetRef
-                          - weight
                           type: object
                       required:
                       - forwardTo
