@@ -189,7 +189,7 @@ spec:
                             path:
                               description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                               type: string
-                            pathType:
+                            pathMatchType:
                               description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: extended (RegularExpression) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
                               type: string
                           required:
@@ -359,7 +359,7 @@ spec:
                               path:
                                 description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                                 type: string
-                              pathType:
+                              pathMatchType:
                                 description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: extended (RegularExpression) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
                                 type: string
                             required:

@@ -1615,9 +1615,11 @@ given action.</p>
 <tbody>
 <tr>
 <td>
-<code>pathType</code></br>
+<code>pathMatchType</code></br>
 <em>
-string
+<a href="#networking.x-k8s.io/v1alpha1.PathMatchType">
+PathMatchType
+</a>
 </em>
 </td>
 <td>
@@ -2179,6 +2181,15 @@ status of all such Listeners.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.PathMatchType">PathMatchType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+</p>
+<p>
+<p>PathMatchType specifies the semantics of how HTTP paths should be compared.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.ProtocolType">ProtocolType
 (<code>string</code> alias)</p></h3>
 <p>
