@@ -95,8 +95,8 @@ type GatewayClassSpec struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default={onlySameNamespace:true}
 	// +optional
+	// +kubebuilder:default={onlySameNamespace:true}
 	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
 
 	// ParametersRef is a controller specific resource containing
@@ -148,8 +148,8 @@ type RouteNamespaces struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default=true
 	// +optional
+	// +kubebuilder:default=true
 	OnlySameNamespace bool `json:"onlySameNamespace" protobuf:"bytes,2,opt,name=onlySameNamespace"`
 }
 

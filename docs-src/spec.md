@@ -566,6 +566,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Group is the group of the referent.  Omitting the value or specifying
 the empty string indicates the core API group.  For example, use the
 following to specify a configmaps:</p>
@@ -588,6 +589,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Resource is the API resource name of the referent. Omitting the value
 or specifying the empty string indicates the configmaps resource. For
 example, use the following to specify a configmaps resource:</p>
@@ -683,6 +685,7 @@ TargetWeight
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Weight specifies the proportion of traffic to be forwarded to a targetRef,
 computed as weight/(sum of all weights in targetRefs). Weight is not a
 percentage and the sum of weights does not need to equal 100. The following
@@ -1928,6 +1931,7 @@ HostnameMatch
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Hostname specifies to match the virtual host name for
 protocol types that define this concept.</p>
 <p>Incoming requests that include a host name are matched
@@ -2246,6 +2250,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Group is the group of the route resource to select. Omitting the value or specifying
 the empty string indicates the networking.x-k8s.io API group.
 For example, use the following to select an HTTPRoute:</p>
@@ -2363,6 +2368,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Group is the group of the referent.  Omitting the value or specifying
 the empty string indicates the core API group.  For example, use the
 following to specify a secrets resource:</p>
@@ -2385,6 +2391,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Resource is the API resource name of the referent. Omitting the value
 or specifying the empty string indicates the secrets resource. For
 example, use the following to specify a secrets resource:</p>
@@ -2438,6 +2445,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Group is the group of the referent.  Omitting the value or specifying
 the empty string indicates the core API group.  For example, use the
 following to specify a service:</p>
@@ -2460,6 +2468,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Resource is the API resource name of the referent. Omitting the value
 or specifying the empty string indicates the services resource. For example,
 use the following to specify a services resource:</p>

@@ -173,7 +173,6 @@ spec:
                               type: object
                           type: object
                       required:
-                      - group
                       - resource
                       type: object
                     tls:
@@ -196,9 +195,7 @@ spec:
                                 description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the secrets resource. For example, use the following to specify a secrets resource: \n fooRef:   name: mysecret \n Otherwise, if the secrets resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                 type: string
                             required:
-                            - group
                             - name
-                            - resource
                             type: object
                           type: array
                         minimumVersion:

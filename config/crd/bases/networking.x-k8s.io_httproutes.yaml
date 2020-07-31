@@ -50,9 +50,7 @@ spec:
                         description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                         type: string
                     required:
-                    - group
                     - name
-                    - resource
                     type: object
                   hostnames:
                     description: "Hostnames defines a set of hostname that should match against the HTTP Host header to select a HTTPRoute to process a the request. Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IPs are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Incoming requests are matched against the hostnames before the HTTPRoute rules. If no hostname is specified, traffic is routed based on the HTTPRouteRules. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. \"*.example.com\"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == \"*\"). Requests will be matched against the Host field in the following order: 1. If Host is precise, the request matches this rule if    the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if    the http host header is to equal to the suffix    (removing the first label) of the wildcard rule. \n Support: Core"
@@ -82,9 +80,7 @@ spec:
                                   description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                   type: string
                               required:
-                              - group
                               - name
-                              - resource
                               type: object
                             forwardTo:
                               description: "ForwardTo sends requests to the referenced object(s).  The resource may be \"services\" (omit or use the empty string for the group), or an implementation may support other resources (for example, resource \"myroutetargets\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"services\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the HTTPRoute will be true. \n Support: core"
@@ -110,9 +106,7 @@ spec:
                                         description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the services resource. For example, use the following to specify a services resource: \n fooRef:   name: myservice \n Otherwise, if the services resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                         type: string
                                     required:
-                                    - group
                                     - name
-                                    - resource
                                     type: object
                                   weight:
                                     default: 1
@@ -121,7 +115,6 @@ spec:
                                     type: integer
                                 required:
                                 - targetRef
-                                - weight
                                 type: object
                               type: array
                           required:
@@ -145,9 +138,7 @@ spec:
                                   description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                   type: string
                               required:
-                              - group
                               - name
-                              - resource
                               type: object
                             headers:
                               description: "Headers related filters. \n Support: extended"
@@ -185,9 +176,7 @@ spec:
                                   description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                   type: string
                               required:
-                              - group
                               - name
-                              - resource
                               type: object
                             headerMatchType:
                               description: "HeaderMatchType defines the semantics of the `Header` matcher. \n Support: core (Exact) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
@@ -231,9 +220,7 @@ spec:
                           description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                           type: string
                       required:
-                      - group
                       - name
-                      - resource
                       type: object
                     hostnames:
                       description: "Hostnames defines a set of hostname that should match against the HTTP Host header to select a HTTPRoute to process a the request. Hostname is the fully qualified domain name of a network host, as defined by RFC 3986. Note the following deviations from the \"host\" part of the URI as defined in the RFC: \n 1. IPs are not allowed. 2. The `:` delimiter is not respected because ports are not allowed. \n Incoming requests are matched against the hostnames before the HTTPRoute rules. If no hostname is specified, traffic is routed based on the HTTPRouteRules. \n Hostname can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. \"*.example.com\"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == \"*\"). Requests will be matched against the Host field in the following order: 1. If Host is precise, the request matches this rule if    the http host header is equal to Host. 2. If Host is a wildcard, then the request matches this rule if    the http host header is to equal to the suffix    (removing the first label) of the wildcard rule. \n Support: Core"
@@ -263,9 +250,7 @@ spec:
                                     description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
-                                - group
                                 - name
-                                - resource
                                 type: object
                               forwardTo:
                                 description: "ForwardTo sends requests to the referenced object(s).  The resource may be \"services\" (omit or use the empty string for the group), or an implementation may support other resources (for example, resource \"myroutetargets\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"services\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the HTTPRoute will be true. \n Support: core"
@@ -291,9 +276,7 @@ spec:
                                           description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the services resource. For example, use the following to specify a services resource: \n fooRef:   name: myservice \n Otherwise, if the services resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                           type: string
                                       required:
-                                      - group
                                       - name
-                                      - resource
                                       type: object
                                     weight:
                                       default: 1
@@ -302,7 +285,6 @@ spec:
                                       type: integer
                                   required:
                                   - targetRef
-                                  - weight
                                   type: object
                                 type: array
                             required:
@@ -326,9 +308,7 @@ spec:
                                     description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
-                                - group
                                 - name
-                                - resource
                                 type: object
                               headers:
                                 description: "Headers related filters. \n Support: extended"
@@ -366,9 +346,7 @@ spec:
                                     description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                     type: string
                                 required:
-                                - group
                                 - name
-                                - resource
                                 type: object
                               headerMatchType:
                                 description: "HeaderMatchType defines the semantics of the `Header` matcher. \n Support: core (Exact) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
