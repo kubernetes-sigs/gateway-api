@@ -204,7 +204,7 @@ type Listener struct {
 	//
 	// Support: Core
 	//
-	// +required
+	// +optional
 	// +kubebuilder:default={match: "Any"}
 	Hostname HostnameMatch `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
 
@@ -317,8 +317,8 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default={onlySameNamespace:true}
 	// +optional
+	// +kubebuilder:default={onlySameNamespace:true}
 	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty" protobuf:"bytes,1,opt,name=routeNamespaces"`
 	// RouteSelector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
@@ -345,6 +345,7 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default=networking.x-k8s.io
 	Group string `json:"group" protobuf:"bytes,3,opt,name=group"`
 	// Resource is the API resource name of the route resource to select.

@@ -35,6 +35,7 @@ type ServicesDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=core
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the API resource name of the referent. Omitting the value
@@ -52,6 +53,7 @@ type ServicesDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=services
 	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
 	// Name is the name of the referent.
@@ -80,6 +82,7 @@ type ConfigMapsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=core
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the API resource name of the referent. Omitting the value
@@ -97,6 +100,7 @@ type ConfigMapsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=configmaps
 	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
 	// Name is the name of the referent.
@@ -125,6 +129,7 @@ type SecretsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=core
 	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
 	// Resource is the API resource name of the referent. Omitting the value
@@ -142,6 +147,7 @@ type SecretsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
+	// +optional
 	// +kubebuilder:default=secrets
 	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
 	// Name is the name of the referent.

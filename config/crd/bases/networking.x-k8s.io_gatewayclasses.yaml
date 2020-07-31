@@ -120,9 +120,7 @@ spec:
                     description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                     type: string
                 required:
-                - group
                 - name
-                - resource
                 type: object
             required:
             - controller
