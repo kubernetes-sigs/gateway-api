@@ -100,7 +100,7 @@ spec:
                           description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   resource: httproutes \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
                           type: string
                         resource:
-                          description: "Resource is the API resource name of the route resource to select. \n Resource MUST correspond to route resources that are compatible with the application protocol specified in the Listener's Protocol field. \n Support: Core"
+                          description: "Resource is the API resource name of the route resource to select. \n Resource MUST correspond to route resources that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
                           type: string
                         routeNamespaces:
                           default:
@@ -176,7 +176,7 @@ spec:
                       - resource
                       type: object
                     tls:
-                      description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\". \n Support: Core"
+                      description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n Support: Core"
                       properties:
                         certificateRefs:
                           description: "CertificateRefs is a list of references to Kubernetes objects that each contain an identity certificate.  The host name in a TLS SNI client hello message is used for certificate matching and route host name selection. The SNI server_name must match a route host name for the Gateway to route the TLS request.  If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)"

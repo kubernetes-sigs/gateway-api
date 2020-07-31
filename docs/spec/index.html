@@ -2322,7 +2322,8 @@ TLSConfig
 <td>
 <em>(Optional)</em>
 <p>TLS is the TLS configuration for the Listener. This field
-is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo;.</p>
+is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; and
+ignored otherwise.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2522,7 +2523,11 @@ status of all such Listeners.</p>
 <a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
 </p>
 <p>
-<p>ProtocolType defines the application protocol accepted by a Listener.</p>
+<p>ProtocolType defines the application protocol accepted by a
+Listener. Implementations are not required to accept all the
+defined protocols. If an implementation does not support a
+specified protocol, it should raise a &ldquo;ConditionUnsupportedProtocol&rdquo;
+condition for the affected Listener.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
 </h3>
@@ -2611,6 +2616,9 @@ string
 <p>Resource is the API resource name of the route resource to select.</p>
 <p>Resource MUST correspond to route resources that are compatible with the
 application protocol specified in the Listener&rsquo;s Protocol field.</p>
+<p>If an implementation does not support or recognize this
+resource type, it SHOULD raise a &ldquo;ConditionInvalidRoutes&rdquo;
+condition for the affected Listener.</p>
 <p>Support: Core</p>
 </td>
 </tr>

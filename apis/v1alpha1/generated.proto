@@ -797,7 +797,8 @@ message Listener {
   optional string protocol = 3;
 
   // TLS is the TLS configuration for the Listener. This field
-  // is required if the Protocol field is "HTTPS" or "TLS".
+  // is required if the Protocol field is "HTTPS" or "TLS" and
+  // ignored otherwise.
   //
   // Support: Core
   //
@@ -927,6 +928,10 @@ message RouteBindingSelector {
   //
   // Resource MUST correspond to route resources that are compatible with the
   // application protocol specified in the Listener's Protocol field.
+  //
+  // If an implementation does not support or recognize this
+  // resource type, it SHOULD raise a "ConditionInvalidRoutes"
+  // condition for the affected Listener.
   //
   // Support: Core
   //
