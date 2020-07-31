@@ -112,7 +112,11 @@ type GatewaySpec struct {
 	Addresses []GatewayAddress `json:"addresses" protobuf:"bytes,3,rep,name=addresses"`
 }
 
-// ProtocolType defines the application protocol accepted by a Listener.
+// ProtocolType defines the application protocol accepted by a
+// Listener. Implementations are not required to accept all the
+// defined protocols. If an implementation does not support a
+// specified protocol, it should raise a "ConditionUnsupportedProtocol"
+// condition for the affected Listener.
 type ProtocolType string
 
 const (
@@ -242,7 +246,8 @@ type Listener struct {
 	Protocol ProtocolType `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field
-	// is required if the Protocol field is "HTTPS" or "TLS".
+	// is required if the Protocol field is "HTTPS" or "TLS" and
+	// ignored otherwise.
 	//
 	// Support: Core
 	//
@@ -351,6 +356,10 @@ type RouteBindingSelector struct {
 	//
 	// Resource MUST correspond to route resources that are compatible with the
 	// application protocol specified in the Listener's Protocol field.
+	//
+	// If an implementation does not support or recognize this
+	// resource type, it SHOULD raise a "ConditionInvalidRoutes"
+	// condition for the affected Listener.
 	//
 	// Support: Core
 	//
