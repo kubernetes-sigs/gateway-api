@@ -103,11 +103,11 @@ message ForwardToTarget {
   // +optional
   optional int32 targetPort = 2;
 
-  // Weight specifies the proportion of traffic to be forwarded to a targetRef,
-  // computed as weight/(sum of all weights in targetRefs). Weight is not a
-  // percentage and the sum of weights does not need to equal 100. The following
-  // example (in yaml) sends 70% of traffic to service "my-trafficsplit-sv1" and
-  // 30% of the traffic to service "my-trafficsplit-sv2":
+  // Weight specifies the proportion of traffic forwarded to a targetRef, computed
+  // as weight/(sum of all weights in targetRefs). Weight is not a percentage and
+  // the sum of weights does not need to equal 100. The following example (in yaml)
+  // sends 70% of traffic to service "my-trafficsplit-sv1" and 30% of the traffic
+  // to service "my-trafficsplit-sv2":
   //
   //   forwardTo:
   //     - targetRef:
@@ -120,7 +120,8 @@ message ForwardToTarget {
   // If only one targetRef is specified, 100% of the traffic is forwarded to the
   // targetRef. If unspecified, weight defaults to 1.
   //
-  // Support: Core
+  // Support: Core (httproute)
+  // Support: Extended (tcproute)
   //
   // +optional
   // +kubebuilder:default=1
@@ -529,6 +530,8 @@ message HTTPRouteAction {
   // that includes the HTTPRoute will be true.
   //
   // Support: core
+  //
+  // +kubebuilder:validation:MinItems=1
   repeated ForwardToTarget forwardTo = 1;
 
   // ExtensionRef is an optional, implementation-specific extension to the
@@ -1084,15 +1087,19 @@ message TCPRoute {
 
 // TCPRouteAction is the action for a given rule.
 message TCPRouteAction {
-  // ForwardTo sends requests to the referenced object.  The
+  // ForwardTo sends requests to the referenced object(s).  The
   // resource may be "services" (omit or use the empty string for the
   // group), or an implementation may support other resources (for
   // example, resource "myroutetargets" in group "networking.acme.io").
   // Omitting or specifying the empty string for both the resource and
   // group indicates that the resource is "services".  If the referent
   // cannot be found, the "InvalidRoutes" status condition on any Gateway
-  // that includes the TCPRoute will be true.
-  optional ForwardToTarget forwardTo = 1;
+  // that includes the HTTPRoute will be true.
+  //
+  // Support: core
+  //
+  // +kubebuilder:validation:MinItems=1
+  repeated ForwardToTarget forwardTo = 1;
 
   // ExtensionRef is an optional, implementation-specific extension to the
   // "action" behavior.  The resource may be "configmaps" (use the empty

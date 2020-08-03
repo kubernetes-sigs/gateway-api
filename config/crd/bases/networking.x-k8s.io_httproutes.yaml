@@ -110,12 +110,13 @@ spec:
                                     type: object
                                   weight:
                                     default: 1
-                                    description: "Weight specifies the proportion of traffic to be forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core"
+                                    description: "Weight specifies the proportion of traffic forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core (httproute) Support: Extended (tcproute)"
                                     format: int32
                                     type: integer
                                 required:
                                 - targetRef
                                 type: object
+                              minItems: 1
                               type: array
                           required:
                           - forwardTo
@@ -280,12 +281,13 @@ spec:
                                       type: object
                                     weight:
                                       default: 1
-                                      description: "Weight specifies the proportion of traffic to be forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core"
+                                      description: "Weight specifies the proportion of traffic forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core (httproute) Support: Extended (tcproute)"
                                       format: int32
                                       type: integer
                                   required:
                                   - targetRef
                                   type: object
+                                minItems: 1
                                 type: array
                             required:
                             - forwardTo
