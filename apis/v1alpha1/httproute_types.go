@@ -121,12 +121,13 @@ type HTTPRouteMatch struct {
 	// PathType is defines the semantics of the `Path` matcher.
 	//
 	// Support: core (Exact, Prefix)
-	// Support: extended (RegularExpression)
-	// Support: custom (ImplementationSpecific)
+	// Support: custom (RegularExpression, ImplementationSpecific)
 	//
 	// Default: "Exact"
 	//
 	// +optional
+	// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
+	// +kubebuilder:default=Exact
 	PathMatchType PathMatchType `json:"pathMatchType" protobuf:"bytes,1,opt,name=pathMatchType"`
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
@@ -142,6 +143,8 @@ type HTTPRouteMatch struct {
 	// Default: "Exact"
 	//
 	// +optional
+	// +kubebuilder:validation:Enum=Exact;ImplementationSpecific
+	// +kubebuilder:default=Exact
 	HeaderMatchType *string `json:"headerMatchType" protobuf:"bytes,3,opt,name=headerMatchType"`
 	// Headers are the HTTP Headers to match as interpreted via
 	// HeaderMatchType. Multiple headers are ANDed together, meaning, a request
