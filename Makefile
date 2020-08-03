@@ -20,7 +20,7 @@ TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
-all: controller generate verify
+all: generate controller verify
 
 # Build manager binary and run static analysis.
 .PHONY: controller
