@@ -637,12 +637,13 @@ message HTTPRouteMatch {
   // PathType is defines the semantics of the `Path` matcher.
   //
   // Support: core (Exact, Prefix)
-  // Support: extended (RegularExpression)
-  // Support: custom (ImplementationSpecific)
+  // Support: custom (RegularExpression, ImplementationSpecific)
   //
   // Default: "Exact"
   //
   // +optional
+  // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
+  // +kubebuilder:default=Exact
   optional string pathMatchType = 1;
 
   // Path is the value of the HTTP path as interpreted via
@@ -659,6 +660,8 @@ message HTTPRouteMatch {
   // Default: "Exact"
   //
   // +optional
+  // +kubebuilder:validation:Enum=Exact;ImplementationSpecific
+  // +kubebuilder:default=Exact
   optional string headerMatchType = 3;
 
   // Headers are the HTTP Headers to match as interpreted via

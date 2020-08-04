@@ -179,7 +179,11 @@ spec:
                               - name
                               type: object
                             headerMatchType:
+                              default: Exact
                               description: "HeaderMatchType defines the semantics of the `Header` matcher. \n Support: core (Exact) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
+                              enum:
+                              - Exact
+                              - ImplementationSpecific
                               type: string
                             headers:
                               additionalProperties:
@@ -190,7 +194,13 @@ spec:
                               description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                               type: string
                             pathMatchType:
-                              description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: extended (RegularExpression) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
+                              default: Exact
+                              description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Exact\""
+                              enum:
+                              - Exact
+                              - Prefix
+                              - RegularExpression
+                              - ImplementationSpecific
                               type: string
                           required:
                           - path
@@ -349,7 +359,11 @@ spec:
                                 - name
                                 type: object
                               headerMatchType:
+                                default: Exact
                                 description: "HeaderMatchType defines the semantics of the `Header` matcher. \n Support: core (Exact) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
+                                enum:
+                                - Exact
+                                - ImplementationSpecific
                                 type: string
                               headers:
                                 additionalProperties:
@@ -360,7 +374,13 @@ spec:
                                 description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                                 type: string
                               pathMatchType:
-                                description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: extended (RegularExpression) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
+                                default: Exact
+                                description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Exact\""
+                                enum:
+                                - Exact
+                                - Prefix
+                                - RegularExpression
+                                - ImplementationSpecific
                                 type: string
                             required:
                             - path
