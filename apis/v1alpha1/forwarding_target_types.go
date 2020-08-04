@@ -63,6 +63,7 @@ type ForwardToTarget struct {
 	//
 	// +optional
 	// +kubebuilder:default=1
+	// +optional
 	Weight TargetWeight `json:"weight" protobuf:"bytes,3,opt,name=weight"`
 }
 

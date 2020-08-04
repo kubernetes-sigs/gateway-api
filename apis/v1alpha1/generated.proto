@@ -124,6 +124,7 @@ message ForwardToTarget {
   //
   // +optional
   // +kubebuilder:default=1
+  // +optional
   optional int32 weight = 3;
 }
 
