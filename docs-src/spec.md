@@ -686,11 +686,11 @@ TargetWeight
 </td>
 <td>
 <em>(Optional)</em>
-<p>Weight specifies the proportion of traffic to be forwarded to a targetRef,
-computed as weight/(sum of all weights in targetRefs). Weight is not a
-percentage and the sum of weights does not need to equal 100. The following
-example (in yaml) sends 70% of traffic to service &ldquo;my-trafficsplit-sv1&rdquo; and
-30% of the traffic to service &ldquo;my-trafficsplit-sv2&rdquo;:</p>
+<p>Weight specifies the proportion of traffic forwarded to a targetRef, computed
+as weight/(sum of all weights in targetRefs). Weight is not a percentage and
+the sum of weights does not need to equal 100. The following example (in yaml)
+sends 70% of traffic to service &ldquo;my-trafficsplit-sv1&rdquo; and 30% of the traffic
+to service &ldquo;my-trafficsplit-sv2&rdquo;:</p>
 <p>forwardTo:
 - targetRef:
 name: my-trafficsplit-sv1
@@ -700,7 +700,8 @@ name: my-trafficsplit-sv2
 weight: 30</p>
 <p>If only one targetRef is specified, 100% of the traffic is forwarded to the
 targetRef. If unspecified, weight defaults to 1.</p>
-<p>Support: Core</p>
+<p>Support: Core (httproute)
+Support: Extended (tcproute)</p>
 </td>
 </tr>
 </tbody>
@@ -2535,19 +2536,20 @@ string
 <code>forwardTo</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
-ForwardToTarget
+[]ForwardToTarget
 </a>
 </em>
 </td>
 <td>
-<p>ForwardTo sends requests to the referenced object.  The
+<p>ForwardTo sends requests to the referenced object(s).  The
 resource may be &ldquo;services&rdquo; (omit or use the empty string for the
 group), or an implementation may support other resources (for
 example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
 group indicates that the resource is &ldquo;services&rdquo;.  If the referent
 cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the TCPRoute will be true.</p>
+that includes the HTTPRoute will be true.</p>
+<p>Support: core</p>
 </td>
 </tr>
 <tr>

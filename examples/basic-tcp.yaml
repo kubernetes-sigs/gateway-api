@@ -39,7 +39,7 @@ spec:
   rules:
   - action:
       forwardTo:
-        targetRef:
-          name: my-service
-          group: core
-          resource: services
+        - targetRef:
+            name: my-service
+            group: core
+            resource: services

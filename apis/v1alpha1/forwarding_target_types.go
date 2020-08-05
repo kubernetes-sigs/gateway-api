@@ -42,11 +42,11 @@ type ForwardToTarget struct {
 	// +optional
 	TargetPort *TargetPort `json:"targetPort,omitempty" protobuf:"bytes,2,opt,name=targetPort"`
 
-	// Weight specifies the proportion of traffic to be forwarded to a targetRef,
-	// computed as weight/(sum of all weights in targetRefs). Weight is not a
-	// percentage and the sum of weights does not need to equal 100. The following
-	// example (in yaml) sends 70% of traffic to service "my-trafficsplit-sv1" and
-	// 30% of the traffic to service "my-trafficsplit-sv2":
+	// Weight specifies the proportion of traffic forwarded to a targetRef, computed
+	// as weight/(sum of all weights in targetRefs). Weight is not a percentage and
+	// the sum of weights does not need to equal 100. The following example (in yaml)
+	// sends 70% of traffic to service "my-trafficsplit-sv1" and 30% of the traffic
+	// to service "my-trafficsplit-sv2":
 	//
 	//   forwardTo:
 	//     - targetRef:
@@ -59,7 +59,8 @@ type ForwardToTarget struct {
 	// If only one targetRef is specified, 100% of the traffic is forwarded to the
 	// targetRef. If unspecified, weight defaults to 1.
 	//
-	// Support: Core
+	// Support: Core (httproute)
+	// Support: Extended (tcproute)
 	//
 	// +optional
 	// +kubebuilder:default=1

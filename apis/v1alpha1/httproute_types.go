@@ -247,6 +247,7 @@ type HTTPRouteAction struct {
 	//
 	// Support: core
 	//
+	// +kubebuilder:validation:MinItems=1
 	ForwardTo []ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,rep,name=forwardTo"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty

@@ -798,8 +798,10 @@ func (in *TCPRouteAction) DeepCopyInto(out *TCPRouteAction) {
 	*out = *in
 	if in.ForwardTo != nil {
 		in, out := &in.ForwardTo, &out.ForwardTo
-		*out = new(ForwardToTarget)
-		(*in).DeepCopyInto(*out)
+		*out = make([]ForwardToTarget, len(*in))
+		for i := range *in {
+			(*in)[i].DeepCopyInto(&(*out)[i])
+		}
 	}
 	if in.ExtensionRef != nil {
 		in, out := &in.ExtensionRef, &out.ExtensionRef
