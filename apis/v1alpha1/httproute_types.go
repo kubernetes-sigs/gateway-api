@@ -59,6 +59,8 @@ type HTTPRouteHost struct {
 	Hostnames []string `json:"hostnames,omitempty" protobuf:"bytes,1,opt,name=hostnames"`
 
 	// Rules are a list of HTTP matchers, filters and actions.
+	//
+	// +kubebuilder:validation:MinItems=1
 	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
@@ -107,9 +109,17 @@ type HTTPRouteRule struct {
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
+// Valid PathMatchType values are:
+//
+// * "Exact"
+// * "Prefix"
+// * "RegularExpression"
+// * "ImplementationSpecific"
+//
+// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
 type PathMatchType string
 
-// PathType constants.
+// PathMatchType constants.
 const (
 	PathMatchExact                  PathMatchType = "Exact"
 	PathMatchPrefix                 PathMatchType = "Prefix"
@@ -117,13 +127,22 @@ const (
 	PathMatchImplementationSpecific PathMatchType = "ImplementationSpecific"
 )
 
+// HeaderMatchType specifies the semantics of how HTTP headers should be compared.
+// Valid HeaderMatchType values are:
+//
+// * "Exact"
+// * "ImplementationSpecific"
+//
+// +kubebuilder:validation:Enum=Exact;ImplementationSpecific
+type HeaderMatchType string
+
 // HeaderMatchType constants.
 const (
 	// HeaderMatchTypeExact matches HTTP request-header fields.
 	// Field names matches are case-insensitive while field values matches
 	// are case-sensitive.
-	HeaderMatchTypeExact                  = "Exact"
-	HeaderMatchTypeImplementationSpecific = "ImplementationSpecific"
+	HeaderMatchExact                  HeaderMatchType = "Exact"
+	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
 )
 
 // HTTPRouteMatch defines the predicate used to match requests to a
@@ -146,9 +165,9 @@ type HTTPRouteMatch struct {
 	// Default: "Prefix"
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
 	// +kubebuilder:default=Prefix
 	PathMatchType PathMatchType `json:"pathMatchType" protobuf:"bytes,1,opt,name=pathMatchType"`
+
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
 	//
@@ -163,9 +182,9 @@ type HTTPRouteMatch struct {
 	// Default: "Exact"
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=Exact;ImplementationSpecific
 	// +kubebuilder:default=Exact
-	HeaderMatchType *string `json:"headerMatchType" protobuf:"bytes,3,opt,name=headerMatchType"`
+	HeaderMatchType *HeaderMatchType `json:"headerMatchType" protobuf:"bytes,3,opt,name=headerMatchType"`
+
 	// Headers are the HTTP Headers to match as interpreted via
 	// HeaderMatchType. Multiple headers are ANDed together, meaning, a request
 	// must contain all the headers specified in order to select this route.
@@ -269,6 +288,7 @@ type HTTPRouteAction struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	ForwardTo []ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,rep,name=forwardTo"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
 	// string for the group) or an implementation-defined resource (for
