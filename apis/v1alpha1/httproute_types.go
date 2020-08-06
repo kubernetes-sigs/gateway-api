@@ -87,19 +87,35 @@ type HTTPRouteRule struct {
 	// incoming HTTP requests.
 	// Each match is independent, i.e. this rule will be matched
 	// if **any** one of the matches is satisfied.
+	//
 	// For example, take the following matches configuration:
+	//
+	// ```
 	// matches:
-	// - path: /foo
+	// - path:
+	//     value: "/foo"
 	//   headers:
-	//     version: "2"
-	// - path: /v2/foo
+	//     values:
+	//       version: "2"
+	// - path:
+	//     value: "/v2/foo"
+	// ```
+	//
 	// For a request to match against this rule, a request should satisfy
 	// EITHER of the two conditions:
+	//
 	// - path prefixed with `/foo` AND contains the header `version: "2"`
 	// - path prefix of `/v2/foo`
-	// Please see doc for HTTPRouteMatch on how to specify multiple
+	//
+	// See the documentation for HTTPRouteMatch on how to specify multiple
 	// match conditions that should be ANDed together.
+	//
+	// If no matches are specified, the default is a prefix
+	// path match on "/", which has the effect of matching every
+	// HTTP request.
+	//
 	// +optional
+	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
 	Matches []HTTPRouteMatch `json:"matches" protobuf:"bytes,1,rep,name=matches"`
 
 	// Filters define the filters that are applied to requests that match
@@ -161,19 +177,9 @@ const (
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
 )
 
-// HTTPRouteMatch defines the predicate used to match requests to a
-// given action.
-// Multiple match types are ANDed together, i.e. the match will evaluate
-// to true only if all conditions are satisfied.
-// For example:
-//  match:
-//    path: /foo
-//    headers:
-//      version: "1"
-// will result in a match only if an HTTP request's path starts with `/foo` AND
-// contains the `version: "1"` header.
-type HTTPRouteMatch struct {
-	// PathType defines the semantics of the `Path` matcher.
+// HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
+type HTTPPathMatch struct {
+	// Type specifies how to match against the path Value.
 	//
 	// Support: core (Exact, Prefix)
 	// Support: custom (RegularExpression, ImplementationSpecific)
@@ -187,15 +193,19 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Prefix
-	PathMatchType PathMatchType `json:"pathMatchType" protobuf:"bytes,1,opt,name=pathMatchType"`
+	Type PathMatchType `json:"type" protobuf:"bytes,1,opt,name=type"`
 
-	// Path is the value of the HTTP path as interpreted via
-	// PathType.
+	// Value of the HTTP path to match against.
 	//
-	// Default: "/"
-	Path *string `json:"path" protobuf:"bytes,2,opt,name=path"`
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
+}
 
-	// HeaderMatchType defines the semantics of the `Header` matcher.
+// HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.
+type HTTPHeaderMatch struct {
+	// HeaderMatchType specifies how to match a HTTP request
+	// header against the Values map.
 	//
 	// Support: core (Exact)
 	// Support: custom (ImplementationSpecific)
@@ -204,14 +214,49 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Exact
-	HeaderMatchType *HeaderMatchType `json:"headerMatchType" protobuf:"bytes,3,opt,name=headerMatchType"`
+	Type HeaderMatchType `json:"type" protobuf:"bytes,1,opt,name=type"`
 
-	// Headers are the HTTP Headers to match as interpreted via
-	// HeaderMatchType. Multiple headers are ANDed together, meaning, a request
-	// must contain all the headers specified in order to select this route.
+	// Values is a map of HTTP Headers to be matched.
+	// It MUST contain at least one entry.
+	//
+	// The HTTP header field name to match is the map key, and the
+	// value of the HTTP header is the map value. HTTP header field
+	// names MUST be matched case-insensitively.
+	//
+	// Multiple match values are ANDed together, meaning, a request
+	// must match all the specified headers to select the route.
+	//
+	// +required
+	Values map[string]string `json:"values" protobuf:"bytes,2,rep,name=values"`
+}
+
+// HTTPRouteMatch defines the predicate used to match requests to a given
+// action. Multiple match types are ANDed together, i.e. the match will
+// evaluate to true only if all conditions are satisfied.
+//
+// For example, the match below will match a HTTP request only if its path
+// starts with `/foo` AND it contains the `version: "1"` header:
+//
+// ```
+// match:
+//   path:
+//     value: "/foo"
+//   headers:
+//     values:
+//       version: "1"
+// ```
+type HTTPRouteMatch struct {
+	// Path specifies a HTTP request path matcher. If this field is not
+	// specified, a default prefix match on the "/" path is provided.
 	//
 	// +optional
-	Headers map[string]string `json:"headers" protobuf:"bytes,4,rep,name=headers"`
+	// +kubebuilder:default={type: "Prefix", value: "/"}
+	Path *HTTPPathMatch `json:"path" protobuf:"bytes,1,opt,name=path"`
+
+	// Headers specifies a HTTP request header matcher.
+	//
+	// +optional
+	Headers *HTTPHeaderMatch `json:"headers" protobuf:"bytes,2,opt,name=headers"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
@@ -225,7 +270,7 @@ type HTTPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,5,opt,name=extensionRef"`
+	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
 const (

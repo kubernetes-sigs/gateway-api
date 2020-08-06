@@ -474,6 +474,59 @@ message GatewayStatus {
   repeated ListenerStatus listeners = 3;
 }
 
+// HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.
+message HTTPHeaderMatch {
+  // HeaderMatchType specifies how to match a HTTP request
+  // header against the Values map.
+  //
+  // Support: core (Exact)
+  // Support: custom (ImplementationSpecific)
+  //
+  // Default: "Exact"
+  //
+  // +optional
+  // +kubebuilder:default=Exact
+  optional string type = 1;
+
+  // Values is a map of HTTP Headers to be matched.
+  // It MUST contain at least one entry.
+  //
+  // The HTTP header field name to match is the map key, and the
+  // value of the HTTP header is the map value. HTTP header field
+  // names MUST be matched case-insensitively.
+  //
+  // Multiple match values are ANDed together, meaning, a request
+  // must match all the specified headers to select the route.
+  //
+  // +required
+  map<string, string> values = 2;
+}
+
+// HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
+message HTTPPathMatch {
+  // Type specifies how to match against the path Value.
+  //
+  // Support: core (Exact, Prefix)
+  // Support: custom (RegularExpression, ImplementationSpecific)
+  //
+  // Since RegularExpression PathType has custom conformance, implementations
+  // can support POSIX, PCRE or any other dialects of regular expressions.
+  // Please read the implementation's documentation to determine the supported
+  // dialect.
+  //
+  // Default: "Prefix"
+  //
+  // +optional
+  // +kubebuilder:default=Prefix
+  optional string type = 1;
+
+  // Value of the HTTP path to match against.
+  //
+  // +required
+  // +kubebuilder:validation:MinLength=1
+  optional string value = 2;
+}
+
 // HTTPRequestHeaderConfig defines configuration for the
 // RequestHeader filter.
 message HTTPRequestHeaderConfig {
@@ -667,57 +720,33 @@ message HTTPRouteList {
   repeated HTTPRoute items = 3;
 }
 
-// HTTPRouteMatch defines the predicate used to match requests to a
-// given action.
-// Multiple match types are ANDed together, i.e. the match will evaluate
-// to true only if all conditions are satisfied.
-// For example:
-//  match:
-//    path: /foo
-//    headers:
-//      version: "1"
-// will result in a match only if an HTTP request's path starts with `/foo` AND
-// contains the `version: "1"` header.
+// HTTPRouteMatch defines the predicate used to match requests to a given
+// action. Multiple match types are ANDed together, i.e. the match will
+// evaluate to true only if all conditions are satisfied.
+//
+// For example, the match below will match a HTTP request only if its path
+// starts with `/foo` AND it contains the `version: "1"` header:
+//
+// ```
+// match:
+//   path:
+//     value: "/foo"
+//   headers:
+//     values:
+//       version: "1"
+// ```
 message HTTPRouteMatch {
-  // PathType defines the semantics of the `Path` matcher.
-  //
-  // Support: core (Exact, Prefix)
-  // Support: custom (RegularExpression, ImplementationSpecific)
-  //
-  // Since RegularExpression PathType has custom conformance, implementations
-  // can support POSIX, PCRE or any other dialects of regular expressions.
-  // Please read the implementation's documentation to determine the supported
-  // dialect.
-  //
-  // Default: "Prefix"
+  // Path specifies a HTTP request path matcher. If this field is not
+  // specified, a default prefix match on the "/" path is provided.
   //
   // +optional
-  // +kubebuilder:default=Prefix
-  optional string pathMatchType = 1;
+  // +kubebuilder:default={type: "Prefix", value: "/"}
+  optional HTTPPathMatch path = 1;
 
-  // Path is the value of the HTTP path as interpreted via
-  // PathType.
-  //
-  // Default: "/"
-  optional string path = 2;
-
-  // HeaderMatchType defines the semantics of the `Header` matcher.
-  //
-  // Support: core (Exact)
-  // Support: custom (ImplementationSpecific)
-  //
-  // Default: "Exact"
+  // Headers specifies a HTTP request header matcher.
   //
   // +optional
-  // +kubebuilder:default=Exact
-  optional string headerMatchType = 3;
-
-  // Headers are the HTTP Headers to match as interpreted via
-  // HeaderMatchType. Multiple headers are ANDed together, meaning, a request
-  // must contain all the headers specified in order to select this route.
-  //
-  // +optional
-  map<string, string> headers = 4;
+  optional HTTPHeaderMatch headers = 2;
 
   // ExtensionRef is an optional, implementation-specific extension to the
   // "match" behavior.  The resource may be "configmap" (use the empty
@@ -731,7 +760,7 @@ message HTTPRouteMatch {
   // Support: custom
   //
   // +optional
-  optional ConfigMapsDefaultLocalObjectReference extensionRef = 5;
+  optional ConfigMapsDefaultLocalObjectReference extensionRef = 3;
 }
 
 // HTTPRouteRule defines semantics for matching an incoming HTTP request against
@@ -742,19 +771,35 @@ message HTTPRouteRule {
   // incoming HTTP requests.
   // Each match is independent, i.e. this rule will be matched
   // if **any** one of the matches is satisfied.
+  //
   // For example, take the following matches configuration:
+  //
+  // ```
   // matches:
-  // - path: /foo
+  // - path:
+  //     value: "/foo"
   //   headers:
-  //     version: "2"
-  // - path: /v2/foo
+  //     values:
+  //       version: "2"
+  // - path:
+  //     value: "/v2/foo"
+  // ```
+  //
   // For a request to match against this rule, a request should satisfy
   // EITHER of the two conditions:
+  //
   // - path prefixed with `/foo` AND contains the header `version: "2"`
   // - path prefix of `/v2/foo`
-  // Please see doc for HTTPRouteMatch on how to specify multiple
+  //
+  // See the documentation for HTTPRouteMatch on how to specify multiple
   // match conditions that should be ANDed together.
+  //
+  // If no matches are specified, the default is a prefix
+  // path match on "/", which has the effect of matching every
+  // HTTP request.
+  //
   // +optional
+  // +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
   repeated HTTPRouteMatch matches = 1;
 
   // Filters define the filters that are applied to requests that match

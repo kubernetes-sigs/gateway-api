@@ -40,7 +40,9 @@ spec:
         - "my.trafficsplit.com"
       rules:
         - match:
-            path: /bar
+            path:
+              type: Exact
+              value: /bar
           action:
             forwardTo:
               - targetRef:
