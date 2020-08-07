@@ -123,11 +123,11 @@ type HTTPRouteMatch struct {
 	// Support: core (Exact, Prefix)
 	// Support: custom (RegularExpression, ImplementationSpecific)
 	//
-	// Default: "Exact"
+	// Default: "Prefix"
 	//
 	// +optional
 	// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
-	// +kubebuilder:default=Exact
+	// +kubebuilder:default=Prefix
 	PathMatchType PathMatchType `json:"pathMatchType" protobuf:"bytes,1,opt,name=pathMatchType"`
 	// Path is the value of the HTTP path as interpreted via
 	// PathType.
