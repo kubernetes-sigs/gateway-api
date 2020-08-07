@@ -1196,18 +1196,6 @@ message TLSConfig {
   // +required
   repeated SecretsDefaultLocalObjectReference certificateRefs = 1;
 
-  // MinimumVersion of TLS allowed. It is recommended to use one of
-  // the TLS_* constants above. Note: MinimumVersion is not strongly
-  // typed to allow implementation-specific versions to be used without
-  // requiring updates to the API types. String must be of the form
-  // "<protocol><major>_<minor>".
-  //
-  // Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
-  // values.
-  //
-  // +optional
-  optional string minimumVersion = 2;
-
   // Options are a list of key/value pairs to give extended options
   // to the provider.
   //
