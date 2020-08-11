@@ -198,9 +198,6 @@ spec:
                             - name
                             type: object
                           type: array
-                        minimumVersion:
-                          description: "MinimumVersion of TLS allowed. It is recommended to use one of the TLS_* constants above. Note: MinimumVersion is not strongly typed to allow implementation-specific versions to be used without requiring updates to the API types. String must be of the form \"<protocol><major>_<minor>\". \n Support: Core for TLS1_{1,2,3}. Implementation-specific for all other values."
-                          type: string
                         options:
                           additionalProperties:
                             type: string

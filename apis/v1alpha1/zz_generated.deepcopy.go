@@ -947,11 +947,6 @@ func (in *TLSConfig) DeepCopyInto(out *TLSConfig) {
 		*out = make([]SecretsDefaultLocalObjectReference, len(*in))
 		copy(*out, *in)
 	}
-	if in.MinimumVersion != nil {
-		in, out := &in.MinimumVersion, &out.MinimumVersion
-		*out = new(string)
-		**out = **in
-	}
 	if in.Options != nil {
 		in, out := &in.Options, &out.Options
 		*out = make(map[string]string, len(*in))

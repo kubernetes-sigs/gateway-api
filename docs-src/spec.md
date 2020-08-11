@@ -2776,24 +2776,6 @@ Support: Implementation-specific (Other resource types)</p>
 </tr>
 <tr>
 <td>
-<code>minimumVersion</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>MinimumVersion of TLS allowed. It is recommended to use one of
-the TLS<em>* constants above. Note: MinimumVersion is not strongly
-typed to allow implementation-specific versions to be used without
-requiring updates to the API types. String must be of the form
-&ldquo;<protocol><major></em><minor>&rdquo;.</p>
-<p>Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
-values.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>options</code></br>
 <em>
 map[string]string

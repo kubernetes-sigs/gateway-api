@@ -15,17 +15,6 @@ limitations under the License.
 
 package v1alpha1
 
-const (
-	// TLS1_0 denotes the TLS v1.0.
-	TLS1_0 = "TLS1_0"
-	// TLS1_1 denotes the TLS v1.1.
-	TLS1_1 = "TLS1_1"
-	// TLS1_2 denotes the TLS v1.2.
-	TLS1_2 = "TLS1_2"
-	// TLS1_3 denotes the TLS v1.3.
-	TLS1_3 = "TLS1_3"
-)
-
 // TLSConfig describes a TLS configuration.
 //
 // References
@@ -50,17 +39,6 @@ type TLSConfig struct {
 	//
 	// +required
 	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty" protobuf:"bytes,1,rep,name=certificateRefs"`
-	// MinimumVersion of TLS allowed. It is recommended to use one of
-	// the TLS_* constants above. Note: MinimumVersion is not strongly
-	// typed to allow implementation-specific versions to be used without
-	// requiring updates to the API types. String must be of the form
-	// "<protocol><major>_<minor>".
-	//
-	// Support: Core for TLS1_{1,2,3}. Implementation-specific for all other
-	// values.
-	//
-	// +optional
-	MinimumVersion *string `json:"minimumVersion" protobuf:"bytes,2,opt,name=minimumVersion"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//
