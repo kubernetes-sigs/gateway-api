@@ -100,10 +100,10 @@ type PathMatchType string
 
 // PathType constants.
 const (
-	PathMatchExact                PathMatchType = "Exact"
-	PathMatchPrefix               PathMatchType = "Prefix"
-	PathMatchRegularExpression    PathMatchType = "RegularExpression"
-	PathMatchImplementionSpecific PathMatchType = "ImplementationSpecific"
+	PathMatchExact                  PathMatchType = "Exact"
+	PathMatchPrefix                 PathMatchType = "Prefix"
+	PathMatchRegularExpression      PathMatchType = "RegularExpression"
+	PathMatchImplementationSpecific PathMatchType = "ImplementationSpecific"
 )
 
 // HeaderMatchType constants.
@@ -111,8 +111,8 @@ const (
 	// HeaderMatchTypeExact matches HTTP request-header fields.
 	// Field names matches are case-insensitive while field values matches
 	// are case-sensitive.
-	HeaderMatchTypeExact                = "Exact"
-	HeaderMatchTypeImplementionSpecific = "ImplementationSpecific"
+	HeaderMatchTypeExact                  = "Exact"
+	HeaderMatchTypeImplementationSpecific = "ImplementationSpecific"
 )
 
 // HTTPRouteMatch defines the predicate used to match requests to a
