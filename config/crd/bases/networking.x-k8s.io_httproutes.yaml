@@ -195,8 +195,8 @@ spec:
                               description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                               type: string
                             pathMatchType:
-                              default: Exact
-                              description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Exact\""
+                              default: Prefix
+                              description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Prefix\""
                               enum:
                               - Exact
                               - Prefix
@@ -376,8 +376,8 @@ spec:
                                 description: "Path is the value of the HTTP path as interpreted via PathType. \n Default: \"/\""
                                 type: string
                               pathMatchType:
-                                default: Exact
-                                description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Exact\""
+                                default: Prefix
+                                description: "PathType is defines the semantics of the `Path` matcher. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Default: \"Prefix\""
                                 enum:
                                 - Exact
                                 - Prefix

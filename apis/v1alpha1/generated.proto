@@ -642,11 +642,11 @@ message HTTPRouteMatch {
   // Support: core (Exact, Prefix)
   // Support: custom (RegularExpression, ImplementationSpecific)
   //
-  // Default: "Exact"
+  // Default: "Prefix"
   //
   // +optional
   // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
-  // +kubebuilder:default=Exact
+  // +kubebuilder:default=Prefix
   optional string pathMatchType = 1;
 
   // Path is the value of the HTTP path as interpreted via
