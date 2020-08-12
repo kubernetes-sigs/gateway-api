@@ -1589,7 +1589,16 @@ that includes the HTTPRoute will be true.</p>
 </p>
 <p>
 <p>HTTPRouteMatch defines the predicate used to match requests to a
-given action.</p>
+given action.
+Multiple match types are ANDed together, i.e. the match will evaluate
+to true only if all conditions are satisfied.
+For example:
+match:
+path: /foo
+headers:
+version: &ldquo;1&rdquo;
+will result in a match only if an HTTP request&rsquo;s path starts with <code>/foo</code> AND
+contains the <code>version: &quot;1&quot;</code> header.</p>
 </p>
 <table>
 <thead>
@@ -1689,7 +1698,9 @@ that includes the HTTPRoute will be true.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>)
 </p>
 <p>
-<p>HTTPRouteRule is the configuration for a given path.</p>
+<p>HTTPRouteRule defines semantics for matching an incoming HTTP request against
+a set of matching rules and executing an action (and optionally filters) on
+the request.</p>
 </p>
 <table>
 <thead>
@@ -1701,16 +1712,31 @@ that includes the HTTPRoute will be true.</p>
 <tbody>
 <tr>
 <td>
-<code>match</code></br>
+<code>matches</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">
-HTTPRouteMatch
+[]HTTPRouteMatch
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Match defines which requests match this path.</p>
+<p>Matches define conditions used for matching the rule against
+incoming HTTP requests.
+Each match is independent, i.e. this rule will be matched
+if <strong>any</strong> one of the matches is satisfied.
+For example, take the following matches configuration:
+matches:
+- path: /foo
+headers:
+version: &ldquo;2&rdquo;
+- path: /v2/foo
+For a request to match against this rule, a request should satisfy
+EITHER of the two conditions:
+- path prefixed with <code>/foo</code> AND contains the header <code>version: &quot;2&quot;</code>
+- path prefix of <code>/v2/foo</code>
+Please see doc for HTTPRouteMatch on how to specify multiple
+match conditions that should be ANDed together.</p>
 </td>
 </tr>
 <tr>
