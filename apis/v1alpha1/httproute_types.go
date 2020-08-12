@@ -76,11 +76,28 @@ type HTTPRouteHost struct {
 	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
 }
 
-// HTTPRouteRule is the configuration for a given path.
+// HTTPRouteRule defines semantics for matching an incoming HTTP request against
+// a set of matching rules and executing an action (and optionally filters) on
+// the request.
 type HTTPRouteRule struct {
-	// Match defines which requests match this path.
+	// Matches define conditions used for matching the rule against
+	// incoming HTTP requests.
+	// Each match is independent, i.e. this rule will be matched
+	// if **any** one of the matches is satisfied.
+	// For example, take the following matches configuration:
+	// matches:
+	// - path: /foo
+	//   headers:
+	//     version: "2"
+	// - path: /v2/foo
+	// For a request to match against this rule, a request should satisfy
+	// EITHER of the two conditions:
+	// - path prefixed with `/foo` AND contains the header `version: "2"`
+	// - path prefix of `/v2/foo`
+	// Please see doc for HTTPRouteMatch on how to specify multiple
+	// match conditions that should be ANDed together.
 	// +optional
-	Match *HTTPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
+	Matches []HTTPRouteMatch `json:"matches" protobuf:"bytes,1,rep,name=matches"`
 	// Filter defines what filters are applied to the request.
 	// +optional
 	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
@@ -111,6 +128,15 @@ const (
 
 // HTTPRouteMatch defines the predicate used to match requests to a
 // given action.
+// Multiple match types are ANDed together, i.e. the match will evaluate
+// to true only if all conditions are satisfied.
+// For example:
+//  match:
+//    path: /foo
+//    headers:
+//      version: "1"
+// will result in a match only if an HTTP request's path starts with `/foo` AND
+// contains the `version: "1"` header.
 type HTTPRouteMatch struct {
 	// PathType is defines the semantics of the `Path` matcher.
 	//
