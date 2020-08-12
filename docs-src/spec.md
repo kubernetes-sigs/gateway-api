@@ -406,21 +406,6 @@ HTTPRouteSpec
 <p>Hosts is a list of Host definitions.</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>default</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Default is the default host to use. Default.Hostnames must
-be an empty list.</p>
-</td>
-</tr>
 </table>
 </td>
 </tr>
@@ -1786,21 +1771,6 @@ HTTPRouteAction
 </td>
 <td>
 <p>Hosts is a list of Host definitions.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>default</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Default is the default host to use. Default.Hostnames must
-be an empty list.</p>
 </td>
 </tr>
 </tbody>
