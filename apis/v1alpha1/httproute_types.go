@@ -23,12 +23,6 @@ import (
 type HTTPRouteSpec struct {
 	// Hosts is a list of Host definitions.
 	Hosts []HTTPRouteHost `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
-
-	// Default is the default host to use. Default.Hostnames must
-	// be an empty list.
-	//
-	// +optional
-	Default *HTTPRouteHost `json:"default" protobuf:"bytes,2,opt,name=default"`
 }
 
 // HTTPRouteHost is the configuration for a given set of hosts.

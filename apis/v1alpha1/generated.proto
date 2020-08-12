@@ -708,12 +708,6 @@ message HTTPRouteRule {
 message HTTPRouteSpec {
   // Hosts is a list of Host definitions.
   repeated HTTPRouteHost hosts = 1;
-
-  // Default is the default host to use. Default.Hostnames must
-  // be an empty list.
-  //
-  // +optional
-  optional HTTPRouteHost default = 2;
 }
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
