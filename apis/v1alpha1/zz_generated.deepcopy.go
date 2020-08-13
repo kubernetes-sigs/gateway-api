@@ -524,7 +524,7 @@ func (in *HTTPRouteMatch) DeepCopyInto(out *HTTPRouteMatch) {
 	}
 	if in.HeaderMatchType != nil {
 		in, out := &in.HeaderMatchType, &out.HeaderMatchType
-		*out = new(string)
+		*out = new(HeaderMatchType)
 		**out = **in
 	}
 	if in.Headers != nil {

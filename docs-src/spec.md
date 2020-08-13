@@ -517,7 +517,12 @@ TCPRouteStatus
 <a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress</a>)
 </p>
 <p>
-<p>AddressType defines how a network address is represented as a text string.</p>
+<p>AddressType defines how a network address is represented as a text string.
+Valid AddressType values are:</p>
+<ul>
+<li>&ldquo;IPAddress&rdquo;</li>
+<li>&ldquo;NamedAddress&rdquo;</li>
+</ul>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">ConfigMapsDefaultLocalObjectReference
 </h3>
@@ -1642,7 +1647,9 @@ PathType.</p>
 <td>
 <code>headerMatchType</code></br>
 <em>
-string
+<a href="#networking.x-k8s.io/v1alpha1.HeaderMatchType">
+HeaderMatchType
+</a>
 </em>
 </td>
 <td>
@@ -1832,6 +1839,20 @@ HTTPRouteAction
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.HeaderMatchType">HeaderMatchType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+</p>
+<p>
+<p>HeaderMatchType specifies the semantics of how HTTP headers should be compared.
+Valid HeaderMatchType values are:</p>
+<ul>
+<li>&ldquo;Exact&rdquo;</li>
+<li>&ldquo;ImplementationSpecific&rdquo;</li>
+</ul>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.HostnameMatch">HostnameMatch
 </h3>
 <p>
@@ -1899,7 +1920,13 @@ preferred name syntax defined in
 </p>
 <p>
 <p>HostnameMatchType specifies the types of matches that are valid
-for host names.</p>
+for host names.
+Valid match types are:</p>
+<ul>
+<li>&ldquo;Domain&rdquo;</li>
+<li>&ldquo;Exact&rdquo;</li>
+<li>&ldquo;Any&rdquo;</li>
+</ul>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.Listener">Listener
 </h3>
@@ -2185,7 +2212,14 @@ status of all such Listeners.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
 </p>
 <p>
-<p>PathMatchType specifies the semantics of how HTTP paths should be compared.</p>
+<p>PathMatchType specifies the semantics of how HTTP paths should be compared.
+Valid PathMatchType values are:</p>
+<ul>
+<li>&ldquo;Exact&rdquo;</li>
+<li>&ldquo;Prefix&rdquo;</li>
+<li>&ldquo;RegularExpression&rdquo;</li>
+<li>&ldquo;ImplementationSpecific&rdquo;</li>
+</ul>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.ProtocolType">ProtocolType
 (<code>string</code> alias)</p></h3>
@@ -2199,6 +2233,13 @@ Listener. Implementations are not required to accept all the
 defined protocols. If an implementation does not support a
 specified protocol, it should raise a &ldquo;ConditionUnsupportedProtocol&rdquo;
 condition for the affected Listener.</p>
+<p>Valid ProtocolType values are:</p>
+<ul>
+<li>&ldquo;HTTP&rdquo;</li>
+<li>&ldquo;HTTPS&rdquo;</li>
+<li>&ldquo;TLS&rdquo;</li>
+<li>&ldquo;TCP&rdquo;</li>
+</ul>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
 </h3>

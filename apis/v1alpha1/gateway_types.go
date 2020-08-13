@@ -117,6 +117,15 @@ type GatewaySpec struct {
 // defined protocols. If an implementation does not support a
 // specified protocol, it should raise a "ConditionUnsupportedProtocol"
 // condition for the affected Listener.
+//
+// Valid ProtocolType values are:
+//
+// * "HTTP"
+// * "HTTPS"
+// * "TLS"
+// * "TCP"
+//
+// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
 type ProtocolType string
 
 const (
@@ -135,6 +144,13 @@ const (
 
 // HostnameMatchType specifies the types of matches that are valid
 // for host names.
+// Valid match types are:
+//
+// * "Domain"
+// * "Exact"
+// * "Any"
+//
+// +kubebuilder:validation:Enum=Domain;Exact;Any
 type HostnameMatchType string
 
 const (
@@ -172,7 +188,6 @@ type HostnameMatch struct {
 	// matched against the given value.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=Domain;Exact;Any
 	// +kubebuilder:default=Exact
 	Match HostnameMatchType `json:"match" protobuf:"bytes,1,name=match"`
 
@@ -242,7 +257,6 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
-	// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
 	Protocol ProtocolType `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field
@@ -274,6 +288,12 @@ type Listener struct {
 }
 
 // AddressType defines how a network address is represented as a text string.
+// Valid AddressType values are:
+//
+// * "IPAddress"
+// * "NamedAddress"
+//
+// +kubebuilder:validation:Enum=IPAddress;NamedAddress
 type AddressType string
 
 const (
@@ -287,6 +307,7 @@ const (
 	//
 	// Support: Extended.
 	IPAddressType AddressType = "IPAddress"
+
 	// NamedAddressType is an address selected by name. The interpretation of
 	// the name is dependent on the controller.
 	//
@@ -301,7 +322,6 @@ type GatewayAddress struct {
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=IPAddress;NamedAddress
 	// +kubebuilder:default=IPAddress
 	Type AddressType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=AddressType"`
 

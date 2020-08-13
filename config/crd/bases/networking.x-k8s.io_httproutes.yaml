@@ -212,6 +212,7 @@ spec:
                               type: object
                             type: array
                         type: object
+                      minItems: 1
                       type: array
                   required:
                   - rules

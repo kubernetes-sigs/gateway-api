@@ -125,7 +125,6 @@ message ForwardToTarget {
   //
   // +optional
   // +kubebuilder:default=1
-  // +optional
   optional int32 weight = 3;
 }
 
@@ -148,7 +147,6 @@ message GatewayAddress {
   // Support: Extended
   //
   // +optional
-  // +kubebuilder:validation:Enum=IPAddress;NamedAddress
   // +kubebuilder:default=IPAddress
   optional string type = 1;
 
@@ -608,6 +606,8 @@ message HTTPRouteHost {
   repeated string hostnames = 1;
 
   // Rules are a list of HTTP matchers, filters and actions.
+  //
+  // +kubebuilder:validation:MinItems=1
   repeated HTTPRouteRule rules = 2;
 
   // ExtensionRef is an optional, implementation-specific extension to the
@@ -654,7 +654,6 @@ message HTTPRouteMatch {
   // Default: "Prefix"
   //
   // +optional
-  // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
   // +kubebuilder:default=Prefix
   optional string pathMatchType = 1;
 
@@ -672,7 +671,6 @@ message HTTPRouteMatch {
   // Default: "Exact"
   //
   // +optional
-  // +kubebuilder:validation:Enum=Exact;ImplementationSpecific
   // +kubebuilder:default=Exact
   optional string headerMatchType = 3;
 
@@ -750,7 +748,6 @@ message HostnameMatch {
   // matched against the given value.
   //
   // +optional
-  // +kubebuilder:validation:Enum=Domain;Exact;Any
   // +kubebuilder:default=Exact
   optional string match = 1;
 
@@ -820,7 +817,6 @@ message Listener {
   // Support: Core
   //
   // +required
-  // +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
   optional string protocol = 3;
 
   // TLS is the TLS configuration for the Listener. This field
