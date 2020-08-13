@@ -718,7 +718,10 @@ message HTTPRouteRule {
   // - path prefix of `/v2/foo`
   // Please see doc for HTTPRouteMatch on how to specify multiple
   // match conditions that should be ANDed together.
-  // +optional
+  //
+  // Default catch-all route can be configured using path `/`.
+  //
+  // +kubebuilder:validation:MinItems=1
   repeated HTTPRouteMatch matches = 1;
 
   // Filter defines what filters are applied to the request.

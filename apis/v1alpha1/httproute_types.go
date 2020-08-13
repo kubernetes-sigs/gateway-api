@@ -96,7 +96,10 @@ type HTTPRouteRule struct {
 	// - path prefix of `/v2/foo`
 	// Please see doc for HTTPRouteMatch on how to specify multiple
 	// match conditions that should be ANDed together.
-	// +optional
+	//
+	// Default catch-all route can be configured using path `/`.
+	//
+	// +kubebuilder:validation:MinItems=1
 	Matches []HTTPRouteMatch `json:"matches" protobuf:"bytes,1,rep,name=matches"`
 	// Filter defines what filters are applied to the request.
 	// +optional

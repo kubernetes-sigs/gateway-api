@@ -1720,7 +1720,6 @@ the request.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Matches define conditions used for matching the rule against
 incoming HTTP requests.
 Each match is independent, i.e. this rule will be matched
@@ -1737,6 +1736,7 @@ EITHER of the two conditions:
 - path prefix of <code>/v2/foo</code>
 Please see doc for HTTPRouteMatch on how to specify multiple
 match conditions that should be ANDed together.</p>
+<p>Default catch-all route can be configured using path <code>/</code>.</p>
 </td>
 </tr>
 <tr>

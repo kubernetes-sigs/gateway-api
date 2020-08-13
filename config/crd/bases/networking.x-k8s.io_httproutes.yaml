@@ -162,7 +162,7 @@ spec:
                                 type: object
                             type: object
                           matches:
-                            description: 'Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. For example, take the following matches configuration: matches: - path: /foo   headers:     version: "2" - path: /v2/foo For a request to match against this rule, a request should satisfy EITHER of the two conditions: - path prefixed with `/foo` AND contains the header `version: "2"` - path prefix of `/v2/foo` Please see doc for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together.'
+                            description: "Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. For example, take the following matches configuration: matches: - path: /foo   headers:     version: \"2\" - path: /v2/foo For a request to match against this rule, a request should satisfy EITHER of the two conditions: - path prefixed with `/foo` AND contains the header `version: \"2\"` - path prefix of `/v2/foo` Please see doc for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together. \n Default catch-all route can be configured using path `/`."
                             items:
                               description: 'HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied. For example:  match:    path: /foo    headers:      version: "1" will result in a match only if an HTTP request''s path starts with `/foo` AND contains the `version: "1"` header.'
                               properties:
@@ -210,7 +210,10 @@ spec:
                               required:
                               - path
                               type: object
+                            minItems: 1
                             type: array
+                        required:
+                        - matches
                         type: object
                       type: array
                   required:
