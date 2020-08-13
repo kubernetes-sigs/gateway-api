@@ -32,8 +32,8 @@ spec:
           spec:
             description: Spec for this GatewayClass.
             properties:
-              allowedGatewayNamespaceSelector:
-                description: "AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways can use this GatewayClass from. This is a standard Kubernetes LabelSelector. Controllers must not support Gateways in namespaces outside this selector. \n An empty selector (default) indicates that Gateways can use this GatewayClass from any namespace. \n When a Gateway attempts to use this class from a namespace that is not allowed by this selector, the controller implementing the GatewayClass may add a new \"ForbiddenNamespaceForClass\" condition to the Gateway status. Adding this condition is considered optional since not all controllers will have access to all namespaces. \n Support: Core"
+              allowedGatewayNamespaces:
+                description: "AllowedGatewayNamespaces is a selector of namespaces that Gateways of this class can be created in. Implementations must not support Gateways when they are created in namespaces not specified by this field. \n Gateways that appear in namespaces not specified by this field must continue to be supported if they have already been provisioned. This must be indicated by the Gateway's presence in the ProvisionedGateways list in the status for this GatewayClass. If the status on a Gateway indicates that it has been provisioned but the Gateway does not appear in the ProvisionedGateways list on GatewayClass it must not be supported. \n When this field is unspecified (default) or an empty selector, Gateways in any namespace will be able to use this GatewayClass. \n Support: Core"
                 properties:
                   matchExpressions:
                     description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -185,6 +185,23 @@ spec:
                   - type
                   type: object
                 type: array
+              provisionedGateways:
+                description: ProvisionedGateways is a list of Gateways that have been provisioned using this class. Implementations must add any Gateways of this class to this list once they have been provisioned and remove Gateways as soon as they are deleted or deprovisioned.
+                items:
+                  description: GatewayObjectReference identifies a Gateway object.
+                  properties:
+                    name:
+                      description: Name is the name of the referent.
+                      type: string
+                    namespace:
+                      description: Namespace is the namespace of the referent.
+                      type: string
+                  required:
+                  - name
+                  type: object
+                type: array
+            required:
+            - provisionedGateways
             type: object
         type: object
     served: true
