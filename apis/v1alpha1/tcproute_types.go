@@ -27,7 +27,13 @@ type TCPRouteSpec struct {
 
 // TCPRouteStatus defines the observed state of TCPRoute
 type TCPRouteStatus struct {
-	GatewayRefs []GatewayObjectReference `json:"gatewayRefs" protobuf:"bytes,1,rep,name=gatewayRefs"`
+	// Gateways is a list of the Gateways that are associated with the
+	// TCPRoute, and the status of the route with respect to each of these
+	// Gateways.  When a Gateway selects this route, the controller that
+	// manages the Gateway should add an entry to this list when the
+	// controller first sees the route and should update the entry as
+	// appropriate when the route is modified.
+	Gateways []RouteGatewayStatus `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
 }
 
 // +genclient
