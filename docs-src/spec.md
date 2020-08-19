@@ -102,7 +102,7 @@ logical endpoints that are bound on this Gateway&rsquo;s addresses.
 At least one Listener MUST be specified.</p>
 <p>Each Listener in this array must have a unique Port field,
 however a GatewayClass may collapse compatible Listener
-definitions into single implementation-defined acceptor
+definitions into a single implementation-defined acceptor
 configuration even if their Port fields would otherwise conflict.</p>
 <p>Listeners are compatible if all of the following conditions are true:</p>
 <ol>
@@ -113,9 +113,9 @@ configuration even if their Port fields would otherwise conflict.</p>
 <p>As a special case, each group of compatible listeners
 may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
 <p>If the GatewayClass collapses compatible Listeners, the
-host name provided in the incoming client request MUST be
+hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
-The incoming host name MUST be matched using the Hostname
+The incoming hostname MUST be matched using the Hostname
 field for each Listener in order of most to least specific.
 That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
@@ -140,10 +140,10 @@ a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
 behavior can depend on the GatewayClass. If a value is set
 in the spec and the requested address is invalid, the
 GatewayClass MUST indicate this in the associated entry in
-GatewayStatus.Listeners.</p>
-<p>If no ListenerAddresses are specified, the GatewayClass may
+GatewayStatus.Addresses.</p>
+<p>If no Addresses are specified, the GatewayClass may
 schedule the Gateway in an implementation-defined manner,
-assigning an appropriate set of ListenerAddresses.</p>
+assigning an appropriate set of Addresses.</p>
 <p>The GatewayClass MUST bind all Listeners to every
 GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
@@ -236,7 +236,7 @@ string
 </td>
 <td>
 <p>Controller is a domain/path string that indicates the
-controller that managing Gateways of this class.</p>
+controller that is managing Gateways of this class.</p>
 <p>Example: &ldquo;acme.io/gateway-controller&rdquo;.</p>
 <p>This field is not mutable and cannot be empty.</p>
 <p>The format of this field is DOMAIN &ldquo;/&rdquo; PATH, where DOMAIN
@@ -258,9 +258,8 @@ Kubernetes meta/v1.LabelSelector
 <em>(Optional)</em>
 <p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
 can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector, a label query over a set of resources. The result of
-matchLabels and matchExpressions are ANDed. Controllers must not support
-Gateways in namespaces outside this selector.</p>
+LabelSelector. Controllers must not support Gateways in namespaces
+outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
 GatewayClass from any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
@@ -304,7 +303,7 @@ ConfigMapsDefaultLocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller specific resource containing
+<p>ParametersRef is a controller-specific resource containing
 the configuration parameters corresponding to this
 class. This is optional if the controller does not require
 any additional configuration.</p>
@@ -881,7 +880,7 @@ string
 </td>
 <td>
 <p>Controller is a domain/path string that indicates the
-controller that managing Gateways of this class.</p>
+controller that is managing Gateways of this class.</p>
 <p>Example: &ldquo;acme.io/gateway-controller&rdquo;.</p>
 <p>This field is not mutable and cannot be empty.</p>
 <p>The format of this field is DOMAIN &ldquo;/&rdquo; PATH, where DOMAIN
@@ -903,9 +902,8 @@ Kubernetes meta/v1.LabelSelector
 <em>(Optional)</em>
 <p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
 can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector, a label query over a set of resources. The result of
-matchLabels and matchExpressions are ANDed. Controllers must not support
-Gateways in namespaces outside this selector.</p>
+LabelSelector. Controllers must not support Gateways in namespaces
+outside this selector.</p>
 <p>An empty selector (default) indicates that Gateways can use this
 GatewayClass from any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
@@ -949,7 +947,7 @@ ConfigMapsDefaultLocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller specific resource containing
+<p>ParametersRef is a controller-specific resource containing
 the configuration parameters corresponding to this
 class. This is optional if the controller does not require
 any additional configuration.</p>
@@ -1092,7 +1090,8 @@ int64
 <td>
 <em>(Optional)</em>
 <p>If set, this represents the .metadata.generation that the condition was set based upon.
-For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+For instance, if .metadata.generation is currently 12, but
+the .status.conditions[x].observedGeneration is 9, the condition is out of date
 with respect to the current state of the instance.</p>
 </td>
 </tr>
@@ -1158,9 +1157,6 @@ string
 </p>
 <p>
 <p>GatewaySpec defines the desired state of Gateway.</p>
-<p>The Spec is split into two major pieces: listeners describing
-client-facing properties and routes that describe application-level
-routing.</p>
 <p>Not all possible combinations of options specified in the Spec are
 valid. Some invalid configurations can be caught synchronously via a
 webhook, but there are many cases that will require asynchronous
@@ -1200,7 +1196,7 @@ logical endpoints that are bound on this Gateway&rsquo;s addresses.
 At least one Listener MUST be specified.</p>
 <p>Each Listener in this array must have a unique Port field,
 however a GatewayClass may collapse compatible Listener
-definitions into single implementation-defined acceptor
+definitions into a single implementation-defined acceptor
 configuration even if their Port fields would otherwise conflict.</p>
 <p>Listeners are compatible if all of the following conditions are true:</p>
 <ol>
@@ -1211,9 +1207,9 @@ configuration even if their Port fields would otherwise conflict.</p>
 <p>As a special case, each group of compatible listeners
 may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
 <p>If the GatewayClass collapses compatible Listeners, the
-host name provided in the incoming client request MUST be
+hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
-The incoming host name MUST be matched using the Hostname
+The incoming hostname MUST be matched using the Hostname
 field for each Listener in order of most to least specific.
 That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
@@ -1238,10 +1234,10 @@ a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
 behavior can depend on the GatewayClass. If a value is set
 in the spec and the requested address is invalid, the
 GatewayClass MUST indicate this in the associated entry in
-GatewayStatus.Listeners.</p>
-<p>If no ListenerAddresses are specified, the GatewayClass may
+GatewayStatus.Addresses.</p>
+<p>If no Addresses are specified, the GatewayClass may
 schedule the Gateway in an implementation-defined manner,
-assigning an appropriate set of ListenerAddresses.</p>
+assigning an appropriate set of Addresses.</p>
 <p>The GatewayClass MUST bind all Listeners to every
 GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
@@ -1308,7 +1304,7 @@ assigns an address from a reserved pool.</p>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Listeners provides status for each unique listener port defined in the Spec.</p>
+<p>Listeners provide status for each unique listener port defined in the Spec.</p>
 </td>
 </tr>
 </tbody>
@@ -1358,7 +1354,7 @@ my-header: foo</p>
 </em>
 </td>
 <td>
-<p>Remove the given header(s) on the HTTP request before the
+<p>Remove the given header(s) from the HTTP request before the
 action. The value of RemoveHeader is a list of HTTP header
 names. Note that the header names are case-insensitive
 [RFC-2616 4.2].</p>
@@ -1523,7 +1519,7 @@ that includes the HTTPRoute will be true.</p>
 <td>
 <em>(Optional)</em>
 <p>Hostnames defines a set of hostname that should match against
-the HTTP Host header to select a HTTPRoute to process a the request.
+the HTTP Host header to select a HTTPRoute to process the request.
 Hostname is the fully qualified domain name of a network host,
 as defined by RFC 3986. Note the following deviations from the
 &ldquo;host&rdquo; part of the URI as defined in the RFC:</p>
@@ -1624,9 +1620,13 @@ PathMatchType
 </td>
 <td>
 <em>(Optional)</em>
-<p>PathType is defines the semantics of the <code>Path</code> matcher.</p>
+<p>PathType defines the semantics of the <code>Path</code> matcher.</p>
 <p>Support: core (Exact, Prefix)
 Support: custom (RegularExpression, ImplementationSpecific)</p>
+<p>Since RegularExpression PathType has custom conformance, implementations
+can support POSIX, PCRE or any other dialects of regular expressions.
+Please read the implementation&rsquo;s documentation to determine the supported
+dialect.</p>
 <p>Default: &ldquo;Prefix&rdquo;</p>
 </td>
 </tr>
@@ -1861,7 +1861,7 @@ Valid HeaderMatchType values are:</p>
 </p>
 <p>
 <p>HostnameMatch specifies how a Listener should match the incoming
-host name from a client request. Depending on the incoming protocol,
+hostname from a client request. Depending on the incoming protocol,
 the match must apply to names provided by the client at both the
 TLS and the HTTP protocol layers.</p>
 </p>
@@ -1884,7 +1884,7 @@ HostnameMatchType
 </td>
 <td>
 <em>(Optional)</em>
-<p>Match specifies how the host name provided by the client should be
+<p>Match specifies how the hostname provided by the client should be
 matched against the given value.</p>
 </td>
 </tr>
@@ -1920,7 +1920,7 @@ preferred name syntax defined in
 </p>
 <p>
 <p>HostnameMatchType specifies the types of matches that are valid
-for host names.
+for hostnames.
 Valid match types are:</p>
 <ul>
 <li>&ldquo;Domain&rdquo;</li>
@@ -1957,9 +1957,9 @@ HostnameMatch
 </td>
 <td>
 <em>(Optional)</em>
-<p>Hostname specifies to match the virtual host name for
+<p>Hostname specifies to match the virtual hostname for
 protocol types that define this concept.</p>
-<p>Incoming requests that include a host name are matched
+<p>Incoming requests that include a hostname are matched
 according to the given HostnameMatchType to select
 the Routes from this Listener.</p>
 <p>If a match type other than &ldquo;Any&rdquo; is supplied, it MUST
@@ -2143,9 +2143,10 @@ int64
 </td>
 <td>
 <em>(Optional)</em>
-<p>If set, this represents the .metadata.generation that the condition was set based upon.
-For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
-with respect to the current state of the instance.</p>
+<p>If set, this represents the .metadata.generation that the condition was
+set based upon. For instance, if .metadata.generation is currently 12,
+but the .status.conditions[x].observedGeneration is 9, the condition is
+out of date with respect to the current state of the instance.</p>
 </td>
 </tr>
 </tbody>
@@ -2578,7 +2579,7 @@ string
 </em>
 </td>
 <td>
-<p>ForwardTo sends requests to the referenced object(s).  The
+<p>ForwardTo sends requests to the referenced object(s). The
 resource may be &ldquo;services&rdquo; (omit or use the empty string for the
 group), or an implementation may support other resources (for
 example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).

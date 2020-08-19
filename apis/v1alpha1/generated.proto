@@ -234,7 +234,7 @@ message GatewayClassList {
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 message GatewayClassSpec {
   // Controller is a domain/path string that indicates the
-  // controller that managing Gateways of this class.
+  // controller that is managing Gateways of this class.
   //
   // Example: "acme.io/gateway-controller".
   //
@@ -251,9 +251,8 @@ message GatewayClassSpec {
 
   // AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
   // can use this GatewayClass from. This is a standard Kubernetes
-  // LabelSelector, a label query over a set of resources. The result of
-  // matchLabels and matchExpressions are ANDed. Controllers must not support
-  // Gateways in namespaces outside this selector.
+  // LabelSelector. Controllers must not support Gateways in namespaces
+  // outside this selector.
   //
   // An empty selector (default) indicates that Gateways can use this
   // GatewayClass from any namespace.
@@ -285,7 +284,7 @@ message GatewayClassSpec {
   // +kubebuilder:default={onlySameNamespace:true}
   optional RouteNamespaces allowedRouteNamespaces = 3;
 
-  // ParametersRef is a controller specific resource containing
+  // ParametersRef is a controller-specific resource containing
   // the configuration parameters corresponding to this
   // class. This is optional if the controller does not require
   // any additional configuration.
@@ -347,7 +346,8 @@ message GatewayCondition {
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
 
   // If set, this represents the .metadata.generation that the condition was set based upon.
-  // For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+  // For instance, if .metadata.generation is currently 12, but
+  // the .status.conditions[x].observedGeneration is 9, the condition is out of date
   // with respect to the current state of the instance.
   //
   // +optional
@@ -378,10 +378,6 @@ message GatewayObjectReference {
 
 // GatewaySpec defines the desired state of Gateway.
 //
-// The Spec is split into two major pieces: listeners describing
-// client-facing properties and routes that describe application-level
-// routing.
-//
 // Not all possible combinations of options specified in the Spec are
 // valid. Some invalid configurations can be caught synchronously via a
 // webhook, but there are many cases that will require asynchronous
@@ -396,7 +392,7 @@ message GatewaySpec {
   //
   // Each Listener in this array must have a unique Port field,
   // however a GatewayClass may collapse compatible Listener
-  // definitions into single implementation-defined acceptor
+  // definitions into a single implementation-defined acceptor
   // configuration even if their Port fields would otherwise conflict.
   //
   // Listeners are compatible if all of the following conditions are true:
@@ -409,9 +405,9 @@ message GatewaySpec {
   // may contain exactly one Listener with a match type of "Any".
   //
   // If the GatewayClass collapses compatible Listeners, the
-  // host name provided in the incoming client request MUST be
+  // hostname provided in the incoming client request MUST be
   // matched to a Listener to find the correct set of Routes.
-  // The incoming host name MUST be matched using the Hostname
+  // The incoming hostname MUST be matched using the Hostname
   // field for each Listener in order of most to least specific.
   // That is, "Exact" matches must be processed before "Domain"
   // matches, which must be processed before "Any" matches.
@@ -430,11 +426,11 @@ message GatewaySpec {
   // behavior can depend on the GatewayClass. If a value is set
   // in the spec and the requested address is invalid, the
   // GatewayClass MUST indicate this in the associated entry in
-  // GatewayStatus.Listeners.
+  // GatewayStatus.Addresses.
   //
-  // If no ListenerAddresses are specified, the GatewayClass may
+  // If no Addresses are specified, the GatewayClass may
   // schedule the Gateway in an implementation-defined manner,
-  // assigning an appropriate set of ListenerAddresses.
+  // assigning an appropriate set of Addresses.
   //
   // The GatewayClass MUST bind all Listeners to every
   // GatewayAddress that it assigns to the Gateway.
@@ -461,7 +457,7 @@ message GatewayStatus {
   // +optional
   repeated GatewayCondition conditions = 2;
 
-  // Listeners provides status for each unique listener port defined in the Spec.
+  // Listeners provide status for each unique listener port defined in the Spec.
   // +optional
   repeated ListenerStatus listeners = 3;
 }
@@ -484,7 +480,7 @@ message HTTPHeaderFilter {
   // Support: extended?
   map<string, string> add = 1;
 
-  // Remove the given header(s) on the HTTP request before the
+  // Remove the given header(s) from the HTTP request before the
   // action. The value of RemoveHeader is a list of HTTP header
   // names. Note that the header names are case-insensitive
   // [RFC-2616 4.2].
@@ -575,7 +571,7 @@ message HTTPRouteFilter {
 // HTTPRouteHost is the configuration for a given set of hosts.
 message HTTPRouteHost {
   // Hostnames defines a set of hostname that should match against
-  // the HTTP Host header to select a HTTPRoute to process a the request.
+  // the HTTP Host header to select a HTTPRoute to process the request.
   // Hostname is the fully qualified domain name of a network host,
   // as defined by RFC 3986. Note the following deviations from the
   // "host" part of the URI as defined in the RFC:
@@ -646,10 +642,15 @@ message HTTPRouteList {
 // will result in a match only if an HTTP request's path starts with `/foo` AND
 // contains the `version: "1"` header.
 message HTTPRouteMatch {
-  // PathType is defines the semantics of the `Path` matcher.
+  // PathType defines the semantics of the `Path` matcher.
   //
   // Support: core (Exact, Prefix)
   // Support: custom (RegularExpression, ImplementationSpecific)
+  //
+  // Since RegularExpression PathType has custom conformance, implementations
+  // can support POSIX, PCRE or any other dialects of regular expressions.
+  // Please read the implementation's documentation to determine the supported
+  // dialect.
   //
   // Default: "Prefix"
   //
@@ -740,11 +741,11 @@ message HTTPRouteStatus {
 }
 
 // HostnameMatch specifies how a Listener should match the incoming
-// host name from a client request. Depending on the incoming protocol,
+// hostname from a client request. Depending on the incoming protocol,
 // the match must apply to names provided by the client at both the
 // TLS and the HTTP protocol layers.
 message HostnameMatch {
-  // Match specifies how the host name provided by the client should be
+  // Match specifies how the hostname provided by the client should be
   // matched against the given value.
   //
   // +optional
@@ -771,10 +772,10 @@ message HostnameMatch {
 // Listener embodies the concept of a logical endpoint where a
 // Gateway can accept network connections.
 message Listener {
-  // Hostname specifies to match the virtual host name for
+  // Hostname specifies to match the virtual hostname for
   // protocol types that define this concept.
   //
-  // Incoming requests that include a host name are matched
+  // Incoming requests that include a hostname are matched
   // according to the given HostnameMatchType to select
   // the Routes from this Listener.
   //
@@ -879,9 +880,10 @@ message ListenerCondition {
   // +required
   optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
 
-  // If set, this represents the .metadata.generation that the condition was set based upon.
-  // For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
-  // with respect to the current state of the instance.
+  // If set, this represents the .metadata.generation that the condition was
+  // set based upon. For instance, if .metadata.generation is currently 12,
+  // but the .status.conditions[x].observedGeneration is 9, the condition is
+  // out of date with respect to the current state of the instance.
   //
   // +optional
   optional int64 observedGeneration = 6;
@@ -1107,7 +1109,7 @@ message TCPRoute {
 
 // TCPRouteAction is the action for a given rule.
 message TCPRouteAction {
-  // ForwardTo sends requests to the referenced object(s).  The
+  // ForwardTo sends requests to the referenced object(s). The
   // resource may be "services" (omit or use the empty string for the
   // group), or an implementation may support other resources (for
   // example, resource "myroutetargets" in group "networking.acme.io").
