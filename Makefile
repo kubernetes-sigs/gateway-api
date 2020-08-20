@@ -27,13 +27,16 @@ all: generate controller verify
 controller:
 	$(MAKE) -f kubebuilder.mk manager
 
-# Run generators for protos, Deepcopy funcs, CRDs, and docs..
+# Run generators for protos, Deepcopy funcs, CRDs, and docs.
+#
+# Order here matters; we need to generate Go code before generating
+# protobuf. Generating proto is really slow, so it's last.
 .PHONY: generate
 generate:
-	$(MAKE) proto
 	$(MAKE) -f kubebuilder.mk generate
 	$(MAKE) manifests
 	$(MAKE) docs
+	$(MAKE) proto
 
 # Generate manifests e.g. CRD, RBAC etc.
 .PHONY: manifests
