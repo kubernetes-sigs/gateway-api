@@ -30,10 +30,10 @@ spec:
           metadata:
             type: object
           spec:
-            description: "GatewaySpec defines the desired state of Gateway. \n The Spec is split into two major pieces: listeners describing client-facing properties and routes that describe application-level routing. \n Not all possible combinations of options specified in the Spec are valid. Some invalid configurations can be caught synchronously via a webhook, but there are many cases that will require asynchronous signaling via the GatewayStatus block."
+            description: "GatewaySpec defines the desired state of Gateway. \n Not all possible combinations of options specified in the Spec are valid. Some invalid configurations can be caught synchronously via a webhook, but there are many cases that will require asynchronous signaling via the GatewayStatus block."
             properties:
               addresses:
-                description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Listeners. \n If no ListenerAddresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of ListenerAddresses. \n The GatewayClass MUST bind all Listeners to every GatewayAddress that it assigns to the Gateway. \n Support: Core"
+                description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Addresses. \n If no Addresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of Addresses. \n The GatewayClass MUST bind all Listeners to every GatewayAddress that it assigns to the Gateway. \n Support: Core"
                 items:
                   description: GatewayAddress describes an address that can be bound to a Gateway.
                   properties:
@@ -55,18 +55,18 @@ spec:
                 description: Class used for this Gateway. This is the name of a GatewayClass resource.
                 type: string
               listeners:
-                description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified. \n Each Listener in this array must have a unique Port field, however a GatewayClass may collapse compatible Listener definitions into single implementation-defined acceptor configuration even if their Port fields would otherwise conflict. \n Listeners are compatible if all of the following conditions are true: \n 1. all their Protocol fields are \"HTTP\", or all their Protocol fields are \"HTTPS\" or TLS\" 2. their Hostname fields are specified with a match type other than \"Any\" 3. their Hostname fields are not an exact match for any other Listener \n As a special case, each group of compatible listeners may contain exactly one Listener with a match type of \"Any\". \n If the GatewayClass collapses compatible Listeners, the host name provided in the incoming client request MUST be matched to a Listener to find the correct set of Routes. The incoming host name MUST be matched using the Hostname field for each Listener in order of most to least specific. That is, \"Exact\" matches must be processed before \"Domain\" matches, which must be processed before \"Any\" matches. \n If this field specifies multiple Listeners that have the same Port value but are not compatible, the GatewayClass must raise a \"PortConflict\" condition on the Gateway. \n Support: Core"
+                description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified. \n Each Listener in this array must have a unique Port field, however a GatewayClass may collapse compatible Listener definitions into a single implementation-defined acceptor configuration even if their Port fields would otherwise conflict. \n Listeners are compatible if all of the following conditions are true: \n 1. all their Protocol fields are \"HTTP\", or all their Protocol fields are \"HTTPS\" or TLS\" 2. their Hostname fields are specified with a match type other than \"Any\" 3. their Hostname fields are not an exact match for any other Listener \n As a special case, each group of compatible listeners may contain exactly one Listener with a match type of \"Any\". \n If the GatewayClass collapses compatible Listeners, the hostname provided in the incoming client request MUST be matched to a Listener to find the correct set of Routes. The incoming hostname MUST be matched using the Hostname field for each Listener in order of most to least specific. That is, \"Exact\" matches must be processed before \"Domain\" matches, which must be processed before \"Any\" matches. \n If this field specifies multiple Listeners that have the same Port value but are not compatible, the GatewayClass must raise a \"PortConflict\" condition on the Gateway. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint where a Gateway can accept network connections.
                   properties:
                     hostname:
                       default:
                         match: Any
-                      description: "Hostname specifies to match the virtual host name for protocol types that define this concept. \n Incoming requests that include a host name are matched according to the given HostnameMatchType to select the Routes from this Listener. \n If a match type other than \"Any\" is supplied, it MUST be compatible with the specified Protocol field. \n Support: Core"
+                      description: "Hostname specifies to match the virtual hostname for protocol types that define this concept. \n Incoming requests that include a hostname are matched according to the given HostnameMatchType to select the Routes from this Listener. \n If a match type other than \"Any\" is supplied, it MUST be compatible with the specified Protocol field. \n Support: Core"
                       properties:
                         match:
                           default: Exact
-                          description: Match specifies how the host name provided by the client should be matched against the given value.
+                          description: Match specifies how the hostname provided by the client should be matched against the given value.
                           enum:
                           - Domain
                           - Exact
@@ -250,7 +250,7 @@ spec:
                       description: Message is a human-understandable message describing the condition. This field may be empty.
                       type: string
                     observedGeneration:
-                      description: If set, this represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
+                      description: If set, this represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
                       format: int64
                       type: integer
                     reason:
@@ -268,7 +268,7 @@ spec:
                   type: object
                 type: array
               listeners:
-                description: Listeners provides status for each unique listener port defined in the Spec.
+                description: Listeners provide status for each unique listener port defined in the Spec.
                 items:
                   description: ListenerStatus is the status associated with a Listener port.
                   properties:
@@ -285,7 +285,7 @@ spec:
                             description: Message is a human-understandable message describing the condition. This field may be empty.
                             type: string
                           observedGeneration:
-                            description: If set, this represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
+                            description: If set, this represents the .metadata.generation that the condition was set based upon. For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date with respect to the current state of the instance.
                             format: int64
                             type: integer
                           reason:

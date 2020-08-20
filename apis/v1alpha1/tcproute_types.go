@@ -56,7 +56,7 @@ type TCPRouteRule struct {
 
 // TCPRouteAction is the action for a given rule.
 type TCPRouteAction struct {
-	// ForwardTo sends requests to the referenced object(s).  The
+	// ForwardTo sends requests to the referenced object(s). The
 	// resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
 	// example, resource "myroutetargets" in group "networking.acme.io").

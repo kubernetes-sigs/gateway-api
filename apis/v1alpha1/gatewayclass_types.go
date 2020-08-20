@@ -48,7 +48,7 @@ type GatewayClass struct {
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 type GatewayClassSpec struct {
 	// Controller is a domain/path string that indicates the
-	// controller that managing Gateways of this class.
+	// controller that is managing Gateways of this class.
 	//
 	// Example: "acme.io/gateway-controller".
 	//
@@ -65,9 +65,8 @@ type GatewayClassSpec struct {
 
 	// AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
 	// can use this GatewayClass from. This is a standard Kubernetes
-	// LabelSelector, a label query over a set of resources. The result of
-	// matchLabels and matchExpressions are ANDed. Controllers must not support
-	// Gateways in namespaces outside this selector.
+	// LabelSelector. Controllers must not support Gateways in namespaces
+	// outside this selector.
 	//
 	// An empty selector (default) indicates that Gateways can use this
 	// GatewayClass from any namespace.
@@ -99,7 +98,7 @@ type GatewayClassSpec struct {
 	// +kubebuilder:default={onlySameNamespace:true}
 	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
 
-	// ParametersRef is a controller specific resource containing
+	// ParametersRef is a controller-specific resource containing
 	// the configuration parameters corresponding to this
 	// class. This is optional if the controller does not require
 	// any additional configuration.

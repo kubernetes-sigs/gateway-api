@@ -45,10 +45,6 @@ type GatewayList struct {
 
 // GatewaySpec defines the desired state of Gateway.
 //
-// The Spec is split into two major pieces: listeners describing
-// client-facing properties and routes that describe application-level
-// routing.
-//
 // Not all possible combinations of options specified in the Spec are
 // valid. Some invalid configurations can be caught synchronously via a
 // webhook, but there are many cases that will require asynchronous
@@ -63,7 +59,7 @@ type GatewaySpec struct {
 	//
 	// Each Listener in this array must have a unique Port field,
 	// however a GatewayClass may collapse compatible Listener
-	// definitions into single implementation-defined acceptor
+	// definitions into a single implementation-defined acceptor
 	// configuration even if their Port fields would otherwise conflict.
 	//
 	// Listeners are compatible if all of the following conditions are true:
@@ -76,9 +72,9 @@ type GatewaySpec struct {
 	// may contain exactly one Listener with a match type of "Any".
 	//
 	// If the GatewayClass collapses compatible Listeners, the
-	// host name provided in the incoming client request MUST be
+	// hostname provided in the incoming client request MUST be
 	// matched to a Listener to find the correct set of Routes.
-	// The incoming host name MUST be matched using the Hostname
+	// The incoming hostname MUST be matched using the Hostname
 	// field for each Listener in order of most to least specific.
 	// That is, "Exact" matches must be processed before "Domain"
 	// matches, which must be processed before "Any" matches.
@@ -97,11 +93,11 @@ type GatewaySpec struct {
 	// behavior can depend on the GatewayClass. If a value is set
 	// in the spec and the requested address is invalid, the
 	// GatewayClass MUST indicate this in the associated entry in
-	// GatewayStatus.Listeners.
+	// GatewayStatus.Addresses.
 	//
-	// If no ListenerAddresses are specified, the GatewayClass may
+	// If no Addresses are specified, the GatewayClass may
 	// schedule the Gateway in an implementation-defined manner,
-	// assigning an appropriate set of ListenerAddresses.
+	// assigning an appropriate set of Addresses.
 	//
 	// The GatewayClass MUST bind all Listeners to every
 	// GatewayAddress that it assigns to the Gateway.
@@ -143,7 +139,7 @@ const (
 )
 
 // HostnameMatchType specifies the types of matches that are valid
-// for host names.
+// for hostnames.
 // Valid match types are:
 //
 // * "Domain"
@@ -154,10 +150,16 @@ const (
 type HostnameMatchType string
 
 const (
-	// HostnameMatchDomain specifies that the host name provided
+	// HostnameMatchExact specifies that the hostname provided
+	// by the client must exactly match the specified value.
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchExact HostnameMatchType = "Exact"
+
+	// HostnameMatchDomain specifies that the hostname provided
 	// by the client should be matched against a DNS domain value.
 	// The domain match removes the leftmost DNS label from the
-	// host name provided by the client and compares the resulting
+	// hostname provided by the client and compares the resulting
 	// value.
 	//
 	// For example, "example.com" is a "Domain" match for the host
@@ -167,24 +169,18 @@ const (
 	// This match type MUST be case-insensitive.
 	HostnameMatchDomain HostnameMatchType = "Domain"
 
-	// HostnameMatchExact specifies that the host name provided
-	// by the client must exactly match the specified value.
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchExact HostnameMatchType = "Exact"
-
 	// HostnameMatchAny specifies that this Listener accepts
 	// all client traffic regardless of the presence or value of
-	// any host name supplied by the client.
+	// any hostname supplied by the client.
 	HostnameMatchAny HostnameMatchType = "Any"
 )
 
 // HostnameMatch specifies how a Listener should match the incoming
-// host name from a client request. Depending on the incoming protocol,
+// hostname from a client request. Depending on the incoming protocol,
 // the match must apply to names provided by the client at both the
 // TLS and the HTTP protocol layers.
 type HostnameMatch struct {
-	// Match specifies how the host name provided by the client should be
+	// Match specifies how the hostname provided by the client should be
 	// matched against the given value.
 	//
 	// +optional
@@ -211,10 +207,10 @@ type HostnameMatch struct {
 // Listener embodies the concept of a logical endpoint where a
 // Gateway can accept network connections.
 type Listener struct {
-	// Hostname specifies to match the virtual host name for
+	// Hostname specifies to match the virtual hostname for
 	// protocol types that define this concept.
 	//
-	// Incoming requests that include a host name are matched
+	// Incoming requests that include a hostname are matched
 	// according to the given HostnameMatchType to select
 	// the Routes from this Listener.
 	//
@@ -298,7 +294,7 @@ type AddressType string
 
 const (
 	// IPAddressType a textual representation of a numeric IP
-	// address. IPv4 addresses, must be in dotted-decimal
+	// address. IPv4 addresses must be in dotted-decimal
 	// form. IPv6 addresses must be in a standard IPv6 text
 	// representation (see RFC 5952).
 	//
@@ -410,7 +406,7 @@ type GatewayStatus struct {
 	// +optional
 	Conditions []GatewayCondition `json:"conditions,omitempty" protobuf:"bytes,2,rep,name=conditions"`
 
-	// Listeners provides status for each unique listener port defined in the Spec.
+	// Listeners provide status for each unique listener port defined in the Spec.
 	// +optional
 	Listeners []ListenerStatus `json:"listeners,omitempty" protobuf:"bytes,3,rep,name=listeners"`
 }
@@ -419,10 +415,6 @@ type GatewayStatus struct {
 type GatewayConditionType string
 
 const (
-	// ConditionNoSuchGatewayClass indicates that the specified GatewayClass
-	// does not exist.
-	ConditionNoSuchGatewayClass GatewayConditionType = "NoSuchGatewayClass"
-
 	// ConditionForbiddenNamespaceForClass indicates that this Gateway is in
 	// a namespace forbidden by the GatewayClass.
 	ConditionForbiddenNamespaceForClass GatewayConditionType = "ForbiddenNamespaceForClass"
@@ -476,7 +468,8 @@ type GatewayCondition struct {
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 	// If set, this represents the .metadata.generation that the condition was set based upon.
-	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
+	// For instance, if .metadata.generation is currently 12, but
+	// the .status.conditions[x].observedGeneration is 9, the condition is out of date
 	// with respect to the current state of the instance.
 	//
 	// +optional
@@ -505,12 +498,12 @@ type ListenerConditionType string
 const (
 	// ConditionInvalidListener is a generic condition that is a catch all for
 	// unsupported configurations that do not match a more specific condition.
-	// Implementors should try to use a more specific condition instead of this
+	// Implementers should try to use a more specific condition instead of this
 	// one to give users and automation more information.
 	ConditionInvalidListener ListenerConditionType = "InvalidListener"
 
 	// ConditionListenerNotReady indicates the listener is not ready.
-	ConditionListenerNotReady ListenerConditionType = "NotReady"
+	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
 
 	// ConditionPortConflict indicates that two or more Listeners with
 	// the same port were bound to this gateway and they could not be
@@ -565,9 +558,10 @@ type ListenerCondition struct {
 	//
 	// +required
 	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
-	// If set, this represents the .metadata.generation that the condition was set based upon.
-	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
-	// with respect to the current state of the instance.
+	// If set, this represents the .metadata.generation that the condition was
+	// set based upon. For instance, if .metadata.generation is currently 12,
+	// but the .status.conditions[x].observedGeneration is 9, the condition is
+	// out of date with respect to the current state of the instance.
 	//
 	// +optional
 	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`

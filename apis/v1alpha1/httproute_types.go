@@ -28,7 +28,7 @@ type HTTPRouteSpec struct {
 // HTTPRouteHost is the configuration for a given set of hosts.
 type HTTPRouteHost struct {
 	// Hostnames defines a set of hostname that should match against
-	// the HTTP Host header to select a HTTPRoute to process a the request.
+	// the HTTP Host header to select a HTTPRoute to process the request.
 	// Hostname is the fully qualified domain name of a network host,
 	// as defined by RFC 3986. Note the following deviations from the
 	// "host" part of the URI as defined in the RFC:
@@ -139,7 +139,7 @@ type HeaderMatchType string
 // HeaderMatchType constants.
 const (
 	// HeaderMatchTypeExact matches HTTP request-header fields.
-	// Field names matches are case-insensitive while field values matches
+	// Field name matches are case-insensitive while field value matches
 	// are case-sensitive.
 	HeaderMatchExact                  HeaderMatchType = "Exact"
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
@@ -157,10 +157,15 @@ const (
 // will result in a match only if an HTTP request's path starts with `/foo` AND
 // contains the `version: "1"` header.
 type HTTPRouteMatch struct {
-	// PathType is defines the semantics of the `Path` matcher.
+	// PathType defines the semantics of the `Path` matcher.
 	//
 	// Support: core (Exact, Prefix)
 	// Support: custom (RegularExpression, ImplementationSpecific)
+	//
+	// Since RegularExpression PathType has custom conformance, implementations
+	// can support POSIX, PCRE or any other dialects of regular expressions.
+	// Please read the implementation's documentation to determine the supported
+	// dialect.
 	//
 	// Default: "Prefix"
 	//
@@ -249,7 +254,7 @@ type HTTPHeaderFilter struct {
 	// Support: extended?
 	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
 
-	// Remove the given header(s) on the HTTP request before the
+	// Remove the given header(s) from the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
 	// names. Note that the header names are case-insensitive
 	// [RFC-2616 4.2].
