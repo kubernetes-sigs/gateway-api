@@ -104,6 +104,20 @@ Route objects define protocol-specific rules for mapping requests from a Gateway
 `HTTPRoute` and `TCPRoute` are currently the only defined Route objects. Additional protocol-specific Route
 objects may be added in the future.
 
+### BackendPolicy
+
+BackendPolicy provides a way to configure connections between a Gateway and a
+backend. For the purpose of this API, a backend is any resource that a route can
+forward traffic to. A common example of a backend is a Service. Configuration at
+this level is currently limited to TLS, but will expand in the future to support
+more advanced policies such as health checking.
+
+Some backend configuration may vary depending on the Route that is targeting the
+backend. In those cases, configuration fields will be placed on Routes and not
+BackendPolicy. For more information on what may be configured with this resource
+in the future, refer to the related [GitHub
+issue](https://github.com/kubernetes-sigs/service-apis/issues/196).
+
 ### Combined types
 
 The combination of `GatewayClass`, `Gateway`, `xRoute` and `Service`(s) will

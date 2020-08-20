@@ -25,6 +25,7 @@ import (
 
 type NetworkingV1alpha1Interface interface {
 	RESTClient() rest.Interface
+	BackendPoliciesGetter
 	GatewaysGetter
 	GatewayClassesGetter
 	HTTPRoutesGetter
@@ -36,6 +37,10 @@ type NetworkingV1alpha1Interface interface {
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.x-k8s.io group.
 type NetworkingV1alpha1Client struct {
 	restClient rest.Interface
+}
+
+func (c *NetworkingV1alpha1Client) BackendPolicies(namespace string) BackendPolicyInterface {
+	return newBackendPolicies(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) Gateways(namespace string) GatewayInterface {
