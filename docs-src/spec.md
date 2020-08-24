@@ -1770,7 +1770,6 @@ HTTPRouteAction
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Action defines what happens to the request.</p>
 </td>
 </tr>
@@ -2697,7 +2696,6 @@ TCPRouteAction
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Action defines what happens to the connection.</p>
 </td>
 </tr>

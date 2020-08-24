@@ -49,8 +49,6 @@ type TCPRouteRule struct {
 	// +optional
 	Match *TCPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
 	// Action defines what happens to the connection.
-	//
-	// +optional
 	Action *TCPRouteAction `json:"action" protobuf:"bytes,2,opt,name=action"`
 }
 

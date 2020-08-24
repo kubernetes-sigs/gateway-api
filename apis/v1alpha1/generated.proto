@@ -725,7 +725,6 @@ message HTTPRouteRule {
   optional HTTPRouteFilter filter = 2;
 
   // Action defines what happens to the request.
-  // +optional
   optional HTTPRouteAction action = 3;
 }
 
@@ -1173,8 +1172,6 @@ message TCPRouteRule {
   optional TCPRouteMatch match = 1;
 
   // Action defines what happens to the connection.
-  //
-  // +optional
   optional TCPRouteAction action = 2;
 }
 

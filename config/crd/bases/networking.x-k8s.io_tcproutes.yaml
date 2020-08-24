@@ -117,6 +117,8 @@ spec:
                           - name
                           type: object
                       type: object
+                  required:
+                  - action
                   type: object
                 type: array
             required:

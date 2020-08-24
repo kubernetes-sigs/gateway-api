@@ -104,7 +104,6 @@ type HTTPRouteRule struct {
 	// +optional
 	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
 	// Action defines what happens to the request.
-	// +optional
 	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
 }
 
