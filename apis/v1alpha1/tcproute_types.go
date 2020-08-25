@@ -32,6 +32,7 @@ type TCPRouteStatus struct {
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // TCPRoute is the Schema for the tcproutes API
 type TCPRoute struct {
