@@ -334,6 +334,7 @@ type GatewayObjectReference struct {
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // HTTPRoute is the Schema for the httproutes API
 type HTTPRoute struct {
