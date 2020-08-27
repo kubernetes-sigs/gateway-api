@@ -89,6 +89,53 @@ spec:
                                 items:
                                   description: ForwardToTarget identifies a target object within a known namespace.
                                   properties:
+                                    filters:
+                                      description: "Filters defined at this-level should be executed if and only if the request is being forwarded to the target defined here. \n Conformance: For any implementation, filtering support, including core filters, is NOT guaranteed at this-level. Use Filters in HTTPRouteRule for portable filters across implementations. \n Support: custom"
+                                      items:
+                                        description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
+                                        properties:
+                                          extensionRef:
+                                            description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
+                                            properties:
+                                              group:
+                                                default: core
+                                                description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a configmaps: \n fooRef:   resource: configmaps   name: myconfigmap \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                                type: string
+                                              name:
+                                                description: Name is the name of the referent.
+                                                type: string
+                                              resource:
+                                                default: configmaps
+                                                description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                                type: string
+                                            required:
+                                            - name
+                                            type: object
+                                          requestHeader:
+                                            description: HTTPRequestHeaderConfig defines configuration for the RequestHeader filter.
+                                            properties:
+                                              add:
+                                                additionalProperties:
+                                                  type: string
+                                                description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: extended?"
+                                                type: object
+                                              remove:
+                                                description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: extended?"
+                                                items:
+                                                  type: string
+                                                type: array
+                                            required:
+                                            - add
+                                            - remove
+                                            type: object
+                                          type:
+                                            description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
+                                            type: string
+                                        required:
+                                        - requestHeader
+                                        - type
+                                        type: object
+                                      type: array
                                     targetPort:
                                       description: "TargetPort specifies the destination port number to use for the TargetRef. If unspecified and TargetRef is a Service object consisting of a single port definition, that port will be used. If unspecified and TargetRef is a Service object consisting of multiple port definitions, an error is surfaced in status. \n Support: Core"
                                       format: int32
@@ -123,44 +170,53 @@ spec:
                             required:
                             - forwardTo
                             type: object
-                          filter:
-                            description: Filter defines what filters are applied to the request.
-                            properties:
-                              extensionRef:
-                                description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutefilters\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the HTTPRoute will be true. \n Support: custom"
-                                properties:
-                                  group:
-                                    default: core
-                                    description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a configmaps: \n fooRef:   resource: configmaps   name: myconfigmap \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
-                                    type: string
-                                  name:
-                                    description: Name is the name of the referent.
-                                    type: string
-                                  resource:
-                                    default: configmaps
-                                    description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
-                                    type: string
-                                required:
-                                - name
-                                type: object
-                              headers:
-                                description: "Headers related filters. \n Support: extended"
-                                properties:
-                                  add:
-                                    additionalProperties:
+                          filters:
+                            description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently undefined. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across implementations. Specifying a core filter multiple times has undefined or custom conformance. \n Support: core"
+                            items:
+                              description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
+                              properties:
+                                extensionRef:
+                                  description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
+                                  properties:
+                                    group:
+                                      default: core
+                                      description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a configmaps: \n fooRef:   resource: configmaps   name: myconfigmap \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                                       type: string
-                                    description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: extended?"
-                                    type: object
-                                  remove:
-                                    description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: extended?"
-                                    items:
+                                    name:
+                                      description: Name is the name of the referent.
                                       type: string
-                                    type: array
-                                required:
-                                - add
-                                - remove
-                                type: object
-                            type: object
+                                    resource:
+                                      default: configmaps
+                                      description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                      type: string
+                                  required:
+                                  - name
+                                  type: object
+                                requestHeader:
+                                  description: HTTPRequestHeaderConfig defines configuration for the RequestHeader filter.
+                                  properties:
+                                    add:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: extended?"
+                                      type: object
+                                    remove:
+                                      description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: extended?"
+                                      items:
+                                        type: string
+                                      type: array
+                                  required:
+                                  - add
+                                  - remove
+                                  type: object
+                                type:
+                                  description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
+                                  type: string
+                              required:
+                              - requestHeader
+                              - type
+                              type: object
+                            type: array
                           matches:
                             description: 'Matches define conditions used for matching the rule against incoming HTTP requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. For example, take the following matches configuration: matches: - path: /foo   headers:     version: "2" - path: /v2/foo For a request to match against this rule, a request should satisfy EITHER of the two conditions: - path prefixed with `/foo` AND contains the header `version: "2"` - path prefix of `/v2/foo` Please see doc for HTTPRouteMatch on how to specify multiple match conditions that should be ANDed together.'
                             items:

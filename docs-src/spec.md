@@ -693,6 +693,25 @@ targetRef. If unspecified, weight defaults to 1.</p>
 Support: Extended (tcproute)</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>filters</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
+[]HTTPRouteFilter
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Filters defined at this-level should be executed if and only if
+the request is being forwarded to the target defined here.</p>
+<p>Conformance: For any implementation, filtering support, including core
+filters, is NOT guaranteed at this-level.
+Use Filters in HTTPRouteRule for portable filters across implementations.</p>
+<p>Support: custom</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress
@@ -1308,14 +1327,15 @@ assigns an address from a reserved pool.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPHeaderFilter">HTTPHeaderFilter
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRequestHeaderConfig">HTTPRequestHeaderConfig
 </h3>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>)
 </p>
 <p>
-<p>HTTPHeaderFilter defines the filter behavior for a request match.</p>
+<p>HTTPRequestHeaderConfig defines configuration for the
+RequestHeader filter.</p>
 </p>
 <table>
 <thead>
@@ -1438,11 +1458,20 @@ that includes the HTTPRoute will be true.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
 </p>
 <p>
-<p>HTTPRouteFilter defines a filter-like action to be applied to
-requests.</p>
+<p>HTTPRouteFilter defines additional processing steps that must be completed
+during the request or response lifecycle.
+HTTPRouteFilters are meant as an extension point to express additional
+processing that may be done in Gateway implementations. Some examples include
+request or response modification, implementing authentication strategies,
+rate-limiting, and traffic shaping.
+API guarantee/conformance is defined based on the type of the filter.
+TODO(hbagdi): re-render CRDs once controller-tools supports union tags:
+- <a href="https://github.com/kubernetes-sigs/controller-tools/pull/298">https://github.com/kubernetes-sigs/controller-tools/pull/298</a>
+- <a href="https://github.com/kubernetes-sigs/controller-tools/issues/461">https://github.com/kubernetes-sigs/controller-tools/issues/461</a></p>
 </p>
 <table>
 <thead>
@@ -1454,17 +1483,28 @@ requests.</p>
 <tbody>
 <tr>
 <td>
-<code>headers</code></br>
+<code>type</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderFilter">
-HTTPHeaderFilter
-</a>
+string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>Headers related filters.</p>
-<p>Support: extended</p>
+<p>Type identifies the filter to execute.
+Types are classified into three conformance-levels (similar to
+other locations in this API):
+- Core and extended: These filter types and their corresponding configuration
+is defined in this package. All implementations must implement
+the core filters. Implementers are encouraged to support extended filters.
+Definitions for filter-specific configuration for these
+filters is defined in this package.
+- Custom: These filters are defined and supported by specific vendors.
+In the future, filters showing convergence in behavior across multiple
+implementations will be considered for inclusion in extended or core
+conformance rings. Filter-specific configuration for such filters
+is specified using the ExtensionRef field. <code>Type</code> should be set to
+&ldquo;ImplementationSpecific&rdquo; for custom filters.</p>
+<p>Implementers are encouraged to define custom implementation
+types to extend the core API with implementation-specific behavior.</p>
 </td>
 </tr>
 <tr>
@@ -1483,10 +1523,20 @@ ConfigMapsDefaultLocalObjectReference
 string for the group) or an implementation-defined resource (for
 example, resource &ldquo;myroutefilters&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: custom</p>
+group indicates that the resource is &ldquo;configmaps&rdquo;.
+ExtensionRef MUST NOT be used for core and extended filters.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>requestHeader</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestHeaderConfig">
+HTTPRequestHeaderConfig
+</a>
+</em>
+</td>
+<td>
 </td>
 </tr>
 </tbody>
@@ -1747,16 +1797,25 @@ match conditions that should be ANDed together.</p>
 </tr>
 <tr>
 <td>
-<code>filter</code></br>
+<code>filters</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
-HTTPRouteFilter
+[]HTTPRouteFilter
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Filter defines what filters are applied to the request.</p>
+<p>Filters define the filters that are applied to requests that match
+this rule.</p>
+<p>The effects of ordering of multiple behaviors are currently undefined.
+This can change in the future based on feedback during the alpha stage.</p>
+<p>Conformance-levels at this level are defined based on the type of filter:
+- ALL core filters MUST be supported by all implementations.
+- Implementers are encouraged to support extended filters.
+- Implementation-specific custom filters have no API guarantees across implementations.
+Specifying a core filter multiple times has undefined or custom conformance.</p>
+<p>Support: core</p>
 </td>
 </tr>
 <tr>

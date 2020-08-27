@@ -65,6 +65,18 @@ type ForwardToTarget struct {
 	// +optional
 	// +kubebuilder:default=1
 	Weight TargetWeight `json:"weight" protobuf:"bytes,3,opt,name=weight"`
+
+	// Filters defined at this-level should be executed if and only if
+	// the request is being forwarded to the target defined here.
+	//
+	// Conformance: For any implementation, filtering support, including core
+	// filters, is NOT guaranteed at this-level.
+	// Use Filters in HTTPRouteRule for portable filters across implementations.
+	//
+	// Support: custom
+	//
+	// +optional
+	Filters []HTTPRouteFilter `json:"filters" protobuf:"bytes,4,rep,name=filters"`
 }
 
 // TargetPort specifies the destination port number to use for a TargetRef.
