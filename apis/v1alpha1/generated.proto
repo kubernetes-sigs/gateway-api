@@ -737,7 +737,13 @@ message HTTPRouteSpec {
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 message HTTPRouteStatus {
-  repeated GatewayObjectReference gatewayRefs = 1;
+  // Gateways is a list of the Gateways that are associated with the
+  // HTTPRoute, and the status of the route with respect to each of these
+  // Gateways.  When a Gateway selects this route, the controller that
+  // manages the Gateway should add an entry to this list when the
+  // controller first sees the route and should update the entry as
+  // appropriate when the route is modified.
+  repeated RouteGatewayStatus gateways = 1;
 }
 
 // HostnameMatch specifies how a Listener should match the incoming
@@ -964,6 +970,43 @@ message RouteBindingSelector {
   optional string resource = 4;
 }
 
+// RouteCondition is a status condition for a given route.
+message RouteCondition {
+  // Type indicates the type of condition.
+  optional string type = 1;
+
+  // Status describes the current state of this condition.  Can be "True",
+  // "False", or "Unknown".
+  optional string status = 2;
+
+  // Message is a human-understandable message describing the condition.
+  // +optional
+  optional string message = 3;
+
+  // Reason indicates why the condition is in this state.
+  // +optional
+  optional string reason = 4;
+
+  // LastTransitionTime indicates the last time this condition changed.
+  // +optional
+  optional k8s.io.apimachinery.pkg.apis.meta.v1.Time lastTransitionTime = 5;
+}
+
+// RouteGatewayStatus describes the status of a route with respect to an
+// associated Gateway.
+message RouteGatewayStatus {
+  // GatewayRef is a reference to a Gateway object that is associated with
+  // the route.
+  optional GatewayObjectReference gatewayRef = 4;
+
+  // Conditions describes the status of the route with respect to the
+  // Gateway.  For example, the "Admitted" condition indicates whether the
+  // route has been admitted or rejected by the Gateway, and why.  Note
+  // that the route's availability is also subject to the Gateway's own
+  // status conditions and listener status.
+  repeated RouteCondition conditions = 3;
+}
+
 // RouteNamespaces is used by Gateway and GatewayClass to indicate which
 // namespaces Routes should be selected from.
 message RouteNamespaces {
@@ -1186,7 +1229,13 @@ message TCPRouteSpec {
 
 // TCPRouteStatus defines the observed state of TCPRoute
 message TCPRouteStatus {
-  repeated GatewayObjectReference gatewayRefs = 1;
+  // Gateways is a list of the Gateways that are associated with the
+  // TCPRoute, and the status of the route with respect to each of these
+  // Gateways.  When a Gateway selects this route, the controller that
+  // manages the Gateway should add an entry to this list when the
+  // controller first sees the route and should update the entry as
+  // appropriate when the route is modified.
+  repeated RouteGatewayStatus gateways = 1;
 }
 
 // TLSConfig describes a TLS configuration.

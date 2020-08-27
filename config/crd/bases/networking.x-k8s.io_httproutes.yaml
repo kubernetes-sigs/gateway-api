@@ -222,22 +222,55 @@ spec:
           status:
             description: HTTPRouteStatus defines the observed state of HTTPRoute.
             properties:
-              gatewayRefs:
+              gateways:
+                description: Gateways is a list of the Gateways that are associated with the HTTPRoute, and the status of the route with respect to each of these Gateways.  When a Gateway selects this route, the controller that manages the Gateway should add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified.
                 items:
-                  description: GatewayObjectReference identifies a Gateway object.
+                  description: RouteGatewayStatus describes the status of a route with respect to an associated Gateway.
                   properties:
-                    name:
-                      description: Name is the name of the referent.
-                      type: string
-                    namespace:
-                      description: Namespace is the namespace of the referent.
-                      type: string
+                    conditions:
+                      description: Conditions describes the status of the route with respect to the Gateway.  For example, the "Admitted" condition indicates whether the route has been admitted or rejected by the Gateway, and why.  Note that the route's availability is also subject to the Gateway's own status conditions and listener status.
+                      items:
+                        description: RouteCondition is a status condition for a given route.
+                        properties:
+                          lastTransitionTime:
+                            description: LastTransitionTime indicates the last time this condition changed.
+                            format: date-time
+                            type: string
+                          message:
+                            description: Message is a human-understandable message describing the condition.
+                            type: string
+                          reason:
+                            description: Reason indicates why the condition is in this state.
+                            type: string
+                          status:
+                            description: Status describes the current state of this condition.  Can be "True", "False", or "Unknown".
+                            type: string
+                          type:
+                            description: Type indicates the type of condition.
+                            type: string
+                        required:
+                        - status
+                        - type
+                        type: object
+                      type: array
+                    gatewayRef:
+                      description: GatewayRef is a reference to a Gateway object that is associated with the route.
+                      properties:
+                        name:
+                          description: Name is the name of the referent.
+                          type: string
+                        namespace:
+                          description: Namespace is the namespace of the referent.
+                          type: string
+                      required:
+                      - name
+                      type: object
                   required:
-                  - name
+                  - gatewayRef
                   type: object
                 type: array
             required:
-            - gatewayRefs
+            - gateways
             type: object
         type: object
     served: true

@@ -1435,8 +1435,7 @@ with respect to the current state of the instance.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2152,14 +2151,20 @@ HTTPRouteAction
 <tbody>
 <tr>
 <td>
-<code>gatewayRefs</code></br>
+<code>gateways</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-[]GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">
+[]RouteGatewayStatus
 </a>
 </em>
 </td>
 <td>
+<p>Gateways is a list of the Gateways that are associated with the
+HTTPRoute, and the status of the route with respect to each of these
+Gateways.  When a Gateway selects this route, the controller that
+manages the Gateway should add an entry to this list when the
+controller first sees the route and should update the entry as
+appropriate when the route is modified.</p>
 </td>
 </tr>
 </tbody>
@@ -2662,6 +2667,151 @@ condition for the affected Listener.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteCondition">RouteCondition
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
+</p>
+<p>
+<p>RouteCondition is a status condition for a given route.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteConditionType">
+RouteConditionType
+</a>
+</em>
+</td>
+<td>
+<p>Type indicates the type of condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#conditionstatus-v1-core">
+Kubernetes core/v1.ConditionStatus
+</a>
+</em>
+</td>
+<td>
+<p>Status describes the current state of this condition.  Can be &ldquo;True&rdquo;,
+&ldquo;False&rdquo;, or &ldquo;Unknown&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>message</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Message is a human-understandable message describing the condition.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>reason</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Reason indicates why the condition is in this state.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>lastTransitionTime</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
+Kubernetes meta/v1.Time
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>LastTransitionTime indicates the last time this condition changed.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteConditionType">RouteConditionType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteCondition">RouteCondition</a>)
+</p>
+<p>
+<p>RouteConditionType is a type of condition for a route.</p>
+</p>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>)
+</p>
+<p>
+<p>RouteGatewayStatus describes the status of a route with respect to an
+associated Gateway.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gatewayRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
+GatewayObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>GatewayRef is a reference to a Gateway object that is associated with
+the route.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>conditions</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteCondition">
+[]RouteCondition
+</a>
+</em>
+</td>
+<td>
+<p>Conditions describes the status of the route with respect to the
+Gateway.  For example, the &ldquo;Admitted&rdquo; condition indicates whether the
+route has been admitted or rejected by the Gateway, and why.  Note
+that the route&rsquo;s availability is also subject to the Gateway&rsquo;s own
+status conditions and listener status.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteNamespaces">RouteNamespaces
 </h3>
 <p>
@@ -3079,14 +3229,20 @@ TCPRouteAction
 <tbody>
 <tr>
 <td>
-<code>gatewayRefs</code></br>
+<code>gateways</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-[]GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">
+[]RouteGatewayStatus
 </a>
 </em>
 </td>
 <td>
+<p>Gateways is a list of the Gateways that are associated with the
+TCPRoute, and the status of the route with respect to each of these
+Gateways.  When a Gateway selects this route, the controller that
+manages the Gateway should add an entry to this list when the
+controller first sees the route and should update the entry as
+appropriate when the route is modified.</p>
 </td>
 </tr>
 </tbody>

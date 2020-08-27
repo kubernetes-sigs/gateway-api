@@ -16,6 +16,7 @@ limitations under the License.
 package v1alpha1
 
 import (
+	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -317,7 +318,13 @@ type RouteHostExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
-	GatewayRefs []GatewayObjectReference `json:"gatewayRefs" protobuf:"bytes,1,rep,name=gatewayRefs"`
+	// Gateways is a list of the Gateways that are associated with the
+	// HTTPRoute, and the status of the route with respect to each of these
+	// Gateways.  When a Gateway selects this route, the controller that
+	// manages the Gateway should add an entry to this list when the
+	// controller first sees the route and should update the entry as
+	// appropriate when the route is modified.
+	Gateways []RouteGatewayStatus `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
 }
 
 // GatewayObjectReference identifies a Gateway object.
@@ -330,6 +337,47 @@ type GatewayObjectReference struct {
 	// +kubebuilder:validation:Required
 	// +required
 	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
+}
+
+// RouteGatewayStatus describes the status of a route with respect to an
+// associated Gateway.
+type RouteGatewayStatus struct {
+	// GatewayRef is a reference to a Gateway object that is associated with
+	// the route.
+	GatewayRef GatewayObjectReference `json:"gatewayRef" protobuf:"bytes,4,rep,name=gatewayRef"`
+	// Conditions describes the status of the route with respect to the
+	// Gateway.  For example, the "Admitted" condition indicates whether the
+	// route has been admitted or rejected by the Gateway, and why.  Note
+	// that the route's availability is also subject to the Gateway's own
+	// status conditions and listener status.
+	Conditions []RouteCondition `json:"conditions,omitempty" protobuf:"bytes,3,rep,name=conditions"`
+}
+
+// RouteConditionType is a type of condition for a route.
+type RouteConditionType string
+
+const (
+	// ConditionRouteAdmitted indicates whether the route has been admitted
+	// or rejected by a Gateway, and why.
+	ConditionRouteAdmitted RouteConditionType = "Admitted"
+)
+
+// RouteCondition is a status condition for a given route.
+type RouteCondition struct {
+	// Type indicates the type of condition.
+	Type RouteConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=RouteConditionType"`
+	// Status describes the current state of this condition.  Can be "True",
+	// "False", or "Unknown".
+	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	// Message is a human-understandable message describing the condition.
+	// +optional
+	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
+	// Reason indicates why the condition is in this state.
+	// +optional
+	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	// LastTransitionTime indicates the last time this condition changed.
+	// +optional
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
 }
 
 // +genclient
