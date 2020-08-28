@@ -101,9 +101,24 @@ type HTTPRouteRule struct {
 	// match conditions that should be ANDed together.
 	// +optional
 	Matches []HTTPRouteMatch `json:"matches" protobuf:"bytes,1,rep,name=matches"`
-	// Filter defines what filters are applied to the request.
+
+	// Filters define the filters that are applied to requests that match
+	// this rule.
+	//
+	// The effects of ordering of multiple behaviors are currently undefined.
+	// This can change in the future based on feedback during the alpha stage.
+	//
+	// Conformance-levels at this level are defined based on the type of filter:
+	// - ALL core filters MUST be supported by all implementations.
+	// - Implementers are encouraged to support extended filters.
+	// - Implementation-specific custom filters have no API guarantees across implementations.
+	// Specifying a core filter multiple times has undefined or custom conformance.
+	//
+	// Support: core
+	//
 	// +optional
-	Filter *HTTPRouteFilter `json:"filter" protobuf:"bytes,2,opt,name=filter"`
+	Filters []HTTPRouteFilter `json:"filters" protobuf:"bytes,2,rep,name=filters"`
+
 	// Action defines what happens to the request.
 	// +optional
 	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
@@ -213,32 +228,70 @@ type HTTPRouteMatch struct {
 	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,5,opt,name=extensionRef"`
 }
 
-// HTTPRouteFilter defines a filter-like action to be applied to
-// requests.
-type HTTPRouteFilter struct {
-	// Headers related filters.
-	//
-	// Support: extended
+const (
+	// FilterHTTPReqeustHeader can be used to add or remove an HTTP
+	// header from an HTTP request before it is sent to the upstream target.
+	// Support: core
 	// +optional
-	Headers *HTTPHeaderFilter `json:"headers" protobuf:"bytes,1,opt,name=headers"`
+	FilterHTTPRequesttHeader = "RequestHeader"
+	// TODO(hbagdi): add FilterHTTPRequestMirroring filter
+
+	FilterImplementationSpecific = "ImplementationSpecific"
+)
+
+// HTTPRouteFilter defines additional processing steps that must be completed
+// during the request or response lifecycle.
+// HTTPRouteFilters are meant as an extension point to express additional
+// processing that may be done in Gateway implementations. Some examples include
+// request or response modification, implementing authentication strategies,
+// rate-limiting, and traffic shaping.
+// API guarantee/conformance is defined based on the type of the filter.
+// TODO(hbagdi): re-render CRDs once controller-tools supports union tags:
+// - https://github.com/kubernetes-sigs/controller-tools/pull/298
+// - https://github.com/kubernetes-sigs/controller-tools/issues/461
+// +union
+type HTTPRouteFilter struct {
+	// Type identifies the filter to execute.
+	// Types are classified into three conformance-levels (similar to
+	// other locations in this API):
+	// - Core and extended: These filter types and their corresponding configuration
+	//   is defined in this package. All implementations must implement
+	//   the core filters. Implementers are encouraged to support extended filters.
+	//   Definitions for filter-specific configuration for these
+	//   filters is defined in this package.
+	// - Custom: These filters are defined and supported by specific vendors.
+	//   In the future, filters showing convergence in behavior across multiple
+	//   implementations will be considered for inclusion in extended or core
+	//   conformance rings. Filter-specific configuration for such filters
+	//   is specified using the ExtensionRef field. `Type` should be set to
+	//   "ImplementationSpecific" for custom filters.
+	//
+	// Implementers are encouraged to define custom implementation
+	// types to extend the core API with implementation-specific behavior.
+	//
+	// +unionDiscriminator
+	// +kubebuilder:validation:Required
+	// +required
+	Type string `json:"type" protobuf:"bytes,1,opt,name=type"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
 	// string for the group) or an implementation-defined resource (for
 	// example, resource "myroutefilters" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
-	//
-	// Support: custom
-	//
+	// group indicates that the resource is "configmaps".
+	// ExtensionRef MUST NOT be used for core and extended filters.
 	// +optional
 	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+
+	// Filter-specific configuration definitions for core and extended filters
+
+	RequestHeader *HTTPRequestHeaderConfig `json:"requestHeader" protobuf:"bytes,3,opt,name=requestHeader"`
 }
 
-// HTTPHeaderFilter defines the filter behavior for a request match.
-type HTTPHeaderFilter struct {
+// HTTPRequestHeaderConfig defines configuration for the
+// RequestHeader filter.
+type HTTPRequestHeaderConfig struct {
 	// Add adds the given header (name, value) to the request
 	// before the action.
 	//
