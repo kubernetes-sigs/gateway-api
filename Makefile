@@ -13,8 +13,6 @@
 # limitations under the License.
 
 DOCKER ?= docker
-# Image to build protobufs
-PROTO_IMG ?= k8s.gcr.io/kube-cross:v1.13.6-1
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
@@ -23,51 +21,15 @@ ROOT := $(abspath $(TOP))
 all: generate controller verify
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
-#
-# Order here matters; we need to generate Go code before generating
-# protobuf. Generating proto is really slow, so it's last.
 .PHONY: generate
 generate:
 	$(MAKE) manifests
 	$(MAKE) docs
-	$(MAKE) proto
 
 # Generate manifests e.g. CRD, RBAC etc.
 .PHONY: manifests
 manifests:
 	$(MAKE) -f kubebuilder.mk manifests
-
-# Generate protobufs
-.PHONY: proto
-proto:
-	$(DOCKER) run -it \
-		--mount type=bind,source=$(ROOT),target=/go/src/sigs.k8s.io/service-apis  \
-		--mount type=bind,source=$(GOPATH)/pkg/mod,target=/go/pkg/mod  \
-		--env GOPATH=/go \
-		--env GOCACHE=/go/.cache \
-		--rm \
-		--user "$(shell id -u):$(shell id -g)" \
-		-w /go/src/sigs.k8s.io/service-apis \
-		$(PROTO_IMG) \
-		hack/update-proto.sh
-
-# Verify protobuf generation
-.PHONY: verify-proto
-verify-proto:
-	$(DOCKER) run \
-		--mount type=bind,source=$(ROOT),target=/realgo/src/sigs.k8s.io/service-apis \
-		--mount type=bind,source=$(GOPATH)/pkg/mod,target=/go/pkg/mod  \
-		--env GOPATH=/go \
-		--env GOCACHE=/go/.cache \
-		--rm \
-		--user "$(shell id -u):$(shell id -g)" \
-		-w /go \
-		$(PROTO_IMG) \
-		/bin/bash -c "mkdir -p src/sigs.k8s.io/service-apis && \
-			cp -r /realgo/src/sigs.k8s.io/service-apis/ src/sigs.k8s.io && \
-			cd src/sigs.k8s.io/service-apis && \
-			hack/update-proto.sh && \
-			diff -r apis /realgo/src/sigs.k8s.io/service-apis/apis"
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

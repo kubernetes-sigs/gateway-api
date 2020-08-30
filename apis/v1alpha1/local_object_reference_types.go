@@ -37,7 +37,7 @@ type ServicesDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=core
-	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
+	Group string `json:"group"`
 	// Resource is the API resource name of the referent. Omitting the value
 	// or specifying the empty string indicates the services resource. For example,
 	// use the following to specify a services resource:
@@ -55,11 +55,11 @@ type ServicesDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=services
-	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
+	Resource string `json:"resource"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
-	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
+	Name string `json:"name"`
 }
 
 // ConfigMapsDefaultLocalObjectReference identifies an API object within a
@@ -84,7 +84,7 @@ type ConfigMapsDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=core
-	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
+	Group string `json:"group"`
 	// Resource is the API resource name of the referent. Omitting the value
 	// or specifying the empty string indicates the configmaps resource. For
 	// example, use the following to specify a configmaps resource:
@@ -102,11 +102,11 @@ type ConfigMapsDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=configmaps
-	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
+	Resource string `json:"resource"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
-	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
+	Name string `json:"name"`
 }
 
 // SecretsDefaultLocalObjectReference identifies an API object within a
@@ -131,7 +131,7 @@ type SecretsDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=core
-	Group string `json:"group" protobuf:"bytes,1,opt,name=group"`
+	Group string `json:"group"`
 	// Resource is the API resource name of the referent. Omitting the value
 	// or specifying the empty string indicates the secrets resource. For
 	// example, use the following to specify a secrets resource:
@@ -149,9 +149,9 @@ type SecretsDefaultLocalObjectReference struct {
 	//
 	// +optional
 	// +kubebuilder:default=secrets
-	Resource string `json:"resource" protobuf:"bytes,2,opt,name=resource"`
+	Resource string `json:"resource"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
-	Name string `json:"name" protobuf:"bytes,3,opt,name=name"`
+	Name string `json:"name"`
 }

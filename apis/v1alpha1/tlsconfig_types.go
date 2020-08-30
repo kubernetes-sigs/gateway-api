@@ -38,7 +38,7 @@ type TLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty" protobuf:"bytes,1,rep,name=certificateRefs"`
+	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//
@@ -48,7 +48,7 @@ type TLSConfig struct {
 	// construct.
 	//
 	// Support: Implementation-specific.
-	Options map[string]string `json:"options" protobuf:"bytes,3,rep,name=options"`
+	Options map[string]string `json:"options"`
 }
 
 // CertificateObjectReference identifies a certificate object within a known

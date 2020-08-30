@@ -22,7 +22,7 @@ import (
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpec struct {
 	// Rules are a list of TCP matchers and actions.
-	Rules []TCPRouteRule `json:"rules" protobuf:"bytes,1,rep,name=rules"`
+	Rules []TCPRouteRule `json:"rules"`
 }
 
 // TCPRouteStatus defines the observed state of TCPRoute
@@ -33,7 +33,7 @@ type TCPRouteStatus struct {
 	// manages the Gateway should add an entry to this list when the
 	// controller first sees the route and should update the entry as
 	// appropriate when the route is modified.
-	Gateways []RouteGatewayStatus `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
+	Gateways []RouteGatewayStatus `json:"gateways"`
 }
 
 // +genclient
@@ -42,11 +42,11 @@ type TCPRouteStatus struct {
 
 // TCPRoute is the Schema for the tcproutes API
 type TCPRoute struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TCPRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status TCPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+	Spec   TCPRouteSpec   `json:"spec,omitempty"`
+	Status TCPRouteStatus `json:"status,omitempty"`
 }
 
 // TCPRouteRule is the configuration for a given rule.
@@ -54,11 +54,11 @@ type TCPRouteRule struct {
 	// Match defines which connections match this rule.
 	//
 	// +optional
-	Match *TCPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
+	Match *TCPRouteMatch `json:"match"`
 	// Action defines what happens to the connection.
 	//
 	// +optional
-	Action *TCPRouteAction `json:"action" protobuf:"bytes,2,opt,name=action"`
+	Action *TCPRouteAction `json:"action"`
 }
 
 // TCPRouteAction is the action for a given rule.
@@ -75,7 +75,7 @@ type TCPRouteAction struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	ForwardTo []ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,rep,name=forwardTo"`
+	ForwardTo []ForwardToTarget `json:"forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -89,7 +89,7 @@ type TCPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef,omitempty" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef,omitempty"`
 }
 
 // TCPRouteMatch defines the predicate used to match connections to a
@@ -107,14 +107,14 @@ type TCPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,1,opt,name=extensionRef"`
+	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
 }
 
 // +kubebuilder:object:root=true
 
 // TCPRouteList contains a list of TCPRoute
 type TCPRouteList struct {
-	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []TCPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []TCPRoute `json:"items"`
 }

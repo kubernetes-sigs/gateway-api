@@ -23,7 +23,7 @@ import (
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpec struct {
 	// Hosts is a list of Host definitions.
-	Hosts []HTTPRouteHost `json:"hosts,omitempty" protobuf:"bytes,1,rep,name=hosts"`
+	Hosts []HTTPRouteHost `json:"hosts,omitempty"`
 }
 
 // HTTPRouteHost is the configuration for a given set of hosts.
@@ -57,12 +57,12 @@ type HTTPRouteHost struct {
 	// Support: Core
 	//
 	// +optional
-	Hostnames []string `json:"hostnames,omitempty" protobuf:"bytes,1,opt,name=hostnames"`
+	Hostnames []string `json:"hostnames,omitempty"`
 
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
-	Rules []HTTPRouteRule `json:"rules" protobuf:"bytes,2,rep,name=rules"`
+	Rules []HTTPRouteRule `json:"rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "host" block.  The resource may be "configmaps" (omit or specify the
@@ -76,7 +76,7 @@ type HTTPRouteHost struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
+	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef"`
 }
 
 // HTTPRouteRule defines semantics for matching an incoming HTTP request against
@@ -116,7 +116,7 @@ type HTTPRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
-	Matches []HTTPRouteMatch `json:"matches" protobuf:"bytes,1,rep,name=matches"`
+	Matches []HTTPRouteMatch `json:"matches"`
 
 	// Filters define the filters that are applied to requests that match
 	// this rule.
@@ -133,11 +133,11 @@ type HTTPRouteRule struct {
 	// Support: core
 	//
 	// +optional
-	Filters []HTTPRouteFilter `json:"filters" protobuf:"bytes,2,rep,name=filters"`
+	Filters []HTTPRouteFilter `json:"filters"`
 
 	// Action defines what happens to the request.
 	// +optional
-	Action *HTTPRouteAction `json:"action" protobuf:"bytes,3,opt,name=action"`
+	Action *HTTPRouteAction `json:"action"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
@@ -193,13 +193,13 @@ type HTTPPathMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Prefix
-	Type PathMatchType `json:"type" protobuf:"bytes,1,opt,name=type"`
+	Type PathMatchType `json:"type"`
 
 	// Value of the HTTP path to match against.
 	//
 	// +required
 	// +kubebuilder:validation:MinLength=1
-	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
+	Value string `json:"value"`
 }
 
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.
@@ -214,7 +214,7 @@ type HTTPHeaderMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Exact
-	Type HeaderMatchType `json:"type" protobuf:"bytes,1,opt,name=type"`
+	Type HeaderMatchType `json:"type"`
 
 	// Values is a map of HTTP Headers to be matched.
 	// It MUST contain at least one entry.
@@ -227,7 +227,7 @@ type HTTPHeaderMatch struct {
 	// must match all the specified headers to select the route.
 	//
 	// +required
-	Values map[string]string `json:"values" protobuf:"bytes,2,rep,name=values"`
+	Values map[string]string `json:"values"`
 }
 
 // HTTPRouteMatch defines the predicate used to match requests to a given
@@ -251,12 +251,12 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default={type: "Prefix", value: "/"}
-	Path *HTTPPathMatch `json:"path" protobuf:"bytes,1,opt,name=path"`
+	Path *HTTPPathMatch `json:"path"`
 
 	// Headers specifies a HTTP request header matcher.
 	//
 	// +optional
-	Headers *HTTPHeaderMatch `json:"headers" protobuf:"bytes,2,opt,name=headers"`
+	Headers *HTTPHeaderMatch `json:"headers"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
@@ -270,18 +270,19 @@ type HTTPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,3,opt,name=extensionRef"`
+	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
 }
 
 const (
-	// FilterHTTPReqeustHeader can be used to add or remove an HTTP
+	// FilterHTTPRequestHeader can be used to add or remove an HTTP
 	// header from an HTTP request before it is sent to the upstream target.
 	// Support: core
 	// +optional
-	FilterHTTPRequesttHeader = "RequestHeader"
-	// TODO(hbagdi): add FilterHTTPRequestMirroring filter
+	FilterHTTPRequestHeader = "RequestHeader"
 
+	// FilterImplementationSpecific defines an implementation specific filter.
 	FilterImplementationSpecific = "ImplementationSpecific"
+	// TODO(hbagdi): add FilterHTTPRequestMirroring filter
 )
 
 // HTTPRouteFilter defines additional processing steps that must be completed
@@ -317,7 +318,7 @@ type HTTPRouteFilter struct {
 	// +unionDiscriminator
 	// +kubebuilder:validation:Required
 	// +required
-	Type string `json:"type" protobuf:"bytes,1,opt,name=type"`
+	Type string `json:"type"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  The resource may be "configmap" (use the empty
@@ -327,11 +328,11 @@ type HTTPRouteFilter struct {
 	// group indicates that the resource is "configmaps".
 	// ExtensionRef MUST NOT be used for core and extended filters.
 	// +optional
-	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef"`
 
 	// Filter-specific configuration definitions for core and extended filters
 
-	RequestHeader *HTTPRequestHeaderConfig `json:"requestHeader" protobuf:"bytes,3,opt,name=requestHeader"`
+	RequestHeader *HTTPRequestHeaderConfig `json:"requestHeader"`
 }
 
 // HTTPRequestHeaderConfig defines configuration for the
@@ -351,7 +352,7 @@ type HTTPRequestHeaderConfig struct {
 	//   my-header: foo
 	//
 	// Support: extended?
-	Add map[string]string `json:"add" protobuf:"bytes,1,rep,name=add"`
+	Add map[string]string `json:"add"`
 
 	// Remove the given header(s) from the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
@@ -372,7 +373,7 @@ type HTTPRequestHeaderConfig struct {
 	//   My-Header2: DEF
 	//
 	// Support: extended?
-	Remove []string `json:"remove" protobuf:"bytes,2,rep,name=remove"`
+	Remove []string `json:"remove"`
 
 	// TODO
 }
@@ -391,7 +392,7 @@ type HTTPRouteAction struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	ForwardTo []ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,rep,name=forwardTo"`
+	ForwardTo []ForwardToTarget `json:"forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -405,7 +406,7 @@ type HTTPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef"`
 }
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
@@ -422,19 +423,19 @@ type HTTPRouteStatus struct {
 	// manages the Gateway should add an entry to this list when the
 	// controller first sees the route and should update the entry as
 	// appropriate when the route is modified.
-	Gateways []RouteGatewayStatus `json:"gateways" protobuf:"bytes,1,rep,name=gateways"`
+	Gateways []RouteGatewayStatus `json:"gateways"`
 }
 
 // GatewayObjectReference identifies a Gateway object.
 type GatewayObjectReference struct {
 	// Namespace is the namespace of the referent.
 	// +optional
-	Namespace string `json:"namespace,omitempty" protobuf:"bytes,1,opt,name=namespace"`
+	Namespace string `json:"namespace,omitempty"`
 	// Name is the name of the referent.
 	//
 	// +kubebuilder:validation:Required
 	// +required
-	Name string `json:"name" protobuf:"bytes,2,opt,name=name"`
+	Name string `json:"name"`
 }
 
 // RouteGatewayStatus describes the status of a route with respect to an
@@ -442,13 +443,13 @@ type GatewayObjectReference struct {
 type RouteGatewayStatus struct {
 	// GatewayRef is a reference to a Gateway object that is associated with
 	// the route.
-	GatewayRef GatewayObjectReference `json:"gatewayRef" protobuf:"bytes,4,rep,name=gatewayRef"`
+	GatewayRef GatewayObjectReference `json:"gatewayRef"`
 	// Conditions describes the status of the route with respect to the
 	// Gateway.  For example, the "Admitted" condition indicates whether the
 	// route has been admitted or rejected by the Gateway, and why.  Note
 	// that the route's availability is also subject to the Gateway's own
 	// status conditions and listener status.
-	Conditions []RouteCondition `json:"conditions,omitempty" protobuf:"bytes,3,rep,name=conditions"`
+	Conditions []RouteCondition `json:"conditions,omitempty"`
 }
 
 // RouteConditionType is a type of condition for a route.
@@ -463,19 +464,19 @@ const (
 // RouteCondition is a status condition for a given route.
 type RouteCondition struct {
 	// Type indicates the type of condition.
-	Type RouteConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=RouteConditionType"`
+	Type RouteConditionType `json:"type"`
 	// Status describes the current state of this condition.  Can be "True",
 	// "False", or "Unknown".
-	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	Status core.ConditionStatus `json:"status"`
 	// Message is a human-understandable message describing the condition.
 	// +optional
-	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
+	Message string `json:"message,omitempty"`
 	// Reason indicates why the condition is in this state.
 	// +optional
-	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// LastTransitionTime indicates the last time this condition changed.
 	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 }
 
 // +genclient
@@ -484,18 +485,18 @@ type RouteCondition struct {
 
 // HTTPRoute is the Schema for the httproutes API
 type HTTPRoute struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HTTPRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status HTTPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
+	Status HTTPRouteStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // HTTPRouteList contains a list of HTTPRoute
 type HTTPRouteList struct {
-	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []HTTPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []HTTPRoute `json:"items"`
 }

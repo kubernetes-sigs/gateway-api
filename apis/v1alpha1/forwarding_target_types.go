@@ -29,7 +29,7 @@ type ForwardToTarget struct {
 	// Support: Core (Kubernetes Services)
 	// Support: Implementation-specific (Other resource types)
 	//
-	TargetRef ForwardToTargetObjectReference `json:"targetRef" protobuf:"bytes,1,opt,name=targetRef"`
+	TargetRef ForwardToTargetObjectReference `json:"targetRef"`
 
 	// TargetPort specifies the destination port number to use for the TargetRef.
 	// If unspecified and TargetRef is a Service object consisting of a single
@@ -40,7 +40,7 @@ type ForwardToTarget struct {
 	// Support: Core
 	//
 	// +optional
-	TargetPort *TargetPort `json:"targetPort,omitempty" protobuf:"bytes,2,opt,name=targetPort"`
+	TargetPort *TargetPort `json:"targetPort,omitempty"`
 
 	// Weight specifies the proportion of traffic forwarded to a targetRef, computed
 	// as weight/(sum of all weights in targetRefs). Weight is not a percentage and
@@ -64,7 +64,7 @@ type ForwardToTarget struct {
 	//
 	// +optional
 	// +kubebuilder:default=1
-	Weight TargetWeight `json:"weight" protobuf:"bytes,3,opt,name=weight"`
+	Weight TargetWeight `json:"weight"`
 
 	// Filters defined at this-level should be executed if and only if
 	// the request is being forwarded to the target defined here.
@@ -76,7 +76,7 @@ type ForwardToTarget struct {
 	// Support: custom
 	//
 	// +optional
-	Filters []HTTPRouteFilter `json:"filters" protobuf:"bytes,4,rep,name=filters"`
+	Filters []HTTPRouteFilter `json:"filters"`
 }
 
 // TargetPort specifies the destination port number to use for a TargetRef.
