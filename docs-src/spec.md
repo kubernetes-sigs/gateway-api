@@ -1327,6 +1327,111 @@ assigns an address from a reserved pool.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+</p>
+<p>
+<p>HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HeaderMatchType">
+HeaderMatchType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>HeaderMatchType specifies how to match a HTTP request
+header against the Values map.</p>
+<p>Support: core (Exact)
+Support: custom (ImplementationSpecific)</p>
+<p>Default: &ldquo;Exact&rdquo;</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>values</code></br>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<p>Values is a map of HTTP Headers to be matched.
+It MUST contain at least one entry.</p>
+<p>The HTTP header field name to match is the map key, and the
+value of the HTTP header is the map value. HTTP header field
+names MUST be matched case-insensitively.</p>
+<p>Multiple match values are ANDed together, meaning, a request
+must match all the specified headers to select the route.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPPathMatch">HTTPPathMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+</p>
+<p>
+<p>HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>type</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.PathMatchType">
+PathMatchType
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Type specifies how to match against the path Value.</p>
+<p>Support: core (Exact, Prefix)
+Support: custom (RegularExpression, ImplementationSpecific)</p>
+<p>Since RegularExpression PathType has custom conformance, implementations
+can support POSIX, PCRE or any other dialects of regular expressions.
+Please read the implementation&rsquo;s documentation to determine the supported
+dialect.</p>
+<p>Default: &ldquo;Prefix&rdquo;</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>value</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Value of the HTTP path to match against.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRequestHeaderConfig">HTTPRequestHeaderConfig
 </h3>
 <p>
@@ -1638,17 +1743,18 @@ that includes the HTTPRoute will be true.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
 </p>
 <p>
-<p>HTTPRouteMatch defines the predicate used to match requests to a
-given action.
-Multiple match types are ANDed together, i.e. the match will evaluate
-to true only if all conditions are satisfied.
-For example:
-match:
-path: /foo
+<p>HTTPRouteMatch defines the predicate used to match requests to a given
+action. Multiple match types are ANDed together, i.e. the match will
+evaluate to true only if all conditions are satisfied.</p>
+<p>For example, the match below will match a HTTP request only if its path
+starts with <code>/foo</code> AND it contains the <code>version: &quot;1&quot;</code> header:</p>
+<pre><code>match:
+path:
+value: &quot;/foo&quot;
 headers:
-version: &ldquo;1&rdquo;
-will result in a match only if an HTTP request&rsquo;s path starts with <code>/foo</code> AND
-contains the <code>version: &quot;1&quot;</code> header.</p>
+values:
+version: &quot;1&quot;
+</code></pre>
 </p>
 <table>
 <thead>
@@ -1660,67 +1766,31 @@ contains the <code>version: &quot;1&quot;</code> header.</p>
 <tbody>
 <tr>
 <td>
-<code>pathMatchType</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.PathMatchType">
-PathMatchType
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>PathType defines the semantics of the <code>Path</code> matcher.</p>
-<p>Support: core (Exact, Prefix)
-Support: custom (RegularExpression, ImplementationSpecific)</p>
-<p>Since RegularExpression PathType has custom conformance, implementations
-can support POSIX, PCRE or any other dialects of regular expressions.
-Please read the implementation&rsquo;s documentation to determine the supported
-dialect.</p>
-<p>Default: &ldquo;Prefix&rdquo;</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>path</code></br>
 <em>
-string
-</em>
-</td>
-<td>
-<p>Path is the value of the HTTP path as interpreted via
-PathType.</p>
-<p>Default: &ldquo;/&rdquo;</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>headerMatchType</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HeaderMatchType">
-HeaderMatchType
+<a href="#networking.x-k8s.io/v1alpha1.HTTPPathMatch">
+HTTPPathMatch
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>HeaderMatchType defines the semantics of the <code>Header</code> matcher.</p>
-<p>Support: core (Exact)
-Support: custom (ImplementationSpecific)</p>
-<p>Default: &ldquo;Exact&rdquo;</p>
+<p>Path specifies a HTTP request path matcher. If this field is not
+specified, a default prefix match on the &ldquo;/&rdquo; path is provided.</p>
 </td>
 </tr>
 <tr>
 <td>
 <code>headers</code></br>
 <em>
-map[string]string
+<a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">
+HTTPHeaderMatch
+</a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Headers are the HTTP Headers to match as interpreted via
-HeaderMatchType. Multiple headers are ANDed together, meaning, a request
-must contain all the headers specified in order to select this route.</p>
+<p>Headers specifies a HTTP request header matcher.</p>
 </td>
 </tr>
 <tr>
@@ -1780,19 +1850,28 @@ the request.</p>
 <p>Matches define conditions used for matching the rule against
 incoming HTTP requests.
 Each match is independent, i.e. this rule will be matched
-if <strong>any</strong> one of the matches is satisfied.
-For example, take the following matches configuration:
-matches:
-- path: /foo
+if <strong>any</strong> one of the matches is satisfied.</p>
+<p>For example, take the following matches configuration:</p>
+<pre><code>matches:
+- path:
+value: &quot;/foo&quot;
 headers:
-version: &ldquo;2&rdquo;
-- path: /v2/foo
-For a request to match against this rule, a request should satisfy
-EITHER of the two conditions:
-- path prefixed with <code>/foo</code> AND contains the header <code>version: &quot;2&quot;</code>
-- path prefix of <code>/v2/foo</code>
-Please see doc for HTTPRouteMatch on how to specify multiple
+values:
+version: &quot;2&quot;
+- path:
+value: &quot;/v2/foo&quot;
+</code></pre>
+<p>For a request to match against this rule, a request should satisfy
+EITHER of the two conditions:</p>
+<ul>
+<li>path prefixed with <code>/foo</code> AND contains the header <code>version: &quot;2&quot;</code></li>
+<li>path prefix of <code>/v2/foo</code></li>
+</ul>
+<p>See the documentation for HTTPRouteMatch on how to specify multiple
 match conditions that should be ANDed together.</p>
+<p>If no matches are specified, the default is a prefix
+path match on &ldquo;/&rdquo;, which has the effect of matching every
+HTTP request.</p>
 </td>
 </tr>
 <tr>
@@ -1907,7 +1986,7 @@ appropriate when the route is modified.</p>
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch</a>)
 </p>
 <p>
 <p>HeaderMatchType specifies the semantics of how HTTP headers should be compared.
@@ -2274,7 +2353,7 @@ status of all such Listeners.</p>
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPPathMatch">HTTPPathMatch</a>)
 </p>
 <p>
 <p>PathMatchType specifies the semantics of how HTTP paths should be compared.
