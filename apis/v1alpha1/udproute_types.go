@@ -23,6 +23,10 @@ import (
 type UDPRouteSpec struct {
 	// Rules are a list of UDP matchers and actions.
 	Rules []UDPRouteRule `json:"rules"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
 }
 
 // UDPRouteStatus defines the observed state of UDPRoute.

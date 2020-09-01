@@ -32,6 +32,38 @@ spec:
           spec:
             description: TLSRouteSpec defines the desired state of TLSRoute
             properties:
+              gateways:
+                default:
+                  allow: SameNamespace
+                description: Gateways defines which Gateways can use this Route.
+                properties:
+                  allow:
+                    default: SameNamespace
+                    description: 'Allow indicates which Gateways will be allowed to use this route. Possible values are: * All: Gateways in any namespace can use this route. * FromList: Only Gateways specified in GatewayRefs may use this route. * SameNamespace: Only Gateways in the same namespace may use this route.'
+                    enum:
+                    - All
+                    - FromList
+                    - SameNamespace
+                    type: string
+                  gatewayRefs:
+                    description: GatewayRefs must be specified when Allow is set to "FromList". In that case, only Gateways referenced in this list will be allowed to use this route. This field is ignored for other values of "Allow".
+                    items:
+                      description: GatewayReference identifies a Gateway in a specified namespace.
+                      properties:
+                        name:
+                          description: Name is the name of the referent.
+                          maxLength: 253
+                          type: string
+                        namespace:
+                          description: Namespace is the namespace of the referent.
+                          maxLength: 253
+                          type: string
+                      required:
+                      - name
+                      - namespace
+                      type: object
+                    type: array
+                type: object
               rules:
                 description: Rules are a list of TLS matchers and actions.
                 items:
@@ -192,12 +224,15 @@ spec:
                       properties:
                         name:
                           description: Name is the name of the referent.
+                          maxLength: 253
                           type: string
                         namespace:
                           description: Namespace is the namespace of the referent.
+                          maxLength: 253
                           type: string
                       required:
                       - name
+                      - namespace
                       type: object
                   required:
                   - gatewayRef

@@ -62,46 +62,6 @@ spec:
                     description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                     type: object
                 type: object
-              allowedRouteNamespaces:
-                default:
-                  onlySameNamespace: true
-                description: "AllowedRouteNamespaces indicates in which namespaces Routes can be selected for Gateways of this class. This is restricted to the namespace of the Gateway by default. \n When any Routes are selected by a Gateway in a namespace that is not allowed by this selector, the controller implementing the GatewayClass may add a new \"ForbiddenRoutesForClass\" condition to the Gateway status. Adding this condition is considered optional since not all controllers will have access to all namespaces. \n Support: Core"
-                properties:
-                  namespaceSelector:
-                    description: "NamespaceSelector is a selector of namespaces that Routes should be selected from. This is a standard Kubernetes LabelSelector, a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. Controllers must not support Routes in namespaces outside this selector. \n An empty selector (default) indicates that Routes in any namespace can be selected. \n The OnlySameNamespace field takes precedence over this field. This selector will only take effect when OnlySameNamespace is false. \n Support: Core"
-                    properties:
-                      matchExpressions:
-                        description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
-                        items:
-                          description: A label selector requirement is a selector that contains values, a key, and an operator that relates the key and values.
-                          properties:
-                            key:
-                              description: key is the label key that the selector applies to.
-                              type: string
-                            operator:
-                              description: operator represents a key's relationship to a set of values. Valid operators are In, NotIn, Exists and DoesNotExist.
-                              type: string
-                            values:
-                              description: values is an array of string values. If the operator is In or NotIn, the values array must be non-empty. If the operator is Exists or DoesNotExist, the values array must be empty. This array is replaced during a strategic merge patch.
-                              items:
-                                type: string
-                              type: array
-                          required:
-                          - key
-                          - operator
-                          type: object
-                        type: array
-                      matchLabels:
-                        additionalProperties:
-                          type: string
-                        description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
-                        type: object
-                    type: object
-                  onlySameNamespace:
-                    default: true
-                    description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
-                    type: boolean
-                type: object
               controller:
                 description: "Controller is a domain/path string that indicates the controller that is managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"
                 type: string
@@ -188,16 +148,19 @@ spec:
               provisionedGateways:
                 description: ProvisionedGateways is a list of Gateways that have been provisioned using this class. Implementations must add any Gateways of this class to this list once they have been provisioned and remove Gateways as soon as they are deleted or deprovisioned.
                 items:
-                  description: GatewayObjectReference identifies a Gateway object.
+                  description: GatewayReference identifies a Gateway in a specified namespace.
                   properties:
                     name:
                       description: Name is the name of the referent.
+                      maxLength: 253
                       type: string
                     namespace:
                       description: Namespace is the namespace of the referent.
+                      maxLength: 253
                       type: string
                   required:
                   - name
+                  - namespace
                   type: object
                 type: array
             required:

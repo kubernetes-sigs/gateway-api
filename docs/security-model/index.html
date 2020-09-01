@@ -354,8 +354,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#namespace-restrictions" class="md-nav__link">
-    Namespace Restrictions
+  <a href="#limiting-namespaces-where-a-gatewayclass-can-be-used" class="md-nav__link">
+    Limiting Namespaces Where a GatewayClass Can Be Used
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#route-namespaces" class="md-nav__link">
+    Route Namespaces
   </a>
   
 </li>
@@ -537,8 +544,15 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#namespace-restrictions" class="md-nav__link">
-    Namespace Restrictions
+  <a href="#limiting-namespaces-where-a-gatewayclass-can-be-used" class="md-nav__link">
+    Limiting Namespaces Where a GatewayClass Can Be Used
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#route-namespaces" class="md-nav__link">
+    Route Namespaces
   </a>
   
 </li>
@@ -720,37 +734,54 @@ readable by most roles, so instead we'll focus on write access for this model.</
 </tr>
 </tbody>
 </table>
-<h2 id="namespace-restrictions">Namespace Restrictions</h2>
-<p>The extra configuration options are not possible to control with RBAC. Instead,
-they will be controlled with configuration fields on GatewayClasses:</p>
-<ul>
-<li><strong>allowedGatewayNamespaces</strong>: AllowedGatewayNamespaces is a selector of
-  namespaces that Gateways of this class can be created in. Implementations must
-  not support Gateways when they are created in namespaces not specified by this
-  field.</li>
-</ul>
-<p>Gateways that appear in namespaces not specified by this field must continue
-  to be supported if they have already been provisioned. This must be indicated
-  by the Gateway's presence in the ProvisionedGateways list in the status for
-  this GatewayClass. If the status on a Gateway indicates that it has been
-  provisioned but the Gateway does not appear in the ProvisionedGateways list on
-  GatewayClass it must not be supported.</p>
+<h2 id="limiting-namespaces-where-a-gatewayclass-can-be-used">Limiting Namespaces Where a GatewayClass Can Be Used</h2>
+<p>Kubernetes RBAC only allows for granting access to create Gateways as a whole,
+not limiting creation to specific GatewayClasses. With that in mind,
+GatewayClass includes an <code>allowedGatewayNamespaces</code> field to enable limiting
+where a GatewayClass can be used. </p>
+<p>This field is a selector of namespaces that Gateways of this class can be
+created in. Implementations must not support Gateways when they are created in
+namespaces not specified by this field.</p>
+<p>Gateways that appear in namespaces not specified by this field must continue to
+be supported if they have already been provisioned. This must be indicated by
+the Gateway's presence in the ProvisionedGateways list in the status for this
+GatewayClass. If the status on a Gateway indicates that it has been provisioned
+but the Gateway does not appear in the ProvisionedGateways list on GatewayClass
+it must not be supported.</p>
 <p>When this field is unspecified or an empty selector, Gateways will be able to
-  use this GatewayClass in any namespace.</p>
-<ul>
-<li><strong>allowedRouteNamespaces</strong>: AllowedRouteNamespaces indicates in which
-  namespaces Routes can be selected for Gateways of this class. This is
-  restricted to the namespace of the Gateway by default.</li>
-</ul>
+use this GatewayClass in any namespace.</p>
+<h2 id="route-namespaces">Route Namespaces</h2>
+<p>Service APIs allow Gateways to select Routes across multiple Namespaces.
+Although this can be remarkably powerful, this capability needs to be used
+carefully. Gateways include a <code>RouteNamespaces</code> field that allows selecting
+multiple namespaces with a label selector. By default, this is limited to Routes
+in the same namespace as the Gateway. Additionally, Routes include a <code>Gateways</code>
+field that allows them to restrict which Gateways use them. If the Gateways
+field is not specified (i.e. its empty), then the Route will default to allowing
+selection by Gateways in the same namespace. </p>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>91a9b54 (Adding Gateway selection to Routes)</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
+</blockquote>
 <h2 id="controller-requirements">Controller Requirements</h2>
 <p>To be considered conformant with the Service APIs spec, controllers need to:</p>
 <ul>
 <li>Populate status fields on Gateways and Resources to indicate if they are
   compatible with the corresponding GatewayClass configuration.</li>
-<li>Not implement invalid configuration. Fore example, if a route is referenced in
-  an invalid namespace for the GatewayClass, it should be ignored. </li>
-<li>Respond to changes in GatewayClass configuration that may change which
-  Gateways or Routes are valid.</li>
+<li>Ensure that all Routes added to a Gateway:</li>
+<li>Have been selected by the Gateway.</li>
+<li>Have a Gateways field that allows the Gateway use of the route.</li>
 </ul>
 <h2 id="alternative-approaches-considered">Alternative Approaches Considered</h2>
 <h3 id="new-api-resources">New API Resources</h3>

@@ -23,6 +23,10 @@ import (
 type HTTPRouteSpec struct {
 	// Hosts is a list of Host definitions.
 	Hosts []HTTPRouteHost `json:"hosts,omitempty"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
 }
 
 // HTTPRouteHost is the configuration for a given set of hosts.

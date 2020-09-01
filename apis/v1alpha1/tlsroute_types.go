@@ -25,6 +25,10 @@ type TLSRouteSpec struct {
 	// +required
 	// +kubebuilder:validation:MinItems=1
 	Rules []TLSRouteRule `json:"rules"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
 }
 
 // TLSRouteStatus defines the observed state of TLSRoute
