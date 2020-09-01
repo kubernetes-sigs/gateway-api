@@ -22,18 +22,12 @@ ROOT := $(abspath $(TOP))
 
 all: generate controller verify
 
-# Build manager binary and run static analysis.
-.PHONY: controller
-controller:
-	$(MAKE) -f kubebuilder.mk manager
-
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 #
 # Order here matters; we need to generate Go code before generating
 # protobuf. Generating proto is really slow, so it's last.
 .PHONY: generate
 generate:
-	$(MAKE) -f kubebuilder.mk generate
 	$(MAKE) manifests
 	$(MAKE) docs
 	$(MAKE) proto
