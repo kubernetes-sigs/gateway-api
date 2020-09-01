@@ -51,14 +51,17 @@ type TCPRoute struct {
 
 // TCPRouteRule is the configuration for a given rule.
 type TCPRouteRule struct {
-	// Match defines which connections match this rule.
+	// Matches define conditions used for matching the rule against
+	// incoming TCP connections.
+	// Each match is independent, i.e. this rule will be matched
+	// if **any** one of the matches is satisfied.
 	//
 	// +optional
-	Match *TCPRouteMatch `json:"match"`
+	Matches []TCPRouteMatch `json:"matches"`
+
 	// Action defines what happens to the connection.
-	//
-	// +optional
-	Action *TCPRouteAction `json:"action"`
+	// +required
+	Action TCPRouteAction `json:"action"`
 }
 
 // TCPRouteAction is the action for a given rule.
