@@ -106,7 +106,7 @@ spec:
                 description: "Controller is a domain/path string that indicates the controller that is managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"
                 type: string
               parametersRef:
-                description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
+                description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n Parameters resources are implementation specific custom resources. These resources must be cluster-scoped. \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
                 properties:
                   group:
                     description: Group is the API group name of the referent.
