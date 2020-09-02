@@ -36,6 +36,10 @@ CONTROLLER_GEN=go run sigs.k8s.io/controller-tools/cmd/controller-gen
 
 all: manifests
 
+# Install CRDs into a cluster
+install: manifests
+	kustomize build config/crd | kubectl apply -f -
+
 # Run go fmt against code
 fmt:
 	go fmt ./...
@@ -47,4 +51,3 @@ vet:
 # Generate manifests e.g. CRD, RBAC etc.
 manifests:
 	$(CONTROLLER_GEN) $(CRD_OPTIONS) rbac:roleName=manager-role webhook paths="./..." output:crd:artifacts:config=config/crd/bases
-
