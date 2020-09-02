@@ -20,7 +20,7 @@ TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
-all: generate controller verify
+all: generate vet fmt verify
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 #
@@ -31,6 +31,14 @@ generate:
 	$(MAKE) manifests
 	$(MAKE) docs
 	$(MAKE) proto
+
+# Run go fmt against code
+fmt:
+	$(MAKE) -f kubebuilder.mk fmt
+
+# Run go vet against code
+vet:
+	$(MAKE) -f kubebuilder.mk vet
 
 # Generate manifests e.g. CRD, RBAC etc.
 .PHONY: manifests
