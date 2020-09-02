@@ -35,14 +35,14 @@ import (
 //
 // Support: Core.
 type GatewayClass struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,4,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec for this GatewayClass.
-	Spec GatewayClassSpec `json:"spec,omitempty" protobuf:"bytes,2,opt,name=spec"`
+	Spec GatewayClassSpec `json:"spec,omitempty"`
 	// Status of the GatewayClass.
 	// +kubebuilder:default={conditions: {{type: "InvalidParameters", status: "Unknown"}}}
-	Status GatewayClassStatus `json:"status,omitempty" protobuf:"bytes,3,opt,name=status"`
+	Status GatewayClassStatus `json:"status,omitempty"`
 }
 
 // GatewayClassSpec reflects the configuration of a class of Gateways.
@@ -61,7 +61,7 @@ type GatewayClassSpec struct {
 	// Support: Core
 	//
 	// +required
-	Controller string `json:"controller" protobuf:"bytes,1,opt,name=controller"`
+	Controller string `json:"controller"`
 
 	// AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
 	// can use this GatewayClass from. This is a standard Kubernetes
@@ -80,7 +80,7 @@ type GatewayClassSpec struct {
 	// Support: Core
 	//
 	// +optional
-	AllowedGatewayNamespaceSelector metav1.LabelSelector `json:"allowedGatewayNamespaceSelector" protobuf:"bytes,2,opt,name=allowedGatewayNamespaceSelector"`
+	AllowedGatewayNamespaceSelector metav1.LabelSelector `json:"allowedGatewayNamespaceSelector"`
 
 	// AllowedRouteNamespaces indicates in which namespaces Routes can be
 	// selected for Gateways of this class. This is restricted to the namespace
@@ -96,7 +96,7 @@ type GatewayClassSpec struct {
 	//
 	// +optional
 	// +kubebuilder:default={onlySameNamespace:true}
-	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty" protobuf:"bytes,3,opt,name=allowedRouteNamespaces"`
+	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty"`
 
 	// ParametersRef is a controller-specific resource containing
 	// the configuration parameters corresponding to this
@@ -114,8 +114,7 @@ type GatewayClassSpec struct {
 	// Support: Custom
 	//
 	// +optional
-	// +protobuf=false
-	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty" protobuf:"bytes,4,opt,name=parametersRef"`
+	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty"`
 }
 
 // RouteNamespaces is used by Gateway and GatewayClass to indicate which
@@ -136,7 +135,7 @@ type RouteNamespaces struct {
 	// Support: Core
 	//
 	// +optional
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector" protobuf:"bytes,1,opt,name=namespaceSelector"`
+	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector"`
 
 	// OnlySameNamespace is a boolean used to indicate if Route references are
 	// limited to the same Namespace as the Gateway. When true, only Routes
@@ -149,7 +148,7 @@ type RouteNamespaces struct {
 	//
 	// +optional
 	// +kubebuilder:default=true
-	OnlySameNamespace bool `json:"onlySameNamespace" protobuf:"bytes,2,opt,name=onlySameNamespace"`
+	OnlySameNamespace bool `json:"onlySameNamespace"`
 }
 
 // GatewayClassParametersObjectReference identifies a parameters object for a
@@ -174,7 +173,7 @@ type GatewayClassStatus struct {
 	// this GatewayClass.
 	// +optional
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
-	Conditions []GatewayClassCondition `json:"conditions,omitempty" protobuf:"bytes,1,rep,name=conditions"`
+	Conditions []GatewayClassCondition `json:"conditions,omitempty"`
 }
 
 // GatewayClassCondition contains the details for the current
@@ -185,11 +184,11 @@ type GatewayClassCondition struct {
 	// Type of this condition.
 	//
 	// +required
-	Type GatewayClassConditionType `json:"type" protobuf:"bytes,1,opt,name=type"`
+	Type GatewayClassConditionType `json:"type"`
 	// Status of this condition.
 	//
 	// +required
-	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status"`
+	Status core.ConditionStatus `json:"status"`
 	// Reason is a machine consumable string for the last
 	// transition. It should be a one-word, CamelCase
 	// string. Reason will be defined by the controller.
@@ -198,31 +197,31 @@ type GatewayClassCondition struct {
 	// This field must not be empty.
 	//
 	// +required
-	Reason string `json:"reason,omitempty" protobuf:"bytes,3,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// Message is a human readable reason for last transition.
 	// This field may be empty.
 	//
 	// +required
-	Message string `json:"message,omitempty" protobuf:"bytes,4,opt,name=message"`
+	Message string `json:"message,omitempty"`
 	// LastTransitionTime is the time of the last change to this condition.
 	// This should be when the underlying condition changed.
 	// If that is not known, then using the time when the API field changed is acceptable.
 	//
 	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	// If set, this represents the .metadata.generation that the condition was set based upon.
 	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
 	// with respect to the current state of the instance.
 	//
 	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // GatewayClassList contains a list of GatewayClass
 type GatewayClassList struct {
-	metav1.TypeMeta `json:",inline" protobuf:"bytes,3,opt,name=typeMeta"`
-	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,1,opt,name=metadata"`
-	Items           []GatewayClass `json:"items" protobuf:"bytes,2,rep,name=items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []GatewayClass `json:"items"`
 }

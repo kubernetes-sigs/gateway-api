@@ -27,20 +27,20 @@ import (
 // Gateway represents an instantiation of a service-traffic handling
 // infrastructure by binding Listeners to a set of IP addresses.
 type Gateway struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GatewaySpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status GatewayStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+	Spec   GatewaySpec   `json:"spec,omitempty"`
+	Status GatewayStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
 // GatewayList contains a list of Gateway
 type GatewayList struct {
-	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []Gateway `json:"items" protobuf:"bytes,3,rep,name=items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []Gateway `json:"items"`
 }
 
 // GatewaySpec defines the desired state of Gateway.
@@ -51,7 +51,7 @@ type GatewayList struct {
 // signaling via the GatewayStatus block.
 type GatewaySpec struct {
 	// Class used for this Gateway. This is the name of a GatewayClass resource.
-	Class string `json:"class" protobuf:"bytes,1,opt,name=class"`
+	Class string `json:"class"`
 
 	// Listeners associated with this Gateway. Listeners define
 	// logical endpoints that are bound on this Gateway's addresses.
@@ -87,7 +87,7 @@ type GatewaySpec struct {
 	//
 	// +required
 	// +kubebuilder:validation:MinItems=1
-	Listeners []Listener `json:"listeners" protobuf:"bytes,2,rep,name=listeners"`
+	Listeners []Listener `json:"listeners"`
 
 	// Addresses requested for this gateway. This is optional and
 	// behavior can depend on the GatewayClass. If a value is set
@@ -105,7 +105,7 @@ type GatewaySpec struct {
 	// Support: Core
 	//
 	// +optional
-	Addresses []GatewayAddress `json:"addresses" protobuf:"bytes,3,rep,name=addresses"`
+	Addresses []GatewayAddress `json:"addresses"`
 }
 
 // ProtocolType defines the application protocol accepted by a
@@ -185,7 +185,7 @@ type HostnameMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Exact
-	Match HostnameMatchType `json:"match" protobuf:"bytes,1,name=match"`
+	Match HostnameMatchType `json:"match"`
 
 	// Name contains the name to match against. This value must
 	// be a fully qualified host or domain name conforming to the
@@ -201,7 +201,7 @@ type HostnameMatch struct {
 	// This field is required for the "Domain" and "Exact" match types.
 	//
 	// +optional
-	Name string `json:"name" protobuf:"bytes,2,name=name"`
+	Name string `json:"name"`
 }
 
 // Listener embodies the concept of a logical endpoint where a
@@ -221,7 +221,7 @@ type Listener struct {
 	//
 	// +optional
 	// +kubebuilder:default={match: "Any"}
-	Hostname HostnameMatch `json:"hostname,omitempty" protobuf:"bytes,1,opt,name=hostname"`
+	Hostname HostnameMatch `json:"hostname,omitempty"`
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
@@ -233,7 +233,7 @@ type Listener struct {
 	// +kubebuilder:validation:Maximum=65536
 	// +kubebuilder:validation:ExclusiveMinimum=true
 	// +kubebuilder:validation:ExclusiveMaximum=true
-	Port int32 `json:"port,omitempty" protobuf:"varint,2,opt,name=port"`
+	Port int32 `json:"port,omitempty"`
 
 	// Protocol specifies the network protocol this listener
 	// expects to receive. The GatewayClass MUST validate that
@@ -253,7 +253,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
-	Protocol ProtocolType `json:"protocol,omitempty" protobuf:"bytes,3,opt,name=protocol"`
+	Protocol ProtocolType `json:"protocol,omitempty"`
 
 	// TLS is the TLS configuration for the Listener. This field
 	// is required if the Protocol field is "HTTPS" or "TLS" and
@@ -262,7 +262,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +optional
-	TLS *TLSConfig `json:"tls,omitempty" protobuf:"bytes,4,opt,name=tls"`
+	TLS *TLSConfig `json:"tls,omitempty"`
 
 	// Routes specifies a schema for associating routes with the
 	// Listener using selectors. A Route is a resource capable of
@@ -280,7 +280,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +required
-	Routes RouteBindingSelector `json:"routes" protobuf:"bytes,5,opt,name=routes"`
+	Routes RouteBindingSelector `json:"routes"`
 }
 
 // AddressType defines how a network address is represented as a text string.
@@ -319,13 +319,13 @@ type GatewayAddress struct {
 	//
 	// +optional
 	// +kubebuilder:default=IPAddress
-	Type AddressType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=AddressType"`
+	Type AddressType `json:"type"`
 
 	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
 	// values will depend on `Type` and support by the controller.
 	//
 	// +required
-	Value string `json:"value" protobuf:"bytes,2,opt,name=value"`
+	Value string `json:"value"`
 }
 
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
@@ -340,7 +340,7 @@ type RouteBindingSelector struct {
 	//
 	// +optional
 	// +kubebuilder:default={onlySameNamespace:true}
-	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty" protobuf:"bytes,1,opt,name=routeNamespaces"`
+	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty"`
 	// RouteSelector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
 	// only routes matching the RouteSelector are associated with the Gateway.
@@ -349,7 +349,7 @@ type RouteBindingSelector struct {
 	// Support: Core
 	//
 	// +optional
-	RouteSelector metav1.LabelSelector `json:"routeSelector,omitempty" protobuf:"bytes,2,opt,name=routeSelector"`
+	RouteSelector metav1.LabelSelector `json:"routeSelector,omitempty"`
 	// Group is the group of the route resource to select. Omitting the value or specifying
 	// the empty string indicates the networking.x-k8s.io API group.
 	// For example, use the following to select an HTTPRoute:
@@ -368,7 +368,7 @@ type RouteBindingSelector struct {
 	//
 	// +optional
 	// +kubebuilder:default=networking.x-k8s.io
-	Group string `json:"group" protobuf:"bytes,3,opt,name=group"`
+	Group string `json:"group"`
 	// Resource is the API resource name of the route resource to select.
 	//
 	// Resource MUST correspond to route resources that are compatible with the
@@ -381,7 +381,7 @@ type RouteBindingSelector struct {
 	// Support: Core
 	//
 	// +required
-	Resource string `json:"resource" protobuf:"bytes,4,opt,name=resource"`
+	Resource string `json:"resource"`
 }
 
 // ListenerExtensionObjectReference identifies a listener extension object
@@ -400,15 +400,15 @@ type GatewayStatus struct {
 	// These addresses should all be of type "IPAddress".
 	//
 	// +required
-	Addresses []GatewayAddress `json:"addresses" protobuf:"bytes,1,opt,name=addresses"`
+	Addresses []GatewayAddress `json:"addresses"`
 
 	// Conditions describe the current conditions of the Gateway.
 	// +optional
-	Conditions []GatewayCondition `json:"conditions,omitempty" protobuf:"bytes,2,rep,name=conditions"`
+	Conditions []GatewayCondition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
 	// +optional
-	Listeners []ListenerStatus `json:"listeners,omitempty" protobuf:"bytes,3,rep,name=listeners"`
+	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
 
 // GatewayConditionType is a type of condition associated with a Gateway.
@@ -445,35 +445,35 @@ type GatewayCondition struct {
 	// Type indicates the type of condition.
 	//
 	// +required
-	Type GatewayConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=GatewayConditionType"`
+	Type GatewayConditionType `json:"type"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
 	//
 	// +required
-	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	Status core.ConditionStatus `json:"status"`
 	// Message is a human-understandable message describing the condition.
 	// This field may be empty.
 	//
 	// +required
-	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
+	Message string `json:"message,omitempty"`
 	// Reason indicates why the condition is in this state.
 	// This field must not be empty.
 	//
 	// +required
-	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// LastTransitionTime indicates the last time this condition changed.
 	// This should be when the underlying condition changed.
 	// If that is not known, then using the time when the API field changed is acceptable.
 	//
 	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	// If set, this represents the .metadata.generation that the condition was set based upon.
 	// For instance, if .metadata.generation is currently 12, but
 	// the .status.conditions[x].observedGeneration is 9, the condition is out of date
 	// with respect to the current state of the instance.
 	//
 	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
 
 // ListenerStatus is the status associated with a Listener port.
@@ -484,12 +484,12 @@ type ListenerStatus struct {
 	// status of all such Listeners.
 	//
 	// +required
-	Port string `json:"port" protobuf:"varint,1,opt,name=port"`
+	Port string `json:"port"`
 
 	// Conditions describe the current condition of this listener.
 	//
 	// +required
-	Conditions []ListenerCondition `json:"conditions" protobuf:"bytes,3,rep,name=conditions"`
+	Conditions []ListenerCondition `json:"conditions"`
 }
 
 // ListenerConditionType is a type of condition associated with the listener.
@@ -536,33 +536,33 @@ type ListenerCondition struct {
 	// Type indicates the type of condition.
 	//
 	// +required
-	Type ListenerConditionType `json:"type" protobuf:"bytes,1,opt,name=type,casttype=ListenerConditionType"`
+	Type ListenerConditionType `json:"type"`
 	// Status describes the current state of this condition. Can be "True",
 	// "False", or "Unknown".
 	//
 	// +required
-	Status core.ConditionStatus `json:"status" protobuf:"bytes,2,opt,name=status,casttype=k8s.io/api/core/v1.ConditionStatus"`
+	Status core.ConditionStatus `json:"status"`
 	// Message is a human-understandable message describing the condition.
 	// This field may be empty.
 	//
 	// +required
-	Message string `json:"message,omitempty" protobuf:"bytes,3,opt,name=message"`
+	Message string `json:"message,omitempty"`
 	// Reason indicates why the condition is in this state.
 	// This field must not be empty.
 	//
 	// +required
-	Reason string `json:"reason,omitempty" protobuf:"bytes,4,opt,name=reason"`
+	Reason string `json:"reason,omitempty"`
 	// LastTransitionTime indicates the last time this condition changed.
 	// This should be when the underlying condition changed.
 	// If that is not known, then using the time when the API field changed is acceptable.
 	//
 	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty" protobuf:"bytes,5,opt,name=lastTransitionTime"`
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
 	// If set, this represents the .metadata.generation that the condition was
 	// set based upon. For instance, if .metadata.generation is currently 12,
 	// but the .status.conditions[x].observedGeneration is 9, the condition is
 	// out of date with respect to the current state of the instance.
 	//
 	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty" protobuf:"varint,6,opt,name=observedGeneration"`
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
 }
