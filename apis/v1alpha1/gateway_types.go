@@ -108,100 +108,25 @@ type GatewaySpec struct {
 	Addresses []GatewayAddress `json:"addresses"`
 }
 
-// ProtocolType defines the application protocol accepted by a
-// Listener. Implementations are not required to accept all the
-// defined protocols. If an implementation does not support a
-// specified protocol, it should raise a "ConditionUnsupportedProtocol"
-// condition for the affected Listener.
-//
-// Valid ProtocolType values are:
-//
-// * "HTTP"
-// * "HTTPS"
-// * "TLS"
-// * "TCP"
-//
-// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
-type ProtocolType string
-
-const (
-	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
-	HTTPProtocolType ProtocolType = "HTTP"
-
-	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
-	HTTPSProtocolType ProtocolType = "HTTPS"
-
-	// TLSProtocolType accepts TLS sessions over TCP.
-	TLSProtocolType ProtocolType = "TLS"
-
-	// TCPProtocolType accepts TCP sessions.
-	TCPProtocolType ProtocolType = "TCP"
-)
-
-// HostnameMatchType specifies the types of matches that are valid
-// for hostnames.
-// Valid match types are:
-//
-// * "Domain"
-// * "Exact"
-// * "Any"
-//
-// +kubebuilder:validation:Enum=Domain;Exact;Any
-type HostnameMatchType string
-
-const (
-	// HostnameMatchExact specifies that the hostname provided
-	// by the client must exactly match the specified value.
+// GatewayStatus defines the observed state of Gateway.
+type GatewayStatus struct {
+	// Addresses lists the IP addresses that have actually been
+	// bound to the Gateway. These addresses may differ from the
+	// addresses in the Spec, e.g. if the Gateway automatically
+	// assigns an address from a reserved pool.
 	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchExact HostnameMatchType = "Exact"
-
-	// HostnameMatchDomain specifies that the hostname provided
-	// by the client should be matched against a DNS domain value.
-	// The domain match removes the leftmost DNS label from the
-	// hostname provided by the client and compares the resulting
-	// value.
+	// These addresses should all be of type "IPAddress".
 	//
-	// For example, "example.com" is a "Domain" match for the host
-	// name "foo.example.com", but not for "foo.bar.example.com"
-	// or for "example.foo.com".
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchDomain HostnameMatchType = "Domain"
+	// +required
+	Addresses []GatewayAddress `json:"addresses"`
 
-	// HostnameMatchAny specifies that this Listener accepts
-	// all client traffic regardless of the presence or value of
-	// any hostname supplied by the client.
-	HostnameMatchAny HostnameMatchType = "Any"
-)
-
-// HostnameMatch specifies how a Listener should match the incoming
-// hostname from a client request. Depending on the incoming protocol,
-// the match must apply to names provided by the client at both the
-// TLS and the HTTP protocol layers.
-type HostnameMatch struct {
-	// Match specifies how the hostname provided by the client should be
-	// matched against the given value.
-	//
+	// Conditions describe the current conditions of the Gateway.
 	// +optional
-	// +kubebuilder:default=Exact
-	Match HostnameMatchType `json:"match"`
+	Conditions []GatewayCondition `json:"conditions,omitempty"`
 
-	// Name contains the name to match against. This value must
-	// be a fully qualified host or domain name conforming to the
-	// preferred name syntax defined in
-	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
-	//
-	// In addition to any RFC rules, this field MUST NOT contain
-	//
-	// 1. IP address literals
-	// 2. Colon-delimited port numbers
-	// 3. Percent-encoded octets
-	//
-	// This field is required for the "Domain" and "Exact" match types.
-	//
+	// Listeners provide status for each unique listener port defined in the Spec.
 	// +optional
-	Name string `json:"name"`
+	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a
@@ -283,34 +208,6 @@ type Listener struct {
 	Routes RouteBindingSelector `json:"routes"`
 }
 
-// AddressType defines how a network address is represented as a text string.
-// Valid AddressType values are:
-//
-// * "IPAddress"
-// * "NamedAddress"
-//
-// +kubebuilder:validation:Enum=IPAddress;NamedAddress
-type AddressType string
-
-const (
-	// IPAddressType a textual representation of a numeric IP
-	// address. IPv4 addresses must be in dotted-decimal
-	// form. IPv6 addresses must be in a standard IPv6 text
-	// representation (see RFC 5952).
-	//
-	// Implementations should accept any address representation
-	// accepted by the inet_pton(3) API.
-	//
-	// Support: Extended.
-	IPAddressType AddressType = "IPAddress"
-
-	// NamedAddressType is an address selected by name. The interpretation of
-	// the name is dependent on the controller.
-	//
-	// Support: Implementation-specific.
-	NamedAddressType AddressType = "NamedAddress"
-)
-
 // GatewayAddress describes an address that can be bound to a Gateway.
 type GatewayAddress struct {
 	// Type of the Address. This is either "IPAddress" or "NamedAddress".
@@ -327,6 +224,117 @@ type GatewayAddress struct {
 	// +required
 	Value string `json:"value"`
 }
+
+// GatewayCondition is an error status for a given route.
+type GatewayCondition struct {
+	// Type indicates the type of condition.
+	//
+	// +required
+	Type GatewayConditionType `json:"type"`
+	// Status describes the current state of this condition. Can be "True",
+	// "False", or "Unknown".
+	//
+	// +required
+	Status core.ConditionStatus `json:"status"`
+	// Message is a human-understandable message describing the condition.
+	// This field may be empty.
+	//
+	// +required
+	Message string `json:"message,omitempty"`
+	// Reason indicates why the condition is in this state.
+	// This field must not be empty.
+	//
+	// +required
+	Reason string `json:"reason,omitempty"`
+	// LastTransitionTime indicates the last time this condition changed.
+	// This should be when the underlying condition changed.
+	// If that is not known, then using the time when the API field changed is acceptable.
+	//
+	// +required
+	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
+	// If set, this represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but
+	// the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	//
+	// +optional
+	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+}
+
+// ListenerStatus is the status associated with a Listener port.
+type ListenerStatus struct {
+	// Port is the unique Listener port value for which this message
+	// is reporting the status. If more than one Gateway Listener
+	// shares the same port value, this message reports the combined
+	// status of all such Listeners.
+	//
+	// +required
+	Port string `json:"port"`
+
+	// Conditions describe the current condition of this listener.
+	//
+	// +required
+	Conditions []ListenerCondition `json:"conditions"`
+}
+
+// HostnameMatch specifies how a Listener should match the incoming
+// hostname from a client request. Depending on the incoming protocol,
+// the match must apply to names provided by the client at both the
+// TLS and the HTTP protocol layers.
+type HostnameMatch struct {
+	// Match specifies how the hostname provided by the client should be
+	// matched against the given value.
+	//
+	// +optional
+	// +kubebuilder:default=Exact
+	Match HostnameMatchType `json:"match"`
+
+	// Name contains the name to match against. This value must
+	// be a fully qualified host or domain name conforming to the
+	// preferred name syntax defined in
+	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
+	//
+	// In addition to any RFC rules, this field MUST NOT contain
+	//
+	// 1. IP address literals
+	// 2. Colon-delimited port numbers
+	// 3. Percent-encoded octets
+	//
+	// This field is required for the "Domain" and "Exact" match types.
+	//
+	// +optional
+	Name string `json:"name"`
+}
+
+// ProtocolType defines the application protocol accepted by a
+// Listener. Implementations are not required to accept all the
+// defined protocols. If an implementation does not support a
+// specified protocol, it should raise a "ConditionUnsupportedProtocol"
+// condition for the affected Listener.
+//
+// Valid ProtocolType values are:
+//
+// * "HTTP"
+// * "HTTPS"
+// * "TLS"
+// * "TCP"
+//
+// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
+type ProtocolType string
+
+const (
+	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
+	HTTPProtocolType ProtocolType = "HTTP"
+
+	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
+	HTTPSProtocolType ProtocolType = "HTTPS"
+
+	// TLSProtocolType accepts TLS sessions over TCP.
+	TLSProtocolType ProtocolType = "TLS"
+
+	// TCPProtocolType accepts TCP sessions.
+	TCPProtocolType ProtocolType = "TCP"
+)
 
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
@@ -384,32 +392,76 @@ type RouteBindingSelector struct {
 	Resource string `json:"resource"`
 }
 
+// HostnameMatchType specifies the types of matches that are valid
+// for hostnames.
+// Valid match types are:
+//
+// * "Domain"
+// * "Exact"
+// * "Any"
+//
+// +kubebuilder:validation:Enum=Domain;Exact;Any
+type HostnameMatchType string
+
+const (
+	// HostnameMatchExact specifies that the hostname provided
+	// by the client must exactly match the specified value.
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchExact HostnameMatchType = "Exact"
+
+	// HostnameMatchDomain specifies that the hostname provided
+	// by the client should be matched against a DNS domain value.
+	// The domain match removes the leftmost DNS label from the
+	// hostname provided by the client and compares the resulting
+	// value.
+	//
+	// For example, "example.com" is a "Domain" match for the host
+	// name "foo.example.com", but not for "foo.bar.example.com"
+	// or for "example.foo.com".
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchDomain HostnameMatchType = "Domain"
+
+	// HostnameMatchAny specifies that this Listener accepts
+	// all client traffic regardless of the presence or value of
+	// any hostname supplied by the client.
+	HostnameMatchAny HostnameMatchType = "Any"
+)
+
+// AddressType defines how a network address is represented as a text string.
+// Valid AddressType values are:
+//
+// * "IPAddress"
+// * "NamedAddress"
+//
+// +kubebuilder:validation:Enum=IPAddress;NamedAddress
+type AddressType string
+
+const (
+	// IPAddressType a textual representation of a numeric IP
+	// address. IPv4 addresses must be in dotted-decimal
+	// form. IPv6 addresses must be in a standard IPv6 text
+	// representation (see RFC 5952).
+	//
+	// Implementations should accept any address representation
+	// accepted by the inet_pton(3) API.
+	//
+	// Support: Extended.
+	IPAddressType AddressType = "IPAddress"
+
+	// NamedAddressType is an address selected by name. The interpretation of
+	// the name is dependent on the controller.
+	//
+	// Support: Implementation-specific.
+	NamedAddressType AddressType = "NamedAddress"
+)
+
 // ListenerExtensionObjectReference identifies a listener extension object
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
 type ListenerExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
-
-// GatewayStatus defines the observed state of Gateway.
-type GatewayStatus struct {
-	// Addresses lists the IP addresses that have actually been
-	// bound to the Gateway. These addresses may differ from the
-	// addresses in the Spec, e.g. if the Gateway automatically
-	// assigns an address from a reserved pool.
-	//
-	// These addresses should all be of type "IPAddress".
-	//
-	// +required
-	Addresses []GatewayAddress `json:"addresses"`
-
-	// Conditions describe the current conditions of the Gateway.
-	// +optional
-	Conditions []GatewayCondition `json:"conditions,omitempty"`
-
-	// Listeners provide status for each unique listener port defined in the Spec.
-	// +optional
-	Listeners []ListenerStatus `json:"listeners,omitempty"`
-}
 
 // GatewayConditionType is a type of condition associated with a Gateway.
 type GatewayConditionType string
@@ -439,58 +491,6 @@ const (
 	// Gateway's Addresses is invalid or could not be assigned.
 	ConditionInvalidAddress GatewayConditionType = "InvalidAddress"
 )
-
-// GatewayCondition is an error status for a given route.
-type GatewayCondition struct {
-	// Type indicates the type of condition.
-	//
-	// +required
-	Type GatewayConditionType `json:"type"`
-	// Status describes the current state of this condition. Can be "True",
-	// "False", or "Unknown".
-	//
-	// +required
-	Status core.ConditionStatus `json:"status"`
-	// Message is a human-understandable message describing the condition.
-	// This field may be empty.
-	//
-	// +required
-	Message string `json:"message,omitempty"`
-	// Reason indicates why the condition is in this state.
-	// This field must not be empty.
-	//
-	// +required
-	Reason string `json:"reason,omitempty"`
-	// LastTransitionTime indicates the last time this condition changed.
-	// This should be when the underlying condition changed.
-	// If that is not known, then using the time when the API field changed is acceptable.
-	//
-	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-	// If set, this represents the .metadata.generation that the condition was set based upon.
-	// For instance, if .metadata.generation is currently 12, but
-	// the .status.conditions[x].observedGeneration is 9, the condition is out of date
-	// with respect to the current state of the instance.
-	//
-	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-}
-
-// ListenerStatus is the status associated with a Listener port.
-type ListenerStatus struct {
-	// Port is the unique Listener port value for which this message
-	// is reporting the status. If more than one Gateway Listener
-	// shares the same port value, this message reports the combined
-	// status of all such Listeners.
-	//
-	// +required
-	Port string `json:"port"`
-
-	// Conditions describe the current condition of this listener.
-	//
-	// +required
-	Conditions []ListenerCondition `json:"conditions"`
-}
 
 // ListenerConditionType is a type of condition associated with the listener.
 type ListenerConditionType string
