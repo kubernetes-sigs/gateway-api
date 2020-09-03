@@ -15,7 +15,7 @@ metadata:
   name: my-trafficsplit-gateway
   namespace: default
 spec:
-  class: trafficsplit-lb
+  gatewayClassName: trafficsplit-lb
   listeners:  # Use GatewayClass defaults for listener definition.
     - protocol: HTTP
       routes:

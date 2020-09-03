@@ -51,8 +51,8 @@ spec:
                   - value
                   type: object
                 type: array
-              class:
-                description: Class used for this Gateway. This is the name of a GatewayClass resource.
+              gatewayClassName:
+                description: GatewayClassName used for this Gateway. This is the name of a GatewayClass resource.
                 type: string
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified. \n Each Listener in this array must have a unique Port field, however a GatewayClass may collapse compatible Listener definitions into a single implementation-defined acceptor configuration even if their Port fields would otherwise conflict. \n Listeners are compatible if all of the following conditions are true: \n 1. all their Protocol fields are \"HTTP\", or all their Protocol fields are \"HTTPS\" or TLS\" 2. their Hostname fields are specified with a match type other than \"Any\" 3. their Hostname fields are not an exact match for any other Listener \n As a special case, each group of compatible listeners may contain exactly one Listener with a match type of \"Any\". \n If the GatewayClass collapses compatible Listeners, the hostname provided in the incoming client request MUST be matched to a Listener to find the correct set of Routes. The incoming hostname MUST be matched using the Hostname field for each Listener in order of most to least specific. That is, \"Exact\" matches must be processed before \"Domain\" matches, which must be processed before \"Any\" matches. \n If this field specifies multiple Listeners that have the same Port value but are not compatible, the GatewayClass must raise a \"PortConflict\" condition on the Gateway. \n Support: Core"
@@ -212,7 +212,7 @@ spec:
                 minItems: 1
                 type: array
             required:
-            - class
+            - gatewayClassName
             - listeners
             type: object
           status:

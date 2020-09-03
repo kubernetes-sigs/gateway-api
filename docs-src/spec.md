@@ -78,13 +78,14 @@ GatewaySpec
 <table>
 <tr>
 <td>
-<code>class</code></br>
+<code>gatewayClassName</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Class used for this Gateway. This is the name of a GatewayClass resource.</p>
+<p>GatewayClassName used for this Gateway. This is the name of a
+GatewayClass resource.</p>
 </td>
 </tr>
 <tr>
@@ -1190,13 +1191,14 @@ signaling via the GatewayStatus block.</p>
 <tbody>
 <tr>
 <td>
-<code>class</code></br>
+<code>gatewayClassName</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Class used for this Gateway. This is the name of a GatewayClass resource.</p>
+<p>GatewayClassName used for this Gateway. This is the name of a
+GatewayClass resource.</p>
 </td>
 </tr>
 <tr>
