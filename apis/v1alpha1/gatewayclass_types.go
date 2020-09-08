@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -157,7 +156,8 @@ type RouteNamespaces struct {
 // +k8s:deepcopy-gen=false
 type GatewayClassParametersObjectReference = ConfigMapsDefaultLocalObjectReference
 
-// GatewayClassConditionType is the type of status conditions.
+// GatewayClassConditionType is the type of status conditions. This
+// type should be used with the GatewayClassStatus.Conditions field.
 type GatewayClassConditionType string
 
 const (
@@ -173,48 +173,7 @@ type GatewayClassStatus struct {
 	// this GatewayClass.
 	// +optional
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
-	Conditions []GatewayClassCondition `json:"conditions,omitempty"`
-}
-
-// GatewayClassCondition contains the details for the current
-// condition of this GatewayClass.
-//
-// Support: Core, unless otherwise specified.
-type GatewayClassCondition struct {
-	// Type of this condition.
-	//
-	// +required
-	Type GatewayClassConditionType `json:"type"`
-	// Status of this condition.
-	//
-	// +required
-	Status core.ConditionStatus `json:"status"`
-	// Reason is a machine consumable string for the last
-	// transition. It should be a one-word, CamelCase
-	// string. Reason will be defined by the controller.
-	//
-	// Support: Custom; values will be controller-specific.
-	// This field must not be empty.
-	//
-	// +required
-	Reason string `json:"reason,omitempty"`
-	// Message is a human readable reason for last transition.
-	// This field may be empty.
-	//
-	// +required
-	Message string `json:"message,omitempty"`
-	// LastTransitionTime is the time of the last change to this condition.
-	// This should be when the underlying condition changed.
-	// If that is not known, then using the time when the API field changed is acceptable.
-	//
-	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-	// If set, this represents the .metadata.generation that the condition was set based upon.
-	// For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
-	// with respect to the current state of the instance.
-	//
-	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // +kubebuilder:object:root=true
