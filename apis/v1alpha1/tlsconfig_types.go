@@ -37,7 +37,7 @@ type TLSConfig struct {
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
-	// +required
+	// +optional
 	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
