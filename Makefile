@@ -12,32 +12,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Enable Go modules.
+export GO111MODULE=on
+
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
+CONTROLLER_GEN=go run sigs.k8s.io/controller-tools/cmd/controller-gen
+
 all: generate vet fmt verify
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
 generate:
-	$(MAKE) manifests
+	$(CONTROLLER_GEN) \
+		object:headerFile=./hack/boilerplate.go.txt,year=$$(date +%Y) \
+		crd:crdVersions=v1 \
+		output:crd:artifacts:config=config/crd/bases \
+		paths=./...
 	$(MAKE) docs
 
 # Run go fmt against code
 fmt:
-	$(MAKE) -f kubebuilder.mk fmt
+	go fmt ./...
 
 # Run go vet against code
 vet:
-	$(MAKE) -f kubebuilder.mk vet
-
-# Generate manifests e.g. CRD, RBAC etc.
-.PHONY: manifests
-manifests:
-	$(MAKE) -f kubebuilder.mk manifests
+	go vet ./...
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
@@ -46,7 +50,7 @@ install: manifests crd example
 # Install the CRD's to a pre-existing cluster.
 .PHONY: crd
 crd:
-	$(MAKE) -f kubebuilder.mk install
+	kustomize build config/crd | kubectl apply -f -
 
 # Install the example resources to a pre-existing cluster.
 .PHONY: example
