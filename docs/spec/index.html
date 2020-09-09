@@ -3382,16 +3382,19 @@ that includes the TCPRoute will be true.</p>
 <tbody>
 <tr>
 <td>
-<code>match</code></br>
+<code>matches</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">
-TCPRouteMatch
+[]TCPRouteMatch
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Match defines which connections match this rule.</p>
+<p>Matches define conditions used for matching the rule against
+incoming TCP connections.
+Each match is independent, i.e. this rule will be matched
+if <strong>any</strong> one of the matches is satisfied.</p>
 </td>
 </tr>
 <tr>
@@ -3404,7 +3407,6 @@ TCPRouteAction
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Action defines what happens to the connection.</p>
 </td>
 </tr>
