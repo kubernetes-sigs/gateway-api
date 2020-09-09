@@ -24,3 +24,5 @@ type GatewayClassExpansion interface{}
 type HTTPRouteExpansion interface{}
 
 type TCPRouteExpansion interface{}
+
+type UDPRouteExpansion interface{}

@@ -120,8 +120,9 @@ type GatewaySpec struct {
 // * "HTTPS"
 // * "TLS"
 // * "TCP"
+// * "UDP"
 //
-// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP
+// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP;UDP
 type ProtocolType string
 
 const (
@@ -136,6 +137,9 @@ const (
 
 	// TCPProtocolType accepts TCP sessions.
 	TCPProtocolType ProtocolType = "TCP"
+
+	// UDPProtocolType accepts UDP packets.
+	UDPProtocolType ProtocolType = "UDP"
 )
 
 // HostnameMatchType specifies the types of matches that are valid

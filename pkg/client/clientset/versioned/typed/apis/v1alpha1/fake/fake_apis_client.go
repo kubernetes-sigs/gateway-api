@@ -43,6 +43,10 @@ func (c *FakeNetworkingV1alpha1) TCPRoutes(namespace string) v1alpha1.TCPRouteIn
 	return &FakeTCPRoutes{c, namespace}
 }
 
+func (c *FakeNetworkingV1alpha1) UDPRoutes(namespace string) v1alpha1.UDPRouteInterface {
+	return &FakeUDPRoutes{c, namespace}
+}
+
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
 func (c *FakeNetworkingV1alpha1) RESTClient() rest.Interface {

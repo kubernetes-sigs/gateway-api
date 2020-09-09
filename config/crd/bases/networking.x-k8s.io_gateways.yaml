@@ -91,6 +91,7 @@ spec:
                       - HTTPS
                       - TLS
                       - TCP
+                      - UDP
                       type: string
                     routes:
                       description: "Routes specifies a schema for associating routes with the Listener using selectors. A Route is a resource capable of servicing a request and allows a cluster operator to expose a cluster resource (i.e. Service) by externally-reachable URL, load-balance traffic and terminate SSL/TLS.  Typically, a route is a \"HTTPRoute\" or \"TCPRoute\" in group \"networking.x-k8s.io\", however, an implementation may support other types of resources. \n The Routes selector MUST select a set of objects that are compatible with the application protocol specified in the Protocol field. \n Support: Core"

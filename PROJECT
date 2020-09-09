@@ -14,3 +14,6 @@ resources:
 - group: networking
   version: v1alpha1
   kind: TcpRoute
+- group: networking
+  version: v1alpha1
+  kind: UDPRoute

@@ -342,6 +342,8 @@
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>
+</li><li>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute</a>
 </li></ul>
 <h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
 </h3>
@@ -834,6 +836,93 @@ TCPRouteStatus
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute
+</h3>
+<p>
+<p>UDPRoute is the Schema for the udproutes API.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>UDPRoute</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteSpec">
+UDPRouteSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">
+[]UDPRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of UDP matchers and actions.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteStatus">
+UDPRouteStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.AddressType">AddressType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -858,7 +947,9 @@ Valid AddressType values are:</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>)
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
 <p>
 <p>RouteMatchExtensionObjectReference identifies a route-match extension object
@@ -935,7 +1026,8 @@ string
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>)
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>)
 </p>
 <p>
 <p>ForwardToTarget identifies a target object within a known namespace.</p>
@@ -1454,7 +1546,8 @@ with respect to the current state of the instance.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteStatus">UDPRouteStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2708,6 +2801,7 @@ condition for the affected Listener.</p>
 <li>&ldquo;HTTPS&rdquo;</li>
 <li>&ldquo;TLS&rdquo;</li>
 <li>&ldquo;TCP&rdquo;</li>
+<li>&ldquo;UDP&rdquo;</li>
 </ul>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
@@ -3470,6 +3564,219 @@ construct.</p>
 <p>TargetWeight specifies weight used for making a forwarding decision
 to a TargetRef.</p>
 </p>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule</a>)
+</p>
+<p>
+<p>UDPRouteAction is the action for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>forwardTo</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
+ForwardToTarget
+</a>
+</em>
+</td>
+<td>
+<p>ForwardTo sends requests to the referenced object.  The
+resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the UDPRoute will be true.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the UDPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule</a>)
+</p>
+<p>
+<p>UDPRouteMatch defines the predicate used to match packets to a
+given action.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the UDPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteSpec">UDPRouteSpec</a>)
+</p>
+<p>
+<p>UDPRouteRule is the configuration for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>match</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">
+UDPRouteMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Match defines which packets match this rule.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>action</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">
+UDPRouteAction
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Action defines what happens to the packet.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteSpec">UDPRouteSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute</a>)
+</p>
+<p>
+<p>UDPRouteSpec defines the desired state of UDPRoute.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">
+[]UDPRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of UDP matchers and actions.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteStatus">UDPRouteStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute</a>)
+</p>
+<p>
+<p>UDPRouteStatus defines the observed state of UDPRoute.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gatewayRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
+[]GatewayObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <hr/>
 <p><em>
 Generated with <code>gen-crd-api-reference-docs</code>.

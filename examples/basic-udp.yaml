@@ -1,0 +1,45 @@
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+spec:
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb-configmap
+    group: core
+    resource: configmaps
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  class: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - protocol: UDP
+    port: 8080
+    routes:
+      resource: udpproutes
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
+      routeSelector:
+        matchLabels:
+          "app": "foo"
+---
+kind: UDPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: udp-app-1
+  namespace: default
+  labels:
+    app: foo
+spec:
+  rules:
+  - action:
+      forwardTo:
+        targetRef:
+          name: my-service
+          group: core
+          resource: services

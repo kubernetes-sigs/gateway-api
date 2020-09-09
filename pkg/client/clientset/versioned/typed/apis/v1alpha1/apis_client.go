@@ -29,6 +29,7 @@ type NetworkingV1alpha1Interface interface {
 	GatewayClassesGetter
 	HTTPRoutesGetter
 	TCPRoutesGetter
+	UDPRoutesGetter
 }
 
 // NetworkingV1alpha1Client is used to interact with features provided by the networking.x-k8s.io group.
@@ -50,6 +51,10 @@ func (c *NetworkingV1alpha1Client) HTTPRoutes(namespace string) HTTPRouteInterfa
 
 func (c *NetworkingV1alpha1Client) TCPRoutes(namespace string) TCPRouteInterface {
 	return newTCPRoutes(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) UDPRoutes(namespace string) UDPRouteInterface {
+	return newUDPRoutes(c, namespace)
 }
 
 // NewForConfig creates a new NetworkingV1alpha1Client for the given config.

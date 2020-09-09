@@ -44,3 +44,11 @@ type TCPRouteListerExpansion interface{}
 // TCPRouteNamespaceListerExpansion allows custom methods to be added to
 // TCPRouteNamespaceLister.
 type TCPRouteNamespaceListerExpansion interface{}
+
+// UDPRouteListerExpansion allows custom methods to be added to
+// UDPRouteLister.
+type UDPRouteListerExpansion interface{}
+
+// UDPRouteNamespaceListerExpansion allows custom methods to be added to
+// UDPRouteNamespaceLister.
+type UDPRouteNamespaceListerExpansion interface{}

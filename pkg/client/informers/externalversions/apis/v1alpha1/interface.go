@@ -31,6 +31,8 @@ type Interface interface {
 	HTTPRoutes() HTTPRouteInformer
 	// TCPRoutes returns a TCPRouteInformer.
 	TCPRoutes() TCPRouteInformer
+	// UDPRoutes returns a UDPRouteInformer.
+	UDPRoutes() UDPRouteInformer
 }
 
 type version struct {
@@ -62,4 +64,9 @@ func (v *version) HTTPRoutes() HTTPRouteInformer {
 // TCPRoutes returns a TCPRouteInformer.
 func (v *version) TCPRoutes() TCPRouteInformer {
 	return &tCPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// UDPRoutes returns a UDPRouteInformer.
+func (v *version) UDPRoutes() UDPRouteInformer {
+	return &uDPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
