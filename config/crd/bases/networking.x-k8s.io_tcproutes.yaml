@@ -85,7 +85,7 @@ spec:
                                       - name
                                       type: object
                                     requestHeader:
-                                      description: HTTPRequestHeaderConfig defines configuration for the RequestHeader filter.
+                                      description: HTTPRequestHeaderFilter defines configuration for the RequestHeader filter.
                                       properties:
                                         add:
                                           additionalProperties:
