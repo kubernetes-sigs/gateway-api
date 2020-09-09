@@ -15,6 +15,23 @@ limitations under the License.
 
 package v1alpha1
 
+// TLSModeType type defines behavior of gateway with TLS protocol.
+// +kubebuilder:validation:Enum=Terminate;Passthrough
+// +kubebuilder:default=Terminate
+type TLSModeType string
+
+const (
+	// TLSModeTerminate represents the Terminate mode.
+	// In this mode, TLS session between the downstream client
+	// and the Gateway is terminated at the Gateway.
+	TLSModeTerminate TLSModeType = "Terminate"
+	// TLSModePassthrough represents the Passthrough mode.
+	// In this mode, the TLS session NOT terminated by the Gateway. This
+	// implies that the Gateway can't decipher the TLS stream except for
+	// the ClientHello message of the TLS protocol.
+	TLSModePassthrough TLSModeType = "Passthrough"
+)
+
 // TLSConfig describes a TLS configuration.
 //
 // References
@@ -25,20 +42,29 @@ package v1alpha1
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type TLSConfig struct {
-	// CertificateRefs is a list of references to Kubernetes objects that each
-	// contain an identity certificate.  The host name in a TLS SNI client hello
-	// message is used for certificate matching and route host name selection.
-	// The SNI server_name must match a route host name for the Gateway to route
-	// the TLS request.  If an entry in this list omits or specifies the empty
+	// Mode defines the TLS behavior for the TLS session initiated by the client.
+	// There are two possible modes:
+	// - Terminate: The TLS session between the downstream client
+	//   and the Gateway is terminated at the Gateway.
+	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
+	//   implies that the Gateway can't decipher the TLS stream except for
+	//   the ClientHello message of the TLS protocol.
+	//   CertificateRef field is ignored in this mode.
+	Mode TLSModeType `json:"mode,omitempty" protobuf:"bytes,1,opt,name=mode"`
+
+	// CertificateRef is the reference to Kubernetes object that
+	// contain a TLS certificate and private key.
+	// This certificate MUST be used for TLS handshakes for the domain
+	// this TLSConfig is associated with.
+	// If an entry in this list omits or specifies the empty
 	// string for both the group and the resource, the resource defaults to "secrets".
 	// An implementation may support other resources (for example, resource
 	// "mycertificates" in group "networking.acme.io").
-	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
-	// +optional
-	CertificateRefs []CertificateObjectReference `json:"certificateRefs,omitempty"`
+	// +required
+	CertificateRef CertificateObjectReference `json:"certificateRef,omitempty"`
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//
