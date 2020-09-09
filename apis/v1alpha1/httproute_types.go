@@ -277,9 +277,13 @@ const (
 	// FilterTypeHTTPRequestHeader can be used to add or remove an HTTP
 	// header from an HTTP request before it is sent to the upstream target.
 	// Support: core
-	// +optional
 	FilterTypeHTTPRequestHeader = "RequestHeader"
-	// TODO(hbagdi): add FilterHTTPRequestMirroring filter
+
+	// FilterTypeHTTPRequestMirror can be used to mirror requests to a
+	// different backend. The responses from this backend MUST be ignored
+	// by the Gateway.
+	// Support: extended
+	FilterTypeHTTPRequestMirror = "RequestMirror"
 
 	// FilterTypeImplementationSpecific should be used for configuring
 	// custom filters.
@@ -334,6 +338,8 @@ type HTTPRouteFilter struct {
 	// Filter-specific configuration definitions for core and extended filters
 
 	RequestHeader *HTTPRequestHeaderFilter `json:"requestHeader"`
+
+	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror"`
 }
 
 // HTTPRequestHeaderFilter defines configuration for the
@@ -377,6 +383,35 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove"`
 
 	// TODO
+}
+
+// HTTPRequestMirrorFilter defines configuration for the
+// RequestMirror filter.
+type HTTPRequestMirrorFilter struct {
+	// TargetRef is an object reference to forward matched requests to.
+	// The resource may be "services" (omit or use the empty string for the
+	// group), or an implementation may support other resources (for
+	// example, resource "myroutetargets" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "services".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
+	//
+	// Support: Core (Kubernetes Services)
+	// Support: Implementation-specific (Other resource types)
+	//
+	TargetRef ForwardToTargetObjectReference `json:"targetRef" protobuf:"bytes,1,opt,name=targetRef"`
+
+	// TargetPort specifies the destination port number to use for the TargetRef.
+	// If unspecified and TargetRef is a Service object consisting of a single
+	// port definition, that port will be used. If unspecified and TargetRef is
+	// a Service object consisting of multiple port definitions, an error is
+	// surfaced in status.
+	//
+	// Support: Core
+	//
+	// +optional
+	TargetPort *TargetPort `json:"targetPort,omitempty" protobuf:"bytes,2,opt,name=targetPort"`
 }
 
 // HTTPRouteAction is the action taken given a match.
