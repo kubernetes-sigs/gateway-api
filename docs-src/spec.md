@@ -1222,8 +1222,7 @@ with respect to the current state of the instance.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteStatus">UDPRouteStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2132,20 +2131,17 @@ HTTPRouteAction
 <tbody>
 <tr>
 <td>
-<code>gateways</code></br>
+<code>RouteStatus</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">
-[]RouteGatewayStatus
+<a href="#networking.x-k8s.io/v1alpha1.RouteStatus">
+RouteStatus
 </a>
 </em>
 </td>
 <td>
-<p>Gateways is a list of the Gateways that are associated with the
-HTTPRoute, and the status of the route with respect to each of these
-Gateways.  When a Gateway selects this route, the controller that
-manages the Gateway should add an entry to this list when the
-controller first sees the route and should update the entry as
-appropriate when the route is modified.</p>
+<p>
+(Members of <code>RouteStatus</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 </tbody>
@@ -2754,8 +2750,7 @@ Kubernetes meta/v1.Time
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteStatus">RouteStatus</a>)
 </p>
 <p>
 <p>RouteGatewayStatus describes the status of a route with respect to an
@@ -2859,6 +2854,46 @@ within the same Namespace as the Gateway should be selected.</p>
 <p>This field takes precedence over the NamespaceSelector field. That
 selector should only take effect when this field is set to false.</p>
 <p>Support: Core</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteStatus">RouteStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteStatus">UDPRouteStatus</a>)
+</p>
+<p>
+<p>RouteStatus defines the observed state that is required across
+all route types.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">
+[]RouteGatewayStatus
+</a>
+</em>
+</td>
+<td>
+<p>Gateways is a list of the Gateways that are associated with the
+route, and the status of the route with respect to each of these
+Gateways. When a Gateway selects this route, the controller that
+manages the Gateway should add an entry to this list when the
+controller first sees the route and should update the entry as
+appropriate when the route is modified.</p>
 </td>
 </tr>
 </tbody>
@@ -3222,20 +3257,17 @@ TCPRouteAction
 <tbody>
 <tr>
 <td>
-<code>gateways</code></br>
+<code>RouteStatus</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">
-[]RouteGatewayStatus
+<a href="#networking.x-k8s.io/v1alpha1.RouteStatus">
+RouteStatus
 </a>
 </em>
 </td>
 <td>
-<p>Gateways is a list of the Gateways that are associated with the
-TCPRoute, and the status of the route with respect to each of these
-Gateways.  When a Gateway selects this route, the controller that
-manages the Gateway should add an entry to this list when the
-controller first sees the route and should update the entry as
-appropriate when the route is modified.</p>
+<p>
+(Members of <code>RouteStatus</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 </tbody>
@@ -3555,14 +3587,17 @@ UDPRouteAction
 <tbody>
 <tr>
 <td>
-<code>gatewayRefs</code></br>
+<code>RouteStatus</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-[]GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteStatus">
+RouteStatus
 </a>
 </em>
 </td>
 <td>
+<p>
+(Members of <code>RouteStatus</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 </tbody>
