@@ -274,15 +274,16 @@ type HTTPRouteMatch struct {
 }
 
 const (
-	// FilterHTTPRequestHeader can be used to add or remove an HTTP
+	// FilterTypeHTTPRequestHeader can be used to add or remove an HTTP
 	// header from an HTTP request before it is sent to the upstream target.
 	// Support: core
 	// +optional
-	FilterHTTPRequestHeader = "RequestHeader"
-
-	// FilterImplementationSpecific defines an implementation specific filter.
-	FilterImplementationSpecific = "ImplementationSpecific"
+	FilterTypeHTTPRequestHeader = "RequestHeader"
 	// TODO(hbagdi): add FilterHTTPRequestMirroring filter
+
+	// FilterTypeImplementationSpecific should be used for configuring
+	// custom filters.
+	FilterTypeImplementationSpecific = "ImplementationSpecific"
 )
 
 // HTTPRouteFilter defines additional processing steps that must be completed
@@ -332,12 +333,12 @@ type HTTPRouteFilter struct {
 
 	// Filter-specific configuration definitions for core and extended filters
 
-	RequestHeader *HTTPRequestHeaderConfig `json:"requestHeader"`
+	RequestHeader *HTTPRequestHeaderFilter `json:"requestHeader"`
 }
 
-// HTTPRequestHeaderConfig defines configuration for the
+// HTTPRequestHeaderFilter defines configuration for the
 // RequestHeader filter.
-type HTTPRequestHeaderConfig struct {
+type HTTPRequestHeaderFilter struct {
 	// Add adds the given header (name, value) to the request
 	// before the action.
 	//
