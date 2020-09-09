@@ -168,10 +168,23 @@ resources:
 Separation and delegation of responsibility among independent actors (e.g
 between cluster ops and application developers) can result in conflicts in the
 configuration. For example, two application teams may inadvertently submit
-configuration for the same HTTP path. There are several different strategies for
-handling this:
+configuration for the same HTTP path.
 
-* TODO
+In most cases, guidance for conflict resolution is provided along with the
+documentation for fields that may have a conflict. If a conflict does not have a
+prescribed resolution, the following guiding principles should be applied:
+
+* Prefer not to break things that are working.
+* Drop as little traffic as possible.
+* Provide a consistent experience when conflicts occur.
+* Make it clear which path has been chosen when a conflict has been identified.
+  Where possible, this should be communicated by setting appropriate status
+  conditions on relevant resources.
+* More specific matches should be given precedence over less specific ones.
+* The resource with the oldest creation timestamp wins.
+* If everything else is equivalent (including creation timestamp), precedences
+  should be given to the resource appearing first in alphabetical order
+  (namespace/name). For example, foo/bar would be given precedence over foo/baz.
 
 ### Conformance
 

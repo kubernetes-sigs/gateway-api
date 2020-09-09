@@ -982,10 +982,22 @@ resources:</p>
 <p>Separation and delegation of responsibility among independent actors (e.g
 between cluster ops and application developers) can result in conflicts in the
 configuration. For example, two application teams may inadvertently submit
-configuration for the same HTTP path. There are several different strategies for
-handling this:</p>
+configuration for the same HTTP path.</p>
+<p>In most cases, guidance for conflict resolution is provided along with the
+documentation for fields that may have a conflict. If a conflict does not have a
+prescribed resolution, the following guiding principles should be applied:</p>
 <ul>
-<li>TODO</li>
+<li>Prefer not to break things that are working.</li>
+<li>Drop as little traffic as possible.</li>
+<li>Provide a consistent experience when conflicts occur.</li>
+<li>Make it clear which path has been chosen when a conflict has been identified.
+  Where possible, this should be communicated by setting appropriate status
+  conditions on relevant resources.</li>
+<li>More specific matches should be given precedence over less specific ones.</li>
+<li>The resource with the oldest creation timestamp wins.</li>
+<li>If everything else is equivalent (including creation timestamp), precedences
+  should be given to the resource appearing first in alphabetical order
+  (namespace/name). For example, foo/bar would be given precedence over foo/baz.</li>
 </ul>
 <h3 id="conformance">Conformance</h3>
 <p>As this API aims to cover a wide set of implementations and use cases,
