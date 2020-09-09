@@ -13,7 +13,7 @@ metadata:
   name: default-match-gw
   namespace: default
 spec:
-  class: default-match-example
+  gatewayClassName: default-match-example
   listeners:
   - protocol: HTTP
     routes:

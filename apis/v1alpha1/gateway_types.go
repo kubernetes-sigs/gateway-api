@@ -50,8 +50,9 @@ type GatewayList struct {
 // webhook, but there are many cases that will require asynchronous
 // signaling via the GatewayStatus block.
 type GatewaySpec struct {
-	// Class used for this Gateway. This is the name of a GatewayClass resource.
-	Class string `json:"class"`
+	// GatewayClassName used for this Gateway. This is the name of a
+	// GatewayClass resource.
+	GatewayClassName string `json:"gatewayClassName"`
 
 	// Listeners associated with this Gateway. Listeners define
 	// logical endpoints that are bound on this Gateway's addresses.
