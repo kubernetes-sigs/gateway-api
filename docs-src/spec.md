@@ -2258,6 +2258,14 @@ TLSConfig
 <p>TLS is the TLS configuration for the Listener. This field
 is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; and
 ignored otherwise.</p>
+<p>The association of SNIs to Certificate defined in TLSConfig is
+defined based on the Hostname field for this listener:
+- &ldquo;Domain&rdquo;: Certificate should be used for the domain and its
+first-level subdomains.
+- &ldquo;Exact&rdquo;: Certificate should be used for the domain only.
+- &ldquo;Any&rdquo;: Certificate in TLSConfig is the default certificate to use.</p>
+<p>The GatewayClass MUST use the longest matching SNI out of all
+available certificates for any TLS handshake.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3180,24 +3188,43 @@ appropriate when the route is modified.</p>
 <tbody>
 <tr>
 <td>
-<code>certificateRefs</code></br>
+<code>mode</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-[]SecretsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.TLSModeType">
+TLSModeType
 </a>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>CertificateRefs is a list of references to Kubernetes objects that each
-contain an identity certificate.  The host name in a TLS SNI client hello
-message is used for certificate matching and route host name selection.
-The SNI server_name must match a route host name for the Gateway to route
-the TLS request.  If an entry in this list omits or specifies the empty
+<p>Mode defines the TLS behavior for the TLS session initiated by the client.
+There are two possible modes:
+- Terminate: The TLS session between the downstream client
+and the Gateway is terminated at the Gateway.
+- Passthrough: The TLS session is NOT terminated by the Gateway. This
+implies that the Gateway can&rsquo;t decipher the TLS stream except for
+the ClientHello message of the TLS protocol.
+CertificateRef field is ignored in this mode.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>certificateRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
+SecretsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>CertificateRef is the reference to Kubernetes object that
+contain a TLS certificate and private key.
+This certificate MUST be used for TLS handshakes for the domain
+this TLSConfig is associated with.
+If an entry in this list omits or specifies the empty
 string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
 An implementation may support other resources (for example, resource
-&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>Support: Core (Kubernetes Secrets)
+&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Support: Core (Kubernetes Secrets)
 Support: Implementation-specific (Other resource types)</p>
 </td>
 </tr>
@@ -3220,6 +3247,15 @@ construct.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSModeType">TLSModeType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSConfig">TLSConfig</a>)
+</p>
+<p>
+<p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.TargetPort">TargetPort
 (<code>int32</code> alias)</p></h3>
 <p>

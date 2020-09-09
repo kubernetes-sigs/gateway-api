@@ -263,6 +263,16 @@ type Listener struct {
 	// is required if the Protocol field is "HTTPS" or "TLS" and
 	// ignored otherwise.
 	//
+	// The association of SNIs to Certificate defined in TLSConfig is
+	// defined based on the Hostname field for this listener:
+	// - "Domain": Certificate should be used for the domain and its
+	//   first-level subdomains.
+	// - "Exact": Certificate should be used for the domain only.
+	// - "Any": Certificate in TLSConfig is the default certificate to use.
+	//
+	// The GatewayClass MUST use the longest matching SNI out of all
+	// available certificates for any TLS handshake.
+	//
 	// Support: Core
 	//
 	// +optional
