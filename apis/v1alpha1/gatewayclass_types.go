@@ -40,7 +40,7 @@ type GatewayClass struct {
 	// Spec for this GatewayClass.
 	Spec GatewayClassSpec `json:"spec,omitempty"`
 	// Status of the GatewayClass.
-	// +kubebuilder:default={conditions: {{type: "InvalidParameters", status: "Unknown"}}}
+	// +kubebuilder:default={conditions: {{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
 
@@ -172,7 +172,7 @@ type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	// +optional
-	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown"}}
+	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
