@@ -1592,6 +1592,67 @@ My-Header2: DEF</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>)
+</p>
+<p>
+<p>HTTPRequestMirrorFilter defines configuration for the
+RequestMirror filter.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>targetRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">
+ServicesDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>TargetRef is an object reference to forward matched requests to.
+The resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
+<p>Support: Core (Kubernetes Services)
+Support: Implementation-specific (Other resource types)</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>targetPort</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TargetPort">
+TargetPort
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TargetPort specifies the destination port number to use for the TargetRef.
+If unspecified and TargetRef is a Service object consisting of a single
+port definition, that port will be used. If unspecified and TargetRef is
+a Service object consisting of multiple port definitions, an error is
+surfaced in status.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction
 </h3>
 <p>
@@ -1733,6 +1794,18 @@ ExtensionRef MUST NOT be used for core and extended filters.</p>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestHeaderFilter">
 HTTPRequestHeaderFilter
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+<tr>
+<td>
+<code>requestMirror</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">
+HTTPRequestMirrorFilter
 </a>
 </em>
 </td>
@@ -2871,7 +2944,8 @@ string
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>)
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>)
 </p>
 <p>
 <p>ServicesDefaultLocalObjectReference identifies an API object within a
@@ -3264,7 +3338,8 @@ construct.</p>
 (<code>int32</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>)
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">ForwardToTarget</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>)
 </p>
 <p>
 <p>TargetPort specifies the destination port number to use for a TargetRef.</p>

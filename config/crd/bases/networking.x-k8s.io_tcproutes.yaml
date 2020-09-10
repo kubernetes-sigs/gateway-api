@@ -101,11 +101,39 @@ spec:
                                       - add
                                       - remove
                                       type: object
+                                    requestMirror:
+                                      description: HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+                                      properties:
+                                        targetPort:
+                                          description: "TargetPort specifies the destination port number to use for the TargetRef. If unspecified and TargetRef is a Service object consisting of a single port definition, that port will be used. If unspecified and TargetRef is a Service object consisting of multiple port definitions, an error is surfaced in status. \n Support: Core"
+                                          format: int32
+                                          type: integer
+                                        targetRef:
+                                          description: "TargetRef is an object reference to forward matched requests to. The resource may be \"services\" (omit or use the empty string for the group), or an implementation may support other resources (for example, resource \"myroutetargets\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"services\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the HTTPRoute will be true. \n Support: Core (Kubernetes Services) Support: Implementation-specific (Other resource types)"
+                                          properties:
+                                            group:
+                                              default: core
+                                              description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a service: \n fooRef:   resource: services   name: myservice \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                              type: string
+                                            name:
+                                              description: Name is the name of the referent.
+                                              type: string
+                                            resource:
+                                              default: services
+                                              description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the services resource. For example, use the following to specify a services resource: \n fooRef:   name: myservice \n Otherwise, if the services resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                              type: string
+                                          required:
+                                          - name
+                                          type: object
+                                      required:
+                                      - targetRef
+                                      type: object
                                     type:
                                       description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
                                       type: string
                                   required:
                                   - requestHeader
+                                  - requestMirror
                                   - type
                                   type: object
                                 type: array
