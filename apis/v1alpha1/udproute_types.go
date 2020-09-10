@@ -27,7 +27,7 @@ type UDPRouteSpec struct {
 
 // UDPRouteStatus defines the observed state of UDPRoute.
 type UDPRouteStatus struct {
-	GatewayRefs []GatewayObjectReference `json:"gatewayRefs" protobuf:"bytes,1,rep,name=gatewayRefs"`
+	RouteStatus `json:",inline"`
 }
 
 // +genclient
