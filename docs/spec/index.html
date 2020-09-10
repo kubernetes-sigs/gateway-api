@@ -1179,117 +1179,11 @@ values will depend on <code>Type</code> and support by the controller.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.GatewayClassCondition">GatewayClassCondition
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassStatus">GatewayClassStatus</a>)
-</p>
-<p>
-<p>GatewayClassCondition contains the details for the current
-condition of this GatewayClass.</p>
-<p>Support: Core, unless otherwise specified.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassConditionType">
-GatewayClassConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type of this condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status of this condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason is a machine consumable string for the last
-transition. It should be a one-word, CamelCase
-string. Reason will be defined by the controller.</p>
-<p>Support: Custom; values will be controller-specific.
-This field must not be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human readable reason for last transition.
-This field may be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime is the time of the last change to this condition.
-This should be when the underlying condition changed.
-If that is not known, then using the time when the API field changed is acceptable.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code></br>
-<em>
-int64
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>If set, this represents the .metadata.generation that the condition was set based upon.
-For instance, if .metadata.generation is currently 12, but the .status.condition[x].observedGeneration is 9, the condition is out of date
-with respect to the current state of the instance.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassConditionType">GatewayClassConditionType
 (<code>string</code> alias)</p></h3>
 <p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassCondition">GatewayClassCondition</a>)
-</p>
-<p>
-<p>GatewayClassConditionType is the type of status conditions.</p>
+<p>GatewayClassConditionType is the type of status conditions. This
+type should be used with the GatewayClassStatus.Conditions field.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec
 </h3>
@@ -1421,8 +1315,8 @@ will be true.</p>
 <td>
 <code>conditions</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassCondition">
-[]GatewayClassCondition
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#condition-v1-meta">
+[]Kubernetes meta/v1.Condition
 </a>
 </em>
 </td>
@@ -1434,114 +1328,12 @@ this GatewayClass.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.GatewayCondition">GatewayCondition
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">GatewayStatus</a>)
-</p>
-<p>
-<p>GatewayCondition is an error status for a given route.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayConditionType">
-GatewayConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type indicates the type of condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status describes the current state of this condition. Can be &ldquo;True&rdquo;,
-&ldquo;False&rdquo;, or &ldquo;Unknown&rdquo;.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-understandable message describing the condition.
-This field may be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason indicates why the condition is in this state.
-This field must not be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime indicates the last time this condition changed.
-This should be when the underlying condition changed.
-If that is not known, then using the time when the API field changed is acceptable.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code></br>
-<em>
-int64
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>If set, this represents the .metadata.generation that the condition was set based upon.
-For instance, if .metadata.generation is currently 12, but
-the .status.conditions[x].observedGeneration is 9, the condition is out of date
-with respect to the current state of the instance.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayConditionType">GatewayConditionType
 (<code>string</code> alias)</p></h3>
 <p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayCondition">GatewayCondition</a>)
-</p>
-<p>
-<p>GatewayConditionType is a type of condition associated with a Gateway.</p>
+<p>GatewayConditionType is a type of condition associated with a
+Gateway. This type should be used with the GatewayStatus.Conditions
+field.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayObjectReference">GatewayObjectReference
 </h3>
@@ -1720,8 +1512,8 @@ assigns an address from a reserved pool.</p>
 <td>
 <code>conditions</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayCondition">
-[]GatewayCondition
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#condition-v1-meta">
+[]Kubernetes meta/v1.Condition
 </a>
 </em>
 </td>
@@ -2691,114 +2483,12 @@ the Protocol field.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.ListenerCondition">ListenerCondition
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>)
-</p>
-<p>
-<p>ListenerCondition is an error status for a given listener.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerConditionType">
-ListenerConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type indicates the type of condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status describes the current state of this condition. Can be &ldquo;True&rdquo;,
-&ldquo;False&rdquo;, or &ldquo;Unknown&rdquo;.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Message is a human-understandable message describing the condition.
-This field may be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Reason indicates why the condition is in this state.
-This field must not be empty.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<p>LastTransitionTime indicates the last time this condition changed.
-This should be when the underlying condition changed.
-If that is not known, then using the time when the API field changed is acceptable.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>observedGeneration</code></br>
-<em>
-int64
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>If set, this represents the .metadata.generation that the condition was
-set based upon. For instance, if .metadata.generation is currently 12,
-but the .status.conditions[x].observedGeneration is 9, the condition is
-out of date with respect to the current state of the instance.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerConditionType">ListenerConditionType
 (<code>string</code> alias)</p></h3>
 <p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerCondition">ListenerCondition</a>)
-</p>
-<p>
-<p>ListenerConditionType is a type of condition associated with the listener.</p>
+<p>ListenerConditionType is a type of condition associated with the
+listener. This type should be used with the ListenerStatus.Conditions
+field.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus
 </h3>
@@ -2835,8 +2525,8 @@ status of all such Listeners.</p>
 <td>
 <code>conditions</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ListenerCondition">
-[]ListenerCondition
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#condition-v1-meta">
+[]Kubernetes meta/v1.Condition
 </a>
 </em>
 </td>
@@ -2978,96 +2668,8 @@ condition for the affected Listener.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.RouteCondition">RouteCondition
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
-</p>
-<p>
-<p>RouteCondition is a status condition for a given route.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>type</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteConditionType">
-RouteConditionType
-</a>
-</em>
-</td>
-<td>
-<p>Type indicates the type of condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>status</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#conditionstatus-v1-core">
-Kubernetes core/v1.ConditionStatus
-</a>
-</em>
-</td>
-<td>
-<p>Status describes the current state of this condition.  Can be &ldquo;True&rdquo;,
-&ldquo;False&rdquo;, or &ldquo;Unknown&rdquo;.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>message</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Message is a human-understandable message describing the condition.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>reason</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Reason indicates why the condition is in this state.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>lastTransitionTime</code></br>
-<em>
-<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#time-v1-meta">
-Kubernetes meta/v1.Time
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>LastTransitionTime indicates the last time this condition changed.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteConditionType">RouteConditionType
 (<code>string</code> alias)</p></h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteCondition">RouteCondition</a>)
-</p>
 <p>
 <p>RouteConditionType is a type of condition for a route.</p>
 </p>
@@ -3107,8 +2709,8 @@ the route.</p>
 <td>
 <code>conditions</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteCondition">
-[]RouteCondition
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#condition-v1-meta">
+[]Kubernetes meta/v1.Condition
 </a>
 </em>
 </td>

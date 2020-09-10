@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -41,24 +40,6 @@ const (
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
 )
 
-// RouteCondition is a status condition for a given route.
-type RouteCondition struct {
-	// Type indicates the type of condition.
-	Type RouteConditionType `json:"type"`
-	// Status describes the current state of this condition.  Can be "True",
-	// "False", or "Unknown".
-	Status core.ConditionStatus `json:"status"`
-	// Message is a human-understandable message describing the condition.
-	// +optional
-	Message string `json:"message,omitempty"`
-	// Reason indicates why the condition is in this state.
-	// +optional
-	Reason string `json:"reason,omitempty"`
-	// LastTransitionTime indicates the last time this condition changed.
-	// +optional
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-}
-
 // RouteGatewayStatus describes the status of a route with respect to an
 // associated Gateway.
 type RouteGatewayStatus struct {
@@ -70,7 +51,7 @@ type RouteGatewayStatus struct {
 	// route has been admitted or rejected by the Gateway, and why.  Note
 	// that the route's availability is also subject to the Gateway's own
 	// status conditions and listener status.
-	Conditions []RouteCondition `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
 // RouteStatus defines the observed state that is required across

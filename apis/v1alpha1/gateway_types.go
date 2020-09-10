@@ -16,7 +16,6 @@ limitations under the License.
 package v1alpha1
 
 import (
-	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -419,14 +418,16 @@ type GatewayStatus struct {
 
 	// Conditions describe the current conditions of the Gateway.
 	// +optional
-	Conditions []GatewayCondition `json:"conditions,omitempty"`
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
 	// +optional
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
 
-// GatewayConditionType is a type of condition associated with a Gateway.
+// GatewayConditionType is a type of condition associated with a
+// Gateway. This type should be used with the GatewayStatus.Conditions
+// field.
 type GatewayConditionType string
 
 const (
@@ -455,42 +456,6 @@ const (
 	ConditionInvalidAddress GatewayConditionType = "InvalidAddress"
 )
 
-// GatewayCondition is an error status for a given route.
-type GatewayCondition struct {
-	// Type indicates the type of condition.
-	//
-	// +required
-	Type GatewayConditionType `json:"type"`
-	// Status describes the current state of this condition. Can be "True",
-	// "False", or "Unknown".
-	//
-	// +required
-	Status core.ConditionStatus `json:"status"`
-	// Message is a human-understandable message describing the condition.
-	// This field may be empty.
-	//
-	// +required
-	Message string `json:"message,omitempty"`
-	// Reason indicates why the condition is in this state.
-	// This field must not be empty.
-	//
-	// +required
-	Reason string `json:"reason,omitempty"`
-	// LastTransitionTime indicates the last time this condition changed.
-	// This should be when the underlying condition changed.
-	// If that is not known, then using the time when the API field changed is acceptable.
-	//
-	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-	// If set, this represents the .metadata.generation that the condition was set based upon.
-	// For instance, if .metadata.generation is currently 12, but
-	// the .status.conditions[x].observedGeneration is 9, the condition is out of date
-	// with respect to the current state of the instance.
-	//
-	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-}
-
 // ListenerStatus is the status associated with a Listener port.
 type ListenerStatus struct {
 	// Port is the unique Listener port value for which this message
@@ -504,10 +469,12 @@ type ListenerStatus struct {
 	// Conditions describe the current condition of this listener.
 	//
 	// +required
-	Conditions []ListenerCondition `json:"conditions"`
+	Conditions []metav1.Condition `json:"conditions"`
 }
 
-// ListenerConditionType is a type of condition associated with the listener.
+// ListenerConditionType is a type of condition associated with the
+// listener. This type should be used with the ListenerStatus.Conditions
+// field.
 type ListenerConditionType string
 
 const (
@@ -545,39 +512,3 @@ const (
 	// or unsupported protocol type was requested.
 	ConditionUnsupportedProtocol ListenerConditionType = "UnsupportedProtocol"
 )
-
-// ListenerCondition is an error status for a given listener.
-type ListenerCondition struct {
-	// Type indicates the type of condition.
-	//
-	// +required
-	Type ListenerConditionType `json:"type"`
-	// Status describes the current state of this condition. Can be "True",
-	// "False", or "Unknown".
-	//
-	// +required
-	Status core.ConditionStatus `json:"status"`
-	// Message is a human-understandable message describing the condition.
-	// This field may be empty.
-	//
-	// +required
-	Message string `json:"message,omitempty"`
-	// Reason indicates why the condition is in this state.
-	// This field must not be empty.
-	//
-	// +required
-	Reason string `json:"reason,omitempty"`
-	// LastTransitionTime indicates the last time this condition changed.
-	// This should be when the underlying condition changed.
-	// If that is not known, then using the time when the API field changed is acceptable.
-	//
-	// +required
-	LastTransitionTime metav1.Time `json:"lastTransitionTime,omitempty"`
-	// If set, this represents the .metadata.generation that the condition was
-	// set based upon. For instance, if .metadata.generation is currently 12,
-	// but the .status.conditions[x].observedGeneration is 9, the condition is
-	// out of date with respect to the current state of the instance.
-	//
-	// +optional
-	ObservedGeneration int64 `json:"observedGeneration,omitempty"`
-}
