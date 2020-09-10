@@ -2928,6 +2928,7 @@ SecretsDefaultLocalObjectReference
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>CertificateRef is the reference to Kubernetes object that
 contain a TLS certificate and private key.
 This certificate MUST be used for TLS handshakes for the domain
@@ -2948,6 +2949,7 @@ map[string]string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Options are a list of key/value pairs to give extended options
 to the provider.</p>
 <p>There variation among providers as to how ciphersuites are
