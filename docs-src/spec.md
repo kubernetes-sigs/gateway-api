@@ -6,7 +6,8 @@
 </ul>
 <h2 id="networking.x-k8s.io/v1alpha1">networking.x-k8s.io/v1alpha1</h2>
 <p>
-<p>Package v1alpha1 contains API Schema definitions for the networking v1alpha1 API group</p>
+<p>Package v1alpha1 contains API Schema definitions for the networking.x-k8s.io
+API group.</p>
 </p>
 Resource Types:
 <ul><li>

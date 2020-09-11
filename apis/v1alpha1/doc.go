@@ -13,7 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1alpha1 contains API Schema definitions for the networking v1alpha1 API group
+// Package v1alpha1 contains API Schema definitions for the networking.x-k8s.io
+// API group.
 // +kubebuilder:object:generate=true
 // +groupName=networking.x-k8s.io
 package v1alpha1
