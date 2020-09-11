@@ -22,7 +22,7 @@ import (
 // UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpec struct {
 	// Rules are a list of UDP matchers and actions.
-	Rules []UDPRouteRule `json:"rules" protobuf:"bytes,1,rep,name=rules"`
+	Rules []UDPRouteRule `json:"rules"`
 }
 
 // UDPRouteStatus defines the observed state of UDPRoute.
@@ -36,23 +36,23 @@ type UDPRouteStatus struct {
 
 // UDPRoute is the Schema for the UDPRoute resource.
 type UDPRoute struct {
-	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   UDPRouteSpec   `json:"spec,omitempty" protobuf:"bytes,3,opt,name=spec"`
-	Status UDPRouteStatus `json:"status,omitempty" protobuf:"bytes,4,opt,name=status"`
+	Spec   UDPRouteSpec   `json:"spec,omitempty"`
+	Status UDPRouteStatus `json:"status,omitempty"`
 }
 
 // UDPRouteRule is the configuration for a given rule.
 type UDPRouteRule struct {
-	// Match defines which packets match this rule.
+	// Matches defines which packets match this rule.
 	//
 	// +optional
-	Match *UDPRouteMatch `json:"match" protobuf:"bytes,1,opt,name=match"`
+	Matches []UDPRouteMatch `json:"matches"`
 	// Action defines what happens to the packet.
 	//
 	// +optional
-	Action *UDPRouteAction `json:"action" protobuf:"bytes,2,opt,name=action"`
+	Action *UDPRouteAction `json:"action"`
 }
 
 // UDPRouteAction is the action for a given rule.
@@ -65,7 +65,7 @@ type UDPRouteAction struct {
 	// group indicates that the resource is "services".  If the referent
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the UDPRoute will be true.
-	ForwardTo *ForwardToTarget `json:"forwardTo" protobuf:"bytes,1,opt,name=forwardTo"`
+	ForwardTo *ForwardToTarget `json:"forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
@@ -79,7 +79,7 @@ type UDPRouteAction struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef" protobuf:"bytes,2,opt,name=extensionRef"`
+	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef"`
 }
 
 // UDPRouteMatch defines the predicate used to match packets to a
@@ -97,14 +97,14 @@ type UDPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef" protobuf:"bytes,1,opt,name=extensionRef"`
+	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
 }
 
 // +kubebuilder:object:root=true
 
 // UDPRouteList contains a list of UDPRoute
 type UDPRouteList struct {
-	metav1.TypeMeta `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
-	metav1.ListMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`
-	Items           []UDPRoute `json:"items" protobuf:"bytes,3,rep,name=items"`
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []UDPRoute `json:"items"`
 }
