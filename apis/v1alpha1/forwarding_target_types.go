@@ -15,8 +15,8 @@ limitations under the License.
 
 package v1alpha1
 
-// ForwardToTarget identifies a target object within a known namespace.
-type ForwardToTarget struct {
+// HTTPForwardToTarget identifies a target object within a known namespace.
+type HTTPForwardToTarget struct {
 	// TargetRef is an object reference to forward matched requests to.
 	// The resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
@@ -91,3 +91,55 @@ type TargetWeight int32
 //
 // +k8s:deepcopy-gen=false
 type ForwardToTargetObjectReference = ServicesDefaultLocalObjectReference
+
+// GenericForwardToTarget identifies a target object within a known namespace.
+type GenericForwardToTarget struct {
+	// TargetRef is an object reference to forward matched requests to.
+	// The resource may be "services" (omit or use the empty string for the
+	// group), or an implementation may support other resources (for
+	// example, resource "myroutetargets" in group "networking.acme.io").
+	// Omitting or specifying the empty string for both the resource and
+	// group indicates that the resource is "services".  If the referent
+	// cannot be found, the "InvalidRoutes" status condition on any Gateway
+	// that includes the HTTPRoute will be true.
+	//
+	// Support: Core (Kubernetes Services)
+	// Support: Implementation-specific (Other resource types)
+	//
+	TargetRef ForwardToTargetObjectReference `json:"targetRef"`
+
+	// TargetPort specifies the destination port number to use for the TargetRef.
+	// If unspecified and TargetRef is a Service object consisting of a single
+	// port definition, that port will be used. If unspecified and TargetRef is
+	// a Service object consisting of multiple port definitions, an error is
+	// surfaced in status.
+	//
+	// Support: Core
+	//
+	// +optional
+	TargetPort *TargetPort `json:"targetPort,omitempty"`
+
+	// Weight specifies the proportion of traffic forwarded to a targetRef, computed
+	// as weight/(sum of all weights in targetRefs). Weight is not a percentage and
+	// the sum of weights does not need to equal 100. The following example (in yaml)
+	// sends 70% of traffic to service "my-trafficsplit-sv1" and 30% of the traffic
+	// to service "my-trafficsplit-sv2":
+	//
+	//   forwardTo:
+	//     - targetRef:
+	//         name: my-trafficsplit-sv1
+	//         weight: 70
+	//     - targetRef:
+	//         name: my-trafficsplit-sv2
+	//         weight: 30
+	//
+	// If only one targetRef is specified, 100% of the traffic is forwarded to the
+	// targetRef. If unspecified, weight defaults to 1.
+	//
+	// Support: Core (HTTPRoute)
+	// Support: Extended (TCPRoute)
+	//
+	// +optional
+	// +kubebuilder:default=1
+	Weight TargetWeight `json:"weight"`
+}
