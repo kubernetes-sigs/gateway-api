@@ -108,176 +108,6 @@ type GatewaySpec struct {
 	Addresses []GatewayAddress `json:"addresses"`
 }
 
-// ProtocolType defines the application protocol accepted by a
-// Listener. Implementations are not required to accept all the
-// defined protocols. If an implementation does not support a
-// specified protocol, it should raise a "ConditionUnsupportedProtocol"
-// condition for the affected Listener.
-//
-// Valid ProtocolType values are:
-//
-// * "HTTP"
-// * "HTTPS"
-// * "TLS"
-// * "TCP"
-// * "UDP"
-//
-// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP;UDP
-type ProtocolType string
-
-const (
-	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
-	HTTPProtocolType ProtocolType = "HTTP"
-
-	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
-	HTTPSProtocolType ProtocolType = "HTTPS"
-
-	// TLSProtocolType accepts TLS sessions over TCP.
-	TLSProtocolType ProtocolType = "TLS"
-
-	// TCPProtocolType accepts TCP sessions.
-	TCPProtocolType ProtocolType = "TCP"
-
-	// UDPProtocolType accepts UDP packets.
-	UDPProtocolType ProtocolType = "UDP"
-)
-
-// HostnameMatchType specifies the types of matches that are valid
-// for hostnames.
-// Valid match types are:
-//
-// * "Domain"
-// * "Exact"
-// * "Any"
-//
-// +kubebuilder:validation:Enum=Domain;Exact;Any
-type HostnameMatchType string
-
-const (
-	// HostnameMatchExact specifies that the hostname provided
-	// by the client must exactly match the specified value.
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchExact HostnameMatchType = "Exact"
-
-	// HostnameMatchDomain specifies that the hostname provided
-	// by the client should be matched against a DNS domain value.
-	// The domain match removes the leftmost DNS label from the
-	// hostname provided by the client and compares the resulting
-	// value.
-	//
-	// For example, "example.com" is a "Domain" match for the host
-	// name "foo.example.com", but not for "foo.bar.example.com"
-	// or for "example.foo.com".
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchDomain HostnameMatchType = "Domain"
-
-	// HostnameMatchAny specifies that this Listener accepts
-	// all client traffic regardless of the presence or value of
-	// any hostname supplied by the client.
-	HostnameMatchAny HostnameMatchType = "Any"
-)
-
-// HostnameMatch specifies how a Listener should match the incoming
-// hostname from a client request. Depending on the incoming protocol,
-// the match must apply to names provided by the client at both the
-// TLS and the HTTP protocol layers.
-type HostnameMatch struct {
-	// Match specifies how the hostname provided by the client should be
-	// matched against the given value.
-	//
-	// +optional
-	// +kubebuilder:default=Exact
-	Match HostnameMatchType `json:"match"`
-
-	// Name contains the name to match against. This value must
-	// be a fully qualified host or domain name conforming to the
-	// preferred name syntax defined in
-	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
-	//
-	// In addition to any RFC rules, this field MUST NOT contain
-	//
-	// 1. IP address literals
-	// 2. Colon-delimited port numbers
-	// 3. Percent-encoded octets
-	//
-	// This field is required for the "Domain" and "Exact" match types.
-	//
-	// +optional
-	Name string `json:"name"`
-}
-
-// TLSModeType type defines behavior of gateway with TLS protocol.
-// +kubebuilder:validation:Enum=Terminate;Passthrough
-// +kubebuilder:default=Terminate
-type TLSModeType string
-
-const (
-	// TLSModeTerminate represents the Terminate mode.
-	// In this mode, TLS session between the downstream client
-	// and the Gateway is terminated at the Gateway.
-	TLSModeTerminate TLSModeType = "Terminate"
-	// TLSModePassthrough represents the Passthrough mode.
-	// In this mode, the TLS session NOT terminated by the Gateway. This
-	// implies that the Gateway can't decipher the TLS stream except for
-	// the ClientHello message of the TLS protocol.
-	TLSModePassthrough TLSModeType = "Passthrough"
-)
-
-// CertificateObjectReference identifies a certificate object within a known
-// namespace.
-//
-// +k8s:deepcopy-gen=false
-type CertificateObjectReference = SecretsDefaultLocalObjectReference
-
-// GatewayTLSConfig describes a TLS configuration.
-//
-// References
-// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
-// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
-// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
-// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
-// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-type GatewayTLSConfig struct {
-	// Mode defines the TLS behavior for the TLS session initiated by the client.
-	// There are two possible modes:
-	// - Terminate: The TLS session between the downstream client
-	//   and the Gateway is terminated at the Gateway.
-	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
-	//   implies that the Gateway can't decipher the TLS stream except for
-	//   the ClientHello message of the TLS protocol.
-	//   CertificateRef field is ignored in this mode.
-	Mode TLSModeType `json:"mode,omitempty"`
-
-	// CertificateRef is the reference to Kubernetes object that
-	// contain a TLS certificate and private key.
-	// This certificate MUST be used for TLS handshakes for the domain
-	// this GatewayTLSConfig is associated with.
-	// If an entry in this list omits or specifies the empty
-	// string for both the group and the resource, the resource defaults to "secrets".
-	// An implementation may support other resources (for example, resource
-	// "mycertificates" in group "networking.acme.io").
-	// Support: Core (Kubernetes Secrets)
-	// Support: Implementation-specific (Other resource types)
-	//
-	// +optional
-	CertificateRef CertificateObjectReference `json:"certificateRef,omitempty"`
-	// Options are a list of key/value pairs to give extended options
-	// to the provider.
-	//
-	// There variation among providers as to how ciphersuites are
-	// expressed. If there is a common subset for expressing ciphers
-	// then it will make sense to loft that as a core API
-	// construct.
-	//
-	// Support: Implementation-specific.
-	//
-	// +optional
-	Options map[string]string `json:"options"`
-}
-
 // Listener embodies the concept of a logical endpoint where a
 // Gateway can accept network connections.
 type Listener struct {
@@ -367,50 +197,175 @@ type Listener struct {
 	Routes RouteBindingSelector `json:"routes"`
 }
 
-// AddressType defines how a network address is represented as a text string.
-// Valid AddressType values are:
-//
-// * "IPAddress"
-// * "NamedAddress"
-//
-// +kubebuilder:validation:Enum=IPAddress;NamedAddress
-type AddressType string
-
-const (
-	// IPAddressType a textual representation of a numeric IP
-	// address. IPv4 addresses must be in dotted-decimal
-	// form. IPv6 addresses must be in a standard IPv6 text
-	// representation (see RFC 5952).
-	//
-	// Implementations should accept any address representation
-	// accepted by the inet_pton(3) API.
-	//
-	// Support: Extended.
-	IPAddressType AddressType = "IPAddress"
-
-	// NamedAddressType is an address selected by name. The interpretation of
-	// the name is dependent on the controller.
-	//
-	// Support: Implementation-specific.
-	NamedAddressType AddressType = "NamedAddress"
-)
-
-// GatewayAddress describes an address that can be bound to a Gateway.
-type GatewayAddress struct {
-	// Type of the Address. This is either "IPAddress" or "NamedAddress".
-	//
-	// Support: Extended
+// HostnameMatch specifies how a Listener should match the incoming
+// hostname from a client request. Depending on the incoming protocol,
+// the match must apply to names provided by the client at both the
+// TLS and the HTTP protocol layers.
+type HostnameMatch struct {
+	// Match specifies how the hostname provided by the client should be
+	// matched against the given value.
 	//
 	// +optional
-	// +kubebuilder:default=IPAddress
-	Type AddressType `json:"type"`
+	// +kubebuilder:default=Exact
+	Match HostnameMatchType `json:"match"`
 
-	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
-	// values will depend on `Type` and support by the controller.
+	// Name contains the name to match against. This value must
+	// be a fully qualified host or domain name conforming to the
+	// preferred name syntax defined in
+	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
 	//
-	// +required
-	Value string `json:"value"`
+	// In addition to any RFC rules, this field MUST NOT contain
+	//
+	// 1. IP address literals
+	// 2. Colon-delimited port numbers
+	// 3. Percent-encoded octets
+	//
+	// This field is required for the "Domain" and "Exact" match types.
+	//
+	// +optional
+	Name string `json:"name"`
 }
+
+// HostnameMatchType specifies the types of matches that are valid
+// for hostnames.
+// Valid match types are:
+//
+// * "Domain"
+// * "Exact"
+// * "Any"
+//
+// +kubebuilder:validation:Enum=Domain;Exact;Any
+type HostnameMatchType string
+
+const (
+	// HostnameMatchExact specifies that the hostname provided
+	// by the client must exactly match the specified value.
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchExact HostnameMatchType = "Exact"
+
+	// HostnameMatchDomain specifies that the hostname provided
+	// by the client should be matched against a DNS domain value.
+	// The domain match removes the leftmost DNS label from the
+	// hostname provided by the client and compares the resulting
+	// value.
+	//
+	// For example, "example.com" is a "Domain" match for the host
+	// name "foo.example.com", but not for "foo.bar.example.com"
+	// or for "example.foo.com".
+	//
+	// This match type MUST be case-insensitive.
+	HostnameMatchDomain HostnameMatchType = "Domain"
+
+	// HostnameMatchAny specifies that this Listener accepts
+	// all client traffic regardless of the presence or value of
+	// any hostname supplied by the client.
+	HostnameMatchAny HostnameMatchType = "Any"
+)
+
+// ProtocolType defines the application protocol accepted by a
+// Listener. Implementations are not required to accept all the
+// defined protocols. If an implementation does not support a
+// specified protocol, it should raise a "ConditionUnsupportedProtocol"
+// condition for the affected Listener.
+//
+// Valid ProtocolType values are:
+//
+// * "HTTP"
+// * "HTTPS"
+// * "TLS"
+// * "TCP"
+// * "UDP"
+//
+// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP;UDP
+type ProtocolType string
+
+const (
+	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
+	HTTPProtocolType ProtocolType = "HTTP"
+
+	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
+	HTTPSProtocolType ProtocolType = "HTTPS"
+
+	// TLSProtocolType accepts TLS sessions over TCP.
+	TLSProtocolType ProtocolType = "TLS"
+
+	// TCPProtocolType accepts TCP sessions.
+	TCPProtocolType ProtocolType = "TCP"
+
+	// UDPProtocolType accepts UDP packets.
+	UDPProtocolType ProtocolType = "UDP"
+)
+
+// GatewayTLSConfig describes a TLS configuration.
+//
+// References
+// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
+// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
+// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
+// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
+// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
+// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
+type GatewayTLSConfig struct {
+	// Mode defines the TLS behavior for the TLS session initiated by the client.
+	// There are two possible modes:
+	// - Terminate: The TLS session between the downstream client
+	//   and the Gateway is terminated at the Gateway.
+	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
+	//   implies that the Gateway can't decipher the TLS stream except for
+	//   the ClientHello message of the TLS protocol.
+	//   CertificateRef field is ignored in this mode.
+	Mode TLSModeType `json:"mode,omitempty"`
+
+	// CertificateRef is the reference to Kubernetes object that
+	// contain a TLS certificate and private key.
+	// This certificate MUST be used for TLS handshakes for the domain
+	// this GatewayTLSConfig is associated with.
+	// If an entry in this list omits or specifies the empty
+	// string for both the group and the resource, the resource defaults to "secrets".
+	// An implementation may support other resources (for example, resource
+	// "mycertificates" in group "networking.acme.io").
+	// Support: Core (Kubernetes Secrets)
+	// Support: Implementation-specific (Other resource types)
+	//
+	// +optional
+	CertificateRef CertificateObjectReference `json:"certificateRef,omitempty"`
+	// Options are a list of key/value pairs to give extended options
+	// to the provider.
+	//
+	// There variation among providers as to how ciphersuites are
+	// expressed. If there is a common subset for expressing ciphers
+	// then it will make sense to loft that as a core API
+	// construct.
+	//
+	// Support: Implementation-specific.
+	//
+	// +optional
+	Options map[string]string `json:"options"`
+}
+
+// TLSModeType type defines behavior of gateway with TLS protocol.
+// +kubebuilder:validation:Enum=Terminate;Passthrough
+// +kubebuilder:default=Terminate
+type TLSModeType string
+
+const (
+	// TLSModeTerminate represents the Terminate mode.
+	// In this mode, TLS session between the downstream client
+	// and the Gateway is terminated at the Gateway.
+	TLSModeTerminate TLSModeType = "Terminate"
+	// TLSModePassthrough represents the Passthrough mode.
+	// In this mode, the TLS session NOT terminated by the Gateway. This
+	// implies that the Gateway can't decipher the TLS stream except for
+	// the ClientHello message of the TLS protocol.
+	TLSModePassthrough TLSModeType = "Passthrough"
+)
+
+// CertificateObjectReference identifies a certificate object within a known
+// namespace.
+//
+// +k8s:deepcopy-gen=false
+type CertificateObjectReference = SecretsDefaultLocalObjectReference
 
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
@@ -467,6 +422,51 @@ type RouteBindingSelector struct {
 	// +required
 	Resource string `json:"resource"`
 }
+
+// GatewayAddress describes an address that can be bound to a Gateway.
+type GatewayAddress struct {
+	// Type of the Address. This is either "IPAddress" or "NamedAddress".
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=IPAddress
+	Type AddressType `json:"type"`
+
+	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
+	// values will depend on `Type` and support by the controller.
+	//
+	// +required
+	Value string `json:"value"`
+}
+
+// AddressType defines how a network address is represented as a text string.
+// Valid AddressType values are:
+//
+// * "IPAddress"
+// * "NamedAddress"
+//
+// +kubebuilder:validation:Enum=IPAddress;NamedAddress
+type AddressType string
+
+const (
+	// IPAddressType a textual representation of a numeric IP
+	// address. IPv4 addresses must be in dotted-decimal
+	// form. IPv6 addresses must be in a standard IPv6 text
+	// representation (see RFC 5952).
+	//
+	// Implementations should accept any address representation
+	// accepted by the inet_pton(3) API.
+	//
+	// Support: Extended.
+	IPAddressType AddressType = "IPAddress"
+
+	// NamedAddressType is an address selected by name. The interpretation of
+	// the name is dependent on the controller.
+	//
+	// Support: Implementation-specific.
+	NamedAddressType AddressType = "NamedAddress"
+)
 
 // ListenerExtensionObjectReference identifies a listener extension object
 // within a known namespace.
