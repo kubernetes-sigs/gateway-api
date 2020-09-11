@@ -32,7 +32,7 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// TLSConfig describes a TLS configuration.
+// GatewayTLSConfig describes a TLS configuration.
 //
 // References
 // - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
@@ -41,7 +41,7 @@ const (
 // - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
 // - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
 // - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
-type TLSConfig struct {
+type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	// - Terminate: The TLS session between the downstream client
@@ -55,7 +55,7 @@ type TLSConfig struct {
 	// CertificateRef is the reference to Kubernetes object that
 	// contain a TLS certificate and private key.
 	// This certificate MUST be used for TLS handshakes for the domain
-	// this TLSConfig is associated with.
+	// this GatewayTLSConfig is associated with.
 	// If an entry in this list omits or specifies the empty
 	// string for both the group and the resource, the resource defaults to "secrets".
 	// An implementation may support other resources (for example, resource

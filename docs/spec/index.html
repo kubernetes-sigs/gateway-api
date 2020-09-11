@@ -1538,6 +1538,93 @@ assigns an address from a reserved pool.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
+</p>
+<p>
+<p>GatewayTLSConfig describes a TLS configuration.</p>
+<p>References
+- nginx: <a href="https://nginx.org/en/docs/http/configuring_https_servers.html">https://nginx.org/en/docs/http/configuring_https_servers.html</a>
+- envoy: <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto">https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto</a>
+- haproxy: <a href="https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/">https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/</a>
+- gcp: <a href="https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile">https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile</a>
+- aws: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies</a>
+- azure: <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112">https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112</a></p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>mode</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSModeType">
+TLSModeType
+</a>
+</em>
+</td>
+<td>
+<p>Mode defines the TLS behavior for the TLS session initiated by the client.
+There are two possible modes:
+- Terminate: The TLS session between the downstream client
+and the Gateway is terminated at the Gateway.
+- Passthrough: The TLS session is NOT terminated by the Gateway. This
+implies that the Gateway can&rsquo;t decipher the TLS stream except for
+the ClientHello message of the TLS protocol.
+CertificateRef field is ignored in this mode.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>certificateRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
+SecretsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>CertificateRef is the reference to Kubernetes object that
+contain a TLS certificate and private key.
+This certificate MUST be used for TLS handshakes for the domain
+this GatewayTLSConfig is associated with.
+If an entry in this list omits or specifies the empty
+string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
+An implementation may support other resources (for example, resource
+&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Support: Core (Kubernetes Secrets)
+Support: Implementation-specific (Other resource types)</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>options</code></br>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Options are a list of key/value pairs to give extended options
+to the provider.</p>
+<p>There variation among providers as to how ciphersuites are
+expressed. If there is a common subset for expressing ciphers
+then it will make sense to loft that as a core API
+construct.</p>
+<p>Support: Implementation-specific.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch
 </h3>
 <p>
@@ -2436,8 +2523,8 @@ applied at both the TLS and HTTP protocol layers.</li>
 <td>
 <code>tls</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSConfig">
-TLSConfig
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">
+GatewayTLSConfig
 </a>
 </em>
 </td>
@@ -2446,12 +2533,12 @@ TLSConfig
 <p>TLS is the TLS configuration for the Listener. This field
 is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; and
 ignored otherwise.</p>
-<p>The association of SNIs to Certificate defined in TLSConfig is
+<p>The association of SNIs to Certificate defined in GatewayTLSConfig is
 defined based on the Hostname field for this listener:
 - &ldquo;Domain&rdquo;: Certificate should be used for the domain and its
 first-level subdomains.
 - &ldquo;Exact&rdquo;: Certificate should be used for the domain only.
-- &ldquo;Any&rdquo;: Certificate in TLSConfig is the default certificate to use.</p>
+- &ldquo;Any&rdquo;: Certificate in GatewayTLSConfig is the default certificate to use.</p>
 <p>The GatewayClass MUST use the longest matching SNI out of all
 available certificates for any TLS handshake.</p>
 <p>Support: Core</p>
@@ -2829,7 +2916,7 @@ appropriate when the route is modified.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSConfig">TLSConfig</a>)
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>)
 </p>
 <p>
 <p>SecretsDefaultLocalObjectReference identifies an API object within a
@@ -3199,98 +3286,11 @@ RouteStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.TLSConfig">TLSConfig
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
-</p>
-<p>
-<p>TLSConfig describes a TLS configuration.</p>
-<p>References
-- nginx: <a href="https://nginx.org/en/docs/http/configuring_https_servers.html">https://nginx.org/en/docs/http/configuring_https_servers.html</a>
-- envoy: <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto">https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto</a>
-- haproxy: <a href="https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/">https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/</a>
-- gcp: <a href="https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile">https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile</a>
-- aws: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies</a>
-- azure: <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112">https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112</a></p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>mode</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSModeType">
-TLSModeType
-</a>
-</em>
-</td>
-<td>
-<p>Mode defines the TLS behavior for the TLS session initiated by the client.
-There are two possible modes:
-- Terminate: The TLS session between the downstream client
-and the Gateway is terminated at the Gateway.
-- Passthrough: The TLS session is NOT terminated by the Gateway. This
-implies that the Gateway can&rsquo;t decipher the TLS stream except for
-the ClientHello message of the TLS protocol.
-CertificateRef field is ignored in this mode.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>certificateRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-SecretsDefaultLocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>CertificateRef is the reference to Kubernetes object that
-contain a TLS certificate and private key.
-This certificate MUST be used for TLS handshakes for the domain
-this TLSConfig is associated with.
-If an entry in this list omits or specifies the empty
-string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
-An implementation may support other resources (for example, resource
-&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Support: Core (Kubernetes Secrets)
-Support: Implementation-specific (Other resource types)</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>options</code></br>
-<em>
-map[string]string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Options are a list of key/value pairs to give extended options
-to the provider.</p>
-<p>There variation among providers as to how ciphersuites are
-expressed. If there is a common subset for expressing ciphers
-then it will make sense to loft that as a core API
-construct.</p>
-<p>Support: Implementation-specific.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSModeType">TLSModeType
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSConfig">TLSConfig</a>)
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>)
 </p>
 <p>
 <p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
