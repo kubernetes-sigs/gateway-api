@@ -65,7 +65,7 @@ type UDPRouteAction struct {
 	// group indicates that the resource is "services".  If the referent
 	// cannot be found, the "InvalidRoutes" status condition on any Gateway
 	// that includes the UDPRoute will be true.
-	ForwardTo *ForwardToTarget `json:"forwardTo"`
+	ForwardTo *GenericForwardToTarget `json:"forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty

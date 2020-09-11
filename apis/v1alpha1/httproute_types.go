@@ -427,7 +427,7 @@ type HTTPForwardingTarget struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	To []ForwardToTarget `json:"to"`
+	To []HTTPForwardToTarget `json:"to"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty

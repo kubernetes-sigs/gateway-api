@@ -77,7 +77,7 @@ type TLSRouteAction struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	ForwardTo []ForwardToTarget `json:"forwardTo"`
+	ForwardTo []GenericForwardToTarget `json:"forwardTo"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty
