@@ -896,6 +896,12 @@ this GatewayClass.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayConditionReason">GatewayConditionReason
+(<code>string</code> alias)</p></h3>
+<p>
+<p>GatewayConditionReason defines the set of reasons that explain
+why a particular Gateway condition type has been raised.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayConditionType">GatewayConditionType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -1069,6 +1075,7 @@ GatewayAddress that it assigns to the Gateway.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Addresses lists the IP addresses that have actually been
 bound to the Gateway. These addresses may differ from the
 addresses in the Spec, e.g. if the Gateway automatically
@@ -1086,8 +1093,16 @@ assigns an address from a reserved pool.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Conditions describe the current conditions of the Gateway.</p>
+<p>Implementations should prefer to express Gateway conditions
+using the <code>GatewayConditionType</code> and <code>GatewayConditionReason</code>
+constants so that operators and tools can converge on a common
+vocabulary to describe Gateway state.</p>
+<p>Known condition types are:</p>
+<ul>
+<li>&ldquo;Scheduled&rdquo;</li>
+<li>&ldquo;Ready&rdquo;</li>
+</ul>
 </td>
 </tr>
 <tr>

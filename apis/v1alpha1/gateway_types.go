@@ -29,7 +29,9 @@ type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GatewaySpec   `json:"spec,omitempty"`
+	Spec GatewaySpec `json:"spec,omitempty"`
+
+	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
@@ -505,14 +507,30 @@ type GatewayStatus struct {
 	//
 	// These addresses should all be of type "IPAddress".
 	//
-	// +required
+	// +optional
 	Addresses []GatewayAddress `json:"addresses"`
 
 	// Conditions describe the current conditions of the Gateway.
-	// +optional
+	//
+	// Implementations should prefer to express Gateway conditions
+	// using the `GatewayConditionType` and `GatewayConditionReason`
+	// constants so that operators and tools can converge on a common
+	// vocabulary to describe Gateway state.
+	//
+	// Known condition types are:
+	//
+	// * "Scheduled"
+	// * "Ready"
+	//
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=type
+	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
+	//
 	// +optional
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
@@ -522,30 +540,88 @@ type GatewayStatus struct {
 // field.
 type GatewayConditionType string
 
+// GatewayConditionReason defines the set of reasons that explain
+// why a particular Gateway condition type has been raised.
+type GatewayConditionReason string
+
 const (
-	// ConditionForbiddenNamespaceForClass indicates that this Gateway is in
-	// a namespace forbidden by the GatewayClass.
-	ConditionForbiddenNamespaceForClass GatewayConditionType = "ForbiddenNamespaceForClass"
+	// GatewayConditionScheduled indicates whether the controller
+	// managing the Gateway has scheduled the Gateway to the
+	// underlying network infrastructure.
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "NotReconciled"
+	// * "NamespaceForbidden"
+	// * "NoSuchGatewayClass"
+	// * "NoResources"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.`
+	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
-	// ConditionGatewayNotScheduled indicates that the Gateway has not been
-	// scheduled.
-	ConditionGatewayNotScheduled GatewayConditionType = "GatewayNotScheduled"
+	// GatewayReasonNotReconciled is used when the Gateway is
+	// not scheduled because it recently been created and no
+	// controller has reconciled it yet.
+	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
-	// ConditionListenersNotReady indicates that at least one of the specified
-	// listeners is not ready. If this condition has a status of True, a more
-	// detailed ListenerCondition should be present in the corresponding
-	// ListenerStatus.
-	ConditionListenersNotReady GatewayConditionType = "ListenersNotReady"
+	// GatewayReasonNamespaceForbidden is used when the Gateway is
+	// not scheduled because the controller's configuration
+	// forbids it from scheduling objects from that namespace.
+	GatewayReasonNamespaceForbidden GatewayConditionReason = "NamespaceForbidden"
 
-	// ConditionInvalidListeners indicates that at least one of the specified
-	// listeners is invalid. If this condition has a status of True, a more
-	// detailed ListenerCondition should be present in the corresponding
-	// ListenerStatus.
-	ConditionInvalidListeners GatewayConditionType = "InvalidListeners"
+	// GatewayReasonNoSuchGatewayClass is used when the Gateway is
+	// not scheduled because there is no controller that recognizes
+	// the GatewayClassName. This reason should only be set by
+	// a controller that has cluster-wide visibility of all the
+	// installed GatewayClasses.
+	GatewayReasonNoSuchGatewayClass GatewayConditionReason = "NoSuchGatewayClass"
 
-	// ConditionInvalidAddress indicates one or more of the
-	// Gateway's Addresses is invalid or could not be assigned.
-	ConditionInvalidAddress GatewayConditionType = "InvalidAddress"
+	// GatewayReasonNoResources is used when the Gateway is
+	// not scheduled because no infrastructure resources are
+	// available for this Gateway.
+	GatewayReasonNoResources GatewayConditionReason = "NoResources"
+)
+
+const (
+	// GatewayConditionReady indicates whether the Gateway is able
+	// to serve traffic. Note that this does not indicate that the
+	// Gateway configuration is current or even complete (e.g. the
+	// controller may still not have reconciled the latest version,
+	// or some parts of the configuration could be missing).
+	//
+	// If both the "ListenersNotValid" and "ListenersNotReady"
+	// reasons are true, the Gateway controller should prefer the
+	// "ListenersNotValid" reason.
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "ListenersNotValid"
+	// * "ListenersNotReady"
+	// * "AddressNotAssigned"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.`
+	GatewayConditionReady GatewayConditionType = "Ready"
+
+	// GatewayReasonListenersNotValid is used when one or more
+	// Listeners have an invalid or unsupported configuration
+	// and cannot be configured on the Gateway.
+	GatewayReasonListenersNotValid GatewayConditionReason = "ListenersNotValid"
+
+	// GatewayReasonListenersNotReady is used when one or more
+	// Listeners are not ready to serve traffic.
+	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
+
+	// GatewayReasonAddressNotAssigned is used when the requested
+	// address has not been assigned to the Gateway. This reason
+	// can be used to express a range of circumstances, including
+	// (but not limited to) IPAM address exhaustion, invalid
+	// or unsupported address requests, or a named address not
+	// being found.
+	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
 // ListenerStatus is the status associated with a Listener port.

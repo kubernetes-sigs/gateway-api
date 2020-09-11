@@ -46,7 +46,7 @@ vet:
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
-install: manifests crd example
+install: crd example
 
 # Install the CRD's to a pre-existing cluster.
 .PHONY: crd
