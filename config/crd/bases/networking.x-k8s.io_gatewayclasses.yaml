@@ -128,13 +128,19 @@ spec:
           status:
             default:
               conditions:
-              - status: Unknown
+              - lastTransitionTime: "1970-01-01T00:00:00Z"
+                message: Waiting for controller
+                reason: Waiting
+                status: Unknown
                 type: InvalidParameters
             description: Status of the GatewayClass.
             properties:
               conditions:
                 default:
-                - status: Unknown
+                - lastTransitionTime: "1970-01-01T00:00:00Z"
+                  message: Waiting for controller
+                  reason: Waiting
+                  status: Unknown
                   type: InvalidParameters
                 description: Conditions is the current status from the controller for this GatewayClass.
                 items:
