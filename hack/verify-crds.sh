@@ -19,8 +19,8 @@ set -o nounset
 set -o pipefail
 
 SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
-DIFFROOT="${SCRIPT_ROOT}/config/crd/bases"
-TMP_DIFFROOT="${SCRIPT_ROOT}/_tmp/config/crd/bases"
+DIFFROOT="${SCRIPT_ROOT}/crd"
+TMP_DIFFROOT="${SCRIPT_ROOT}/_tmp/crd"
 _tmp="${SCRIPT_ROOT}/_tmp"
 # The controller-gen command for generating CRDs from API definitions.
 CONTROLLER_GEN="go run sigs.k8s.io/controller-tools/cmd/controller-gen"

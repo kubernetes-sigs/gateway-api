@@ -1,0 +1,7 @@
+resources:
+- networking.x-k8s.io_gatewayclasses.yaml
+- networking.x-k8s.io_gateways.yaml
+- networking.x-k8s.io_httproutes.yaml
+- networking.x-k8s.io_tcproutes.yaml
+- networking.x-k8s.io_tlsroutes.yaml
+- networking.x-k8s.io_udproutes.yaml

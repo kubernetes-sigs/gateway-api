@@ -31,7 +31,7 @@ generate:
 	$(CONTROLLER_GEN) \
 		object:headerFile=./hack/boilerplate.go.txt,year=$$(date +%Y) \
 		crd:crdVersions=v1 \
-		output:crd:artifacts:config=config/crd/bases \
+		output:crd:artifacts:config=crd \
 		paths=./...
 	$(MAKE) docs
 
@@ -50,7 +50,7 @@ install: manifests crd example
 # Install the CRD's to a pre-existing cluster.
 .PHONY: crd
 crd:
-	kustomize build config/crd | kubectl apply -f -
+	kustomize build crd | kubectl apply -f -
 
 # Install the example resources to a pre-existing cluster.
 .PHONY: example
