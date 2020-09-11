@@ -32,6 +32,7 @@ type UDPRouteStatus struct {
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
 
 // UDPRoute is the Schema for the udproutes API.
 type UDPRoute struct {
