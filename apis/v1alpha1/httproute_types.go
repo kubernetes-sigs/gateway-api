@@ -134,9 +134,9 @@ type HTTPRouteRule struct {
 	// +optional
 	Filters []HTTPRouteFilter `json:"filters"`
 
-	// Action defines what happens to the request.
+	// Forward defines the upstream target(s) where the request should be sent.
 	// +optional
-	Action *HTTPRouteAction `json:"action"`
+	Forward *HTTPForwardingTarget `json:"forward"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
@@ -413,9 +413,9 @@ type HTTPRequestMirrorFilter struct {
 	TargetPort *TargetPort `json:"targetPort,omitempty" protobuf:"bytes,2,opt,name=targetPort"`
 }
 
-// HTTPRouteAction is the action taken given a match.
-type HTTPRouteAction struct {
-	// ForwardTo sends requests to the referenced object(s).  The
+// HTTPForwardingTarget is the target to send the request to for a given a match.
+type HTTPForwardingTarget struct {
+	// To references referenced object(s) where the request should be sent. The
 	// resource may be "services" (omit or use the empty string for the
 	// group), or an implementation may support other resources (for
 	// example, resource "myroutetargets" in group "networking.acme.io").
@@ -427,7 +427,7 @@ type HTTPRouteAction struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	ForwardTo []ForwardToTarget `json:"forwardTo"`
+	To []ForwardToTarget `json:"to"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "action" behavior.  The resource may be "configmaps" (use the empty

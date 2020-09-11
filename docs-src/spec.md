@@ -712,7 +712,7 @@ Valid AddressType values are:</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
@@ -797,7 +797,7 @@ string
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>)
@@ -1398,6 +1398,68 @@ construct.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
+</p>
+<p>
+<p>HTTPForwardingTarget is the target to send the request to for a given a match.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>to</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
+[]ForwardToTarget
+</a>
+</em>
+</td>
+<td>
+<p>To references referenced object(s) where the request should be sent. The
+resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
+<p>Support: core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch
 </h3>
 <p>
@@ -1625,68 +1687,6 @@ port definition, that port will be used. If unspecified and TargetRef is
 a Service object consisting of multiple port definitions, an error is
 surfaced in status.</p>
 <p>Support: Core</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
-</p>
-<p>
-<p>HTTPRouteAction is the action taken given a match.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>forwardTo</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
-[]ForwardToTarget
-</a>
-</em>
-</td>
-<td>
-<p>ForwardTo sends requests to the referenced object(s).  The
-resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: custom</p>
 </td>
 </tr>
 </tbody>
@@ -2043,16 +2043,16 @@ Specifying a core filter multiple times has undefined or custom conformance.</p>
 </tr>
 <tr>
 <td>
-<code>action</code></br>
+<code>forward</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">
-HTTPRouteAction
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">
+HTTPForwardingTarget
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Action defines what happens to the request.</p>
+<p>Forward defines the upstream target(s) where the request should be sent.</p>
 </td>
 </tr>
 </tbody>
