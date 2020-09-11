@@ -343,6 +343,8 @@
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a>
 </li><li>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute</a>
+</li><li>
 <a href="#networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute</a>
 </li></ul>
 <h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
@@ -837,6 +839,98 @@ TCPRouteStatus
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute
+</h3>
+<p>
+<p>TLSRoute is the Schema for the TLSRoute resource.
+TLSRoute is similar to TCPRoute but can be configured to match against
+TLS-specific metadata.
+This allows more flexibility in matching streams for in a given TLS listener.</p>
+<p>If you need to forward traffic to a single target for a TLS listener, you
+could chose to use a TCPRoute with a TLS listener.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>TLSRoute</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteSpec">
+TLSRouteSpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">
+[]TLSRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of TLS matchers and actions.</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteStatus">
+TLSRouteStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute
 </h3>
 <p>
@@ -949,6 +1043,8 @@ Valid AddressType values are:</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
@@ -1028,6 +1124,7 @@ string
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteAction">HTTPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>)
 </p>
 <p>
@@ -1339,7 +1436,8 @@ field.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteStatus">TLSRouteStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2060,7 +2158,7 @@ dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rd
 a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
 The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
 label and matches only a single label.
-You cannot have a wildcard label by itself (e.g. Host == &ldquo;*&rdquo;).
+You cannot have a wildcard label by itself (e.g. Host == &ldquo;<em>&rdquo;).
 Requests will be matched against the Host field in the following order:
 1. If Host is precise, the request matches this rule if
 the http host header is equal to Host.
@@ -3295,6 +3393,249 @@ RouteStatus
 <p>
 <p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
 </p>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule</a>)
+</p>
+<p>
+<p>TLSRouteAction is the action for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>forwardTo</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ForwardToTarget">
+[]ForwardToTarget
+</a>
+</em>
+</td>
+<td>
+<p>ForwardTo sends requests to the referenced object(s). The
+resource may be &ldquo;services&rdquo; (omit or use the empty string for the
+group), or an implementation may support other resources (for
+example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;services&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
+<p>Support: core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the TLSRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule</a>)
+</p>
+<p>
+<p>TLSRouteMatch defines the predicate used to match connections to a
+given action.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>snis</code></br>
+<em>
+[]string
+</em>
+</td>
+<td>
+<p>SNIs defines a set of SNI names that should match against the
+SNI attribute of TLS CLientHello message in TLS handshake.</p>
+<p>SNI can be &ldquo;precise&rdquo; which is a domain name without the terminating
+dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rdquo;, which is
+a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
+The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
+label and matches only a single label.
+You cannot have a wildcard label by itself (e.g. Host == &ldquo;</em>&rdquo;).
+Requests will be matched against the Host field in the following order:</p>
+<ol>
+<li>If SNI is precise, the request matches this rule if
+the SNI in ClientHello is equal to one of the defined SNIs.</li>
+<li>If SNI is a wildcard, then the request matches this rule if
+the SNI is to equal to the suffix
+(removing the first label) of the wildcard rule.</li>
+</ol>
+<p>Support: core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
+ConfigMapsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the TLSRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteSpec">TLSRouteSpec</a>)
+</p>
+<p>
+<p>TLSRouteRule is the configuration for a given rule.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>matches</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">
+[]TLSRouteMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Matches define conditions used for matching the rule against
+incoming TLS handshake.
+Each match is independent, i.e. this rule will be matched
+if <strong>any</strong> one of the matches is satisfied.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>action</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">
+TLSRouteAction
+</a>
+</em>
+</td>
+<td>
+<p>Action defines what happens to the connection.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteSpec">TLSRouteSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute</a>)
+</p>
+<p>
+<p>TLSRouteSpec defines the desired state of TLSRoute</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">
+[]TLSRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of TLS matchers and actions.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteStatus">TLSRouteStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute</a>)
+</p>
+<p>
+<p>TLSRouteStatus defines the observed state of TLSRoute</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gatewayRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
+[]GatewayObjectReference
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TargetPort">TargetPort
 (<code>int32</code> alias)</p></h3>
 <p>
