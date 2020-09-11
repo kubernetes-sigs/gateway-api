@@ -249,7 +249,7 @@ type GatewayTLSConfig struct {
 	//   implies that the Gateway can't decipher the TLS stream except for
 	//   the ClientHello message of the TLS protocol.
 	//   CertificateRef field is ignored in this mode.
-	Mode TLSModeType `json:"mode,omitempty" protobuf:"bytes,1,opt,name=mode"`
+	Mode TLSModeType `json:"mode,omitempty"`
 
 	// CertificateRef is the reference to Kubernetes object that
 	// contain a TLS certificate and private key.
