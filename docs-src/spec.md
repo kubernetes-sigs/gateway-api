@@ -1111,8 +1111,7 @@ field.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteStatus">TLSRouteStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
 </p>
 <p>
 <p>GatewayObjectReference identifies a Gateway object.</p>
@@ -2651,6 +2650,7 @@ selector should only take effect when this field is set to false.</p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteStatus">TLSRouteStatus</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteStatus">UDPRouteStatus</a>)
 </p>
 <p>
@@ -3299,14 +3299,17 @@ TLSRouteAction
 <tbody>
 <tr>
 <td>
-<code>gatewayRefs</code></br>
+<code>RouteStatus</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-[]GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteStatus">
+RouteStatus
 </a>
 </em>
 </td>
 <td>
+<p>
+(Members of <code>RouteStatus</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 </tbody>

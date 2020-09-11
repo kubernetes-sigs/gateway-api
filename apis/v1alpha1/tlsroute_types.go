@@ -29,7 +29,7 @@ type TLSRouteSpec struct {
 
 // TLSRouteStatus defines the observed state of TLSRoute
 type TLSRouteStatus struct {
-	GatewayRefs []GatewayObjectReference `json:"gatewayRefs"`
+	RouteStatus `json:",inline"`
 }
 
 // +genclient
