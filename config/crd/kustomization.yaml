@@ -3,3 +3,4 @@ resources:
 - bases/networking.x-k8s.io_gateways.yaml
 - bases/networking.x-k8s.io_httproutes.yaml
 - bases/networking.x-k8s.io_tcproutes.yaml
+- bases/networking.x-k8s.io_tlsroutes.yaml
