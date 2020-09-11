@@ -34,7 +34,7 @@ type UDPRouteStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// UDPRoute is the Schema for the udproutes API.
+// UDPRoute is the Schema for the UDPRoute resource.
 type UDPRoute struct {
 	metav1.TypeMeta   `json:",inline" protobuf:"bytes,1,opt,name=typeMeta"`
 	metav1.ObjectMeta `json:"metadata,omitempty" protobuf:"bytes,2,opt,name=metadata"`

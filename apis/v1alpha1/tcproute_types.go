@@ -34,7 +34,7 @@ type TCPRouteStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// TCPRoute is the Schema for the tcproutes API
+// TCPRoute is the Schema for the TCPRoute resource.
 type TCPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

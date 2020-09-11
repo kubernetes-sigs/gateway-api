@@ -668,7 +668,7 @@ GatewayClassStatus
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute
 </h3>
 <p>
-<p>HTTPRoute is the Schema for the httproutes API</p>
+<p>HTTPRoute is the Schema for the HTTPRoute resource.</p>
 </p>
 <table>
 <thead>
@@ -755,7 +755,7 @@ HTTPRouteStatus
 <h3 id="networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute
 </h3>
 <p>
-<p>TCPRoute is the Schema for the tcproutes API</p>
+<p>TCPRoute is the Schema for the TCPRoute resource.</p>
 </p>
 <table>
 <thead>
@@ -934,7 +934,7 @@ TLSRouteStatus
 <h3 id="networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute
 </h3>
 <p>
-<p>UDPRoute is the Schema for the udproutes API.</p>
+<p>UDPRoute is the Schema for the UDPRoute resource.</p>
 </p>
 <table>
 <thead>
@@ -1204,8 +1204,8 @@ name: my-trafficsplit-sv2
 weight: 30</p>
 <p>If only one targetRef is specified, 100% of the traffic is forwarded to the
 targetRef. If unspecified, weight defaults to 1.</p>
-<p>Support: Core (httproute)
-Support: Extended (tcproute)</p>
+<p>Support: Core (HTTPRoute)
+Support: Extended (TCPRoute)</p>
 </td>
 </tr>
 <tr>

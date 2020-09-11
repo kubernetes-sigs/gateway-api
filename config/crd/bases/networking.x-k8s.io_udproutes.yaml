@@ -19,7 +19,7 @@ spec:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: UDPRoute is the Schema for the udproutes API.
+        description: UDPRoute is the Schema for the UDPRoute resource.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -158,7 +158,7 @@ spec:
                               type: object
                             weight:
                               default: 1
-                              description: "Weight specifies the proportion of traffic forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core (httproute) Support: Extended (tcproute)"
+                              description: "Weight specifies the proportion of traffic forwarded to a targetRef, computed as weight/(sum of all weights in targetRefs). Weight is not a percentage and the sum of weights does not need to equal 100. The following example (in yaml) sends 70% of traffic to service \"my-trafficsplit-sv1\" and 30% of the traffic to service \"my-trafficsplit-sv2\": \n   forwardTo:     - targetRef:         name: my-trafficsplit-sv1         weight: 70     - targetRef:         name: my-trafficsplit-sv2         weight: 30 \n If only one targetRef is specified, 100% of the traffic is forwarded to the targetRef. If unspecified, weight defaults to 1. \n Support: Core (HTTPRoute) Support: Extended (TCPRoute)"
                               format: int32
                               type: integer
                           required:

@@ -459,7 +459,7 @@ type HTTPRouteStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// HTTPRoute is the Schema for the httproutes API
+// HTTPRoute is the Schema for the HTTPRoute resource.
 type HTTPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
