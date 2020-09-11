@@ -59,8 +59,8 @@ type ForwardToTarget struct {
 	// If only one targetRef is specified, 100% of the traffic is forwarded to the
 	// targetRef. If unspecified, weight defaults to 1.
 	//
-	// Support: Core (httproute)
-	// Support: Extended (tcproute)
+	// Support: Core (HTTPRoute)
+	// Support: Extended (TCPRoute)
 	//
 	// +optional
 	// +kubebuilder:default=1
