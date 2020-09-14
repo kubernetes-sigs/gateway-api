@@ -309,15 +309,11 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing
-the configuration parameters corresponding to this
-class. This is optional if the controller does not require
-any additional configuration.</p>
-<p>Valid resources for reference are up to the Controller. Examples
-include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
-<p>If the referent cannot be found,
-the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
-will be true.</p>
+<p>ParametersRef is a controller-specific resource containing the configuration
+parameters corresponding to this class. This is optional if the controller
+does not require any additional configuration.</p>
+<p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
+status condition will be true.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -852,15 +848,11 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing
-the configuration parameters corresponding to this
-class. This is optional if the controller does not require
-any additional configuration.</p>
-<p>Valid resources for reference are up to the Controller. Examples
-include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
-<p>If the referent cannot be found,
-the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
-will be true.</p>
+<p>ParametersRef is a controller-specific resource containing the configuration
+parameters corresponding to this class. This is optional if the controller
+does not require any additional configuration.</p>
+<p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
+status condition will be true.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -1866,11 +1858,8 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;host&rdquo; block.  The resource may be &ldquo;configmaps&rdquo;  or an
-implementation-defined resource
-(for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>Valid resources for reference are up to the Controller. Examples
-include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
+&ldquo;host&rdquo; block. The resource may be &ldquo;configmaps&rdquo;  or an implementation-defined
+resource (for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
 <p>If the referent cannot be found,
 the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
 will be true.</p>
@@ -2431,15 +2420,7 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>Group is the group of the referent.  Omitting the value or specifying
-the empty string indicates the core API group.  For example, use the
-following to specify a configmaps:</p>
-<p>fooRef:
-resource: configmaps
-name: myconfigmap</p>
-<p>Otherwise, if the core API group is not desired, specify the desired
-group:</p>
+<p>Group is the API group name of the referent.</p>
 <p>fooRef:
 group: acme.io
 resource: foos
@@ -2454,13 +2435,7 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Resource is the API resource name of the referent.</p>
-<p>specify the desired resource and group</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
 </td>
 </tr>
 <tr>

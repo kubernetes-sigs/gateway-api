@@ -64,12 +64,8 @@ type HTTPRouteHost struct {
 	Rules []HTTPRouteRule `json:"rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "host" block.  The resource may be "configmaps"  or an
-	// implementation-defined resource
-	// (for example, resource "myroutehosts" in group "networking.acme.io").
-	//
-	// Valid resources for reference are up to the Controller. Examples
-	// include "configmaps"  or a custom resource (CRD).
+	// "host" block. The resource may be "configmaps"  or an implementation-defined
+	// resource (for example, resource "myroutehosts" in group "networking.acme.io").
 	//
 	// If the referent cannot be found,
 	// the GatewayClass's "InvalidParameters" status condition
