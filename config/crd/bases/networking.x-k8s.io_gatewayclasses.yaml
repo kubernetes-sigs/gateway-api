@@ -106,7 +106,7 @@ spec:
                 description: "Controller is a domain/path string that indicates the controller that is managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"
                 type: string
               parametersRef:
-                description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n Valid resources for reference are up to the Controller. Examples include \"configmaps\" (omit or specify the empty string for the group to indicate the core API group) or a custom resource (CRD).  Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
+                description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n Valid resources for reference are up to the Controller. Examples include \"configmaps\"  or a custom resource (CRD). \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
                 properties:
                   group:
                     default: core
@@ -116,8 +116,7 @@ spec:
                     description: Name is the name of the referent.
                     type: string
                   resource:
-                    default: configmaps
-                    description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the configmaps resource. For example, use the following to specify a configmaps resource: \n fooRef:   name: myconfigmap \n Otherwise, if the configmaps resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                    description: "Resource is the API resource name of the referent. \n specify the desired resource and group \n fooRef:   group: acme.io   resource: foos   name: myfoo"
                     type: string
                 required:
                 - name

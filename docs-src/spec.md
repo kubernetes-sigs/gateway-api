@@ -302,8 +302,8 @@ will have access to all namespaces.</p>
 <td>
 <code>parametersRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -314,11 +314,9 @@ the configuration parameters corresponding to this
 class. This is optional if the controller does not require
 any additional configuration.</p>
 <p>Valid resources for reference are up to the Controller. Examples
-include &ldquo;configmaps&rdquo; (omit or specify the empty string for the group
-to indicate the core API group) or a custom resource (CRD).  Omitting
-or specifying the empty string for both the resource and group
-indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent cannot
-be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
+include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
+<p>If the referent cannot be found,
+the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
 will be true.</p>
 <p>Support: Custom</p>
 </td>
@@ -708,92 +706,6 @@ Valid AddressType values are:</p>
 <li>&ldquo;NamedAddress&rdquo;</li>
 </ul>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">ConfigMapsDefaultLocalObjectReference
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
-</p>
-<p>
-<p>RouteMatchExtensionObjectReference identifies a route-match extension object
-within a known namespace.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>group</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Group is the group of the referent.  Omitting the value or specifying
-the empty string indicates the core API group.  For example, use the
-following to specify a configmaps:</p>
-<p>fooRef:
-resource: configmaps
-name: myconfigmap</p>
-<p>Otherwise, if the core API group is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resource</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Resource is the API resource name of the referent. Omitting the value
-or specifying the empty string indicates the configmaps resource. For
-example, use the following to specify a configmaps resource:</p>
-<p>fooRef:
-name: myconfigmap</p>
-<p>Otherwise, if the configmaps resource is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referent.</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress
 </h3>
 <p>
@@ -933,8 +845,8 @@ will have access to all namespaces.</p>
 <td>
 <code>parametersRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -945,11 +857,9 @@ the configuration parameters corresponding to this
 class. This is optional if the controller does not require
 any additional configuration.</p>
 <p>Valid resources for reference are up to the Controller. Examples
-include &ldquo;configmaps&rdquo; (omit or specify the empty string for the group
-to indicate the core API group) or a custom resource (CRD).  Omitting
-or specifying the empty string for both the resource and group
-indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent cannot
-be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
+include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
+<p>If the referent cannot be found,
+the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
 will be true.</p>
 <p>Support: Custom</p>
 </td>
@@ -1528,8 +1438,8 @@ that includes the HTTPRoute will be true.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -1836,8 +1746,8 @@ types to extend the core API with implementation-specific behavior.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -1948,21 +1858,22 @@ the http host header is to equal to the suffix
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;host&rdquo; block.  The resource may be &ldquo;configmaps&rdquo; (omit or specify the
-empty string for the group) or an implementation-defined resource
-(for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
+&ldquo;host&rdquo; block.  The resource may be &ldquo;configmaps&rdquo;  or an
+implementation-defined resource
+(for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
+<p>Valid resources for reference are up to the Controller. Examples
+include &ldquo;configmaps&rdquo;  or a custom resource (CRD).</p>
+<p>If the referent cannot be found,
+the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
+will be true.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -2029,8 +1940,8 @@ HTTPHeaderMatch
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -2480,6 +2391,87 @@ status of all such Listeners.</p>
 </td>
 <td>
 <p>Conditions describe the current condition of this listener.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.LocalObjectReference">LocalObjectReference
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
+</p>
+<p>
+<p>RouteMatchExtensionObjectReference identifies a route-match extension object
+within a known namespace.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Group is the group of the referent.  Omitting the value or specifying
+the empty string indicates the core API group.  For example, use the
+following to specify a configmaps:</p>
+<p>fooRef:
+resource: configmaps
+name: myconfigmap</p>
+<p>Otherwise, if the core API group is not desired, specify the desired
+group:</p>
+<p>fooRef:
+group: acme.io
+resource: foos
+name: myfoo</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Resource is the API resource name of the referent.</p>
+<p>specify the desired resource and group</p>
+<p>fooRef:
+group: acme.io
+resource: foos
+name: myfoo</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referent.</p>
 </td>
 </tr>
 </tbody>
@@ -2972,8 +2964,8 @@ that includes the HTTPRoute will be true.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3014,8 +3006,8 @@ given action.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3200,8 +3192,8 @@ that includes the HTTPRoute will be true.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3269,8 +3261,8 @@ the SNI is to equal to the suffix
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3467,8 +3459,8 @@ that includes the UDPRoute will be true.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3509,8 +3501,8 @@ given action.</p>
 <td>
 <code>extensionRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ConfigMapsDefaultLocalObjectReference">
-ConfigMapsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
