@@ -472,7 +472,7 @@ const (
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type ListenerExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+type ListenerExtensionObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

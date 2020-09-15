@@ -19,16 +19,16 @@ package v1alpha1
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteMatchExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+type RouteMatchExtensionObjectReference = LocalObjectReference
 
 // RouteFilterExtensionObjectReference identifies a route-filter extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteFilterExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+type RouteFilterExtensionObjectReference = LocalObjectReference
 
 // RouteActionExtensionObjectReference identifies a route-action extension
 // object within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteActionExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+type RouteActionExtensionObjectReference = LocalObjectReference

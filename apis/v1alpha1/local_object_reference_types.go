@@ -62,50 +62,13 @@ type ServicesDefaultLocalObjectReference struct {
 	Name string `json:"name"`
 }
 
-// ConfigMapsDefaultLocalObjectReference identifies an API object within a
-// known namespace that defaults group to core and resource to configmaps
-// if unspecified.
-type ConfigMapsDefaultLocalObjectReference struct {
-	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.  For example, use the
-	// following to specify a configmaps:
-	//
-	// fooRef:
-	//   resource: configmaps
-	//   name: myconfigmap
-	//
-	// Otherwise, if the core API group is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +optional
-	// +kubebuilder:default=core
+// LocalObjectReference identifies an API object within a known namespace.
+type LocalObjectReference struct {
+	// Group is the API group name of the referent.
 	Group string `json:"group"`
-	// Resource is the API resource name of the referent. Omitting the value
-	// or specifying the empty string indicates the configmaps resource. For
-	// example, use the following to specify a configmaps resource:
-	//
-	// fooRef:
-	//   name: myconfigmap
-	//
-	// Otherwise, if the configmaps resource is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +optional
-	// +kubebuilder:default=configmaps
+	// Resource is the API resource name of the referent.
 	Resource string `json:"resource"`
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 }
 

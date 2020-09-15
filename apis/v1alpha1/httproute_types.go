@@ -64,13 +64,12 @@ type HTTPRouteHost struct {
 	Rules []HTTPRouteRule `json:"rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "host" block.  The resource may be "configmaps" (omit or specify the
-	// empty string for the group) or an implementation-defined resource
-	// (for example, resource "myroutehosts" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
+	// "host" block. The resource may be "configmaps"  or an implementation-defined
+	// resource (for example, resource "myroutehosts" in group "networking.acme.io").
+	//
+	// If the referent cannot be found,
+	// the GatewayClass's "InvalidParameters" status condition
+	// will be true.
 	//
 	// Support: custom
 	//
@@ -448,7 +447,7 @@ type HTTPForwardingTarget struct {
 // within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type RouteHostExtensionObjectReference = ConfigMapsDefaultLocalObjectReference
+type RouteHostExtensionObjectReference = LocalObjectReference
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {

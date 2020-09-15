@@ -97,18 +97,12 @@ type GatewayClassSpec struct {
 	// +kubebuilder:default={onlySameNamespace:true}
 	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty"`
 
-	// ParametersRef is a controller-specific resource containing
-	// the configuration parameters corresponding to this
-	// class. This is optional if the controller does not require
-	// any additional configuration.
+	// ParametersRef is a controller-specific resource containing the configuration
+	// parameters corresponding to this class. This is optional if the controller
+	// does not require any additional configuration.
 	//
-	// Valid resources for reference are up to the Controller. Examples
-	// include "configmaps" (omit or specify the empty string for the group
-	// to indicate the core API group) or a custom resource (CRD).  Omitting
-	// or specifying the empty string for both the resource and group
-	// indicates that the resource is "configmaps".  If the referent cannot
-	// be found, the GatewayClass's "InvalidParameters" status condition
-	// will be true.
+	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
+	// status condition will be true.
 	//
 	// Support: Custom
 	//
@@ -154,7 +148,7 @@ type RouteNamespaces struct {
 // gateway class within a known namespace.
 //
 // +k8s:deepcopy-gen=false
-type GatewayClassParametersObjectReference = ConfigMapsDefaultLocalObjectReference
+type GatewayClassParametersObjectReference = LocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions. This
 // type should be used with the GatewayClassStatus.Conditions field.
