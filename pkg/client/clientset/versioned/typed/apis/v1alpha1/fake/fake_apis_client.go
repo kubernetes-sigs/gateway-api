@@ -43,6 +43,10 @@ func (c *FakeNetworkingV1alpha1) TCPRoutes(namespace string) v1alpha1.TCPRouteIn
 	return &FakeTCPRoutes{c, namespace}
 }
 
+func (c *FakeNetworkingV1alpha1) TLSRoutes(namespace string) v1alpha1.TLSRouteInterface {
+	return &FakeTLSRoutes{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) UDPRoutes(namespace string) v1alpha1.UDPRouteInterface {
 	return &FakeUDPRoutes{c, namespace}
 }
