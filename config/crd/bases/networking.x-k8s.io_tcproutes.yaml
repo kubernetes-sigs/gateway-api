@@ -44,7 +44,7 @@ spec:
                           description: "ExtensionRef is an optional, implementation-specific extension to the \"action\" behavior.  The resource may be \"configmaps\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myrouteactions\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the TCPRoute will be true. \n Support: custom"
                           properties:
                             group:
-                              description: "Group is the API group name of the referent. \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              description: Group is the API group name of the referent.
                               type: string
                             name:
                               description: Name is the name of the referent.
@@ -105,7 +105,7 @@ spec:
                             description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutematchers\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the TCPRoute will be true. \n Support: custom"
                             properties:
                               group:
-                                description: "Group is the API group name of the referent. \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                                description: Group is the API group name of the referent.
                                 type: string
                               name:
                                 description: Name is the name of the referent.

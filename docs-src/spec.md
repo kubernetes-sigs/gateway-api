@@ -2421,10 +2421,6 @@ string
 </td>
 <td>
 <p>Group is the API group name of the referent.</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
 </td>
 </tr>
 <tr>

@@ -65,18 +65,10 @@ type ServicesDefaultLocalObjectReference struct {
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
 	// Group is the API group name of the referent.
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
 	Group string `json:"group"`
 	// Resource is the API resource name of the referent.
 	Resource string `json:"resource"`
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 }
 
