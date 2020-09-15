@@ -25,4 +25,6 @@ type HTTPRouteExpansion interface{}
 
 type TCPRouteExpansion interface{}
 
+type TLSRouteExpansion interface{}
+
 type UDPRouteExpansion interface{}

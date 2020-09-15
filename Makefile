@@ -34,6 +34,7 @@ generate:
 		output:crd:artifacts:config=config/crd/bases \
 		paths=./...
 	$(MAKE) docs
+	hack/update-codegen.sh
 
 # Run go fmt against code
 fmt:

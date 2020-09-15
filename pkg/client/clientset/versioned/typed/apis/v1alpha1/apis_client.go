@@ -29,6 +29,7 @@ type NetworkingV1alpha1Interface interface {
 	GatewayClassesGetter
 	HTTPRoutesGetter
 	TCPRoutesGetter
+	TLSRoutesGetter
 	UDPRoutesGetter
 }
 
@@ -51,6 +52,10 @@ func (c *NetworkingV1alpha1Client) HTTPRoutes(namespace string) HTTPRouteInterfa
 
 func (c *NetworkingV1alpha1Client) TCPRoutes(namespace string) TCPRouteInterface {
 	return newTCPRoutes(c, namespace)
+}
+
+func (c *NetworkingV1alpha1Client) TLSRoutes(namespace string) TLSRouteInterface {
+	return newTLSRoutes(c, namespace)
 }
 
 func (c *NetworkingV1alpha1Client) UDPRoutes(namespace string) UDPRouteInterface {
