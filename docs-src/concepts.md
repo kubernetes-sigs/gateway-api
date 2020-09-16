@@ -343,6 +343,30 @@ status:
     Message: "foobar" is an FooBar.
 ```
 
+### GatewayClass controller selection
+
+The `GatewayClass.spec.controller` field is used to determine whether
+or not a given `GatewayClass` is managed by the controller.
+This format of this field is opaque and specific to a particular controller.
+Which GatewayClass is selected by a given controller field depends on how
+various controller(s) in the cluster interpret this field.
+
+It is RECOMMENDED that controller authors/deployments make their
+selection unique by using a domain / path combination under their
+administrative control (e.g. controller managing of all `controller`s
+starting with `acme.io` is the owner of the `acme.io` domain) to avoid
+conflicts.
+
+Controller versioning can be done by encoding the version of a
+controller into the path portion. An example scheme could be (similar
+to container URIs):
+
+```text
+acme.io/gateway/v1   // Use version 1
+acme.io/gateway/v2   // Use version 2
+acme.io/gateway      // Use the default version
+```
+
 ## Gateway
 
 A `Gateway` is 1:1 with the life cycle of the configuration of
