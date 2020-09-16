@@ -5,9 +5,9 @@ metadata:
 spec:
   controller: acme.io/gateway-controller
   parametersRef:
-    name: acme-lb-configmap
-    group: core
-    resource: configmaps
+    name: acme-lb
+    group: acme.io
+    resource: parameters
 ---
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1

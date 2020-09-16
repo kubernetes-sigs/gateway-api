@@ -309,9 +309,11 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the configuration
-parameters corresponding to this class. This is optional if the controller
-does not require any additional configuration.</p>
+<p>ParametersRef is a controller-specific resource containing the
+configuration parameters corresponding to this class. This is optional if
+the controller does not require any additional configuration.</p>
+<p>Parameters resources are implementation specific custom resources. These
+resources must be cluster-scoped.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>
@@ -848,9 +850,11 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the configuration
-parameters corresponding to this class. This is optional if the controller
-does not require any additional configuration.</p>
+<p>ParametersRef is a controller-specific resource containing the
+configuration parameters corresponding to this class. This is optional if
+the controller does not require any additional configuration.</p>
+<p>Parameters resources are implementation specific custom resources. These
+resources must be cluster-scoped.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>

@@ -97,9 +97,12 @@ type GatewayClassSpec struct {
 	// +kubebuilder:default={onlySameNamespace:true}
 	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty"`
 
-	// ParametersRef is a controller-specific resource containing the configuration
-	// parameters corresponding to this class. This is optional if the controller
-	// does not require any additional configuration.
+	// ParametersRef is a controller-specific resource containing the
+	// configuration parameters corresponding to this class. This is optional if
+	// the controller does not require any additional configuration.
+	//
+	// Parameters resources are implementation specific custom resources. These
+	// resources must be cluster-scoped.
 	//
 	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
 	// status condition will be true.
@@ -144,8 +147,8 @@ type RouteNamespaces struct {
 	OnlySameNamespace bool `json:"onlySameNamespace"`
 }
 
-// GatewayClassParametersObjectReference identifies a parameters object for a
-// gateway class within a known namespace.
+// GatewayClassParametersObjectReference identifies a cluster-scoped parameters
+// resource for a GatewayClass.
 //
 // +k8s:deepcopy-gen=false
 type GatewayClassParametersObjectReference = LocalObjectReference
