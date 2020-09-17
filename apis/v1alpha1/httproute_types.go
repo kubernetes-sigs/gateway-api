@@ -335,9 +335,11 @@ type HTTPRouteFilter struct {
 
 	// Filter-specific configuration definitions for core and extended filters
 
-	RequestHeader *HTTPRequestHeaderFilter `json:"requestHeader"`
+	// +optional
+	RequestHeader *HTTPRequestHeaderFilter `json:"requestHeader,omitempty"`
 
-	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror"`
+	// +optional
+	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 }
 
 // HTTPRequestHeaderFilter defines configuration for the

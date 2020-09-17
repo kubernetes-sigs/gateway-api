@@ -134,8 +134,6 @@ spec:
                                   description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
                                   type: string
                               required:
-                              - requestHeader
-                              - requestMirror
                               - type
                               type: object
                             type: array
@@ -234,8 +232,6 @@ spec:
                                             description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
                                             type: string
                                         required:
-                                        - requestHeader
-                                        - requestMirror
                                         - type
                                         type: object
                                       type: array
