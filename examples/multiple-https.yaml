@@ -15,8 +15,8 @@ spec:
     protocol: HTTPS
     tls:
       options: {}
-      certificateRefs:
-      - resource: secrets
+      certificateRef:
+        resource: secrets
         group: core
         name: httpbin
     routes:
@@ -33,8 +33,8 @@ spec:
     protocol: HTTPS
     tls:
       options: {}
-      certificateRefs:
-      - resource: secrets
+      certificateRef:
+        resource: secrets
         group: core
         name: conformance
     routes:

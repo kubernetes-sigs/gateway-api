@@ -53,6 +53,8 @@ type GatewayList struct {
 type GatewaySpec struct {
 	// GatewayClassName used for this Gateway. This is the name of a
 	// GatewayClass resource.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	GatewayClassName string `json:"gatewayClassName"`
 
 	// Listeners associated with this Gateway. Listeners define
@@ -87,8 +89,8 @@ type GatewaySpec struct {
 	//
 	// Support: Core
 	//
-	// +required
 	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=64
 	Listeners []Listener `json:"listeners"`
 
 	// Addresses requested for this gateway. This is optional and
@@ -107,7 +109,8 @@ type GatewaySpec struct {
 	// Support: Core
 	//
 	// +optional
-	Addresses []GatewayAddress `json:"addresses"`
+	// +kubebuilder:validation:MaxItems=16
+	Addresses []GatewayAddress `json:"addresses,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway can
@@ -127,7 +130,6 @@ type Listener struct {
 	//
 	// Support: Core
 	//
-	// +optional
 	// +kubebuilder:default={match: "Any"}
 	Hostname HostnameMatch `json:"hostname,omitempty"`
 
@@ -136,12 +138,9 @@ type Listener struct {
 	//
 	// Support: Core
 	//
-	// +required
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=65536
-	// +kubebuilder:validation:ExclusiveMinimum=true
-	// +kubebuilder:validation:ExclusiveMaximum=true
-	Port int32 `json:"port,omitempty"`
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	Port int32 `json:"port"`
 
 	// Protocol specifies the network protocol this listener
 	// expects to receive. The GatewayClass MUST validate that
@@ -159,9 +158,7 @@ type Listener struct {
 	//   applied at both the TLS and HTTP protocol layers.
 	//
 	// Support: Core
-	//
-	// +required
-	Protocol ProtocolType `json:"protocol,omitempty"`
+	Protocol ProtocolType `json:"protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field
 	// is required if the Protocol field is "HTTPS" or "TLS" and
@@ -216,8 +213,6 @@ type Listener struct {
 	// invalid, the rest of the Route should still be supported.
 	//
 	// Support: Core
-	//
-	// +required
 	Routes RouteBindingSelector `json:"routes"`
 }
 
@@ -229,9 +224,8 @@ type HostnameMatch struct {
 	// Match specifies how the hostname provided by the client should be
 	// matched against the given value.
 	//
-	// +optional
 	// +kubebuilder:default=Exact
-	Match HostnameMatchType `json:"match"`
+	Match HostnameMatchType `json:"match,omitempty"`
 
 	// Name contains the name to match against. This value must
 	// be a fully qualified host or domain name conforming to the
@@ -247,7 +241,8 @@ type HostnameMatch struct {
 	// This field is required for the "Domain" and "Exact" match types.
 	//
 	// +optional
-	Name string `json:"name"`
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name,omitempty"`
 }
 
 // HostnameMatchType specifies the types of matches that are valid
@@ -440,7 +435,6 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
-	// +optional
 	// +kubebuilder:default={onlySameNamespace:true}
 	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty"`
 	// RouteSelector specifies a set of route labels used for selecting
@@ -468,9 +462,10 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
-	// +optional
 	// +kubebuilder:default=networking.x-k8s.io
-	Group string `json:"group"`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Group string `json:"group,omitempty"`
 	// Resource is the API resource name of the route resource to select.
 	//
 	// Resource MUST correspond to route resources that are compatible with the
@@ -482,7 +477,7 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
-	// +required
+	// +kubebuilder:validation:MaxLength=253
 	Resource string `json:"resource"`
 }
 
@@ -524,14 +519,14 @@ type GatewayAddress struct {
 	//
 	// Support: Extended
 	//
-	// +optional
 	// +kubebuilder:default=IPAddress
-	Type AddressType `json:"type"`
+	Type AddressType `json:"type,omitempty"`
 
 	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
 	// values will depend on `Type` and support by the controller.
 	//
-	// +required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value"`
 }
 
@@ -579,6 +574,7 @@ type GatewayStatus struct {
 	// These addresses should all be of type "IPAddress".
 	//
 	// +optional
+	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayAddress `json:"addresses"`
 
 	// Conditions describe the current conditions of the Gateway.
@@ -598,11 +594,13 @@ type GatewayStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
+	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
 
@@ -702,12 +700,13 @@ type ListenerStatus struct {
 	// shares the same port value, this message reports the combined
 	// status of all such Listeners.
 	//
-	// +required
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
 	Port int32 `json:"port"`
 
 	// Conditions describe the current condition of this listener.
 	//
-	// +required
+	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions"`
 }
 

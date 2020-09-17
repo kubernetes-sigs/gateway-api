@@ -35,9 +35,9 @@ type ServicesDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
-	// +optional
+	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=core
-	Group string `json:"group"`
+	Group string `json:"group,omitempty"`
 	// Resource is the API resource name of the referent. Omitting the value
 	// or specifying the empty string indicates the services resource. For example,
 	// use the following to specify a services resource:
@@ -53,22 +53,29 @@ type ServicesDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
-	// +optional
+	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=services
-	Resource string `json:"resource"`
+	Resource string `json:"resource,omitempty"`
 	// Name is the name of the referent.
 	//
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 }
 
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
-	// Group is the API group name of the referent.
+	// Group is the API group name of the referent
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
 	// Resource is the API resource name of the referent.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Resource string `json:"resource"`
 	// Name is the name of the referent.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 }
 
@@ -92,9 +99,9 @@ type SecretsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
-	// +optional
+	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=core
-	Group string `json:"group"`
+	Group string `json:"group,omitempty"`
 	// Resource is the API resource name of the referent. Omitting the value
 	// or specifying the empty string indicates the secrets resource. For
 	// example, use the following to specify a secrets resource:
@@ -110,11 +117,11 @@ type SecretsDefaultLocalObjectReference struct {
 	//   resource: foos
 	//   name: myfoo
 	//
-	// +optional
+	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=secrets
-	Resource string `json:"resource"`
+	Resource string `json:"resource,omitempty"`
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 }

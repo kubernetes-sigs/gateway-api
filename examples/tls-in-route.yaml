@@ -54,8 +54,8 @@ spec:
       group: core
       name: bar-example-com-cert
   rules:
-  - match:
-      path:
+  - matches:
+    - path:
         type: Prefix
         value: /
     forwardTo:
@@ -80,8 +80,8 @@ spec:
       group: core
       name: baz-example-com-cert
   rules:
-  - match:
-      path:
+  - matches:
+    - path:
         type: Prefix
         value: /
     forwardTo:

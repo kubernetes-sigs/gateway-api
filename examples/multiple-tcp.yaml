@@ -40,8 +40,8 @@ spec:
     protocol: TLS
     tls:
       options: {}
-      certificateRefs:
-      - name: ssh-server
+      certificateRef:
+        name: ssh-server
         resource: secrets
         group: core
     routes:

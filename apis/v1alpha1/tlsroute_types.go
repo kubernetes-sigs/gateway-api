@@ -19,23 +19,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// TLSRouteSpec defines the desired state of TLSRoute
-type TLSRouteSpec struct {
-	// Rules are a list of TLS matchers and actions.
-	// +required
-	// +kubebuilder:validation:MinItems=1
-	Rules []TLSRouteRule `json:"rules"`
-
-	// Gateways defines which Gateways can use this Route.
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
-}
-
-// TLSRouteStatus defines the observed state of TLSRoute
-type TLSRouteStatus struct {
-	RouteStatus `json:",inline"`
-}
-
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
@@ -55,6 +38,23 @@ type TLSRoute struct {
 	Status TLSRouteStatus `json:"status,omitempty"`
 }
 
+// TLSRouteSpec defines the desired state of TLSRoute
+type TLSRouteSpec struct {
+	// Rules are a list of TLS matchers and actions.
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	Rules []TLSRouteRule `json:"rules"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
+}
+
+// TLSRouteStatus defines the observed state of TLSRoute
+type TLSRouteStatus struct {
+	RouteStatus `json:",inline"`
+}
+
 // TLSRouteRule is the configuration for a given rule.
 type TLSRouteRule struct {
 	// Matches define conditions used for matching the rule against
@@ -62,11 +62,12 @@ type TLSRouteRule struct {
 	// Each match is independent, i.e. this rule will be matched
 	// if **any** one of the matches is satisfied.
 	// +optional
-	Matches []TLSRouteMatch `json:"matches"`
+	// +kubebuilder:validation:MaxItems=8
+	Matches []TLSRouteMatch `json:"matches,omitempty"`
 
 	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=4
 	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
 }
 
@@ -94,7 +95,6 @@ type TLSRouteMatch struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=10
-	// +required
 	SNIs []string `json:"snis,omitempty"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
@@ -108,7 +108,7 @@ type TLSRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true

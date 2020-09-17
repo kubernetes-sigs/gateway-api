@@ -46,13 +46,18 @@ spec:
                       type: string
                     value:
                       description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      maxLength: 253
+                      minLength: 1
                       type: string
                   required:
                   - value
                   type: object
+                maxItems: 16
                 type: array
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name of a GatewayClass resource.
+                maxLength: 253
+                minLength: 1
                 type: string
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define logical endpoints that are bound on this Gateway's addresses. At least one Listener MUST be specified. \n Each Listener in this array must have a unique Port field, however a GatewayClass may collapse compatible Listener definitions into a single implementation-defined acceptor configuration even if their Port fields would otherwise conflict. \n Listeners are compatible if all of the following conditions are true: \n 1. all their Protocol fields are \"HTTP\", or all their Protocol fields are \"HTTPS\" or TLS\" 2. their Hostname fields are specified with a match type other than \"Any\" 3. their Hostname fields are not an exact match for any other Listener \n As a special case, each group of compatible listeners may contain exactly one Listener with a match type of \"Any\". \n If the GatewayClass collapses compatible Listeners, the hostname provided in the incoming client request MUST be matched to a Listener to find the correct set of Routes. The incoming hostname MUST be matched using the Hostname field for each Listener in order of most to least specific. That is, \"Exact\" matches must be processed before \"Domain\" matches, which must be processed before \"Any\" matches. \n If this field specifies multiple Listeners that have the same Port value but are not compatible, the GatewayClass must raise a \"PortConflict\" condition on the Gateway. \n Support: Core"
@@ -74,15 +79,14 @@ spec:
                           type: string
                         name:
                           description: "Name contains the name to match against. This value must be a fully qualified host or domain name conforming to the preferred name syntax defined in [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5) \n In addition to any RFC rules, this field MUST NOT contain \n 1. IP address literals 2. Colon-delimited port numbers 3. Percent-encoded octets \n This field is required for the \"Domain\" and \"Exact\" match types."
+                          maxLength: 253
                           type: string
                       type: object
                     port:
                       description: "Port is the network port. Multiple listeners may use the same port, subject to the Listener compatibility rules. \n Support: Core"
-                      exclusiveMaximum: true
-                      exclusiveMinimum: true
                       format: int32
-                      maximum: 65536
-                      minimum: 0
+                      maximum: 65535
+                      minimum: 1
                       type: integer
                     protocol:
                       description: "Protocol specifies the network protocol this listener expects to receive. The GatewayClass MUST validate that match type specified in the Hostname field is appropriate for the protocol. \n * For the \"TLS\" protocol, the Hostname match MUST be   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)   server name offered by the client. * For the \"HTTP\" protocol, the Hostname match MUST be   applied to the host portion of the   [effective request URI](https://tools.ietf.org/html/rfc7230#section-5.5)   or the [:authority pseudo-header](https://tools.ietf.org/html/rfc7540#section-8.1.2.3) * For the \"HTTPS\" protocol, the Hostname match MUST be   applied at both the TLS and HTTP protocol layers. \n Support: Core"
@@ -99,9 +103,12 @@ spec:
                         group:
                           default: networking.x-k8s.io
                           description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   resource: httproutes \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
+                          maxLength: 253
+                          minLength: 1
                           type: string
                         resource:
                           description: "Resource is the API resource name of the route resource to select. \n Resource MUST correspond to route resources that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
+                          maxLength: 253
                           type: string
                         routeNamespaces:
                           default:
@@ -185,13 +192,17 @@ spec:
                             group:
                               default: core
                               description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a secrets resource: \n fooRef:   resource: secrets   name: mysecret \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              maxLength: 253
                               type: string
                             name:
                               description: Name is the name of the referent.
+                              maxLength: 253
+                              minLength: 1
                               type: string
                             resource:
                               default: secrets
                               description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the secrets resource. For example, use the following to specify a secrets resource: \n fooRef:   name: mysecret \n Otherwise, if the secrets resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              maxLength: 253
                               type: string
                           required:
                           - name
@@ -224,8 +235,11 @@ spec:
                           type: object
                       type: object
                   required:
+                  - port
+                  - protocol
                   - routes
                   type: object
+                maxItems: 64
                 minItems: 1
                 type: array
             required:
@@ -256,10 +270,13 @@ spec:
                       type: string
                     value:
                       description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      maxLength: 253
+                      minLength: 1
                       type: string
                   required:
                   - value
                   type: object
+                maxItems: 16
                 type: array
               conditions:
                 default:
@@ -310,6 +327,7 @@ spec:
                   - status
                   - type
                   type: object
+                maxItems: 8
                 type: array
                 x-kubernetes-list-map-keys:
                 - type
@@ -362,15 +380,19 @@ spec:
                         - status
                         - type
                         type: object
+                      maxItems: 8
                       type: array
                     port:
                       description: Port is the unique Listener port value for which this message is reporting the status. If more than one Gateway Listener shares the same port value, this message reports the combined status of all such Listeners.
                       format: int32
+                      maximum: 65535
+                      minimum: 1
                       type: integer
                   required:
                   - conditions
                   - port
                   type: object
+                maxItems: 64
                 type: array
             type: object
         type: object

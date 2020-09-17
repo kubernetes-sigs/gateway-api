@@ -501,7 +501,9 @@ RouteGateways
 <td>
 <code>hostnames</code></br>
 <em>
-[]string
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHostname">
+[]HTTPRouteHostname
+</a>
 </em>
 </td>
 <td>
@@ -1215,7 +1217,6 @@ AddressType
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Type of the Address. This is either &ldquo;IPAddress&rdquo; or &ldquo;NamedAddress&rdquo;.</p>
 <p>Support: Extended</p>
 </td>
@@ -1359,7 +1360,6 @@ status condition will be true.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Conditions is the current status from the controller for
 this GatewayClass.</p>
 </td>
@@ -1712,195 +1712,6 @@ construct.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget
-</h3>
-<p>
-<p>GenericForwardToTarget identifies a target object within a known namespace.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>targetRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">
-ServicesDefaultLocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>TargetRef is an object reference to forward matched requests to.
-The resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: Core (Kubernetes Services)
-Support: Implementation-specific (Other resource types)</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>targetPort</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TargetPort">
-TargetPort
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>TargetPort specifies the destination port number to use for the TargetRef.
-If unspecified and TargetRef is a Service object consisting of a single
-port definition, that port will be used. If unspecified and TargetRef is
-a Service object consisting of multiple port definitions, an error is
-surfaced in status.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>weight</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TargetWeight">
-TargetWeight
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Weight specifies the proportion of traffic forwarded to a targetRef, computed
-as weight/(sum of all weights in targetRefs). Weight is not a percentage and
-the sum of weights does not need to equal 100. The following example (in yaml)
-sends 70% of traffic to service &ldquo;my-trafficsplit-sv1&rdquo; and 30% of the traffic
-to service &ldquo;my-trafficsplit-sv2&rdquo;:</p>
-<p>forwardTo:
-- targetRef:
-name: my-trafficsplit-sv1
-weight: 70
-- targetRef:
-name: my-trafficsplit-sv2
-weight: 30</p>
-<p>If only one targetRef is specified, 100% of the traffic is forwarded to the
-targetRef. If unspecified, weight defaults to 1.</p>
-<p>Support: Core (HTTPRoute)
-Support: Extended (TCPRoute)</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget
-</h3>
-<p>
-<p>HTTPForwardToTarget identifies a target object within a known namespace.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>targetRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">
-ServicesDefaultLocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<p>TargetRef is an object reference to forward matched requests to.
-The resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: Core (Kubernetes Services)
-Support: Implementation-specific (Other resource types)</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>targetPort</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TargetPort">
-TargetPort
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>TargetPort specifies the destination port number to use for the TargetRef.
-If unspecified and TargetRef is a Service object consisting of a single
-port definition, that port will be used. If unspecified and TargetRef is
-a Service object consisting of multiple port definitions, an error is
-surfaced in status.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>weight</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.TargetWeight">
-TargetWeight
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Weight specifies the proportion of traffic forwarded to a targetRef, computed
-as weight/(sum of all weights in targetRefs). Weight is not a percentage and
-the sum of weights does not need to equal 100. The following example (in yaml)
-sends 70% of traffic to service &ldquo;my-trafficsplit-sv1&rdquo; and 30% of the traffic
-to service &ldquo;my-trafficsplit-sv2&rdquo;:</p>
-<p>forwardTo:
-- targetRef:
-name: my-trafficsplit-sv1
-weight: 70
-- targetRef:
-name: my-trafficsplit-sv2
-weight: 30</p>
-<p>If only one targetRef is specified, 100% of the traffic is forwarded to the
-targetRef. If unspecified, weight defaults to 1.</p>
-<p>Support: Core (HTTPRoute)
-Support: Extended (TCPRoute)</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>filters</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
-[]HTTPRouteFilter
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Filters defined at this-level should be executed if and only if
-the request is being forwarded to the target defined here.</p>
-<p>Conformance: For any implementation, filtering support, including core
-filters, is NOT guaranteed at this-level.
-Use Filters in HTTPRouteRule for portable filters across implementations.</p>
-<p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch
 </h3>
 <p>
@@ -1928,7 +1739,6 @@ HeaderMatchType
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>HeaderMatchType specifies how to match a HTTP request
 header against the Values map.</p>
 <p>Support: core (Exact)
@@ -1982,7 +1792,6 @@ PathMatchType
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Type specifies how to match against the path Value.</p>
 <p>Support: core (Exact, Prefix)
 Support: custom (RegularExpression, ImplementationSpecific)</p>
@@ -2041,7 +1850,7 @@ add: {&ldquo;my-header&rdquo;: &ldquo;foo&rdquo;}</p>
 <p>Output:
 GET /foo HTTP/1.1
 my-header: foo</p>
-<p>Support: extended?</p>
+<p>Support: Extended</p>
 </td>
 </tr>
 <tr>
@@ -2066,7 +1875,7 @@ remove: [&ldquo;my-header1&rdquo;, &ldquo;my-header3&rdquo;]</p>
 <p>Output:
 GET /foo HTTP/1.1
 My-Header2: DEF</p>
-<p>Support: extended?</p>
+<p>Support: Extended</p>
 </td>
 </tr>
 </tbody>
@@ -2150,7 +1959,6 @@ to true.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
 </p>
@@ -2359,6 +2167,16 @@ implementations.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteHostname">HTTPRouteHostname
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
+</p>
+<p>
+<p>HTTPRouteHostname is used to specify a hostname that should be matched by
+HTTPRoute.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch
 </h3>
 <p>
@@ -2397,7 +2215,6 @@ HTTPPathMatch
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Path specifies a HTTP request path matcher. If this field is not
 specified, a default prefix match on the &ldquo;/&rdquo; path is provided.</p>
 </td>
@@ -2469,7 +2286,6 @@ the request.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Matches define conditions used for matching the rule against
 incoming HTTP requests.
 Each match is independent, i.e. this rule will be matched
@@ -2570,7 +2386,9 @@ RouteGateways
 <td>
 <code>hostnames</code></br>
 <em>
-[]string
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHostname">
+[]HTTPRouteHostname
+</a>
 </em>
 </td>
 <td>
@@ -2742,7 +2560,6 @@ HostnameMatchType
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Match specifies how the hostname provided by the client should be
 matched against the given value.</p>
 </td>
@@ -2817,7 +2634,6 @@ HostnameMatch
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Hostname specifies to match the virtual hostname for
 protocol types that define this concept.</p>
 <p>Incoming requests that include a hostname are matched
@@ -3008,7 +2824,7 @@ status of all such Listeners.</p>
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
 <p>
-<p>RouteMatchExtensionObjectReference identifies a route-match extension object
+<p>RouteHostExtensionObjectReference identifies a route-host extension object
 within a known namespace.</p>
 </p>
 <table>
@@ -3027,7 +2843,7 @@ string
 </em>
 </td>
 <td>
-<p>Group is the API group name of the referent.</p>
+<p>Group is the API group name of the referent</p>
 </td>
 </tr>
 <tr>
@@ -3120,7 +2936,6 @@ RouteNamespaces
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>RouteNamespaces indicates in which namespaces Routes should be selected
 for this Gateway. This is restricted to the namespace of this Gateway by
 default.</p>
@@ -3153,7 +2968,6 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Group is the group of the route resource to select. Omitting the value or specifying
 the empty string indicates the networking.x-k8s.io API group.
 For example, use the following to select an HTTPRoute:</p>
@@ -3563,7 +3377,6 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Group is the group of the referent.  Omitting the value or specifying
 the empty string indicates the core API group.  For example, use the
 following to specify a secrets resource:</p>
@@ -3586,7 +3399,6 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Resource is the API resource name of the referent. Omitting the value
 or specifying the empty string indicates the secrets resource. For
 example, use the following to specify a secrets resource:</p>
@@ -3616,11 +3428,6 @@ string
 <h3 id="networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">ServicesDefaultLocalObjectReference
 </h3>
 <p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>)
-</p>
-<p>
 <p>ServicesDefaultLocalObjectReference identifies an API object within a
 known namespace that defaults group to core and resource to services
 if unspecified.</p>
@@ -3641,7 +3448,6 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Group is the group of the referent.  Omitting the value or specifying
 the empty string indicates the core API group.  For example, use the
 following to specify a service:</p>
@@ -3664,7 +3470,6 @@ string
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Resource is the API resource name of the referent. Omitting the value
 or specifying the empty string indicates the services resource. For example,
 use the following to specify a services resource:</p>
@@ -4116,27 +3921,6 @@ RouteStatus
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.TargetPort">TargetPort
-(<code>int32</code> alias)</p></h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>)
-</p>
-<p>
-<p>TargetPort specifies the destination port number to use for a TargetRef.</p>
-</p>
-<h3 id="networking.x-k8s.io/v1alpha1.TargetWeight">TargetWeight
-(<code>int32</code> alias)</p></h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>)
-</p>
-<p>
-<p>TargetWeight specifies weight used for making a forwarding decision
-to a TargetRef.</p>
-</p>
 <h3 id="networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch
 </h3>
 <p>

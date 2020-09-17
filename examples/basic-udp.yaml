@@ -15,7 +15,7 @@ metadata:
   name: my-gateway
   namespace: default
 spec:
-  class: acme-lb
+  gatewayClassName: acme-lb
   listeners:  # Use GatewayClass defaults for listener definition.
   - protocol: UDP
     port: 8080

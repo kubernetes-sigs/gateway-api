@@ -19,21 +19,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// UDPRouteSpec defines the desired state of UDPRoute.
-type UDPRouteSpec struct {
-	// Rules are a list of UDP matchers and actions.
-	Rules []UDPRouteRule `json:"rules"`
-
-	// Gateways defines which Gateways can use this Route.
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
-}
-
-// UDPRouteStatus defines the observed state of UDPRoute.
-type UDPRouteStatus struct {
-	RouteStatus `json:",inline"`
-}
-
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
@@ -52,12 +37,28 @@ type UDPRouteRule struct {
 	// Matches defines which packets match this rule.
 	//
 	// +optional
-	Matches []UDPRouteMatch `json:"matches"`
+	// +kubebuilder:validation:MaxItems=8
+	Matches []UDPRouteMatch `json:"matches,omitempty"`
 
 	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=4
 	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
+}
+
+// UDPRouteSpec defines the desired state of UDPRoute.
+type UDPRouteSpec struct {
+	// Rules are a list of UDP matchers and actions.
+	Rules []UDPRouteRule `json:"rules"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
+}
+
+// UDPRouteStatus defines the observed state of UDPRoute.
+type UDPRouteStatus struct {
+	RouteStatus `json:",inline"`
 }
 
 // UDPRouteMatch defines the predicate used to match packets to a
@@ -75,7 +76,7 @@ type UDPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true

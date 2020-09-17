@@ -57,9 +57,11 @@ type RouteGateways struct {
 // GatewayReference identifies a Gateway in a specified namespace.
 type GatewayReference struct {
 	// Name is the name of the referent.
+	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 	// Namespace is the namespace of the referent.
+	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Namespace string `json:"namespace"`
 }
@@ -140,6 +142,7 @@ type RouteGatewayStatus struct {
 	// route has been admitted or rejected by the Gateway, and why.  Note
 	// that the route's availability is also subject to the Gateway's own
 	// status conditions and listener status.
+	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
