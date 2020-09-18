@@ -64,6 +64,62 @@ type GatewayReference struct {
 	Namespace string `json:"namespace"`
 }
 
+// RouteForwardTo defines how a Route should forward a request.
+type RouteForwardTo struct {
+	// ServiceName refers to the name of the Service to forward matched requests
+	// to. When specified, this takes the place of BackendRef. If both
+	// BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this
+	// Route to true.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	ServiceName *string `json:"serviceName,omitempty"`
+
+	// BackendRef is a reference to a backend to forward matched requests to. If
+	// both BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
+	//
+	// Support: Custom
+	//
+	// +optional
+	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
+
+	// Port specifies the destination port number to use for the backend
+	// referenced by the ServiceName or BackendRef field. If unspecified and a
+	// Service object consisting of a single port definition is the backend,
+	// that port will be used. If unspecified and the backend is a Service
+	// object consisting of multiple port definitions, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	Port *int32 `json:"port,omitempty"`
+
+	// Weight specifies the proportion of traffic forwarded to the backend
+	// referenced by the ServiceName or BackendRef field. computed as
+	// weight/(sum of all weights in this ForwardTo list). Weight is not a
+	// percentage and the sum of weights does not need to equal 100. If only one
+	// backend is specified, 100% of the traffic is forwarded to that backend.
+	// If unspecified, weight defaults to 1.
+	//
+	// Support: Extended
+	//
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=10000
+	Weight int32 `json:"weight,omitempty"`
+}
+
 // RouteConditionType is a type of condition for a route.
 type RouteConditionType string
 

@@ -39,35 +39,22 @@ metadata:
   labels:
     app: default-match
 spec:
-  hosts:
-  - hostnames:
+  hostnames:
     - default-match.com
-    rules:
-    - matches:
-      - headers:
-          type: Exact
-          values:
-            magic: default-match
-      action:
-        forwardTo:
-          - targetRef:
-              name: my-service
-              group: core
-              resource: services
-    - matches:
-      - path:
-          type: Exact
-          value: /example/exact
-      action:
-        forwardTo:
-          - targetRef:
-              name: my-service
-              group: core
-              resource: services
-    - action:
-        forwardTo:
-          - targetRef:
-              name: my-service
-              group: core
-              resource: services
-
+  rules:
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          magic: default-match
+    forwardTo:
+    - backendRef:
+        name: my-custom-resource
+        group: acme.io
+        resource: custombackend
+  - matches:
+    - path:
+        type: Exact
+        value: /example/exact
+    forwardTo:
+    - serviceName: my-service-2

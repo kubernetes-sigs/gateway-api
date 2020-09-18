@@ -35,32 +35,23 @@ metadata:
   labels:
     app: foo
 spec:
-  hosts:
-  - hostnames:
-    - "foo.com"
-    rules:
-    - match:
-        path:
-          type: Prefix
-          value: /bar
-      action:
-        forwardTo:
-          - targetRef:
-              name: my-service
-              group: core
-              resource: services
-    - match:
-        headers:
-          type: Exact
-          values:
-            x-forwarded-proto: https
-            magic: foo
-        path:
-          type: Prefix
-          value: /some/thing
-      action:
-        forwardTo:
-          - targetRef:
-              name: my-service
-              group: core
-              resource: services
+  hostnames:
+  - "foo.com"
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /bar
+    forwardTo:
+    - serviceName: my-service1
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          x-forwarded-proto: https
+          magic: foo
+      path:
+        type: Prefix
+        value: /some/thing
+    forwardTo:
+    - serviceName: my-service2

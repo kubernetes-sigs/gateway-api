@@ -53,37 +53,11 @@ type UDPRouteRule struct {
 	//
 	// +optional
 	Matches []UDPRouteMatch `json:"matches"`
-	// Action defines what happens to the packet.
-	//
-	// +optional
-	Action *UDPRouteAction `json:"action"`
-}
 
-// UDPRouteAction is the action for a given rule.
-type UDPRouteAction struct {
-	// ForwardTo sends requests to the referenced object.  The
-	// resource may be "services" (omit or use the empty string for the
-	// group), or an implementation may support other resources (for
-	// example, resource "myroutetargets" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "services".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the UDPRoute will be true.
-	ForwardTo *GenericForwardToTarget `json:"forwardTo"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "action" behavior.  The resource may be "configmaps" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteactions" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the UDPRoute will be true.
-	//
-	// Support: custom
-	//
+	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef"`
+	// +kubebuilder:validation:MaxItems=8
+	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
 }
 
 // UDPRouteMatch defines the predicate used to match packets to a

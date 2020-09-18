@@ -19,18 +19,34 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+
+// HTTPRoute is the Schema for the HTTPRoute resource.
+type HTTPRoute struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
+	Status HTTPRouteStatus `json:"status,omitempty"`
+}
+
+// +kubebuilder:object:root=true
+
+// HTTPRouteList contains a list of HTTPRoute
+type HTTPRouteList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []HTTPRoute `json:"items"`
+}
+
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpec struct {
-	// Hosts is a list of Host definitions.
-	Hosts []HTTPRouteHost `json:"hosts,omitempty"`
-
 	// Gateways defines which Gateways can use this Route.
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
-}
 
-// HTTPRouteHost is the configuration for a given set of hosts.
-type HTTPRouteHost struct {
 	// Hostnames defines a set of hostname that should match against
 	// the HTTP Host header to select a HTTPRoute to process the request.
 	// Hostname is the fully qualified domain name of a network host,
@@ -99,7 +115,7 @@ type HTTPRouteHost struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef,omitempty"`
 }
 
 // RouteTLSConfig describes a TLS configuration defined at the Route level.
@@ -156,7 +172,8 @@ type HTTPRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
-	Matches []HTTPRouteMatch `json:"matches"`
+	// +kubebuilder:validation:MaxItems=8
+	Matches []HTTPRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
 	// this rule.
@@ -173,11 +190,13 @@ type HTTPRouteRule struct {
 	// Support: core
 	//
 	// +optional
-	Filters []HTTPRouteFilter `json:"filters"`
+	// +kubebuilder:validation:MaxItems=16
+	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
-	// Forward defines the upstream target(s) where the request should be sent.
+	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	Forward *HTTPForwardingTarget `json:"forward"`
+	// +kubebuilder:validation:MaxItems=8
+	ForwardTo []HTTPRouteForwardTo `json:"forwardTo,omitempty"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
@@ -427,64 +446,114 @@ type HTTPRequestHeaderFilter struct {
 	// TODO
 }
 
-// HTTPRequestMirrorFilter defines configuration for the
-// RequestMirror filter.
+// HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 type HTTPRequestMirrorFilter struct {
-	// TargetRef is an object reference to forward matched requests to.
-	// The resource may be "services" (omit or use the empty string for the
-	// group), or an implementation may support other resources (for
-	// example, resource "myroutetargets" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "services".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
-	//
-	// Support: Core (Kubernetes Services)
-	// Support: Implementation-specific (Other resource types)
-	//
-	TargetRef ForwardToTargetObjectReference `json:"targetRef"`
-
-	// TargetPort specifies the destination port number to use for the TargetRef.
-	// If unspecified and TargetRef is a Service object consisting of a single
-	// port definition, that port will be used. If unspecified and TargetRef is
-	// a Service object consisting of multiple port definitions, an error is
-	// surfaced in status.
+	// ServiceName refers to the name of the Service to mirror matched requests
+	// to. When specified, this takes the place of BackendRef. If both
+	// BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this
+	// Route to true.
 	//
 	// Support: Core
 	//
 	// +optional
-	TargetPort *TargetPort `json:"targetPort,omitempty"`
-}
+	// +kubebuilder:validation:MaxLength=253
+	ServiceName *string `json:"serviceName,omitempty"`
 
-// HTTPForwardingTarget is the target to send the request to for a given a match.
-type HTTPForwardingTarget struct {
-	// To references referenced object(s) where the request should be sent. The
-	// resource may be "services" (omit or use the empty string for the
-	// group), or an implementation may support other resources (for
-	// example, resource "myroutetargets" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "services".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
+	// BackendRef is a local object reference to mirror matched requests to. If
+	// both BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
 	//
-	// Support: core
-	//
-	// +kubebuilder:validation:MinItems=1
-	To []HTTPForwardToTarget `json:"to"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "action" behavior.  The resource may be "configmaps" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteactions" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
-	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef"`
+	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
+
+	// Port specifies the destination port number to use for the backend
+	// referenced by the ServiceName or BackendRef field. If unspecified and a
+	// Service object consisting of a single port definition is the backend,
+	// that port will be used. If unspecified and the backend is a Service
+	// object consisting of multiple port definitions, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	Port *int32 `json:"port,omitempty"`
+}
+
+// HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
+type HTTPRouteForwardTo struct {
+	// ServiceName refers to the name of the Service to forward matched requests
+	// to. When specified, this takes the place of BackendRef. If both
+	// BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this
+	// Route to true.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=253
+	ServiceName *string `json:"serviceName,omitempty"`
+
+	// BackendRef is a reference to a backend to forward matched requests to. If
+	// both BackendRef and ServiceName are specified, ServiceName will be given
+	// precedence. If the referent cannot be found, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
+	//
+	// Support: Custom
+	//
+	// +optional
+	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
+
+	// Port specifies the destination port number to use for the backend
+	// referenced by the ServiceName or BackendRef field. If unspecified and a
+	// Service object consisting of a single port definition is the backend,
+	// that port will be used. If unspecified and the backend is a Service
+	// object consisting of multiple port definitions, controllers must set the
+	// "InvalidRoutes" status condition on any Gateway that includes this Route
+	// to true.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=65535
+	Port *int32 `json:"port,omitempty"`
+
+	// Weight specifies the proportion of traffic forwarded to the backend
+	// referenced by the ServiceName or BackendRef field. computed as
+	// weight/(sum of all weights in this ForwardTo list). Weight is not a
+	// percentage and the sum of weights does not need to equal 100. If only one
+	// backend is specified, 100% of the traffic is forwarded to that backend.
+	// If unspecified, weight defaults to 1.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=1
+	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Maximum=10000
+	Weight int32 `json:"weight,omitempty"`
+
+	// Filters defined at this-level should be executed if and only if the
+	// request is being forwarded to the backend defined here.
+	//
+	// Conformance: Filtering support, including core filters, is NOT guaranteed
+	// at this-level. Use Filters in HTTPRouteRule for portable filters across
+	// implementations.
+	//
+	// Support: Custom
+	//
+	// +optional
+	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 }
 
 // RouteHostExtensionObjectReference identifies a route-host extension object
@@ -496,26 +565,4 @@ type RouteHostExtensionObjectReference = LocalObjectReference
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
 	RouteStatus `json:",inline"`
-}
-
-// +genclient
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-
-// HTTPRoute is the Schema for the HTTPRoute resource.
-type HTTPRoute struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
-	Status HTTPRouteStatus `json:"status,omitempty"`
-}
-
-// +kubebuilder:object:root=true
-
-// HTTPRouteList contains a list of HTTPRoute
-type HTTPRouteList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []HTTPRoute `json:"items"`
 }
