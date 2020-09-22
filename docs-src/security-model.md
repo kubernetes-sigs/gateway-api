@@ -72,14 +72,11 @@ readable by most roles, so instead we'll focus on write access for this model.
 The extra configuration options are not possible to control with RBAC. Instead,
 they will be controlled with configuration fields on GatewayClasses:
 
-* **allowedGatewayNamespaceSelector**: This field is a selector of namespaces
-  that Gateways can use this GatewayClass from. This is a standard Kubernetes
-  LabelSelector, a label query over a set of resources. The result of
-  matchLabels and matchExpressions are ANDed. Controllers must not support
-  Gateways in namespaces outside this selector. An empty selector (default)
-  indicates that Gateways can use this GatewayClass from any namespace. This
-  field is intentionally not a pointer because the nil behavior (no namespaces)
-  is undesirable here.
+* **gatewayNamespaceSelector**: This field is a selector of namespaces. Gateways
+that run in matched namespaces can use this GatewayClass. This is a standard
+Kubernetes LabelSelector. Controllers must not support Gateways in namespaces
+outside this selector. An empty selector (default) indicates that this GatewayClass
+is available to use by Gateways in any namespace.
 
 * **allowedRouteNamespaces**: AllowedRouteNamespaces indicates in which
   namespaces Routes can be selected for Gateways of this class. This is

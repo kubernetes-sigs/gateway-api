@@ -725,14 +725,11 @@ readable by most roles, so instead we'll focus on write access for this model.</
 they will be controlled with configuration fields on GatewayClasses:</p>
 <ul>
 <li>
-<p><strong>allowedGatewayNamespaceSelector</strong>: This field is a selector of namespaces
-  that Gateways can use this GatewayClass from. This is a standard Kubernetes
-  LabelSelector, a label query over a set of resources. The result of
-  matchLabels and matchExpressions are ANDed. Controllers must not support
-  Gateways in namespaces outside this selector. An empty selector (default)
-  indicates that Gateways can use this GatewayClass from any namespace. This
-  field is intentionally not a pointer because the nil behavior (no namespaces)
-  is undesirable here.</p>
+<p><strong>gatewayNamespaceSelector</strong>: This field is a selector of namespaces. Gateways
+that run in matched namespaces can use this GatewayClass. This is a standard
+Kubernetes LabelSelector. Controllers must not support Gateways in namespaces
+outside this selector. An empty selector (default) indicates that this GatewayClass
+is available to use by Gateways in any namespace.</p>
 </li>
 <li>
 <p><strong>allowedRouteNamespaces</strong>: AllowedRouteNamespaces indicates in which

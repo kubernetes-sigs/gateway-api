@@ -253,7 +253,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaceSelector</code></br>
+<code>gatewayNamespaceSelector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -262,12 +262,12 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector. Controllers must not support Gateways in namespaces
-outside this selector.</p>
-<p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace.</p>
+<p>GatewayNamespaceSelector is a selector of namespaces. Gateways that
+run in matched namespaces can use this GatewayClass. This is a standard
+Kubernetes LabelSelector. Controllers must not support Gateways in
+namespaces outside this selector.</p>
+<p>An empty selector (default) indicates that this GatewayClass is available
+to use by Gateways in any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
@@ -794,7 +794,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaceSelector</code></br>
+<code>gatewayNamespaceSelector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -803,12 +803,12 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector. Controllers must not support Gateways in namespaces
-outside this selector.</p>
-<p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace.</p>
+<p>GatewayNamespaceSelector is a selector of namespaces. Gateways that
+run in matched namespaces can use this GatewayClass. This is a standard
+Kubernetes LabelSelector. Controllers must not support Gateways in
+namespaces outside this selector.</p>
+<p>An empty selector (default) indicates that this GatewayClass is available
+to use by Gateways in any namespace.</p>
 <p>When a Gateway attempts to use this class from a namespace that is not
 allowed by this selector, the controller implementing the GatewayClass
 may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway

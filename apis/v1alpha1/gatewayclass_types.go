@@ -62,13 +62,13 @@ type GatewayClassSpec struct {
 	// +required
 	Controller string `json:"controller"`
 
-	// AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-	// can use this GatewayClass from. This is a standard Kubernetes
-	// LabelSelector. Controllers must not support Gateways in namespaces
-	// outside this selector.
+	// GatewayNamespaceSelector is a selector of namespaces. Gateways that
+	// run in matched namespaces can use this GatewayClass. This is a standard
+	// Kubernetes LabelSelector. Controllers must not support Gateways in
+	// namespaces outside this selector.
 	//
-	// An empty selector (default) indicates that Gateways can use this
-	// GatewayClass from any namespace.
+	// An empty selector (default) indicates that this GatewayClass is available
+	// to use by Gateways in any namespace.
 	//
 	// When a Gateway attempts to use this class from a namespace that is not
 	// allowed by this selector, the controller implementing the GatewayClass
@@ -79,7 +79,7 @@ type GatewayClassSpec struct {
 	// Support: Core
 	//
 	// +optional
-	AllowedGatewayNamespaceSelector metav1.LabelSelector `json:"allowedGatewayNamespaceSelector"`
+	GatewayNamespaceSelector metav1.LabelSelector `json:"gatewayNamespaceSelector,omitempty"`
 
 	// AllowedRouteNamespaces indicates in which namespaces Routes can be
 	// selected for Gateways of this class. This is restricted to the namespace
