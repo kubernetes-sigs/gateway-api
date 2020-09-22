@@ -1768,6 +1768,7 @@ HTTPRequestHeaderFilter
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 </td>
 </tr>
 <tr>
@@ -1780,6 +1781,7 @@ HTTPRequestMirrorFilter
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 </td>
 </tr>
 </tbody>
