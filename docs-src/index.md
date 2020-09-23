@@ -16,16 +16,13 @@ limitations under the License.
 
 # Introduction
 
-This is the documentation for the evolution of service-related APIs
-for Kubernetes. This project is part of the Kubernetes project working
-under [SIG-NETWORK][sig-network].
+Service APIs is the evolution of Kubernetes APIs that relate to `Services`, e.g. `Ingress`.
+The project is part of Kubernetes, working under [SIG-NETWORK][sig-network].
+Use the following resources to learn more about Service APIs.
 
 [sig-network]: https://groups.google.com/g/kubernetes-sig-network
 
-## Gateway API
-
-Gateway is an API for a common portable declarative description
-of load-balancing infrastructure for Kubernetes.
+## Resources
 
 If you are a user:
 
