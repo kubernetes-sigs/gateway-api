@@ -218,6 +218,13 @@ spec:
             - listeners
             type: object
           status:
+            default:
+              conditions:
+              - lastTransitionTime: "1970-01-01T00:00:00Z"
+                message: Waiting for controller
+                reason: NotReconciled
+                status: "False"
+                type: Scheduled
             description: GatewayStatus defines the observed state of Gateway.
             properties:
               addresses:
@@ -240,7 +247,13 @@ spec:
                   type: object
                 type: array
               conditions:
-                description: Conditions describe the current conditions of the Gateway.
+                default:
+                - lastTransitionTime: "1970-01-01T00:00:00Z"
+                  message: Waiting for controller
+                  reason: NotReconciled
+                  status: "False"
+                  type: Scheduled
+                description: "Conditions describe the current conditions of the Gateway. \n Implementations should prefer to express Gateway conditions using the `GatewayConditionType` and `GatewayConditionReason` constants so that operators and tools can converge on a common vocabulary to describe Gateway state. \n Known condition types are: \n * \"Scheduled\" * \"Ready\""
                 items:
                   description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, type FooStatus struct{     // Represents the observations of a foo's current state.     // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type     // +patchStrategy=merge     // +listType=map     // +listMapKey=type     Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n     // other fields }"
                   properties:
@@ -283,6 +296,9 @@ spec:
                   - type
                   type: object
                 type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
               listeners:
                 description: Listeners provide status for each unique listener port defined in the Spec.
                 items:
@@ -340,8 +356,6 @@ spec:
                   - port
                   type: object
                 type: array
-            required:
-            - addresses
             type: object
         type: object
     served: true
