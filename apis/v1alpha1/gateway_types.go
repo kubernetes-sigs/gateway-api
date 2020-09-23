@@ -108,8 +108,10 @@ type GatewaySpec struct {
 	Addresses []GatewayAddress `json:"addresses"`
 }
 
-// Listener embodies the concept of a logical endpoint where a
-// Gateway can accept network connections.
+// Listener embodies the concept of a logical endpoint where a Gateway can
+// accept network connections. Each listener in a Gateway must have a unique
+// combination of Hostname, Port, and Protocol. This will be enforced by a
+// validating webhook.
 type Listener struct {
 	// Hostname specifies to match the virtual hostname for
 	// protocol types that define this concept.
@@ -190,6 +192,26 @@ type Listener struct {
 	// The Routes selector MUST select a set of objects that
 	// are compatible with the application protocol specified in
 	// the Protocol field.
+	//
+	// Although a client request may technically match multiple route rules,
+	// only one rule may ultimately receive the request. Matching precedence
+	// MUST be determined in order of the following criteria:
+	//
+	// * The most specific match. For example, the most specific HTTPRoute match
+	//   is determined by the longest matching combination of hostname and path.
+	// * The oldest Route based on creation timestamp. For example, a Route with
+	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
+	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
+	// * If everything else is equivalent, the Route appearing first in
+	//   alphabetical order (namespace/name) should be given precedence. For
+	//   example, foo/bar is given precedence over foo/baz.
+	//
+	// All valid portions of a Route selected by this field should be supported.
+	// Invalid portions of a Route can be ignored (sometimes that will mean the
+	// full Route). If a portion of a Route transitions from valid to invalid,
+	// support for that portion of the Route should be dropped to ensure
+	// consistency. For example, even if a filter specified by a Route is
+	// invalid, the rest of the Route should still be supported.
 	//
 	// Support: Core
 	//
