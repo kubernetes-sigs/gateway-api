@@ -17,6 +17,8 @@ limitations under the License.
 
 package v1alpha1
 
+type BackendPolicyExpansion interface{}
+
 type GatewayExpansion interface{}
 
 type GatewayClassExpansion interface{}

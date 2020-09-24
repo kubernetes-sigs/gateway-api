@@ -274,6 +274,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#backendpolicy" class="md-nav__link">
+    BackendPolicy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#combined-types" class="md-nav__link">
     Combined types
   </a>
@@ -627,6 +634,13 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#backendpolicy" class="md-nav__link">
+    BackendPolicy
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#combined-types" class="md-nav__link">
     Combined types
   </a>
@@ -926,6 +940,17 @@ This behaviour will be made clear using the GatewayClass Status object.</p>
 <p>Route objects define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services.</p>
 <p><code>HTTPRoute</code> and <code>TCPRoute</code> are currently the only defined Route objects. Additional protocol-specific Route
 objects may be added in the future.</p>
+<h3 id="backendpolicy">BackendPolicy</h3>
+<p>BackendPolicy provides a way to configure connections between a Gateway and a
+backend. For the purpose of this API, a backend is any resource that a route can
+forward traffic to. A common example of a backend is a Service. Configuration at
+this level is currently limited to TLS, but will expand in the future to support
+more advanced policies such as health checking.</p>
+<p>Some backend configuration may vary depending on the Route that is targeting the
+backend. In those cases, configuration fields will be placed on Routes and not
+BackendPolicy. For more information on what may be configured with this resource
+in the future, refer to the related <a href="https://github.com/kubernetes-sigs/service-apis/issues/196">GitHub
+issue</a>.</p>
 <h3 id="combined-types">Combined types</h3>
 <p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xRoute</code> and <code>Service</code>(s) will
 define an implementable load-balancer. The diagram below illustrates the

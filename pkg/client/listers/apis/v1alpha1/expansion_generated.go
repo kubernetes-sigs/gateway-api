@@ -17,6 +17,14 @@ limitations under the License.
 
 package v1alpha1
 
+// BackendPolicyListerExpansion allows custom methods to be added to
+// BackendPolicyLister.
+type BackendPolicyListerExpansion interface{}
+
+// BackendPolicyNamespaceListerExpansion allows custom methods to be added to
+// BackendPolicyNamespaceLister.
+type BackendPolicyNamespaceListerExpansion interface{}
+
 // GatewayListerExpansion allows custom methods to be added to
 // GatewayLister.
 type GatewayListerExpansion interface{}

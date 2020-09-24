@@ -1,0 +1,19 @@
+kind: BackendPolicy
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-app
+spec:
+  backendRefs:
+    - name: my-service
+      group: core
+      resource: services
+  tls:
+    clientCertificateRef: 
+      name: my-app-cert
+      group: core
+      resource: secrets
+    certificateAuthorityRef: 
+      name: my-app-ca
+      group: core
+      resource: secrets  
+    options: {}

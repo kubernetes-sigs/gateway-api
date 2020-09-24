@@ -336,6 +336,8 @@ API group.</p>
 
 <p>Resource Types:
 <ul><li>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicy">BackendPolicy</a>
+</li><li>
 <a href="#networking.x-k8s.io/v1alpha1.Gateway">Gateway</a>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClass">GatewayClass</a>
@@ -348,6 +350,116 @@ API group.</p>
 </li><li>
 <a href="#networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute</a>
 </li></ul>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendPolicy">BackendPolicy
+</h3>
+<p>
+<p>BackendPolicy defines policies associated with backends. For the purpose of
+this API, a backend is defined as any resource that a route can forward
+traffic to. A common example of a backend is a Service. Configuration that is
+implementation specific may be represented with similar implementation
+specific custom resources.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>apiVersion</code></br>
+string</td>
+<td>
+<code>
+networking.x-k8s.io/v1alpha1
+</code>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+string
+</td>
+<td><code>BackendPolicy</code></td>
+</tr>
+<tr>
+<td>
+<code>metadata</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#objectmeta-v1-meta">
+Kubernetes meta/v1.ObjectMeta
+</a>
+</em>
+</td>
+<td>
+Refer to the Kubernetes API documentation for the fields of the
+<code>metadata</code> field.
+</td>
+</tr>
+<tr>
+<td>
+<code>spec</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicySpec">
+BackendPolicySpec
+</a>
+</em>
+</td>
+<td>
+<br/>
+<br/>
+<table>
+<tr>
+<td>
+<code>backendRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendRef">
+[]BackendRef
+</a>
+</em>
+</td>
+<td>
+<p>BackendRefs define which backends this policy should be applied to. This
+policy can only apply to backends within the same namespace. If more than
+one BackendPolicy targets the same backend, precedence must be given to
+the oldest BackendPolicy.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tls</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">
+BackendTLSConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TLS is the TLS configuration for these backends.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+</table>
+</td>
+</tr>
+<tr>
+<td>
+<code>status</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicyStatus">
+BackendPolicyStatus
+</a>
+</em>
+</td>
+<td>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.Gateway">Gateway
 </h3>
 <p>
@@ -1059,6 +1171,264 @@ Valid AddressType values are:</p>
 <li>&ldquo;NamedAddress&rdquo;</li>
 </ul>
 </p>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendPolicyConditionType">BackendPolicyConditionType
+(<code>string</code> alias)</p></h3>
+<p>
+<p>BackendPolicyConditionType is a type of condition associated with a
+BackendPolicy.</p>
+</p>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendPolicySpec">BackendPolicySpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicy">BackendPolicy</a>)
+</p>
+<p>
+<p>BackendPolicySpec defines desired policy for a backend.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>backendRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendRef">
+[]BackendRef
+</a>
+</em>
+</td>
+<td>
+<p>BackendRefs define which backends this policy should be applied to. This
+policy can only apply to backends within the same namespace. If more than
+one BackendPolicy targets the same backend, precedence must be given to
+the oldest BackendPolicy.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tls</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">
+BackendTLSConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TLS is the TLS configuration for these backends.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendPolicyStatus">BackendPolicyStatus
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicy">BackendPolicy</a>)
+</p>
+<p>
+<p>BackendPolicyStatus defines the observed state of BackendPolicy. Conditions
+that are related to a specific Route or Gateway should be placed on the
+Route(s) using backends configured by this BackendPolicy.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>conditions</code></br>
+<em>
+<a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#condition-v1-meta">
+[]Kubernetes meta/v1.Condition
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Conditions describe the current conditions of the BackendPolicy.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendRef">BackendRef
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicySpec">BackendPolicySpec</a>)
+</p>
+<p>
+<p>BackendRef identifies an API object within a known namespace that defaults
+group to core and resource to services if unspecified.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Group is the group of the referent.  Omitting the value or specifying
+the empty string indicates the core API group.  For example, use the
+following to specify a service:</p>
+<p>fooRef:
+resource: services
+name: myservice</p>
+<p>Otherwise, if the core API group is not desired, specify the desired
+group:</p>
+<p>fooRef:
+group: acme.io
+resource: foos
+name: myfoo</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>resource</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Resource is the API resource name of the referent. Omitting the value
+or specifying the empty string indicates the services resource. For example,
+use the following to specify a services resource:</p>
+<p>fooRef:
+name: myservice</p>
+<p>Otherwise, if the services resource is not desired, specify the desired
+group:</p>
+<p>fooRef:
+group: acme.io
+resource: foos
+name: myfoo</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referent.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Port is the port of the referent. If unspecified, this policy applies to
+all ports on the backend.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.BackendTLSConfig">BackendTLSConfig
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendPolicySpec">BackendPolicySpec</a>)
+</p>
+<p>
+<p>BackendTLSConfig describes TLS configuration for a backend.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>clientCertificateRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
+SecretsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ClientCertificateRef is a reference to a TLS client certificate-key pair
+that may be used to connect to these backends. If an entry in this list
+omits or specifies the empty string for both the group and the resource,
+the resource defaults to &ldquo;secrets&rdquo;. An implementation may support other
+resources (for example, resource &ldquo;mycertificates&rdquo; in group
+&ldquo;networking.acme.io&rdquo;).</p>
+<p>If a Secret is referenced, it must be of type &ldquo;kubernetes.io/tls&rdquo; and
+contain tls.crt and tls.key data fields that contain the certificate and
+private key to use for TLS.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>certificateAuthorityRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
+SecretsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>CertificateAuthorityRef is a reference to a resource that includes
+trusted CA certificates for the associated backends. If an entry in this
+list omits or specifies the empty string for both the group and the
+resource, the resource defaults to &ldquo;secrets&rdquo;. An implementation may
+support other resources (for example, resource &ldquo;mycertificates&rdquo; in group
+&ldquo;networking.acme.io&rdquo;).</p>
+<p>When stored in a Secret, certificates must be PEM encoded and specified
+within the &ldquo;ca.crt&rdquo; data field of the Secret. Multiple certificates can
+be specified, concatenated by new lines.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>options</code></br>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Options are a list of key/value pairs to give extended options to the
+provider.</p>
+<p>Support: Implementation-specific.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress
 </h3>
 <p>
@@ -3295,6 +3665,7 @@ Support: Implementation-specific (Other resource types)</p>
 </h3>
 <p>
 (<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">BackendTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>)
 </p>

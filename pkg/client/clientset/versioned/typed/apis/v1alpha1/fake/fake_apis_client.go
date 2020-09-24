@@ -27,6 +27,10 @@ type FakeNetworkingV1alpha1 struct {
 	*testing.Fake
 }
 
+func (c *FakeNetworkingV1alpha1) BackendPolicies(namespace string) v1alpha1.BackendPolicyInterface {
+	return &FakeBackendPolicies{c, namespace}
+}
+
 func (c *FakeNetworkingV1alpha1) Gateways(namespace string) v1alpha1.GatewayInterface {
 	return &FakeGateways{c, namespace}
 }
