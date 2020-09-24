@@ -486,6 +486,38 @@ type RouteBindingSelector struct {
 	Resource string `json:"resource"`
 }
 
+// RouteNamespaces indicate which namespaces Routes should be selected from.
+type RouteNamespaces struct {
+	// NamespaceSelector is a selector of namespaces that Routes should be
+	// selected from. This is a standard Kubernetes LabelSelector, a label query
+	// over a set of resources. The result of matchLabels and matchExpressions
+	// are ANDed. Controllers must not support Routes in namespaces outside this
+	// selector.
+	//
+	// An empty selector (default) indicates that Routes in any namespace can be
+	// selected.
+	//
+	// The OnlySameNamespace field takes precedence over this field. This
+	// selector will only take effect when OnlySameNamespace is false.
+	//
+	// Support: Core
+	//
+	// +optional
+	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector,omitempty"`
+
+	// OnlySameNamespace is a boolean used to indicate if Route references are
+	// limited to the same Namespace as the Gateway. When true, only Routes
+	// within the same Namespace as the Gateway should be selected.
+	//
+	// This field takes precedence over the NamespaceSelector field. That
+	// selector should only take effect when this field is set to false.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=true
+	OnlySameNamespace bool `json:"onlySameNamespace,omitempty"`
+}
+
 // GatewayAddress describes an address that can be bound to a Gateway.
 type GatewayAddress struct {
 	// Type of the Address. This is either "IPAddress" or "NamedAddress".

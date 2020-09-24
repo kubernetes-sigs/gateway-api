@@ -23,6 +23,10 @@ import (
 type TCPRouteSpec struct {
 	// Rules are a list of TCP matchers and actions.
 	Rules []TCPRouteRule `json:"rules"`
+
+	// Gateways defines which Gateways can use this Route.
+	// +kubebuilder:default={allow: "SameNamespace"}
+	Gateways RouteGateways `json:"gateways,omitempty"`
 }
 
 // TCPRouteStatus defines the observed state of TCPRoute

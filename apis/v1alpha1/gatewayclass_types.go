@@ -81,22 +81,6 @@ type GatewayClassSpec struct {
 	// +optional
 	AllowedGatewayNamespaces metav1.LabelSelector `json:"allowedGatewayNamespaces,omitempty"`
 
-	// AllowedRouteNamespaces indicates in which namespaces Routes can be
-	// selected for Gateways of this class. This is restricted to the namespace
-	// of the Gateway by default.
-	//
-	// When any Routes are selected by a Gateway in a namespace that is not
-	// allowed by this selector, the controller implementing the GatewayClass
-	// may add a new "ForbiddenRoutesForClass" condition to the Gateway status.
-	// Adding this condition is considered optional since not all controllers
-	// will have access to all namespaces.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default={onlySameNamespace:true}
-	AllowedRouteNamespaces RouteNamespaces `json:"allowedRouteNamespaces,omitempty"`
-
 	// ParametersRef is a controller-specific resource containing the
 	// configuration parameters corresponding to this class. This is optional if
 	// the controller does not require any additional configuration.
@@ -111,40 +95,6 @@ type GatewayClassSpec struct {
 	//
 	// +optional
 	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty"`
-}
-
-// RouteNamespaces is used by Gateway and GatewayClass to indicate which
-// namespaces Routes should be selected from.
-type RouteNamespaces struct {
-	// NamespaceSelector is a selector of namespaces that Routes should be
-	// selected from. This is a standard Kubernetes LabelSelector, a label query
-	// over a set of resources. The result of matchLabels and matchExpressions
-	// are ANDed. Controllers must not support Routes in namespaces outside this
-	// selector.
-	//
-	// An empty selector (default) indicates that Routes in any namespace can be
-	// selected.
-	//
-	// The OnlySameNamespace field takes precedence over this field. This
-	// selector will only take effect when OnlySameNamespace is false.
-	//
-	// Support: Core
-	//
-	// +optional
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector"`
-
-	// OnlySameNamespace is a boolean used to indicate if Route references are
-	// limited to the same Namespace as the Gateway. When true, only Routes
-	// within the same Namespace as the Gateway should be selected.
-	//
-	// This field takes precedence over the NamespaceSelector field. That
-	// selector should only take effect when this field is set to false.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default=true
-	OnlySameNamespace bool `json:"onlySameNamespace"`
 }
 
 // GatewayClassParametersObjectReference identifies a cluster-scoped parameters
@@ -176,7 +126,7 @@ type GatewayClassStatus struct {
 	// using this class. Implementations must add any Gateways of this class to
 	// this list once they have been provisioned and remove Gateways as soon as
 	// they are deleted or deprovisioned.
-	ProvisionedGateways []GatewayObjectReference `json:"provisionedGateways"`
+	ProvisionedGateways []GatewayReference `json:"provisionedGateways"`
 }
 
 // +kubebuilder:object:root=true

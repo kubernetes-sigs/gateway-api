@@ -278,28 +278,6 @@ in any namespace will be able to use this GatewayClass.</p>
 </tr>
 <tr>
 <td>
-<code>allowedRouteNamespaces</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
-RouteNamespaces
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>AllowedRouteNamespaces indicates in which namespaces Routes can be
-selected for Gateways of this class. This is restricted to the namespace
-of the Gateway by default.</p>
-<p>When any Routes are selected by a Gateway in a namespace that is not
-allowed by this selector, the controller implementing the GatewayClass
-may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
-Adding this condition is considered optional since not all controllers
-will have access to all namespaces.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>parametersRef</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
@@ -407,6 +385,19 @@ HTTPRouteSpec
 <p>Hosts is a list of Host definitions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -492,6 +483,19 @@ TCPRouteSpec
 </td>
 <td>
 <p>Rules are a list of TCP matchers and actions.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
 </table>
@@ -586,6 +590,19 @@ TLSRouteSpec
 <p>Rules are a list of TLS matchers and actions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -673,6 +690,19 @@ UDPRouteSpec
 <p>Rules are a list of UDP matchers and actions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -751,6 +781,15 @@ values will depend on <code>Type</code> and support by the controller.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayAllowType">GatewayAllowType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">RouteGateways</a>)
+</p>
+<p>
+<p>GatewayAllowType specifies which Gateways should be allowed to use a Route.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassConditionType">GatewayClassConditionType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -819,28 +858,6 @@ in any namespace will be able to use this GatewayClass.</p>
 </tr>
 <tr>
 <td>
-<code>allowedRouteNamespaces</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
-RouteNamespaces
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>AllowedRouteNamespaces indicates in which namespaces Routes can be
-selected for Gateways of this class. This is restricted to the namespace
-of the Gateway by default.</p>
-<p>When any Routes are selected by a Gateway in a namespace that is not
-allowed by this selector, the controller implementing the GatewayClass
-may add a new &ldquo;ForbiddenRoutesForClass&rdquo; condition to the Gateway status.
-Adding this condition is considered optional since not all controllers
-will have access to all namespaces.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>parametersRef</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
@@ -898,8 +915,8 @@ this GatewayClass.</p>
 <td>
 <code>provisionedGateways</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-[]GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.GatewayReference">
+[]GatewayReference
 </a>
 </em>
 </td>
@@ -925,15 +942,16 @@ why a particular Gateway condition type has been raised.</p>
 Gateway. This type should be used with the GatewayStatus.Conditions
 field.</p>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.GatewayObjectReference">GatewayObjectReference
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayReference">GatewayReference
 </h3>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClassStatus">GatewayClassStatus</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
+<a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">RouteGateways</a>)
 </p>
 <p>
-<p>GatewayObjectReference identifies a Gateway object.</p>
+<p>GatewayReference identifies a Gateway in a specified namespace.</p>
 </p>
 <table>
 <thead>
@@ -945,18 +963,6 @@ field.</p>
 <tbody>
 <tr>
 <td>
-<code>namespace</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Namespace is the namespace of the referent.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>name</code></br>
 <em>
 string
@@ -964,6 +970,17 @@ string
 </td>
 <td>
 <p>Name is the name of the referent.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>namespace</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Namespace is the namespace of the referent.</p>
 </td>
 </tr>
 </tbody>
@@ -2157,6 +2174,19 @@ HTTPForwardingTarget
 <p>Hosts is a list of Host definitions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus
@@ -2709,8 +2739,8 @@ associated Gateway.</p>
 <td>
 <code>gatewayRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
-GatewayObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.GatewayReference">
+GatewayReference
 </a>
 </em>
 </td>
@@ -2738,16 +2768,72 @@ status conditions and listener status.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteGateways">RouteGateways
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteSpec">TCPRouteSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteSpec">TLSRouteSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteSpec">UDPRouteSpec</a>)
+</p>
+<p>
+<p>RouteGateways defines which Gateways will be able to use a route. If this
+field results in preventing the selection of a Route by a Gateway, an
+&ldquo;Admitted&rdquo; condition with a status of false must be set for the Gateway on
+that Route.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>allow</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayAllowType">
+GatewayAllowType
+</a>
+</em>
+</td>
+<td>
+<p>Allow indicates which Gateways will be allowed to use this route.
+Possible values are:
+* All: Gateways in any namespace can use this route.
+* FromList: Only Gateways specified in GatewayRefs may use this route.
+* SameNamespace: Only Gateways in the same namespace may use this route.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>gatewayRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayReference">
+[]GatewayReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>GatewayRefs must be specified when Allow is set to &ldquo;FromList&rdquo;. In that
+case, only Gateways referenced in this list will be allowed to use this
+route. This field is ignored for other values of &ldquo;Allow&rdquo;.</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteNamespaces">RouteNamespaces
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector</a>)
 </p>
 <p>
-<p>RouteNamespaces is used by Gateway and GatewayClass to indicate which
-namespaces Routes should be selected from.</p>
+<p>RouteNamespaces indicate which namespaces Routes should be selected from.</p>
 </p>
 <table>
 <thead>
@@ -2788,7 +2874,6 @@ bool
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>OnlySameNamespace is a boolean used to indicate if Route references are
 limited to the same Namespace as the Gateway. When true, only Routes
 within the same Namespace as the Gateway should be selected.</p>
@@ -3221,6 +3306,19 @@ TCPRouteAction
 <p>Rules are a list of TCP matchers and actions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.TCPRouteStatus">TCPRouteStatus
@@ -3523,6 +3621,19 @@ TLSRouteAction
 <p>Rules are a list of TLS matchers and actions.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRouteStatus">TLSRouteStatus
@@ -3759,6 +3870,19 @@ UDPRouteAction
 </td>
 <td>
 <p>Rules are a list of UDP matchers and actions.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
 </tbody>

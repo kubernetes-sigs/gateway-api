@@ -19,16 +19,49 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GatewayObjectReference identifies a Gateway object.
-type GatewayObjectReference struct {
-	// Namespace is the namespace of the referent.
+// GatewayAllowType specifies which Gateways should be allowed to use a Route.
+type GatewayAllowType string
+
+const (
+	// GatewayAllowAll indicates that all Gateways will be able to use this
+	// route.
+	GatewayAllowAll GatewayAllowType = "All"
+	// GatewayAllowFromList indicates that only Gateways that have been
+	// specified in GatewayRefs will be able to use this route.
+	GatewayAllowFromList GatewayAllowType = "FromList"
+	// GatewayAllowSameNamespace indicates that only Gateways within the same
+	// namespace will be able to use this route.
+	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
+)
+
+// RouteGateways defines which Gateways will be able to use a route. If this
+// field results in preventing the selection of a Route by a Gateway, an
+// "Admitted" condition with a status of false must be set for the Gateway on
+// that Route.
+type RouteGateways struct {
+	// Allow indicates which Gateways will be allowed to use this route.
+	// Possible values are:
+	// * All: Gateways in any namespace can use this route.
+	// * FromList: Only Gateways specified in GatewayRefs may use this route.
+	// * SameNamespace: Only Gateways in the same namespace may use this route.
+	// +kubebuilder:validation:Enum=All;FromList;SameNamespace
+	// +kubebuilder:default=SameNamespace
+	Allow GatewayAllowType `json:"allow,omitempty"`
+	// GatewayRefs must be specified when Allow is set to "FromList". In that
+	// case, only Gateways referenced in this list will be allowed to use this
+	// route. This field is ignored for other values of "Allow".
 	// +optional
-	Namespace string `json:"namespace,omitempty"`
+	GatewayRefs []GatewayReference `json:"gatewayRefs,omitempty"`
+}
+
+// GatewayReference identifies a Gateway in a specified namespace.
+type GatewayReference struct {
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
-	// +required
+	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
+	// Namespace is the namespace of the referent.
+	// +kubebuilder:validation:MaxLength=253
+	Namespace string `json:"namespace"`
 }
 
 // RouteConditionType is a type of condition for a route.
@@ -45,7 +78,7 @@ const (
 type RouteGatewayStatus struct {
 	// GatewayRef is a reference to a Gateway object that is associated with
 	// the route.
-	GatewayRef GatewayObjectReference `json:"gatewayRef"`
+	GatewayRef GatewayReference `json:"gatewayRef"`
 	// Conditions describes the status of the route with respect to the
 	// Gateway.  For example, the "Admitted" condition indicates whether the
 	// route has been admitted or rejected by the Gateway, and why.  Note
