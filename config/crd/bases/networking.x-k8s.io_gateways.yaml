@@ -207,6 +207,21 @@ spec:
                             type: string
                           description: "Options are a list of key/value pairs to give extended options to the provider. \n There variation among providers as to how ciphersuites are expressed. If there is a common subset for expressing ciphers then it will make sense to loft that as a core API construct. \n Support: Implementation-specific."
                           type: object
+                        routeOverride:
+                          default:
+                            certificate: Deny
+                          description: "RouteOverride dictates if TLS settings can be configured via Routes or not. \n CertificateRef must be defined even if `routeOverride.certificate` is set to 'Allow' as it will be used as the default certificate for the listener."
+                          properties:
+                            certificate:
+                              default: Deny
+                              description: "Certificate dictates if TLS certificates can be configured via Routes. If set to 'Allow', a TLS certificate for a hostname defined in a Route takes precedence over the certificate defined in Gateway. \n Support: Core"
+                              enum:
+                              - Allow
+                              - Deny
+                              type: string
+                          required:
+                          - certificate
+                          type: object
                       type: object
                   required:
                   - routes

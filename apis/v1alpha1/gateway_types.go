@@ -321,6 +321,34 @@ const (
 	UDPProtocolType ProtocolType = "UDP"
 )
 
+// TLSRouteOverrideType type defines the level of allowance for Routes
+// to override a specific TLS setting.
+// +kubebuilder:validation:Enum=Allow;Deny
+// +kubebuilder:default=Deny
+type TLSRouteOverrideType string
+
+const (
+	// TLSROuteOVerrideAllow allows the parameter to be configured from all routes.
+	TLSROuteOVerrideAllow TLSRouteOverrideType = "Allow"
+
+	// TLSRouteOverrideDeny prohibits the parameter to be configured from any route.
+	TLSRouteOverrideDeny TLSRouteOverrideType = "Deny"
+)
+
+// TLSOverridePolicy defines a schema for overriding TLS settings at the Route
+// level.
+type TLSOverridePolicy struct {
+	// Certificate dictates if TLS certificates can be configured
+	// via Routes. If set to 'Allow', a TLS certificate for a hostname
+	// defined in a Route takes precedence over the certificate defined in
+	// Gateway.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=Deny
+	Certificate TLSRouteOverrideType `json:"certificate"`
+}
+
 // GatewayTLSConfig describes a TLS configuration.
 //
 // References
@@ -354,6 +382,17 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	CertificateRef CertificateObjectReference `json:"certificateRef,omitempty"`
+
+	// RouteOverride dictates if TLS settings can be configured
+	// via Routes or not.
+	//
+	// CertificateRef must be defined even if `routeOverride.certificate` is
+	// set to 'Allow' as it will be used as the default certificate for the
+	// listener.
+	//
+	// +kubebuilder:default={certificate:Deny}
+	RouteOverride TLSOverridePolicy `json:"routeOverride,omitempty"`
+
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
 	//

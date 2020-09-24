@@ -58,6 +58,27 @@ type HTTPRouteHost struct {
 	// +optional
 	Hostnames []string `json:"hostnames,omitempty"`
 
+	// TLS defines the TLS certificate to use for Hostnames defined in this
+	// Route. This configuration only takes effect if the AllowRouteOverride
+	// field is set to true in the associated Gateway resource.
+	//
+	// Collisions can happen if multiple HTTPRoutes define a TLS certificate
+	// for the same hostname. In such a case, conflict resolution guiding
+	// principles apply, specificallly, if hostnames are same and two different
+	// certificates are specified then the certificate in the
+	// oldest resource wins.
+	//
+	// Please note that HTTP Route-selection takes place after the
+	// TLS Handshake (ClientHello). Due to this, TLS certificate defined
+	// here will take precedence even if the request has the potential to
+	// match multiple routes (in case multiple HTTPRoutes share the same
+	// hostname).
+	//
+	// Support: Core
+	//
+	// +optional
+	TLS *RouteTLSConfig `json:"tls,omitempty"`
+
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
@@ -75,6 +96,23 @@ type HTTPRouteHost struct {
 	//
 	// +optional
 	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef"`
+}
+
+// RouteTLSConfig describes a TLS configuration defined at the Route level.
+type RouteTLSConfig struct {
+	// CertificateRef refers to a Kubernetes object that
+	// contains a TLS certificate and private key.
+	// This certificate MUST be used for TLS handshakes for the domain
+	// this RouteTLSConfig is associated with.
+	// If an entry in this list omits or specifies the empty
+	// string for both the group and the resource, the resource defaults to "secrets".
+	// An implementation may support other resources (for example, resource
+	// "mycertificates" in group "networking.acme.io").
+	// Support: Core (Kubernetes Secrets)
+	// Support: Implementation-specific (Other resource types)
+	//
+	// +required
+	CertificateRef CertificateObjectReference `json:"certificateRef"`
 }
 
 // HTTPRouteRule defines semantics for matching an incoming HTTP request against
@@ -400,7 +438,7 @@ type HTTPRequestMirrorFilter struct {
 	// Support: Core (Kubernetes Services)
 	// Support: Implementation-specific (Other resource types)
 	//
-	TargetRef ForwardToTargetObjectReference `json:"targetRef" protobuf:"bytes,1,opt,name=targetRef"`
+	TargetRef ForwardToTargetObjectReference `json:"targetRef"`
 
 	// TargetPort specifies the destination port number to use for the TargetRef.
 	// If unspecified and TargetRef is a Service object consisting of a single
@@ -411,7 +449,7 @@ type HTTPRequestMirrorFilter struct {
 	// Support: Core
 	//
 	// +optional
-	TargetPort *TargetPort `json:"targetPort,omitempty" protobuf:"bytes,2,opt,name=targetPort"`
+	TargetPort *TargetPort `json:"targetPort,omitempty"`
 }
 
 // HTTPForwardingTarget is the target to send the request to for a given a match.

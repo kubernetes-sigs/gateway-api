@@ -340,6 +340,29 @@ spec:
                         type: object
                       minItems: 1
                       type: array
+                    tls:
+                      description: "TLS defines the TLS certificate to use for Hostnames defined in this Route. This configuration only takes effect if the AllowRouteOverride field is set to true in the associated Gateway resource. \n Collisions can happen if multiple HTTPRoutes define a TLS certificate for the same hostname. In such a case, conflict resolution guiding principles apply, specificallly, if hostnames are same and two different certificates are specified then the certificate in the oldest resource wins. \n Please note that HTTP Route-selection takes place after the TLS Handshake (ClientHello). Due to this, TLS certificate defined here will take precedence even if the request has the potential to match multiple routes (in case multiple HTTPRoutes share the same hostname). \n Support: Core"
+                      properties:
+                        certificateRef:
+                          description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
+                          properties:
+                            group:
+                              default: core
+                              description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a secrets resource: \n fooRef:   resource: secrets   name: mysecret \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              type: string
+                            name:
+                              description: Name is the name of the referent.
+                              type: string
+                            resource:
+                              default: secrets
+                              description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the secrets resource. For example, use the following to specify a secrets resource: \n fooRef:   name: mysecret \n Otherwise, if the secrets resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              type: string
+                          required:
+                          - name
+                          type: object
+                      required:
+                      - certificateRef
+                      type: object
                   required:
                   - rules
                   type: object

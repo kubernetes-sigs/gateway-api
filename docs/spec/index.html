@@ -1532,6 +1532,23 @@ Support: Implementation-specific (Other resource types)</p>
 </tr>
 <tr>
 <td>
+<code>routeOverride</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSOverridePolicy">
+TLSOverridePolicy
+</a>
+</em>
+</td>
+<td>
+<p>RouteOverride dictates if TLS settings can be configured
+via Routes or not.</p>
+<p>CertificateRef must be defined even if <code>routeOverride.certificate</code> is
+set to &lsquo;Allow&rsquo; as it will be used as the default certificate for the
+listener.</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>options</code></br>
 <em>
 map[string]string
@@ -2193,6 +2210,33 @@ the http host header is equal to Host.
 2. If Host is a wildcard, then the request matches this rule if
 the http host header is to equal to the suffix
 (removing the first label) of the wildcard rule.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tls</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">
+RouteTLSConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TLS defines the TLS certificate to use for Hostnames defined in this
+Route. This configuration only takes effect if the AllowRouteOverride
+field is set to true in the associated Gateway resource.</p>
+<p>Collisions can happen if multiple HTTPRoutes define a TLS certificate
+for the same hostname. In such a case, conflict resolution guiding
+principles apply, specificallly, if hostnames are same and two different
+certificates are specified then the certificate in the
+oldest resource wins.</p>
+<p>Please note that HTTP Route-selection takes place after the
+TLS Handshake (ClientHello). Due to this, TLS certificate defined
+here will take precedence even if the request has the potential to
+match multiple routes (in case multiple HTTPRoutes share the same
+hostname).</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3121,11 +3165,53 @@ appropriate when the route is modified.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>)
+</p>
+<p>
+<p>RouteTLSConfig describes a TLS configuration defined at the Route level.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>certificateRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
+SecretsDefaultLocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>CertificateRef refers to a Kubernetes object that
+contains a TLS certificate and private key.
+This certificate MUST be used for TLS handshakes for the domain
+this RouteTLSConfig is associated with.
+If an entry in this list omits or specifies the empty
+string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
+An implementation may support other resources (for example, resource
+&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Support: Core (Kubernetes Secrets)
+Support: Implementation-specific (Other resource types)</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">SecretsDefaultLocalObjectReference
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>)
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>)
 </p>
 <p>
 <p>SecretsDefaultLocalObjectReference identifies an API object within a
@@ -3505,6 +3591,43 @@ RouteStatus
 <p>
 <p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
 </p>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSOverridePolicy">TLSOverridePolicy
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>)
+</p>
+<p>
+<p>TLSOverridePolicy defines a schema for overriding TLS settings at the Route
+level.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>certificate</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteOverrideType">
+TLSRouteOverrideType
+</a>
+</em>
+</td>
+<td>
+<p>Certificate dictates if TLS certificates can be configured
+via Routes. If set to &lsquo;Allow&rsquo;, a TLS certificate for a hostname
+defined in a Route takes precedence over the certificate defined in
+Gateway.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction
 </h3>
 <p>
@@ -3636,6 +3759,16 @@ that includes the TLSRoute will be true.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteOverrideType">TLSRouteOverrideType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TLSOverridePolicy">TLSOverridePolicy</a>)
+</p>
+<p>
+<p>TLSRouteOverrideType type defines the level of allowance for Routes
+to override a specific TLS setting.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule
 </h3>
 <p>
