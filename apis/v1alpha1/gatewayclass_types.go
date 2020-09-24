@@ -62,24 +62,24 @@ type GatewayClassSpec struct {
 	// +required
 	Controller string `json:"controller"`
 
-	// AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-	// can use this GatewayClass from. This is a standard Kubernetes
-	// LabelSelector. Controllers must not support Gateways in namespaces
-	// outside this selector.
+	// AllowedGatewayNamespaces is a selector of namespaces that Gateways of
+	// this class can be created in. Implementations must not support Gateways
+	// when they are created in namespaces not specified by this field.
 	//
-	// An empty selector (default) indicates that Gateways can use this
-	// GatewayClass from any namespace.
+	// Gateways that appear in namespaces not specified by this field must
+	// continue to be supported if they have already been provisioned. This must
+	// be indicated by the Gateway's presence in the ProvisionedGateways list in
+	// the status for this GatewayClass. If the status on a Gateway indicates
+	// that it has been provisioned but the Gateway does not appear in the
+	// ProvisionedGateways list on GatewayClass it must not be supported.
 	//
-	// When a Gateway attempts to use this class from a namespace that is not
-	// allowed by this selector, the controller implementing the GatewayClass
-	// may add a new "ForbiddenNamespaceForClass" condition to the Gateway
-	// status. Adding this condition is considered optional since not all
-	// controllers will have access to all namespaces.
+	// When this field is unspecified (default) or an empty selector, Gateways
+	// in any namespace will be able to use this GatewayClass.
 	//
 	// Support: Core
 	//
 	// +optional
-	AllowedGatewayNamespaceSelector metav1.LabelSelector `json:"allowedGatewayNamespaceSelector"`
+	AllowedGatewayNamespaces metav1.LabelSelector `json:"allowedGatewayNamespaces,omitempty"`
 
 	// AllowedRouteNamespaces indicates in which namespaces Routes can be
 	// selected for Gateways of this class. This is restricted to the namespace
@@ -171,6 +171,12 @@ type GatewayClassStatus struct {
 	// +optional
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// ProvisionedGateways is a list of Gateways that have been provisioned
+	// using this class. Implementations must add any Gateways of this class to
+	// this list once they have been provisioned and remove Gateways as soon as
+	// they are deleted or deprovisioned.
+	ProvisionedGateways []GatewayObjectReference `json:"provisionedGateways"`
 }
 
 // +kubebuilder:object:root=true

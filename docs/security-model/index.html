@@ -724,21 +724,23 @@ readable by most roles, so instead we'll focus on write access for this model.</
 <p>The extra configuration options are not possible to control with RBAC. Instead,
 they will be controlled with configuration fields on GatewayClasses:</p>
 <ul>
-<li>
-<p><strong>allowedGatewayNamespaceSelector</strong>: This field is a selector of namespaces
-  that Gateways can use this GatewayClass from. This is a standard Kubernetes
-  LabelSelector, a label query over a set of resources. The result of
-  matchLabels and matchExpressions are ANDed. Controllers must not support
-  Gateways in namespaces outside this selector. An empty selector (default)
-  indicates that Gateways can use this GatewayClass from any namespace. This
-  field is intentionally not a pointer because the nil behavior (no namespaces)
-  is undesirable here.</p>
-</li>
-<li>
-<p><strong>allowedRouteNamespaces</strong>: AllowedRouteNamespaces indicates in which
+<li><strong>allowedGatewayNamespaces</strong>: AllowedGatewayNamespaces is a selector of
+  namespaces that Gateways of this class can be created in. Implementations must
+  not support Gateways when they are created in namespaces not specified by this
+  field.</li>
+</ul>
+<p>Gateways that appear in namespaces not specified by this field must continue
+  to be supported if they have already been provisioned. This must be indicated
+  by the Gateway's presence in the ProvisionedGateways list in the status for
+  this GatewayClass. If the status on a Gateway indicates that it has been
+  provisioned but the Gateway does not appear in the ProvisionedGateways list on
+  GatewayClass it must not be supported.</p>
+<p>When this field is unspecified or an empty selector, Gateways will be able to
+  use this GatewayClass in any namespace.</p>
+<ul>
+<li><strong>allowedRouteNamespaces</strong>: AllowedRouteNamespaces indicates in which
   namespaces Routes can be selected for Gateways of this class. This is
-  restricted to the namespace of the Gateway by default.</p>
-</li>
+  restricted to the namespace of the Gateway by default.</li>
 </ul>
 <h2 id="controller-requirements">Controller Requirements</h2>
 <p>To be considered conformant with the Service APIs spec, controllers need to:</p>

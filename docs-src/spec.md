@@ -253,7 +253,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaceSelector</code></br>
+<code>allowedGatewayNamespaces</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -262,17 +262,17 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector. Controllers must not support Gateways in namespaces
-outside this selector.</p>
-<p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace.</p>
-<p>When a Gateway attempts to use this class from a namespace that is not
-allowed by this selector, the controller implementing the GatewayClass
-may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
-status. Adding this condition is considered optional since not all
-controllers will have access to all namespaces.</p>
+<p>AllowedGatewayNamespaces is a selector of namespaces that Gateways of
+this class can be created in. Implementations must not support Gateways
+when they are created in namespaces not specified by this field.</p>
+<p>Gateways that appear in namespaces not specified by this field must
+continue to be supported if they have already been provisioned. This must
+be indicated by the Gateway&rsquo;s presence in the ProvisionedGateways list in
+the status for this GatewayClass. If the status on a Gateway indicates
+that it has been provisioned but the Gateway does not appear in the
+ProvisionedGateways list on GatewayClass it must not be supported.</p>
+<p>When this field is unspecified (default) or an empty selector, Gateways
+in any namespace will be able to use this GatewayClass.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -794,7 +794,7 @@ and PATH are valid Kubernetes names
 </tr>
 <tr>
 <td>
-<code>allowedGatewayNamespaceSelector</code></br>
+<code>allowedGatewayNamespaces</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -803,17 +803,17 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>AllowedGatewayNamespaceSelector is a selector of namespaces that Gateways
-can use this GatewayClass from. This is a standard Kubernetes
-LabelSelector. Controllers must not support Gateways in namespaces
-outside this selector.</p>
-<p>An empty selector (default) indicates that Gateways can use this
-GatewayClass from any namespace.</p>
-<p>When a Gateway attempts to use this class from a namespace that is not
-allowed by this selector, the controller implementing the GatewayClass
-may add a new &ldquo;ForbiddenNamespaceForClass&rdquo; condition to the Gateway
-status. Adding this condition is considered optional since not all
-controllers will have access to all namespaces.</p>
+<p>AllowedGatewayNamespaces is a selector of namespaces that Gateways of
+this class can be created in. Implementations must not support Gateways
+when they are created in namespaces not specified by this field.</p>
+<p>Gateways that appear in namespaces not specified by this field must
+continue to be supported if they have already been provisioned. This must
+be indicated by the Gateway&rsquo;s presence in the ProvisionedGateways list in
+the status for this GatewayClass. If the status on a Gateway indicates
+that it has been provisioned but the Gateway does not appear in the
+ProvisionedGateways list on GatewayClass it must not be supported.</p>
+<p>When this field is unspecified (default) or an empty selector, Gateways
+in any namespace will be able to use this GatewayClass.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -894,6 +894,22 @@ status condition will be true.</p>
 this GatewayClass.</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>provisionedGateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayObjectReference">
+[]GatewayObjectReference
+</a>
+</em>
+</td>
+<td>
+<p>ProvisionedGateways is a list of Gateways that have been provisioned
+using this class. Implementations must add any Gateways of this class to
+this list once they have been provisioned and remove Gateways as soon as
+they are deleted or deprovisioned.</p>
+</td>
+</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayConditionReason">GatewayConditionReason
@@ -913,6 +929,7 @@ field.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayClassStatus">GatewayClassStatus</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus</a>)
 </p>
 <p>
