@@ -1,0 +1,91 @@
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+spec:
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    resource: parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+  namespace: default
+spec:
+  gatewayClassName: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - protocol: HTTPS
+    port: 443
+    hostname:
+      match: Any
+    tls:
+      mode: Terminate
+      certificateRef:
+        resource: secrets
+        group: core
+        name: default-cert
+      routeOverride:
+        certificate: Allow
+    routes:
+      resource: httproutes
+      routeNamespaces:
+        namespaceSelector: {}
+        onlySameNamespace: false
+      routeSelector:
+        matchLabels:
+          app: foo
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  namespace: default
+  labels:
+    app: foo
+spec:
+  hostnames:
+  - "bar.example.com"
+  tls:
+    certificateRef:
+      resource: secrets
+      group: core
+      name: bar-example-com-cert
+  rules:
+  - match:
+      path:
+        type: Prefix
+        value: /
+    forwardTo:
+    - backendRef:
+        name: my-service
+        group: core
+        resource: services
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  namespace: default
+  labels:
+    app: foo
+spec:
+  hostnames:
+  - "baz.example.com"
+  tls:
+    certificateRef:
+      resource: secrets
+      group: core
+      name: baz-example-com-cert
+  rules:
+  - match:
+      path:
+        type: Prefix
+        value: /
+    forwardTo:
+    - backendRef:
+        name: my-service
+        group: core
+        resource: services
