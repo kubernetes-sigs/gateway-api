@@ -163,8 +163,6 @@ spec:
                   - namespace
                   type: object
                 type: array
-            required:
-            - provisionedGateways
             type: object
         type: object
     served: true

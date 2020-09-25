@@ -126,7 +126,7 @@ type GatewayClassStatus struct {
 	// using this class. Implementations must add any Gateways of this class to
 	// this list once they have been provisioned and remove Gateways as soon as
 	// they are deleted or deprovisioned.
-	ProvisionedGateways []GatewayReference `json:"provisionedGateways"`
+	ProvisionedGateways []GatewayReference `json:"provisionedGateways,omitempty"`
 }
 
 // +kubebuilder:object:root=true
