@@ -98,7 +98,6 @@ field that allows them to restrict which Gateways use them. If the Gateways
 field is not specified (i.e. its empty), then the Route will default to allowing
 selection by Gateways in the same namespace. 
 
->>>>>>> 91a9b54 (Adding Gateway selection to Routes)
 ## Controller Requirements
 To be considered conformant with the Service APIs spec, controllers need to:
 
