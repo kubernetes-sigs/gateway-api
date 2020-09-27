@@ -26,10 +26,13 @@ import (
 )
 
 // GatewayClassLister helps list GatewayClasses.
+// All objects returned here must be treated as read-only.
 type GatewayClassLister interface {
 	// List lists all GatewayClasses in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.GatewayClass, err error)
 	// Get retrieves the GatewayClass from the index for a given name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.GatewayClass, error)
 	GatewayClassListerExpansion
 }

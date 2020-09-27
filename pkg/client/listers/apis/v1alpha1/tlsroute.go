@@ -26,8 +26,10 @@ import (
 )
 
 // TLSRouteLister helps list TLSRoutes.
+// All objects returned here must be treated as read-only.
 type TLSRouteLister interface {
 	// List lists all TLSRoutes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.TLSRoute, err error)
 	// TLSRoutes returns an object that can list and get TLSRoutes.
 	TLSRoutes(namespace string) TLSRouteNamespaceLister
@@ -58,10 +60,13 @@ func (s *tLSRouteLister) TLSRoutes(namespace string) TLSRouteNamespaceLister {
 }
 
 // TLSRouteNamespaceLister helps list and get TLSRoutes.
+// All objects returned here must be treated as read-only.
 type TLSRouteNamespaceLister interface {
 	// List lists all TLSRoutes in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.TLSRoute, err error)
 	// Get retrieves the TLSRoute from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.TLSRoute, error)
 	TLSRouteNamespaceListerExpansion
 }
