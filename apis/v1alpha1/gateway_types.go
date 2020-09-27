@@ -108,7 +108,22 @@ type GatewaySpec struct {
 	//
 	// +optional
 	Addresses []GatewayAddress `json:"addresses"`
+
+	// ExtensionRefs specifies additional, implementation-specific
+	// configuration for the Gateway.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=64
+	ExtensionRefs []GatewayExtensionObjectReference `json:"extensionRefs,omitempty"`
 }
+
+// GatewayExtensionObjectReference identifies a Gateway extension object
+// within the current namespace.
+//
+// +k8s:deepcopy-gen=false
+type GatewayExtensionObjectReference = LocalObjectReference
 
 // Listener embodies the concept of a logical endpoint where a Gateway can
 // accept network connections. Each listener in a Gateway must have a unique
@@ -562,12 +577,6 @@ const (
 	// Support: Implementation-specific.
 	NamedAddressType AddressType = "NamedAddress"
 )
-
-// ListenerExtensionObjectReference identifies a listener extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type ListenerExtensionObjectReference = LocalObjectReference
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

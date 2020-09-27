@@ -267,6 +267,22 @@ GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
 </td>
 </tr>
+<tr>
+<td>
+<code>extensionRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+[]LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRefs specifies additional, implementation-specific
+configuration for the Gateway.</p>
+<p>Support: Implementation-specific</p>
+</td>
+</tr>
 </table>
 </td>
 </tr>
@@ -1448,6 +1464,22 @@ assigning an appropriate set of Addresses.</p>
 <p>The GatewayClass MUST bind all Listeners to every
 GatewayAddress that it assigns to the Gateway.</p>
 <p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRefs</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+[]LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRefs specifies additional, implementation-specific
+configuration for the Gateway.</p>
+<p>Support: Implementation-specific</p>
 </td>
 </tr>
 </tbody>
@@ -2892,6 +2924,7 @@ status of all such Listeners.</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.GatewaySpec">GatewaySpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 

@@ -51,6 +51,27 @@ spec:
                   - value
                   type: object
                 type: array
+              extensionRefs:
+                description: "ExtensionRefs specifies additional, implementation-specific configuration for the Gateway. \n Support: Implementation-specific"
+                items:
+                  description: LocalObjectReference identifies an API object within a known namespace.
+                  properties:
+                    group:
+                      description: Group is the API group name of the referent.
+                      type: string
+                    name:
+                      description: Name is the name of the referent.
+                      type: string
+                    resource:
+                      description: Resource is the API resource name of the referent.
+                      type: string
+                  required:
+                  - group
+                  - name
+                  - resource
+                  type: object
+                maxItems: 64
+                type: array
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name of a GatewayClass resource.
                 type: string
