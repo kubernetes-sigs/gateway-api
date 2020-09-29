@@ -55,42 +55,13 @@ type TCPRouteRule struct {
 	// if **any** one of the matches is satisfied.
 	//
 	// +optional
-	Matches []TCPRouteMatch `json:"matches"`
+	// +kubebuilder:validation:MaxItems=8
+	Matches []TCPRouteMatch `json:"matches,omitempty"`
 
-	// Action defines what happens to the connection.
-	// +required
-	Action TCPRouteAction `json:"action"`
-}
-
-// TCPRouteAction is the action for a given rule.
-type TCPRouteAction struct {
-	// ForwardTo sends requests to the referenced object(s). The
-	// resource may be "services" (omit or use the empty string for the
-	// group), or an implementation may support other resources (for
-	// example, resource "myroutetargets" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "services".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the HTTPRoute will be true.
-	//
-	// Support: core
-	//
-	// +kubebuilder:validation:MinItems=1
-	ForwardTo []GenericForwardToTarget `json:"forwardTo"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "action" behavior.  The resource may be "configmaps" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myrouteactions" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the TCPRoute will be true.
-	//
-	// Support: custom
-	//
+	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	ExtensionRef *RouteActionExtensionObjectReference `json:"extensionRef,omitempty"`
+	// +kubebuilder:validation:MaxItems=8
+	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
 }
 
 // TCPRouteMatch defines the predicate used to match connections to a

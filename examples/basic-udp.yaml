@@ -37,9 +37,5 @@ metadata:
     app: foo
 spec:
   rules:
-  - action:
-      forwardTo:
-        targetRef:
-          name: my-service
-          group: core
-          resource: services
+  - forwardTo:
+    - serviceName: my-service

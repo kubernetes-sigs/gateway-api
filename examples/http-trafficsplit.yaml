@@ -13,7 +13,6 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: my-trafficsplit-gateway
-  namespace: default
 spec:
   gatewayClassName: trafficsplit-lb
   listeners:  # Use GatewayClass defaults for listener definition.
@@ -31,23 +30,18 @@ kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-trafficsplit-1
-  namespace: default
   labels:
     app: split
 spec:
-  hosts:
-    - hostnames:
-        - "my.trafficsplit.com"
-      rules:
-        - match:
-            path:
-              type: Exact
-              value: /bar
-          action:
-            forwardTo:
-              - targetRef:
-                  name: my-trafficsplit-sv1
-                weight: 50
-              - targetRef:
-                  name: my-trafficsplit-sv2
-                weight: 50
+  hostnames:
+  - "my.trafficsplit.com"
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /bar
+    forwardTo:
+    - serviceName: my-trafficsplit-svc1
+      weight: 50
+    - serviceName: my-trafficsplit-svc2
+      weight: 50

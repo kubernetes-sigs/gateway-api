@@ -486,19 +486,6 @@ HTTPRouteSpec
 <table>
 <tr>
 <td>
-<code>hosts</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-[]HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<p>Hosts is a list of Host definitions.</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>gateways</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
@@ -508,6 +495,102 @@ RouteGateways
 </td>
 <td>
 <p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>hostnames</code></br>
+<em>
+[]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Hostnames defines a set of hostname that should match against
+the HTTP Host header to select a HTTPRoute to process the request.
+Hostname is the fully qualified domain name of a network host,
+as defined by RFC 3986. Note the following deviations from the
+&ldquo;host&rdquo; part of the URI as defined in the RFC:</p>
+<ol>
+<li>IPs are not allowed.</li>
+<li>The <code>:</code> delimiter is not respected because ports are not allowed.</li>
+</ol>
+<p>Incoming requests are matched against the hostnames before the
+HTTPRoute rules. If no hostname is specified, traffic is routed
+based on the HTTPRouteRules.</p>
+<p>Hostname can be &ldquo;precise&rdquo; which is a domain name without the terminating
+dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rdquo;, which is
+a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
+The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
+label and matches only a single label.
+You cannot have a wildcard label by itself (e.g. Host == &ldquo;*&rdquo;).
+Requests will be matched against the Host field in the following order:
+1. If Host is precise, the request matches this rule if
+the http host header is equal to Host.
+2. If Host is a wildcard, then the request matches this rule if
+the http host header is to equal to the suffix
+(removing the first label) of the wildcard rule.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>tls</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">
+RouteTLSConfig
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>TLS defines the TLS certificate to use for Hostnames defined in this
+Route. This configuration only takes effect if the AllowRouteOverride
+field is set to true in the associated Gateway resource.</p>
+<p>Collisions can happen if multiple HTTPRoutes define a TLS certificate
+for the same hostname. In such a case, conflict resolution guiding
+principles apply, specificallly, if hostnames are same and two different
+certificates are specified then the certificate in the
+oldest resource wins.</p>
+<p>Please note that HTTP Route-selection takes place after the
+TLS Handshake (ClientHello). Due to this, TLS certificate defined
+here will take precedence even if the request has the potential to
+match multiple routes (in case multiple HTTPRoutes share the same
+hostname).</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>rules</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">
+[]HTTPRouteRule
+</a>
+</em>
+</td>
+<td>
+<p>Rules are a list of HTTP matchers, filters and actions.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;host&rdquo; block. The resource may be &ldquo;configmaps&rdquo;  or an implementation-defined
+resource (for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
+<p>If the referent cannot be found,
+the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
+will be true.</p>
+<p>Support: custom</p>
 </td>
 </tr>
 </table>
@@ -1632,12 +1715,6 @@ construct.</p>
 <h3 id="networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget
 </h3>
 <p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>)
-</p>
-<p>
 <p>GenericForwardToTarget identifies a target object within a known namespace.</p>
 </p>
 <table>
@@ -1722,10 +1799,6 @@ Support: Extended (TCPRoute)</p>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget
 </h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>)
-</p>
 <p>
 <p>HTTPForwardToTarget identifies a target object within a known namespace.</p>
 </p>
@@ -1823,68 +1896,6 @@ the request is being forwarded to the target defined here.</p>
 <p>Conformance: For any implementation, filtering support, including core
 filters, is NOT guaranteed at this-level.
 Use Filters in HTTPRouteRule for portable filters across implementations.</p>
-<p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
-</p>
-<p>
-<p>HTTPForwardingTarget is the target to send the request to for a given a match.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>to</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">
-[]HTTPForwardToTarget
-</a>
-</em>
-</td>
-<td>
-<p>To references referenced object(s) where the request should be sent. The
-resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -2067,8 +2078,7 @@ My-Header2: DEF</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>)
 </p>
 <p>
-<p>HTTPRequestMirrorFilter defines configuration for the
-RequestMirror filter.</p>
+<p>HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.</p>
 </p>
 <table>
 <thead>
@@ -2080,42 +2090,57 @@ RequestMirror filter.</p>
 <tbody>
 <tr>
 <td>
-<code>targetRef</code></br>
+<code>serviceName</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">
-ServicesDefaultLocalObjectReference
-</a>
+string
 </em>
 </td>
 <td>
-<p>TargetRef is an object reference to forward matched requests to.
-The resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: Core (Kubernetes Services)
-Support: Implementation-specific (Other resource types)</p>
+<em>(Optional)</em>
+<p>ServiceName refers to the name of the Service to mirror matched requests
+to. When specified, this takes the place of BackendRef. If both
+BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
+Route to true.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>targetPort</code></br>
+<code>backendRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TargetPort">
-TargetPort
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>TargetPort specifies the destination port number to use for the TargetRef.
-If unspecified and TargetRef is a Service object consisting of a single
-port definition, that port will be used. If unspecified and TargetRef is
-a Service object consisting of multiple port definitions, an error is
-surfaced in status.</p>
+<p>BackendRef is a local object reference to mirror matched requests to. If
+both BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
+<p>Support: Custom</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Port specifies the destination port number to use for the backend
+referenced by the ServiceName or BackendRef field. If unspecified and a
+Service object consisting of a single port definition is the backend,
+that port will be used. If unspecified and the backend is a Service
+object consisting of multiple port definitions, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2126,6 +2151,7 @@ surfaced in status.</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
 </p>
 <p>
@@ -2222,14 +2248,14 @@ HTTPRequestMirrorFilter
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
 </p>
 <p>
-<p>HTTPRouteHost is the configuration for a given set of hosts.</p>
+<p>HTTPRouteForwardTo defines how a HTTPRoute should forward a request.</p>
 </p>
 <table>
 <thead>
@@ -2239,6 +2265,307 @@ HTTPRequestMirrorFilter
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<code>serviceName</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ServiceName refers to the name of the Service to forward matched requests
+to. When specified, this takes the place of BackendRef. If both
+BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
+Route to true.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>backendRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>BackendRef is a reference to a backend to forward matched requests to. If
+both BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
+<p>Support: Custom</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Port specifies the destination port number to use for the backend
+referenced by the ServiceName or BackendRef field. If unspecified and a
+Service object consisting of a single port definition is the backend,
+that port will be used. If unspecified and the backend is a Service
+object consisting of multiple port definitions, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>weight</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Weight specifies the proportion of traffic forwarded to the backend
+referenced by the ServiceName or BackendRef field. computed as
+weight/(sum of all weights in this ForwardTo list). Weight is not a
+percentage and the sum of weights does not need to equal 100. If only one
+backend is specified, 100% of the traffic is forwarded to that backend.
+If unspecified, weight defaults to 1.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>filters</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
+[]HTTPRouteFilter
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Filters defined at this-level should be executed if and only if the
+request is being forwarded to the backend defined here.</p>
+<p>Conformance: Filtering support, including core filters, is NOT guaranteed
+at this-level. Use Filters in HTTPRouteRule for portable filters across
+implementations.</p>
+<p>Support: Custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
+</p>
+<p>
+<p>HTTPRouteMatch defines the predicate used to match requests to a given
+action. Multiple match types are ANDed together, i.e. the match will
+evaluate to true only if all conditions are satisfied.</p>
+<p>For example, the match below will match a HTTP request only if its path
+starts with <code>/foo</code> AND it contains the <code>version: &quot;1&quot;</code> header:</p>
+<pre><code>match:
+path:
+value: &quot;/foo&quot;
+headers:
+values:
+version: &quot;1&quot;
+</code></pre>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>path</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPPathMatch">
+HTTPPathMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Path specifies a HTTP request path matcher. If this field is not
+specified, a default prefix match on the &ldquo;/&rdquo; path is provided.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>headers</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">
+HTTPHeaderMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Headers specifies a HTTP request header matcher.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>extensionRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ExtensionRef is an optional, implementation-specific extension to the
+&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
+string for the group) or an implementation-defined resource (for
+example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
+Omitting or specifying the empty string for both the resource and
+group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
+cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
+that includes the HTTPRoute will be true.</p>
+<p>Support: custom</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
+</p>
+<p>
+<p>HTTPRouteRule defines semantics for matching an incoming HTTP request against
+a set of matching rules and executing an action (and optionally filters) on
+the request.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>matches</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">
+[]HTTPRouteMatch
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Matches define conditions used for matching the rule against
+incoming HTTP requests.
+Each match is independent, i.e. this rule will be matched
+if <strong>any</strong> one of the matches is satisfied.</p>
+<p>For example, take the following matches configuration:</p>
+<pre><code>matches:
+- path:
+value: &quot;/foo&quot;
+headers:
+values:
+version: &quot;2&quot;
+- path:
+value: &quot;/v2/foo&quot;
+</code></pre>
+<p>For a request to match against this rule, a request should satisfy
+EITHER of the two conditions:</p>
+<ul>
+<li>path prefixed with <code>/foo</code> AND contains the header <code>version: &quot;2&quot;</code></li>
+<li>path prefix of <code>/v2/foo</code></li>
+</ul>
+<p>See the documentation for HTTPRouteMatch on how to specify multiple
+match conditions that should be ANDed together.</p>
+<p>If no matches are specified, the default is a prefix
+path match on &ldquo;/&rdquo;, which has the effect of matching every
+HTTP request.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>filters</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
+[]HTTPRouteFilter
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Filters define the filters that are applied to requests that match
+this rule.</p>
+<p>The effects of ordering of multiple behaviors are currently undefined.
+This can change in the future based on feedback during the alpha stage.</p>
+<p>Conformance-levels at this level are defined based on the type of filter:
+- ALL core filters MUST be supported by all implementations.
+- Implementers are encouraged to support extended filters.
+- Implementation-specific custom filters have no API guarantees across implementations.
+Specifying a core filter multiple times has undefined or custom conformance.</p>
+<p>Support: core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>forwardTo</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">
+[]HTTPRouteForwardTo
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>)
+</p>
+<p>
+<p>HTTPRouteSpec defines the desired state of HTTPRoute</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>gateways</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
+RouteGateways
+</a>
+</em>
+</td>
+<td>
+<p>Gateways defines which Gateways can use this Route.</p>
+</td>
+</tr>
 <tr>
 <td>
 <code>hostnames</code></br>
@@ -2333,228 +2660,6 @@ resource (for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;netwo
 the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
 will be true.</p>
 <p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule</a>)
-</p>
-<p>
-<p>HTTPRouteMatch defines the predicate used to match requests to a given
-action. Multiple match types are ANDed together, i.e. the match will
-evaluate to true only if all conditions are satisfied.</p>
-<p>For example, the match below will match a HTTP request only if its path
-starts with <code>/foo</code> AND it contains the <code>version: &quot;1&quot;</code> header:</p>
-<pre><code>match:
-path:
-value: &quot;/foo&quot;
-headers:
-values:
-version: &quot;1&quot;
-</code></pre>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>path</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPPathMatch">
-HTTPPathMatch
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Path specifies a HTTP request path matcher. If this field is not
-specified, a default prefix match on the &ldquo;/&rdquo; path is provided.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>headers</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">
-HTTPHeaderMatch
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Headers specifies a HTTP request header matcher.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteRule">HTTPRouteRule
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>)
-</p>
-<p>
-<p>HTTPRouteRule defines semantics for matching an incoming HTTP request against
-a set of matching rules and executing an action (and optionally filters) on
-the request.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>matches</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">
-[]HTTPRouteMatch
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Matches define conditions used for matching the rule against
-incoming HTTP requests.
-Each match is independent, i.e. this rule will be matched
-if <strong>any</strong> one of the matches is satisfied.</p>
-<p>For example, take the following matches configuration:</p>
-<pre><code>matches:
-- path:
-value: &quot;/foo&quot;
-headers:
-values:
-version: &quot;2&quot;
-- path:
-value: &quot;/v2/foo&quot;
-</code></pre>
-<p>For a request to match against this rule, a request should satisfy
-EITHER of the two conditions:</p>
-<ul>
-<li>path prefixed with <code>/foo</code> AND contains the header <code>version: &quot;2&quot;</code></li>
-<li>path prefix of <code>/v2/foo</code></li>
-</ul>
-<p>See the documentation for HTTPRouteMatch on how to specify multiple
-match conditions that should be ANDed together.</p>
-<p>If no matches are specified, the default is a prefix
-path match on &ldquo;/&rdquo;, which has the effect of matching every
-HTTP request.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>filters</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">
-[]HTTPRouteFilter
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Filters define the filters that are applied to requests that match
-this rule.</p>
-<p>The effects of ordering of multiple behaviors are currently undefined.
-This can change in the future based on feedback during the alpha stage.</p>
-<p>Conformance-levels at this level are defined based on the type of filter:
-- ALL core filters MUST be supported by all implementations.
-- Implementers are encouraged to support extended filters.
-- Implementation-specific custom filters have no API guarantees across implementations.
-Specifying a core filter multiple times has undefined or custom conformance.</p>
-<p>Support: core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>forward</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">
-HTTPForwardingTarget
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Forward defines the upstream target(s) where the request should be sent.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a>)
-</p>
-<p>
-<p>HTTPRouteSpec defines the desired state of HTTPRoute</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>hosts</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">
-[]HTTPRouteHost
-</a>
-</em>
-</td>
-<td>
-<p>Hosts is a list of Host definitions.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>gateways</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.RouteGateways">
-RouteGateways
-</a>
-</em>
-</td>
-<td>
-<p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
 </tbody>
@@ -2892,15 +2997,14 @@ status of all such Listeners.</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardingTarget">HTTPForwardingTarget</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
 <p>
@@ -3087,6 +3191,100 @@ condition for the affected Listener.</p>
 <p>
 <p>RouteConditionType is a type of condition for a route.</p>
 </p>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule</a>)
+</p>
+<p>
+<p>RouteForwardTo defines how a Route should forward a request.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>serviceName</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>ServiceName refers to the name of the Service to forward matched requests
+to. When specified, this takes the place of BackendRef. If both
+BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
+Route to true.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>backendRef</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>BackendRef is a reference to a backend to forward matched requests to. If
+both BackendRef and ServiceName are specified, ServiceName will be given
+precedence. If the referent cannot be found, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
+<p>Support: Custom</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>port</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Port specifies the destination port number to use for the backend
+referenced by the ServiceName or BackendRef field. If unspecified and a
+Service object consisting of a single port definition is the backend,
+that port will be used. If unspecified and the backend is a Service
+object consisting of multiple port definitions, controllers must set the
+&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
+to true.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>weight</code></br>
+<em>
+int32
+</em>
+</td>
+<td>
+<p>Weight specifies the proportion of traffic forwarded to the backend
+referenced by the ServiceName or BackendRef field. computed as
+weight/(sum of all weights in this ForwardTo list). Weight is not a
+percentage and the sum of weights does not need to equal 100. If only one
+backend is specified, 100% of the traffic is forwarded to that backend.
+If unspecified, weight defaults to 1.</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+</tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteGatewayStatus">RouteGatewayStatus
 </h3>
 <p>
@@ -3299,7 +3497,7 @@ appropriate when the route is modified.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHost">HTTPRouteHost</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
 </p>
 <p>
 <p>RouteTLSConfig describes a TLS configuration defined at the Route level.</p>
@@ -3420,8 +3618,7 @@ string
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>)
 </p>
 <p>
 <p>ServicesDefaultLocalObjectReference identifies an API object within a
@@ -3490,68 +3687,6 @@ string
 </td>
 <td>
 <p>Name is the name of the referent.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.TCPRouteAction">TCPRouteAction
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule</a>)
-</p>
-<p>
-<p>TCPRouteAction is the action for a given rule.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>forwardTo</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">
-[]GenericForwardToTarget
-</a>
-</em>
-</td>
-<td>
-<p>ForwardTo sends requests to the referenced object(s). The
-resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the TCPRoute will be true.</p>
-<p>Support: custom</p>
 </td>
 </tr>
 </tbody>
@@ -3634,15 +3769,16 @@ if <strong>any</strong> one of the matches is satisfied.</p>
 </tr>
 <tr>
 <td>
-<code>action</code></br>
+<code>forwardTo</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TCPRouteAction">
-TCPRouteAction
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">
+[]RouteForwardTo
 </a>
 </em>
 </td>
 <td>
-<p>Action defines what happens to the connection.</p>
+<em>(Optional)</em>
+<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
 </td>
 </tr>
 </tbody>
@@ -3772,68 +3908,6 @@ Gateway.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.TLSRouteAction">TLSRouteAction
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule</a>)
-</p>
-<p>
-<p>TLSRouteAction is the action for a given rule.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>forwardTo</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">
-[]GenericForwardToTarget
-</a>
-</em>
-</td>
-<td>
-<p>ForwardTo sends requests to the referenced object(s). The
-resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
-<p>Support: core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the TLSRoute will be true.</p>
-<p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch
 </h3>
 <p>
@@ -3949,15 +4023,16 @@ if <strong>any</strong> one of the matches is satisfied.</p>
 </tr>
 <tr>
 <td>
-<code>action</code></br>
+<code>forwardTo</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.TLSRouteAction">
-TLSRouteAction
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">
+[]RouteForwardTo
 </a>
 </em>
 </td>
 <td>
-<p>Action defines what happens to the connection.</p>
+<em>(Optional)</em>
+<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
 </td>
 </tr>
 </tbody>
@@ -4046,8 +4121,7 @@ RouteStatus
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">GenericForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPForwardToTarget">HTTPForwardToTarget</a>)
 </p>
 <p>
 <p>TargetPort specifies the destination port number to use for a TargetRef.</p>
@@ -4063,67 +4137,6 @@ RouteStatus
 <p>TargetWeight specifies weight used for making a forwarding decision
 to a TargetRef.</p>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.UDPRouteAction">UDPRouteAction
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule</a>)
-</p>
-<p>
-<p>UDPRouteAction is the action for a given rule.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>forwardTo</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.GenericForwardToTarget">
-GenericForwardToTarget
-</a>
-</em>
-</td>
-<td>
-<p>ForwardTo sends requests to the referenced object.  The
-resource may be &ldquo;services&rdquo; (omit or use the empty string for the
-group), or an implementation may support other resources (for
-example, resource &ldquo;myroutetargets&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;services&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the UDPRoute will be true.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;action&rdquo; behavior.  The resource may be &ldquo;configmaps&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myrouteactions&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the UDPRoute will be true.</p>
-<p>Support: custom</p>
-</td>
-</tr>
-</tbody>
-</table>
 <h3 id="networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch
 </h3>
 <p>
@@ -4199,16 +4212,16 @@ that includes the UDPRoute will be true.</p>
 </tr>
 <tr>
 <td>
-<code>action</code></br>
+<code>forwardTo</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.UDPRouteAction">
-UDPRouteAction
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">
+[]RouteForwardTo
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Action defines what happens to the packet.</p>
+<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
 </td>
 </tr>
 </tbody>
