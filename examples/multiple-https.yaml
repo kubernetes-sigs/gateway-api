@@ -16,11 +16,11 @@ spec:
     tls:
       options: {}
       certificateRef:
-        resource: secrets
+        kind: Secret
         group: core
         name: httpbin
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -34,11 +34,11 @@ spec:
     tls:
       options: {}
       certificateRef:
-        resource: secrets
+        kind: Secret
         group: core
         name: conformance
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

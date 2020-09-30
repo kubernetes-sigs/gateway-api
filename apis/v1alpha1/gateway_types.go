@@ -376,7 +376,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +optional
-	CertificateRef CertificateObjectReference `json:"certificateRef,omitempty"`
+	CertificateRef LocalObjectReference `json:"certificateRef,omitempty"`
 
 	// RouteOverride dictates if TLS settings can be configured
 	// via Routes or not.
@@ -419,12 +419,6 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// CertificateObjectReference identifies a certificate object within a known
-// namespace.
-//
-// +k8s:deepcopy-gen=false
-type CertificateObjectReference = SecretsDefaultLocalObjectReference
-
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
@@ -451,7 +445,7 @@ type RouteBindingSelector struct {
 	// For example, use the following to select an HTTPRoute:
 	//
 	// routes:
-	//   resource: httproutes
+	//   kind: HTTPRoute
 	//
 	// Otherwise, if an alternative API group is desired, specify the desired
 	// group:
@@ -466,9 +460,9 @@ type RouteBindingSelector struct {
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group,omitempty"`
-	// Resource is the API resource name of the route resource to select.
+	// Kind is the kind of the route resource to select.
 	//
-	// Resource MUST correspond to route resources that are compatible with the
+	// Kind MUST correspond to kinds of routes that are compatible with the
 	// application protocol specified in the Listener's Protocol field.
 	//
 	// If an implementation does not support or recognize this
@@ -476,9 +470,7 @@ type RouteBindingSelector struct {
 	// condition for the affected Listener.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Resource string `json:"resource"`
+	Kind string `json:"kind"`
 }
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.

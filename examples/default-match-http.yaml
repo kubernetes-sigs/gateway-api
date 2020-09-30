@@ -18,7 +18,7 @@ spec:
   - protocol: HTTP
     port: 80
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -52,7 +52,7 @@ spec:
     - backendRef:
         name: my-custom-resource
         group: acme.io
-        resource: custombackend
+        kind: CustomBackend
   - matches:
     - path:
         type: Exact

@@ -15,7 +15,7 @@ spec:
     port: 80
     protocol: HTTP
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

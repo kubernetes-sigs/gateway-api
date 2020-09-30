@@ -5,9 +5,9 @@ metadata:
 spec:
   controller: acme.io/gateway-controller
   parametersRef:
-    name: acme-lb-configmap
-    group: core
-    resource: configmaps
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
 ---
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -20,7 +20,7 @@ spec:
   - protocol: UDP
     port: 8080
     routes:
-      resource: udpproutes
+      kind: UDPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

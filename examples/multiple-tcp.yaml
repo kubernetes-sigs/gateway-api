@@ -13,7 +13,7 @@ spec:
   - port: 22
     protocol: TCP
     routes:
-      resource: tcproutes
+      kind: TCPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -24,7 +24,7 @@ spec:
   - port: 2222
     protocol: TCP
     routes:
-      resource: tcproutes
+      kind: TCPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -42,10 +42,10 @@ spec:
       options: {}
       certificateRef:
         name: ssh-server
-        resource: secrets
+        kind: Secret
         group: core
     routes:
-      resource: tcproutes
+      kind: TCPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

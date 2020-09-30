@@ -6,14 +6,14 @@ spec:
   backendRefs:
     - name: my-service
       group: core
-      resource: services
+      kind: Service
   tls:
     clientCertificateRef: 
       name: my-app-cert
       group: core
-      resource: secrets
+      kind: Secret
     certificateAuthorityRef: 
       name: my-app-ca
       group: core
-      resource: secrets  
+      kind: Secret
     options: {}
