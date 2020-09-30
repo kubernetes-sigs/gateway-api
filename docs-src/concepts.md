@@ -116,17 +116,15 @@ relationships between the different resources:
 A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
 
  1. A client makes a request to http://foo.example.com.
- 2. DNS resolves the name to `gateway.status.listeners[x].address`.
- 3. The reverse proxy receives the request on `gateway.status.listeners[x].address`:
- `gateway.spec.listeners[x].port` and uses the [Host header](https://tools.ietf.org/html/rfc7230#section-5.4) to
- match an `HTTPRoute`.
+ 2. DNS resolves the name to a `Gateway` address.
+ 3. The reverse proxy receives the request on a `Listener` and uses the
+ [Host header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an `HTTPRoute`.
  5. Optionally, the reverse proxy can perform request header and/or path matching based
  on `match` rules of the `HTTPRoute`.
- 6. Optionally, the reverse proxy can manipulate the request, i.e. add/remove headers,
- etc. based on `filter` rules of the `HTTPRoute`.
- 7. Lastly, the reverse proxy forwards the request to one or more objects in the cluster
- based on `action` rules of the `HTTPRoute`. When specifying multiple `forwardTo`
- objects, the request is split, i.e. forwarded to each object.
+ 6. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based
+ on `filter` rules of the `HTTPRoute`.
+ 7. Lastly, the reverse proxy forwards the request to one or more objects, i.e. `Service`,
+ in the cluster based on `forwardTo` rules of the `HTTPRoute`.
 
 ## TLS Configuration
 
