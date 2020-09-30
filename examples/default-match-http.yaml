@@ -20,8 +20,7 @@ spec:
     routes:
       kind: HTTPRoute
       routeNamespaces:
-        namespaceSelector: {}
-        onlySameNamespace: false
+        from: "All"
       routeSelector:
         matchLabels:
           app: default-match

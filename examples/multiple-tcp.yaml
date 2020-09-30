@@ -15,8 +15,7 @@ spec:
     routes:
       kind: TCPRoute
       routeNamespaces:
-        namespaceSelector: {}
-        onlySameNamespace: false
+        from: "All"
       routeSelector:
         matchLabels:
           app: sshd-honeypot
@@ -26,8 +25,7 @@ spec:
     routes:
       kind: TCPRoute
       routeNamespaces:
-        namespaceSelector: {}
-        onlySameNamespace: false
+        from: "All"
       routeSelector:
         matchLabels:
           app: sshd-legitimate
@@ -47,8 +45,7 @@ spec:
     routes:
       kind: TCPRoute
       routeNamespaces:
-        namespaceSelector: {}
-        onlySameNamespace: false
+        from: "All"
       routeSelector:
         matchLabels:
           app: sshd-legitimate

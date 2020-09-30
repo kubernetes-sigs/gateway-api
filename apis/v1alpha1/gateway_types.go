@@ -430,9 +430,7 @@ type RouteBindingSelector struct {
 	// default.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:default={onlySameNamespace:true}
-	RouteNamespaces RouteNamespaces `json:"routeNamespaces,omitempty"`
+	RouteNamespaces RouteNamespaces `json:"routeNamespaces"`
 	// RouteSelector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
 	// only routes matching the RouteSelector are associated with the Gateway.
@@ -475,36 +473,43 @@ type RouteBindingSelector struct {
 	Kind string `json:"kind"`
 }
 
+// RouteSelectType specifies where Routes should be selected by a Gateway.
+// +kubebuilder:validation:Enum=All;Selector;Same
+// +kubebuilder:default=Same
+type RouteSelectType string
+
+const (
+	// RouteSelectAll indicates that Routes in all namespaces may be used by
+	// this Gateway.
+	RouteSelectAll RouteSelectType = "All"
+	// RouteSelectSelector indicates that only Routes in namespaces selected by
+	// the selector may be used by this Gateway.
+	RouteSelectSelector RouteSelectType = "Selector"
+	// RouteSelectSame indicates that Only Routes in the same namespace may be
+	// used by this Gateway.
+	RouteSelectSame RouteSelectType = "Same"
+)
+
 // RouteNamespaces indicate which namespaces Routes should be selected from.
 type RouteNamespaces struct {
-	// NamespaceSelector is a selector of namespaces that Routes should be
-	// selected from. This is a standard Kubernetes LabelSelector, a label query
-	// over a set of resources. The result of matchLabels and matchExpressions
-	// are ANDed. Controllers must not support Routes in namespaces outside this
-	// selector.
+	// From indicates where Routes will be selected for this Gateway. Possible
+	// values are:
+	// * All: Routes in all namespaces may be used by this Gateway.
+	// * Selector: Routes in namespaces selected by the selector may be used by
+	//   this Gateway.
+	// * Same: Only Routes in the same namespace may be used by this Gateway.
 	//
-	// An empty selector (default) indicates that Routes in any namespace can be
-	// selected.
-	//
-	// The OnlySameNamespace field takes precedence over this field. This
-	// selector will only take effect when OnlySameNamespace is false.
+	// Support: Core
+	From RouteSelectType `json:"from,omitempty"`
+
+	// Selector must be specified when From is set to "Selector". In that case,
+	// only Routes in Namespaces matching this Selector will be selected by this
+	// Gateway. This field is ignored for other values of "From".
 	//
 	// Support: Core
 	//
 	// +optional
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector,omitempty"`
-
-	// OnlySameNamespace is a boolean used to indicate if Route references are
-	// limited to the same Namespace as the Gateway. When true, only Routes
-	// within the same Namespace as the Gateway should be selected.
-	//
-	// This field takes precedence over the NamespaceSelector field. That
-	// selector should only take effect when this field is set to false.
-	//
-	// Support: Core
-	//
-	// +kubebuilder:default=true
-	OnlySameNamespace bool `json:"onlySameNamespace,omitempty"`
+	Selector metav1.LabelSelector `json:"selector,omitempty"`
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
