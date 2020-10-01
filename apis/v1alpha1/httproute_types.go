@@ -76,7 +76,8 @@ type HTTPRouteSpec struct {
 	// Support: Core
 	//
 	// +optional
-	Hostnames []string `json:"hostnames,omitempty"`
+	// +kubebuilder:validation:MaxItems=16
+	Hostnames []HTTPRouteHostname `json:"hostnames,omitempty"`
 
 	// TLS defines the TLS certificate to use for Hostnames defined in this
 	// Route. This configuration only takes effect if the AllowRouteOverride
@@ -102,6 +103,7 @@ type HTTPRouteSpec struct {
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	Rules []HTTPRouteRule `json:"rules"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
@@ -134,6 +136,12 @@ type RouteTLSConfig struct {
 	// +required
 	CertificateRef CertificateObjectReference `json:"certificateRef"`
 }
+
+// HTTPRouteHostname is used to specify a hostname that should be matched by
+// HTTPRoute.
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+type HTTPRouteHostname string
 
 // HTTPRouteRule defines semantics for matching an incoming HTTP request against
 // a set of matching rules and executing an action (and optionally filters) on
@@ -170,7 +178,6 @@ type HTTPRouteRule struct {
 	// path match on "/", which has the effect of matching every
 	// HTTP request.
 	//
-	// +optional
 	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
 	// +kubebuilder:validation:MaxItems=8
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
@@ -195,7 +202,7 @@ type HTTPRouteRule struct {
 
 	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=4
 	ForwardTo []HTTPRouteForwardTo `json:"forwardTo,omitempty"`
 }
 
@@ -250,13 +257,11 @@ type HTTPPathMatch struct {
 	//
 	// Default: "Prefix"
 	//
-	// +optional
 	// +kubebuilder:default=Prefix
-	Type PathMatchType `json:"type"`
+	Type PathMatchType `json:"type,omitempty"`
 
 	// Value of the HTTP path to match against.
 	//
-	// +required
 	// +kubebuilder:validation:MinLength=1
 	Value string `json:"value"`
 }
@@ -271,9 +276,8 @@ type HTTPHeaderMatch struct {
 	//
 	// Default: "Exact"
 	//
-	// +optional
 	// +kubebuilder:default=Exact
-	Type HeaderMatchType `json:"type"`
+	Type HeaderMatchType `json:"type,omitempty"`
 
 	// Values is a map of HTTP Headers to be matched.
 	// It MUST contain at least one entry.
@@ -284,8 +288,6 @@ type HTTPHeaderMatch struct {
 	//
 	// Multiple match values are ANDed together, meaning, a request
 	// must match all the specified headers to select the route.
-	//
-	// +required
 	Values map[string]string `json:"values"`
 }
 
@@ -308,9 +310,8 @@ type HTTPRouteMatch struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
 	//
-	// +optional
 	// +kubebuilder:default={type: "Prefix", value: "/"}
-	Path *HTTPPathMatch `json:"path"`
+	Path HTTPPathMatch `json:"path,omitempty"`
 
 	// Headers specifies a HTTP request header matcher.
 	//
@@ -329,7 +330,7 @@ type HTTPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 const (
@@ -380,8 +381,8 @@ type HTTPRouteFilter struct {
 	// types to extend the core API with implementation-specific behavior.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:Required
-	// +required
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=100
 	Type string `json:"type"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
@@ -392,7 +393,7 @@ type HTTPRouteFilter struct {
 	// group indicates that the resource is "configmaps".
 	// ExtensionRef MUST NOT be used for core and extended filters.
 	// +optional
-	ExtensionRef *RouteFilterExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 
 	// Filter-specific configuration definitions for core and extended filters
 
@@ -419,7 +420,7 @@ type HTTPRequestHeaderFilter struct {
 	//   GET /foo HTTP/1.1
 	//   my-header: foo
 	//
-	// Support: extended?
+	// Support: Extended
 	Add map[string]string `json:"add"`
 
 	// Remove the given header(s) from the HTTP request before the
@@ -440,10 +441,9 @@ type HTTPRequestHeaderFilter struct {
 	//   GET /foo HTTP/1.1
 	//   My-Header2: DEF
 	//
-	// Support: extended?
+	// Support: Extended
+	// +kubebuilder:validation:MaxItems=16
 	Remove []string `json:"remove"`
-
-	// TODO
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
@@ -553,6 +553,7 @@ type HTTPRouteForwardTo struct {
 	// Support: Custom
 	//
 	// +optional
+	// +kubebuilder:validation:MaxItems=16
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 }
 

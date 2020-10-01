@@ -59,7 +59,7 @@ type GatewayClassSpec struct {
 	//
 	// Support: Core
 	//
-	// +required
+	// +kubebuilder:validation:MaxLength=253
 	Controller string `json:"controller"`
 
 	// AllowedGatewayNamespaces is a selector of namespaces that Gateways of
@@ -118,7 +118,8 @@ const (
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
-	// +optional
+	//
+	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 

@@ -167,6 +167,7 @@ type BackendTLSConfig struct {
 type BackendPolicyStatus struct {
 	// Conditions describe the current conditions of the BackendPolicy.
 	// +optional
+	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 

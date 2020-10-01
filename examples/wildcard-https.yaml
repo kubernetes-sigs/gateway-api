@@ -16,8 +16,8 @@ spec:
     protocol: HTTPS
     tls:
       options: {}
-      certificateRefs:
-      - name: example-wildcard
+      certificateRef:
+        name: example-wildcard
         resource: secrets
         group: core
     routes:

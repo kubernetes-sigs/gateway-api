@@ -19,6 +19,19 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:subresource:status
+
+// TCPRoute is the Schema for the TCPRoute resource.
+type TCPRoute struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   TCPRouteSpec   `json:"spec,omitempty"`
+	Status TCPRouteStatus `json:"status,omitempty"`
+}
+
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpec struct {
 	// Rules are a list of TCP matchers and actions.
@@ -34,19 +47,6 @@ type TCPRouteStatus struct {
 	RouteStatus `json:",inline"`
 }
 
-// +genclient
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
-
-// TCPRoute is the Schema for the TCPRoute resource.
-type TCPRoute struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	Spec   TCPRouteSpec   `json:"spec,omitempty"`
-	Status TCPRouteStatus `json:"status,omitempty"`
-}
-
 // TCPRouteRule is the configuration for a given rule.
 type TCPRouteRule struct {
 	// Matches define conditions used for matching the rule against
@@ -60,7 +60,7 @@ type TCPRouteRule struct {
 
 	// ForwardTo defines the backend(s) where matching requests should be sent.
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=4
 	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
 }
 
@@ -79,7 +79,7 @@ type TCPRouteMatch struct {
 	// Support: custom
 	//
 	// +optional
-	ExtensionRef *RouteMatchExtensionObjectReference `json:"extensionRef"`
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true
