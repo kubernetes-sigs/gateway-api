@@ -365,7 +365,8 @@ spec:
                       type: array
                     port:
                       description: Port is the unique Listener port value for which this message is reporting the status. If more than one Gateway Listener shares the same port value, this message reports the combined status of all such Listeners.
-                      type: string
+                      format: int32
+                      type: integer
                   required:
                   - conditions
                   - port
