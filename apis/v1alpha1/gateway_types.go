@@ -703,7 +703,7 @@ type ListenerStatus struct {
 	// status of all such Listeners.
 	//
 	// +required
-	Port string `json:"port"`
+	Port int32 `json:"port"`
 
 	// Conditions describe the current condition of this listener.
 	//

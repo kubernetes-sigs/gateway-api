@@ -2967,7 +2967,7 @@ field.</p>
 <td>
 <code>port</code></br>
 <em>
-string
+int32
 </em>
 </td>
 <td>
