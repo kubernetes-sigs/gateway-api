@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#building-testing-and-deploying" tabindex="1" class="md-skip">
+      <a href="#developing-service-apis" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -243,99 +243,9 @@
       
     
     
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Developer guide
-      </label>
-    
     <a href="./" title="Developer guide" class="md-nav__link md-nav__link--active">
       Developer guide
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#project-management" class="md-nav__link">
-    Project management
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-cadence" class="md-nav__link">
-    Release cadence
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-the-code" class="md-nav__link">
-    Building the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-the-code" class="md-nav__link">
-    Testing the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#submitting-a-review" class="md-nav__link">
-    Submitting a review
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
     
   </li>
 
@@ -417,83 +327,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#project-management" class="md-nav__link">
-    Project management
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#release-cadence" class="md-nav__link">
-    Release cadence
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#building-the-code" class="md-nav__link">
-    Building the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#testing-the-code" class="md-nav__link">
-    Testing the code
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#submitting-a-review" class="md-nav__link">
-    Submitting a review
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    Verify
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#documentation" class="md-nav__link">
-    Documentation
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#publishing" class="md-nav__link">
-    Publishing
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -520,6 +353,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
+<h2 id="developing-service-apis">Developing Service APIs</h2>
+<p>You must have a working <a href="https://golang.org/doc/install">Go environment</a> and then clone the repo:</p>
+<pre><code>mkdir -p $GOPATH/src/sigs.k8s.io
+cd $GOPATH/src/sigs.k8s.io
+git clone https://github.com/kubernetes-sigs/service-apis
+cd service-apis
+</code></pre>
 
 <h1 id="building-testing-and-deploying">Building, testing and deploying</h1>
 <p>You will need to have Docker installed to perform the steps below.</p>
@@ -561,8 +402,15 @@ make install
 make uninstall
 </code></pre>
 
-<h2 id="submitting-a-review">Submitting a review</h2>
-<p>TODO</p>
+<h2 id="submitting-a-pull-request">Submitting a Pull Request</h2>
+<p>Service APIs follows a similar pull request process as <a href="https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md">Kubernetes</a>. Merging a pull request requires the
+following steps to be completed before the pull request will be merged automatically.</p>
+<ul>
+<li><a href="https://git.k8s.io/community/CLA.md">Sign the CLA</a> (prerequisite)</li>
+<li><a href="https://help.github.com/articles/about-pull-requests/">Open a pull request</a></li>
+<li>Pass <a href="#verify">verification</a> tests</li>
+<li>Get all necessary approvals from reviewers and code owners</li>
+</ul>
 <h3 id="verify">Verify</h3>
 <p>Make sure you run the static analysis over the repo before submitting your
 changes. The <a href="https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis">Prow presubmit</a> will not let your change merge if

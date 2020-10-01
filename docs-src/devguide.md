@@ -14,6 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
+## Developing Service APIs
+
+You must have a working [Go environment] and then clone the repo:
+
+```
+mkdir -p $GOPATH/src/sigs.k8s.io
+cd $GOPATH/src/sigs.k8s.io
+git clone https://github.com/kubernetes-sigs/service-apis
+cd service-apis
+```
+
 # Building, testing and deploying
 
 You will need to have Docker installed to perform the steps below.
@@ -72,9 +83,15 @@ make uninstall
 [kubebuilder]: https://book.kubebuilder.io/
 [kind]: https://github.com/kubernetes-sigs/kind
 
-## Submitting a review
+## Submitting a Pull Request
 
-TODO
+Service APIs follows a similar pull request process as [Kubernetes]. Merging a pull request requires the
+following steps to be completed before the pull request will be merged automatically.
+
+- [Sign the CLA](https://git.k8s.io/community/CLA.md) (prerequisite)
+- [Open a pull request](https://help.github.com/articles/about-pull-requests/)
+- Pass [verification](#verify) tests
+- Get all necessary approvals from reviewers and code owners
 
 ### Verify
 
@@ -121,3 +138,5 @@ reviews simple and clearly delineate user vs generated content.
 
 [ghp]: https://kubernetes-sigs.github.io/service-apis/
 [mkdocs]: https://www.mkdocs.org/
+[Go environment]: https://golang.org/doc/install
+[Kubernetes]: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md
