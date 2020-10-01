@@ -16,7 +16,11 @@ spec:
     singular: gatewayclass
   scope: Cluster
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.controller
+      name: Controller
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources. \n GatewayClass is a Cluster level resource. \n Support: Core."

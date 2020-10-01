@@ -16,7 +16,11 @@ spec:
     singular: gateway
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.gatewayClassName
+      name: Class
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: Gateway represents an instantiation of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.

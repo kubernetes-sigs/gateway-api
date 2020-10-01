@@ -22,6 +22,7 @@ import (
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 
 // HTTPRoute is the Schema for the HTTPRoute resource.
 type HTTPRoute struct {
