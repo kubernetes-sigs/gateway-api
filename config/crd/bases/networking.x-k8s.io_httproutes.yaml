@@ -16,7 +16,11 @@ spec:
     singular: httproute
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .spec.hostnames
+      name: Hostnames
+      type: string
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: HTTPRoute is the Schema for the HTTPRoute resource.
