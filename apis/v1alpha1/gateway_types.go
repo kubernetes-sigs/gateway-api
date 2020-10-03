@@ -87,7 +87,7 @@ type GatewaySpec struct {
 	//
 	// If this field specifies multiple Listeners that have the same
 	// Port value but are not compatible, the GatewayClass must raise
-	// a "PortConflict" condition on the Gateway.
+	// a "Conflicted" condition in the Listener status.
 	//
 	// Support: Core
 	//
@@ -284,11 +284,11 @@ const (
 	HostnameMatchAny HostnameMatchType = "Any"
 )
 
-// ProtocolType defines the application protocol accepted by a
-// Listener. Implementations are not required to accept all the
-// defined protocols. If an implementation does not support a
-// specified protocol, it should raise a "ConditionUnsupportedProtocol"
-// condition for the affected Listener.
+// ProtocolType defines the application protocol accepted by a Listener.
+// Implementations are not required to accept all the defined protocols.
+// If an implementation does not support a specified protocol, it
+// should raise a "Detached" condition for the affected Listener with
+// a reason of "UnsupportedProtocol".
 //
 // Valid ProtocolType values are:
 //
@@ -591,6 +591,8 @@ type GatewayStatus struct {
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
+	// +listType=map
+	// +listMapKey=port
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
@@ -618,7 +620,7 @@ const (
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
-	// interoperability.`
+	// interoperability.
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
 	// GatewayReasonNotReconciled is used when the Gateway is
@@ -708,38 +710,138 @@ type ListenerStatus struct {
 // field.
 type ListenerConditionType string
 
+// ListenerConditionReason defines the set of reasons that explain
+// why a particular Listener condition type has been raised.
+type ListenerConditionReason string
+
 const (
-	// ConditionInvalidListener is a generic condition that is a catch all for
-	// unsupported configurations that do not match a more specific condition.
-	// Implementers should try to use a more specific condition instead of this
-	// one to give users and automation more information.
-	ConditionInvalidListener ListenerConditionType = "InvalidListener"
+	// ListenerConditionConflicted indicates that the controller
+	// was unable to resolve conflicting specification requirements
+	// for this Listener. If a Listener is conflicted, its network
+	// port should not be configured on any network elements.
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "HostnameConflict"
+	// * "ProtocolConflict"
+	// * "RouteConflict"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	ListenerConditionConflicted ListenerConditionType = "Conflicted"
 
-	// ConditionListenerNotReady indicates the listener is not ready.
-	ConditionListenerNotReady ListenerConditionType = "ListenerNotReady"
+	// ListenerReasonHostnameConflict is used when the Listener
+	// violates the Hostname match constraints that allow collapsing
+	// Listeners. For example, this reason would be used when multiple
+	// Listeners on the same port use the "Any" hostname match type.
+	ListenerReasonHostnameConflict ListenerConditionReason = "HostnameConflict"
 
-	// ConditionPortConflict indicates that two or more Listeners with
-	// the same port were bound to this gateway and they could not be
-	// collapsed into a single configuration.
-	ConditionPortConflict ListenerConditionType = "PortConflict"
+	// ListenerReasonProtocolConflict is used when multiple
+	// Listeners are specified with the same Listener port number,
+	// but have conflicting protocol specifications.
+	ListenerReasonProtocolConflict ListenerConditionReason = "ProtocolConflict"
 
-	// ConditionInvalidCertificateRef indicates the certificate reference of the
-	// listener's TLS configuration is invalid.
-	ConditionInvalidCertificateRef ListenerConditionType = "InvalidCertificateRef"
+	// ListenerReasonRouteConflict is used when the route
+	// resources selected for this Listener conflict with other
+	// specified properties of the Listener (e.g. Protocol).
+	// For example, a Listener that specifies "UDP" as the protocol
+	// but a route selector that resolves "TCPRoute" objects.
+	ListenerReasonRouteConflict ListenerConditionReason = "RouteConflict"
+)
 
-	// ConditionRoutesNotReady indicates that at least one of the specified
-	// routes is not ready.
-	ConditionRoutesNotReady ListenerConditionType = "RoutesNotReady"
+const (
+	// ListenerConditionDetached indicates that, even though
+	// the listener is syntactically and semantically valid, the
+	// controller is not able to configure it on the underlying
+	// Gateway infrastructure.
+	//
+	// A Listener is specified as a logical requirement, but needs to be
+	// configured on a network endpoint (i.e. address and port) by a
+	// controller. The controller may be unable to attach the Listener
+	// if it specifies an unsupported requirement, or prerequisite
+	// resources are not available.
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "PortUnavailable"
+	// * "UnsupportedExtension"
+	// * "UnsupportedProtocol"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	ListenerConditionDetached ListenerConditionType = "Detached"
 
-	// ConditionInvalidRoutes indicates that at least one of the specified
-	// routes is invalid.
-	ConditionInvalidRoutes ListenerConditionType = "InvalidRoutes"
+	// ListenerReasonPortUnavailable is used when the Listener
+	// requests a port that cannot be used on the Gateway.
+	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
 
-	// ConditionForbiddenRoutesForClass indicates that at least one of the
-	// routes is in a namespace forbidden by the GatewayClass.
-	ConditionForbiddenRoutesForClass ListenerConditionType = "ForbiddenRoutesForClass"
+	// ListenerReasonUnsupportedExtension is used when the
+	// controller detects that an implementation-specific Listener
+	// extension is being requested, but is not able to support
+	// the extension.
+	ListenerReasonUnsupportedExtension ListenerConditionReason = "UnsupportedExtension"
 
-	// ConditionUnsupportedProtocol indicates that an invalid
-	// or unsupported protocol type was requested.
-	ConditionUnsupportedProtocol ListenerConditionType = "UnsupportedProtocol"
+	// ListenerReasonUnsupportedProtocol is used when the
+	// Listener could not be attached to be Gateway because its
+	// protocol type is not supported.
+	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
+)
+
+const (
+	// ListenerConditionResolvedRefs indicates whether the
+	// controller was able to resolve all the object references
+	// for the Listener.
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "DroppedRoutes"
+	// * "InvalidCertificateRef"
+	// * "InvalidRoutesRef"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	ListenerConditionResolvedRefs ListenerConditionType = "ResolvedRefs"
+
+	// ListenerReasonDroppedRoutes indicates that not all of the routes
+	// selected by this Listener could be configured. The specific
+	// reason why each route was dropped should be indicated in the
+	// route's .Status.Conditions field.
+	ListenerReasonDroppedRoutes ListenerConditionReason = "DroppedRoutes"
+
+	// ListenerReasonInvalidCertificateRef is used when the
+	// Listener has a TLS configuration with a TLS CertificateRef
+	// that is invalid or cannot be resolved.
+	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
+
+	// ListenerReasonInvalidRoutesRef is used when the Listener's Routes
+	// selector is invalid or cannot be resolved. Note that it is not
+	// an error for this selector to not resolve any Routes, and the
+	// "ResolvedRefs" status condition should not be raised in that case.
+	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRoutesRef"
+)
+
+const (
+	// ListenerConditionReady indicates whether the Listener
+	// has been configured on the Gateway.
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "Invalid"
+	// * "Pending"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	ListenerConditionReady ListenerConditionType = "Ready"
+
+	// ListenerReasonInvalid is used when the Listener is
+	// syntactically or semantically invalid.
+	ListenerReasonInvalid ListenerConditionReason = "Invalid"
+
+	// ListenerReasonPending is used when the Listener is not
+	// yet not online and ready to accept client traffic.
+	ListenerReasonPending ListenerConditionReason = "Pending"
 )

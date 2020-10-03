@@ -239,7 +239,7 @@ That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdqu
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
 <p>If this field specifies multiple Listeners that have the same
 Port value but are not compatible, the GatewayClass must raise
-a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
+a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1463,7 +1463,7 @@ That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdqu
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
 <p>If this field specifies multiple Listeners that have the same
 Port value but are not compatible, the GatewayClass must raise
-a &ldquo;PortConflict&rdquo; condition on the Gateway.</p>
+a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1867,9 +1867,12 @@ string
 <p>ServiceName refers to the name of the Service to mirror matched requests
 to. When specified, this takes the place of BackendRef. If both
 BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
-Route to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1886,9 +1889,12 @@ LocalObjectReference
 <em>(Optional)</em>
 <p>BackendRef is a local object reference to mirror matched requests to. If
 both BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -1901,13 +1907,18 @@ int32
 </td>
 <td>
 <em>(Optional)</em>
-<p>Port specifies the destination port number to use for the backend
-referenced by the ServiceName or BackendRef field. If unspecified and a
-Service object consisting of a single port definition is the backend,
-that port will be used. If unspecified and the backend is a Service
-object consisting of multiple port definitions, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+<p>Port specifies the destination port number to use for the
+backend referenced by the ServiceName or BackendRef field.</p>
+<p>If the port is unspecified and a Service object consisting
+of a single port definition is the backend, that port will
+be used.</p>
+<p>If the port is unspecified and the backend is a Service
+object consisting of multiple port definitions, the route
+must be dropped from the Gateway. The controller should
+raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
+&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
+should be updated with a condition that describes the error
+more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2043,9 +2054,12 @@ string
 <p>ServiceName refers to the name of the Service to forward matched requests
 to. When specified, this takes the place of BackendRef. If both
 BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
-Route to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2062,9 +2076,12 @@ LocalObjectReference
 <em>(Optional)</em>
 <p>BackendRef is a reference to a backend to forward matched requests to. If
 both BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -2077,13 +2094,18 @@ int32
 </td>
 <td>
 <em>(Optional)</em>
-<p>Port specifies the destination port number to use for the backend
-referenced by the ServiceName or BackendRef field. If unspecified and a
-Service object consisting of a single port definition is the backend,
-that port will be used. If unspecified and the backend is a Service
-object consisting of multiple port definitions, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+<p>Port specifies the destination port number to use for the
+backend referenced by the ServiceName or BackendRef field.</p>
+<p>If the port is unspecified and a Service object consisting
+of a single port definition is the backend, that port will
+be used.</p>
+<p>If the port is unspecified and the backend is a Service
+object consisting of multiple port definitions, the route
+must be dropped from the Gateway. The controller should
+raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
+&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
+should be updated with a condition that describes the error
+more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2207,9 +2229,12 @@ LocalObjectReference
 string for the group) or an implementation-defined resource (for
 example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the HTTPRoute will be true.</p>
+group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -2693,6 +2718,12 @@ invalid, the rest of the Route should still be supported.</p>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.ListenerConditionReason">ListenerConditionReason
+(<code>string</code> alias)</p></h3>
+<p>
+<p>ListenerConditionReason defines the set of reasons that explain
+why a particular Listener condition type has been raised.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerConditionType">ListenerConditionType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -2833,11 +2864,11 @@ Valid PathMatchType values are:</p>
 <a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
 </p>
 <p>
-<p>ProtocolType defines the application protocol accepted by a
-Listener. Implementations are not required to accept all the
-defined protocols. If an implementation does not support a
-specified protocol, it should raise a &ldquo;ConditionUnsupportedProtocol&rdquo;
-condition for the affected Listener.</p>
+<p>ProtocolType defines the application protocol accepted by a Listener.
+Implementations are not required to accept all the defined protocols.
+If an implementation does not support a specified protocol, it
+should raise a &ldquo;Detached&rdquo; condition for the affected Listener with
+a reason of &ldquo;UnsupportedProtocol&rdquo;.</p>
 <p>Valid ProtocolType values are:</p>
 <ul>
 <li>&ldquo;HTTP&rdquo;</li>
@@ -2976,9 +3007,12 @@ string
 <p>ServiceName refers to the name of the Service to forward matched requests
 to. When specified, this takes the place of BackendRef. If both
 BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this
-Route to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2995,9 +3029,12 @@ LocalObjectReference
 <em>(Optional)</em>
 <p>BackendRef is a reference to a backend to forward matched requests to. If
 both BackendRef and ServiceName are specified, ServiceName will be given
-precedence. If the referent cannot be found, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+precedence.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -3010,13 +3047,17 @@ int32
 </td>
 <td>
 <em>(Optional)</em>
-<p>Port specifies the destination port number to use for the backend
-referenced by the ServiceName or BackendRef field. If unspecified and a
-Service object consisting of a single port definition is the backend,
-that port will be used. If unspecified and the backend is a Service
-object consisting of multiple port definitions, controllers must set the
-&ldquo;InvalidRoutes&rdquo; status condition on any Gateway that includes this Route
-to true.</p>
+<p>Port specifies the destination port number to use for the
+backend referenced by the ServiceName or BackendRef field.</p>
+<p>If the port is unspecified and a Service object consisting
+of a single port definition is the backend, that port will
+be used.</p>
+<p>If the port is unspecified and the backend is a Service
+object consisting of multiple port definitions, the route
+must be dropped from the Gateway. The controller should
+raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
+&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
+should be updated with a condition that describes the error</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3328,9 +3369,12 @@ LocalObjectReference
 string for the group) or an implementation-defined resource (for
 example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the TCPRoute will be true.</p>
+group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -3572,9 +3616,12 @@ LocalObjectReference
 string for the group) or an implementation-defined resource (for
 example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the TLSRoute will be true.</p>
+group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -3753,9 +3800,12 @@ LocalObjectReference
 string for the group) or an implementation-defined resource (for
 example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.  If the referent
-cannot be found, the &ldquo;InvalidRoutes&rdquo; status condition on any Gateway
-that includes the UDPRoute will be true.</p>
+group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
+<p>If the referent cannot be found, the route must be dropped
+from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+The gateway status for this route should be updated with a
+condition that describes the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>

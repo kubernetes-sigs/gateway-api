@@ -102,9 +102,13 @@ type TLSRouteMatch struct {
 	// string for the group) or an implementation-defined resource (for
 	// example, resource "myroutematchers" in group "networking.acme.io").
 	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".  If the referent
-	// cannot be found, the "InvalidRoutes" status condition on any Gateway
-	// that includes the TLSRoute will be true.
+	// group indicates that the resource is "configmaps".
+	//
+	// If the referent cannot be found, the route must be dropped
+	// from the Gateway. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DroppedRoutes" reason.
+	// The gateway status for this route should be updated with a
+	// condition that describes the error more specifically.
 	//
 	// Support: custom
 	//

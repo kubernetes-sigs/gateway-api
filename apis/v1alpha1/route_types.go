@@ -72,9 +72,13 @@ type RouteForwardTo struct {
 	// ServiceName refers to the name of the Service to forward matched requests
 	// to. When specified, this takes the place of BackendRef. If both
 	// BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence. If the referent cannot be found, controllers must set the
-	// "InvalidRoutes" status condition on any Gateway that includes this
-	// Route to true.
+	// precedence.
+	//
+	// If the referent cannot be found, the route must be dropped
+	// from the Gateway. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DroppedRoutes" reason.
+	// The gateway status for this route should be updated with a
+	// condition that describes the error more specifically.
 	//
 	// Support: Core
 	//
@@ -84,22 +88,33 @@ type RouteForwardTo struct {
 
 	// BackendRef is a reference to a backend to forward matched requests to. If
 	// both BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence. If the referent cannot be found, controllers must set the
-	// "InvalidRoutes" status condition on any Gateway that includes this Route
-	// to true.
+	// precedence.
+	//
+	// If the referent cannot be found, the route must be dropped
+	// from the Gateway. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DroppedRoutes" reason.
+	// The gateway status for this route should be updated with a
+	// condition that describes the error more specifically.
+	//
 	//
 	// Support: Custom
 	//
 	// +optional
 	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
 
-	// Port specifies the destination port number to use for the backend
-	// referenced by the ServiceName or BackendRef field. If unspecified and a
-	// Service object consisting of a single port definition is the backend,
-	// that port will be used. If unspecified and the backend is a Service
-	// object consisting of multiple port definitions, controllers must set the
-	// "InvalidRoutes" status condition on any Gateway that includes this Route
-	// to true.
+	// Port specifies the destination port number to use for the
+	// backend referenced by the ServiceName or BackendRef field.
+	//
+	// If the port is unspecified and a Service object consisting
+	// of a single port definition is the backend, that port will
+	// be used.
+	//
+	// If the port is unspecified and the backend is a Service
+	// object consisting of multiple port definitions, the route
+	// must be dropped from the Gateway. The controller should
+	// raise the "ResolvedRefs" condition on the Gateway with the
+	// "DroppedRoutes" reason.  The gateway status for this route
+	// should be updated with a condition that describes the error
 	//
 	// Support: Core
 	//
