@@ -591,12 +591,10 @@ type GatewayStatus struct {
 	// * "Scheduled"
 	// * "Ready"
 	//
-	// +patchMergeKey=type
-	// +patchStrategy=merge
 	// +listType=map
 	// +listMapKey=type
-	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
@@ -708,6 +706,8 @@ type ListenerStatus struct {
 
 	// Conditions describe the current condition of this listener.
 	//
+	// +listType=map
+	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions"`
 }

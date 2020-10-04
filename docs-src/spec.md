@@ -1017,7 +1017,6 @@ Route(s) using backends configured by this BackendPolicy.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Conditions describe the current conditions of the BackendPolicy.</p>
 </td>
 </tr>

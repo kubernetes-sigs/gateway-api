@@ -157,6 +157,9 @@ spec:
                   type: object
                 maxItems: 8
                 type: array
+                x-kubernetes-list-map-keys:
+                - type
+                x-kubernetes-list-type: map
               provisionedGateways:
                 description: ProvisionedGateways is a list of Gateways that have been provisioned using this class. Implementations must add any Gateways of this class to this list once they have been provisioned and remove Gateways as soon as they are deleted or deprovisioned.
                 items:

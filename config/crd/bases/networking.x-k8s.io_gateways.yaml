@@ -386,6 +386,9 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-map-keys:
+                      - type
+                      x-kubernetes-list-type: map
                     port:
                       description: Port is the unique Listener port value for which this message is reporting the status. If more than one Gateway Listener shares the same port value, this message reports the combined status of all such Listeners.
                       format: int32
