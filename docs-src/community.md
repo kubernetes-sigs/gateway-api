@@ -3,6 +3,12 @@
 This page contains links to all of the meeting notes, design docs and related
 discussions around the APIs.
 
+## Feedback and Bug Reports
+
+Feedback and bug reports should be filed as [Github Issues][gh-issues] on this repo.
+
+[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues/new/choose
+
 ## Communications
 
 Major discussions and notifications will be sent on the [SIG-NETWORK mailing

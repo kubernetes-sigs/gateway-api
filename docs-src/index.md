@@ -25,7 +25,6 @@ For everyone:
 * [Releases](releases.md)
 * [Security Model](security-model.md)
 * [Enhancement requests](enhancement-requests.md)
-* [Feedback and bug reports](feedback.md)
 
 ## Contacts
 
