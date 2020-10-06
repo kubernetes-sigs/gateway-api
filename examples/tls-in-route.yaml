@@ -7,7 +7,7 @@ spec:
   parametersRef:
     name: acme-lb
     group: acme.io
-    resource: parameters
+    kind: Parameters
 ---
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -24,13 +24,13 @@ spec:
     tls:
       mode: Terminate
       certificateRef:
-        resource: secrets
+        kind: Secret
         group: core
         name: default-cert
       routeOverride:
         certificate: Allow
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false
@@ -50,7 +50,7 @@ spec:
   - "bar.example.com"
   tls:
     certificateRef:
-      resource: secrets
+      kind: Secret
       group: core
       name: bar-example-com-cert
   rules:
@@ -62,7 +62,7 @@ spec:
     - backendRef:
         name: my-service
         group: core
-        resource: services
+        kind: Service
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -76,7 +76,7 @@ spec:
   - "baz.example.com"
   tls:
     certificateRef:
-      resource: secrets
+      kind: Secret
       group: core
       name: baz-example-com-cert
   rules:
@@ -88,4 +88,4 @@ spec:
     - backendRef:
         name: my-service
         group: core
-        resource: services
+        kind: Service

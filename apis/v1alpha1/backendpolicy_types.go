@@ -67,48 +67,15 @@ type BackendPolicySpec struct {
 // BackendRef identifies an API object within a known namespace that defaults
 // group to core and resource to services if unspecified.
 type BackendRef struct {
-	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.  For example, use the
-	// following to specify a service:
-	//
-	// fooRef:
-	//   resource: services
-	//   name: myservice
-	//
-	// Otherwise, if the core API group is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:default=core
+	// Group is the group of the referent.
 	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group,omitempty"`
+	Group string `json:"group"`
 
-	// Resource is the API resource name of the referent. Omitting the value
-	// or specifying the empty string indicates the services resource. For example,
-	// use the following to specify a services resource:
-	//
-	// fooRef:
-	//   name: myservice
-	//
-	// Otherwise, if the services resource is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:default=services
+	// Kind is the kind of the referent.
 	// +kubebuilder:validation:MaxLength=253
-	Resource string `json:"resource,omitempty"`
+	Kind string `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 
@@ -136,7 +103,7 @@ type BackendTLSConfig struct {
 	// Support: Extended
 	//
 	// +optional
-	ClientCertificateRef *CertificateObjectReference `json:"clientCertificateRef,omitempty"`
+	ClientCertificateRef *LocalObjectReference `json:"clientCertificateRef,omitempty"`
 
 	// CertificateAuthorityRef is a reference to a resource that includes
 	// trusted CA certificates for the associated backends. If an entry in this
@@ -152,7 +119,7 @@ type BackendTLSConfig struct {
 	// Support: Extended
 	//
 	// +optional
-	CertificateAuthorityRef *CertificateObjectReference `json:"certificateAuthorityRef,omitempty"`
+	CertificateAuthorityRef *LocalObjectReference `json:"certificateAuthorityRef,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options to the
 	// provider.

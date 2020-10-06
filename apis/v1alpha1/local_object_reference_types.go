@@ -16,111 +16,16 @@ limitations under the License.
 
 package v1alpha1
 
-// ServicesDefaultLocalObjectReference identifies an API object within a
-// known namespace that defaults group to core and resource to services
-// if unspecified.
-type ServicesDefaultLocalObjectReference struct {
-	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.  For example, use the
-	// following to specify a service:
-	//
-	// fooRef:
-	//   resource: services
-	//   name: myservice
-	//
-	// Otherwise, if the core API group is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:validation:MaxLength=253
-	// +kubebuilder:default=core
-	Group string `json:"group,omitempty"`
-	// Resource is the API resource name of the referent. Omitting the value
-	// or specifying the empty string indicates the services resource. For example,
-	// use the following to specify a services resource:
-	//
-	// fooRef:
-	//   name: myservice
-	//
-	// Otherwise, if the services resource is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:validation:MaxLength=253
-	// +kubebuilder:default=services
-	Resource string `json:"resource,omitempty"`
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-}
-
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
-	// Group is the API group name of the referent
+	// Group is the group of the referent.
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
-	// Resource is the API resource name of the referent.
+	// Kind is kind of the referent.
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	Resource string `json:"resource"`
-	// Name is the name of the referent.
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-}
-
-// SecretsDefaultLocalObjectReference identifies an API object within a
-// known namespace that defaults group to core and resource to secrets
-// if unspecified.
-type SecretsDefaultLocalObjectReference struct {
-	// Group is the group of the referent.  Omitting the value or specifying
-	// the empty string indicates the core API group.  For example, use the
-	// following to specify a secrets resource:
-	//
-	// fooRef:
-	//   resource: secrets
-	//   name: mysecret
-	//
-	// Otherwise, if the core API group is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:validation:MaxLength=253
-	// +kubebuilder:default=core
-	Group string `json:"group,omitempty"`
-	// Resource is the API resource name of the referent. Omitting the value
-	// or specifying the empty string indicates the secrets resource. For
-	// example, use the following to specify a secrets resource:
-	//
-	// fooRef:
-	//   name: mysecret
-	//
-	// Otherwise, if the secrets resource is not desired, specify the desired
-	// group:
-	//
-	// fooRef:
-	//   group: acme.io
-	//   resource: foos
-	//   name: myfoo
-	//
-	// +kubebuilder:validation:MaxLength=253
-	// +kubebuilder:default=secrets
-	Resource string `json:"resource,omitempty"`
+	Kind string `json:"kind"`
 	// Name is the name of the referent.
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253

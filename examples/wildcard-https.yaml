@@ -18,10 +18,10 @@ spec:
       options: {}
       certificateRef:
         name: example-wildcard
-        resource: secrets
+        kind: Secret
         group: core
     routes:
-      resource: httproutes
+      kind: HTTPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

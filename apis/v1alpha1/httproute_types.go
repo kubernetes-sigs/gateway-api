@@ -136,7 +136,7 @@ type RouteTLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +required
-	CertificateRef CertificateObjectReference `json:"certificateRef"`
+	CertificateRef LocalObjectReference `json:"certificateRef"`
 }
 
 // HTTPRouteHostname is used to specify a hostname that should be matched by

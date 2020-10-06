@@ -74,7 +74,12 @@ spec:
                 description: "ParametersRef is a controller-specific resource containing the configuration parameters corresponding to this class. This is optional if the controller does not require any additional configuration. \n Parameters resources are implementation specific custom resources. These resources must be cluster-scoped. \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: Custom"
                 properties:
                   group:
-                    description: Group is the API group name of the referent
+                    description: Group is the group of the referent.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  kind:
+                    description: Kind is kind of the referent.
                     maxLength: 253
                     minLength: 1
                     type: string
@@ -83,15 +88,10 @@ spec:
                     maxLength: 253
                     minLength: 1
                     type: string
-                  resource:
-                    description: Resource is the API resource name of the referent.
-                    maxLength: 253
-                    minLength: 1
-                    type: string
                 required:
                 - group
+                - kind
                 - name
-                - resource
                 type: object
             required:
             - controller

@@ -106,13 +106,12 @@ spec:
                       properties:
                         group:
                           default: networking.x-k8s.io
-                          description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   resource: httproutes \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
+                          description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   kind: HTTPRoute \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
                           maxLength: 253
                           minLength: 1
                           type: string
-                        resource:
-                          description: "Resource is the API resource name of the route resource to select. \n Resource MUST correspond to route resources that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
-                          maxLength: 253
+                        kind:
+                          description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
                           type: string
                         routeNamespaces:
                           default:
@@ -185,7 +184,7 @@ spec:
                               type: object
                           type: object
                       required:
-                      - resource
+                      - kind
                       type: object
                     tls:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n The association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener: - \"Domain\": Certificate should be used for the domain and its   first-level subdomains. - \"Exact\": Certificate should be used for the domain only. - \"Any\": Certificate in GatewayTLSConfig is the default certificate to use. \n The GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake. \n Support: Core"
@@ -194,21 +193,23 @@ spec:
                           description: 'CertificateRef is the reference to Kubernetes object that contain a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this GatewayTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
                           properties:
                             group:
-                              default: core
-                              description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a secrets resource: \n fooRef:   resource: secrets   name: mysecret \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                              description: Group is the group of the referent.
                               maxLength: 253
+                              minLength: 1
+                              type: string
+                            kind:
+                              description: Kind is kind of the referent.
+                              maxLength: 253
+                              minLength: 1
                               type: string
                             name:
                               description: Name is the name of the referent.
                               maxLength: 253
                               minLength: 1
                               type: string
-                            resource:
-                              default: secrets
-                              description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the secrets resource. For example, use the following to specify a secrets resource: \n fooRef:   name: mysecret \n Otherwise, if the secrets resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
-                              maxLength: 253
-                              type: string
                           required:
+                          - group
+                          - kind
                           - name
                           type: object
                         mode:

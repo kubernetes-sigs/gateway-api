@@ -80,7 +80,12 @@ spec:
                             description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. If the referent cannot be found, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Custom"
                             properties:
                               group:
-                                description: Group is the API group name of the referent
+                                description: Group is the group of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              kind:
+                                description: Kind is kind of the referent.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -89,15 +94,10 @@ spec:
                                 maxLength: 253
                                 minLength: 1
                                 type: string
-                              resource:
-                                description: Resource is the API resource name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
                             required:
                             - group
+                            - kind
                             - name
-                            - resource
                             type: object
                           port:
                             description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. If unspecified and a Service object consisting of a single port definition is the backend, that port will be used. If unspecified and the backend is a Service object consisting of multiple port definitions, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Core"
@@ -128,7 +128,12 @@ spec:
                             description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutematchers\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the TLSRoute will be true. \n Support: custom"
                             properties:
                               group:
-                                description: Group is the API group name of the referent
+                                description: Group is the group of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              kind:
+                                description: Kind is kind of the referent.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -137,15 +142,10 @@ spec:
                                 maxLength: 253
                                 minLength: 1
                                 type: string
-                              resource:
-                                description: Resource is the API resource name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
                             required:
                             - group
+                            - kind
                             - name
-                            - resource
                             type: object
                           snis:
                             description: "SNIs defines a set of SNI names that should match against the SNI attribute of TLS CLientHello message in TLS handshake. \n SNI can be \"precise\" which is a domain name without the terminating dot of a network host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain name prefixed with a single wildcard label (e.g. \"*.example.com\"). The wildcard character '*' must appear by itself as the first DNS label and matches only a single label. You cannot have a wildcard label by itself (e.g. Host == \"*\"). Requests will be matched against the Host field in the following order: \n 1. If SNI is precise, the request matches this rule if    the SNI in ClientHello is equal to one of the defined SNIs. 2. If SNI is a wildcard, then the request matches this rule if    the SNI is to equal to the suffix    (removing the first label) of the wildcard rule. \n Support: core"

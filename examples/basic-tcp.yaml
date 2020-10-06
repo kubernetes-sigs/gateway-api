@@ -7,7 +7,7 @@ spec:
   parametersRef:
     name: acme-lb
     group: acme.io
-    resource: parameters
+    kind: Parameters
 ---
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -20,7 +20,7 @@ spec:
   - protocol: TCP
     port: 8080
     routes:
-      resource: tcpproutes
+      kind: TCPRoute
       routeNamespaces:
         namespaceSelector: {}
         onlySameNamespace: false

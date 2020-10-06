@@ -1361,39 +1361,18 @@ string
 </em>
 </td>
 <td>
-<p>Group is the group of the referent.  Omitting the value or specifying
-the empty string indicates the core API group.  For example, use the
-following to specify a service:</p>
-<p>fooRef:
-resource: services
-name: myservice</p>
-<p>Otherwise, if the core API group is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
+<p>Group is the group of the referent.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>resource</code></br>
+<code>kind</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Resource is the API resource name of the referent. Omitting the value
-or specifying the empty string indicates the services resource. For example,
-use the following to specify a services resource:</p>
-<p>fooRef:
-name: myservice</p>
-<p>Otherwise, if the services resource is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
+<p>Kind is the kind of the referent.</p>
 </td>
 </tr>
 <tr>
@@ -1443,8 +1422,8 @@ all ports on the backend.</p>
 <td>
 <code>clientCertificateRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-SecretsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -1466,8 +1445,8 @@ private key to use for TLS.</p>
 <td>
 <code>certificateAuthorityRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-SecretsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -1968,8 +1947,8 @@ CertificateRef field is ignored in this mode.</p>
 <td>
 <code>certificateRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-SecretsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3124,13 +3103,16 @@ status of all such Listeners.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">BackendTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
@@ -3155,18 +3137,18 @@ string
 </em>
 </td>
 <td>
-<p>Group is the API group name of the referent</p>
+<p>Group is the group of the referent.</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>resource</code></br>
+<code>kind</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Resource is the API resource name of the referent.</p>
+<p>Kind is kind of the referent.</p>
 </td>
 </tr>
 <tr>
@@ -3284,7 +3266,7 @@ string
 the empty string indicates the networking.x-k8s.io API group.
 For example, use the following to select an HTTPRoute:</p>
 <p>routes:
-resource: httproutes</p>
+kind: HTTPRoute</p>
 <p>Otherwise, if an alternative API group is desired, specify the desired
 group:</p>
 <p>routes:
@@ -3295,14 +3277,14 @@ resource: fooroutes</p>
 </tr>
 <tr>
 <td>
-<code>resource</code></br>
+<code>kind</code></br>
 <em>
 string
 </em>
 </td>
 <td>
-<p>Resource is the API resource name of the route resource to select.</p>
-<p>Resource MUST correspond to route resources that are compatible with the
+<p>Kind is the kind of the route resource to select.</p>
+<p>Kind MUST correspond to kinds of routes that are compatible with the
 application protocol specified in the Listener&rsquo;s Protocol field.</p>
 <p>If an implementation does not support or recognize this
 resource type, it SHOULD raise a &ldquo;ConditionInvalidRoutes&rdquo;
@@ -3640,8 +3622,8 @@ appropriate when the route is modified.</p>
 <td>
 <code>certificateRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">
-SecretsDefaultLocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
+LocalObjectReference
 </a>
 </em>
 </td>
@@ -3656,154 +3638,6 @@ An implementation may support other resources (for example, resource
 &ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Support: Core (Kubernetes Secrets)
 Support: Implementation-specific (Other resource types)</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.SecretsDefaultLocalObjectReference">SecretsDefaultLocalObjectReference
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">BackendTLSConfig</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>)
-</p>
-<p>
-<p>SecretsDefaultLocalObjectReference identifies an API object within a
-known namespace that defaults group to core and resource to secrets
-if unspecified.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>group</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Group is the group of the referent.  Omitting the value or specifying
-the empty string indicates the core API group.  For example, use the
-following to specify a secrets resource:</p>
-<p>fooRef:
-resource: secrets
-name: mysecret</p>
-<p>Otherwise, if the core API group is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resource</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Resource is the API resource name of the referent. Omitting the value
-or specifying the empty string indicates the secrets resource. For
-example, use the following to specify a secrets resource:</p>
-<p>fooRef:
-name: mysecret</p>
-<p>Otherwise, if the secrets resource is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referent.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.ServicesDefaultLocalObjectReference">ServicesDefaultLocalObjectReference
-</h3>
-<p>
-<p>ServicesDefaultLocalObjectReference identifies an API object within a
-known namespace that defaults group to core and resource to services
-if unspecified.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>group</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Group is the group of the referent.  Omitting the value or specifying
-the empty string indicates the core API group.  For example, use the
-following to specify a service:</p>
-<p>fooRef:
-resource: services
-name: myservice</p>
-<p>Otherwise, if the core API group is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>resource</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Resource is the API resource name of the referent. Omitting the value
-or specifying the empty string indicates the services resource. For example,
-use the following to specify a services resource:</p>
-<p>fooRef:
-name: myservice</p>
-<p>Otherwise, if the services resource is not desired, specify the desired
-group:</p>
-<p>fooRef:
-group: acme.io
-resource: foos
-name: myfoo</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<p>Name is the name of the referent.</p>
 </td>
 </tr>
 </tbody>

@@ -40,7 +40,12 @@ spec:
                 description: "ExtensionRef is an optional, implementation-specific extension to the \"host\" block. The resource may be \"configmaps\"  or an implementation-defined resource (for example, resource \"myroutehosts\" in group \"networking.acme.io\"). \n If the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true. \n Support: custom"
                 properties:
                   group:
-                    description: Group is the API group name of the referent
+                    description: Group is the group of the referent.
+                    maxLength: 253
+                    minLength: 1
+                    type: string
+                  kind:
+                    description: Kind is kind of the referent.
                     maxLength: 253
                     minLength: 1
                     type: string
@@ -49,15 +54,10 @@ spec:
                     maxLength: 253
                     minLength: 1
                     type: string
-                  resource:
-                    description: Resource is the API resource name of the referent.
-                    maxLength: 253
-                    minLength: 1
-                    type: string
                 required:
                 - group
+                - kind
                 - name
-                - resource
                 type: object
               gateways:
                 default:
@@ -116,7 +116,12 @@ spec:
                             description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
                             properties:
                               group:
-                                description: Group is the API group name of the referent
+                                description: Group is the group of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              kind:
+                                description: Kind is kind of the referent.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -125,15 +130,10 @@ spec:
                                 maxLength: 253
                                 minLength: 1
                                 type: string
-                              resource:
-                                description: Resource is the API resource name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
                             required:
                             - group
+                            - kind
                             - name
-                            - resource
                             type: object
                           requestHeader:
                             description: HTTPRequestHeaderFilter defines configuration for the RequestHeader filter.
@@ -160,7 +160,12 @@ spec:
                                 description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. If the referent cannot be found, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Custom"
                                 properties:
                                   group:
-                                    description: Group is the API group name of the referent
+                                    description: Group is the group of the referent.
+                                    maxLength: 253
+                                    minLength: 1
+                                    type: string
+                                  kind:
+                                    description: Kind is kind of the referent.
                                     maxLength: 253
                                     minLength: 1
                                     type: string
@@ -169,15 +174,10 @@ spec:
                                     maxLength: 253
                                     minLength: 1
                                     type: string
-                                  resource:
-                                    description: Resource is the API resource name of the referent.
-                                    maxLength: 253
-                                    minLength: 1
-                                    type: string
                                 required:
                                 - group
+                                - kind
                                 - name
-                                - resource
                                 type: object
                               port:
                                 description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. If unspecified and a Service object consisting of a single port definition is the backend, that port will be used. If unspecified and the backend is a Service object consisting of multiple port definitions, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Core"
@@ -209,7 +209,12 @@ spec:
                             description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. If the referent cannot be found, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Custom"
                             properties:
                               group:
-                                description: Group is the API group name of the referent
+                                description: Group is the group of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              kind:
+                                description: Kind is kind of the referent.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -218,15 +223,10 @@ spec:
                                 maxLength: 253
                                 minLength: 1
                                 type: string
-                              resource:
-                                description: Resource is the API resource name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
                             required:
                             - group
+                            - kind
                             - name
-                            - resource
                             type: object
                           filters:
                             description: "Filters defined at this-level should be executed if and only if the request is being forwarded to the backend defined here. \n Conformance: Filtering support, including core filters, is NOT guaranteed at this-level. Use Filters in HTTPRouteRule for portable filters across implementations. \n Support: Custom"
@@ -237,7 +237,12 @@ spec:
                                   description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
                                   properties:
                                     group:
-                                      description: Group is the API group name of the referent
+                                      description: Group is the group of the referent.
+                                      maxLength: 253
+                                      minLength: 1
+                                      type: string
+                                    kind:
+                                      description: Kind is kind of the referent.
                                       maxLength: 253
                                       minLength: 1
                                       type: string
@@ -246,15 +251,10 @@ spec:
                                       maxLength: 253
                                       minLength: 1
                                       type: string
-                                    resource:
-                                      description: Resource is the API resource name of the referent.
-                                      maxLength: 253
-                                      minLength: 1
-                                      type: string
                                   required:
                                   - group
+                                  - kind
                                   - name
-                                  - resource
                                   type: object
                                 requestHeader:
                                   description: HTTPRequestHeaderFilter defines configuration for the RequestHeader filter.
@@ -281,7 +281,12 @@ spec:
                                       description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. If the referent cannot be found, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Custom"
                                       properties:
                                         group:
-                                          description: Group is the API group name of the referent
+                                          description: Group is the group of the referent.
+                                          maxLength: 253
+                                          minLength: 1
+                                          type: string
+                                        kind:
+                                          description: Kind is kind of the referent.
                                           maxLength: 253
                                           minLength: 1
                                           type: string
@@ -290,15 +295,10 @@ spec:
                                           maxLength: 253
                                           minLength: 1
                                           type: string
-                                        resource:
-                                          description: Resource is the API resource name of the referent.
-                                          maxLength: 253
-                                          minLength: 1
-                                          type: string
                                       required:
                                       - group
+                                      - kind
                                       - name
-                                      - resource
                                       type: object
                                     port:
                                       description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. If unspecified and a Service object consisting of a single port definition is the backend, that port will be used. If unspecified and the backend is a Service object consisting of multiple port definitions, controllers must set the \"InvalidRoutes\" status condition on any Gateway that includes this Route to true. \n Support: Core"
@@ -354,7 +354,12 @@ spec:
                             description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutematchers\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\".  If the referent cannot be found, the \"InvalidRoutes\" status condition on any Gateway that includes the HTTPRoute will be true. \n Support: custom"
                             properties:
                               group:
-                                description: Group is the API group name of the referent
+                                description: Group is the group of the referent.
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                              kind:
+                                description: Kind is kind of the referent.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -363,15 +368,10 @@ spec:
                                 maxLength: 253
                                 minLength: 1
                                 type: string
-                              resource:
-                                description: Resource is the API resource name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
                             required:
                             - group
+                            - kind
                             - name
-                            - resource
                             type: object
                           headers:
                             description: Headers specifies a HTTP request header matcher.
@@ -427,21 +427,23 @@ spec:
                     description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
                     properties:
                       group:
-                        default: core
-                        description: "Group is the group of the referent.  Omitting the value or specifying the empty string indicates the core API group.  For example, use the following to specify a secrets resource: \n fooRef:   resource: secrets   name: mysecret \n Otherwise, if the core API group is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
+                        description: Group is the group of the referent.
                         maxLength: 253
+                        minLength: 1
+                        type: string
+                      kind:
+                        description: Kind is kind of the referent.
+                        maxLength: 253
+                        minLength: 1
                         type: string
                       name:
                         description: Name is the name of the referent.
                         maxLength: 253
                         minLength: 1
                         type: string
-                      resource:
-                        default: secrets
-                        description: "Resource is the API resource name of the referent. Omitting the value or specifying the empty string indicates the secrets resource. For example, use the following to specify a secrets resource: \n fooRef:   name: mysecret \n Otherwise, if the secrets resource is not desired, specify the desired group: \n fooRef:   group: acme.io   resource: foos   name: myfoo"
-                        maxLength: 253
-                        type: string
                     required:
+                    - group
+                    - kind
                     - name
                     type: object
                 required:
