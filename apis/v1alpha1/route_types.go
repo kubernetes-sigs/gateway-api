@@ -143,6 +143,9 @@ type RouteGatewayStatus struct {
 	// route has been admitted or rejected by the Gateway, and why.  Note
 	// that the route's availability is also subject to the Gateway's own
 	// status conditions and listener status.
+	//
+	// +listType=map
+	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }

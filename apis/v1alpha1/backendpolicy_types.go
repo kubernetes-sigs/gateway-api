@@ -167,7 +167,9 @@ type BackendTLSConfig struct {
 // Route(s) using backends configured by this BackendPolicy.
 type BackendPolicyStatus struct {
 	// Conditions describe the current conditions of the BackendPolicy.
-	// +optional
+	//
+	// +listType=map
+	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }

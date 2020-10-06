@@ -121,6 +121,8 @@ type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	//
+	// +listType=map
+	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`

@@ -503,6 +503,9 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                      x-kubernetes-list-map-keys:
+                      - type
+                      x-kubernetes-list-type: map
                     gatewayRef:
                       description: GatewayRef is a reference to a Gateway object that is associated with the route.
                       properties:
