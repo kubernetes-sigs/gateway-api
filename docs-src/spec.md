@@ -575,26 +575,6 @@ hostname).</p>
 <p>Rules are a list of HTTP matchers, filters and actions.</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;host&rdquo; block. The resource may be &ldquo;configmaps&rdquo;  or an implementation-defined
-resource (for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>If the referent cannot be found,
-the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
-will be true.</p>
-<p>Support: custom</p>
-</td>
-</tr>
 </table>
 </td>
 </tr>
@@ -2438,26 +2418,6 @@ hostname).</p>
 <p>Rules are a list of HTTP matchers, filters and actions.</p>
 </td>
 </tr>
-<tr>
-<td>
-<code>extensionRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;host&rdquo; block. The resource may be &ldquo;configmaps&rdquo;  or an implementation-defined
-resource (for example, resource &ldquo;myroutehosts&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>If the referent cannot be found,
-the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo; status condition
-will be true.</p>
-<p>Support: custom</p>
-</td>
-</tr>
 </tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteStatus">HTTPRouteStatus
@@ -2797,7 +2757,6 @@ status of all such Listeners.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteMatch">TCPRouteMatch</a>, 
