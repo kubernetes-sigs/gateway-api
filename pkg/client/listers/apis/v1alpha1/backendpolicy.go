@@ -26,8 +26,10 @@ import (
 )
 
 // BackendPolicyLister helps list BackendPolicies.
+// All objects returned here must be treated as read-only.
 type BackendPolicyLister interface {
 	// List lists all BackendPolicies in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.BackendPolicy, err error)
 	// BackendPolicies returns an object that can list and get BackendPolicies.
 	BackendPolicies(namespace string) BackendPolicyNamespaceLister
@@ -58,10 +60,13 @@ func (s *backendPolicyLister) BackendPolicies(namespace string) BackendPolicyNam
 }
 
 // BackendPolicyNamespaceLister helps list and get BackendPolicies.
+// All objects returned here must be treated as read-only.
 type BackendPolicyNamespaceLister interface {
 	// List lists all BackendPolicies in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.BackendPolicy, err error)
 	// Get retrieves the BackendPolicy from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.BackendPolicy, error)
 	BackendPolicyNamespaceListerExpansion
 }

@@ -26,8 +26,10 @@ import (
 )
 
 // HTTPRouteLister helps list HTTPRoutes.
+// All objects returned here must be treated as read-only.
 type HTTPRouteLister interface {
 	// List lists all HTTPRoutes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.HTTPRoute, err error)
 	// HTTPRoutes returns an object that can list and get HTTPRoutes.
 	HTTPRoutes(namespace string) HTTPRouteNamespaceLister
@@ -58,10 +60,13 @@ func (s *hTTPRouteLister) HTTPRoutes(namespace string) HTTPRouteNamespaceLister 
 }
 
 // HTTPRouteNamespaceLister helps list and get HTTPRoutes.
+// All objects returned here must be treated as read-only.
 type HTTPRouteNamespaceLister interface {
 	// List lists all HTTPRoutes in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.HTTPRoute, err error)
 	// Get retrieves the HTTPRoute from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.HTTPRoute, error)
 	HTTPRouteNamespaceListerExpansion
 }

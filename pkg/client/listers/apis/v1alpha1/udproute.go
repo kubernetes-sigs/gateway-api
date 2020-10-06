@@ -26,8 +26,10 @@ import (
 )
 
 // UDPRouteLister helps list UDPRoutes.
+// All objects returned here must be treated as read-only.
 type UDPRouteLister interface {
 	// List lists all UDPRoutes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.UDPRoute, err error)
 	// UDPRoutes returns an object that can list and get UDPRoutes.
 	UDPRoutes(namespace string) UDPRouteNamespaceLister
@@ -58,10 +60,13 @@ func (s *uDPRouteLister) UDPRoutes(namespace string) UDPRouteNamespaceLister {
 }
 
 // UDPRouteNamespaceLister helps list and get UDPRoutes.
+// All objects returned here must be treated as read-only.
 type UDPRouteNamespaceLister interface {
 	// List lists all UDPRoutes in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.UDPRoute, err error)
 	// Get retrieves the UDPRoute from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.UDPRoute, error)
 	UDPRouteNamespaceListerExpansion
 }

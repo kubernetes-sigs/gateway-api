@@ -26,8 +26,10 @@ import (
 )
 
 // TCPRouteLister helps list TCPRoutes.
+// All objects returned here must be treated as read-only.
 type TCPRouteLister interface {
 	// List lists all TCPRoutes in the indexer.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error)
 	// TCPRoutes returns an object that can list and get TCPRoutes.
 	TCPRoutes(namespace string) TCPRouteNamespaceLister
@@ -58,10 +60,13 @@ func (s *tCPRouteLister) TCPRoutes(namespace string) TCPRouteNamespaceLister {
 }
 
 // TCPRouteNamespaceLister helps list and get TCPRoutes.
+// All objects returned here must be treated as read-only.
 type TCPRouteNamespaceLister interface {
 	// List lists all TCPRoutes in the indexer for a given namespace.
+	// Objects returned here must be treated as read-only.
 	List(selector labels.Selector) (ret []*v1alpha1.TCPRoute, err error)
 	// Get retrieves the TCPRoute from the indexer for a given namespace and name.
+	// Objects returned here must be treated as read-only.
 	Get(name string) (*v1alpha1.TCPRoute, error)
 	TCPRouteNamespaceListerExpansion
 }
