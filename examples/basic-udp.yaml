@@ -22,8 +22,7 @@ spec:
     routes:
       kind: UDPRoute
       routeNamespaces:
-        namespaceSelector: {}
-        onlySameNamespace: false
+        from: "All"
       routeSelector:
         matchLabels:
           "app": "foo"

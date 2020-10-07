@@ -3480,7 +3480,26 @@ route. This field is ignored for other values of &ldquo;Allow&rdquo;.</p>
 <tbody>
 <tr>
 <td>
-<code>namespaceSelector</code></br>
+<code>from</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteSelectType">
+RouteSelectType
+</a>
+</em>
+</td>
+<td>
+<p>From indicates where Routes will be selected for this Gateway. Possible
+values are:
+* All: Routes in all namespaces may be used by this Gateway.
+* Selector: Routes in namespaces selected by the selector may be used by
+this Gateway.
+* Same: Only Routes in the same namespace may be used by this Gateway.</p>
+<p>Support: Core</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>selector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -3489,36 +3508,23 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>NamespaceSelector is a selector of namespaces that Routes should be
-selected from. This is a standard Kubernetes LabelSelector, a label query
-over a set of resources. The result of matchLabels and matchExpressions
-are ANDed. Controllers must not support Routes in namespaces outside this
-selector.</p>
-<p>An empty selector (default) indicates that Routes in any namespace can be
-selected.</p>
-<p>The OnlySameNamespace field takes precedence over this field. This
-selector will only take effect when OnlySameNamespace is false.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>onlySameNamespace</code></br>
-<em>
-bool
-</em>
-</td>
-<td>
-<p>OnlySameNamespace is a boolean used to indicate if Route references are
-limited to the same Namespace as the Gateway. When true, only Routes
-within the same Namespace as the Gateway should be selected.</p>
-<p>This field takes precedence over the NamespaceSelector field. That
-selector should only take effect when this field is set to false.</p>
+<p>Selector must be specified when From is set to &ldquo;Selector&rdquo;. In that case,
+only Routes in Namespaces matching this Selector will be selected by this
+Gateway. This field is ignored for other values of &ldquo;From&rdquo;.</p>
 <p>Support: Core</p>
 </td>
 </tr>
 </tbody>
 </table>
+<h3 id="networking.x-k8s.io/v1alpha1.RouteSelectType">RouteSelectType
+(<code>string</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">RouteNamespaces</a>)
+</p>
+<p>
+<p>RouteSelectType specifies where Routes should be selected by a Gateway.</p>
+</p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteStatus">RouteStatus
 </h3>
 <p>

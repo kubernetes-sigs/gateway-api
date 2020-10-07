@@ -114,12 +114,17 @@ spec:
                           description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
                           type: string
                         routeNamespaces:
-                          default:
-                            onlySameNamespace: true
                           description: "RouteNamespaces indicates in which namespaces Routes should be selected for this Gateway. This is restricted to the namespace of this Gateway by default. \n Support: Core"
                           properties:
-                            namespaceSelector:
-                              description: "NamespaceSelector is a selector of namespaces that Routes should be selected from. This is a standard Kubernetes LabelSelector, a label query over a set of resources. The result of matchLabels and matchExpressions are ANDed. Controllers must not support Routes in namespaces outside this selector. \n An empty selector (default) indicates that Routes in any namespace can be selected. \n The OnlySameNamespace field takes precedence over this field. This selector will only take effect when OnlySameNamespace is false. \n Support: Core"
+                            from:
+                              description: "From indicates where Routes will be selected for this Gateway. Possible values are: * All: Routes in all namespaces may be used by this Gateway. * Selector: Routes in namespaces selected by the selector may be used by   this Gateway. * Same: Only Routes in the same namespace may be used by this Gateway. \n Support: Core"
+                              enum:
+                              - All
+                              - Selector
+                              - Same
+                              type: string
+                            selector:
+                              description: "Selector must be specified when From is set to \"Selector\". In that case, only Routes in Namespaces matching this Selector will be selected by this Gateway. This field is ignored for other values of \"From\". \n Support: Core"
                               properties:
                                 matchExpressions:
                                   description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
@@ -148,10 +153,6 @@ spec:
                                   description: matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels map is equivalent to an element of matchExpressions, whose key field is "key", the operator is "In", and the values array contains only "value". The requirements are ANDed.
                                   type: object
                               type: object
-                            onlySameNamespace:
-                              default: true
-                              description: "OnlySameNamespace is a boolean used to indicate if Route references are limited to the same Namespace as the Gateway. When true, only Routes within the same Namespace as the Gateway should be selected. \n This field takes precedence over the NamespaceSelector field. That selector should only take effect when this field is set to false. \n Support: Core"
-                              type: boolean
                           type: object
                         routeSelector:
                           description: "RouteSelector specifies a set of route labels used for selecting routes to associate with the Gateway. If RouteSelector is defined, only routes matching the RouteSelector are associated with the Gateway. An empty RouteSelector matches all routes. \n Support: Core"
@@ -185,6 +186,7 @@ spec:
                           type: object
                       required:
                       - kind
+                      - routeNamespaces
                       type: object
                     tls:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n The association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener: - \"Domain\": Certificate should be used for the domain and its   first-level subdomains. - \"Exact\": Certificate should be used for the domain only. - \"Any\": Certificate in GatewayTLSConfig is the default certificate to use. \n The GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake. \n Support: Core"

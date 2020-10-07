@@ -21,8 +21,8 @@ spec:
       routes:
         kind: HTTPRoute
         routeNamespaces:
-          namespaceSelector: {}
-          onlySameNamespace: false
+          from: "Selector"
+          selector: {}
         routeSelector:
           matchLabels:
             app: split
