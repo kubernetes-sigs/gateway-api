@@ -934,17 +934,15 @@ relationships between the different resources:</p>
 <p>A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:</p>
 <ol>
 <li>A client makes a request to http://foo.example.com.</li>
-<li>DNS resolves the name to <code>gateway.status.listeners[x].address</code>.</li>
-<li>The reverse proxy receives the request on <code>gateway.status.listeners[x].address</code>:
- <code>gateway.spec.listeners[x].port</code> and uses the <a href="https://tools.ietf.org/html/rfc7230#section-5.4">Host header</a> to
- match an <code>HTTPRoute</code>.</li>
+<li>DNS resolves the name to a <code>Gateway</code> address.</li>
+<li>The reverse proxy receives the request on a <code>Listener</code> and uses the
+ <a href="https://tools.ietf.org/html/rfc7230#section-5.4">Host header</a> to match an <code>HTTPRoute</code>.</li>
 <li>Optionally, the reverse proxy can perform request header and/or path matching based
  on <code>match</code> rules of the <code>HTTPRoute</code>.</li>
-<li>Optionally, the reverse proxy can manipulate the request, i.e. add/remove headers,
- etc. based on <code>filter</code> rules of the <code>HTTPRoute</code>.</li>
-<li>Lastly, the reverse proxy forwards the request to one or more objects in the cluster
- based on <code>action</code> rules of the <code>HTTPRoute</code>. When specifying multiple <code>forwardTo</code>
- objects, the request is split, i.e. forwarded to each object.</li>
+<li>Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based
+ on <code>filter</code> rules of the <code>HTTPRoute</code>.</li>
+<li>Lastly, the reverse proxy forwards the request to one or more objects, i.e. <code>Service</code>,
+ in the cluster based on <code>forwardTo</code> rules of the <code>HTTPRoute</code>.</li>
 </ol>
 <h2 id="tls-configuration">TLS Configuration</h2>
 <p>TLS configuration is tied to Gateway listeners. Although adding the option to
