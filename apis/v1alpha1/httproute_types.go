@@ -107,19 +107,6 @@ type HTTPRouteSpec struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Rules []HTTPRouteRule `json:"rules"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "host" block. The resource may be "configmaps"  or an implementation-defined
-	// resource (for example, resource "myroutehosts" in group "networking.acme.io").
-	//
-	// If the referent cannot be found,
-	// the GatewayClass's "InvalidParameters" status condition
-	// will be true.
-	//
-	// Support: custom
-	//
-	// +optional
-	ExtensionRef *RouteHostExtensionObjectReference `json:"extensionRef,omitempty"`
 }
 
 // RouteTLSConfig describes a TLS configuration defined at the Route level.
