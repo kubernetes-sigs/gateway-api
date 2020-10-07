@@ -552,12 +552,6 @@ const (
 	NamedAddressType AddressType = "NamedAddress"
 )
 
-// ListenerExtensionObjectReference identifies a listener extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type ListenerExtensionObjectReference = LocalObjectReference
-
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
 	// Addresses lists the IP addresses that have actually been
