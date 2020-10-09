@@ -583,12 +583,6 @@ type HTTPRouteForwardTo struct {
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 }
 
-// RouteHostExtensionObjectReference identifies a route-host extension object
-// within a known namespace.
-//
-// +k8s:deepcopy-gen=false
-type RouteHostExtensionObjectReference = LocalObjectReference
-
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
 	RouteStatus `json:",inline"`
