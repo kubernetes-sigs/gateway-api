@@ -355,9 +355,10 @@ spec:
                             properties:
                               type:
                                 default: Exact
-                                description: "HeaderMatchType specifies how to match a HTTP request header against the Values map. \n Support: core (Exact) Support: custom (ImplementationSpecific) \n Default: \"Exact\""
+                                description: "Type specifies how to match against the value of the header. \n Support: core (Exact) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect."
                                 enum:
                                 - Exact
+                                - RegularExpression
                                 - ImplementationSpecific
                                 type: string
                               values:
@@ -376,7 +377,7 @@ spec:
                             properties:
                               type:
                                 default: Prefix
-                                description: "Type specifies how to match against the path Value. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect. \n Default: \"Prefix\""
+                                description: "Type specifies how to match against the path Value. \n Support: core (Exact, Prefix) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect."
                                 enum:
                                 - Exact
                                 - Prefix

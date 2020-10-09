@@ -1697,11 +1697,13 @@ HeaderMatchType
 </em>
 </td>
 <td>
-<p>HeaderMatchType specifies how to match a HTTP request
-header against the Values map.</p>
+<p>Type specifies how to match against the value of the header.</p>
 <p>Support: core (Exact)
-Support: custom (ImplementationSpecific)</p>
-<p>Default: &ldquo;Exact&rdquo;</p>
+Support: custom (RegularExpression, ImplementationSpecific)</p>
+<p>Since RegularExpression PathType has custom conformance, implementations
+can support POSIX, PCRE or any other dialects of regular expressions.
+Please read the implementation&rsquo;s documentation to determine the supported
+dialect.</p>
 </td>
 </tr>
 <tr>
@@ -1757,7 +1759,6 @@ Support: custom (RegularExpression, ImplementationSpecific)</p>
 can support POSIX, PCRE or any other dialects of regular expressions.
 Please read the implementation&rsquo;s documentation to determine the supported
 dialect.</p>
-<p>Default: &ldquo;Prefix&rdquo;</p>
 </td>
 </tr>
 <tr>
@@ -2490,6 +2491,7 @@ RouteStatus
 Valid HeaderMatchType values are:</p>
 <ul>
 <li>&ldquo;Exact&rdquo;</li>
+<li>&ldquo;RegularExpression&rdquo;</li>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
 </p>
