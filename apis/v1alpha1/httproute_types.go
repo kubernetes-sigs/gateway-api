@@ -557,12 +557,13 @@ type HTTPRouteForwardTo struct {
 	// weight/(sum of all weights in this ForwardTo list). Weight is not a
 	// percentage and the sum of weights does not need to equal 100. If only one
 	// backend is specified, 100% of the traffic is forwarded to that backend.
+	// If weight is set to 0, no traffic should be forwarded for this entry.
 	// If unspecified, weight defaults to 1.
 	//
 	// Support: Core
 	//
 	// +kubebuilder:default=1
-	// +kubebuilder:validation:Minimum=1
+	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=10000
 	Weight int32 `json:"weight,omitempty"`
 
