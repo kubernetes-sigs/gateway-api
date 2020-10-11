@@ -218,9 +218,10 @@ const (
 // Valid HeaderMatchType values are:
 //
 // * "Exact"
+// * "RegularExpression"
 // * "ImplementationSpecific"
 //
-// +kubebuilder:validation:Enum=Exact;ImplementationSpecific
+// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
 type HeaderMatchType string
 
 // HeaderMatchType constants.
@@ -229,6 +230,7 @@ const (
 	// Field name matches are case-insensitive while field value matches
 	// are case-sensitive.
 	HeaderMatchExact                  HeaderMatchType = "Exact"
+	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
 )
 
@@ -244,8 +246,6 @@ type HTTPPathMatch struct {
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	//
-	// Default: "Prefix"
-	//
 	// +kubebuilder:default=Prefix
 	Type PathMatchType `json:"type,omitempty"`
 
@@ -257,13 +257,15 @@ type HTTPPathMatch struct {
 
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.
 type HTTPHeaderMatch struct {
-	// HeaderMatchType specifies how to match a HTTP request
-	// header against the Values map.
+	// Type specifies how to match against the value of the header.
 	//
 	// Support: core (Exact)
-	// Support: custom (ImplementationSpecific)
+	// Support: custom (RegularExpression, ImplementationSpecific)
 	//
-	// Default: "Exact"
+	// Since RegularExpression PathType has custom conformance, implementations
+	// can support POSIX, PCRE or any other dialects of regular expressions.
+	// Please read the implementation's documentation to determine the supported
+	// dialect.
 	//
 	// +kubebuilder:default=Exact
 	Type HeaderMatchType `json:"type,omitempty"`
