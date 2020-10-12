@@ -96,14 +96,8 @@ type GatewayClassSpec struct {
 	// Support: Custom
 	//
 	// +optional
-	ParametersRef *GatewayClassParametersObjectReference `json:"parametersRef,omitempty"`
+	ParametersRef *LocalObjectReference `json:"parametersRef,omitempty"`
 }
-
-// GatewayClassParametersObjectReference identifies a cluster-scoped parameters
-// resource for a GatewayClass.
-//
-// +k8s:deepcopy-gen=false
-type GatewayClassParametersObjectReference = LocalObjectReference
 
 // GatewayClassConditionType is the type of status conditions. This
 // type should be used with the GatewayClassStatus.Conditions field.
