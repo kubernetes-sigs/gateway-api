@@ -1079,22 +1079,21 @@ metadata:
 spec:
   controller: &quot;acme.io/gateway-controller&quot;
   parametersRef:
-    name: internet-gateway
+    group: acme.io/v1alpha1
+    kind: Config
+    name: internet-gateway-config
 ---
-kind: ConfigMap
+kind: Config
+apiVersion: acme.io/v1alpha1
 metadata:
-  name: internet-gateway
-  namespace: acme-system
-data:
+  name: internet-gateway-config
+spec:
   ip-address-pool: internet-vips
   ...
 </code></pre>
 
-<p><strong>Note:</strong>  parametersRef will expect a ConfigMap as a referenced object if
-<code>resource</code> and <code>group</code> are omitted.</p>
-<p>The type of object referenced by <code>GatewayClass.spec.parametersRef</code> will depend
-on the provider itself. A <code>core.ConfigMap</code> is used in the example above, but
-controllers may opt to use a <code>CustomResource</code> for better schema validation.</p>
+<p>Using a Custom Resource for <code>GatewayClass.spec.parametersRef</code> is encouraged
+but implementations may resort to using a ConfigMap if needed.</p>
 <h3 id="gatewayclass-status">GatewayClass status</h3>
 <p><code>GatewayClasses</code> MUST be validated by the provider to ensure that the configured
 parameters are valid. The validity of the class will be signaled to the user via
