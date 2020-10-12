@@ -25,6 +25,9 @@ git clone https://github.com/kubernetes-sigs/service-apis
 cd service-apis
 ```
 
+This project works with Go modules; you can chose to setup your environment
+outside $GOPATH as well.
+
 # Building, testing and deploying
 
 You will need to have Docker installed to perform the steps below.
@@ -37,11 +40,13 @@ for this project:
 * [Open issues][gh-issues]
 * [Project dashboard][gh-dashboard]
 
-[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues
-[gh-dashboard]: https://github.com/kubernetes-sigs/service-apis/projects/1
-
 Issues labeled `good first issue` and `help wanted` are especially good for a
 first contribution.
+We use [milestones][gh-milestones] to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.
+
+[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues
+[gh-dashboard]: https://github.com/kubernetes-sigs/service-apis/projects/1
+[gh-milestones]: https://github.com/kubernetes-sigs/service-apis/milestones
 
 ## Release cadence
 
@@ -50,43 +55,36 @@ explicitly decoupling ourselves from the Kubernetes API versioning cycle to
 give us more flexibility to evolve the specification. As the specification solidifies,
 we will slow down our release cycle.
 
-General target timeline:
-
-* 1H 2020: Monthly release cycle, with first release targeted for January 31
-* 2H 2020: Slower release cycle
-
 ## Building the code
 
-The project uses `make` to drive the build. `make` will build the manager binary, run code generators, and run static
-analysis against the code. You can kick off an overall build from the top-level makefile:
+The project uses `make` to drive the build.
+`make` will run code generators, and run static analysis against the code and
+generate Kubernetes CRDs.
+You can kick off an overall build from the top-level makefile:
 
 ```shell
 make
 ```
 
-## Testing the code
+## Install CRDs
 
-The easiest way to test the code is to use the [kubebuilder][kubebuilder]
-created CRD with a [kind][kind] cluster. Follow the installation instructions
-for `kind` in the README in the repo.
+To install service-apis CRDs into a Kubernetes cluster:
 
 ```shell
-kind create cluster
-...
-# Install the CRDs
 make install
+```
 
-# Remove the CRDs and associated CRs
+To uninstall CRDs and associated resources:
+
+```shell
 make uninstall
 ```
 
-[kubebuilder]: https://book.kubebuilder.io/
-[kind]: https://github.com/kubernetes-sigs/kind
-
 ## Submitting a Pull Request
 
-Service APIs follows a similar pull request process as [Kubernetes]. Merging a pull request requires the
-following steps to be completed before the pull request will be merged automatically.
+Service APIs follows a similar pull request process as [Kubernetes].
+Merging a pull request requires the following steps to be completed before the
+pull request will be merged automatically.
 
 - [Sign the CLA](https://git.k8s.io/community/CLA.md) (prerequisite)
 - [Open a pull request](https://help.github.com/articles/about-pull-requests/)
@@ -117,7 +115,7 @@ Building the docs:
 make docs
 ```
 
-Live preview for editing (view on [http://localhost:8000](), CTRL-C to quit):
+Live preview for editing (view on [http://localhost:8000](http://localhost:8000), CTRL-C to quit):
 
 ```shell
 make serve

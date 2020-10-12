@@ -350,6 +350,8 @@ git clone https://github.com/kubernetes-sigs/service-apis
 cd service-apis
 </code></pre>
 
+<p>This project works with Go modules; you can chose to setup your environment
+outside $GOPATH as well.</p>
 <h1 id="building-testing-and-deploying">Building, testing and deploying</h1>
 <p>You will need to have Docker installed to perform the steps below.</p>
 <h2 id="project-management">Project management</h2>
@@ -360,39 +362,34 @@ for this project:</p>
 <li><a href="https://github.com/kubernetes-sigs/service-apis/projects/1">Project dashboard</a></li>
 </ul>
 <p>Issues labeled <code>good first issue</code> and <code>help wanted</code> are especially good for a
-first contribution.</p>
+first contribution.
+We use <a href="https://github.com/kubernetes-sigs/service-apis/milestones">milestones</a> to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.</p>
 <h2 id="release-cadence">Release cadence</h2>
 <p>During the development phase, we expect to release on a monthly cadence. We are
 explicitly decoupling ourselves from the Kubernetes API versioning cycle to
 give us more flexibility to evolve the specification. As the specification solidifies,
 we will slow down our release cycle.</p>
-<p>General target timeline:</p>
-<ul>
-<li>1H 2020: Monthly release cycle, with first release targeted for January 31</li>
-<li>2H 2020: Slower release cycle</li>
-</ul>
 <h2 id="building-the-code">Building the code</h2>
-<p>The project uses <code>make</code> to drive the build. <code>make</code> will build the manager binary, run code generators, and run static
-analysis against the code. You can kick off an overall build from the top-level makefile:</p>
+<p>The project uses <code>make</code> to drive the build.
+<code>make</code> will run code generators, and run static analysis against the code and
+generate Kubernetes CRDs.
+You can kick off an overall build from the top-level makefile:</p>
 <pre><code class="shell">make
 </code></pre>
 
-<h2 id="testing-the-code">Testing the code</h2>
-<p>The easiest way to test the code is to use the <a href="https://book.kubebuilder.io/">kubebuilder</a>
-created CRD with a <a href="https://github.com/kubernetes-sigs/kind">kind</a> cluster. Follow the installation instructions
-for <code>kind</code> in the README in the repo.</p>
-<pre><code class="shell">kind create cluster
-...
-# Install the CRDs
-make install
+<h2 id="install-crds">Install CRDs</h2>
+<p>To install service-apis CRDs into a Kubernetes cluster:</p>
+<pre><code class="shell">make install
+</code></pre>
 
-# Remove the CRDs and associated CRs
-make uninstall
+<p>To uninstall CRDs and associated resources:</p>
+<pre><code class="shell">make uninstall
 </code></pre>
 
 <h2 id="submitting-a-pull-request">Submitting a Pull Request</h2>
-<p>Service APIs follows a similar pull request process as <a href="https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md">Kubernetes</a>. Merging a pull request requires the
-following steps to be completed before the pull request will be merged automatically.</p>
+<p>Service APIs follows a similar pull request process as <a href="https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md">Kubernetes</a>.
+Merging a pull request requires the following steps to be completed before the
+pull request will be merged automatically.</p>
 <ul>
 <li><a href="https://git.k8s.io/community/CLA.md">Sign the CLA</a> (prerequisite)</li>
 <li><a href="https://help.github.com/articles/about-pull-requests/">Open a pull request</a></li>
@@ -414,7 +411,7 @@ Github Pages.</p>
 <pre><code class="shell">make docs
 </code></pre>
 
-<p>Live preview for editing (view on <a href="">http://localhost:8000</a>, CTRL-C to quit):</p>
+<p>Live preview for editing (view on <a href="http://localhost:8000">http://localhost:8000</a>, CTRL-C to quit):</p>
 <pre><code class="shell">make serve
 </code></pre>
 
