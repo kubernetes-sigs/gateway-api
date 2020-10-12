@@ -436,10 +436,84 @@
                 
                 <h1 id="frequently-asked-questions-faq">Frequently Asked Questions (FAQ)</h1>
 <ul>
-<li>Q: Will there be a default controller implementation (in this repo)?<br>
+<li>
+<p><strong>Q: How can I get involved with Service API?<br></strong>
+    A: The <a href="/community">community</a> page keeps track of how to get
+    involved with the project.</p>
+</li>
+<li>
+<p><strong>Q: Will Service API replace the Ingress API?<br></strong>
+    A: No. The Ingress API is GA since Kubernetes 1.19. There are no
+    plans to deprecate this API and we expect most Ingress controllers
+    to support it indefinitely.</p>
+</li>
+<li>
+<p><strong>Q: What are the differences between Ingress and Service API?<br></strong>
+    A: Ingress primarily targets exposing HTTP applications with a
+    simple, declarative syntax. Service API exposes a more general API
+    for proxying that can be used for more protocols than just HTTP,
+    and models more infrastucture components to provide better
+    deployment and management options for cluster operators.</p>
+</li>
+<li>
+<p><strong>Q: Will there be a default controller implementation (in this repo)?<br></strong>
     A: There is no current plan to have an "official" or "default"
     implementation. You will see the controller code in this repo be
-    used for testing the support libraries.</li>
+    used for testing the support libraries.</p>
+</li>
+<li>
+<p><strong>Q: How can I expose custom capabilities through Service API?<br></strong>
+    A: There is a lot of diversity in the networking and proxying
+    ecosystem, and many products will have features that are not directly
+    supported in the API.  However, there are a few mechanisms available
+    for extending the API with implementation-specific capabilities:</p>
+<ul>
+<li>
+<p>Decorate Service API objects with implementation-specific objects. A
+  policy or configuration object could match the Service API object either
+  by name or by using an explicit object reference.</p>
+<p>For example, given a <code>Gateway</code> object with name "inbound",
+creating a <code>AccessPolicy</code> object that also has the name "inbound"
+could cause an implementation to attach a specified access
+control policy. This is an example of matching the object by name.</p>
+<p>Service API uses this decorator pattern with the
+<a href="/spec/#networking.x-k8s.io/v1alpha1.BackendPolicy"><code>BackendPolicy</code></a>
+resource, which modifies how a <code>Gateway</code> should forward traffic
+to a backend target (commonly a Kubernetes <code>Service</code>). This is
+an example of using explicit object references.</p>
+</li>
+<li>
+<p>Use implementation-specific values for string fields. In many
+  places, the fields of Service API resources have the type
+  "string". This allows an implementation to support custom values
+  for those fields in addition to any values specified in the API.</p>
+</li>
+<li>
+<p>Use implementation-specific annotations. For some kinds of
+  configuration, implementations may choose to support custom
+  annotations on Servce API objects. This approach continues
+  a proud tradition of extending Ingress objects.</p>
+</li>
+<li>
+<p>Use API-defined extension points. Some Service
+  API objects have explicit <a href="/concepts/#extension-points">extension points</a>
+  for implementations to use.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Q: Where can I find Service API releases?<br></strong>
+   A: Service API releases are tags of the <a href="https://github.com/kubernetes-sigs/service-apis">Github repository</a>.
+   The <a href="https://github.com/kubernetes-sigs/service-apis/releases">Github releases</a> page shows all the releases.</p>
+</li>
+<li>
+<p><strong>Q: How should I think about the alpha release?<br></strong>
+  A: The <code>v1alpha1</code> release will be the first Service API release. As
+  various projects begin implementing the API, and operators start using
+  it, the working group will collect feedback and issues, which will
+  guide what revisions are needed for the next release. It is possible
+  that the next release will contain breaking changes.</p>
+</li>
 </ul>
                 
                   

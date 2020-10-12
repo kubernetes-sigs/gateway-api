@@ -203,6 +203,7 @@ addressing the large number of use-cases that cannot be addressed by a general
 purpose API.
 
 Here is a summary of extension points in the API:
+
 - **XRouteMatch.ExtensionRef**: This extension point should be used to extend
   the match semantics of a specific core Route. This is an experimental
   extension point and will be iterated on in future based on feedback.
