@@ -44,10 +44,13 @@ on Wednesdays.
 
 ### Meeting notes
 
-[Meeting schedule scratch pad][meeting-sched-scratch]
-[meeting-sched-scratch]: https://docs.google.com/spreadsheets/d/1_jXy5hHLAmLTVN9rTNsI3Xx_Dzc0JvLqNqjS9hdzryI
+Meeting agendas and notes are recorded in the [meeting notes doc][meeting-notes].
 
+All meetings are recorded and automatically uploaded to youtube:
 [Meeting recordings](https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb).
+
+Some initial recordings of this working group were done manually and can be
+found in the below table:
 
 | Date               |                                |
 |--------------------|--------------------------------|
@@ -70,14 +73,6 @@ on Wednesdays.
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
 [sig-net-2019-11-sync]: https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview
 [meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
-
-## Design docs
-
-| Title | Description |
-|-------|-------------|
-| [API sketch][api-sketch] | Sketch of the proposed API |
-
-[api-sketch]:  https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag
 
 ## Presentations, Talks
 
