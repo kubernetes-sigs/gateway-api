@@ -230,7 +230,27 @@ be differences in behavior from the spec.
 
 ### Extension points
 
-TODO
+A number of extension points are provided in the API to provide flexibility in
+addressing the large number of use-cases that cannot be addressed by a general
+purpose API.
+
+Here is a summary of extension points in the API:
+- **XRouteMatch.ExtensionRef**: This extension point should be used to extend
+  the match semantics of a specific core Route. This is an experimental
+  extension point and will be iterated on in future based on feedback.
+- **XForwardTo.BackendRef**: This extension point should be used for forwarding
+  traffic to network endpoints other than core Kubernetes Service resource.
+  Examples include an S3 bucket, Lambda function, a file-server, etc.
+- **HTTPRouteFilter**: This API type in HTTPoute provides a way to hook into the
+  request/response lifecycle of an HTTP request.
+- **Custom Routes**: If none of the above extensions points suffice for a use
+  case, Implementers can chose to create custom Route resources for protocols
+  that are not currently supported in the API.
+
+Whenever you are using an extension point without any prior art, please let
+the community know. As we learn more about usage of extension points, we would
+like to find the common denominators and promote the features to core/extended
+API conformance.
 
 ## API Resources
 
