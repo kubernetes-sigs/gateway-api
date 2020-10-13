@@ -6,7 +6,9 @@ docs_dir: docs-src
 theme:
   name: material
 # an empty plugins list disables search (and prevents a lot of merge conflicts)
-plugins: []
+plugins:
+  - macros:
+      include_dir: examples
 nav:
   - Introduction: index.md
   - User guide: userguide.md
