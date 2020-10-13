@@ -361,6 +361,14 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#api-resources" class="md-nav__link">
+    API Resources
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
@@ -393,8 +401,8 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
@@ -414,8 +422,7 @@
     Gateway Status
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#listeners" class="md-nav__link">
@@ -458,22 +465,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#delegationinclusion" class="md-nav__link">
-    Delegation/inclusion
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#destinations" class="md-nav__link">
-    Destinations
-  </a>
   
 </li>
         
@@ -709,6 +702,14 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#api-resources" class="md-nav__link">
+    API Resources
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#gatewayclass_1" class="md-nav__link">
     GatewayClass
   </a>
@@ -741,8 +742,8 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
   <a href="#gateway_1" class="md-nav__link">
     Gateway
   </a>
@@ -762,8 +763,7 @@
     Gateway Status
   </a>
   
-    <nav class="md-nav">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
   <a href="#listeners" class="md-nav__link">
@@ -806,22 +806,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#delegationinclusion" class="md-nav__link">
-    Delegation/inclusion
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#destinations" class="md-nav__link">
-    Destinations
-  </a>
   
 </li>
         
@@ -1034,7 +1020,8 @@ results of the conformance tests to understand areas where there may
 be differences in behavior from the spec.</p>
 <h3 id="extension-points">Extension points</h3>
 <p>TODO</p>
-<h2 id="gatewayclass_1">GatewayClass</h2>
+<h2 id="api-resources">API Resources</h2>
+<h3 id="gatewayclass_1">GatewayClass</h3>
 <p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/apis/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
 defined by the infrastructure provider. This resource represents a class of
 Gateways that can be instantiated.</p>
@@ -1068,7 +1055,7 @@ metadata:
 <p>The user of the classes will not need to know <em>how</em> <code>internet</code> and <code>private</code> are
 implemented. Instead, the user will only need to understand the resulting
 properties of the class that the <code>Gateway</code> was created with.</p>
-<h3 id="gatewayclass-parameters">GatewayClass parameters</h3>
+<h4 id="gatewayclass-parameters">GatewayClass parameters</h4>
 <p>Providers of the <code>Gateway</code> API may need to pass parameters to their controller
 as part of the class definition. This is done using the
 <code>GatewayClass.spec.parametersRef</code> field:</p>
@@ -1094,7 +1081,7 @@ spec:
 
 <p>Using a Custom Resource for <code>GatewayClass.spec.parametersRef</code> is encouraged
 but implementations may resort to using a ConfigMap if needed.</p>
-<h3 id="gatewayclass-status">GatewayClass status</h3>
+<h4 id="gatewayclass-status">GatewayClass status</h4>
 <p><code>GatewayClasses</code> MUST be validated by the provider to ensure that the configured
 parameters are valid. The validity of the class will be signaled to the user via
 <code>GatewayClass.status</code>:</p>
@@ -1132,7 +1119,7 @@ status:
     Message: &quot;foobar&quot; is an FooBar.
 </code></pre>
 
-<h3 id="gatewayclass-controller-selection">GatewayClass controller selection</h3>
+<h4 id="gatewayclass-controller-selection">GatewayClass controller selection</h4>
 <p>The <code>GatewayClass.spec.controller</code> field is used to determine whether
 or not a given <code>GatewayClass</code> is managed by the controller.
 This format of this field is opaque and specific to a particular controller.
@@ -1151,7 +1138,7 @@ acme.io/gateway/v2   // Use version 2
 acme.io/gateway      // Use the default version
 </code></pre>
 
-<h2 id="gateway_1">Gateway</h2>
+<h3 id="gateway_1">Gateway</h3>
 <p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of
 infrastructure. When a user creates a <code>Gateway</code>, some load balancing
 infrastructure is provisioned or configured
@@ -1170,7 +1157,7 @@ together.</p>
 </ul>
 <p>If the Listener configuration requested by a Gateway definition is incompatible
 with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.</p>
-<h3 id="deployment-models">Deployment models</h3>
+<h4 id="deployment-models">Deployment models</h4>
 <p>Depending on the <code>GatewayClass</code>, the creation of the <code>Gateway</code> could do any of
 the following actions:</p>
 <ul>
@@ -1184,7 +1171,7 @@ the following actions:</p>
 <p>The API does not specify which one of these actions will be taken. Note that a
 GatewayClass controller that manages in-cluster proxy processes MAY restrict
 Gateway configuration scope, e.g. only be served in the same namespace.</p>
-<h3 id="gateway-status">Gateway Status</h3>
+<h4 id="gateway-status">Gateway Status</h4>
 <p>Gateways track status for the <code>Gateway</code> resource as a whole as well as each
 <code>Listener</code> it contains. The status for a specific Route is reported in the
 status of the <code>Route</code> resource. Within <code>GatewayStatus</code>, Listeners will have
@@ -1201,10 +1188,6 @@ and the last time this condition changed.</p>
 <h4 id="tcproute"><code>TCPRoute</code></h4>
 <p>TODO</p>
 <h4 id="generic-routing">Generic routing</h4>
-<p>TODO</p>
-<h4 id="delegationinclusion">Delegation/inclusion</h4>
-<p>TODO</p>
-<h3 id="destinations">Destinations</h3>
 <p>TODO</p>
                 
                   

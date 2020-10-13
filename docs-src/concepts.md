@@ -232,7 +232,9 @@ be differences in behavior from the spec.
 
 TODO
 
-## GatewayClass
+## API Resources
+
+### GatewayClass
 
 `GatewayClass` ([source code][gatewayclass-src]) is cluster-scoped resource
 defined by the infrastructure provider. This resource represents a class of
@@ -275,7 +277,7 @@ The user of the classes will not need to know *how* `internet` and `private` are
 implemented. Instead, the user will only need to understand the resulting
 properties of the class that the `Gateway` was created with.
 
-### GatewayClass parameters
+#### GatewayClass parameters
 
 Providers of the `Gateway` API may need to pass parameters to their controller
 as part of the class definition. This is done using the
@@ -305,7 +307,7 @@ spec:
 Using a Custom Resource for `GatewayClass.spec.parametersRef` is encouraged
 but implementations may resort to using a ConfigMap if needed.
 
-### GatewayClass status
+#### GatewayClass status
 
 `GatewayClasses` MUST be validated by the provider to ensure that the configured
 parameters are valid. The validity of the class will be signaled to the user via
@@ -350,7 +352,7 @@ status:
     Message: "foobar" is an FooBar.
 ```
 
-### GatewayClass controller selection
+#### GatewayClass controller selection
 
 The `GatewayClass.spec.controller` field is used to determine whether
 or not a given `GatewayClass` is managed by the controller.
@@ -374,7 +376,7 @@ acme.io/gateway/v2   // Use version 2
 acme.io/gateway      // Use the default version
 ```
 
-## Gateway
+### Gateway
 
 A `Gateway` is 1:1 with the life cycle of the configuration of
 infrastructure. When a user creates a `Gateway`, some load balancing
@@ -396,7 +398,7 @@ The `Gateway` spec defines the following:
 If the Listener configuration requested by a Gateway definition is incompatible
 with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.
 
-### Deployment models
+#### Deployment models
 
 Depending on the `GatewayClass`, the creation of the `Gateway` could do any of
 the following actions:
@@ -412,7 +414,7 @@ The API does not specify which one of these actions will be taken. Note that a
 GatewayClass controller that manages in-cluster proxy processes MAY restrict
 Gateway configuration scope, e.g. only be served in the same namespace.
 
-### Gateway Status
+#### Gateway Status
 
 Gateways track status for the `Gateway` resource as a whole as well as each
 `Listener` it contains. The status for a specific Route is reported in the
@@ -442,10 +444,3 @@ TODO
 
 TODO
 
-#### Delegation/inclusion
-
-TODO
-
-### Destinations
-
-TODO
