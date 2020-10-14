@@ -77,6 +77,10 @@ type GatewaySpec struct {
 	// As a special case, each group of compatible listeners
 	// may contain exactly one Listener with a match type of "Any".
 	//
+	// Listeners across Gateway resources cannot be collapsed i.e. Gateway
+	// merging is not allowed. Each Gateway resource is a distinct network
+	// endpoint.
+	//
 	// If the GatewayClass collapses compatible Listeners, the
 	// hostname provided in the incoming client request MUST be
 	// matched to a Listener to find the correct set of Routes.

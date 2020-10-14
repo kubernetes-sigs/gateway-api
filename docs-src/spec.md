@@ -230,6 +230,9 @@ configuration even if their Port fields would otherwise conflict.</p>
 </ol>
 <p>As a special case, each group of compatible listeners
 may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
+<p>Listeners across Gateway resources cannot be collapsed i.e. Gateway
+merging is not allowed. Each Gateway resource is a distinct network
+endpoint.</p>
 <p>If the GatewayClass collapses compatible Listeners, the
 hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
@@ -1454,6 +1457,9 @@ configuration even if their Port fields would otherwise conflict.</p>
 </ol>
 <p>As a special case, each group of compatible listeners
 may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
+<p>Listeners across Gateway resources cannot be collapsed i.e. Gateway
+merging is not allowed. Each Gateway resource is a distinct network
+endpoint.</p>
 <p>If the GatewayClass collapses compatible Listeners, the
 hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
