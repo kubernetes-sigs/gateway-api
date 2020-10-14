@@ -2901,7 +2901,7 @@ selectors are associated with the Gateway.</p>
 <tbody>
 <tr>
 <td>
-<code>routeNamespaces</code></br>
+<code>namespaces</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.RouteNamespaces">
 RouteNamespaces
@@ -2909,7 +2909,7 @@ RouteNamespaces
 </em>
 </td>
 <td>
-<p>RouteNamespaces indicates in which namespaces Routes should be selected
+<p>Namespaces indicates in which namespaces Routes should be selected
 for this Gateway. This is restricted to the namespace of this Gateway by
 default.</p>
 <p>Support: Core</p>
@@ -2917,7 +2917,7 @@ default.</p>
 </tr>
 <tr>
 <td>
-<code>routeSelector</code></br>
+<code>selector</code></br>
 <em>
 <a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.18/#labelselector-v1-meta">
 Kubernetes meta/v1.LabelSelector
@@ -2926,7 +2926,7 @@ Kubernetes meta/v1.LabelSelector
 </td>
 <td>
 <em>(Optional)</em>
-<p>RouteSelector specifies a set of route labels used for selecting
+<p>Selector specifies a set of route labels used for selecting
 routes to associate with the Gateway. If RouteSelector is defined,
 only routes matching the RouteSelector are associated with the Gateway.
 An empty RouteSelector matches all routes.</p>

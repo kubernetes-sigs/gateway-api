@@ -21,11 +21,11 @@ spec:
         name: httpbin
     routes:
       kind: HTTPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: httpbin
+      namespaces:
+        from: "All"
   - hostname:
       name: conformance.example.com
     port: 443
@@ -38,8 +38,8 @@ spec:
         name: conformance
     routes:
       kind: HTTPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: conformance
+      namespaces:
+        from: "All"

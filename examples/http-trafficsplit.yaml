@@ -20,12 +20,12 @@ spec:
       port: 80
       routes:
         kind: HTTPRoute
-        routeNamespaces:
-          from: "Selector"
-          selector: {}
-        routeSelector:
+        selector:
           matchLabels:
             app: split
+        namespaces:
+          from: "Selector"
+          selector: {}
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1

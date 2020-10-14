@@ -21,11 +21,11 @@ spec:
     port: 8080
     routes:
       kind: UDPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           "app": "foo"
+      namespaces:
+        from: "All"
 ---
 kind: UDPRoute
 apiVersion: networking.x-k8s.io/v1alpha1

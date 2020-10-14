@@ -425,13 +425,13 @@ const (
 // If NamespaceSelector and RouteSelector are defined, only routes matching both
 // selectors are associated with the Gateway.
 type RouteBindingSelector struct {
-	// RouteNamespaces indicates in which namespaces Routes should be selected
+	// Namespaces indicates in which namespaces Routes should be selected
 	// for this Gateway. This is restricted to the namespace of this Gateway by
 	// default.
 	//
 	// Support: Core
-	RouteNamespaces RouteNamespaces `json:"routeNamespaces"`
-	// RouteSelector specifies a set of route labels used for selecting
+	Namespaces RouteNamespaces `json:"namespaces"`
+	// Selector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
 	// only routes matching the RouteSelector are associated with the Gateway.
 	// An empty RouteSelector matches all routes.
@@ -439,7 +439,7 @@ type RouteBindingSelector struct {
 	// Support: Core
 	//
 	// +optional
-	RouteSelector metav1.LabelSelector `json:"routeSelector,omitempty"`
+	Selector metav1.LabelSelector `json:"selector,omitempty"`
 	// Group is the group of the route resource to select. Omitting the value or specifying
 	// the empty string indicates the networking.x-k8s.io API group.
 	// For example, use the following to select an HTTPRoute:

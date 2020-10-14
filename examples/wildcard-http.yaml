@@ -16,10 +16,10 @@ spec:
     protocol: HTTP
     routes:
       kind: HTTPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           # This label selects httpbin.example.com and
           # conformance.example.com routes.
           app: httpbin-or-conformance
+      namespaces:
+        from: "All"
