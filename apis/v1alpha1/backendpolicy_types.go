@@ -89,22 +89,6 @@ type BackendRef struct {
 
 // BackendTLSConfig describes TLS configuration for a backend.
 type BackendTLSConfig struct {
-	// ClientCertificateRef is a reference to a TLS client certificate-key pair
-	// that may be used to connect to these backends. If an entry in this list
-	// omits or specifies the empty string for both the group and the resource,
-	// the resource defaults to "secrets". An implementation may support other
-	// resources (for example, resource "mycertificates" in group
-	// "networking.acme.io").
-	//
-	// If a Secret is referenced, it must be of type "kubernetes.io/tls" and
-	// contain tls.crt and tls.key data fields that contain the certificate and
-	// private key to use for TLS.
-	//
-	// Support: Extended
-	//
-	// +optional
-	ClientCertificateRef *LocalObjectReference `json:"clientCertificateRef,omitempty"`
-
 	// CertificateAuthorityRef is a reference to a resource that includes
 	// trusted CA certificates for the associated backends. If an entry in this
 	// list omits or specifies the empty string for both the group and the

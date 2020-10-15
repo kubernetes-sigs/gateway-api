@@ -87,29 +87,6 @@ spec:
                     - kind
                     - name
                     type: object
-                  clientCertificateRef:
-                    description: "ClientCertificateRef is a reference to a TLS client certificate-key pair that may be used to connect to these backends. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n If a Secret is referenced, it must be of type \"kubernetes.io/tls\" and contain tls.crt and tls.key data fields that contain the certificate and private key to use for TLS. \n Support: Extended"
-                    properties:
-                      group:
-                        description: Group is the group of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                      kind:
-                        description: Kind is kind of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                      name:
-                        description: Name is the name of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                    required:
-                    - group
-                    - kind
-                    - name
-                    type: object
                   options:
                     additionalProperties:
                       type: string

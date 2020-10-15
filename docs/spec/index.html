@@ -1400,29 +1400,6 @@ all ports on the backend.</p>
 <tbody>
 <tr>
 <td>
-<code>clientCertificateRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
-</a>
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ClientCertificateRef is a reference to a TLS client certificate-key pair
-that may be used to connect to these backends. If an entry in this list
-omits or specifies the empty string for both the group and the resource,
-the resource defaults to &ldquo;secrets&rdquo;. An implementation may support other
-resources (for example, resource &ldquo;mycertificates&rdquo; in group
-&ldquo;networking.acme.io&rdquo;).</p>
-<p>If a Secret is referenced, it must be of type &ldquo;kubernetes.io/tls&rdquo; and
-contain tls.crt and tls.key data fields that contain the certificate and
-private key to use for TLS.</p>
-<p>Support: Extended</p>
-</td>
-</tr>
-<tr>
-<td>
 <code>certificateAuthorityRef</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
