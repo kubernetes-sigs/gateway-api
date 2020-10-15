@@ -69,24 +69,13 @@ readable by most roles, so instead we'll focus on write access for this model.
 | Application Developers | No | No | In Specified Namespaces |
 
 ## Limiting Namespaces Where a GatewayClass Can Be Used
-Kubernetes RBAC only allows for granting access to create Gateways as a whole,
-not limiting creation to specific GatewayClasses. With that in mind,
-GatewayClass includes an `allowedGatewayNamespaces` field to enable limiting
-where a GatewayClass can be used. 
-
-This field is a selector of namespaces that Gateways of this class can be
-created in. Implementations must not support Gateways when they are created in
-namespaces not specified by this field.
-
-Gateways that appear in namespaces not specified by this field must continue to
-be supported if they have already been provisioned. This must be indicated by
-the Gateway's presence in the ProvisionedGateways list in the status for this
-GatewayClass. If the status on a Gateway indicates that it has been provisioned
-but the Gateway does not appear in the ProvisionedGateways list on GatewayClass
-it must not be supported.
-
-When this field is unspecified or an empty selector, Gateways will be able to
-use this GatewayClass in any namespace.
+Some infrastructure providers or cluster operators may wish to limit the
+namespaces where a GatewayClass can be used. At this point, we do not have a
+solution for this built into the API. We continue to [explore
+options](https://github.com/kubernetes-sigs/service-apis/issues/375) to improve
+support for this. Until then, we recommend using a policy agent such as Open
+Policy Agent and [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
+to enforce these kinds of policies.
   
 ## Route Namespaces
 Service APIs allow Gateways to select Routes across multiple Namespaces.

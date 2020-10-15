@@ -619,7 +619,6 @@ const (
 	// Possible reasons for this condition to be false are:
 	//
 	// * "NotReconciled"
-	// * "NamespaceForbidden"
 	// * "NoSuchGatewayClass"
 	// * "NoResources"
 	//
@@ -632,11 +631,6 @@ const (
 	// not scheduled because it recently been created and no
 	// controller has reconciled it yet.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
-
-	// GatewayReasonNamespaceForbidden is used when the Gateway is
-	// not scheduled because the controller's configuration
-	// forbids it from scheduling objects from that namespace.
-	GatewayReasonNamespaceForbidden GatewayConditionReason = "NamespaceForbidden"
 
 	// GatewayReasonNoSuchGatewayClass is used when the Gateway is
 	// not scheduled because there is no controller that recognizes
