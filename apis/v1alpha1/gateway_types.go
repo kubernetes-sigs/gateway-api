@@ -27,6 +27,11 @@ import (
 
 // Gateway represents an instantiation of a service-traffic handling
 // infrastructure by binding Listeners to a set of IP addresses.
+//
+// Implementations should add the `gateway-exists-finalizer.networking.x-k8s.io`
+// finalizer on the associated GatewayClass whenever Gateway(s) is running.
+// This ensures that a GatewayClass associated with a Gateway(s) is not
+// deleted while in use.
 type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

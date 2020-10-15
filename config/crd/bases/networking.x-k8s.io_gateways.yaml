@@ -23,7 +23,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: Gateway represents an instantiation of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.
+        description: "Gateway represents an instantiation of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses. \n Implementations should add the `gateway-exists-finalizer.networking.x-k8s.io` finalizer on the associated GatewayClass whenever Gateway(s) is running. This ensures that a GatewayClass associated with a Gateway(s) is not deleted while in use."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'

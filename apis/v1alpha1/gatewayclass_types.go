@@ -114,6 +114,10 @@ const (
 	// validity of the Parameters set for a given controller. This
 	// will initially start off as "Unknown".
 	GatewayClassConditionStatusInvalidParameters GatewayClassConditionType = "InvalidParameters"
+
+	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
+	// GatewayClass whenever there are provisioned Gateways using a GatewayClass.
+	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.networking.x-k8s.io"
 )
 
 // GatewayClassStatus is the current status for the GatewayClass.
