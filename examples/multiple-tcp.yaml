@@ -14,21 +14,21 @@ spec:
     protocol: TCP
     routes:
       kind: TCPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: sshd-honeypot
+      namespaces:
+        from: "All"
   # Forward port 2222 to a real SSH server.
   - port: 2222
     protocol: TCP
     routes:
       kind: TCPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: sshd-legitimate
+      namespaces:
+        from: "All"
   # Forward the SNI named service to the real SSH server ever TLS, assuming
   # that there is an actual client for such a beast.
   - hostname:
@@ -44,8 +44,8 @@ spec:
         group: core
     routes:
       kind: TCPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: sshd-legitimate
+      namespaces:
+        from: "All"

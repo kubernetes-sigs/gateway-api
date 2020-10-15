@@ -15,8 +15,8 @@ spec:
     protocol: HTTP
     routes:
       kind: HTTPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: httpbin
+      namespaces:
+        from: "All"

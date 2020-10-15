@@ -19,11 +19,11 @@ spec:
     port: 80
     routes:
       kind: HTTPRoute
-      routeNamespaces:
-        from: "All"
-      routeSelector:
+      selector:
         matchLabels:
           app: default-match
+      namespaces:
+        from: "All"
 
 ---
 
