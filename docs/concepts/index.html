@@ -1019,7 +1019,25 @@ different providers in the early days of this API. Users can use the
 results of the conformance tests to understand areas where there may
 be differences in behavior from the spec.</p>
 <h3 id="extension-points">Extension points</h3>
-<p>TODO</p>
+<p>A number of extension points are provided in the API to provide flexibility in
+addressing the large number of use-cases that cannot be addressed by a general
+purpose API.</p>
+<p>Here is a summary of extension points in the API:
+- <strong>XRouteMatch.ExtensionRef</strong>: This extension point should be used to extend
+  the match semantics of a specific core Route. This is an experimental
+  extension point and will be iterated on in future based on feedback.
+- <strong>XForwardTo.BackendRef</strong>: This extension point should be used for forwarding
+  traffic to network endpoints other than core Kubernetes Service resource.
+  Examples include an S3 bucket, Lambda function, a file-server, etc.
+- <strong>HTTPRouteFilter</strong>: This API type in HTTPoute provides a way to hook into the
+  request/response lifecycle of an HTTP request.
+- <strong>Custom Routes</strong>: If none of the above extensions points suffice for a use
+  case, Implementers can chose to create custom Route resources for protocols
+  that are not currently supported in the API.</p>
+<p>Whenever you are using an extension point without any prior art, please let
+the community know. As we learn more about usage of extension points, we would
+like to find the common denominators and promote the features to core/extended
+API conformance.</p>
 <h2 id="api-resources">API Resources</h2>
 <h3 id="gatewayclass_1">GatewayClass</h3>
 <p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/apis/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
