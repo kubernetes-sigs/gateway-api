@@ -64,25 +64,6 @@ type GatewayClassSpec struct {
 	// +kubebuilder:validation:MaxLength=253
 	Controller string `json:"controller"`
 
-	// AllowedGatewayNamespaces is a selector of namespaces that Gateways of
-	// this class can be created in. Implementations must not support Gateways
-	// when they are created in namespaces not specified by this field.
-	//
-	// Gateways that appear in namespaces not specified by this field must
-	// continue to be supported if they have already been provisioned. This must
-	// be indicated by the Gateway's presence in the ProvisionedGateways list in
-	// the status for this GatewayClass. If the status on a Gateway indicates
-	// that it has been provisioned but the Gateway does not appear in the
-	// ProvisionedGateways list on GatewayClass it must not be supported.
-	//
-	// When this field is unspecified (default) or an empty selector, Gateways
-	// in any namespace will be able to use this GatewayClass.
-	//
-	// Support: Core
-	//
-	// +optional
-	AllowedGatewayNamespaces metav1.LabelSelector `json:"allowedGatewayNamespaces,omitempty"`
-
 	// ParametersRef is a controller-specific resource containing the
 	// configuration parameters corresponding to this class. This is optional if
 	// the controller does not require any additional configuration.
@@ -124,12 +105,6 @@ type GatewayClassStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
-
-	// ProvisionedGateways is a list of Gateways that have been provisioned
-	// using this class. Implementations must add any Gateways of this class to
-	// this list once they have been provisioned and remove Gateways as soon as
-	// they are deleted or deprovisioned.
-	ProvisionedGateways []GatewayReference `json:"provisionedGateways,omitempty"`
 }
 
 // +kubebuilder:object:root=true
