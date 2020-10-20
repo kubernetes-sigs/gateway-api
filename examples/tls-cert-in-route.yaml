@@ -1,22 +1,16 @@
-kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha1
-metadata:
-  name: acme-lb
-spec:
-  controller: acme.io/gateway-controller
-  parametersRef:
-    name: acme-lb
-    group: acme.io
-    kind: Parameters
----
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
-  name: my-gateway
-  namespace: default
+  name: cert-in-route-gateway
 spec:
   gatewayClassName: acme-lb
-  listeners:  # Use GatewayClass defaults for listener definition.
+  listeners:
+  - protocol: HTTP
+    port: 80
+    hostname:
+      match: Any
+    routes:
+      kind: HTTPRoute
   - protocol: HTTPS
     port: 443
     hostname:
@@ -31,19 +25,31 @@ spec:
         certificate: Allow
     routes:
       kind: HTTPRoute
-      selector:
-        matchLabels:
-          app: foo
-      namespaces:
-        from: "All"
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-1
-  namespace: default
-  labels:
-    app: foo
+spec:
+  hostnames:
+  - "foo.example.com"
+  tls:
+    certificateRef:
+      kind: Secret
+      group: core
+      name: foo-example-com-cert
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /
+    forwardTo:
+    - serviceName: my-service
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-2
 spec:
   hostnames:
   - "bar.example.com"
@@ -58,33 +64,4 @@ spec:
         type: Prefix
         value: /
     forwardTo:
-    - backendRef:
-        name: my-service
-        group: core
-        kind: Service
----
-kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
-metadata:
-  name: http-app-1
-  namespace: default
-  labels:
-    app: foo
-spec:
-  hostnames:
-  - "baz.example.com"
-  tls:
-    certificateRef:
-      kind: Secret
-      group: core
-      name: baz-example-com-cert
-  rules:
-  - matches:
-    - path:
-        type: Prefix
-        value: /
-    forwardTo:
-    - backendRef:
-        name: my-service
-        group: core
-        kind: Service
+    - serviceName: my-service

@@ -1,0 +1,47 @@
+kind: BackendPolicy
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-app
+spec:
+  backendRefs:
+  - name: my-service
+    group: core
+    kind: Service
+    port: 443
+  tls:
+    certificateAuthorityRef:
+      name: my-cluster-ca
+      group: core
+      kind: Secret
+    options: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8000
+  - name: https
+    port: 443
+    targetPort: 8443
+  selector:
+    app: my-service
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-service-route
+spec:
+  hostnames:
+  - "foo.com"
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /
+    forwardTo:
+    - serviceName: my-service
+      port: 8443

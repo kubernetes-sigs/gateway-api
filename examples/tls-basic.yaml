@@ -1,0 +1,35 @@
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tls-basic
+spec:
+  gatewayClassName: acme-lb
+  listeners:
+  - protocol: HTTPS
+    port: 443
+    hostname:
+      name: foo.example.com
+      match: Exact
+    tls:
+      certificateRef:
+        kind: Secret
+        group: core
+        name: foo-example-com-cert
+      routeOverride:
+        certificate: Deny
+    routes:
+      kind: HTTPRoute
+  - protocol: HTTPS
+    port: 443
+    hostname:
+      name: bar.example.com
+      match: Exact
+    tls:
+      certificateRef:
+        kind: Secret
+        group: core
+        name: bar-example-com-cert
+      routeOverride:
+        certificate: Deny
+    routes:
+      kind: HTTPRoute
