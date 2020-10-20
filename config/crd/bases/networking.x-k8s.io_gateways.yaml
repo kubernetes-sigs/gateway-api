@@ -114,6 +114,8 @@ spec:
                           description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
                           type: string
                         namespaces:
+                          default:
+                            from: Same
                           description: "Namespaces indicates in which namespaces Routes should be selected for this Gateway. This is restricted to the namespace of this Gateway by default. \n Support: Core"
                           properties:
                             from:
@@ -186,7 +188,6 @@ spec:
                           type: object
                       required:
                       - kind
-                      - namespaces
                       type: object
                     tls:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n The association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener: - \"Domain\": Certificate should be used for the domain and its   first-level subdomains. - \"Exact\": Certificate should be used for the domain only. - \"Any\": Certificate in GatewayTLSConfig is the default certificate to use. \n The GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake. \n Support: Core"
