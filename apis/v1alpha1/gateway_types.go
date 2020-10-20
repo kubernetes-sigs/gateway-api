@@ -435,7 +435,8 @@ type RouteBindingSelector struct {
 	// default.
 	//
 	// Support: Core
-	Namespaces RouteNamespaces `json:"namespaces"`
+	// +kubebuilder:default={from: "Same"}
+	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 	// Selector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If RouteSelector is defined,
 	// only routes matching the RouteSelector are associated with the Gateway.
