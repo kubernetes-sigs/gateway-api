@@ -1,9 +1,6 @@
 # API Concepts
 
-This document is a deep dive into the reasoning and design for the API. The
-content of this document started from this [API sketch][api-sketch].
-
-[api-sketch]: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview
+This document is a deep dive into the reasoning and design for Service APIs.
 
 ## Roles and personas
 
@@ -128,19 +125,10 @@ A typical client/gateway API request flow for a gateway implemented using a reve
 
 ## TLS Configuration
 
-TLS configuration is tied to Gateway listeners. Although adding the option to
-configure TLS on other resources was considered, ultimately TLS configuration on
-Gateway listeners was deemed sufficient for the following reasons:
+TLS is configured on Gateway listeners. Additionally, TLS certificates
+can be configured on route objects for certain self-service use cases.
 
-* In most cases, users that are configuring TLS will naturally also have access
-  to Gateways.
-* In other cases, TLS config could be implemented with a controller watching
-  Routes and adding generated certs to corresponding Gateways.
-* This does not solve the use case for users wanting to provide their own certs
-  for Routes while not having access to a Gateway resource. This seems like it
-  would be a rare edge case and is not worth supporting at this point. The
-  security model outlined a potential approach to enable this in the future, but
-  there does not seem to be a sufficient reason to work towards that now.
+Please refer to [TLS details](tls.md) for a deep dive on TLS.
 
 ## Design considerations
 
@@ -463,4 +451,3 @@ TODO
 #### Generic routing
 
 TODO
-
