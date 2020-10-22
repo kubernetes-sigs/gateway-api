@@ -511,6 +511,14 @@ type HTTPRouteForwardTo struct {
 	// The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
 	//
+	// The protocol to use is defined using `AppProtocol` field (introduced
+	// in Kubernetes 1.18) in the Service resource. In absence of `AppProtocol` field
+	// (Kubernetes versions < 1.18), `networking.x-k8s.io/app-protocol` annotation
+	// may be used to define the protocol. The annotation serves as a stop-gap
+	// solution for the `AppProtocol` field and it's use is highly discouraged
+	// when AppProtocol field is available. AppProtocol field, when populated,
+	// takes precedence over the annotation.
+	//
 	// Support: Core
 	//
 	// +optional

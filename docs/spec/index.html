@@ -2288,6 +2288,13 @@ from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
 condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
+<p>The protocol to use is defined using <code>AppProtocol</code> field (introduced
+in Kubernetes 1.18) in the Service resource. In absence of <code>AppProtocol</code> field
+(Kubernetes versions &lt; 1.18), <code>networking.x-k8s.io/app-protocol</code> annotation
+may be used to define the protocol. The annotation serves as a stop-gap
+solution for the <code>AppProtocol</code> field and it&rsquo;s use is highly discouraged
+when AppProtocol field is available. AppProtocol field, when populated,
+takes precedence over the annotation.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3242,6 +3249,13 @@ from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
 condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
+<p>The protocol to use is defined using <code>AppProtocol</code> field (introduced
+in Kubernetes 1.18) in the Service resource. In absence of <code>AppProtocol</code> field
+(Kubernetes versions &lt; 1.18), <code>networking.x-k8s.io/app-protocol</code> annotation
+may be used to define the protocol. The annotation serves as a stop-gap
+solution for the <code>AppProtocol</code> field and it&rsquo;s use is highly discouraged
+when AppProtocol field is available. AppProtocol field, when populated,
+takes precedence over the annotation.</p>
 <p>Support: Core</p>
 </td>
 </tr>

@@ -35,6 +35,23 @@ const (
 	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
 )
 
+const (
+	// AnnotationAppProtocol defines the protocol a Gateway should use for
+	// communication with a Kubernetes Service. The annotation serves as a stop-gap
+	// solution for the Kubernetes versions < 1.18, where the `AppProtocol` field
+	// on the `Service` resource is not available. Using this annotation is highly
+	// discouraged when AppProtocol field is available. AppProtocol field, when
+	// populated, takes precedence over this annotation.
+	//
+	// The annotation value must be a comma separated with each value containing
+	// a port number followed by a forward slash and the protocol.
+	// Examples:
+	//
+	// - `networking.x-k8s.io/app-protocol: 8000/http,8443/https`
+	// - `networking.x-k8s.io/app-protocol: 4000/tcp,5000/tls`
+	AnnotationAppProtocol = "networking.x-k8s.io/app-protocol"
+)
+
 // RouteGateways defines which Gateways will be able to use a route. If this
 // field results in preventing the selection of a Route by a Gateway, an
 // "Admitted" condition with a status of false must be set for the Gateway on
@@ -79,6 +96,14 @@ type RouteForwardTo struct {
 	// condition on the Gateway with the "DroppedRoutes" reason.
 	// The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
+	//
+	// The protocol to use is defined using `AppProtocol` field (introduced
+	// in Kubernetes 1.18) in the Service resource. In absence of `AppProtocol` field
+	// (Kubernetes versions < 1.18), `networking.x-k8s.io/app-protocol` annotation
+	// may be used to define the protocol. The annotation serves as a stop-gap
+	// solution for the `AppProtocol` field and it's use is highly discouraged
+	// when AppProtocol field is available. AppProtocol field, when populated,
+	// takes precedence over the annotation.
 	//
 	// Support: Core
 	//
