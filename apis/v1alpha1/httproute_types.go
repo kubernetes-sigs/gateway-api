@@ -328,79 +328,94 @@ type HTTPRouteMatch struct {
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
-const (
-	// FilterTypeHTTPRequestHeader can be used to add or remove an HTTP
-	// header from an HTTP request before it is sent to the upstream target.
-	// Support: core
-	FilterTypeHTTPRequestHeader = "RequestHeader"
-
-	// FilterTypeHTTPRequestMirror can be used to mirror requests to a
-	// different backend. The responses from this backend MUST be ignored
-	// by the Gateway.
-	// Support: extended
-	FilterTypeHTTPRequestMirror = "RequestMirror"
-
-	// FilterTypeImplementationSpecific should be used for configuring
-	// custom filters.
-	FilterTypeImplementationSpecific = "ImplementationSpecific"
-)
-
 // HTTPRouteFilter defines additional processing steps that must be completed
-// during the request or response lifecycle.
-// HTTPRouteFilters are meant as an extension point to express additional
-// processing that may be done in Gateway implementations. Some examples include
-// request or response modification, implementing authentication strategies,
-// rate-limiting, and traffic shaping.
+// during the request or response lifecycle. HTTPRouteFilters are meant as an
+// extension point to express additional processing that may be done in Gateway
+// implementations. Some examples include request or response modification,
+// implementing authentication strategies, rate-limiting, and traffic shaping.
 // API guarantee/conformance is defined based on the type of the filter.
 // TODO(hbagdi): re-render CRDs once controller-tools supports union tags:
 // - https://github.com/kubernetes-sigs/controller-tools/pull/298
 // - https://github.com/kubernetes-sigs/controller-tools/issues/461
 // +union
 type HTTPRouteFilter struct {
-	// Type identifies the filter to execute.
-	// Types are classified into three conformance-levels (similar to
-	// other locations in this API):
-	// - Core and extended: These filter types and their corresponding configuration
-	//   is defined in this package. All implementations must implement
-	//   the core filters. Implementers are encouraged to support extended filters.
-	//   Definitions for filter-specific configuration for these
-	//   filters is defined in this package.
-	// - Custom: These filters are defined and supported by specific vendors.
+	// Type identifies the type of filter to apply. As with other API fields,
+	// types are classified into three conformance-levels:
+	//
+	// - Core: Filter types and their corresponding configuration defined by
+	//   "Support: Core" in this package, e.g. "ModifyRequestHeader". All
+	//   implementations must support core filters.
+	//
+	// - Extended: Filter types and their corresponding configuration defined by
+	//   "Support: Extended" in this package, e.g. "MirrorRequest". Implementers
+	//   are encouraged to support extended filters.
+	//
+	// - Custom: Filters that are defined and supported by specific vendors.
 	//   In the future, filters showing convergence in behavior across multiple
 	//   implementations will be considered for inclusion in extended or core
-	//   conformance rings. Filter-specific configuration for such filters
+	//   conformance levels. Filter-specific configuration for such filters
 	//   is specified using the ExtensionRef field. `Type` should be set to
-	//   "ImplementationSpecific" for custom filters.
+	//   "Custom" for custom filters.
 	//
-	// Implementers are encouraged to define custom implementation
-	// types to extend the core API with implementation-specific behavior.
+	// Implementers are encouraged to define custom implementation types to
+	// extend the core API with implementation-specific behavior.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=100
-	Type string `json:"type"`
+	Type HTTPRouteFilterType `json:"type,omitempty"`
+
+	// ModifyRequestHeader defines a schema for a filter that modifies request
+	// headers.
+	//
+	// Support: Core
+	//
+	// +optional
+	ModifyRequestHeader *HTTPRequestHeaderFilter `json:"modifyRequestHeader,omitempty"`
+
+	// MirrorRequest defines a schema for a filter that mirrors requests.
+	//
+	// Support: Extended
+	//
+	// +optional
+	MirrorRequest *HTTPRequestMirrorFilter `json:"mirrorRequest,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "filter" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutefilters" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
-	// ExtensionRef MUST NOT be used for core and extended filters.
+	// "filter" behavior.  The resource may be "configmap" or an
+	// implementation-defined resource (for example, resource "myroutefilters"
+	// in group "networking.acme.io"). ExtensionRef MUST NOT be used for core
+	// and extended filters.
+	//
+	// Support: Implementation-specific
+	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
-
-	// Filter-specific configuration definitions for core and extended filters
-
-	// +optional
-	RequestHeader *HTTPRequestHeaderFilter `json:"requestHeader,omitempty"`
-
-	// +optional
-	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 }
 
-// HTTPRequestHeaderFilter defines configuration for the
-// RequestHeader filter.
+// HTTPRouteFilterType identifies a type of HTTPRoute filter.
+// +kubebuilder:validation:Enum=ModifyRequestHeader;MirrorRequest;Custom
+type HTTPRouteFilterType string
+
+const (
+	// ModifyRequestHeaderHTTPRouteFilter can be used to add or remove an HTTP
+	// header from an HTTP request before it is sent to the upstream target.
+	//
+	// Support: Core
+	ModifyRequestHeaderHTTPRouteFilter HTTPRouteFilterType = "ModifyRequestHeader"
+
+	// MirrorRequestHTTPRouteFilter can be used to mirror HTTP requests to a
+	// different backend. The responses from this backend MUST be ignored by
+	// the Gateway.
+	//
+	// Support: Extended
+	MirrorRequestHTTPRouteFilter HTTPRouteFilterType = "MirrorRequest"
+
+	// CustomHTTPRouteFilter should be used for configuring custom HTTP filters.
+	//
+	// Support: Implementation-specific
+	CustomHTTPRouteFilter HTTPRouteFilterType = "Custom"
+)
+
+// HTTPRequestHeaderFilter defines configuration for the ModifyRequestHeader
+// filter.
 type HTTPRequestHeaderFilter struct {
 	// Add adds the given header (name, value) to the request
 	// before the action.
@@ -416,7 +431,8 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: foo
 	//
 	// Support: Extended
-	Add map[string]string `json:"add"`
+	// +optional
+	Add map[string]string `json:"add,omitempty"`
 
 	// Remove the given header(s) from the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
@@ -437,11 +453,12 @@ type HTTPRequestHeaderFilter struct {
 	//   My-Header2: DEF
 	//
 	// Support: Extended
+	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	Remove []string `json:"remove"`
+	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+// HTTPRequestMirrorFilter defines configuration for the MirrorRequest filter.
 type HTTPRequestMirrorFilter struct {
 	// ServiceName refers to the name of the Service to mirror matched requests
 	// to. When specified, this takes the place of BackendRef. If both

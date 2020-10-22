@@ -1,0 +1,52 @@
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: filter-lb
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-filter-gateway
+spec:
+  gatewayClassName: filter-lb
+  listeners:
+    - protocol: HTTP
+      port: 80
+      routes:
+        kind: HTTPRoute
+        selector:
+          matchLabels:
+            app: filter
+        namespaces:
+          from: "Selector"
+          selector: {}
+---
+# Matches every HTTP request for hostname "my.filter.com".
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-filter-1
+  labels:
+    app: filter
+spec:
+  hostnames:
+    - my.filter.com
+  rules:
+    - matches:
+      - path:
+          type: Prefix
+          value: /
+      filters:
+      - type: ModifyRequestHeader
+        modifyRequestHeader:
+          add:
+            my-header: foo
+      forwardTo:
+      - serviceName: my-filter-svc1
+        weight: 1
