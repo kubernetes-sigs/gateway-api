@@ -310,16 +310,11 @@ type HTTPRouteMatch struct {
 	Headers *HTTPHeaderMatch `json:"headers"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematchers" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
+	// "match" behavior.  For example, resource "myroutematcher" in group
+	// "networking.acme.io". If the referent cannot be found, the route must
+	// be dropped from the Gateway. The controller should raise the
+	// "ResolvedRefs" condition on the Gateway with the "DroppedRoutes"
+	// reason. The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
 	//
 	// Support: custom
@@ -340,14 +335,14 @@ type HTTPRouteMatch struct {
 // +union
 type HTTPRouteFilter struct {
 	// Type identifies the type of filter to apply. As with other API fields,
-	// types are classified into three conformance-levels:
+	// types are classified into three conformance levels:
 	//
 	// - Core: Filter types and their corresponding configuration defined by
-	//   "Support: Core" in this package, e.g. "ModifyRequestHeader". All
+	//   "Support: Core" in this package, e.g. "RequestHeaderModifier". All
 	//   implementations must support core filters.
 	//
 	// - Extended: Filter types and their corresponding configuration defined by
-	//   "Support: Extended" in this package, e.g. "MirrorRequest". Implementers
+	//   "Support: Extended" in this package, e.g. "RequestMirror". Implementers
 	//   are encouraged to support extended filters.
 	//
 	// - Custom: Filters that are defined and supported by specific vendors.
@@ -355,34 +350,33 @@ type HTTPRouteFilter struct {
 	//   implementations will be considered for inclusion in extended or core
 	//   conformance levels. Filter-specific configuration for such filters
 	//   is specified using the ExtensionRef field. `Type` should be set to
-	//   "Custom" for custom filters.
+	//   "ExtensionRef" for custom filters.
 	//
 	// Implementers are encouraged to define custom implementation types to
 	// extend the core API with implementation-specific behavior.
 	//
 	// +unionDiscriminator
-	Type HTTPRouteFilterType `json:"type,omitempty"`
+	Type HTTPRouteFilterType `json:"type"`
 
-	// ModifyRequestHeader defines a schema for a filter that modifies request
+	// RequestHeaderModifier defines a schema for a filter that modifies request
 	// headers.
 	//
 	// Support: Core
 	//
 	// +optional
-	ModifyRequestHeader *HTTPRequestHeaderFilter `json:"modifyRequestHeader,omitempty"`
+	RequestHeaderModifier *HTTPRequestHeaderFilter `json:"requestHeaderModifier,omitempty"`
 
-	// MirrorRequest defines a schema for a filter that mirrors requests.
+	// RequestMirror defines a schema for a filter that mirrors requests.
 	//
 	// Support: Extended
 	//
 	// +optional
-	MirrorRequest *HTTPRequestMirrorFilter `json:"mirrorRequest,omitempty"`
+	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "filter" behavior.  The resource may be "configmap" or an
-	// implementation-defined resource (for example, resource "myroutefilters"
-	// in group "networking.acme.io"). ExtensionRef MUST NOT be used for core
-	// and extended filters.
+	// "filter" behavior.  For example, resource "myroutefilter" in group
+	// "networking.acme.io"). ExtensionRef MUST NOT be used for core and
+	// extended filters.
 	//
 	// Support: Implementation-specific
 	//
@@ -391,30 +385,31 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=ModifyRequestHeader;MirrorRequest;Custom
+// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef
 type HTTPRouteFilterType string
 
 const (
-	// ModifyRequestHeaderHTTPRouteFilter can be used to add or remove an HTTP
+	// HTTPRouteFilterRequestHeaderModifier can be used to add or remove an HTTP
 	// header from an HTTP request before it is sent to the upstream target.
 	//
 	// Support: Core
-	ModifyRequestHeaderHTTPRouteFilter HTTPRouteFilterType = "ModifyRequestHeader"
+	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
 
-	// MirrorRequestHTTPRouteFilter can be used to mirror HTTP requests to a
+	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 	// different backend. The responses from this backend MUST be ignored by
 	// the Gateway.
 	//
 	// Support: Extended
-	MirrorRequestHTTPRouteFilter HTTPRouteFilterType = "MirrorRequest"
+	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
 
-	// CustomHTTPRouteFilter should be used for configuring custom HTTP filters.
+	// HTTPRouteFilterExtensionRef should be used for configuring custom
+	// HTTP filters.
 	//
 	// Support: Implementation-specific
-	CustomHTTPRouteFilter HTTPRouteFilterType = "Custom"
+	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 
-// HTTPRequestHeaderFilter defines configuration for the ModifyRequestHeader
+// HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
 // filter.
 type HTTPRequestHeaderFilter struct {
 	// Add adds the given header (name, value) to the request
@@ -458,7 +453,7 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPRequestMirrorFilter defines configuration for the MirrorRequest filter.
+// HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 type HTTPRequestMirrorFilter struct {
 	// ServiceName refers to the name of the Service to mirror matched requests
 	// to. When specified, this takes the place of BackendRef. If both

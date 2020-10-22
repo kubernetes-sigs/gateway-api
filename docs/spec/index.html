@@ -2008,7 +2008,7 @@ string
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>)
 </p>
 <p>
-<p>HTTPRequestHeaderFilter defines configuration for the ModifyRequestHeader
+<p>HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
 filter.</p>
 </p>
 <table>
@@ -2075,7 +2075,7 @@ My-Header2: DEF</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>)
 </p>
 <p>
-<p>HTTPRequestMirrorFilter defines configuration for the MirrorRequest filter.</p>
+<p>HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.</p>
 </p>
 <table>
 <thead>
@@ -2191,20 +2191,20 @@ HTTPRouteFilterType
 </td>
 <td>
 <p>Type identifies the type of filter to apply. As with other API fields,
-types are classified into three conformance-levels:</p>
+types are classified into three conformance levels:</p>
 <ul>
 <li><p>Core: Filter types and their corresponding configuration defined by
-&ldquo;Support: Core&rdquo; in this package, e.g. &ldquo;ModifyRequestHeader&rdquo;. All
+&ldquo;Support: Core&rdquo; in this package, e.g. &ldquo;RequestHeaderModifier&rdquo;. All
 implementations must support core filters.</p></li>
 <li><p>Extended: Filter types and their corresponding configuration defined by
-&ldquo;Support: Extended&rdquo; in this package, e.g. &ldquo;MirrorRequest&rdquo;. Implementers
+&ldquo;Support: Extended&rdquo; in this package, e.g. &ldquo;RequestMirror&rdquo;. Implementers
 are encouraged to support extended filters.</p></li>
 <li><p>Custom: Filters that are defined and supported by specific vendors.
 In the future, filters showing convergence in behavior across multiple
 implementations will be considered for inclusion in extended or core
 conformance levels. Filter-specific configuration for such filters
 is specified using the ExtensionRef field. <code>Type</code> should be set to
-&ldquo;Custom&rdquo; for custom filters.</p></li>
+&ldquo;ExtensionRef&rdquo; for custom filters.</p></li>
 </ul>
 <p>Implementers are encouraged to define custom implementation types to
 extend the core API with implementation-specific behavior.</p>
@@ -2212,7 +2212,7 @@ extend the core API with implementation-specific behavior.</p>
 </tr>
 <tr>
 <td>
-<code>modifyRequestHeader</code></br>
+<code>requestHeaderModifier</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestHeaderFilter">
 HTTPRequestHeaderFilter
@@ -2221,14 +2221,14 @@ HTTPRequestHeaderFilter
 </td>
 <td>
 <em>(Optional)</em>
-<p>ModifyRequestHeader defines a schema for a filter that modifies request
+<p>RequestHeaderModifier defines a schema for a filter that modifies request
 headers.</p>
 <p>Support: Core</p>
 </td>
 </tr>
 <tr>
 <td>
-<code>mirrorRequest</code></br>
+<code>requestMirror</code></br>
 <em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">
 HTTPRequestMirrorFilter
@@ -2237,7 +2237,7 @@ HTTPRequestMirrorFilter
 </td>
 <td>
 <em>(Optional)</em>
-<p>MirrorRequest defines a schema for a filter that mirrors requests.</p>
+<p>RequestMirror defines a schema for a filter that mirrors requests.</p>
 <p>Support: Extended</p>
 </td>
 </tr>
@@ -2253,10 +2253,9 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;filter&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; or an
-implementation-defined resource (for example, resource &ldquo;myroutefilters&rdquo;
-in group &ldquo;networking.acme.io&rdquo;). ExtensionRef MUST NOT be used for core
-and extended filters.</p>
+&ldquo;filter&rdquo; behavior.  For example, resource &ldquo;myroutefilter&rdquo; in group
+&ldquo;networking.acme.io&rdquo;). ExtensionRef MUST NOT be used for core and
+extended filters.</p>
 <p>Support: Implementation-specific</p>
 </td>
 </tr>
@@ -2472,15 +2471,11 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
+&ldquo;match&rdquo; behavior.  For example, resource &ldquo;myroutematcher&rdquo; in group
+&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the route must
+be dropped from the Gateway. The controller should raise the
+&ldquo;ResolvedRefs&rdquo; condition on the Gateway with the &ldquo;DroppedRoutes&rdquo;
+reason. The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
 <p>Support: custom</p>
 </td>

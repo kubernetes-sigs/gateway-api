@@ -24,8 +24,7 @@ spec:
           matchLabels:
             app: filter
         namespaces:
-          from: "Selector"
-          selector: {}
+          from: "All"
 ---
 # Matches every HTTP request for hostname "my.filter.com".
 kind: HTTPRoute
@@ -43,8 +42,8 @@ spec:
           type: Prefix
           value: /
       filters:
-      - type: ModifyRequestHeader
-        modifyRequestHeader:
+      - type: RequestHeaderModifier
+        requestHeaderModifier:
           add:
             my-header: foo
       forwardTo:
