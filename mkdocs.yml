@@ -1,22 +1,27 @@
-site_name: Kubernetes Service API Evolution
+site_name: Kubernetes Service APIs
 repo_url: http://sigs.k8s.io/service-apis
 repo_name: GitHub
 site_dir: docs
 docs_dir: docs-src
 theme:
   name: material
-# an empty plugins list disables search (and prevents a lot of merge conflicts)
 plugins:
   - macros:
       include_dir: examples
 nav:
   - Introduction: index.md
-  - User guide: userguide.md
-  - API cookbook: cookbook.md
-  - API concepts: concepts.md
-  - API specification: spec.md
-  - Developer guide: devguide.md
-  - Releases: releases.md
-  - Security Model: security-model.md
-  - How to contribute: community.md
+  - Concepts:
+      API concepts: concepts.md
+      Security Model: security-model.md
+  - Guides:
+    - User guide: userguide.md
+    - API cookbook: cookbook.md
+    - TLS: tls.md
+  - References:
+    - Releases: releases.md
+    - API specification: spec.md
+  - Contributing:
+    - Developer guide: devguide.md
+    - Enhancement requests: enhancement-requests.md
+    - Community: community.md
   - FAQ: faq.md
