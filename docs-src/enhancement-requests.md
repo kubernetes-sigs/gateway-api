@@ -39,7 +39,7 @@ Create an enhancement once you have:
 
 - circulated your idea to see if there is interest.
 - identified community members who agree to work on and maintain the enhancement.
-  - enhancements may take several releases to complete.
+- enhancements may take several releases to complete.
 - a prototype in your own fork (optional)
 
 
@@ -53,6 +53,7 @@ the right design and approach before getting too deep into an implementation.
 ## When to Comment on an Enhancement Issue
 
 Please comment on the enhancement issue to:
+
 - request a review or clarification on the process
 - update status of the enhancement effort
 - link to relevant issues in other repos
