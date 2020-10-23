@@ -3,3 +3,10 @@
 approvers:
   - bowei
   - robscott
+
+reviewers:
+  - bowei
+  - robscott
+  - hbagdi
+  - jpeach
+  - danehans
