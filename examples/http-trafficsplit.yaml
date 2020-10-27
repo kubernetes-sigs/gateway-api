@@ -43,6 +43,8 @@ spec:
         value: /bar
     forwardTo:
     - serviceName: my-trafficsplit-svc1
+      port: 8080
       weight: 50
     - serviceName: my-trafficsplit-svc2
+      port: 8080
       weight: 50

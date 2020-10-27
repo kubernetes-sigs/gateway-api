@@ -870,6 +870,7 @@ spec:
         value: /
     forwardTo:
     - serviceName: my-service
+      port: 8080
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -890,6 +891,7 @@ spec:
         value: /
     forwardTo:
     - serviceName: my-service
+      port: 8080
 </code></pre>
 
 <h2 id="upstream-tls">Upstream TLS</h2>

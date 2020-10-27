@@ -105,23 +105,11 @@ type RouteForwardTo struct {
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
 	//
-	// If the port is unspecified and a Service object consisting
-	// of a single port definition is the backend, that port will
-	// be used.
-	//
-	// If the port is unspecified and the backend is a Service
-	// object consisting of multiple port definitions, the route
-	// must be dropped from the Gateway. The controller should
-	// raise the "ResolvedRefs" condition on the Gateway with the
-	// "DroppedRoutes" reason.  The gateway status for this route
-	// should be updated with a condition that describes the error
-	//
 	// Support: Core
 	//
-	// +optional
 	// +kubebuilder:validation:Minimum=1
 	// +kubebuilder:validation:Maximum=65535
-	Port *int32 `json:"port,omitempty"`
+	Port int32 `json:"port"`
 
 	// Weight specifies the proportion of traffic forwarded to the backend
 	// referenced by the ServiceName or BackendRef field. computed as

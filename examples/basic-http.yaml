@@ -44,6 +44,7 @@ spec:
         value: /bar
     forwardTo:
     - serviceName: my-service1
+      port: 8080
   - matches:
     - headers:
         type: Exact
@@ -55,3 +56,4 @@ spec:
         value: /some/thing
     forwardTo:
     - serviceName: my-service2
+      port: 8080

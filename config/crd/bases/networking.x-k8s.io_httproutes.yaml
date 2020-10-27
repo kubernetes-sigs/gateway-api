@@ -157,7 +157,7 @@ spec:
                                 - name
                                 type: object
                               port:
-                                description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If the port is unspecified and a Service object consisting of a single port definition is the backend, that port will be used. \n If the port is unspecified and the backend is a Service object consisting of multiple port definitions, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason.  The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
+                                description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -166,6 +166,8 @@ spec:
                                 description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                 maxLength: 253
                                 type: string
+                            required:
+                            - port
                             type: object
                           type:
                             description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -278,7 +280,7 @@ spec:
                                       - name
                                       type: object
                                     port:
-                                      description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If the port is unspecified and a Service object consisting of a single port definition is the backend, that port will be used. \n If the port is unspecified and the backend is a Service object consisting of multiple port definitions, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason.  The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
+                                      description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -287,6 +289,8 @@ spec:
                                       description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                       maxLength: 253
                                       type: string
+                                  required:
+                                  - port
                                   type: object
                                 type:
                                   description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -299,7 +303,7 @@ spec:
                             maxItems: 16
                             type: array
                           port:
-                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If the port is unspecified and a Service object consisting of a single port definition is the backend, that port will be used. \n If the port is unspecified and the backend is a Service object consisting of multiple port definitions, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason.  The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
+                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n Support: Core"
                             format: int32
                             maximum: 65535
                             minimum: 1
@@ -315,6 +319,8 @@ spec:
                             maximum: 10000
                             minimum: 0
                             type: integer
+                        required:
+                        - port
                         type: object
                       maxItems: 4
                       type: array
