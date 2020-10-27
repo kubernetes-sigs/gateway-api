@@ -18,11 +18,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
+readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
 
-GOLINT=${GOLINT:-"golint"}
+readonly GOFLAGS="-mod=readonly"
+readonly GOLINT=${GOLINT:-"golint"}
 
 if ! command -v ${GOLINT} &> /dev/null; then
   echo "golint not found, installing"
