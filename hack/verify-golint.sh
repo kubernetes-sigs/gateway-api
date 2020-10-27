@@ -23,6 +23,12 @@ KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 cd "${KUBE_ROOT}"
 
 GOLINT=${GOLINT:-"golint"}
+
+if ! command -v ${GOLINT} &> /dev/null; then
+  echo "golint not found, installing"
+  go get -u golang.org/x/lint/golint
+fi
+
 PACKAGES=($(go list ./... | grep -v /vendor/))
 bad_files=()
 for package in "${PACKAGES[@]}"; do
