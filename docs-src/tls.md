@@ -30,7 +30,7 @@ Downstream TLS settings are configured using listeners at the Gateway level.
 
 Listeners expose the TLS setting on a per domain or sub-domain basis.
 TLS settings of a listener are applied to all domains that satisfy the
-`hostname.match` criteria.
+`hostname` criteria.
 
 In the following example, the Gateway serves the TLS certificate
 defined in the `default-cert` Secret resource for all requests.
@@ -41,8 +41,6 @@ feature for TLS-only protocol along with TLSRoutes.
 listeners:
 - protocol: HTTPS # Other possible value is `TLS`
   port: 443
-  hostname:
-    match: Any # Other possible values are `Domain` and `Exact`
   tls:
     mode: Terminate
     certificateRef:

@@ -94,8 +94,8 @@ type GatewaySpec struct {
 	// matched to a Listener to find the correct set of Routes.
 	// The incoming hostname MUST be matched using the Hostname
 	// field for each Listener in order of most to least specific.
-	// That is, "Exact" matches must be processed before "Domain"
-	// matches, which must be processed before "Any" matches.
+	// That is, exact matches must be processed before wildcard
+	// matches.
 	//
 	// If this field specifies multiple Listeners that have the same
 	// Port value but are not compatible, the implementation must raise
@@ -132,20 +132,28 @@ type GatewaySpec struct {
 // combination of Hostname, Port, and Protocol. This will be enforced by a
 // validating webhook.
 type Listener struct {
-	// Hostname specifies to match the virtual hostname for
-	// protocol types that define this concept.
+	// Hostname specifies the virtual hostname to match for protocol types that
+	// define this concept. When unspecified or "*", all hostnames are matched.
+	// This field can be omitted for protocols that don't require hostname based
+	// matching.
 	//
-	// Incoming requests that include a hostname are matched
-	// according to the given HostnameMatchType to select
-	// the Routes from this Listener.
+	// Hostname is the fully qualified domain name of a network host, as defined
+	// by RFC 3986. Note the following deviations from the "host" part of the
+	// URI as defined in the RFC:
 	//
-	// If a match type other than "Any" is supplied, it MUST
-	// be compatible with the specified Protocol field.
+	// 1. IP literals are not allowed.
+	// 2. The `:` delimiter is not respected because ports are not allowed.
+	//
+	// Hostname can be "precise" which is a domain name without the terminating
+	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
+	// domain name prefixed with a single wildcard label (e.g. "*.example.com").
+	// The wildcard character '*' must appear by itself as the first DNS label
+	// and matches only a single label.
 	//
 	// Support: Core
 	//
-	// +kubebuilder:default={match: "Any"}
-	Hostname HostnameMatch `json:"hostname,omitempty"`
+	// +optional
+	Hostname *Hostname `json:"hostname,omitempty"`
 
 	// Port is the network port. Multiple listeners may use the
 	// same port, subject to the Listener compatibility rules.
@@ -153,10 +161,9 @@ type Listener struct {
 	// Support: Core
 	Port PortNumber `json:"port"`
 
-	// Protocol specifies the network protocol this listener
-	// expects to receive. The GatewayClass MUST validate that
-	// match type specified in the Hostname field is appropriate
-	// for the protocol.
+	// Protocol specifies the network protocol this listener expects to receive.
+	// The GatewayClass MUST apply the Hostname match appropriately for each
+	// protocol:
 	//
 	// * For the "TLS" protocol, the Hostname match MUST be
 	//   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)
@@ -176,11 +183,7 @@ type Listener struct {
 	// ignored otherwise.
 	//
 	// The association of SNIs to Certificate defined in GatewayTLSConfig is
-	// defined based on the Hostname field for this listener:
-	// - "Domain": Certificate should be used for the domain and its
-	//   first-level subdomains.
-	// - "Exact": Certificate should be used for the domain only.
-	// - "Any": Certificate in GatewayTLSConfig is the default certificate to use.
+	// defined based on the Hostname field for this listener.
 	//
 	// The GatewayClass MUST use the longest matching SNI out of all
 	// available certificates for any TLS handshake.
@@ -227,71 +230,10 @@ type Listener struct {
 	Routes RouteBindingSelector `json:"routes"`
 }
 
-// HostnameMatch specifies how a Listener should match the incoming
-// hostname from a client request. Depending on the incoming protocol,
-// the match must apply to names provided by the client at both the
-// TLS and the HTTP protocol layers.
-type HostnameMatch struct {
-	// Match specifies how the hostname provided by the client should be
-	// matched against the given value.
-	//
-	// +kubebuilder:default=Exact
-	Match HostnameMatchType `json:"match,omitempty"`
-
-	// Name contains the name to match against. This value must
-	// be a fully qualified host or domain name conforming to the
-	// preferred name syntax defined in
-	// [RFC 1034](https://tools.ietf.org/html/rfc1034#section-3.5)
-	//
-	// In addition to any RFC rules, this field MUST NOT contain
-	//
-	// 1. IP address literals
-	// 2. Colon-delimited port numbers
-	// 3. Percent-encoded octets
-	//
-	// This field is required for the "Domain" and "Exact" match types.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name,omitempty"`
-}
-
-// HostnameMatchType specifies the types of matches that are valid
-// for hostnames.
-// Valid match types are:
-//
-// * "Domain"
-// * "Exact"
-// * "Any"
-//
-// +kubebuilder:validation:Enum=Domain;Exact;Any
-type HostnameMatchType string
-
-const (
-	// HostnameMatchExact specifies that the hostname provided
-	// by the client must exactly match the specified value.
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchExact HostnameMatchType = "Exact"
-
-	// HostnameMatchDomain specifies that the hostname provided
-	// by the client should be matched against a DNS domain value.
-	// The domain match removes the leftmost DNS label from the
-	// hostname provided by the client and compares the resulting
-	// value.
-	//
-	// For example, "example.com" is a "Domain" match for the host
-	// name "foo.example.com", but not for "foo.bar.example.com"
-	// or for "example.foo.com".
-	//
-	// This match type MUST be case-insensitive.
-	HostnameMatchDomain HostnameMatchType = "Domain"
-
-	// HostnameMatchAny specifies that this Listener accepts
-	// all client traffic regardless of the presence or value of
-	// any hostname supplied by the client.
-	HostnameMatchAny HostnameMatchType = "Any"
-)
+// Hostname is used to specify a hostname that should be matched.
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+type Hostname string
 
 // ProtocolType defines the application protocol accepted by a Listener.
 // Implementations are not required to accept all the defined protocols.
@@ -740,10 +682,9 @@ const (
 	// interoperability.
 	ListenerConditionConflicted ListenerConditionType = "Conflicted"
 
-	// ListenerReasonHostnameConflict is used when the Listener
-	// violates the Hostname match constraints that allow collapsing
-	// Listeners. For example, this reason would be used when multiple
-	// Listeners on the same port use the "Any" hostname match type.
+	// ListenerReasonHostnameConflict is used when the Listener conflicts with
+	// hostnames in other Listeners. For example, this reason would be used when
+	// multiple Listeners on the same port use "*" in the hostname field.
 	ListenerReasonHostnameConflict ListenerConditionReason = "HostnameConflict"
 
 	// ListenerReasonProtocolConflict is used when multiple

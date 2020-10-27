@@ -79,7 +79,7 @@ type HTTPRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	Hostnames []HTTPRouteHostname `json:"hostnames,omitempty"`
+	Hostnames []Hostname `json:"hostnames,omitempty"`
 
 	// TLS defines the TLS certificate to use for Hostnames defined in this
 	// Route. This configuration only takes effect if the AllowRouteOverride
@@ -125,12 +125,6 @@ type RouteTLSConfig struct {
 	// +required
 	CertificateRef LocalObjectReference `json:"certificateRef"`
 }
-
-// HTTPRouteHostname is used to specify a hostname that should be matched by
-// HTTPRoute.
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=253
-type HTTPRouteHostname string
 
 // HTTPRouteRule defines semantics for matching an incoming HTTP request against
 // a set of matching rules and executing an action (and optionally filters) on

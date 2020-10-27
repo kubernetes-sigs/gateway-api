@@ -9,8 +9,7 @@ spec:
   - type: NamedAddress
     value: auto-assign
   listeners:
-  - hostname:
-      name: httpbin.example.com
+  - hostname: httpbin.example.com
     port: 80
     protocol: HTTP
     routes:

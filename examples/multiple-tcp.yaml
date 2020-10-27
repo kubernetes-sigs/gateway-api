@@ -31,9 +31,7 @@ spec:
         from: "All"
   # Forward the SNI named service to the real SSH server ever TLS, assuming
   # that there is an actual client for such a beast.
-  - hostname:
-      match: Exact
-      name: ssh.example.com
+  - hostname: ssh.example.com
     port: 443
     protocol: TLS
     tls:

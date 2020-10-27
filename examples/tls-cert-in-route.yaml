@@ -7,14 +7,10 @@ spec:
   listeners:
   - protocol: HTTP
     port: 80
-    hostname:
-      match: Any
     routes:
       kind: HTTPRoute
   - protocol: HTTPS
     port: 443
-    hostname:
-      match: Any
     tls:
       mode: Terminate
       certificateRef:
