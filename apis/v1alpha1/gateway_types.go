@@ -144,10 +144,7 @@ type Listener struct {
 	// same port, subject to the Listener compatibility rules.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port"`
+	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener
 	// expects to receive. The GatewayClass MUST validate that
@@ -692,10 +689,7 @@ type ListenerStatus struct {
 	// is reporting the status. If more than one Gateway Listener
 	// shares the same port value, this message reports the combined
 	// status of all such Listeners.
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port"`
+	Port PortNumber `json:"port"`
 
 	// Conditions describe the current condition of this listener.
 	//

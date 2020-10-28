@@ -478,9 +478,7 @@ type HTTPRequestMirrorFilter struct {
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
 	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port"`
+	Port PortNumber `json:"port"`
 }
 
 // HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
@@ -522,9 +520,7 @@ type HTTPRouteForwardTo struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port"`
+	Port PortNumber `json:"port"`
 
 	// Weight specifies the proportion of traffic forwarded to the backend
 	// referenced by the ServiceName or BackendRef field. computed as
