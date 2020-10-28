@@ -100,7 +100,7 @@ spec:
                             - name
                             type: object
                           port:
-                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If the port is unspecified and a Service object consisting of a single port definition is the backend, that port will be used. \n If the port is unspecified and the backend is a Service object consisting of multiple port definitions, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason.  The gateway status for this route should be updated with a condition that describes the error \n Support: Core"
+                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n Support: Core"
                             format: int32
                             maximum: 65535
                             minimum: 1
@@ -116,6 +116,8 @@ spec:
                             maximum: 10000
                             minimum: 0
                             type: integer
+                        required:
+                        - port
                         type: object
                       maxItems: 4
                       type: array

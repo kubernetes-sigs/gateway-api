@@ -58,3 +58,4 @@ spec:
         value: /example/exact
     forwardTo:
     - serviceName: my-service-2
+      port: 8080

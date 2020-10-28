@@ -38,3 +38,4 @@ spec:
   rules:
   - forwardTo:
     - serviceName: my-service
+      port: 5000

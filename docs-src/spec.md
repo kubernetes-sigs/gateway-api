@@ -1821,20 +1821,8 @@ int32
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
 backend referenced by the ServiceName or BackendRef field.</p>
-<p>If the port is unspecified and a Service object consisting
-of a single port definition is the backend, that port will
-be used.</p>
-<p>If the port is unspecified and the backend is a Service
-object consisting of multiple port definitions, the route
-must be dropped from the Gateway. The controller should
-raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
-&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
-should be updated with a condition that describes the error
-more specifically.</p>
-<p>Support: Core</p>
 </td>
 </tr>
 </tbody>
@@ -2008,19 +1996,8 @@ int32
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
 backend referenced by the ServiceName or BackendRef field.</p>
-<p>If the port is unspecified and a Service object consisting
-of a single port definition is the backend, that port will
-be used.</p>
-<p>If the port is unspecified and the backend is a Service
-object consisting of multiple port definitions, the route
-must be dropped from the Gateway. The controller should
-raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
-&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
-should be updated with a condition that describes the error
-more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2962,18 +2939,8 @@ int32
 </em>
 </td>
 <td>
-<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
 backend referenced by the ServiceName or BackendRef field.</p>
-<p>If the port is unspecified and a Service object consisting
-of a single port definition is the backend, that port will
-be used.</p>
-<p>If the port is unspecified and the backend is a Service
-object consisting of multiple port definitions, the route
-must be dropped from the Gateway. The controller should
-raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway with the
-&ldquo;DroppedRoutes&rdquo; reason.  The gateway status for this route
-should be updated with a condition that describes the error</p>
 <p>Support: Core</p>
 </td>
 </tr>
