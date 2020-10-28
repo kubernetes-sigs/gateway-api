@@ -138,7 +138,7 @@ func (in *BackendRef) DeepCopyInto(out *BackendRef) {
 	*out = *in
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
-		*out = new(int32)
+		*out = new(PortNumber)
 		**out = **in
 	}
 }

@@ -1036,7 +1036,9 @@ string
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>
@@ -1817,7 +1819,9 @@ condition that describes the error more specifically.</p>
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>
@@ -1992,7 +1996,9 @@ condition that describes the error more specifically.</p>
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>
@@ -2505,7 +2511,9 @@ be compatible with the specified Protocol field.</p>
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>
@@ -2646,7 +2654,9 @@ field.</p>
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>
@@ -2749,6 +2759,20 @@ Valid PathMatchType values are:</p>
 <li>&ldquo;RegularExpression&rdquo;</li>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
+</p>
+<h3 id="networking.x-k8s.io/v1alpha1.PortNumber">PortNumber
+(<code>int32</code> alias)</p></h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.BackendRef">BackendRef</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>)
+</p>
+<p>
+<p>PortNumber defines a network port.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.ProtocolType">ProtocolType
 (<code>string</code> alias)</p></h3>
@@ -2935,7 +2959,9 @@ condition that describes the error more specifically.</p>
 <td>
 <code>port</code></br>
 <em>
-int32
+<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
+PortNumber
+</a>
 </em>
 </td>
 <td>

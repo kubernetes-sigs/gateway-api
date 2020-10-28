@@ -55,6 +55,12 @@ type RouteGateways struct {
 	GatewayRefs []GatewayReference `json:"gatewayRefs,omitempty"`
 }
 
+// PortNumber defines a network port.
+//
+// +kubebuilder:validation:Minimum=1
+// +kubebuilder:validation:Maximum=65535
+type PortNumber int32
+
 // GatewayReference identifies a Gateway in a specified namespace.
 type GatewayReference struct {
 	// Name is the name of the referent.
@@ -106,10 +112,7 @@ type RouteForwardTo struct {
 	// backend referenced by the ServiceName or BackendRef field.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port int32 `json:"port"`
+	Port PortNumber `json:"port"`
 
 	// Weight specifies the proportion of traffic forwarded to the backend
 	// referenced by the ServiceName or BackendRef field. computed as

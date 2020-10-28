@@ -82,9 +82,7 @@ type BackendRef struct {
 	// Port is the port of the referent. If unspecified, this policy applies to
 	// all ports on the backend.
 	// +optional
-	// +kubebuilder:validation:Minimum=1
-	// +kubebuilder:validation:Maximum=65535
-	Port *int32 `json:"port,omitempty"`
+	Port *PortNumber `json:"port,omitempty"`
 }
 
 // BackendTLSConfig describes TLS configuration for a backend.
