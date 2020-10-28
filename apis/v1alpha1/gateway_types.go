@@ -550,14 +550,18 @@ const (
 	// form. IPv6 addresses must be in a standard IPv6 text
 	// representation (see RFC 5952).
 	//
-	// Implementations should accept any address representation
-	// accepted by the inet_pton(3) API.
+	// If the requested address is unsupported, the controller
+	// should raise the "Detached" listener status condition on
+	// the Gateway with the "UnsupportedAddress" reason.
 	//
 	// Support: Extended.
 	IPAddressType AddressType = "IPAddress"
 
-	// NamedAddressType is an address selected by name. The interpretation of
-	// the name is dependent on the controller.
+	// NamedAddressType is an address selected by name. The interpretation
+	// of the name is dependent on the controller. If a NamedAddress is
+	// requested but unsupported by an implementation, the controller
+	// should raise the "Detached" listener status condition on the Gateway
+	// with the "UnsupportedAddress" reason.
 	//
 	// Support: Implementation-specific.
 	NamedAddressType AddressType = "NamedAddress"
@@ -767,6 +771,7 @@ const (
 	// * "PortUnavailable"
 	// * "UnsupportedExtension"
 	// * "UnsupportedProtocol"
+	// * "UnsupportedAddress"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -787,6 +792,11 @@ const (
 	// Listener could not be attached to be Gateway because its
 	// protocol type is not supported.
 	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
+
+	// ListenerReasonUnsupportedAddress is used when the Listener
+	// could not be attached to the Gateway because the requested
+	// address is not supported.
+	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
 )
 
 const (
