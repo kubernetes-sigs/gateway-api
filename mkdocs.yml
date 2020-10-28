@@ -14,12 +14,11 @@ nav:
       API concepts: concepts.md
       Security Model: security-model.md
   - Guides:
-    - User guide: userguide.md
-    - API cookbook: cookbook.md
+    - Introduction: guides.md
     - TLS: tls.md
   - References:
-    - Releases: releases.md
     - API specification: spec.md
+    - Releases: releases.md
   - Contributing:
     - Developer guide: devguide.md
     - Enhancement requests: enhancement-requests.md
