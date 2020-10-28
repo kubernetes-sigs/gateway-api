@@ -90,7 +90,7 @@ spec:
                         description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
                         properties:
                           extensionRef:
-                            description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.acme.io\"). ExtensionRef MUST NOT be used for core and extended filters. \n Support: Implementation-specific"
                             properties:
                               group:
                                 description: Group is the group of the referent.
@@ -112,8 +112,8 @@ spec:
                             - kind
                             - name
                             type: object
-                          requestHeader:
-                            description: HTTPRequestHeaderFilter defines configuration for the RequestHeader filter.
+                          requestHeaderModifier:
+                            description: "RequestHeaderModifier defines a schema for a filter that modifies request headers. \n Support: Core"
                             properties:
                               add:
                                 additionalProperties:
@@ -126,12 +126,9 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
-                            required:
-                            - add
-                            - remove
                             type: object
                           requestMirror:
-                            description: HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+                            description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
@@ -170,9 +167,11 @@ spec:
                             - port
                             type: object
                           type:
-                            description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
-                            maxLength: 100
-                            minLength: 1
+                            description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
+                            enum:
+                            - RequestHeaderModifier
+                            - RequestMirror
+                            - ExtensionRef
                             type: string
                         required:
                         - type
@@ -213,7 +212,7 @@ spec:
                               description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
                               properties:
                                 extensionRef:
-                                  description: ExtensionRef is an optional, implementation-specific extension to the "filter" behavior.  The resource may be "configmap" (use the empty string for the group) or an implementation-defined resource (for example, resource "myroutefilters" in group "networking.acme.io"). Omitting or specifying the empty string for both the resource and group indicates that the resource is "configmaps". ExtensionRef MUST NOT be used for core and extended filters.
+                                  description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.acme.io\"). ExtensionRef MUST NOT be used for core and extended filters. \n Support: Implementation-specific"
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -235,8 +234,8 @@ spec:
                                   - kind
                                   - name
                                   type: object
-                                requestHeader:
-                                  description: HTTPRequestHeaderFilter defines configuration for the RequestHeader filter.
+                                requestHeaderModifier:
+                                  description: "RequestHeaderModifier defines a schema for a filter that modifies request headers. \n Support: Core"
                                   properties:
                                     add:
                                       additionalProperties:
@@ -249,12 +248,9 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
-                                  required:
-                                  - add
-                                  - remove
                                   type: object
                                 requestMirror:
-                                  description: HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
+                                  description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
@@ -293,9 +289,11 @@ spec:
                                   - port
                                   type: object
                                 type:
-                                  description: "Type identifies the filter to execute. Types are classified into three conformance-levels (similar to other locations in this API): - Core and extended: These filter types and their corresponding configuration   is defined in this package. All implementations must implement   the core filters. Implementers are encouraged to support extended filters.   Definitions for filter-specific configuration for these   filters is defined in this package. - Custom: These filters are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance rings. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ImplementationSpecific\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
-                                  maxLength: 100
-                                  minLength: 1
+                                  description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
+                                  enum:
+                                  - RequestHeaderModifier
+                                  - RequestMirror
+                                  - ExtensionRef
                                   type: string
                               required:
                               - type
@@ -334,7 +332,7 @@ spec:
                         description: "HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied. \n For example, the match below will match a HTTP request only if its path starts with `/foo` AND it contains the `version: \"1\"` header: \n ``` match:   path:     value: \"/foo\"   headers:     values:       version: \"1\" ```"
                         properties:
                           extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutematchers\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\". \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  For example, resource \"myroutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.
