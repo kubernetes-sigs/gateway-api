@@ -95,7 +95,7 @@ type TLSRouteMatch struct {
 	// Support: core
 	//
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=10
+	// +kubebuilder:validation:MaxItems=16
 	SNIs []string `json:"snis,omitempty"`
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  The resource may be "configmap" (use the empty
