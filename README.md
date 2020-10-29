@@ -1,21 +1,39 @@
-# Kubernetes Service/Ingress API evolution
+# Kubernetes Service APIs
 
-The Service APIs group is a part of the [Networking SIG][sn], and this repository is the home of the Kubernetes Service/Ingress API evolution work.
+The Service APIs is a part of the [SIG Network][sn], and this repository
+contains the specification and Custom Resource Definitions (CRDs).
 
-- The goal of this group is to flesh out and extend the original concepts in the [API sketch][apisketch] which was completed in September of 2019 by members of the sig-network group.
-- [The primary documentation is available here in Github Pages][ghp], and is still heavily under development.
+## Documentation
 
-[ghp]: https://kubernetes-sigs.github.io/service-apis/
-[apisketch]: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/preview#
-[sn]: https://github.com/kubernetes/community/tree/master/sig-network
+### Website
 
-## Community, discussion, contribution, and support
+The API specification and detailed documentation is available on the project
+website: [https://kubernetes-sigs.github.io/service-apis][ghp].
 
-[Our community meeting schedule is here][cm].
+### Get started
 
-[cm]: https://kubernetes-sigs.github.io/service-apis/community
+To get started, please read through [API concepts](concepts.md) and
+[Security model](security-model.md). These documents give the necessary background
+to understand the API and the use-cases it targets.
 
-Our Kubernetes Slack channel is [#sig-network-service-apis](https://kubernetes.slack.com/messages/sig-network-service-apis).
+### Guides
+
+Once you have a good understanding of the API at a higher-level, please
+follow one of our [guides](guides.md) to dive deeper into different parts of
+the API.
+
+### References
+
+A complete API reference, please refer to:
+
+- [API reference](spec.md)
+- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1)
+
+## Contributing
+
+Community meeting schedule, notes and developer guide can be found on the
+[community page][cm].
+Our Kubernetes Slack channel is [#sig-network-service-apis][slack].
 
 ## Technical Leads
 
@@ -24,7 +42,11 @@ Our Kubernetes Slack channel is [#sig-network-service-apis](https://kubernetes.s
 
 ### Code of conduct
 
-Participation in the Kubernetes community is governed by the [Kubernetes Code of Conduct](code-of-conduct.md).
+Participation in the Kubernetes community is governed by the
+[Kubernetes Code of Conduct](code-of-conduct.md).
 
-[owners]: https://git.k8s.io/community/contributors/guide/owners.md
-[Creative Commons 4.0]: https://git.k8s.io/website/LICENSE
+[ghp]: https://kubernetes-sigs.github.io/service-apis/
+[sn]: https://github.com/kubernetes/community/tree/master/sig-network
+[cm]: https://kubernetes-sigs.github.io/service-apis/community
+[slack]: https://kubernetes.slack.com/messages/sig-network-service-apis
+
