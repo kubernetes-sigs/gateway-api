@@ -2799,7 +2799,7 @@ Implementations are not required to accept all the defined protocols.
 If an implementation does not support a specified protocol, it
 should raise a &ldquo;Detached&rdquo; condition for the affected Listener with
 a reason of &ldquo;UnsupportedProtocol&rdquo;.</p>
-<p>Valid ProtocolType values are:</p>
+<p>Core ProtocolType values are:</p>
 <ul>
 <li>&ldquo;HTTP&rdquo;</li>
 <li>&ldquo;HTTPS&rdquo;</li>
@@ -2807,6 +2807,11 @@ a reason of &ldquo;UnsupportedProtocol&rdquo;.</p>
 <li>&ldquo;TCP&rdquo;</li>
 <li>&ldquo;UDP&rdquo;</li>
 </ul>
+<p>Implementations can define their own protocols if a core ProtocolType does not
+exist. Such definitions must use prefixed name, such as
+<code>mycompany.com/my-custom-protocol</code>. Un-prefixed names are reserved for core
+protocols. Any protocol defined by implementations will fall under custom
+conformance.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
 </h3>

@@ -292,7 +292,7 @@ const (
 // should raise a "Detached" condition for the affected Listener with
 // a reason of "UnsupportedProtocol".
 //
-// Valid ProtocolType values are:
+// Core ProtocolType values are:
 //
 // * "HTTP"
 // * "HTTPS"
@@ -300,7 +300,11 @@ const (
 // * "TCP"
 // * "UDP"
 //
-// +kubebuilder:validation:Enum=HTTP;HTTPS;TLS;TCP;UDP
+// Implementations can define their own protocols if a core ProtocolType does not
+// exist. Such definitions must use prefixed name, such as
+// `mycompany.com/my-custom-protocol`. Un-prefixed names are reserved for core
+// protocols. Any protocol defined by implementations will fall under custom
+// conformance.
 type ProtocolType string
 
 const (
