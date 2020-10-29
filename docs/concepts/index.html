@@ -236,7 +236,7 @@
       
         <li class="md-nav__item">
   <a href="#roles-and-personas" class="md-nav__link">
-    Roles and personas
+    Roles and personas.
   </a>
   
 </li>
@@ -525,20 +525,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../userguide/" title="User guide" class="md-nav__link">
-      User guide
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../cookbook/" title="API cookbook" class="md-nav__link">
-      API cookbook
+    <a href="../guides/" title="Introduction" class="md-nav__link">
+      Introduction
     </a>
   </li>
 
@@ -585,8 +573,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../releases/" title="Releases" class="md-nav__link">
-      Releases
+    <a href="../spec/" title="API specification" class="md-nav__link">
+      API specification
     </a>
   </li>
 
@@ -597,8 +585,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../spec/" title="API specification" class="md-nav__link">
-      API specification
+    <a href="../releases/" title="Releases" class="md-nav__link">
+      Releases
     </a>
   </li>
 
@@ -702,7 +690,7 @@
       
         <li class="md-nav__item">
   <a href="#roles-and-personas" class="md-nav__link">
-    Roles and personas
+    Roles and personas.
   </a>
   
 </li>
@@ -957,34 +945,16 @@
                 
                 <h1 id="api-concepts">API Concepts</h1>
 <p>This document is a deep dive into the reasoning and design for Service APIs.</p>
-<h2 id="roles-and-personas">Roles and personas</h2>
-<p>In the original design of Kubernetes, Ingress and Service resources were
-based on a self-service model of usage; developers who create Services and
-Ingresses control all aspects of defining and exposing their applications to
-their users.</p>
-<p>We have found that the self-service model does not fully capture some of the
-more complex deployment and team structures that our users are seeing. The
-Gateway/Routes API will target the following personas:</p>
+<h2 id="roles-and-personas">Roles and personas.</h2>
+<p>There are 3 primary roles in the API:</p>
 <ul>
-<li><strong>Infrastructure provider</strong>: The infrastructure provider (infra) is
-  responsible for the overall environment that the cluster(s) are operating in.
-  Examples include public cloud providers (AWS, Azure, GCP, ...), or PaaS providers
-  within an organization.</li>
-<li><strong>Cluster operator</strong>: The cluster operator (ops) is responsible for
-  administration of entire clusters. They manage policies, network access, and
-  application permissions.</li>
-<li><strong>Application developer</strong>: The application developer (dev) is responsible for
-  defining their application configuration (e.g. timeouts, request
-  matching/filter) and Service composition (e.g. path routing to backends).</li>
+<li>Infrastructure Provider</li>
+<li>Cluster Operator</li>
+<li>Application Developer</li>
 </ul>
-<p>We expect that each persona will map approximately to a <code>Role</code> in the Kubernetes
-Role-Based Authentication (RBAC) system and will define resource model
-responsibility and separation.</p>
-<p>Depending on the environment, multiple roles can map to the same user.
-For example, giving the user all the above roles replicates the self-service
-model.</p>
-<p>For more information on the roles and personas considered in the Service API
-design, refer to the <a href="../security-model/">Security Model</a>.</p>
+<p>There could be a fourth role of Application Admin in some use cases.</p>
+<p>Please refer to the <a href="../security-model/#roles-and-personas">roles and personas</a> section
+in the Security model for details.</p>
 <h2 id="resource-model">Resource model</h2>
 <blockquote>
 <p>Note: Resources will initially live in the <code>networking.x-k8s.io</code> API group as

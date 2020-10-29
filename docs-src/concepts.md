@@ -2,38 +2,18 @@
 
 This document is a deep dive into the reasoning and design for Service APIs.
 
-## Roles and personas
+## Roles and personas.
 
-In the original design of Kubernetes, Ingress and Service resources were
-based on a self-service model of usage; developers who create Services and
-Ingresses control all aspects of defining and exposing their applications to
-their users.
+There are 3 primary roles in the API:
 
-We have found that the self-service model does not fully capture some of the
-more complex deployment and team structures that our users are seeing. The
-Gateway/Routes API will target the following personas:
+- Infrastructure Provider
+- Cluster Operator
+- Application Developer
 
-* **Infrastructure provider**: The infrastructure provider (infra) is
-  responsible for the overall environment that the cluster(s) are operating in.
-  Examples include public cloud providers (AWS, Azure, GCP, ...), or PaaS providers
-  within an organization.
-* **Cluster operator**: The cluster operator (ops) is responsible for
-  administration of entire clusters. They manage policies, network access, and
-  application permissions.
-* **Application developer**: The application developer (dev) is responsible for
-  defining their application configuration (e.g. timeouts, request
-  matching/filter) and Service composition (e.g. path routing to backends).
+There could be a fourth role of Application Admin in some use cases.
 
-We expect that each persona will map approximately to a `Role` in the Kubernetes
-Role-Based Authentication (RBAC) system and will define resource model
-responsibility and separation.
-
-Depending on the environment, multiple roles can map to the same user.
-For example, giving the user all the above roles replicates the self-service
-model.
-
-For more information on the roles and personas considered in the Service API
-design, refer to the [Security Model](security-model.md).
+Please refer to the [roles and personas](security-model.md#roles-and-personas) section
+in the Security model for details.
 
 ## Resource model
 

@@ -1,32 +1,36 @@
 # Introduction
 
-Service APIs is the evolution of Kubernetes APIs that relate to `Services`, e.g. `Ingress`.
-The project is part of Kubernetes, working under [SIG-NETWORK][sig-network].
-Use the following resources to learn more about Service APIs.
+Service APIs is the evolution of Kubernetes APIs that relate to `Services`,
+e.g. `Ingress`. The project is part of Kubernetes, working under
+[SIG-NETWORK][sig-network]. Use the following resources to learn more about
+Service APIs.
 
-[sig-network]: https://groups.google.com/g/kubernetes-sig-network
+[sig-network]: https://github.com/kubernetes/community/tree/master/sig-network
 
-## Resources
 
-If you are a user:
+### Get started
 
-* [User guide (how to use the API)](userguide.md)
-* [Cookbook for common tasks](cookbook.md)
+To get started, please read through [API concepts](concepts.md) and
+[Security model](security-model.md). These documents give the necessary background
+to understand the API and the use-cases it targets.
 
-If you are a developer:
 
-* [How to build and test](devguide.md)
-* [How to contribute, meetings, design docs](community.md)
+### Guides
 
-For everyone:
+Once you have a good understanding of the API at a higher-level, please
+follow one of our [guides](guides.md) to dive deeper into different parts of
+the API.
 
-* [Concepts and detailed descriptions](concepts.md)
-* [API specification](spec.md)
-* [Releases](releases.md)
-* [Security Model](security-model.md)
-* [Enhancement requests](enhancement-requests.md)
+### References
+
+Finally, for a complete API reference, please refer to:
+
+- [API reference](spec.md)
+- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1)
 
 ## Contacts
+
+Please reach out to the maintainers for clarifications or feedback:
 
 - Slack: [#sig-network-service-apis](https://kubernetes.slack.com/messages/sig-network-service-apis)
 - [Project Owners](https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS)

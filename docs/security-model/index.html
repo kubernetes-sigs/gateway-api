@@ -274,8 +274,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#roles" class="md-nav__link">
-    Roles
+  <a href="#roles-and-personas" class="md-nav__link">
+    Roles and personas
   </a>
   
 </li>
@@ -410,20 +410,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../userguide/" title="User guide" class="md-nav__link">
-      User guide
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../cookbook/" title="API cookbook" class="md-nav__link">
-      API cookbook
+    <a href="../guides/" title="Introduction" class="md-nav__link">
+      Introduction
     </a>
   </li>
 
@@ -470,8 +458,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../releases/" title="Releases" class="md-nav__link">
-      Releases
+    <a href="../spec/" title="API specification" class="md-nav__link">
+      API specification
     </a>
   </li>
 
@@ -482,8 +470,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../spec/" title="API specification" class="md-nav__link">
-      API specification
+    <a href="../releases/" title="Releases" class="md-nav__link">
+      Releases
     </a>
   </li>
 
@@ -613,8 +601,8 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#roles" class="md-nav__link">
-    Roles
+  <a href="#roles-and-personas" class="md-nav__link">
+    Roles and personas
   </a>
   
 </li>
@@ -746,8 +734,14 @@ security model:</p>
 <li>Which namespaces Routes can be targeted in by Gateways of the specified
   GatewayClass.</li>
 </ul>
-<h2 id="roles">Roles</h2>
-<p>For the purposes of this security model, 3 common roles have been identified:</p>
+<h2 id="roles-and-personas">Roles and personas</h2>
+<p>In the original design of Kubernetes, Ingress and Service resources were
+based on a self-service model of usage; developers who create Services and
+Ingresses control all aspects of defining and exposing their applications to
+their users.</p>
+<p>We have found that the self-service model does not fully capture some of the
+more complex deployment and team structures that our users are seeing. The
+Service APIs are designed to target the following personas:</p>
 <ul>
 <li><strong>Infrastructure provider</strong>: The infrastructure provider (infra) is
   responsible for the overall environment that the cluster(s) are operating in.
@@ -758,7 +752,7 @@ security model:</p>
   application permissions.</li>
 <li><strong>Application developer</strong>: The application developer (dev) is responsible for
   defining their application configuration (e.g. timeouts, request
-  matching/filter) and Service composition (e.g. path routing to backends). </li>
+  matching/filter) and Service composition (e.g. path routing to backends).</li>
 </ul>
 <p>Although these roles can cover a wide variety of use cases, some organizations
 may be structured slightly differently. Many organizations may also have a
@@ -767,6 +761,12 @@ fourth role that sits between "cluster operator" and "application developer":</p
 <li><strong>Application admin</strong>: The application admin has administrative access to some
   namespaces within a cluster, but not the cluster as a whole.</li>
 </ul>
+<p>We expect that each persona will map approximately to a <code>Role</code> in the Kubernetes
+Role-Based Authentication (RBAC) system and will define resource model
+responsibility and separation.</p>
+<p>Depending on the environment, multiple roles can map to the same user.
+For example, giving the user all the above roles replicates the self-service
+model.</p>
 <h2 id="the-security-model">The Security Model</h2>
 <p>There are two primary components to the Service APIs security model: RBAC and
 namespace restrictions.</p>
@@ -958,13 +958,13 @@ to end users. </p>
           </a>
         
         
-          <a href="../userguide/" title="User guide" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../guides/" title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                User guide
+                Introduction
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
