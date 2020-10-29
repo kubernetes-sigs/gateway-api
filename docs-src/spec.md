@@ -222,19 +222,25 @@ GatewayClass resource.</p>
 <p>Listeners associated with this Gateway. Listeners define
 logical endpoints that are bound on this Gateway&rsquo;s addresses.
 At least one Listener MUST be specified.</p>
-<p>Each Listener in this array must have a unique Port field,
-however a GatewayClass may collapse compatible Listener
-definitions into a single implementation-defined acceptor
-configuration even if their Port fields would otherwise conflict.</p>
-<p>Listeners are compatible if all of the following conditions are true:</p>
+<p>An implementation MAY group Listeners by Port and then collapse each
+group of Listeners into a single Listener if the implementation
+determines that the Listeners in the group are &ldquo;compatible&rdquo;. An
+implementation MAY also group together and collapse compatible
+Listeners belonging to different Gateways.</p>
+<p>For example, an implementation might consider Listeners to be
+compatible with each other if all of the following conditions are
+met:</p>
 <ol>
-<li>all their Protocol fields are &ldquo;HTTP&rdquo;, or all their Protocol fields are &ldquo;HTTPS&rdquo; or TLS&rdquo;</li>
-<li>their Hostname fields are specified with a match type other than &ldquo;Any&rdquo;</li>
-<li>their Hostname fields are not an exact match for any other Listener</li>
+<li><p>Either each Listener within the group specifies the &ldquo;HTTP&rdquo;
+Protocol or each Listener within the group specifies either
+the &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; Protocol.</p></li>
+<li><p>Each Listener within the group specifies a Hostname that is unique
+within the group.</p></li>
+<li><p>As a special case, one Listener within a group may omit Hostname,
+in which case this Listener matches when no other Listener
+matches.</p></li>
 </ol>
-<p>As a special case, each group of compatible listeners
-may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
-<p>If the GatewayClass collapses compatible Listeners, the
+<p>If the implementation does collapse compatible Listeners, the
 hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
 The incoming hostname MUST be matched using the Hostname
@@ -242,7 +248,7 @@ field for each Listener in order of most to least specific.
 That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
 <p>If this field specifies multiple Listeners that have the same
-Port value but are not compatible, the GatewayClass must raise
+Port value but are not compatible, the implementation must raise
 a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
 <p>Support: Core</p>
 </td>
@@ -1358,19 +1364,25 @@ GatewayClass resource.</p>
 <p>Listeners associated with this Gateway. Listeners define
 logical endpoints that are bound on this Gateway&rsquo;s addresses.
 At least one Listener MUST be specified.</p>
-<p>Each Listener in this array must have a unique Port field,
-however a GatewayClass may collapse compatible Listener
-definitions into a single implementation-defined acceptor
-configuration even if their Port fields would otherwise conflict.</p>
-<p>Listeners are compatible if all of the following conditions are true:</p>
+<p>An implementation MAY group Listeners by Port and then collapse each
+group of Listeners into a single Listener if the implementation
+determines that the Listeners in the group are &ldquo;compatible&rdquo;. An
+implementation MAY also group together and collapse compatible
+Listeners belonging to different Gateways.</p>
+<p>For example, an implementation might consider Listeners to be
+compatible with each other if all of the following conditions are
+met:</p>
 <ol>
-<li>all their Protocol fields are &ldquo;HTTP&rdquo;, or all their Protocol fields are &ldquo;HTTPS&rdquo; or TLS&rdquo;</li>
-<li>their Hostname fields are specified with a match type other than &ldquo;Any&rdquo;</li>
-<li>their Hostname fields are not an exact match for any other Listener</li>
+<li><p>Either each Listener within the group specifies the &ldquo;HTTP&rdquo;
+Protocol or each Listener within the group specifies either
+the &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; Protocol.</p></li>
+<li><p>Each Listener within the group specifies a Hostname that is unique
+within the group.</p></li>
+<li><p>As a special case, one Listener within a group may omit Hostname,
+in which case this Listener matches when no other Listener
+matches.</p></li>
 </ol>
-<p>As a special case, each group of compatible listeners
-may contain exactly one Listener with a match type of &ldquo;Any&rdquo;.</p>
-<p>If the GatewayClass collapses compatible Listeners, the
+<p>If the implementation does collapse compatible Listeners, the
 hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
 The incoming hostname MUST be matched using the Hostname
@@ -1378,7 +1390,7 @@ field for each Listener in order of most to least specific.
 That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
 matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
 <p>If this field specifies multiple Listeners that have the same
-Port value but are not compatible, the GatewayClass must raise
+Port value but are not compatible, the implementation must raise
 a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
 <p>Support: Core</p>
 </td>

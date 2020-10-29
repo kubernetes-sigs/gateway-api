@@ -68,21 +68,28 @@ type GatewaySpec struct {
 	// logical endpoints that are bound on this Gateway's addresses.
 	// At least one Listener MUST be specified.
 	//
-	// Each Listener in this array must have a unique Port field,
-	// however a GatewayClass may collapse compatible Listener
-	// definitions into a single implementation-defined acceptor
-	// configuration even if their Port fields would otherwise conflict.
+	// An implementation MAY group Listeners by Port and then collapse each
+	// group of Listeners into a single Listener if the implementation
+	// determines that the Listeners in the group are "compatible". An
+	// implementation MAY also group together and collapse compatible
+	// Listeners belonging to different Gateways.
 	//
-	// Listeners are compatible if all of the following conditions are true:
+	// For example, an implementation might consider Listeners to be
+	// compatible with each other if all of the following conditions are
+	// met:
 	//
-	// 1. all their Protocol fields are "HTTP", or all their Protocol fields are "HTTPS" or TLS"
-	// 2. their Hostname fields are specified with a match type other than "Any"
-	// 3. their Hostname fields are not an exact match for any other Listener
+	// 1. Either each Listener within the group specifies the "HTTP"
+	//    Protocol or each Listener within the group specifies either
+	//    the "HTTPS" or "TLS" Protocol.
 	//
-	// As a special case, each group of compatible listeners
-	// may contain exactly one Listener with a match type of "Any".
+	// 2. Each Listener within the group specifies a Hostname that is unique
+	//    within the group.
 	//
-	// If the GatewayClass collapses compatible Listeners, the
+	// 3. As a special case, one Listener within a group may omit Hostname,
+	//    in which case this Listener matches when no other Listener
+	//    matches.
+	//
+	// If the implementation does collapse compatible Listeners, the
 	// hostname provided in the incoming client request MUST be
 	// matched to a Listener to find the correct set of Routes.
 	// The incoming hostname MUST be matched using the Hostname
@@ -91,7 +98,7 @@ type GatewaySpec struct {
 	// matches, which must be processed before "Any" matches.
 	//
 	// If this field specifies multiple Listeners that have the same
-	// Port value but are not compatible, the GatewayClass must raise
+	// Port value but are not compatible, the implementation must raise
 	// a "Conflicted" condition in the Listener status.
 	//
 	// Support: Core
