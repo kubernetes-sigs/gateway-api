@@ -114,19 +114,23 @@ type RouteForwardTo struct {
 	// Support: Core
 	Port PortNumber `json:"port"`
 
-	// Weight specifies the proportion of traffic forwarded to the backend
-	// referenced by the ServiceName or BackendRef field. computed as
-	// weight/(sum of all weights in this ForwardTo list). Weight is not a
-	// percentage and the sum of weights does not need to equal 100. If only one
-	// backend is specified, 100% of the traffic is forwarded to that backend.
-	// If weight is set to 0, no traffic should be forwarded for this entry.
-	// If unspecified, weight defaults to 1.
+	// Weight specifies the proportion of HTTP requests forwarded to the backend
+	// referenced by the ServiceName or BackendRef field. This is computed as
+	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
+	// there may be some epsilon from the exact proportion defined here
+	// depending on the precision an implementation supports. Weight is not a
+	// percentage and the sum of weights does not need to equal 100.
+	//
+	// If only one backend is specified and it has a weight greater than 0, 100%
+	// of the traffic is forwarded to that backend. If weight is set to 0, no
+	// traffic should be forwarded for this entry. If unspecified, weight
+	// defaults to 1.
 	//
 	// Support: Extended
 	//
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=10000
+	// +kubebuilder:validation:Maximum=1000000
 	Weight int32 `json:"weight,omitempty"`
 }
 
@@ -166,5 +170,11 @@ type RouteStatus struct {
 	// manages the Gateway should add an entry to this list when the
 	// controller first sees the route and should update the entry as
 	// appropriate when the route is modified.
+	//
+	// A maximum of 100 Gateways will be represented in this list. If this list
+	// is full, there may be additional Gateways using this Route that are not
+	// included in the list.
+	//
+	// +kubebuilder:validation:MaxItems=100
 	Gateways []RouteGatewayStatus `json:"gateways"`
 }

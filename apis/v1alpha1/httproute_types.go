@@ -168,14 +168,14 @@ type HTTPRouteRule struct {
 	// Filters define the filters that are applied to requests that match
 	// this rule.
 	//
-	// The effects of ordering of multiple behaviors are currently undefined.
+	// The effects of ordering of multiple behaviors are currently unspecified.
 	// This can change in the future based on feedback during the alpha stage.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	// - ALL core filters MUST be supported by all implementations.
 	// - Implementers are encouraged to support extended filters.
 	// - Implementation-specific custom filters have no API guarantees across implementations.
-	// Specifying a core filter multiple times has undefined or custom conformance.
+	// Specifying a core filter multiple times has unspecified or custom conformance.
 	//
 	// Support: core
 	//
@@ -386,20 +386,23 @@ const (
 	// HTTPRouteFilterRequestHeaderModifier can be used to add or remove an HTTP
 	// header from an HTTP request before it is sent to the upstream target.
 	//
-	// Support: Core
+	// Support in HTTPRouteRule: Core
+	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 	// different backend. The responses from this backend MUST be ignored by
 	// the Gateway.
 	//
-	// Support: Extended
+	// Support in HTTPRouteRule: Extended
+	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
 
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
 	//
-	// Support: Implementation-specific
+	// Support in HTTPRouteRule: Custom
+	// Support in HTTPRouteForwardTo: Custom
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 
@@ -528,29 +531,30 @@ type HTTPRouteForwardTo struct {
 	//
 	Port PortNumber `json:"port"`
 
-	// Weight specifies the proportion of traffic forwarded to the backend
-	// referenced by the ServiceName or BackendRef field. computed as
-	// weight/(sum of all weights in this ForwardTo list). Weight is not a
-	// percentage and the sum of weights does not need to equal 100. If only one
-	// backend is specified, 100% of the traffic is forwarded to that backend.
-	// If weight is set to 0, no traffic should be forwarded for this entry.
-	// If unspecified, weight defaults to 1.
+	// Weight specifies the proportion of HTTP requests forwarded to the backend
+	// referenced by the ServiceName or BackendRef field. This is computed as
+	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
+	// there may be some epsilon from the exact proportion defined here
+	// depending on the precision an implementation supports. Weight is not a
+	// percentage and the sum of weights does not need to equal 100.
+	//
+	// If only one backend is specified and it has a weight greater than 0, 100%
+	// of the traffic is forwarded to that backend. If weight is set to 0, no
+	// traffic should be forwarded for this entry. If unspecified, weight
+	// defaults to 1.
 	//
 	// Support: Core
 	//
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=10000
+	// +kubebuilder:validation:Maximum=1000000
 	Weight int32 `json:"weight,omitempty"`
 
 	// Filters defined at this-level should be executed if and only if the
 	// request is being forwarded to the backend defined here.
 	//
-	// Conformance: Filtering support, including core filters, is NOT guaranteed
-	// at this-level. Use Filters in HTTPRouteRule for portable filters across
-	// implementations.
-	//
-	// Support: Custom
+	// Support: Custom (For broader support of filters, use the Filters field
+	// in HTTPRouteRule.)
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16

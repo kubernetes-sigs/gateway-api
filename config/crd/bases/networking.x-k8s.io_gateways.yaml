@@ -87,7 +87,7 @@ spec:
                       properties:
                         group:
                           default: networking.x-k8s.io
-                          description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   kind: HTTPRoute \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   resource: fooroutes \n Support: Core"
+                          description: "Group is the group of the route resource to select. Omitting the value or specifying the empty string indicates the networking.x-k8s.io API group. For example, use the following to select an HTTPRoute: \n routes:   kind: HTTPRoute \n Otherwise, if an alternative API group is desired, specify the desired group: \n routes:   group: acme.io   kind: FooRoute \n Support: Core"
                           maxLength: 253
                           minLength: 1
                           type: string

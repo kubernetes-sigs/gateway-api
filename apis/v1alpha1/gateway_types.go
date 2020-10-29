@@ -408,7 +408,7 @@ type RouteBindingSelector struct {
 	//
 	// routes:
 	//   group: acme.io
-	//   resource: fooroutes
+	//   kind: FooRoute
 	//
 	// Support: Core
 	//
