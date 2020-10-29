@@ -48,13 +48,6 @@ We use [milestones][gh-milestones] to track our progress towards releases. Looki
 [gh-dashboard]: https://github.com/kubernetes-sigs/service-apis/projects/1
 [gh-milestones]: https://github.com/kubernetes-sigs/service-apis/milestones
 
-## Release cadence
-
-During the development phase, we expect to release on a monthly cadence. We are
-explicitly decoupling ourselves from the Kubernetes API versioning cycle to
-give us more flexibility to evolve the specification. As the specification solidifies,
-we will slow down our release cycle.
-
 ## Building the code
 
 The project uses `make` to drive the build.
