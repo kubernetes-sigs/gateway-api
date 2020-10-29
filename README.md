@@ -12,21 +12,21 @@ website: [https://kubernetes-sigs.github.io/service-apis][ghp].
 
 ### Get started
 
-To get started, please read through [API concepts](concepts.md) and
-[Security model](security-model.md). These documents give the necessary background
+To get started, please read through [API concepts][concepts] and
+[Security model][security-model]. These documents give the necessary background
 to understand the API and the use-cases it targets.
 
 ### Guides
 
 Once you have a good understanding of the API at a higher-level, please
-follow one of our [guides](guides.md) to dive deeper into different parts of
+follow one of our [guides][guides] to dive deeper into different parts of
 the API.
 
 ### References
 
 A complete API reference, please refer to:
 
-- [API reference](spec.md)
+- [API reference][spec]
 - [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1)
 
 ## Contributing
@@ -49,4 +49,8 @@ Participation in the Kubernetes community is governed by the
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
 [cm]: https://kubernetes-sigs.github.io/service-apis/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-service-apis
+[guides]: https://kubernetes-sigs.github.io/service-apis/guides
+[spec]: https://kubernetes-sigs.github.io/service-apis/spec
+[concepts]: https://kubernetes-sigs.github.io/service-apis/concepts
+[security-model]: https://kubernetes-sigs.github.io/service-apis/security-model
 
