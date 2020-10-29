@@ -48,7 +48,8 @@ spec:
         values:
           magic: default-match
     forwardTo:
-    - backendRef:
+    - port: 8080
+      backendRef:
         name: my-custom-resource
         group: acme.io
         kind: CustomBackend

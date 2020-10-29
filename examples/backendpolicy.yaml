@@ -8,10 +8,6 @@ spec:
       group: core
       kind: Service
   tls:
-    clientCertificateRef: 
-      name: my-app-cert
-      group: core
-      kind: Secret
     certificateAuthorityRef: 
       name: my-app-ca
       group: core
