@@ -111,9 +111,9 @@ spec:
                             type: string
                           weight:
                             default: 1
-                            description: "Weight specifies the proportion of traffic forwarded to the backend referenced by the ServiceName or BackendRef field. computed as weight/(sum of all weights in this ForwardTo list). Weight is not a percentage and the sum of weights does not need to equal 100. If only one backend is specified, 100% of the traffic is forwarded to that backend. If weight is set to 0, no traffic should be forwarded for this entry. If unspecified, weight defaults to 1. \n Support: Extended"
+                            description: "Weight specifies the proportion of HTTP requests forwarded to the backend referenced by the ServiceName or BackendRef field. This is computed as weight/(sum of all weights in this ForwardTo list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports. Weight is not a percentage and the sum of weights does not need to equal 100. \n If only one backend is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend. If weight is set to 0, no traffic should be forwarded for this entry. If unspecified, weight defaults to 1. \n Support: Extended"
                             format: int32
-                            maximum: 10000
+                            maximum: 1000000
                             minimum: 0
                             type: integer
                         required:
@@ -161,7 +161,7 @@ spec:
             description: UDPRouteStatus defines the observed state of UDPRoute.
             properties:
               gateways:
-                description: Gateways is a list of the Gateways that are associated with the route, and the status of the route with respect to each of these Gateways. When a Gateway selects this route, the controller that manages the Gateway should add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified.
+                description: "Gateways is a list of the Gateways that are associated with the route, and the status of the route with respect to each of these Gateways. When a Gateway selects this route, the controller that manages the Gateway should add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified. \n A maximum of 100 Gateways will be represented in this list. If this list is full, there may be additional Gateways using this Route that are not included in the list."
                 items:
                   description: RouteGatewayStatus describes the status of a route with respect to an associated Gateway.
                   properties:
@@ -233,6 +233,7 @@ spec:
                   required:
                   - gatewayRef
                   type: object
+                maxItems: 100
                 type: array
             required:
             - gateways

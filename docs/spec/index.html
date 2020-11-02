@@ -2467,13 +2467,16 @@ int32
 </em>
 </td>
 <td>
-<p>Weight specifies the proportion of traffic forwarded to the backend
-referenced by the ServiceName or BackendRef field. computed as
-weight/(sum of all weights in this ForwardTo list). Weight is not a
-percentage and the sum of weights does not need to equal 100. If only one
-backend is specified, 100% of the traffic is forwarded to that backend.
-If weight is set to 0, no traffic should be forwarded for this entry.
-If unspecified, weight defaults to 1.</p>
+<p>Weight specifies the proportion of HTTP requests forwarded to the backend
+referenced by the ServiceName or BackendRef field. This is computed as
+weight/(sum of all weights in this ForwardTo list). For non-zero values,
+there may be some epsilon from the exact proportion defined here
+depending on the precision an implementation supports. Weight is not a
+percentage and the sum of weights does not need to equal 100.</p>
+<p>If only one backend is specified and it has a weight greater than 0, 100%
+of the traffic is forwarded to that backend. If weight is set to 0, no
+traffic should be forwarded for this entry. If unspecified, weight
+defaults to 1.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2490,10 +2493,8 @@ If unspecified, weight defaults to 1.</p>
 <em>(Optional)</em>
 <p>Filters defined at this-level should be executed if and only if the
 request is being forwarded to the backend defined here.</p>
-<p>Conformance: Filtering support, including core filters, is NOT guaranteed
-at this-level. Use Filters in HTTPRouteRule for portable filters across
-implementations.</p>
-<p>Support: Custom</p>
+<p>Support: Custom (For broader support of filters, use the Filters field
+in HTTPRouteRule.)</p>
 </td>
 </tr>
 </tbody>
@@ -2646,13 +2647,13 @@ HTTP request.</p>
 <em>(Optional)</em>
 <p>Filters define the filters that are applied to requests that match
 this rule.</p>
-<p>The effects of ordering of multiple behaviors are currently undefined.
+<p>The effects of ordering of multiple behaviors are currently unspecified.
 This can change in the future based on feedback during the alpha stage.</p>
 <p>Conformance-levels at this level are defined based on the type of filter:
 - ALL core filters MUST be supported by all implementations.
 - Implementers are encouraged to support extended filters.
 - Implementation-specific custom filters have no API guarantees across implementations.
-Specifying a core filter multiple times has undefined or custom conformance.</p>
+Specifying a core filter multiple times has unspecified or custom conformance.</p>
 <p>Support: core</p>
 </td>
 </tr>
@@ -3249,7 +3250,7 @@ kind: HTTPRoute</p>
 group:</p>
 <p>routes:
 group: acme.io
-resource: fooroutes</p>
+kind: FooRoute</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3362,13 +3363,16 @@ int32
 </em>
 </td>
 <td>
-<p>Weight specifies the proportion of traffic forwarded to the backend
-referenced by the ServiceName or BackendRef field. computed as
-weight/(sum of all weights in this ForwardTo list). Weight is not a
-percentage and the sum of weights does not need to equal 100. If only one
-backend is specified, 100% of the traffic is forwarded to that backend.
-If weight is set to 0, no traffic should be forwarded for this entry.
-If unspecified, weight defaults to 1.</p>
+<p>Weight specifies the proportion of HTTP requests forwarded to the backend
+referenced by the ServiceName or BackendRef field. This is computed as
+weight/(sum of all weights in this ForwardTo list). For non-zero values,
+there may be some epsilon from the exact proportion defined here
+depending on the precision an implementation supports. Weight is not a
+percentage and the sum of weights does not need to equal 100.</p>
+<p>If only one backend is specified and it has a weight greater than 0, 100%
+of the traffic is forwarded to that backend. If weight is set to 0, no
+traffic should be forwarded for this entry. If unspecified, weight
+defaults to 1.</p>
 <p>Support: Extended</p>
 </td>
 </tr>
@@ -3584,6 +3588,9 @@ Gateways. When a Gateway selects this route, the controller that
 manages the Gateway should add an entry to this list when the
 controller first sees the route and should update the entry as
 appropriate when the route is modified.</p>
+<p>A maximum of 100 Gateways will be represented in this list. If this list
+is full, there may be additional Gateways using this Route that are not
+included in the list.</p>
 </td>
 </tr>
 </tbody>
