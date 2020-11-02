@@ -1,33 +1,45 @@
 # API Concepts
 
-This document is a deep dive into the reasoning and design for Service APIs.
+The Gateway API is a collection of API resources for modeling Service networking. It is a role-oriented API and has resources that map to the roles that typically manage different aspects of the Service. The following diagram shows how the resources and roles relate to one another:
+
+![Gateway API Model](api-model.png)
+
+## Resource model overview
+
+- **GatewayClass** defines a template for L4 and L7 load balancers in a Kubernetes cluster. A GatewayClass could represent a load balancing controller or a specific type of proxy implementation. It could be modeled as something that is very high level and has a high degree of configurability or it could be very specific and be modeled very close to an individual use-case.
+- **Gateway** is an instantiation of a GatewayClass. Gateways route traffic to or within a cluster. They process incoming requests defined by their Routes to Service backends and define where and how the load balancing data plane is listening for traffic. Gateways are implemented via a Gateway controller.
+- **Routes** define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services. A Route contains multiple route rules and each rule maps to a Service. A Route is pure configuration and has no effect unless it is bound to a Gateway.
+- **BackendPolicy** provides a way to configure connections between a Gateway and a backend. For the purpose of this API, a backend is any resource that a route can forward traffic to. A common example of a backend is a Service. Configuration at this level is currently limited to TLS, but will expand in the future to support more advanced policies such as health checking. For more information on what may be configured with this resource in the future, refer to the related [GitHub issue](https://github.com/kubernetes-sigs/service-apis/issues/196).
+- **Gateway controller** is not a resource type, but rather a running piece of software which implements the control plane for a GatewayClass (and all of its associated Gateways.) Just like an Ingress controller this could be cluster-hosted software, a cloud-hosted controller, or a hardware controller. A Gateway controller could map 1:1 with a GatewayClass or it could implement many kinds of GatewayClasses. 
 
 ## Roles and personas.
 
-There are 3 primary roles in the API:
+The Gateway API resources map to different kinds of roles which are common when operating Kubernetes clusters:
 
-- Infrastructure Provider
-- Cluster Operator
-- Application Developer
+- **Infrastructure Provider** - this is the persona who defines the GatewayClass. This may be a cloud provider who defines built-in GatewayClasses that map to different kinds of cloud load balancers. It could also be an ISV that offers their product through GatewayClasses they define. Custom GatewayClasses could also be defined by platform operators who desire to have more control and have the skills to write or augment Gateway controllers.
+- **Platform Operator** - this persona is responsible for the Kubernetes platform which applications are hosted on. They care about maintaining platform policies, setting standards, and having a degree of consistency across services that makes it easy to operate the platform. The platform operators may make certain GatewayClasses available to service operators, or if they want more control, manage Gateways directly for service operators to use via Routes.
+- **Service Operator** - owns the application that is hosted on the Kubernetes platform. They define the traffic matching for what is sent to their Service backends. They may share a Gateway with other teams but have ownership over a specific domain within their organization. Or they may own a Gateway (and its associated IP address) and have full control over the traffic routing on that Gateway. 
 
-There could be a fourth role of Application Admin in some use cases.
+Please refer to the [roles and personas](security-model.md#roles-and-personas) section in the Security model for details.
 
-Please refer to the [roles and personas](security-model.md#roles-and-personas) section
-in the Security model for details.
+## Request flow
 
-## Resource model
+A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
 
-> Note: Resources will initially live in the `networking.x-k8s.io` API group as
-> Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
-> be in this API group.
+  1. A client makes a request to http://foo.example.com.
+  2. DNS resolves the name to a `Gateway` address.
+  3. The reverse proxy receives the request on a `Listener` and uses the
+     [Host header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an `HTTPRoute`.
+  4. Optionally, the reverse proxy can perform request header and/or path matching based
+     on `match` rules of the `HTTPRoute`.
+  5. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based
+     on `filter` rules of the `HTTPRoute`.
+  6. Lastly, the reverse proxy forwards the request to one or more objects, i.e. `Service`,
+     in the cluster based on `forwardTo` rules of the `HTTPRoute`.
 
-There are three main types of objects in our resource model:
 
-*GatewayClass* defines a set of gateways with a common configuration and behavior.
 
-*Gateway* requests a point where traffic can be translated to Services within the cluster.
-
-*Routes* describe how traffic coming via the Gateway maps to the Services.
+## API Resources
 
 ### GatewayClass
 
@@ -40,197 +52,6 @@ A controller that implements the Gateway API does so by providing an associated 
 
 This is similar to [IngressClass](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingress-class) for Ingress and [StorageClass](https://kubernetes.io/docs/concepts/storage/storage-classes/) for PersistentVolumes.
 In Ingress v1beta1, the closest analog to GatewayClass is the `ingress-class` annotation, and in IngressV1, the closest analog is the IngressClass object.
-
-### Gateway
-
-A Gateway describes how traffic can be translated to Services within the cluster.
-That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
-For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
-While many use cases have client traffic originating “outside” the cluster, this is not a requirement.
-
-It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
-The resource MAY be created by an operator directly, or MAY be created by a controller handling a GatewayClass.
-
-As the Gateway spec captures user intent, it may not contain a complete specification for all attributes in the spec.
-For example, the user may omit fields such as addresses, ports, TLS settings.
-This allows the controller managing the GatewayClass to provide these settings for the user, resulting in a more portable spec.
-This behaviour will be made clear using the GatewayClass Status object.
-
-A Gateway MAY contain one or more *Route references which serve to direct traffic for a subset of traffic to a specific service.
-
-### {HTTP,TCP,Foo}Route
-
-Route objects define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services.
-
-`HTTPRoute` and `TCPRoute` are currently the only defined Route objects. Additional protocol-specific Route
-objects may be added in the future.
-
-### BackendPolicy
-
-BackendPolicy provides a way to configure connections between a Gateway and a
-backend. For the purpose of this API, a backend is any resource that a route can
-forward traffic to. A common example of a backend is a Service. Configuration at
-this level is currently limited to TLS, but will expand in the future to support
-more advanced policies such as health checking.
-
-Some backend configuration may vary depending on the Route that is targeting the
-backend. In those cases, configuration fields will be placed on Routes and not
-BackendPolicy. For more information on what may be configured with this resource
-in the future, refer to the related [GitHub
-issue](https://github.com/kubernetes-sigs/service-apis/issues/196).
-
-### Combined types
-
-The combination of `GatewayClass`, `Gateway`, `xRoute` and `Service`(s) will
-define an implementable load-balancer. The diagram below illustrates the
-relationships between the different resources:
-
-<!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
-![schema](schema-uml.svg)
-
-## Request flow
-
-A typical client/gateway API request flow for a gateway implemented using a reverse proxy is:
-
- 1. A client makes a request to http://foo.example.com.
- 2. DNS resolves the name to a `Gateway` address.
- 3. The reverse proxy receives the request on a `Listener` and uses the
- [Host header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an `HTTPRoute`.
- 5. Optionally, the reverse proxy can perform request header and/or path matching based
- on `match` rules of the `HTTPRoute`.
- 6. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based
- on `filter` rules of the `HTTPRoute`.
- 7. Lastly, the reverse proxy forwards the request to one or more objects, i.e. `Service`,
- in the cluster based on `forwardTo` rules of the `HTTPRoute`.
-
-## TLS Configuration
-
-TLS is configured on Gateway listeners. Additionally, TLS certificates
-can be configured on route objects for certain self-service use cases.
-
-Please refer to [TLS details](tls.md) for a deep dive on TLS.
-
-## Design considerations
-
-There are some general design guidelines used throughout this API.
-
-### Single resource consistency
-
-The Kubernetes API guarantees consistency only on a single resource level. There
-are a couple of consequences for complex resource graphs as opposed to single
-resources:
-
-*   Error checking of properties spanning multiple resource will be asynchronous
-    and eventually consistent. Simple syntax checks will be possible at the
-    single resource level, but cross resource dependencies will need to be
-    handled by the controller.
-*   Controllers will need to handle broken links between resources and/or
-    mismatched configuration.
-
-### Conflicts
-
-Separation and delegation of responsibility among independent actors (e.g
-between cluster ops and application developers) can result in conflicts in the
-configuration. For example, two application teams may inadvertently submit
-configuration for the same HTTP path.
-
-In most cases, guidance for conflict resolution is provided along with the
-documentation for fields that may have a conflict. If a conflict does not have a
-prescribed resolution, the following guiding principles should be applied:
-
-* Prefer not to break things that are working.
-* Drop as little traffic as possible.
-* Provide a consistent experience when conflicts occur.
-* Make it clear which path has been chosen when a conflict has been identified.
-  Where possible, this should be communicated by setting appropriate status
-  conditions on relevant resources.
-* More specific matches should be given precedence over less specific ones.
-* The resource with the oldest creation timestamp wins.
-* If everything else is equivalent (including creation timestamp), precedences
-  should be given to the resource appearing first in alphabetical order
-  (namespace/name). For example, foo/bar would be given precedence over foo/baz.
-
-### Conformance
-
-As this API aims to cover a wide set of implementations and use cases,
-it will not be possible for all implementations to support *all*
-features at the present. However, we do expect the set of features
-supported to converge eventually. For a given feature, users will be
-guaranteed that features in the API will be portable between providers
-if the feature is supported.
-
-To model this in the API, we are taking a similar approach as with
-[sig-arch][sig-arch-bdd] work on conformance profiles. Features as
-described in the API spec will be divided into three major categories:
-
-[sig-arch-bdd]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-architecture/960-conformance-behaviors
-
-* **CORE** features will be portable and we expect that there is a
-  reasonable roadmap for ALL implementations towards support of APIs
-  in this category.
-* **EXTENDED** features are those that are portable but not
-  universally supported across implementations. Those implementations
-  that support the feature will have the same behavior and
-  semantics. It is expected that some number of EXTENDED features will
-  eventually migrate into the CORE. EXTENDED features will be part of
-  the API types and schema.
-* **CUSTOM** features are those that are not portable and are
-  vendor-specific. CUSTOM features will not have API types and schema
-  except via generic extension points.
-
-Behavior and feature in the CORE and EXTENDED set will be defined and
-validated via behavior-driven conformance tests. CUSTOM features will
-not be covered by conformance tests.
-
-By including and standardizing EXTENDED features in the API spec, we
-expect to be able to converge on portable subsets of the API among
-implementations without compromising overall API support. Lack of
-universal support will not be a blocker towards developing portable
-feature sets. Standardizing on spec will make it easier to eventually
-graduate to CORE when support is widespread.
-
-#### Conformance expectations
-
-We expect there will be varying levels of conformance among the
-different providers in the early days of this API. Users can use the
-results of the conformance tests to understand areas where there may
-be differences in behavior from the spec.
-
-### Extension points
-
-A number of extension points are provided in the API to provide flexibility in
-addressing the large number of use-cases that cannot be addressed by a general
-purpose API.
-
-Here is a summary of extension points in the API:
-- **XRouteMatch.ExtensionRef**: This extension point should be used to extend
-  the match semantics of a specific core Route. This is an experimental
-  extension point and will be iterated on in future based on feedback.
-- **XForwardTo.BackendRef**: This extension point should be used for forwarding
-  traffic to network endpoints other than core Kubernetes Service resource.
-  Examples include an S3 bucket, Lambda function, a file-server, etc.
-- **HTTPRouteFilter**: This API type in HTTPoute provides a way to hook into the
-  request/response lifecycle of an HTTP request.
-- **Custom Routes**: If none of the above extensions points suffice for a use
-  case, Implementers can chose to create custom Route resources for protocols
-  that are not currently supported in the API.
-
-Whenever you are using an extension point without any prior art, please let
-the community know. As we learn more about usage of extension points, we would
-like to find the common denominators and promote the features to core/extended
-API conformance.
-
-## API Resources
-
-### GatewayClass
-
-`GatewayClass` ([source code][gatewayclass-src]) is cluster-scoped resource
-defined by the infrastructure provider. This resource represents a class of
-Gateways that can be instantiated.
-
-[gatewayclass-src]: https://github.com/kubernetes-sigs/service-apis/blob/master/apis/v1alpha1/gatewayclass_types.go
-
-> Note: this serves the same function as the [`networking.IngressClass` resource][ingress-class-api].
 
 [ingress-class-api]: https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingressclass-resource
 
@@ -340,7 +161,7 @@ status:
     Message: "foobar" is an FooBar.
 ```
 
-#### GatewayClass controller selection
+#### Gateway controllers
 
 The `GatewayClass.spec.controller` field is used to determine whether
 or not a given `GatewayClass` is managed by the controller.
@@ -366,13 +187,7 @@ acme.io/gateway      // Use the default version
 
 ### Gateway
 
-A `Gateway` is 1:1 with the life cycle of the configuration of
-infrastructure. When a user creates a `Gateway`, some load balancing
-infrastructure is provisioned or configured
-(see below for details) by the `GatewayClass` controller. `Gateway` is the
-resource that triggers actions in this API. Other resources in this API are
-configuration snippets until a Gateway has been created to link the resources
-together.
+A Gateway is the instantiation of a GatewayClass. Gateways route traffic to Services within the cluster. They process incoming requests defined by their Routes to Service backends. Gateways define where and how the load balancing data plane is listening for traffic. Gateways are deployed through the respective Gateway controller which could be a cluster-hosted software controller, a cloud Gateway controller, or a controller for hardware data-planes. Routes are resources that bind to Gateways. This binding allows a Route to configure routing rules for how a Gateway processes traffic. As the Gateway spec captures user intent, it may not contain a complete specification for all attributes in the spec. For some GatewayClasses, the user may omit fields such as addresses, ports, TLS settings, which have defaults for that specific class.
 
 The `Gateway` spec defines the following:
 
@@ -383,24 +198,31 @@ The `Gateway` spec defines the following:
     is not supported).
 *   The Routes, which describe how traffic is processed and forwarded.
 
-If the Listener configuration requested by a Gateway definition is incompatible
-with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.
+#### Listener
 
-#### Deployment models
+The following Gateway is of the `internal` GatewayClass. A listener requires the following attributes:
 
-Depending on the `GatewayClass`, the creation of the `Gateway` could do any of
-the following actions:
+- The **port** where a Gateway is listening. This defines the ports where the load balancer is accepting traffic.
+- The **protocol** that the Gateway is listening for.T
+- The type of **resources** that may bind to the Gateway. In this case the HTTPRoute resource is specified. Even more granular filters can be specified to limit what can bind to the `simple-gateway` including resource type, Namespace selection, and label selectors.
 
-* Use cloud APIs to create an LB instance.
-* Spawn a new instance of a software LB (in this or another cluster).
-* Add a configuration stanza to an already instantiated LB to handle the new
-  routes.
-* Program the SDN to implement the configuration.
-* Something else we haven’t thought of yet...
+If the Listener configuration requested by a Gateway definition is incompatible with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.
 
-The API does not specify which one of these actions will be taken. Note that a
-GatewayClass controller that manages in-cluster proxy processes MAY restrict
-Gateway configuration scope, e.g. only be served in the same namespace.
+```yaml
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: cluster-gateway
+spec:
+  class: internet
+  listeners:  
+  - protocol: HTTP
+    port: 80
+    routes:
+      kind: HTTPRoute
+```
+
+Gateways are flexible resources and they can be deployed in multiple ways depending on how the administration of a load balancer is shared or partitioned between different groups within an organization. This role-oriented design allows flexible partitioning of portions of the load balancer configuration. 
 
 #### Gateway Status
 
@@ -412,22 +234,66 @@ status entries corresponding to their name. Both `GatewayStatus` and
 This is a list that includes a type of condition, the status of that condition,
 and the last time this condition changed.
 
-#### Listeners
+### Route
+
+Route objects define protocol-specific rules for mapping requests from a Gateway to Kubernetes Services. A Route is pure configuration and has no effect unless it is bound to a Gateway. A Route resource has a list of one or more route rules which match on the protocol of that type of Route. Routes are protocol-specific resources because traffic matching is highly protocol-dependent. The separation of route resources allow them to evolve independently for the needs of that specific protocol. 
+
+`HTTPRoute` and `TCPRoute` are the only defined Route resources at this time but future proposals for `GRPCRoutes`, `UDPRoutes`, and `TLSRoutes` have been discussed. 
+
+#### HTTPRoute
+
+`HTTPRoute` resources match HTTP and HTTPS traffic against Gateways that support them. Each route rule has at least one of these three clauses:
+
+- **Match** defines a matching predicate such as `path = "/app"` or `headers["x-my-app"] == "bar"`. The match determines which kind of traffic is being filtered for in this route rule.
+- **Filter** modifies the request or response inline with the request flow. Filters might rewrite paths or add additional headers
+- **Action** defines the final destination for the request. The most common action will be to direct matching traffic to a specific Kubernetes Service, but other actions are also possible such as specific response status codes, redirects, or custom extensions.
+
+Note that the match and filter clauses are optional while action is required so that the Gateway knows how to direct and process the traffic. The following HTTPRoute has a hostname match for foo.com and bar.com along with additional header and path matches. 
+
+```yaml
+apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
+metadata:
+  name: my-route
+  namespace: default
+spec:
+  hosts:
+  - hostnames: 
+    - foo.com
+    rules:
+    - action:
+        forwardTo:
+        - targetRef:
+            name: foo-svc
+  - hostnames: 
+    - bar.com
+    rules:
+    - matches:
+      - path: /login
+        headers:
+          accept: text/html
+      action:
+        forwardTo:
+        - targetRef:
+            name: bar-svc
+```
+
+#### Matches
 
 TODO
 
-### Routes
+#### Filters
 
 TODO
 
-#### `HTTPRoute`
+#### Action
 
 TODO
 
-#### `TCPRoute`
+#### TLS
 
 TODO
 
-#### Generic routing
+### Gateway & Route Binding
 
-TODO
+TODO - explain different method of matching/binding Gateways and Routes together

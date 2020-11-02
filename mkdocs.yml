@@ -12,10 +12,13 @@ nav:
   - Introduction: index.md
   - Concepts:
       API concepts: concepts.md
+      Design concepts: design-concepts.md
       Security Model: security-model.md
   - Guides:
-    - Introduction: guides.md
+    - Simple Gateway: simple-gateway.md 
+    - Complex routing: complex-routing.md
     - TLS: tls.md
+    - Multi-tenant Gateway: multi-tenant-gateway.md
   - References:
     - API specification: spec.md
     - Releases: releases.md
