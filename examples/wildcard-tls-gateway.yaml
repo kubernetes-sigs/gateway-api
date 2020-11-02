@@ -7,9 +7,7 @@ spec:
   listeners:
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: foo.example.com
-      match: Exact
+    hostname: foo.example.com
     tls:
       certificateRef:
         kind: Secret
@@ -21,9 +19,7 @@ spec:
       kind: HTTPRoute
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: example.com
-      match: Domain
+    hostname: "*.example.com"
     tls:
       certificateRef:
         kind: Secret

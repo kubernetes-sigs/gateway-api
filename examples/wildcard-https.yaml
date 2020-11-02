@@ -9,9 +9,7 @@ spec:
   - type: NamedAddress
     value: auto-assign
   listeners:
-  - hostname:
-      match: Domain
-      name: example.com
+  - hostname: "*.example.com"
     port: 443
     protocol: HTTPS
     tls:

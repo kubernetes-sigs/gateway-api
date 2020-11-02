@@ -668,8 +668,8 @@ hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
 The incoming hostname MUST be matched using the Hostname
 field for each Listener in order of most to least specific.
-That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
-matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
+That is, exact matches must be processed before wildcard
+matches.</p>
 <p>If this field specifies multiple Listeners that have the same
 Port value but are not compatible, the implementation must raise
 a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
@@ -909,8 +909,8 @@ RouteGateways
 <td>
 <code>hostnames</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHostname">
-[]HTTPRouteHostname
+<a href="#networking.x-k8s.io/v1alpha1.Hostname">
+[]Hostname
 </a>
 </em>
 </td>
@@ -1810,8 +1810,8 @@ hostname provided in the incoming client request MUST be
 matched to a Listener to find the correct set of Routes.
 The incoming hostname MUST be matched using the Hostname
 field for each Listener in order of most to least specific.
-That is, &ldquo;Exact&rdquo; matches must be processed before &ldquo;Domain&rdquo;
-matches, which must be processed before &ldquo;Any&rdquo; matches.</p>
+That is, exact matches must be processed before wildcard
+matches.</p>
 <p>If this field specifies multiple Listeners that have the same
 Port value but are not compatible, the implementation must raise
 a &ldquo;Conflicted&rdquo; condition in the Listener status.</p>
@@ -2498,16 +2498,6 @@ implementations.</p>
 </tr>
 </tbody>
 </table>
-<h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteHostname">HTTPRouteHostname
-(<code>string</code> alias)</p></h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
-</p>
-<p>
-<p>HTTPRouteHostname is used to specify a hostname that should be matched by
-HTTPRoute.</p>
-</p>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch
 </h3>
 <p>
@@ -2716,8 +2706,8 @@ RouteGateways
 <td>
 <code>hostnames</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteHostname">
-[]HTTPRouteHostname
+<a href="#networking.x-k8s.io/v1alpha1.Hostname">
+[]Hostname
 </a>
 </em>
 </td>
@@ -2841,79 +2831,15 @@ Valid HeaderMatchType values are:</p>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
 </p>
-<h3 id="networking.x-k8s.io/v1alpha1.HostnameMatch">HostnameMatch
-</h3>
-<p>
-(<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
-</p>
-<p>
-<p>HostnameMatch specifies how a Listener should match the incoming
-hostname from a client request. Depending on the incoming protocol,
-the match must apply to names provided by the client at both the
-TLS and the HTTP protocol layers.</p>
-</p>
-<table>
-<thead>
-<tr>
-<th>Field</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>
-<code>match</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.HostnameMatchType">
-HostnameMatchType
-</a>
-</em>
-</td>
-<td>
-<p>Match specifies how the hostname provided by the client should be
-matched against the given value.</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>name</code></br>
-<em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>Name contains the name to match against. This value must
-be a fully qualified host or domain name conforming to the
-preferred name syntax defined in
-<a href="https://tools.ietf.org/html/rfc1034#section-3.5">RFC 1034</a></p>
-<p>In addition to any RFC rules, this field MUST NOT contain</p>
-<ol>
-<li>IP address literals</li>
-<li>Colon-delimited port numbers</li>
-<li>Percent-encoded octets</li>
-</ol>
-<p>This field is required for the &ldquo;Domain&rdquo; and &ldquo;Exact&rdquo; match types.</p>
-</td>
-</tr>
-</tbody>
-</table>
-<h3 id="networking.x-k8s.io/v1alpha1.HostnameMatchType">HostnameMatchType
+<h3 id="networking.x-k8s.io/v1alpha1.Hostname">Hostname
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.HostnameMatch">HostnameMatch</a>)
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
 </p>
 <p>
-<p>HostnameMatchType specifies the types of matches that are valid
-for hostnames.
-Valid match types are:</p>
-<ul>
-<li>&ldquo;Domain&rdquo;</li>
-<li>&ldquo;Exact&rdquo;</li>
-<li>&ldquo;Any&rdquo;</li>
-</ul>
+<p>Hostname is used to specify a hostname that should be matched.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.Listener">Listener
 </h3>
@@ -2939,19 +2865,29 @@ validating webhook.</p>
 <td>
 <code>hostname</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.HostnameMatch">
-HostnameMatch
+<a href="#networking.x-k8s.io/v1alpha1.Hostname">
+Hostname
 </a>
 </em>
 </td>
 <td>
-<p>Hostname specifies to match the virtual hostname for
-protocol types that define this concept.</p>
-<p>Incoming requests that include a hostname are matched
-according to the given HostnameMatchType to select
-the Routes from this Listener.</p>
-<p>If a match type other than &ldquo;Any&rdquo; is supplied, it MUST
-be compatible with the specified Protocol field.</p>
+<em>(Optional)</em>
+<p>Hostname specifies the virtual hostname to match for protocol types that
+define this concept. When unspecified or &ldquo;<em>&rdquo;, all hostnames are matched.
+This field can be omitted for protocols that don&rsquo;t require hostname based
+matching.</p>
+<p>Hostname is the fully qualified domain name of a network host, as defined
+by RFC 3986. Note the following deviations from the &ldquo;host&rdquo; part of the
+URI as defined in the RFC:</p>
+<ol>
+<li>IP literals are not allowed.</li>
+<li>The <code>:</code> delimiter is not respected because ports are not allowed.</li>
+</ol>
+<p>Hostname can be &ldquo;precise&rdquo; which is a domain name without the terminating
+dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rdquo;, which is a
+domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
+The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS label
+and matches only a single label.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2980,10 +2916,9 @@ ProtocolType
 </em>
 </td>
 <td>
-<p>Protocol specifies the network protocol this listener
-expects to receive. The GatewayClass MUST validate that
-match type specified in the Hostname field is appropriate
-for the protocol.</p>
+<p>Protocol specifies the network protocol this listener expects to receive.
+The GatewayClass MUST apply the Hostname match appropriately for each
+protocol:</p>
 <ul>
 <li>For the &ldquo;TLS&rdquo; protocol, the Hostname match MUST be
 applied to the <a href="https://tools.ietf.org/html/rfc6066#section-3">SNI</a>
@@ -3013,11 +2948,7 @@ GatewayTLSConfig
 is required if the Protocol field is &ldquo;HTTPS&rdquo; or &ldquo;TLS&rdquo; and
 ignored otherwise.</p>
 <p>The association of SNIs to Certificate defined in GatewayTLSConfig is
-defined based on the Hostname field for this listener:
-- &ldquo;Domain&rdquo;: Certificate should be used for the domain and its
-first-level subdomains.
-- &ldquo;Exact&rdquo;: Certificate should be used for the domain only.
-- &ldquo;Any&rdquo;: Certificate in GatewayTLSConfig is the default certificate to use.</p>
+defined based on the Hostname field for this listener.</p>
 <p>The GatewayClass MUST use the longest matching SNI out of all
 available certificates for any TLS handshake.</p>
 <p>Support: Core</p>
@@ -3951,7 +3882,7 @@ dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rd
 a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
 The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
 label and matches only a single label.
-You cannot have a wildcard label by itself (e.g. Host == &ldquo;*&rdquo;).
+You cannot have a wildcard label by itself (e.g. Host == &ldquo;</em>&rdquo;).
 Requests will be matched against the Host field in the following order:</p>
 <ol>
 <li>If SNI is precise, the request matches this rule if

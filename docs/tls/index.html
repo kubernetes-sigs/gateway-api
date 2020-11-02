@@ -680,7 +680,7 @@ which is the default setting.</p>
 <h3 id="listeners-and-tls">Listeners and TLS</h3>
 <p>Listeners expose the TLS setting on a per domain or sub-domain basis.
 TLS settings of a listener are applied to all domains that satisfy the
-<code>hostname.match</code> criteria.</p>
+<code>hostname</code> criteria.</p>
 <p>In the following example, the Gateway serves the TLS certificate
 defined in the <code>default-cert</code> Secret resource for all requests.
 Although, the example refers to HTTPS protocol, one can also use the same
@@ -688,8 +688,6 @@ feature for TLS-only protocol along with TLSRoutes.</p>
 <pre><code class="yaml">listeners:
 - protocol: HTTPS # Other possible value is `TLS`
   port: 443
-  hostname:
-    match: Any # Other possible values are `Domain` and `Exact`
   tls:
     mode: Terminate
     certificateRef:
@@ -734,9 +732,7 @@ spec:
   listeners:
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: foo.example.com
-      match: Exact
+    hostname: foo.example.com
     tls:
       certificateRef:
         kind: Secret
@@ -748,9 +744,7 @@ spec:
       kind: HTTPRoute
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: bar.example.com
-      match: Exact
+    hostname: bar.example.com
     tls:
       certificateRef:
         kind: Secret
@@ -777,9 +771,7 @@ spec:
   listeners:
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: foo.example.com
-      match: Exact
+    hostname: foo.example.com
     tls:
       certificateRef:
         kind: Secret
@@ -791,9 +783,7 @@ spec:
       kind: HTTPRoute
   - protocol: HTTPS
     port: 443
-    hostname:
-      name: example.com
-      match: Domain
+    hostname: &quot;*.example.com&quot;
     tls:
       certificateRef:
         kind: Secret
@@ -820,14 +810,10 @@ spec:
   listeners:
   - protocol: HTTP
     port: 80
-    hostname:
-      match: Any
     routes:
       kind: HTTPRoute
   - protocol: HTTPS
     port: 443
-    hostname:
-      match: Any
     tls:
       mode: Terminate
       certificateRef:
