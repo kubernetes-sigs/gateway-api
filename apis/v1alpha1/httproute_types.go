@@ -167,6 +167,17 @@ type HTTPRouteRule struct {
 	// path match on "/", which has the effect of matching every
 	// HTTP request.
 	//
+	//
+	// A client request may match multiple HTTP route rules. Matching precedence
+	// MUST be determined in order of the following criteria, continuing on ties:
+	// * The longest matching hostname.
+	// * The longest matching path.
+	// * The largest number of header matches
+	// * The oldest Route based on creation timestamp. For example, a Route with
+	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
+	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
+	// * The Route appearing first in alphabetical order (namespace/name) for
+	//   example, foo/bar is given precedence over foo/baz.
 	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
 	// +kubebuilder:validation:MaxItems=8
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
@@ -202,6 +213,12 @@ type HTTPRouteRule struct {
 // * "Prefix"
 // * "RegularExpression"
 // * "ImplementationSpecific"
+//
+// Prefix and Exact paths must be syntactically valid:
+// 	- Must begin with the '/' character
+// 	- Must not contain consecutive '/' characters (e.g. /foo///, //).
+// 	- For prefix paths, a trailing '/' character in the Path is ignored,
+//      e.g. /abc and /abc/ specify the same match.
 //
 // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
 type PathMatchType string
