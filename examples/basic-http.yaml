@@ -31,7 +31,6 @@ kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-1
-  namespace: default
   labels:
     app: foo
 spec:
@@ -49,7 +48,6 @@ spec:
     - headers:
         type: Exact
         values:
-          x-forwarded-proto: https
           magic: foo
       path:
         type: Prefix
