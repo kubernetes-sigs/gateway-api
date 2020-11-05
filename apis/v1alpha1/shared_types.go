@@ -97,11 +97,10 @@ type RouteForwardTo struct {
 	// BackendRef and ServiceName are specified, ServiceName will be given
 	// precedence.
 	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
 	//
 	// The protocol to use is defined using AppProtocol field (introduced in
 	// Kubernetes 1.18) in the Service resource. In the absence of the
@@ -122,11 +121,10 @@ type RouteForwardTo struct {
 	// both BackendRef and ServiceName are specified, ServiceName will be given
 	// precedence.
 	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
 	//
 	//
 	// Support: Custom
@@ -204,3 +202,8 @@ type RouteStatus struct {
 	// +kubebuilder:validation:MaxItems=100
 	Gateways []RouteGatewayStatus `json:"gateways"`
 }
+
+// Hostname is used to specify a hostname that should be matched.
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+type Hostname string

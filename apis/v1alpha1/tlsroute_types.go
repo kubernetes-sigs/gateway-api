@@ -24,10 +24,9 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// TLSRoute is the Schema for the TLSRoute resource.
-// TLSRoute is similar to TCPRoute but can be configured to match against
-// TLS-specific metadata.
-// This allows more flexibility in matching streams for in a given TLS listener.
+// TLSRoute is the Schema for the TLSRoute resource. TLSRoute is similar to
+// TCPRoute but can be configured to match against TLS-specific metadata.
+// This allows more flexibility in matching streams for a given TLS listener.
 //
 // If you need to forward traffic to a single target for a TLS listener, you
 // could chose to use a TCPRoute with a TLS listener.
@@ -42,6 +41,7 @@ type TLSRoute struct {
 // TLSRouteSpec defines the desired state of TLSRoute
 type TLSRouteSpec struct {
 	// Rules are a list of TLS matchers and actions.
+	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Rules []TLSRouteRule `json:"rules"`
@@ -58,57 +58,60 @@ type TLSRouteStatus struct {
 
 // TLSRouteRule is the configuration for a given rule.
 type TLSRouteRule struct {
-	// Matches define conditions used for matching the rule against
-	// incoming TLS handshake.
-	// Each match is independent, i.e. this rule will be matched
-	// if **any** one of the matches is satisfied.
+	// Matches define conditions used for matching the rule against an
+	// incoming TLS handshake. Each match is independent, i.e. this
+	// rule will be matched if **any** one of the matches is satisfied.
+	// If unspecified, all requests from the associated gateway TLS
+	// listener will match.
+	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
 	Matches []TLSRouteMatch `json:"matches,omitempty"`
 
-	// ForwardTo defines the backend(s) where matching requests should be sent.
-	// +optional
+	// ForwardTo defines the backend(s) where matching requests should be
+	// sent.
+	//
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=4
-	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
+	ForwardTo []RouteForwardTo `json:"forwardTo"`
 }
 
 // TLSRouteMatch defines the predicate used to match connections to a
 // given action.
 type TLSRouteMatch struct {
 	// SNIs defines a set of SNI names that should match against the
-	// SNI attribute of TLS CLientHello message in TLS handshake.
+	// SNI attribute of TLS ClientHello message in TLS handshake.
 	//
 	// SNI can be "precise" which is a domain name without the terminating
 	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
 	// a domain name prefixed with a single wildcard label (e.g. "*.example.com").
-	// The wildcard character '*' must appear by itself as the first DNS
-	// label and matches only a single label.
-	// You cannot have a wildcard label by itself (e.g. Host == "*").
+	// The wildcard character '*' must appear by itself as the first DNS label
+	// and matches only a single label. You cannot have a wildcard label by
+	// itself (e.g. Host == "*").
+	//
 	// Requests will be matched against the Host field in the following order:
 	//
-	// 1. If SNI is precise, the request matches this rule if
-	//    the SNI in ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this rule if
-	//    the SNI is to equal to the suffix
-	//    (removing the first label) of the wildcard rule.
+	// 1. If SNI is precise, the request matches this rule if the SNI in
+	//    ClientHello is equal to one of the defined SNIs.
+	// 2. If SNI is a wildcard, then the request matches this rule if the
+	//    SNI is to equal to the suffix (removing the first label) of the
+	//    wildcard rule.
+	// 3. If SNIs is unspecified, all requests associated with the gateway TLS
+	//    listener will match. This can be used to define a default backend
+	//    for a TLS listener.
 	//
 	// Support: core
 	//
-	// +kubebuilder:validation:MinItems=1
+	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	SNIs []string `json:"snis,omitempty"`
+	SNIs []Hostname `json:"snis,omitempty"`
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematchers" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// "match" behavior.  For example, resource "mytlsroutematcher" in group
+	// "networking.acme.io". If the referent cannot be found, the rule is not
+	// included in the route. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
+	// status for this route should be updated with a condition that describes
+	// the error more specifically.
 	//
 	// Support: custom
 	//

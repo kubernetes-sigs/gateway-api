@@ -36,9 +36,13 @@ type TCPRoute struct {
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpec struct {
 	// Rules are a list of TCP matchers and actions.
+	//
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	Rules []TCPRouteRule `json:"rules"`
 
 	// Gateways defines which Gateways can use this Route.
+	//
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
 }
@@ -51,35 +55,33 @@ type TCPRouteStatus struct {
 // TCPRouteRule is the configuration for a given rule.
 type TCPRouteRule struct {
 	// Matches define conditions used for matching the rule against
-	// incoming TCP connections.
-	// Each match is independent, i.e. this rule will be matched
-	// if **any** one of the matches is satisfied.
+	// incoming TCP connections. Each match is independent, i.e. this
+	// rule will be matched if **any** one of the matches is satisfied.
+	// If unspecified, all requests from the associated gateway TCP
+	// listener will match.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
 	Matches []TCPRouteMatch `json:"matches,omitempty"`
 
-	// ForwardTo defines the backend(s) where matching requests should be sent.
-	// +optional
+	// ForwardTo defines the backend(s) where matching requests should
+	// be sent.
+	//
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=4
-	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
+	ForwardTo []RouteForwardTo `json:"forwardTo"`
 }
 
 // TCPRouteMatch defines the predicate used to match connections to a
 // given action.
 type TCPRouteMatch struct {
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematchers" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// "match" behavior.  For example, resource "mytcproutematcher" in group
+	// "networking.acme.io". If the referent cannot be found, the rule is not
+	// included in the route. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
+	// status for this route should be updated with a condition that describes
+	// the error more specifically.
 	//
 	// Support: custom
 	//

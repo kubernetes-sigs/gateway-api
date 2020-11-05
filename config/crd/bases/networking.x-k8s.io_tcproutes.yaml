@@ -77,7 +77,7 @@ spec:
                         description: RouteForwardTo defines how a Route should forward a request.
                         properties:
                           backendRef:
-                            description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
+                            description: "BackendRef is a reference to a backend to forward matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.
@@ -106,7 +106,7 @@ spec:
                             minimum: 1
                             type: integer
                           serviceName:
-                            description: "ServiceName refers to the name of the Service to forward matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n The protocol to use is defined using AppProtocol field (introduced in Kubernetes 1.18) in the Service resource. In the absence of the AppProtocol field a `networking.x-k8s.io/app-protocol` annotation on the BackendPolicy resource may be used to define the protocol. If the AppProtocol field is available, this annotation should not be used. The AppProtocol field, when populated, takes precedence over the annotation in the BackendPolicy resource. For custom backends, it is encouraged to add a semantically-equivalent field in the Custom Resource Definition. \n Support: Core"
+                            description: "ServiceName refers to the name of the Service to forward matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n The protocol to use is defined using AppProtocol field (introduced in Kubernetes 1.18) in the Service resource. In the absence of the AppProtocol field a `networking.x-k8s.io/app-protocol` annotation on the BackendPolicy resource may be used to define the protocol. If the AppProtocol field is available, this annotation should not be used. The AppProtocol field, when populated, takes precedence over the annotation in the BackendPolicy resource. For custom backends, it is encouraged to add a semantically-equivalent field in the Custom Resource Definition. \n Support: Core"
                             maxLength: 253
                             type: string
                           weight:
@@ -120,14 +120,15 @@ spec:
                         - port
                         type: object
                       maxItems: 4
+                      minItems: 1
                       type: array
                     matches:
-                      description: Matches define conditions used for matching the rule against incoming TCP connections. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied.
+                      description: Matches define conditions used for matching the rule against incoming TCP connections. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied. If unspecified, all requests from the associated gateway TCP listener will match.
                       items:
                         description: TCPRouteMatch defines the predicate used to match connections to a given action.
                         properties:
                           extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  The resource may be \"configmap\" (use the empty string for the group) or an implementation-defined resource (for example, resource \"myroutematchers\" in group \"networking.acme.io\"). Omitting or specifying the empty string for both the resource and group indicates that the resource is \"configmaps\". \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  For example, resource \"mytcproutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.
@@ -152,7 +153,11 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                  required:
+                  - forwardTo
                   type: object
+                maxItems: 16
+                minItems: 1
                 type: array
             required:
             - rules

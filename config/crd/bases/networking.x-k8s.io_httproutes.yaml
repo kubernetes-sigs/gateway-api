@@ -85,7 +85,7 @@ spec:
                   description: HTTPRouteRule defines semantics for matching an incoming HTTP request against a set of matching rules and executing an action (and optionally filters) on the request.
                   properties:
                     filters:
-                      description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across implementations. Specifying a core filter multiple times has unspecified or custom conformance. \n Support: core"
+                      description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across   implementations. \n Specifying a core filter multiple times has unspecified or custom conformance. \n Support: core"
                       items:
                         description: 'HTTPRouteFilter defines additional processing steps that must be completed during the request or response lifecycle. HTTPRouteFilters are meant as an extension point to express additional processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter. TODO(hbagdi): re-render CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298 - https://github.com/kubernetes-sigs/controller-tools/issues/461'
                         properties:
@@ -131,7 +131,7 @@ spec:
                             description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
                             properties:
                               backendRef:
-                                description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
+                                description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                                 properties:
                                   group:
                                     description: Group is the group of the referent.
@@ -160,7 +160,7 @@ spec:
                                 minimum: 1
                                 type: integer
                               serviceName:
-                                description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
+                                description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                 maxLength: 253
                                 type: string
                             required:
@@ -179,7 +179,7 @@ spec:
                       maxItems: 16
                       type: array
                     forwardTo:
-                      description: ForwardTo defines the backend(s) where matching requests should be sent.
+                      description: ForwardTo defines the backend(s) where matching requests should be sent. If unspecified, the rule performs no forwarding. If unspecified and no filters are specified that would result in a response being sent, a 503 error code is returned.
                       items:
                         description: HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
                         properties:
@@ -253,7 +253,7 @@ spec:
                                   description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
                                   properties:
                                     backendRef:
-                                      description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
+                                      description: "BackendRef is a local object reference to mirror matched requests to. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                                       properties:
                                         group:
                                           description: Group is the group of the referent.
@@ -282,7 +282,7 @@ spec:
                                       minimum: 1
                                       type: integer
                                     serviceName:
-                                      description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
+                                      description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                       maxLength: 253
                                       type: string
                                   required:
@@ -332,7 +332,7 @@ spec:
                         description: "HTTPRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied. \n For example, the match below will match a HTTP request only if its path starts with `/foo` AND it contains the `version: \"1\"` header: \n ``` match:   path:     value: \"/foo\"   headers:     values:       version: \"1\" ```"
                         properties:
                           extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  For example, resource \"myroutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the route must be dropped from the Gateway. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DroppedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior. For example, resource \"myroutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.

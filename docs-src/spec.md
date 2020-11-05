@@ -680,10 +680,9 @@ TCPRouteStatus
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute
 </h3>
 <p>
-<p>TLSRoute is the Schema for the TLSRoute resource.
-TLSRoute is similar to TCPRoute but can be configured to match against
-TLS-specific metadata.
-This allows more flexibility in matching streams for in a given TLS listener.</p>
+<p>TLSRoute is the Schema for the TLSRoute resource. TLSRoute is similar to
+TCPRoute but can be configured to match against TLS-specific metadata.
+This allows more flexibility in matching streams for a given TLS listener.</p>
 <p>If you need to forward traffic to a single target for a TLS listener, you
 could chose to use a TCPRoute with a TLS listener.</p>
 </p>
@@ -1799,11 +1798,10 @@ string
 to. When specified, this takes the place of BackendRef. If both
 BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+<p>If the referent cannot be found, the rule is not included in the route.
+The controller should raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway
+with the &ldquo;DegradedRoutes&rdquo; reason. The gateway status for this route should
+be updated with a condition that describes the error more specifically.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -1821,11 +1819,10 @@ LocalObjectReference
 <p>BackendRef is a local object reference to mirror matched requests to. If
 both BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+<p>If the referent cannot be found, the rule is not included in the route.
+The controller should raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway
+with the &ldquo;DegradedRoutes&rdquo; reason. The gateway status for this route should
+be updated with a condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -2152,12 +2149,12 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  For example, resource &ldquo;myroutematcher&rdquo; in group
-&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the route must
-be dropped from the Gateway. The controller should raise the
-&ldquo;ResolvedRefs&rdquo; condition on the Gateway with the &ldquo;DroppedRoutes&rdquo;
-reason. The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+&ldquo;match&rdquo; behavior. For example, resource &ldquo;myroutematcher&rdquo; in group
+&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the rule is not
+included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
+status for this route should be updated with a condition that describes
+the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -2237,8 +2234,9 @@ This can change in the future based on feedback during the alpha stage.</p>
 <p>Conformance-levels at this level are defined based on the type of filter:
 - ALL core filters MUST be supported by all implementations.
 - Implementers are encouraged to support extended filters.
-- Implementation-specific custom filters have no API guarantees across implementations.
-Specifying a core filter multiple times has unspecified or custom conformance.</p>
+- Implementation-specific custom filters have no API guarantees across
+implementations.</p>
+<p>Specifying a core filter multiple times has unspecified or custom conformance.</p>
 <p>Support: core</p>
 </td>
 </tr>
@@ -2253,7 +2251,10 @@ Specifying a core filter multiple times has unspecified or custom conformance.</
 </td>
 <td>
 <em>(Optional)</em>
-<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
+<p>ForwardTo defines the backend(s) where matching requests should be sent.
+If unspecified, the rule performs no forwarding. If unspecified and no
+filters are specified that would result in a response being sent, a 503
+error code is returned.</p>
 </td>
 </tr>
 </tbody>
@@ -2422,7 +2423,8 @@ Valid HeaderMatchType values are:</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>)
 </p>
 <p>
 <p>Hostname is used to specify a hostname that should be matched.</p>
@@ -2895,11 +2897,10 @@ string
 to. When specified, this takes the place of BackendRef. If both
 BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+<p>If the referent cannot be found, the rule is not included in the route.
+The controller should raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway
+with the &ldquo;DegradedRoutes&rdquo; reason. The gateway status for this route should
+be updated with a condition that describes the error more specifically.</p>
 <p>The protocol to use is defined using AppProtocol field (introduced in
 Kubernetes 1.18) in the Service resource. In the absence of the
 AppProtocol field a <code>networking.x-k8s.io/app-protocol</code> annotation on the
@@ -2925,11 +2926,10 @@ LocalObjectReference
 <p>BackendRef is a reference to a backend to forward matched requests to. If
 both BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+<p>If the referent cannot be found, the rule is not included in the route.
+The controller should raise the &ldquo;ResolvedRefs&rdquo; condition on the Gateway
+with the &ldquo;DegradedRoutes&rdquo; reason. The gateway status for this route should
+be updated with a condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
 </td>
 </tr>
@@ -3259,16 +3259,12 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+&ldquo;match&rdquo; behavior.  For example, resource &ldquo;mytcproutematcher&rdquo; in group
+&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the rule is not
+included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
+status for this route should be updated with a condition that describes
+the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -3303,9 +3299,10 @@ condition that describes the error more specifically.</p>
 <td>
 <em>(Optional)</em>
 <p>Matches define conditions used for matching the rule against
-incoming TCP connections.
-Each match is independent, i.e. this rule will be matched
-if <strong>any</strong> one of the matches is satisfied.</p>
+incoming TCP connections. Each match is independent, i.e. this
+rule will be matched if <strong>any</strong> one of the matches is satisfied.
+If unspecified, all requests from the associated gateway TCP
+listener will match.</p>
 </td>
 </tr>
 <tr>
@@ -3318,8 +3315,8 @@ if <strong>any</strong> one of the matches is satisfied.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
+<p>ForwardTo defines the backend(s) where matching requests should
+be sent.</p>
 </td>
 </tr>
 </tbody>
@@ -3471,25 +3468,31 @@ given action.</p>
 <td>
 <code>snis</code></br>
 <em>
-[]string
+<a href="#networking.x-k8s.io/v1alpha1.Hostname">
+[]Hostname
+</a>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>SNIs defines a set of SNI names that should match against the
-SNI attribute of TLS CLientHello message in TLS handshake.</p>
+SNI attribute of TLS ClientHello message in TLS handshake.</p>
 <p>SNI can be &ldquo;precise&rdquo; which is a domain name without the terminating
 dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rdquo;, which is
 a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
-The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS
-label and matches only a single label.
-You cannot have a wildcard label by itself (e.g. Host == &ldquo;*&rdquo;).
-Requests will be matched against the Host field in the following order:</p>
+The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS label
+and matches only a single label. You cannot have a wildcard label by
+itself (e.g. Host == &ldquo;*&rdquo;).</p>
+<p>Requests will be matched against the Host field in the following order:</p>
 <ol>
-<li>If SNI is precise, the request matches this rule if
-the SNI in ClientHello is equal to one of the defined SNIs.</li>
-<li>If SNI is a wildcard, then the request matches this rule if
-the SNI is to equal to the suffix
-(removing the first label) of the wildcard rule.</li>
+<li>If SNI is precise, the request matches this rule if the SNI in
+ClientHello is equal to one of the defined SNIs.</li>
+<li>If SNI is a wildcard, then the request matches this rule if the
+SNI is to equal to the suffix (removing the first label) of the
+wildcard rule.</li>
+<li>If SNIs is unspecified, all requests associated with the gateway TLS
+listener will match. This can be used to define a default backend
+for a TLS listener.</li>
 </ol>
 <p>Support: core</p>
 </td>
@@ -3506,16 +3509,12 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+&ldquo;match&rdquo; behavior.  For example, resource &ldquo;mytlsroutematcher&rdquo; in group
+&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the rule is not
+included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
+status for this route should be updated with a condition that describes
+the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -3559,10 +3558,11 @@ to override a specific TLS setting.</p>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Matches define conditions used for matching the rule against
-incoming TLS handshake.
-Each match is independent, i.e. this rule will be matched
-if <strong>any</strong> one of the matches is satisfied.</p>
+<p>Matches define conditions used for matching the rule against an
+incoming TLS handshake. Each match is independent, i.e. this
+rule will be matched if <strong>any</strong> one of the matches is satisfied.
+If unspecified, all requests from the associated gateway TLS
+listener will match.</p>
 </td>
 </tr>
 <tr>
@@ -3575,8 +3575,8 @@ if <strong>any</strong> one of the matches is satisfied.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
+<p>ForwardTo defines the backend(s) where matching requests should be
+sent.</p>
 </td>
 </tr>
 </tbody>
@@ -3690,16 +3690,12 @@ LocalObjectReference
 <td>
 <em>(Optional)</em>
 <p>ExtensionRef is an optional, implementation-specific extension to the
-&ldquo;match&rdquo; behavior.  The resource may be &ldquo;configmap&rdquo; (use the empty
-string for the group) or an implementation-defined resource (for
-example, resource &ldquo;myroutematchers&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Omitting or specifying the empty string for both the resource and
-group indicates that the resource is &ldquo;configmaps&rdquo;.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
+&ldquo;match&rdquo; behavior.  For example, resource &ldquo;myudproutematcher&rdquo; in group
+&ldquo;networking.acme.io&rdquo;. If the referent cannot be found, the rule is not
+included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo;
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
+status for this route should be updated with a condition that describes
+the error more specifically.</p>
 <p>Support: custom</p>
 </td>
 </tr>
@@ -3733,7 +3729,11 @@ condition that describes the error more specifically.</p>
 </td>
 <td>
 <em>(Optional)</em>
-<p>Matches defines which packets match this rule.</p>
+<p>Matches define conditions used for matching the rule against
+incoming UDP connections. Each match is independent, i.e. this
+rule will be matched if <strong>any</strong> one of the matches is satisfied.
+If unspecified, all requests from the associated gateway UDP
+listener will match.</p>
 </td>
 </tr>
 <tr>
@@ -3746,8 +3746,8 @@ condition that describes the error more specifically.</p>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>ForwardTo defines the backend(s) where matching requests should be sent.</p>
+<p>ForwardTo defines the backend(s) where matching requests should
+be sent.</p>
 </td>
 </tr>
 </tbody>
