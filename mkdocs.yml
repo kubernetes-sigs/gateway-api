@@ -15,6 +15,7 @@ nav:
       Security Model: security-model.md
   - Guides:
     - Introduction: guides.md
+    - Getting started: getting-started.md
     - TLS: tls.md
   - References:
     - API specification: spec.md
