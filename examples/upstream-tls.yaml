@@ -2,6 +2,8 @@ kind: BackendPolicy
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: my-app
+  annotations:
+    networking.x-k8s.io/app-protocol: https
 spec:
   backendRefs:
   - name: my-service
