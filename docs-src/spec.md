@@ -1996,6 +1996,14 @@ from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
 condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
+<p>The protocol to use should be specified with the AppProtocol field on Service
+resources. This field was introduced in Kubernetes 1.18. If using an earlier version
+of Kubernetes, a <code>networking.x-k8s.io/app-protocol</code> annotation on the
+BackendPolicy resource may be used to define the protocol. If the
+AppProtocol field is available, this annotation should not be used. The
+AppProtocol field, when populated, takes precedence over the annotation
+in the BackendPolicy resource. For custom backends, it is encouraged to
+add a semantically-equivalent field in the Custom Resource Definition.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2891,6 +2899,14 @@ from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
 condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
+<p>The protocol to use is defined using AppProtocol field (introduced in
+Kubernetes 1.18) in the Service resource. In the absence of the
+AppProtocol field a <code>networking.x-k8s.io/app-protocol</code> annotation on the
+BackendPolicy resource may be used to define the protocol. If the
+AppProtocol field is available, this annotation should not be used. The
+AppProtocol field, when populated, takes precedence over the annotation
+in the BackendPolicy resource. For custom backends, it is encouraged to
+add a semantically-equivalent field in the Custom Resource Definition.</p>
 <p>Support: Core</p>
 </td>
 </tr>

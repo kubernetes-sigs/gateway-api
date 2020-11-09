@@ -35,6 +35,23 @@ const (
 	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
 )
 
+const (
+	// AnnotationAppProtocol defines the protocol a Gateway should use for
+	// communication with a Kubernetes Service. This annotation must be present
+	// on the BackendPolicy resource and the protocol will apply to all Service
+	// ports that are selected by BackendPolicy.Spec.BackendRefs. If the
+	// AppProtocol field is available, this annotation should not be used. The
+	// AppProtocol field, when populated, takes precedence over this annotation.
+	// The value of this annotation must be also be a valid value for the
+	// AppProtocol field.
+	//
+	// Examples:
+	//
+	// - `networking.x-k8s.io/app-protocol: https`
+	// - `networking.x-k8s.io/app-protocol: tls`
+	AnnotationAppProtocol = "networking.x-k8s.io/app-protocol"
+)
+
 // RouteGateways defines which Gateways will be able to use a route. If this
 // field results in preventing the selection of a Route by a Gateway, an
 // "Admitted" condition with a status of false must be set for the Gateway on
@@ -85,6 +102,15 @@ type RouteForwardTo struct {
 	// condition on the Gateway with the "DroppedRoutes" reason.
 	// The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
+	//
+	// The protocol to use is defined using AppProtocol field (introduced in
+	// Kubernetes 1.18) in the Service resource. In the absence of the
+	// AppProtocol field a `networking.x-k8s.io/app-protocol` annotation on the
+	// BackendPolicy resource may be used to define the protocol. If the
+	// AppProtocol field is available, this annotation should not be used. The
+	// AppProtocol field, when populated, takes precedence over the annotation
+	// in the BackendPolicy resource. For custom backends, it is encouraged to
+	// add a semantically-equivalent field in the Custom Resource Definition.
 	//
 	// Support: Core
 	//
