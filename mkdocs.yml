@@ -12,6 +12,7 @@ nav:
   - Introduction: index.md
   - Concepts:
       API concepts: concepts.md
+      API resources: resources.md
       Security Model: security-model.md
   - Guides:
     - Introduction: guides.md

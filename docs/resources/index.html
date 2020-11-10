@@ -36,7 +36,7 @@
     
     
       
-        <title>Getting started - Kubernetes Service APIs</title>
+        <title>API resources - Kubernetes Service APIs</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#getting-started-with-services-apis" tabindex="1" class="md-skip">
+      <a href="#api-resources" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Getting started
+                API resources
               
             </span>
           
@@ -185,10 +185,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
       Concepts
@@ -216,11 +218,103 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../resources/" title="API resources" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        API resources
+      </label>
+    
+    <a href="./" title="API resources" class="md-nav__link md-nav__link--active">
       API resources
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#gatewayclass" class="md-nav__link">
+    GatewayClass
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-parameters" class="md-nav__link">
+    GatewayClass parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-status" class="md-nav__link">
+    GatewayClass status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-controller-selection" class="md-nav__link">
+    GatewayClass controller selection
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gateway" class="md-nav__link">
+    Gateway
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-models" class="md-nav__link">
+    Deployment models
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gateway-status" class="md-nav__link">
+    Gateway Status
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -245,12 +339,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
       Guides
@@ -278,70 +370,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Getting started
-      </label>
-    
-    <a href="./" title="Getting started" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
       Getting started
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installing-crds" class="md-nav__link">
-    Installing CRDs
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#install-an-implementation" class="md-nav__link">
-    Install an implementation
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sample-gateway" class="md-nav__link">
-    Sample Gateway
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#uninstalling-the-crds" class="md-nav__link">
-    Uninstalling the CRDs
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -503,30 +536,63 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installing-crds" class="md-nav__link">
-    Installing CRDs
+  <a href="#gatewayclass" class="md-nav__link">
+    GatewayClass
   </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-parameters" class="md-nav__link">
+    GatewayClass parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-status" class="md-nav__link">
+    GatewayClass status
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gatewayclass-controller-selection" class="md-nav__link">
+    GatewayClass controller selection
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#install-an-implementation" class="md-nav__link">
-    Install an implementation
+  <a href="#gateway" class="md-nav__link">
+    Gateway
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#deployment-models" class="md-nav__link">
+    Deployment models
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#sample-gateway" class="md-nav__link">
-    Sample Gateway
+        
+          <li class="md-nav__item">
+  <a href="#gateway-status" class="md-nav__link">
+    Gateway Status
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#uninstalling-the-crds" class="md-nav__link">
-    Uninstalling the CRDs
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -547,115 +613,186 @@
               
                 
                 
-                <h1 id="getting-started-with-services-apis">Getting started with Services APIs</h1>
-<h2 id="installing-crds">Installing CRDs</h2>
-<p>This project provides a collection of Custom Resource Definitions (CRDs) that can
-be installed into any Kubernetes (&gt;= 1.16) cluster.</p>
-<p>To install the CRDs, please execute:</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=master&quot; \
-| kubectl apply -f -
+                <h1 id="api-resources">API Resources</h1>
+<h2 id="gatewayclass">GatewayClass</h2>
+<p><code>GatewayClass</code> (<a href="https://github.com/kubernetes-sigs/service-apis/blob/master/apis/v1alpha1/gatewayclass_types.go">source code</a>) is cluster-scoped resource
+defined by the infrastructure provider. This resource represents a class of
+Gateways that can be instantiated.</p>
+<blockquote>
+<p>Note: this serves the same function as the <a href="https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingressclass-resource"><code>networking.IngressClass</code> resource</a>.</p>
+</blockquote>
+<pre><code class="yaml">kind: GatewayClass
+metadata:
+  name: cluster-gateway
+spec:
+  controller: &quot;acme.io/gateway-controller&quot;
 </code></pre>
 
-<h2 id="install-an-implementation">Install an implementation</h2>
-<p>Multiple projects implement the APIs defined by this project.
-You will need to either install an implementation or verify that one is already
-setup for your cluster.</p>
-<h2 id="sample-gateway">Sample Gateway</h2>
-<p>Once you have the CRDs and an implementation installed, you are ready to
-use Service APIs.</p>
-<p>In this example, we are installing three resources:</p>
-<ul>
-<li>An <code>acme-lb</code> GatewayClass which is being managed by a <code>acme.io/gateway-controller</code>
-  controller running in the cluster. Typically, a GatewayClass is provided by
-  the implementation and must be installed in the cluster.</li>
-<li>
-<p>A Gateway which is of type <code>acme-lb</code>:</p>
-<ul>
-<li>This gateway has a single HTTP listener on port 80 which selects HTTPRoutes
-  from all namespaces which have the label <code>app: foo</code> on them.</li>
-</ul>
-</li>
-<li>
-<p>Finally, we have an HTTPRoute resource which is attached to the above Gateway
-  and has two rules:</p>
-<ul>
-<li>All requests with path beginning with <code>/bar</code> are forwarded to my-service1
-  Kubernetes Service.</li>
-<li>All requests with path beginning with <code>/some/thing</code> AND have an HTTP header
-  <code>magic: foo</code> are forwarded to my-service2 Kubernetes Service.</li>
-</ul>
-</li>
-</ul>
-<p>With this configuration, you now have a Gateway resource which is forwarding
-traffic to two Kubernetes Services based on HTTP request metadata.</p>
-<pre><code>kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha1
+<p>We expect that one or more <code>GatewayClasses</code> will be created by the
+infrastructure provider for the user. It allows decoupling of which mechanism
+(e.g. controller) implements the <code>Gateways</code> from the user. For instance, an
+infrastructure provider may create two <code>GatewayClasses</code> named <code>internet</code> and
+<code>private</code> to reflect <code>Gateways</code> that define Internet-facing vs private, internal
+applications.</p>
+<pre><code class="yaml">kind: GatewayClass
 metadata:
-  name: acme-lb
+  name: internet
+  ...
+---
+kind: GatewayClass
+metadata:
+  name: private
+  ...
+</code></pre>
+
+<p>The user of the classes will not need to know <em>how</em> <code>internet</code> and <code>private</code> are
+implemented. Instead, the user will only need to understand the resulting
+properties of the class that the <code>Gateway</code> was created with.</p>
+<h3 id="gatewayclass-parameters">GatewayClass parameters</h3>
+<p>Providers of the <code>Gateway</code> API may need to pass parameters to their controller
+as part of the class definition. This is done using the
+<code>GatewayClass.spec.parametersRef</code> field:</p>
+<pre><code class="yaml"># GatewayClass for Gateways that define Internet-facing applications.
+kind: GatewayClass
+metadata:
+  name: internet
 spec:
-  controller: acme.io/gateway-controller
+  controller: &quot;acme.io/gateway-controller&quot;
   parametersRef:
-    name: acme-lb
-    group: acme.io
-    kind: Parameters
+    group: acme.io/v1alpha1
+    kind: Config
+    name: internet-gateway-config
 ---
-kind: Gateway
-apiVersion: networking.x-k8s.io/v1alpha1
+kind: Config
+apiVersion: acme.io/v1alpha1
 metadata:
-  name: my-gateway
-  namespace: default
+  name: internet-gateway-config
 spec:
-  gatewayClassName: acme-lb
-  listeners:  # Use GatewayClass defaults for listener definition.
-  - protocol: HTTP
-    port: 80
-    routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          app: foo
-      namespaces:
-        from: &quot;All&quot;
----
-kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
-metadata:
-  name: http-app-1
-  labels:
-    app: foo
-spec:
-  hostnames:
-  - &quot;foo.com&quot;
-  rules:
-  - matches:
-    - path:
-        type: Prefix
-        value: /bar
-    forwardTo:
-    - serviceName: my-service1
-      port: 8080
-  - matches:
-    - headers:
-        type: Exact
-        values:
-          magic: foo
-      path:
-        type: Prefix
-        value: /some/thing
-    forwardTo:
-    - serviceName: my-service2
-      port: 8080
+  ip-address-pool: internet-vips
+  ...
 </code></pre>
 
-<p>For more advanced examples, please read the other <a href="../guides/">guides</a>.</p>
-<h2 id="uninstalling-the-crds">Uninstalling the CRDs</h2>
-<p>To uninstall the CRDs and all resources created with them, run the following
-command. Note that this will remove all GatewayClass and Gateway resources in
-your cluster. If you have been using these resources for any other purpose do
-not uninstall these CRDs.</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=master&quot; \
-| kubectl delete -f -
+<p>Using a Custom Resource for <code>GatewayClass.spec.parametersRef</code> is encouraged
+but implementations may resort to using a ConfigMap if needed.</p>
+<h3 id="gatewayclass-status">GatewayClass status</h3>
+<p><code>GatewayClasses</code> MUST be validated by the provider to ensure that the configured
+parameters are valid. The validity of the class will be signaled to the user via
+<code>GatewayClass.status</code>:</p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: Unknown
+    ...
 </code></pre>
+
+<p>A new <code>GatewayClass</code> will start with the <code>InvalidParameters</code> condition set to
+<code>Unknown</code>. At this point the controller has not seen the configuration. Once the
+controller has processed the configuration, the condition will be set to
+<code>False</code>:</p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: False
+    ...
+</code></pre>
+
+<p>If there is an error in the <code>GatewayClass.spec</code>, the conditions will be
+non-empty and contain information about the error.</p>
+<pre><code class="yaml">kind: GatewayClass
+...
+status:
+  conditions:
+  - type: InvalidParameters
+    status: True
+    Reason: BadFooBar
+    Message: &quot;foobar&quot; is an FooBar.
+</code></pre>
+
+<h3 id="gatewayclass-controller-selection">GatewayClass controller selection</h3>
+<p>The <code>GatewayClass.spec.controller</code> field is used to determine whether
+or not a given <code>GatewayClass</code> is managed by the controller.
+This format of this field is opaque and specific to a particular controller.
+Which GatewayClass is selected by a given controller field depends on how
+various controller(s) in the cluster interpret this field.</p>
+<p>It is RECOMMENDED that controller authors/deployments make their
+selection unique by using a domain / path combination under their
+administrative control (e.g. controller managing of all <code>controller</code>s
+starting with <code>acme.io</code> is the owner of the <code>acme.io</code> domain) to avoid
+conflicts.</p>
+<p>Controller versioning can be done by encoding the version of a
+controller into the path portion. An example scheme could be (similar
+to container URIs):</p>
+<pre><code class="text">acme.io/gateway/v1   // Use version 1
+acme.io/gateway/v2   // Use version 2
+acme.io/gateway      // Use the default version
+</code></pre>
+
+<h2 id="gateway">Gateway</h2>
+<p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of
+infrastructure. When a user creates a <code>Gateway</code>, some load balancing
+infrastructure is provisioned or configured
+(see below for details) by the <code>GatewayClass</code> controller. <code>Gateway</code> is the
+resource that triggers actions in this API. Other resources in this API are
+configuration snippets until a Gateway has been created to link the resources
+together.</p>
+<p>The <code>Gateway</code> spec defines the following:</p>
+<ul>
+<li>The <code>GatewayClass</code> used to instantiate this Gateway.</li>
+<li>The Listener bindings, which define addresses and ports, protocol termination,
+    and TLS settings. The Listener configuration requested by a Gateway definition can
+    be incompatible with a given <code>GatewayClass</code> (e.g. port/protocol combination
+    is not supported).</li>
+<li>The Routes, which describe how traffic is processed and forwarded.</li>
+</ul>
+<p>If the Listener configuration requested by a Gateway definition is incompatible
+with a given GatewayClass, the Gateway will be in an error state, signaled by the status field.</p>
+<h3 id="deployment-models">Deployment models</h3>
+<p>Depending on the <code>GatewayClass</code>, the creation of the <code>Gateway</code> could do any of
+the following actions:</p>
+<ul>
+<li>Use cloud APIs to create an LB instance.</li>
+<li>Spawn a new instance of a software LB (in this or another cluster).</li>
+<li>Add a configuration stanza to an already instantiated LB to handle the new
+  routes.</li>
+<li>Program the SDN to implement the configuration.</li>
+<li>Something else we haven’t thought of yet...</li>
+</ul>
+<p>The API does not specify which one of these actions will be taken. Note that a
+GatewayClass controller that manages in-cluster proxy processes MAY restrict
+Gateway configuration scope, e.g. only be served in the same namespace.</p>
+<h3 id="gateway-status">Gateway Status</h3>
+<p>Gateways track status for the <code>Gateway</code> resource as a whole as well as each
+<code>Listener</code> it contains. The status for a specific Route is reported in the
+status of the <code>Route</code> resource. Within <code>GatewayStatus</code>, Listeners will have
+status entries corresponding to their name. Both <code>GatewayStatus</code> and
+<code>ListenerStatus</code> follow the conditions pattern used elsewhere in Kubernetes.
+This is a list that includes a type of condition, the status of that condition,
+and the last time this condition changed.</p>
+<!---
+#### Listeners
+
+TODO
+
+### Routes
+
+TODO
+
+#### `HTTPRoute`
+
+TODO
+
+#### `TCPRoute`
+
+TODO
+
+#### Generic routing
+
+TODO
+--->
                 
                   
                 
@@ -677,7 +814,7 @@ not uninstall these CRDs.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../guides/" title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../concepts/" title="API concepts" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -686,19 +823,19 @@ not uninstall these CRDs.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Introduction
+                API concepts
               </span>
             </div>
           </a>
         
         
-          <a href="../tls/" title="TLS" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../security-model/" title="Security Model" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                TLS
+                Security Model
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
