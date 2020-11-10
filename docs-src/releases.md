@@ -10,6 +10,7 @@ Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Service API
 releases will be independent from Kubernetes releases initially.
 
 Service API releases will include four components:
+
 * Custom Resource Definitions to define the API.
 * Go client libraries.
 * Validation webhooks to implement cross field validations.
@@ -21,21 +22,6 @@ Versioning will be completely separate from the Kubernetes release process, but
 similar methodology will be used. Service API versions will use the [same
 version level requirements as other Kubernetes
 features](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions).
-
-Service APIs are currently at the development stage of versioning described in
-the Kubernetes documentation above. An initial alpha release is currently
-planned for February 2020.
-
-A faster release cadence will be used for alpha versions, with new alpha
-releases monthly. Users and controller authors will be expected to use the
-latest version of the API. There will be little to no provisions for backwards
-compatibility for alpha versions. Generally we expect the alpha API to be for
-users and controller developers to test out the API but not in any production
-environment.
-
-Beta and stable releases will operate on a slower, more standard, release
-schedule. They will also provide all of the stability guarantees that other beta
-and stable Kubernetes features provide.
 
 ## Installation
 
