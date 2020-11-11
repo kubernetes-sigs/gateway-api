@@ -230,11 +230,6 @@ type Listener struct {
 	Routes RouteBindingSelector `json:"routes"`
 }
 
-// Hostname is used to specify a hostname that should be matched.
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=253
-type Hostname string
-
 // ProtocolType defines the application protocol accepted by a Listener.
 // Implementations are not required to accept all the defined protocols.
 // If an implementation does not support a specified protocol, it
@@ -752,7 +747,7 @@ const (
 	//
 	// Possible reasons for this condition to be false are:
 	//
-	// * "DroppedRoutes"
+	// * "DegradedRoutes"
 	// * "InvalidCertificateRef"
 	// * "InvalidRoutesRef"
 	//
@@ -761,11 +756,11 @@ const (
 	// interoperability.
 	ListenerConditionResolvedRefs ListenerConditionType = "ResolvedRefs"
 
-	// ListenerReasonDroppedRoutes indicates that not all of the routes
-	// selected by this Listener could be configured. The specific
-	// reason why each route was dropped should be indicated in the
-	// route's .Status.Conditions field.
-	ListenerReasonDroppedRoutes ListenerConditionReason = "DroppedRoutes"
+	// ListenerReasonDegradedRoutes indicates that not all of the routes
+	// selected by this Listener could be configured. The specific reason
+	// for the degraded route should be indicated in the route's
+	// .Status.Conditions field.
+	ListenerReasonDegradedRoutes ListenerConditionReason = "DegradedRoutes"
 
 	// ListenerReasonInvalidCertificateRef is used when the
 	// Listener has a TLS configuration with a TLS CertificateRef

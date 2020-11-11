@@ -33,23 +33,12 @@ type UDPRoute struct {
 	Status UDPRouteStatus `json:"status,omitempty"`
 }
 
-// UDPRouteRule is the configuration for a given rule.
-type UDPRouteRule struct {
-	// Matches defines which packets match this rule.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	Matches []UDPRouteMatch `json:"matches,omitempty"`
-
-	// ForwardTo defines the backend(s) where matching requests should be sent.
-	// +optional
-	// +kubebuilder:validation:MaxItems=4
-	ForwardTo []RouteForwardTo `json:"forwardTo,omitempty"`
-}
-
 // UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpec struct {
 	// Rules are a list of UDP matchers and actions.
+	//
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	Rules []UDPRouteRule `json:"rules"`
 
 	// Gateways defines which Gateways can use this Route.
@@ -62,21 +51,36 @@ type UDPRouteStatus struct {
 	RouteStatus `json:",inline"`
 }
 
+// UDPRouteRule is the configuration for a given rule.
+type UDPRouteRule struct {
+	// Matches define conditions used for matching the rule against
+	// incoming UDP connections. Each match is independent, i.e. this
+	// rule will be matched if **any** one of the matches is satisfied.
+	// If unspecified, all requests from the associated gateway UDP
+	// listener will match.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=8
+	Matches []UDPRouteMatch `json:"matches,omitempty"`
+
+	// ForwardTo defines the backend(s) where matching requests should
+	// be sent.
+	//
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=4
+	ForwardTo []RouteForwardTo `json:"forwardTo"`
+}
+
 // UDPRouteMatch defines the predicate used to match packets to a
 // given action.
 type UDPRouteMatch struct {
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  The resource may be "configmap" (use the empty
-	// string for the group) or an implementation-defined resource (for
-	// example, resource "myroutematchers" in group "networking.acme.io").
-	// Omitting or specifying the empty string for both the resource and
-	// group indicates that the resource is "configmaps".
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// "match" behavior.  For example, resource "myudproutematcher" in group
+	// "networking.acme.io". If the referent cannot be found, the rule is not
+	// included in the route. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
+	// status for this route should be updated with a condition that describes
+	// the error more specifically.
 	//
 	// Support: custom
 	//

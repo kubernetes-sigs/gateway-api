@@ -174,7 +174,9 @@ type HTTPRouteRule struct {
 	// Conformance-levels at this level are defined based on the type of filter:
 	// - ALL core filters MUST be supported by all implementations.
 	// - Implementers are encouraged to support extended filters.
-	// - Implementation-specific custom filters have no API guarantees across implementations.
+	// - Implementation-specific custom filters have no API guarantees across
+	//   implementations.
+	//
 	// Specifying a core filter multiple times has unspecified or custom conformance.
 	//
 	// Support: core
@@ -184,6 +186,10 @@ type HTTPRouteRule struct {
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
 	// ForwardTo defines the backend(s) where matching requests should be sent.
+	// If unspecified, the rule performs no forwarding. If unspecified and no
+	// filters are specified that would result in a response being sent, a 503
+	// error code is returned.
+	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=4
 	ForwardTo []HTTPRouteForwardTo `json:"forwardTo,omitempty"`
@@ -304,12 +310,12 @@ type HTTPRouteMatch struct {
 	Headers *HTTPHeaderMatch `json:"headers"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  For example, resource "myroutematcher" in group
-	// "networking.acme.io". If the referent cannot be found, the route must
-	// be dropped from the Gateway. The controller should raise the
-	// "ResolvedRefs" condition on the Gateway with the "DroppedRoutes"
-	// reason. The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// "match" behavior. For example, resource "myroutematcher" in group
+	// "networking.acme.io". If the referent cannot be found, the rule is not
+	// included in the route. The controller should raise the "ResolvedRefs"
+	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
+	// status for this route should be updated with a condition that describes
+	// the error more specifically.
 	//
 	// Support: custom
 	//
@@ -457,11 +463,10 @@ type HTTPRequestMirrorFilter struct {
 	// BackendRef and ServiceName are specified, ServiceName will be given
 	// precedence.
 	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
 	//
 	// Support: Core
 	//
@@ -473,11 +478,10 @@ type HTTPRequestMirrorFilter struct {
 	// both BackendRef and ServiceName are specified, ServiceName will be given
 	// precedence.
 	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
 	//
 	// Support: Custom
 	//

@@ -1208,7 +1208,7 @@ func (in *TLSRouteMatch) DeepCopyInto(out *TLSRouteMatch) {
 	*out = *in
 	if in.SNIs != nil {
 		in, out := &in.SNIs, &out.SNIs
-		*out = make([]string, len(*in))
+		*out = make([]Hostname, len(*in))
 		copy(*out, *in)
 	}
 	if in.ExtensionRef != nil {
