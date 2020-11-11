@@ -351,6 +351,18 @@
 
 
   <li class="md-nav__item">
+    <a href="../multiple-ns/" title="Multiple namespaces and routes" class="md-nav__link">
+      Multiple namespaces and routes
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../tls/" title="TLS" class="md-nav__link">
       TLS
     </a>
@@ -603,7 +615,6 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: my-gateway
-  namespace: default
 spec:
   gatewayClassName: acme-lb
   listeners:  # Use GatewayClass defaults for listener definition.
@@ -615,7 +626,7 @@ spec:
         matchLabels:
           app: foo
       namespaces:
-        from: &quot;All&quot;
+        from: &quot;Same&quot;
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -692,13 +703,13 @@ not uninstall these CRDs.</p>
           </a>
         
         
-          <a href="../tls/" title="TLS" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../multiple-ns/" title="Multiple namespaces and routes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                TLS
+                Multiple namespaces and routes
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

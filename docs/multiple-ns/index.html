@@ -36,7 +36,7 @@
     
     
       
-        <title>Introduction - Kubernetes Service APIs</title>
+        <title>Multiple namespaces and routes - Kubernetes Service APIs</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#guides" tabindex="1" class="md-skip">
+      <a href="#routes-in-multiple-namespaces" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Introduction
+                Multiple namespaces and routes
               
             </span>
           
@@ -266,20 +266,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-    <a href="./" title="Introduction" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../guides/" title="Introduction" class="md-nav__link">
       Introduction
     </a>
-    
   </li>
 
         
@@ -299,11 +290,20 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../multiple-ns/" title="Multiple namespaces and routes" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+    <a href="./" title="Multiple namespaces and routes" class="md-nav__link md-nav__link--active">
       Multiple namespaces and routes
     </a>
+    
   </li>
 
         
@@ -472,14 +472,134 @@
               
                 
                 
-                <h1 id="guides">Guides</h1>
-<p>Guides demonstrate and provide examples of how to use the API.
-Please checkout one of the following guides:</p>
+                <h1 id="routes-in-multiple-namespaces">Routes in multiple namespaces</h1>
+<p>With the Service APIs, a single Gateway can target routes across multiple
+namespaces. </p>
+<p>This guide assumes that you have installed Service APIs CRDs and a conformant
+controller.</p>
+<p>In the following example:</p>
 <ul>
-<li><a href="../getting-started/">Getting started</a></li>
-<li><a href="../tls/">Configuring TLS</a></li>
-<li><a href="../multiple-ns/">Routes in multiple namespaces</a></li>
+<li><code>acme-lb</code> GatewayClass: The GatewayClass responsible for satisfying Gateway
+  and Route resources.</li>
+<li><code>multi-ns-gateaway</code> Gateway: The Gateway is configured with a single listener
+  on port 80 which selects routes from <strong>all namespaces</strong> which have the label
+  <code>product: baz</code>. Notice how the <code>routes.namespaces.from</code> field in the listener
+  is set to <code>All</code>.</li>
+<li><code>service-apis-example-ns1</code> and <code>service-apis-example-ns2</code> Namespaces: These
+  are two namespaces in which we route resources are installed.</li>
+<li><code>http-app-1</code> and <code>http-app-2</code> HTTPRoutes: These are two resources that are
+  installed in separate namespaces. These routes will be picked up by
+  <code>multi-ns-gateway</code> resource for the following reasons:<ul>
+<li>Both have the <code>product: baz</code> label on them.</li>
+<li><code>http-app-1</code> HTTPRoute has <code>spec.gateways.allow</code> set to <code>All</code>.  The route
+  owner here has opted to allow <strong>all</strong> Gateways in the cluster to bind to
+  this Route.</li>
+<li><code>http-app-2</code> HTTPRoute has <code>spec.gateways.allow</code> set to <code>FromList</code> and
+  contains a reference to the <code>multi-ns-gateway</code> in <code>default</code> namespace. In
+  this case, no other Gateway can bind to this route.  explictly set this
+  field so that Gateways from other namespaces can target the route.</li>
 </ul>
+</li>
+</ul>
+<pre><code>kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+spec:
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: multi-ns-gateway
+  namespace: default
+spec:
+  gatewayClassName: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - protocol: HTTP
+    port: 80
+    routes:
+      kind: HTTPRoute
+      selector:
+        matchLabels:
+          product: baz
+      namespaces:
+        from: &quot;All&quot;
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: service-apis-example-ns1
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  namespace: service-apis-example-ns1
+  labels:
+    product: baz
+spec:
+  gateways:
+    allow: All
+  hostnames:
+  - &quot;foo.com&quot;
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /bar
+    forwardTo:
+    - serviceName: my-foo-service1
+      port: 8080
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          magic: foo
+      path:
+        type: Prefix
+        value: /some/thing
+    forwardTo:
+    - serviceName: my-foo-service2
+      port: 8080
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: service-apis-example-ns2
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-2
+  namespace: service-apis-example-ns2
+  labels:
+    product: baz
+spec:
+  gateways:
+    allow: FromList
+    gatewayRefs:
+    - name: multi-ns-gateway
+      namespace: default
+  hostnames:
+  - &quot;bar.com&quot;
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /
+    forwardTo:
+    - serviceName: my-bar-service1
+      port: 8080
+</code></pre>
+
+<p>Please note that this guide illustrates this feature for HTTPRoute resource
+only as an example. The same can be accomplished with other route types as
+well.</p>
                 
                   
                 
@@ -501,7 +621,7 @@ Please checkout one of the following guides:</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../security-model/" title="Security Model" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -510,19 +630,19 @@ Please checkout one of the following guides:</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Security Model
+                Getting started
               </span>
             </div>
           </a>
         
         
-          <a href="../getting-started/" title="Getting started" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../tls/" title="TLS" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Getting started
+                TLS
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
