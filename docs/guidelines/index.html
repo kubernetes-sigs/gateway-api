@@ -36,7 +36,7 @@
     
     
       
-        <title>Community - Kubernetes Service APIs</title>
+        <title>Implementation Guidelines - Kubernetes Service APIs</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#how-to-contribute" tabindex="1" class="md-skip">
+      <a href="#implementation-guidelines" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Community
+                Implementation Guidelines
               
             </span>
           
@@ -185,10 +185,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2" checked>
     
     <label class="md-nav__link" for="nav-2">
       Concepts
@@ -240,11 +242,76 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../guidelines/" title="Implementation Guidelines" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Implementation Guidelines
+      </label>
+    
+    <a href="./" title="Implementation Guidelines" class="md-nav__link md-nav__link--active">
       Implementation Guidelines
     </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#single-resource-consistency" class="md-nav__link">
+    Single resource consistency
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conflicts" class="md-nav__link">
+    Conflicts
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#conformance" class="md-nav__link">
+    Conformance
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#conformance-expectations" class="md-nav__link">
+    Conformance expectations
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
   </li>
 
         
@@ -377,12 +444,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
     
     <label class="md-nav__link" for="nav-5">
       Contributing
@@ -422,97 +487,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Community
-      </label>
-    
-    <a href="./" title="Community" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
       Community
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#feedback-and-bug-reports" class="md-nav__link">
-    Feedback and Bug Reports
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#communications" class="md-nav__link">
-    Communications
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#meetings" class="md-nav__link">
-    Meetings
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#office-hours" class="md-nav__link">
-    Office Hours
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#meeting-notes" class="md-nav__link">
-    Meeting notes
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#presentations-talks" class="md-nav__link">
-    Presentations, Talks
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-of-conduct" class="md-nav__link">
-    Code of conduct
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -554,57 +533,36 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#feedback-and-bug-reports" class="md-nav__link">
-    Feedback and Bug Reports
+  <a href="#single-resource-consistency" class="md-nav__link">
+    Single resource consistency
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#communications" class="md-nav__link">
-    Communications
+  <a href="#conflicts" class="md-nav__link">
+    Conflicts
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#meetings" class="md-nav__link">
-    Meetings
+  <a href="#conformance" class="md-nav__link">
+    Conformance
   </a>
   
     <nav class="md-nav">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#office-hours" class="md-nav__link">
-    Office Hours
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#meeting-notes" class="md-nav__link">
-    Meeting notes
+  <a href="#conformance-expectations" class="md-nav__link">
+    Conformance expectations
   </a>
   
 </li>
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#presentations-talks" class="md-nav__link">
-    Presentations, Talks
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-of-conduct" class="md-nav__link">
-    Code of conduct
-  </a>
   
 </li>
       
@@ -625,142 +583,79 @@
               
                 
                 
-                <h1 id="how-to-contribute">How to contribute</h1>
-<p>This page contains links to all of the meeting notes, design docs and related
-discussions around the APIs.</p>
-<h2 id="feedback-and-bug-reports">Feedback and Bug Reports</h2>
-<p>Feedback and bug reports should be filed as <a href="https://github.com/kubernetes-sigs/service-apis/issues/new/choose">Github Issues</a> on this repo.</p>
-<h2 id="communications">Communications</h2>
-<p>Major discussions and notifications will be sent on the <a href="https://groups.google.com/forum/#!forum/kubernetes-sig-network">SIG-NETWORK mailing
-list</a>.</p>
-<p>We also have a <a href="https://kubernetes.slack.com/archives/CR0H13KGA">Slack channel (sig-network-service-apis)</a> on k8s.io for day-to-day
-questions, discussions.</p>
-<h2 id="meetings">Meetings</h2>
-<p>Meetings discussing the evolution of the service APIs will alternate times to
-accommodate participants from various time zones. This calendar includes all
-Service APIs meetings as well as any other SIG-Network meetings.</p>
-<p><iframe
-  src="https://calendar.google.com/calendar/embed?src=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&ctz=America%2FLos_Angeles"
-  style="border: 0" width="800" height="600" frameborder="0"
-  scrolling="no">
-</iframe></p>
+                <h1 id="implementation-guidelines">Implementation guidelines</h1>
+<p>There are some general design guidelines used throughout this API.</p>
+<h2 id="single-resource-consistency">Single resource consistency</h2>
+<p>The Kubernetes API guarantees consistency only on a single resource level. There
+are a couple of consequences for complex resource graphs as opposed to single
+resources:</p>
 <ul>
-<li>Thursday 10:30 AM Pacific (EMEA Friendly Time) <a target="_blank" href="https://zoom.us/j/140577552">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=NHY3dDhnN2tiM242M2Rqbzc0cTQ3cWI5dXNfMjAyMDA0MTZUMTczMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a></li>
-<li>Thursday 4:30 (16:30) PM Pacific (APAC Friendly Time) <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MTVxNzV2YzIzdTQwdHA2azRicTdoYnZvZDFfMjAyMDA0MDlUMjMzMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a></li>
+<li>Error checking of properties spanning multiple resource will be asynchronous
+    and eventually consistent. Simple syntax checks will be possible at the
+    single resource level, but cross resource dependencies will need to be
+    handled by the controller.</li>
+<li>Controllers will need to handle broken links between resources and/or
+    mismatched configuration.</li>
 </ul>
-<h3 id="office-hours">Office Hours</h3>
-<p>In addition to weekly meetings, we have informal weekly office hours meetings
-on Wednesdays.</p>
+<h2 id="conflicts">Conflicts</h2>
+<p>Separation and delegation of responsibility among independent actors (e.g
+between cluster ops and application developers) can result in conflicts in the
+configuration. For example, two application teams may inadvertently submit
+configuration for the same HTTP path.</p>
+<p>In most cases, guidance for conflict resolution is provided along with the
+documentation for fields that may have a conflict. If a conflict does not have a
+prescribed resolution, the following guiding principles should be applied:</p>
 <ul>
-<li>Wednesday 3:00 (15:00) PM Pacific <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=N2VlZWhzanNlbjhvcjRsZjdyZ25kZG9tMTYgODhmZTFsM3FmbjJiNnIxMWs4dW01YW03NmNAZw&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a></li>
+<li>Prefer not to break things that are working.</li>
+<li>Drop as little traffic as possible.</li>
+<li>Provide a consistent experience when conflicts occur.</li>
+<li>Make it clear which path has been chosen when a conflict has been identified.
+  Where possible, this should be communicated by setting appropriate status
+  conditions on relevant resources.</li>
+<li>More specific matches should be given precedence over less specific ones.</li>
+<li>The resource with the oldest creation timestamp wins.</li>
+<li>If everything else is equivalent (including creation timestamp), precedences
+  should be given to the resource appearing first in alphabetical order
+  (namespace/name). For example, foo/bar would be given precedence over foo/baz.</li>
 </ul>
-<h3 id="meeting-notes">Meeting notes</h3>
-<p>Meeting agendas and notes are recorded in the <a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes doc</a>.</p>
-<p>All meetings are recorded and automatically uploaded to youtube:
-<a href="https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb">Meeting recordings</a>.</p>
-<p>Some initial recordings of this working group were done manually and can be
-found in the below table:</p>
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Future meetings</td>
-<td>Check the calendar</td>
-</tr>
-<tr>
-<td>February 27, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/QoInpFSTQbQ">recording</a></td>
-</tr>
-<tr>
-<td>February 20, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/i_oDQuPEhd8">recording</a></td>
-</tr>
-<tr>
-<td>February 13, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/bdFLubKi9_0">recording</a></td>
-</tr>
-<tr>
-<td>February 6, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/XvpCFaTrtBA">recording</a></td>
-</tr>
-<tr>
-<td>January 30, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/cTTqIR3muGk">recording</a></td>
-</tr>
-<tr>
-<td>January 23, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, recording TODO</td>
-</tr>
-<tr>
-<td>January 16, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/ydA-epcZJQo">recording</a></td>
-</tr>
-<tr>
-<td>January 9, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/C3zO67lXGrg">recording</a></td>
-</tr>
-<tr>
-<td>January 2, 2020</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, recording didn't work :-( look at the notes</td>
-</tr>
-<tr>
-<td>December 19, 2019</td>
-<td><a href="https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit">meeting notes</a>, <a href="https://youtu.be/FIcySpPkGa4">recording</a></td>
-</tr>
-<tr>
-<td>November, 2019</td>
-<td><a href="https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview">Kubecon 2019 San Diego: API evolution design discussion</a></td>
-</tr>
-<tr>
-<td>November, 2019</td>
-<td><a href="https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview">SIG-NETWORK: Ingress Evolution Sync</a></td>
-</tr>
-<tr>
-<td>May, 2019</td>
-<td><a href="https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview">Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="presentations-talks">Presentations, Talks</h2>
-<table>
-<thead>
-<tr>
-<th>Date</th>
-<th>Title</th>
-<th></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>November, 2019</td>
-<td><a href="https://static.sched.com/hosted_files/kccncna19/a5/Kubecon%20San%20Diego%202019%20-%20Evolving%20the%20Kubernetes%20Ingress%20APIs%20to%20GA%20and%20Beyond%20%5BPUBLIC%5D.pdf">Kubecon 2019 San Diego: Evolving the Kubernetes Ingress APIs to GA and Beyond</a></td>
-<td><a href="https://static.sched.com/hosted_files/kccncna19/a5/Kubecon%20San%20Diego%202019%20-%20Evolving%20the%20Kubernetes%20Ingress%20APIs%20to%20GA%20and%20Beyond%20%5BPUBLIC%5D.pdf">slides</a>, <a href="https://www.youtube.com/watch?v=cduG0FrjdJA">video</a></td>
-</tr>
-<tr>
-<td>November, 2019</td>
-<td>Kubecon 2019 San Diego: SIG-NETWORK Service/Ingress Evolution Discussion</td>
-<td><a href="https://docs.google.com/presentation/d/1s0scrQCCFLJMVjjGXGQHoV6_4OIZkaIGjwj4wpUUJ7M">slides</a></td>
-</tr>
-<tr>
-<td>May, 2019</td>
-<td><a href="https://kccnceu19.sched.com/event/MPb6/ingress-v2-and-multicluster-services-rohit-ramkumar-bowei-du-google">Kubecon 2019 Barcelona: Ingress V2 and Multicluster Services</a></td>
-<td><a href="https://static.sched.com/hosted_files/kccnceu19/97/%5Bwith%20speaker%20notes%5D%20Kubecon%20EU%202019_%20Ingress%20V2%20%26%20Multi-Cluster%20Services.pdf">slides</a>, <a href="https://www.youtube.com/watch?v=Ne9UJL6irXY&amp;t=1s">video</a></td>
-</tr>
-<tr>
-<td>March, 2018</td>
-<td>SIG-NETWORK: Ingress user survey</td>
-<td><a href="https://github.com/bowei/k8s-ingress-survey-2018">data</a>, <a href="https://github.com/bowei/k8s-ingress-survey-2018/blob/master/survey.pdf">slides</a></td>
-</tr>
-</tbody>
-</table>
-<h2 id="code-of-conduct">Code of conduct</h2>
-<p>Participation in the Kubernetes community is governed by the <a href="https://github.com/kubernetes/community/blob/master/code-of-conduct.md">Kubernetes Code of
-Conduct</a></p>
+<h2 id="conformance">Conformance</h2>
+<p>As this API aims to cover a wide set of implementations and use cases,
+it will not be possible for all implementations to support <em>all</em>
+features at the present. However, we do expect the set of features
+supported to converge eventually. For a given feature, users will be
+guaranteed that features in the API will be portable between providers
+if the feature is supported.</p>
+<p>To model this in the API, we are taking a similar approach as with
+<a href="https://github.com/kubernetes/enhancements/tree/master/keps/sig-architecture/960-conformance-behaviors">sig-arch</a> work on conformance profiles. Features as
+described in the API spec will be divided into three major categories:</p>
+<ul>
+<li><strong>CORE</strong> features will be portable and we expect that there is a
+  reasonable roadmap for ALL implementations towards support of APIs
+  in this category.</li>
+<li><strong>EXTENDED</strong> features are those that are portable but not
+  universally supported across implementations. Those implementations
+  that support the feature will have the same behavior and
+  semantics. It is expected that some number of EXTENDED features will
+  eventually migrate into the CORE. EXTENDED features will be part of
+  the API types and schema.</li>
+<li><strong>CUSTOM</strong> features are those that are not portable and are
+  vendor-specific. CUSTOM features will not have API types and schema
+  except via generic extension points.</li>
+</ul>
+<p>Behavior and feature in the CORE and EXTENDED set will be defined and
+validated via behavior-driven conformance tests. CUSTOM features will
+not be covered by conformance tests.</p>
+<p>By including and standardizing EXTENDED features in the API spec, we
+expect to be able to converge on portable subsets of the API among
+implementations without compromising overall API support. Lack of
+universal support will not be a blocker towards developing portable
+feature sets. Standardizing on spec will make it easier to eventually
+graduate to CORE when support is widespread.</p>
+<h3 id="conformance-expectations">Conformance expectations</h3>
+<p>We expect there will be varying levels of conformance among the
+different providers in the early days of this API. Users can use the
+results of the conformance tests to understand areas where there may
+be differences in behavior from the spec.</p>
                 
                   
                 
@@ -782,7 +677,7 @@ Conduct</a></p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../enhancement-requests/" title="Enhancement requests" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../security-model/" title="Security Model" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -791,19 +686,19 @@ Conduct</a></p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Enhancement requests
+                Security Model
               </span>
             </div>
           </a>
         
         
-          <a href="../faq/" title="FAQ" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../guides/" title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                FAQ
+                Introduction
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">

@@ -304,56 +304,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-considerations" class="md-nav__link">
-    Design considerations
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-resource-consistency" class="md-nav__link">
-    Single resource consistency
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conflicts" class="md-nav__link">
-    Conflicts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conformance" class="md-nav__link">
-    Conformance
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conformance-expectations" class="md-nav__link">
-    Conformance expectations
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#extension-points" class="md-nav__link">
     Extension points
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -388,6 +341,18 @@
   <li class="md-nav__item">
     <a href="../security-model/" title="Security Model" class="md-nav__link">
       Security Model
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../guidelines/" title="Implementation Guidelines" class="md-nav__link">
+      Implementation Guidelines
     </a>
   </li>
 
@@ -679,56 +644,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-considerations" class="md-nav__link">
-    Design considerations
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#single-resource-consistency" class="md-nav__link">
-    Single resource consistency
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conflicts" class="md-nav__link">
-    Conflicts
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#conformance" class="md-nav__link">
-    Conformance
-  </a>
-  
-    <nav class="md-nav">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#conformance-expectations" class="md-nav__link">
-    Conformance expectations
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#extension-points" class="md-nav__link">
     Extension points
   </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -831,80 +749,7 @@ relationships between the different resources:</p>
 <p>TLS is configured on Gateway listeners. Additionally, TLS certificates
 can be configured on route objects for certain self-service use cases.</p>
 <p>Please refer to <a href="../tls/">TLS details</a> for a deep dive on TLS.</p>
-<h2 id="design-considerations">Design considerations</h2>
-<p>There are some general design guidelines used throughout this API.</p>
-<h3 id="single-resource-consistency">Single resource consistency</h3>
-<p>The Kubernetes API guarantees consistency only on a single resource level. There
-are a couple of consequences for complex resource graphs as opposed to single
-resources:</p>
-<ul>
-<li>Error checking of properties spanning multiple resource will be asynchronous
-    and eventually consistent. Simple syntax checks will be possible at the
-    single resource level, but cross resource dependencies will need to be
-    handled by the controller.</li>
-<li>Controllers will need to handle broken links between resources and/or
-    mismatched configuration.</li>
-</ul>
-<h3 id="conflicts">Conflicts</h3>
-<p>Separation and delegation of responsibility among independent actors (e.g
-between cluster ops and application developers) can result in conflicts in the
-configuration. For example, two application teams may inadvertently submit
-configuration for the same HTTP path.</p>
-<p>In most cases, guidance for conflict resolution is provided along with the
-documentation for fields that may have a conflict. If a conflict does not have a
-prescribed resolution, the following guiding principles should be applied:</p>
-<ul>
-<li>Prefer not to break things that are working.</li>
-<li>Drop as little traffic as possible.</li>
-<li>Provide a consistent experience when conflicts occur.</li>
-<li>Make it clear which path has been chosen when a conflict has been identified.
-  Where possible, this should be communicated by setting appropriate status
-  conditions on relevant resources.</li>
-<li>More specific matches should be given precedence over less specific ones.</li>
-<li>The resource with the oldest creation timestamp wins.</li>
-<li>If everything else is equivalent (including creation timestamp), precedences
-  should be given to the resource appearing first in alphabetical order
-  (namespace/name). For example, foo/bar would be given precedence over foo/baz.</li>
-</ul>
-<h3 id="conformance">Conformance</h3>
-<p>As this API aims to cover a wide set of implementations and use cases,
-it will not be possible for all implementations to support <em>all</em>
-features at the present. However, we do expect the set of features
-supported to converge eventually. For a given feature, users will be
-guaranteed that features in the API will be portable between providers
-if the feature is supported.</p>
-<p>To model this in the API, we are taking a similar approach as with
-<a href="https://github.com/kubernetes/enhancements/tree/master/keps/sig-architecture/960-conformance-behaviors">sig-arch</a> work on conformance profiles. Features as
-described in the API spec will be divided into three major categories:</p>
-<ul>
-<li><strong>CORE</strong> features will be portable and we expect that there is a
-  reasonable roadmap for ALL implementations towards support of APIs
-  in this category.</li>
-<li><strong>EXTENDED</strong> features are those that are portable but not
-  universally supported across implementations. Those implementations
-  that support the feature will have the same behavior and
-  semantics. It is expected that some number of EXTENDED features will
-  eventually migrate into the CORE. EXTENDED features will be part of
-  the API types and schema.</li>
-<li><strong>CUSTOM</strong> features are those that are not portable and are
-  vendor-specific. CUSTOM features will not have API types and schema
-  except via generic extension points.</li>
-</ul>
-<p>Behavior and feature in the CORE and EXTENDED set will be defined and
-validated via behavior-driven conformance tests. CUSTOM features will
-not be covered by conformance tests.</p>
-<p>By including and standardizing EXTENDED features in the API spec, we
-expect to be able to converge on portable subsets of the API among
-implementations without compromising overall API support. Lack of
-universal support will not be a blocker towards developing portable
-feature sets. Standardizing on spec will make it easier to eventually
-graduate to CORE when support is widespread.</p>
-<h4 id="conformance-expectations">Conformance expectations</h4>
-<p>We expect there will be varying levels of conformance among the
-different providers in the early days of this API. Users can use the
-results of the conformance tests to understand areas where there may
-be differences in behavior from the spec.</p>
-<h3 id="extension-points">Extension points</h3>
+<h2 id="extension-points">Extension points</h2>
 <p>A number of extension points are provided in the API to provide flexibility in
 addressing the large number of use-cases that cannot be addressed by a general
 purpose API.</p>
