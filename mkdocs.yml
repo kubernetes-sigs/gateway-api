@@ -22,6 +22,7 @@ nav:
       - Introduction: guides.md
       - Getting started: getting-started.md
       - Simple Gateway: simple-gateway.md
+      - HTTP routing: http-routing.md 
       - Multiple namespaces and routes: multiple-ns.md
       - TLS: tls.md
   - References:

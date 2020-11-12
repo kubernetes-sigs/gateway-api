@@ -5,5 +5,6 @@ Please checkout one of the following guides:
 
 - [Getting started](getting-started.md)
 - [Simple Gateway](simple-gateway.md)
+- [HTTP routing](http-routing.md)
 - [Configuring TLS](tls.md)
 - [Routes in multiple namespaces](multiple-ns.md)

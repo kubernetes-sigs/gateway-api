@@ -1,0 +1,21 @@
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: bar-route
+  labels:
+    gateway: prod-web-gw
+spec:
+  hostnames:
+  - "bar.example.com"
+  rules:
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          env: canary
+    forwardTo:
+    - serviceName: bar-svc-canary
+      port: 8080
+  - forwardTo:
+    - serviceName: bar-svc
+      port: 8080
