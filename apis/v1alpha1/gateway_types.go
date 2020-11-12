@@ -636,13 +636,20 @@ const (
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
-// ListenerStatus is the status associated with a Listener port.
+// ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
-	// Port is the unique Listener port value for which this message
-	// is reporting the status. If more than one Gateway Listener
-	// shares the same port value, this message reports the combined
-	// status of all such Listeners.
+	// Port is the unique Listener port value for which this message is
+	// reporting the status.
 	Port PortNumber `json:"port"`
+
+	// Protocol is the Listener protocol value for which this message is
+	// reporting the status.
+	Protocol ProtocolType `json:"protocol"`
+
+	// Hostname is the Listener hostname value for which this message is
+	// reporting the status.
+	// +optional
+	Hostname *Hostname `json:"hostname,omitempty"`
 
 	// Conditions describe the current condition of this listener.
 	//

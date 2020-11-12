@@ -326,7 +326,7 @@ spec:
               listeners:
                 description: Listeners provide status for each unique listener port defined in the Spec.
                 items:
-                  description: ListenerStatus is the status associated with a Listener port.
+                  description: ListenerStatus is the status associated with a Listener.
                   properties:
                     conditions:
                       description: Conditions describe the current condition of this listener.
@@ -376,15 +376,24 @@ spec:
                       x-kubernetes-list-map-keys:
                       - type
                       x-kubernetes-list-type: map
+                    hostname:
+                      description: Hostname is the Listener hostname value for which this message is reporting the status.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
                     port:
-                      description: Port is the unique Listener port value for which this message is reporting the status. If more than one Gateway Listener shares the same port value, this message reports the combined status of all such Listeners.
+                      description: Port is the unique Listener port value for which this message is reporting the status.
                       format: int32
                       maximum: 65535
                       minimum: 1
                       type: integer
+                    protocol:
+                      description: Protocol is the Listener protocol value for which this message is reporting the status.
+                      type: string
                   required:
                   - conditions
                   - port
+                  - protocol
                   type: object
                 maxItems: 64
                 type: array
