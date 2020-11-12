@@ -482,22 +482,23 @@ controller.</p>
 <li><code>acme-lb</code> GatewayClass: The GatewayClass responsible for satisfying Gateway
   and Route resources.</li>
 <li><code>multi-ns-gateaway</code> Gateway: The Gateway is configured with a single listener
-  on port 80 which selects routes from <strong>all namespaces</strong> which have the label
-  <code>product: baz</code>. Notice how the <code>routes.namespaces.from</code> field in the listener
-  is set to <code>All</code>.</li>
+  on port 80 which selects routes that have the label <code>product: baz</code> in any
+  namespace.  Notice how the <code>routes.namespaces.from</code> field in the listener is
+  set to <code>All</code>.</li>
 <li><code>service-apis-example-ns1</code> and <code>service-apis-example-ns2</code> Namespaces: These
-  are two namespaces in which we route resources are installed.</li>
+  are the namespaces in which route resources are instantiated.</li>
 <li><code>http-app-1</code> and <code>http-app-2</code> HTTPRoutes: These are two resources that are
-  installed in separate namespaces. These routes will be picked up by
-  <code>multi-ns-gateway</code> resource for the following reasons:<ul>
+  installed in separate namespaces. These routes will be bound to Gateway
+  <code>multi-ns-gateway</code> for the following reasons:<ul>
 <li>Both have the <code>product: baz</code> label on them.</li>
 <li><code>http-app-1</code> HTTPRoute has <code>spec.gateways.allow</code> set to <code>All</code>.  The route
-  owner here has opted to allow <strong>all</strong> Gateways in the cluster to bind to
-  this Route.</li>
+  owner has opted to allow <strong>all</strong> Gateways in the cluster to bind to this
+  Route.</li>
 <li><code>http-app-2</code> HTTPRoute has <code>spec.gateways.allow</code> set to <code>FromList</code> and
-  contains a reference to the <code>multi-ns-gateway</code> in <code>default</code> namespace. In
-  this case, no other Gateway can bind to this route.  explictly set this
-  field so that Gateways from other namespaces can target the route.</li>
+  contains a reference to the <code>multi-ns-gateway</code> in <code>default</code> namespace.
+  This means that only the specified Gateway resource can bind to this
+  route.  Additional Gateways may be added to this list to allow them to
+  bind to this route.</li>
 </ul>
 </li>
 </ul>
