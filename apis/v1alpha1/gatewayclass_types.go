@@ -23,7 +23,7 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster
+// +kubebuilder:resource:scope=Cluster,shortName=gc
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Controller",type=string,JSONPath=`.spec.controller`
 // +k8s:openapi-gen=true

@@ -22,6 +22,7 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:shortName=gtw
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Class",type=string,JSONPath=`.spec.gatewayClassName`
 
