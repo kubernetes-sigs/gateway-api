@@ -91,7 +91,9 @@ solution for this built into the API. We continue to [explore
 options](https://github.com/kubernetes-sigs/service-apis/issues/375) to improve
 support for this. Until then, we recommend using a policy agent such as Open
 Policy Agent and [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
-to enforce these kinds of policies.
+to enforce these kinds of policies. For reference, we've created an [example of
+configuration](https://github.com/open-policy-agent/gatekeeper-library/pull/24)
+that could be used for this.
   
 ## Route Namespaces
 Service APIs allow Gateways to select Routes across multiple Namespaces.
