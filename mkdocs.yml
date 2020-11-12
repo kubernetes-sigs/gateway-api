@@ -14,6 +14,7 @@ nav:
       API concepts: concepts.md
       API resources: resources.md
       Security Model: security-model.md
+      Implementation Guidelines: guidelines.md
   - Guides:
     - Introduction: guides.md
     - Getting started: getting-started.md
