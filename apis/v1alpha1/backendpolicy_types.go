@@ -22,6 +22,7 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:shortName=bp
 // +kubebuilder:subresource:status
 
 // BackendPolicy defines policies associated with backends. For the purpose of

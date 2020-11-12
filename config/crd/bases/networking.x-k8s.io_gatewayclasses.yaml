@@ -13,6 +13,8 @@ spec:
     kind: GatewayClass
     listKind: GatewayClassList
     plural: gatewayclasses
+    shortNames:
+    - gc
     singular: gatewayclass
   scope: Cluster
   versions:
