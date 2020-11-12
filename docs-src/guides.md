@@ -5,3 +5,4 @@ Please checkout one of the following guides:
 
 - [Getting started](getting-started.md)
 - [Configuring TLS](tls.md)
+- [Routes in multiple namespaces](multiple-ns.md)
