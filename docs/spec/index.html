@@ -2883,6 +2883,7 @@ Valid HeaderMatchType values are:</p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TLSRouteMatch">TLSRouteMatch</a>)
 </p>
 <p>
@@ -3066,7 +3067,7 @@ field.</p>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayStatus">GatewayStatus</a>)
 </p>
 <p>
-<p>ListenerStatus is the status associated with a Listener port.</p>
+<p>ListenerStatus is the status associated with a Listener.</p>
 </p>
 <table>
 <thead>
@@ -3086,10 +3087,37 @@ PortNumber
 </em>
 </td>
 <td>
-<p>Port is the unique Listener port value for which this message
-is reporting the status. If more than one Gateway Listener
-shares the same port value, this message reports the combined
-status of all such Listeners.</p>
+<p>Port is the unique Listener port value for which this message is
+reporting the status.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>protocol</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.ProtocolType">
+ProtocolType
+</a>
+</em>
+</td>
+<td>
+<p>Protocol is the Listener protocol value for which this message is
+reporting the status.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>hostname</code></br>
+<em>
+<a href="#networking.x-k8s.io/v1alpha1.Hostname">
+Hostname
+</a>
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Hostname is the Listener hostname value for which this message is
+reporting the status.</p>
 </td>
 </tr>
 <tr>
@@ -3204,7 +3232,8 @@ Valid PathMatchType values are:</p>
 (<code>string</code> alias)</p></h3>
 <p>
 (<em>Appears on:</em>
-<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>)
+<a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
+<a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>)
 </p>
 <p>
 <p>ProtocolType defines the application protocol accepted by a Listener.
