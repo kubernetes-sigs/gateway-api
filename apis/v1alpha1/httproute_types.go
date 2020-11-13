@@ -214,8 +214,8 @@ const (
 	PathMatchImplementationSpecific PathMatchType = "ImplementationSpecific"
 )
 
-// HeaderMatchType specifies the semantics of how HTTP headers should be compared.
-// Valid HeaderMatchType values are:
+// HeaderMatchType specifies the semantics of how HTTP header values should be
+// compared. Valid HeaderMatchType values are:
 //
 // * "Exact"
 // * "RegularExpression"
@@ -226,9 +226,6 @@ type HeaderMatchType string
 
 // HeaderMatchType constants.
 const (
-	// HeaderMatchTypeExact matches HTTP request-header fields.
-	// Field name matches are case-insensitive while field value matches
-	// are case-sensitive.
 	HeaderMatchExact                  HeaderMatchType = "Exact"
 	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
@@ -255,7 +252,8 @@ type HTTPPathMatch struct {
 	Value string `json:"value"`
 }
 
-// HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.
+// HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
+// headers.
 type HTTPHeaderMatch struct {
 	// Type specifies how to match against the value of the header.
 	//
@@ -267,6 +265,8 @@ type HTTPHeaderMatch struct {
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	//
+	// HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2).
+	//
 	// +kubebuilder:default=Exact
 	Type HeaderMatchType `json:"type,omitempty"`
 
@@ -274,8 +274,8 @@ type HTTPHeaderMatch struct {
 	// It MUST contain at least one entry.
 	//
 	// The HTTP header field name to match is the map key, and the
-	// value of the HTTP header is the map value. HTTP header field
-	// names MUST be matched case-insensitively.
+	// value of the HTTP header is the map value. HTTP header field name matching
+	// MUST be case-insensitive.
 	//
 	// Multiple match values are ANDed together, meaning, a request
 	// must match all the specified headers to select the route.
