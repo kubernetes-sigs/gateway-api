@@ -359,7 +359,7 @@ spec:
                             properties:
                               type:
                                 default: Exact
-                                description: "Type specifies how to match against the value of the header. \n Support: core (Exact) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect."
+                                description: "Type specifies how to match against the value of the header. \n Support: core (Exact) Support: custom (RegularExpression, ImplementationSpecific) \n Since RegularExpression PathType has custom conformance, implementations can support POSIX, PCRE or any other dialects of regular expressions. Please read the implementation's documentation to determine the supported dialect. \n HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2)."
                                 enum:
                                 - Exact
                                 - RegularExpression
@@ -368,7 +368,7 @@ spec:
                               values:
                                 additionalProperties:
                                   type: string
-                                description: "Values is a map of HTTP Headers to be matched. It MUST contain at least one entry. \n The HTTP header field name to match is the map key, and the value of the HTTP header is the map value. HTTP header field names MUST be matched case-insensitively. \n Multiple match values are ANDed together, meaning, a request must match all the specified headers to select the route."
+                                description: "Values is a map of HTTP Headers to be matched. It MUST contain at least one entry. \n The HTTP header field name to match is the map key, and the value of the HTTP header is the map value. HTTP header field name matching MUST be case-insensitive. \n Multiple match values are ANDed together, meaning, a request must match all the specified headers to select the route."
                                 type: object
                             required:
                             - values

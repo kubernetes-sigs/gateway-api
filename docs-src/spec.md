@@ -1604,7 +1604,8 @@ construct.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>)
 </p>
 <p>
-<p>HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request headers.</p>
+<p>HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
+headers.</p>
 </p>
 <table>
 <thead>
@@ -1631,6 +1632,7 @@ Support: custom (RegularExpression, ImplementationSpecific)</p>
 can support POSIX, PCRE or any other dialects of regular expressions.
 Please read the implementation&rsquo;s documentation to determine the supported
 dialect.</p>
+<p>HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2).</p>
 </td>
 </tr>
 <tr>
@@ -1644,8 +1646,8 @@ map[string]string
 <p>Values is a map of HTTP Headers to be matched.
 It MUST contain at least one entry.</p>
 <p>The HTTP header field name to match is the map key, and the
-value of the HTTP header is the map value. HTTP header field
-names MUST be matched case-insensitively.</p>
+value of the HTTP header is the map value. HTTP header field name matching
+MUST be case-insensitive.</p>
 <p>Multiple match values are ANDed together, meaning, a request
 must match all the specified headers to select the route.</p>
 </td>
@@ -2410,8 +2412,8 @@ RouteStatus
 <a href="#networking.x-k8s.io/v1alpha1.HTTPHeaderMatch">HTTPHeaderMatch</a>)
 </p>
 <p>
-<p>HeaderMatchType specifies the semantics of how HTTP headers should be compared.
-Valid HeaderMatchType values are:</p>
+<p>HeaderMatchType specifies the semantics of how HTTP header values should be
+compared. Valid HeaderMatchType values are:</p>
 <ul>
 <li>&ldquo;Exact&rdquo;</li>
 <li>&ldquo;RegularExpression&rdquo;</li>
