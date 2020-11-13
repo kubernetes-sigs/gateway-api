@@ -11,20 +11,24 @@ plugins:
 nav:
   - Introduction: index.md
   - Concepts:
-      API concepts: concepts.md
-      API resources: resources.md
+      API overview: api-overview.md
       Security Model: security-model.md
       Implementation Guidelines: guidelines.md
+  - API Types:
+      GatewayClass: gatewayclass.md
+      Gateway: gateway.md
+      HTTPRoute: httproute.md
   - Guides:
-    - Introduction: guides.md
-    - Getting started: getting-started.md
-    - Multiple namespaces and routes: multiple-ns.md
-    - TLS: tls.md
+      - Introduction: guides.md
+      - Getting started: getting-started.md
+      - Multiple namespaces and routes: multiple-ns.md
+      - TLS: tls.md
   - References:
-    - API specification: spec.md
-    - Releases: releases.md
+      - API specification: spec.md
+      - Releases: releases.md
   - Contributing:
-    - Developer guide: devguide.md
-    - Enhancement requests: enhancement-requests.md
-    - Community: community.md
+      - Developer guide: devguide.md
+      - Enhancement requests: enhancement-requests.md
+      - Community: community.md
   - FAQ: faq.md
+

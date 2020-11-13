@@ -1,0 +1,1219 @@
+
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      
+      
+      
+      
+        <meta name="lang:clipboard.copy" content="Copy to clipboard">
+      
+        <meta name="lang:clipboard.copied" content="Copied to clipboard">
+      
+        <meta name="lang:search.language" content="en">
+      
+        <meta name="lang:search.pipeline.stopwords" content="True">
+      
+        <meta name="lang:search.pipeline.trimmer" content="True">
+      
+        <meta name="lang:search.result.none" content="No matching documents">
+      
+        <meta name="lang:search.result.one" content="1 matching document">
+      
+        <meta name="lang:search.result.other" content="# matching documents">
+      
+        <meta name="lang:search.tokenizer" content="[\s\-]+">
+      
+      <link rel="shortcut icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.0.4, mkdocs-material-4.6.0">
+    
+    
+      
+        <title>HTTPRoute - Kubernetes Service APIs</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/application.1b62728e.css">
+      
+      
+    
+    
+      <script src="../assets/javascripts/modernizr.268332fc.js"></script>
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>body,input{font-family:"Roboto","Helvetica Neue",Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Roboto Mono","Courier New",Courier,monospace}</style>
+      
+    
+    <link rel="stylesheet" href="../assets/fonts/material-icons.css">
+    
+    
+    
+      
+    
+    
+  </head>
+  
+    <body dir="ltr">
+  
+    <svg class="md-svg">
+      <defs>
+        
+        
+      </defs>
+    </svg>
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+    
+      <a href="#httproute" tabindex="1" class="md-skip">
+        Skip to content
+      </a>
+    
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+          
+            <i class="md-icon"></i>
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          
+            <span class="md-header-nav__topic">
+              Kubernetes Service APIs
+            </span>
+            <span class="md-header-nav__topic">
+              
+                HTTPRoute
+              
+            </span>
+          
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        
+      </div>
+      
+        <div class="md-flex__cell md-flex__cell--shrink">
+          <div class="md-header-nav__source">
+            
+
+
+  
+
+<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+          </div>
+        </div>
+      
+    </div>
+  </nav>
+</header>
+    
+    <div class="md-container">
+      
+        
+      
+      
+      <main class="md-main" role="main">
+        <div class="md-main__inner md-grid" data-md-component="container">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+      
+        <i class="md-icon"></i>
+      
+    </a>
+    Kubernetes Service APIs
+  </label>
+  
+    <div class="md-nav__source">
+      
+
+
+  
+
+<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+  
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href=".." title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      Concepts
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        Concepts
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../api-overview/" title="API overview" class="md-nav__link">
+      API overview
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../security-model/" title="Security Model" class="md-nav__link">
+      Security Model
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../guidelines/" title="Implementation Guidelines" class="md-nav__link">
+      Implementation Guidelines
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+    
+    <label class="md-nav__link" for="nav-3">
+      API Types
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        API Types
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gatewayclass/" title="GatewayClass" class="md-nav__link">
+      GatewayClass
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gateway/" title="Gateway" class="md-nav__link">
+      Gateway
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        HTTPRoute
+      </label>
+    
+    <a href="./" title="HTTPRoute" class="md-nav__link md-nav__link--active">
+      HTTPRoute
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spec" class="md-nav__link">
+    Spec
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateways" class="md-nav__link">
+    Gateways
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hostnames" class="md-nav__link">
+    Hostnames
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tls" class="md-nav__link">
+    TLS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    Rules
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matches" class="md-nav__link">
+    Matches
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters-optional" class="md-nav__link">
+    Filters (optional)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forwardto-optional" class="md-nav__link">
+    ForwardTo (optional)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    Status
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routestatus" class="md-nav__link">
+    RouteStatus
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateways_1" class="md-nav__link">
+    Gateways
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Guides
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        Guides
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../guides/" title="Introduction" class="md-nav__link">
+      Introduction
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../getting-started/" title="Getting started" class="md-nav__link">
+      Getting started
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../multiple-ns/" title="Multiple namespaces and routes" class="md-nav__link">
+      Multiple namespaces and routes
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../tls/" title="TLS" class="md-nav__link">
+      TLS
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+    
+    <label class="md-nav__link" for="nav-5">
+      References
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        References
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../spec/" title="API specification" class="md-nav__link">
+      API specification
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../releases/" title="Releases" class="md-nav__link">
+      Releases
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
+    
+    <label class="md-nav__link" for="nav-6">
+      Contributing
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-6">
+        Contributing
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../devguide/" title="Developer guide" class="md-nav__link">
+      Developer guide
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../enhancement-requests/" title="Enhancement requests" class="md-nav__link">
+      Enhancement requests
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../community/" title="Community" class="md-nav__link">
+      Community
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../faq/" title="FAQ" class="md-nav__link">
+      FAQ
+    </a>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">Table of contents</label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#spec" class="md-nav__link">
+    Spec
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateways" class="md-nav__link">
+    Gateways
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hostnames" class="md-nav__link">
+    Hostnames
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tls" class="md-nav__link">
+    TLS
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rules" class="md-nav__link">
+    Rules
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#matches" class="md-nav__link">
+    Matches
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filters-optional" class="md-nav__link">
+    Filters (optional)
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forwardto-optional" class="md-nav__link">
+    ForwardTo (optional)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#status" class="md-nav__link">
+    Status
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#routestatus" class="md-nav__link">
+    RouteStatus
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gateways_1" class="md-nav__link">
+    Gateways
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+      
+      
+      
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                
+                <h1 id="httproute">HTTPRoute</h1>
+<p><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a> is a Service APIs type for specifying routing behavior
+of HTTP requests from a Gateway listener to an API object, i.e. Service.</p>
+<h2 id="spec">Spec</h2>
+<p>The specification of an HTTPRoute consists of:</p>
+<ul>
+<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteGateways">Gateways</a>- Define which Gateways can use this HTTPRoute.</li>
+<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.Hostname">Hostnames</a> (optional)- Define a list of hostnames to use for
+  matching the Host header of HTTP requests.</li>
+<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig">TLS</a> (optional)- Defines the TLS certificate to use for
+  Hostnames defined in this Route.</li>
+<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule">Rules</a>- Define a list of rules to perform actions against
+  matching HTTP requests. Each rule consists
+  of <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">matches</a>, <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">filters</a> (optional), and <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a>
+  (optional) fields.</li>
+</ul>
+<p>The following illustrates an HTTPRoute that sends all traffic to one Service:
+<img alt="httproute-basic-example" src="../httproute-basic-example.svg" /></p>
+<h3 id="gateways">Gateways</h3>
+<p>Gateways define which Gateways can use the HTTPRoute. If unspecified, <code>gateways</code>
+defaults to <code>allow: SameNamespace</code> which allows all Gateways in the HTTPRoute's
+namespace.</p>
+<p>The following example allows Gateways from namespace "httproute-ns-example":</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: httproute-example
+  namespace: httproute-ns-example
+spec:
+  gateways:
+    allow: SameNamespace
+</code></pre>
+
+<p>Possible values for <code>allow</code> are:</p>
+<ul>
+<li><code>All</code>: Gateways in any namespace can use this route.</li>
+<li><code>FromList</code>: Only Gateways specified in <code>gatewayRefs</code> may use this route.</li>
+<li><code>SameNamespace</code> (default): Only Gateways in the same namespace may use this
+  route.</li>
+</ul>
+<p>If <code>allow</code> results in preventing the selection of an HTTPRoute by a Gateway, an
+“Admitted: false” condition must be set on the Gateway for this Route.</p>
+<h3 id="hostnames">Hostnames</h3>
+<p>Hostnames define a list of hostnames to match against the Host header of the
+HTTP request. When a match occurs, the HTTPRoute is selected to perform request
+routing based on rules and filters (optional). A hostname is the fully qualified
+domain name of a network host, as defined by <a href="https://tools.ietf.org/html/rfc3986">RFC 3986</a>. Note the
+following deviations from the “host” part of the URI as defined in the RFC:</p>
+<ul>
+<li>IPs are not allowed.</li>
+<li>The : delimiter is not respected because ports are not allowed.</li>
+</ul>
+<p>Incoming requests are matched against hostnames before the HTTPRoute rules are
+evaluated. If no hostname is specified, traffic is routed based on HTTPRoute
+rules and filters (optional).</p>
+<p>The following example defines hostname "my.example.com" and allows Gateways
+from the same namespace as HTTPRoute "httproute-example":</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: httproute-example
+spec:
+  gateways:
+    allow: SameNamespace
+  hostnames:
+  - my.example.com
+</code></pre>
+
+<h3 id="tls">TLS</h3>
+<p>TLS defines the TLS certificate used for hostnames defined in this HTTPRoute.
+This configuration only takes effect if <code>certificate: Allow</code> is set for
+<code>routeOverride</code> in the associated Gateway. For example:</p>
+<pre><code class="yaml">kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tls-basic
+spec:
+  gatewayClassName: acme-lb
+  listeners:
+  - protocol: HTTPS
+    port: 443
+    hostname: foo.example.com
+    tls:
+      certificateRef:
+        kind: Secret
+        group: core
+        name: foo-example-com-cert
+      routeOverride:
+        certificate: Deny
+    routes:
+      kind: HTTPRoute
+  - protocol: HTTPS
+    port: 443
+    hostname: bar.example.com
+    tls:
+      certificateRef:
+        kind: Secret
+        group: core
+        name: bar-example-com-cert
+      routeOverride:
+        certificate: Deny
+    routes:
+      kind: HTTPRoute
+</code></pre>
+
+<p><code>CertificateRef</code> refers to a Kubernetes object that contains a TLS certificate
+and private key. This certificate MUST be used for TLS handshakes for the domain
+this <code>tls</code> is associated with. If an entry in this list omits or specifies the
+empty string for both the <code>group</code> and <code>kind</code>, the resource defaults to “secrets”.</p>
+<p><strong>Notes:</strong></p>
+<ul>
+<li>HTTPRoute selection takes place after the TLS Handshake (ClientHello). Due to
+this, a TLS certificate in an HTTPRoute will take precedence even if the request
+has the potential to match multiple HTTPRoutes (in case multiple HTTPRoutes
+share the same hostname).</li>
+<li>Collisions can happen if multiple HTTPRoutes define a TLS certificate for the
+same hostname. In such case, the certificate in the oldest HTTPRoute is selected.</li>
+</ul>
+<h3 id="rules">Rules</h3>
+<p>Rules define semantics for matching an HTTP request based on conditions,
+optionally executing additional processing steps, and optionally forwarding
+the request to an API object.</p>
+<h4 id="matches">Matches</h4>
+<p>Matches define conditions used for matching an HTTP request. Each match is
+independent, i.e. this rule will be matched if any single match is satisfied.</p>
+<p>Take the following matches configuration as an example:</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+...
+matches:
+  - path:
+      value: &quot;/foo&quot;
+    headers:
+      values:
+        version: &quot;2&quot;
+  - path:
+      value: &quot;/v2/foo&quot;
+</code></pre>
+
+<p>For a request to match against this rule, it must satisfy EITHER of the
+following conditions:</p>
+<ul>
+<li>A path prefixed with /foo <strong>AND</strong> contains the header "version: 2"</li>
+<li>A path prefix of /v2/foo</li>
+</ul>
+<p>If no matches are specified, the default is a prefix path match on “/”,
+which has the effect of matching every HTTP request.</p>
+<h4 id="filters-optional">Filters (optional)</h4>
+<p>Filters define processing steps that must be completed during the request or
+response lifecycle. Filters act as an extension point to express additional
+processing that may be performed in Gateway implementations. Some examples
+include request or response modification, implementing authentication
+strategies, rate-limiting, and traffic shaping.</p>
+<p>The following example adds header "my-header: foo" to HTTP requests with Host
+header "my.filter.com".</p>
+<pre><code class="yaml">kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: filter-lb
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-filter-gateway
+spec:
+  gatewayClassName: filter-lb
+  listeners:
+    - protocol: HTTP
+      port: 80
+      routes:
+        kind: HTTPRoute
+        selector:
+          matchLabels:
+            app: filter
+        namespaces:
+          from: &quot;All&quot;
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-filter-1
+  labels:
+    app: filter
+spec:
+  hostnames:
+    - my.filter.com
+  rules:
+    - matches:
+      - path:
+          type: Prefix
+          value: /
+      filters:
+      - type: RequestHeaderModifier
+        requestHeaderModifier:
+          add:
+            my-header: foo
+      forwardTo:
+      - serviceName: my-filter-svc1
+        weight: 1
+        port: 80
+</code></pre>
+
+<p>API conformance is defined based on the filter type. The effects of ordering
+multiple behaviors is currently unspecified. This may change in the future
+based on feedback during the alpha stage.</p>
+<p>Conformance levels are defined by the filter type:</p>
+<ul>
+<li>All "core" filters MUST be supported by implementations.</li>
+<li>Implementers are encouraged to support "extended" filters.</li>
+<li>"Custom" filters have no API guarantees across implementations.</li>
+</ul>
+<p>Specifying a core filter multiple times has unspecified or custom conformance.</p>
+<h4 id="forwardto-optional">ForwardTo (optional)</h4>
+<p>ForwardTo defines API objects where matching requests should be sent. If
+unspecified, the rule performs no forwarding. If unspecified and no filters
+are specified that would result in a response being sent, a 503 error code
+is returned.</p>
+<p>The following example forwards HTTP requests for prefiex <code>/bar</code> to service
+"my-service1" on port <code>8080</code> and HTTP requests for prefex <code>/some/thing</code> with
+header <code>magic: foo</code> to service "my-service2" on port <code>8080</code>:</p>
+<pre><code class="yaml">kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+spec:
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-gateway
+spec:
+  gatewayClassName: acme-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - protocol: HTTP
+    port: 80
+    routes:
+      kind: HTTPRoute
+      selector:
+        matchLabels:
+          app: foo
+      namespaces:
+        from: &quot;Same&quot;
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-app-1
+  labels:
+    app: foo
+spec:
+  hostnames:
+  - &quot;foo.com&quot;
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /bar
+    forwardTo:
+    - serviceName: my-service1
+      port: 8080
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          magic: foo
+      path:
+        type: Prefix
+        value: /some/thing
+    forwardTo:
+    - serviceName: my-service2
+      port: 8080
+</code></pre>
+
+<p><strong>Note:</strong> Forwarding to a custom resource instead of a service can be
+accomplished by specifying <code>backendRef</code> instead of <code>serviceName</code>. A
+<code>backendRef</code> follows the standard Kubernetes <code>group</code>, <code>kind</code> and <code>name</code>
+schema.</p>
+<p>The following example uses the <code>weight</code> field to forward HTTP requests for
+prefix <code>/bar</code> equally across service "my-trafficsplit-svc1" and service
+"my-trafficsplit-svc2", i.e. traffic splitting:</p>
+<pre><code class="yaml">kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: trafficsplit-lb
+spec: 
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-trafficsplit-gateway
+spec:
+  gatewayClassName: trafficsplit-lb
+  listeners:  # Use GatewayClass defaults for listener definition.
+    - protocol: HTTP
+      port: 80
+      routes:
+        kind: HTTPRoute
+        selector:
+          matchLabels:
+            app: split
+        namespaces:
+          from: &quot;Selector&quot;
+          selector: {}
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-trafficsplit-1
+  labels:
+    app: split
+spec:
+  hostnames:
+  - &quot;my.trafficsplit.com&quot;
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /bar
+    forwardTo:
+    - serviceName: my-trafficsplit-svc1
+      port: 8080
+      weight: 50
+    - serviceName: my-trafficsplit-svc2
+      port: 8080
+      weight: 50
+</code></pre>
+
+<p>Reference the <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a> API documentation for additional details
+of <code>weight</code> and other fields.</p>
+<h2 id="status">Status</h2>
+<p>Status defines the observed state of HTTPRoute.</p>
+<h3 id="routestatus">RouteStatus</h3>
+<p>RouteStatus defines the observed state that is required across all route types.</p>
+<h4 id="gateways_1">Gateways</h4>
+<p>Gateways define a list of the Gateways that are associated with the HTTPRoute,
+and the status of the HTTPRoute with respect to each of these Gateways. When a
+Gateway selects this HTTPRoute, the controller that manages the Gateway should
+add an entry to this list when the controller first sees the route and should
+update the entry as appropriate when the route is modified.</p>
+<p>The following example indicates HTTPRoute "http-example" has been admitted by
+Gateway "gw-example" in namespace "gw-example-ns":</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: http-example
+...
+status:
+  gateways:
+  - gatewayRef:
+      name: gw-example
+      namespace: gw-example-ns
+    conditions:
+    - type: Admitted
+      status: &quot;True&quot;
+</code></pre>
+
+<p>A maximum of 100 Gateways can be represented in this list. If this list is full,
+there may be additional Gateways using this Route that are not included in the
+list.</p>
+                
+                  
+                
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+        
+          <a href="../gateway/" title="Gateway" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+            </div>
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                Gateway
+              </span>
+            </div>
+          </a>
+        
+        
+          <a href="../guides/" title="Introduction" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+              <span class="md-flex__ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Introduction
+              </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink">
+              <i class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        powered by
+        <a href="https://www.mkdocs.org">MkDocs</a>
+        and
+        <a href="https://squidfunk.github.io/mkdocs-material/">
+          Material for MkDocs</a>
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../assets/javascripts/application.808e90bb.js"></script>
+      
+      <script>app.initialize({version:"1.0.4",url:{base:".."}})</script>
+      
+    
+  </body>
+</html>

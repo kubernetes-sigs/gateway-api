@@ -373,8 +373,8 @@ const (
 )
 
 // RouteBindingSelector defines a schema for associating routes with the Gateway.
-// If NamespaceSelector and RouteSelector are defined, only routes matching both
-// selectors are associated with the Gateway.
+// If Namespaces and Selector are defined, only routes matching both selectors are
+// associated with the Gateway.
 type RouteBindingSelector struct {
 	// Namespaces indicates in which namespaces Routes should be selected
 	// for this Gateway. This is restricted to the namespace of this Gateway by

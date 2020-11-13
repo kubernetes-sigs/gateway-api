@@ -82,7 +82,7 @@ spec:
               rules:
                 description: Rules are a list of HTTP matchers, filters and actions.
                 items:
-                  description: HTTPRouteRule defines semantics for matching an incoming HTTP request against a set of matching rules and executing an action (and optionally filters) on the request.
+                  description: HTTPRouteRule defines semantics for matching an HTTP request based on conditions, optionally executing additional processing steps, and forwarding the request to an API object.
                   properties:
                     filters:
                       description: "Filters define the filters that are applied to requests that match this rule. \n The effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage. \n Conformance-levels at this level are defined based on the type of filter: - ALL core filters MUST be supported by all implementations. - Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across   implementations. \n Specifying a core filter multiple times has unspecified or custom conformance. \n Support: core"
@@ -406,7 +406,7 @@ spec:
                 description: "TLS defines the TLS certificate to use for Hostnames defined in this Route. This configuration only takes effect if the AllowRouteOverride field is set to true in the associated Gateway resource. \n Collisions can happen if multiple HTTPRoutes define a TLS certificate for the same hostname. In such a case, conflict resolution guiding principles apply, specificallly, if hostnames are same and two different certificates are specified then the certificate in the oldest resource wins. \n Please note that HTTP Route-selection takes place after the TLS Handshake (ClientHello). Due to this, TLS certificate defined here will take precedence even if the request has the potential to match multiple routes (in case multiple HTTPRoutes share the same hostname). \n Support: Core"
                 properties:
                   certificateRef:
-                    description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
+                    description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and kind, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
                     properties:
                       group:
                         description: Group is the group of the referent.

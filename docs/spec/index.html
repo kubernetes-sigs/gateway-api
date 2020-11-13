@@ -202,20 +202,8 @@
 
 
   <li class="md-nav__item">
-    <a href="../concepts/" title="API concepts" class="md-nav__link">
-      API concepts
-    </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../resources/" title="API resources" class="md-nav__link">
-      API resources
+    <a href="../api-overview/" title="API overview" class="md-nav__link">
+      API overview
     </a>
   </li>
 
@@ -259,10 +247,70 @@
       <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
-      Guides
+      API Types
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
       <label class="md-nav__title" for="nav-3">
+        API Types
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gatewayclass/" title="GatewayClass" class="md-nav__link">
+      GatewayClass
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../gateway/" title="Gateway" class="md-nav__link">
+      Gateway
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../httproute/" title="HTTPRoute" class="md-nav__link">
+      HTTPRoute
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+    
+    <label class="md-nav__link" for="nav-4">
+      Guides
+    </label>
+    <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
         Guides
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -330,13 +378,13 @@
 
   <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
     
-    <label class="md-nav__link" for="nav-4">
+    <label class="md-nav__link" for="nav-5">
       References
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-4">
+      <label class="md-nav__title" for="nav-5">
         References
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -385,13 +433,13 @@
 
   <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
     
-    <label class="md-nav__link" for="nav-5">
+    <label class="md-nav__link" for="nav-6">
       Contributing
     </label>
     <nav class="md-nav" data-md-component="collapsible" data-md-level="1">
-      <label class="md-nav__title" for="nav-5">
+      <label class="md-nav__title" for="nav-6">
         Contributing
       </label>
       <ul class="md-nav__list" data-md-scrollfix>
@@ -2640,9 +2688,9 @@ the error more specifically.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
 </p>
 <p>
-<p>HTTPRouteRule defines semantics for matching an incoming HTTP request against
-a set of matching rules and executing an action (and optionally filters) on
-the request.</p>
+<p>HTTPRouteRule defines semantics for matching an HTTP request based on
+conditions, optionally executing additional processing steps, and forwarding
+the request to an API object.</p>
 </p>
 <table>
 <thead>
@@ -3277,8 +3325,8 @@ conformance.</p>
 </p>
 <p>
 <p>RouteBindingSelector defines a schema for associating routes with the Gateway.
-If NamespaceSelector and RouteSelector are defined, only routes matching both
-selectors are associated with the Gateway.</p>
+If Namespaces and Selector are defined, only routes matching both selectors are
+associated with the Gateway.</p>
 </p>
 <table>
 <thead>
@@ -3722,7 +3770,7 @@ contains a TLS certificate and private key.
 This certificate MUST be used for TLS handshakes for the domain
 this RouteTLSConfig is associated with.
 If an entry in this list omits or specifies the empty
-string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
+string for both the group and kind, the resource defaults to &ldquo;secrets&rdquo;.
 An implementation may support other resources (for example, resource
 &ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Support: Core (Kubernetes Secrets)

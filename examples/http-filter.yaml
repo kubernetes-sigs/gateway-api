@@ -26,7 +26,6 @@ spec:
         namespaces:
           from: "All"
 ---
-# Matches every HTTP request for hostname "my.filter.com".
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
