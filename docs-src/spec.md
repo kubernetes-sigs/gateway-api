@@ -2169,9 +2169,9 @@ the error more specifically.</p>
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">HTTPRouteSpec</a>)
 </p>
 <p>
-<p>HTTPRouteRule defines semantics for matching an incoming HTTP request against
-a set of matching rules and executing an action (and optionally filters) on
-the request.</p>
+<p>HTTPRouteRule defines semantics for matching an HTTP request based on
+conditions, optionally executing additional processing steps, and forwarding
+the request to an API object.</p>
 </p>
 <table>
 <thead>
@@ -2806,8 +2806,8 @@ conformance.</p>
 </p>
 <p>
 <p>RouteBindingSelector defines a schema for associating routes with the Gateway.
-If NamespaceSelector and RouteSelector are defined, only routes matching both
-selectors are associated with the Gateway.</p>
+If Namespaces and Selector are defined, only routes matching both selectors are
+associated with the Gateway.</p>
 </p>
 <table>
 <thead>
@@ -3251,7 +3251,7 @@ contains a TLS certificate and private key.
 This certificate MUST be used for TLS handshakes for the domain
 this RouteTLSConfig is associated with.
 If an entry in this list omits or specifies the empty
-string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
+string for both the group and kind, the resource defaults to &ldquo;secrets&rdquo;.
 An implementation may support other resources (for example, resource
 &ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
 Support: Core (Kubernetes Secrets)

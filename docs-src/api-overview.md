@@ -1,10 +1,10 @@
-# API Concepts
+# API Overview
 
-This document is a deep dive into the reasoning and design for Service APIs.
+This document provides an overview of Service APIs.
 
 ## Roles and personas.
 
-There are 3 primary roles in the API:
+There are 3 primary roles in Service APIs:
 
 - Infrastructure Provider
 - Cluster Operator

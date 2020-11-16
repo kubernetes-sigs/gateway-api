@@ -116,7 +116,7 @@ type RouteTLSConfig struct {
 	// This certificate MUST be used for TLS handshakes for the domain
 	// this RouteTLSConfig is associated with.
 	// If an entry in this list omits or specifies the empty
-	// string for both the group and the resource, the resource defaults to "secrets".
+	// string for both the group and kind, the resource defaults to "secrets".
 	// An implementation may support other resources (for example, resource
 	// "mycertificates" in group "networking.acme.io").
 	// Support: Core (Kubernetes Secrets)
@@ -126,9 +126,9 @@ type RouteTLSConfig struct {
 	CertificateRef LocalObjectReference `json:"certificateRef"`
 }
 
-// HTTPRouteRule defines semantics for matching an incoming HTTP request against
-// a set of matching rules and executing an action (and optionally filters) on
-// the request.
+// HTTPRouteRule defines semantics for matching an HTTP request based on
+// conditions, optionally executing additional processing steps, and forwarding
+// the request to an API object.
 type HTTPRouteRule struct {
 	// Matches define conditions used for matching the rule against
 	// incoming HTTP requests.

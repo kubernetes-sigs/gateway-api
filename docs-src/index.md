@@ -10,10 +10,9 @@ Service APIs.
 
 ### Get started
 
-To get started, please read through [API concepts](concepts.md) and
+To get started, please read through the [API overview](api-overview.md) and
 [Security model](security-model.md). These documents give the necessary background
-to understand the API and the use-cases it targets.
-
+to understand the API and use-cases it targets.
 
 ### Guides
 
