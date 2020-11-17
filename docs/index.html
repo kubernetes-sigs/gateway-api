@@ -202,29 +202,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
-    Get started
+  <a href="#what-is-the-goal-of-service-apis" class="md-nav__link">
+    What is the goal of Service APIs?
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#guides" class="md-nav__link">
-    Guides
+  <a href="#where-to-get-started" class="md-nav__link">
+    Where to get started
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    References
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contacts" class="md-nav__link">
-    Contacts
+  <a href="#how-to-get-involved" class="md-nav__link">
+    How to get involved
   </a>
   
 </li>
@@ -573,29 +566,22 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#get-started" class="md-nav__link">
-    Get started
+  <a href="#what-is-the-goal-of-service-apis" class="md-nav__link">
+    What is the goal of Service APIs?
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#guides" class="md-nav__link">
-    Guides
+  <a href="#where-to-get-started" class="md-nav__link">
+    Where to get started
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#references" class="md-nav__link">
-    References
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contacts" class="md-nav__link">
-    Contacts
+  <a href="#how-to-get-involved" class="md-nav__link">
+    How to get involved
   </a>
   
 </li>
@@ -618,29 +604,70 @@
                 
                 
                 <h1 id="introduction">Introduction</h1>
-<p>Service APIs is the evolution of Kubernetes APIs that relate to <code>Services</code>,
-e.g. <code>Ingress</code>. The project is part of Kubernetes, working under
-<a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>. Use the following resources to learn more about
-Service APIs.</p>
-<h3 id="get-started">Get started</h3>
-<p>To get started, please read through the <a href="api-overview/">API overview</a> and
-<a href="security-model/">Security model</a>. These documents give the necessary background
-to understand the API and use-cases it targets.</p>
-<h3 id="guides">Guides</h3>
-<p>Once you have a good understanding of the API at a higher-level, please
-follow one of our <a href="guides/">guides</a> to dive deeper into different parts of
-the API.</p>
-<h3 id="references">References</h3>
-<p>Finally, for a complete API reference, please refer to:</p>
+<p>Service APIs is an open source project, working under
+<a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>, that is evolving service networking APIs within
+the Kubernetes ecosystem. Service APIs are the user interfaces you use to expose
+your Kubernetes applications - Services, Ingress, and more. </p>
+<h3 id="what-is-the-goal-of-service-apis">What is the goal of Service APIs?</h3>
+<p>Service APIs aims to improve these interfaces by making them
+more expressive, extensible, and role-oriented while remaining as
+generic routing APIs that have many implementations and broad industry support. </p>
+<p>Service APIs are really a collection of API resources - <code>Service</code>,
+<code>GatewayClass</code>, <code>Gateway</code>, <code>HTTPRoute</code>, <code>TCPRoute</code>, and so on. These resources
+are used together to model a wide variety of different networking use-cases. See
+<a href="concepts.md">API Concepts</a> to learn more about the API model.</p>
+<p><img alt="Service API Model" src="images/api-model.png" /></p>
+<p>How do the Service APIs improve upon current standards like Ingress?</p>
 <ul>
-<li><a href="spec/">API reference</a></li>
+<li><strong>More expressive</strong> - They express more core functionality for things like
+header-based matching, traffic weighting, and other capabilities that were only
+possible through custom means in the Ingress spec.    </li>
+<li><strong>More extensible</strong> - They allow for custom resources to be linked at multiple
+layers within its resources. This allows for more granular customization at the 
+appropriate places within the API structure.    </li>
+<li><strong>Role oriented</strong> - They are broken into API resources that map to the types<br />
+of roles that commonly deploy and configure load balancing.    </li>
+<li><strong>Generic</strong> - This isn't an improvement but rather something
+that should stay the same. Just as Ingress is a universal specification with
+<a href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/">numerous implementations</a>,
+Service APIs are designed to be a portable specification for many
+implementations.</li>
+</ul>
+<p>Some other notable capabilities include …</p>
+<ul>
+<li><strong>Shared Gateways</strong> - They allow the sharing of load balancers and VIPs by
+permitting independent Route resources to bind to the same Gateway. This allows
+teams to share infrastructure safely without requiring direct coordination.  </li>
+<li><strong>Typed backend references</strong> - With typed backend references Routes can
+reference Kubernetes Services, but also any kind of Kubernetes resource that is
+designed to be a Gateway backend.  </li>
+<li><strong>Cross-Namespace references</strong> - Routes across different Namespaces can bind<br />
+to Gateways. This allows for shared networking infrastructure despite Namespace<br />
+segmentation for workloads.  </li>
+<li><strong>Classes</strong> - GatewayClasses formalize types of load balancing implementations. 
+These classes make it easy and explicit for users to understand what kind of
+capabilities are available as a resource model itself.</li>
+</ul>
+<h3 id="where-to-get-started">Where to get started</h3>
+<p>To get started, please read through <a href="api-overview/">API overview</a>. These
+documents give the necessary background to understand the API and the use-cases
+it targets. Once you have a good understanding of the API at a higher-level,
+please follow one of our <a href="guides/">guides</a> to dive deeper into different parts
+of the API.</p>
+<p>For a complete API reference, please refer to:</p>
+<ul>
+<li><a href="spec/">API reference</a> </li>
 <li><a href="https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1">Go docs for the package</a></li>
 </ul>
-<h2 id="contacts">Contacts</h2>
-<p>Please reach out to the maintainers for clarifications or feedback:</p>
+<h3 id="how-to-get-involved">How to get involved</h3>
+<p>This project has many contributors and we welcome anybody and everybody to get
+involved. Join our weekly meetings, file issues, or ask questions in Slack. No
+contribution is too small - even opinions matter! </p>
 <ul>
-<li>Slack: <a href="https://kubernetes.slack.com/messages/sig-network-service-apis">#sig-network-service-apis</a></li>
-<li><a href="https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS">Project Owners</a></li>
+<li><a href="community/#meetings">Weekly meeting schedule</a> </li>
+<li><a href="https://kubernetes.slack.com/messages/sig-network-service-apis">Service APIs Slack</a> </li>
+<li><a href="enhancement-requests/">Enhancement requests</a>  </li>
+<li><a href="https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS">Project owners</a></li>
 </ul>
                 
                   
