@@ -2216,6 +2216,16 @@ match conditions that should be ANDed together.</p>
 <p>If no matches are specified, the default is a prefix
 path match on &ldquo;/&rdquo;, which has the effect of matching every
 HTTP request.</p>
+<p>A client request may match multiple HTTP route rules. Matching precedence
+MUST be determined in order of the following criteria, continuing on ties:
+* The longest matching hostname.
+* The longest matching path.
+* The largest number of header matches
+* The oldest Route based on creation timestamp. For example, a Route with
+a creation timestamp of &ldquo;2020-09-08 01:02:03&rdquo; is given precedence over
+a Route with a creation timestamp of &ldquo;2020-09-08 01:02:04&rdquo;.
+* The Route appearing first in alphabetical order (namespace/name) for
+example, foo/bar is given precedence over foo/baz.</p>
 </td>
 </tr>
 <tr>
@@ -2756,6 +2766,11 @@ Valid PathMatchType values are:</p>
 <li>&ldquo;RegularExpression&rdquo;</li>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
+<p>Prefix and Exact paths must be syntactically valid:
+- Must begin with the &lsquo;/&rsquo; character
+- Must not contain consecutive &lsquo;/&rsquo; characters (e.g. /foo///, //).
+- For prefix paths, a trailing &lsquo;/&rsquo; character in the Path is ignored,
+e.g. /abc and /abc/ specify the same match.</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.PortNumber">PortNumber
 (<code>int32</code> alias)</p></h3>
