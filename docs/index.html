@@ -616,33 +616,32 @@
                 
                 
                 <h1 id="introduction">Introduction</h1>
-<p>Service APIs is an open source project, working under
-<a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>, that is evolving service networking APIs within
-the Kubernetes ecosystem. Service APIs are the user interfaces you use to expose
-your Kubernetes applications - Services, Ingress, and more. </p>
+<p>Service APIs is an open source project managed by the <a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>
+community. The project's goal is to evolve service networking APIs within the
+Kubernetes ecosystem. Service APIs provide interfaces to expose Kubernetes
+applications - Services, Ingress, and more. </p>
 <h3 id="what-is-the-goal-of-service-apis">What is the goal of Service APIs?</h3>
-<p>Service APIs aims to improve these interfaces by making them
-more expressive, extensible, and role-oriented while remaining as
-generic routing APIs that have many implementations and broad industry support. </p>
-<p>Service APIs are really a collection of API resources - <code>Service</code>,
-<code>GatewayClass</code>, <code>Gateway</code>, <code>HTTPRoute</code>, <code>TCPRoute</code>, and so on. These resources
-are used together to model a wide variety of different networking use-cases. See
-<a href="concepts.md">API Concepts</a> to learn more about the API model.</p>
+<p>Service APIs aims to improve service networking by providing expressive,
+extensible, role-oriented interfaces that are implemented by many vendors and
+have broad industry support. </p>
+<p>Service APIs is a collection of API resources - <code>Service</code>, <code>GatewayClass</code>,
+<code>Gateway</code>, <code>HTTPRoute</code>, <code>TCPRoute</code>, etc. Together these resources model a wide
+variety of networking use-cases.</p>
 <p><img alt="Service API Model" src="images/api-model.png" /></p>
-<p>How do the Service APIs improve upon current standards like Ingress?</p>
+<p>How do Service APIs improve upon current standards like Ingress?</p>
 <ul>
 <li><strong>More expressive</strong> - They express more core functionality for things like
 header-based matching, traffic weighting, and other capabilities that were only
-possible through custom means in the Ingress spec.    </li>
-<li><strong>More extensible</strong> - They allow for custom resources to be linked at multiple
-layers within its resources. This allows for more granular customization at the 
-appropriate places within the API structure.    </li>
-<li><strong>Role oriented</strong> - They are broken into API resources that map to the types<br />
-of roles that commonly deploy and configure load balancing.    </li>
+possible in Ingress through custom means.    </li>
+<li><strong>More extensible</strong> - They allow for custom resources to be linked at various
+layers of the API. This allows for more granular customization at the
+appropriate places within the API structure.</li>
+<li><strong>Role oriented</strong> - They are separated into different API resources that map
+to the common roles for running applications on Kubernetes.    </li>
 <li><strong>Generic</strong> - This isn't an improvement but rather something
 that should stay the same. Just as Ingress is a universal specification with
 <a href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/">numerous implementations</a>,
-Service APIs are designed to be a portable specification for many
+Service APIs are designed to be a portable specification supported by many
 implementations.</li>
 </ul>
 <p>Some other notable capabilities include …</p>
@@ -672,7 +671,7 @@ of the API.</p>
 <li><a href="https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1">Go docs for the package</a></li>
 </ul>
 <h3 id="how-to-get-involved">How to get involved</h3>
-<p>This project has many contributors and we welcome anybody and everybody to get
+<p>This project has many contributors, and we welcome anybody and everybody to get
 involved. Join our weekly meetings, file issues, or ask questions in Slack. No
 contribution is too small - even opinions matter! </p>
 <ul>

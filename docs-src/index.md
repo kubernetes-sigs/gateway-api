@@ -1,38 +1,37 @@
 # Introduction
 
-Service APIs is an open source project, working under
-[SIG-NETWORK][sig-network], that is evolving service networking APIs within
-the Kubernetes ecosystem. Service APIs are the user interfaces you use to expose
-your Kubernetes applications - Services, Ingress, and more. 
+Service APIs is an open source project managed by the [SIG-NETWORK][sig-network]
+community. The project's goal is to evolve service networking APIs within the
+Kubernetes ecosystem. Service APIs provide interfaces to expose Kubernetes
+applications - Services, Ingress, and more. 
 
 ### What is the goal of Service APIs?
 
-Service APIs aims to improve these interfaces by making them
-more expressive, extensible, and role-oriented while remaining as
-generic routing APIs that have many implementations and broad industry support. 
+Service APIs aims to improve service networking by providing expressive,
+extensible, role-oriented interfaces that are implemented by many vendors and
+have broad industry support. 
 
-Service APIs are really a collection of API resources - `Service`,
-`GatewayClass`, `Gateway`, `HTTPRoute`, `TCPRoute`, and so on. These resources
-are used together to model a wide variety of different networking use-cases. See
-[API Concepts](concepts.md) to learn more about the API model.
+Service APIs is a collection of API resources - `Service`, `GatewayClass`,
+`Gateway`, `HTTPRoute`, `TCPRoute`, etc. Together these resources model a wide
+variety of networking use-cases.
 
 ![Service API Model](./images/api-model.png)
 
 
-How do the Service APIs improve upon current standards like Ingress?
+How do Service APIs improve upon current standards like Ingress?
 
 - **More expressive** - They express more core functionality for things like
 header-based matching, traffic weighting, and other capabilities that were only
-possible through custom means in the Ingress spec.    
-- **More extensible** - They allow for custom resources to be linked at multiple
-layers within its resources. This allows for more granular customization at the 
-appropriate places within the API structure.    
-- **Role oriented** - They are broken into API resources that map to the types  
-of roles that commonly deploy and configure load balancing.    
+possible in Ingress through custom means.    
+- **More extensible** - They allow for custom resources to be linked at various
+layers of the API. This allows for more granular customization at the
+appropriate places within the API structure.
+- **Role oriented** - They are separated into different API resources that map
+to the common roles for running applications on Kubernetes.    
 - **Generic** - This isn't an improvement but rather something
 that should stay the same. Just as Ingress is a universal specification with
 [numerous implementations](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/),
-Service APIs are designed to be a portable specification for many
+Service APIs are designed to be a portable specification supported by many
 implementations.
 
 Some other notable capabilities include …
@@ -67,7 +66,7 @@ For a complete API reference, please refer to:
 
 ### How to get involved
 
-This project has many contributors and we welcome anybody and everybody to get
+This project has many contributors, and we welcome anybody and everybody to get
 involved. Join our weekly meetings, file issues, or ask questions in Slack. No
 contribution is too small - even opinions matter! 
 
@@ -75,6 +74,3 @@ contribution is too small - even opinions matter!
 - [Service APIs Slack](https://kubernetes.slack.com/messages/sig-network-service-apis) 
 - [Enhancement requests](enhancement-requests.md)  
 - [Project owners](https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS)
-
-
-
