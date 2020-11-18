@@ -83,8 +83,8 @@ spec:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
                   message: Waiting for controller
                   reason: Waiting
-                  status: Unknown
-                  type: InvalidParameters
+                  status: "False"
+                  type: Admitted
                 description: Conditions is the current status from the controller for this GatewayClass.
                 items:
                   description: "Condition contains details for one aspect of the current state of this API Resource. --- This struct is intended for direct use as an array at the field path .status.conditions.  For example, type FooStatus struct{     // Represents the observations of a foo's current state.     // Known .status.conditions.type are: \"Available\", \"Progressing\", and \"Degraded\"     // +patchMergeKey=type     // +patchStrategy=merge     // +listType=map     // +listMapKey=type     Conditions []metav1.Condition `json:\"conditions,omitempty\" patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"` \n     // other fields }"

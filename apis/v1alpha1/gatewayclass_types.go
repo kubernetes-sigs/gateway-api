@@ -85,10 +85,25 @@ type GatewayClassSpec struct {
 type GatewayClassConditionType string
 
 const (
-	// GatewayClassConditionStatusInvalidParameters indicates the
-	// validity of the Parameters set for a given controller. This
-	// will initially start off as "Unknown".
-	GatewayClassConditionStatusInvalidParameters GatewayClassConditionType = "InvalidParameters"
+	// GatewayClassConditionStatusAdmitted indicates that the GatewayClass
+	// has been admitted by the controller set in the `spec.controller`
+	// field.
+	//
+	// It defaults to False, and MUST be set by a controller when it sees
+	// a GatewayClass using its controller string.
+	// The status of this condition MUST be set to true if the controller will support
+	// provisioning Gateways using this class. Otherwise, this status MUST be set to false.
+	// If the status is set to false, the controller SHOULD set a Message and Reason as an
+	// explanation.
+	// GatewayClassNotAdmittedInvalidParameters is provided as an example Reason.
+	GatewayClassConditionStatusAdmitted GatewayClassConditionType = "Admitted"
+
+	// GatewayClassNotAdmittedInvalidParameters should be used as a Reason on the Admitted
+	// condition if the parametersRef field is invalid, with more detail in the message.
+	GatewayClassNotAdmittedInvalidParameters string = "InvalidParameters"
+
+	// GatewayClasssNotAdmittedWaiting is the default Reason on a new GatewayClass.
+	GatewayClasssNotAdmittedWaiting string = "Waiting"
 
 	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
 	// GatewayClass whenever there are provisioned Gateways using a GatewayClass.
@@ -103,7 +118,7 @@ type GatewayClassStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "InvalidParameters", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Admitted", status: "False", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
