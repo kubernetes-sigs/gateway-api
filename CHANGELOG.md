@@ -2,8 +2,44 @@
 
 ## Table of Contents
 
+- [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.1.0
+
+API Version: v1alpha1
+
+### API changes since v0.1.0-rc2
+#### GatewayClass
+- CRD now includes `gc` short name.
+- Change the standard condition for GatewayClass to `Admitted`, with
+  `InvalidParameters` as a sample reason for it to be false.
+
+#### Gateway
+- CRD now includes `gtw` short name.
+- The `DroppedRoutes` condition has been renamed to `DegradedRoutes`.
+- `ListenerStatus` now includes `Protocol` and `Hostname` to uniquely link the
+  status to each listener.
+
+#### Routes
+- HTTPRoute clarifications:
+  - Header name matching must be case-insenstive.
+  - Match tiebreaking semantics have been outlined in detail.
+- TCPRoute, TLSRoute, and UDPRoute:
+  - At least 1 ForwardTo must be specified in each rule.
+  - Clarification that if no matches are specified, all requests should match a
+    rule.
+- TCPRoute and UDPRoute: Validation has been added to ensure that 1-16 rules are
+  specified, matching other route types.
+- TLSRoute: SNIs are now optional in matches. If no SNI or extensionRef are
+  specified, all requests match.
+
+#### BackendPolicy
+- CRD now includes `bp` short name.
+- A new `networking.x-k8s.io/app-protocol` annotation can be used to specify
+  AppProtocol on Services when the AppProtocol field is unavailable.
+
 
 ## v0.1.0-rc2
 
