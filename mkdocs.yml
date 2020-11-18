@@ -21,6 +21,7 @@ nav:
   - Guides:
       - Introduction: guides.md
       - Getting started: getting-started.md
+      - Simple Gateway: simple-gateway.md
       - Multiple namespaces and routes: multiple-ns.md
       - TLS: tls.md
   - References:
