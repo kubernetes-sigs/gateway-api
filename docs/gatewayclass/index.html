@@ -686,21 +686,21 @@ parameters are valid. The validity of the class will be signaled to the user via
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: Unknown
+  - type: Admitted
+    status: False
     ...
 </code></pre>
 
-<p>A new <code>GatewayClass</code> will start with the <code>InvalidParameters</code> condition set to
-<code>Unknown</code>. At this point the controller has not seen the configuration. Once the
+<p>A new <code>GatewayClass</code> will start with the <code>Admitted</code> condition set to
+<code>False</code>. At this point the controller has not seen the configuration. Once the
 controller has processed the configuration, the condition will be set to
-<code>False</code>:</p>
+<code>True</code>:</p>
 <pre><code class="yaml">kind: GatewayClass
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: False
+  - type: Admitted
+    status: True
     ...
 </code></pre>
 
@@ -710,8 +710,8 @@ non-empty and contain information about the error.</p>
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: True
+  - type: Admitted
+    status: False
     Reason: BadFooBar
     Message: &quot;foobar&quot; is an FooBar.
 </code></pre>

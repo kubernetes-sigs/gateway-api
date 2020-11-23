@@ -79,23 +79,23 @@ kind: GatewayClass
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: Unknown
+  - type: Admitted
+    status: False
     ...
 ```
 
-A new `GatewayClass` will start with the `InvalidParameters` condition set to
-`Unknown`. At this point the controller has not seen the configuration. Once the
+A new `GatewayClass` will start with the `Admitted` condition set to
+`False`. At this point the controller has not seen the configuration. Once the
 controller has processed the configuration, the condition will be set to
-`False`:
+`True`:
 
 ```yaml
 kind: GatewayClass
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: False
+  - type: Admitted
+    status: True
     ...
 ```
 
@@ -107,8 +107,8 @@ kind: GatewayClass
 ...
 status:
   conditions:
-  - type: InvalidParameters
-    status: True
+  - type: Admitted
+    status: False
     Reason: BadFooBar
     Message: "foobar" is an FooBar.
 ```
