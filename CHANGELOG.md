@@ -24,7 +24,7 @@ API Version: v1alpha1
 
 #### Routes
 - HTTPRoute clarifications:
-  - Header name matching must be case-insenstive.
+  - Header name matching must be case-insensitive.
   - Match tiebreaking semantics have been outlined in detail.
 - TCPRoute, TLSRoute, and UDPRoute:
   - At least 1 ForwardTo must be specified in each rule.
