@@ -1,12 +1,11 @@
 # See the OWNERS docs at https://go.k8s.io/owners
+# See the OWNERS_ALIASES file at https://github.com/kubernetes-sigs/service-apis/blob/master/OWNERS_ALIASES for a list of members for each alias. 
 
 approvers:
   - bowei
-  - robscott
+  - sig-network-leads
+  - service-apis-admins
+  - service-apis-maintainers
 
 reviewers:
-  - bowei
-  - robscott
-  - hbagdi
-  - jpeach
-  - danehans
+  - service-apis-maintainers
