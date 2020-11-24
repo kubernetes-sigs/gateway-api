@@ -1979,89 +1979,17 @@ extended filters.</p>
 <tbody>
 <tr>
 <td>
-<code>serviceName</code></br>
+<code>RouteForwardTo</code></br>
 <em>
-string
-</em>
-</td>
-<td>
-<em>(Optional)</em>
-<p>ServiceName refers to the name of the Service to forward matched requests
-to. When specified, this takes the place of BackendRef. If both
-BackendRef and ServiceName are specified, ServiceName will be given
-precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
-<p>The protocol to use should be specified with the AppProtocol field on Service
-resources. This field was introduced in Kubernetes 1.18. If using an earlier version
-of Kubernetes, a <code>networking.x-k8s.io/app-protocol</code> annotation on the
-BackendPolicy resource may be used to define the protocol. If the
-AppProtocol field is available, this annotation should not be used. The
-AppProtocol field, when populated, takes precedence over the annotation
-in the BackendPolicy resource. For custom backends, it is encouraged to
-add a semantically-equivalent field in the Custom Resource Definition.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>backendRef</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">
+RouteForwardTo
 </a>
 </em>
 </td>
 <td>
-<em>(Optional)</em>
-<p>BackendRef is a reference to a backend to forward matched requests to. If
-both BackendRef and ServiceName are specified, ServiceName will be given
-precedence.</p>
-<p>If the referent cannot be found, the route must be dropped
-from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
-The gateway status for this route should be updated with a
-condition that describes the error more specifically.</p>
-<p>Support: Custom</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>port</code></br>
-<em>
-<a href="#networking.x-k8s.io/v1alpha1.PortNumber">
-PortNumber
-</a>
-</em>
-</td>
-<td>
-<p>Port specifies the destination port number to use for the
-backend referenced by the ServiceName or BackendRef field.</p>
-<p>Support: Core</p>
-</td>
-</tr>
-<tr>
-<td>
-<code>weight</code></br>
-<em>
-int32
-</em>
-</td>
-<td>
-<p>Weight specifies the proportion of HTTP requests forwarded to the backend
-referenced by the ServiceName or BackendRef field. This is computed as
-weight/(sum of all weights in this ForwardTo list). For non-zero values,
-there may be some epsilon from the exact proportion defined here
-depending on the precision an implementation supports. Weight is not a
-percentage and the sum of weights does not need to equal 100.</p>
-<p>If only one backend is specified and it has a weight greater than 0, 100%
-of the traffic is forwarded to that backend. If weight is set to 0, no
-traffic should be forwarded for this entry. If unspecified, weight
-defaults to 1.</p>
-<p>Support: Core</p>
+<p>
+(Members of <code>RouteForwardTo</code> are embedded into this type.)
+</p>
 </td>
 </tr>
 <tr>
@@ -2697,7 +2625,6 @@ reporting the status.</p>
 <a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">HTTPRouteMatch</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteTLSConfig">RouteTLSConfig</a>, 
@@ -2778,7 +2705,6 @@ e.g. /abc and /abc/ specify the same match.</p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.BackendRef">BackendRef</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.Listener">Listener</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo</a>)
@@ -2915,6 +2841,7 @@ condition for the affected Listener.</p>
 </h3>
 <p>
 (<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TCPRouteRule">TCPRouteRule</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteRule">UDPRouteRule</a>)

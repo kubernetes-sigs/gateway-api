@@ -513,72 +513,7 @@ type HTTPRequestMirrorFilter struct {
 
 // HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
 type HTTPRouteForwardTo struct {
-	// ServiceName refers to the name of the Service to forward matched requests
-	// to. When specified, this takes the place of BackendRef. If both
-	// BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
-	//
-	// The protocol to use should be specified with the AppProtocol field on Service
-	// resources. This field was introduced in Kubernetes 1.18. If using an earlier version
-	// of Kubernetes, a `networking.x-k8s.io/app-protocol` annotation on the
-	// BackendPolicy resource may be used to define the protocol. If the
-	// AppProtocol field is available, this annotation should not be used. The
-	// AppProtocol field, when populated, takes precedence over the annotation
-	// in the BackendPolicy resource. For custom backends, it is encouraged to
-	// add a semantically-equivalent field in the Custom Resource Definition.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:validation:MaxLength=253
-	ServiceName *string `json:"serviceName,omitempty"`
-
-	// BackendRef is a reference to a backend to forward matched requests to. If
-	// both BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
-	//
-	// Support: Custom
-	//
-	// +optional
-	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
-
-	// Port specifies the destination port number to use for the
-	// backend referenced by the ServiceName or BackendRef field.
-	//
-	// Support: Core
-	//
-	Port PortNumber `json:"port"`
-
-	// Weight specifies the proportion of HTTP requests forwarded to the backend
-	// referenced by the ServiceName or BackendRef field. This is computed as
-	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
-	// there may be some epsilon from the exact proportion defined here
-	// depending on the precision an implementation supports. Weight is not a
-	// percentage and the sum of weights does not need to equal 100.
-	//
-	// If only one backend is specified and it has a weight greater than 0, 100%
-	// of the traffic is forwarded to that backend. If weight is set to 0, no
-	// traffic should be forwarded for this entry. If unspecified, weight
-	// defaults to 1.
-	//
-	// Support: Core
-	//
-	// +kubebuilder:default=1
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=1000000
-	Weight int32 `json:"weight,omitempty"`
+	RouteForwardTo `json:",inline"`
 
 	// Filters defined at this-level should be executed if and only if the
 	// request is being forwarded to the backend defined here.
