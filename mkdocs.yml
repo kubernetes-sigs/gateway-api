@@ -6,6 +6,7 @@ docs_dir: docs-src
 theme:
   name: material
 plugins:
+  - search
   - macros:
       include_dir: examples
 nav:
