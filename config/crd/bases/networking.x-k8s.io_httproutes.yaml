@@ -126,6 +126,11 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                              set:
+                                additionalProperties:
+                                  type: string
+                                description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   My-Header: ABC \n Config:   set: {\"my-header\": \"XYZ\"} \n Output:   GET /foo HTTP/1.1   my-header: XYZ \n Support: Extended"
+                                type: object
                             type: object
                           requestMirror:
                             description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"
@@ -248,6 +253,11 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                    set:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   My-Header: ABC \n Config:   set: {\"my-header\": \"XYZ\"} \n Output:   GET /foo HTTP/1.1   my-header: XYZ \n Support: Extended"
+                                      type: object
                                   type: object
                                 requestMirror:
                                   description: "RequestMirror defines a schema for a filter that mirrors requests. \n Support: Extended"

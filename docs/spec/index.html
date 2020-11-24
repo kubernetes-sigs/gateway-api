@@ -2271,6 +2271,28 @@ filter.</p>
 <tbody>
 <tr>
 <td>
+<code>set</code></br>
+<em>
+map[string]string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Set overwrites the request with the given header (name, value)
+before the action.</p>
+<p>Input:
+GET /foo HTTP/1.1
+My-Header: ABC</p>
+<p>Config:
+set: {&ldquo;my-header&rdquo;: &ldquo;XYZ&rdquo;}</p>
+<p>Output:
+GET /foo HTTP/1.1
+my-header: XYZ</p>
+<p>Support: Extended</p>
+</td>
+</tr>
+<tr>
+<td>
 <code>add</code></br>
 <em>
 map[string]string
