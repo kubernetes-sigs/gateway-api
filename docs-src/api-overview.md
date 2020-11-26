@@ -45,7 +45,7 @@ In Ingress v1beta1, the closest analog to GatewayClass is the `ingress-class` an
 
 A Gateway describes how traffic can be translated to Services within the cluster.
 That is, it defines a request for a way to translate traffic from somewhere that does not know about Kubernetes to somewhere that does.
-For example, traffic sent to a Kubernetes Services by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
+For example, traffic sent to a Kubernetes Service by a cloud load balancer, an in-cluster proxy or external hardware load balancer.
 While many use cases have client traffic originating “outside” the cluster, this is not a requirement.
 
 It defines a request for a specific load balancer config that implements the GatewayClass’ configuration and behaviour contract.
@@ -125,7 +125,7 @@ Here is a summary of extension points in the API:
 - **XForwardTo.BackendRef**: This extension point should be used for forwarding
   traffic to network endpoints other than core Kubernetes Service resource.
   Examples include an S3 bucket, Lambda function, a file-server, etc.
-- **HTTPRouteFilter**: This API type in HTTPoute provides a way to hook into the
+- **HTTPRouteFilter**: This API type in HTTPRoute provides a way to hook into the
   request/response lifecycle of an HTTP request.
 - **Custom Routes**: If none of the above extensions points suffice for a use
   case, Implementers can chose to create custom Route resources for protocols

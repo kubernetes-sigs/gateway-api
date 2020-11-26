@@ -51,6 +51,6 @@ Participation in the Kubernetes community is governed by the
 [slack]: https://kubernetes.slack.com/messages/sig-network-service-apis
 [guides]: https://kubernetes-sigs.github.io/service-apis/guides
 [spec]: https://kubernetes-sigs.github.io/service-apis/spec
-[concepts]: https://kubernetes-sigs.github.io/service-apis/concepts
+[concepts]: https://kubernetes-sigs.github.io/service-apis/api-overview
 [security-model]: https://kubernetes-sigs.github.io/service-apis/security-model
 
