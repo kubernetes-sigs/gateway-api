@@ -140,7 +140,7 @@ spec:
                               type: object
                           type: object
                         selector:
-                          description: "Selector specifies a set of route labels used for selecting routes to associate with the Gateway. If RouteSelector is defined, only routes matching the RouteSelector are associated with the Gateway. An empty RouteSelector matches all routes. \n Support: Core"
+                          description: "Selector specifies a set of route labels used for selecting routes to associate with the Gateway. If this Selector is defined, only routes matching the Selector are associated with the Gateway. An empty Selector matches all routes. \n Support: Core"
                           properties:
                             matchExpressions:
                               description: matchExpressions is a list of label selector requirements. The requirements are ANDed.
