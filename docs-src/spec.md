@@ -2899,8 +2899,8 @@ string
 <p>Kind MUST correspond to kinds of routes that are compatible with the
 application protocol specified in the Listener&rsquo;s Protocol field.</p>
 <p>If an implementation does not support or recognize this
-resource type, it SHOULD raise a &ldquo;ConditionInvalidRoutes&rdquo;
-condition for the affected Listener.</p>
+resource type, it SHOULD set the &ldquo;ResolvedRefs&rdquo; condition to false for
+this listener with the &ldquo;InvalidRoutesRef&rdquo; reason.</p>
 <p>Support: Core</p>
 </td>
 </tr>

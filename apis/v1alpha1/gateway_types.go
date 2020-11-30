@@ -418,8 +418,8 @@ type RouteBindingSelector struct {
 	// application protocol specified in the Listener's Protocol field.
 	//
 	// If an implementation does not support or recognize this
-	// resource type, it SHOULD raise a "ConditionInvalidRoutes"
-	// condition for the affected Listener.
+	// resource type, it SHOULD set the "ResolvedRefs" condition to false for
+	// this listener with the "InvalidRoutesRef" reason.
 	//
 	// Support: Core
 	Kind string `json:"kind"`
@@ -776,7 +776,7 @@ const (
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 
 	// ListenerReasonInvalidRoutesRef is used when the Listener's Routes
-	// selector is invalid or cannot be resolved. Note that it is not
+	// selector or kind is invalid or cannot be resolved. Note that it is not
 	// an error for this selector to not resolve any Routes, and the
 	// "ResolvedRefs" status condition should not be raised in that case.
 	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRoutesRef"

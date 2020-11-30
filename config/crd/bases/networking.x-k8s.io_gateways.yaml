@@ -94,7 +94,7 @@ spec:
                           minLength: 1
                           type: string
                         kind:
-                          description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD raise a \"ConditionInvalidRoutes\" condition for the affected Listener. \n Support: Core"
+                          description: "Kind is the kind of the route resource to select. \n Kind MUST correspond to kinds of routes that are compatible with the application protocol specified in the Listener's Protocol field. \n If an implementation does not support or recognize this resource type, it SHOULD set the \"ResolvedRefs\" condition to false for this listener with the \"InvalidRoutesRef\" reason. \n Support: Core"
                           type: string
                         namespaces:
                           default:
