@@ -520,7 +520,7 @@ type HTTPRouteForwardTo struct {
 	//
 	// If the referent cannot be found, the route must be dropped
 	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
+	// condition on the Gateway with the "DegradedRoutes" reason.
 	// The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
 	//
@@ -545,7 +545,7 @@ type HTTPRouteForwardTo struct {
 	//
 	// If the referent cannot be found, the route must be dropped
 	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DroppedRoutes" reason.
+	// condition on the Gateway with the "DegradedRoutes" reason.
 	// The gateway status for this route should be updated with a
 	// condition that describes the error more specifically.
 	//
