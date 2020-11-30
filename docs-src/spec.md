@@ -1992,7 +1992,7 @@ BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
 <p>If the referent cannot be found, the route must be dropped
 from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
 <p>The protocol to use should be specified with the AppProtocol field on Service
@@ -2022,7 +2022,7 @@ both BackendRef and ServiceName are specified, ServiceName will be given
 precedence.</p>
 <p>If the referent cannot be found, the route must be dropped
 from the Gateway. The controller should raise the &ldquo;ResolvedRefs&rdquo;
-condition on the Gateway with the &ldquo;DroppedRoutes&rdquo; reason.
+condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason.
 The gateway status for this route should be updated with a
 condition that describes the error more specifically.</p>
 <p>Support: Custom</p>
