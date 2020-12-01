@@ -484,8 +484,14 @@ type GatewayAddress struct {
 // AddressType defines how a network address is represented as a text string.
 // Valid AddressType values are:
 //
-// * "IPAddress"
-// * "NamedAddress"
+// * "IPAddress": an IPv4 or IPv6 address
+// * "NamedAddress": an opaque identifier. The interpretation
+// of the name is dependent on the controller. If a NamedAddress is
+// requested but unsupported by an implementation, the controller
+// should raise the "Detached" listener status condition on the Gateway
+// with the "UnsupportedAddress" reason.
+//
+// A NamedAddress might be a cloud-dependent ID for a "static" or "elastic" IP
 //
 // +kubebuilder:validation:Enum=IPAddress;NamedAddress
 type AddressType string
@@ -503,7 +509,7 @@ const (
 	// Support: Extended.
 	IPAddressType AddressType = "IPAddress"
 
-	// NamedAddressType is an address selected by name. The interpretation
+	// NamedAddressType is an opaque identifier. The interpretation
 	// of the name is dependent on the controller. If a NamedAddress is
 	// requested but unsupported by an implementation, the controller
 	// should raise the "Detached" listener status condition on the Gateway
