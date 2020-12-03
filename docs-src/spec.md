@@ -891,9 +891,14 @@ UDPRouteStatus
 <p>AddressType defines how a network address is represented as a text string.
 Valid AddressType values are:</p>
 <ul>
-<li>&ldquo;IPAddress&rdquo;</li>
-<li>&ldquo;NamedAddress&rdquo;</li>
+<li>&ldquo;IPAddress&rdquo;: an IPv4 or IPv6 address</li>
+<li>&ldquo;NamedAddress&rdquo;: an opaque identifier. The interpretation
+of the name is dependent on the controller. If a NamedAddress is
+requested but unsupported by an implementation, the controller
+should raise the &ldquo;Detached&rdquo; listener status condition on the Gateway
+with the &ldquo;UnsupportedAddress&rdquo; reason.</li>
 </ul>
+<p>A NamedAddress might be a cloud-dependent ID for a &ldquo;static&rdquo; or &ldquo;elastic&rdquo; IP</p>
 </p>
 <h3 id="networking.x-k8s.io/v1alpha1.BackendPolicyConditionType">BackendPolicyConditionType
 (<code>string</code> alias)</p></h3>
