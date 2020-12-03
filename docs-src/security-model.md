@@ -111,8 +111,8 @@ To be considered conformant with the Service APIs spec, controllers need to:
 * Populate status fields on Gateways and Resources to indicate if they are
   compatible with the corresponding GatewayClass configuration.
 * Ensure that all Routes added to a Gateway:
-  * Have been selected by the Gateway.
-  * Have a Gateways field that allows the Gateway use of the route.
+    * Have been selected by the Gateway.
+    * Have a Gateways field that allows the Gateway use of the route.
 
 ## Alternative Approaches Considered
 ### New API Resources
