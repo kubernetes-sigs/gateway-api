@@ -119,7 +119,7 @@ spec:
                         required:
                         - port
                         type: object
-                      maxItems: 4
+                      maxItems: 16
                       minItems: 1
                       type: array
                     matches:

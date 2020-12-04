@@ -320,7 +320,7 @@ spec:
                         required:
                         - port
                         type: object
-                      maxItems: 4
+                      maxItems: 16
                       type: array
                     matches:
                       default:
