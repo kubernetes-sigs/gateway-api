@@ -6,7 +6,7 @@ effectively.
 
 ## Client/Server and TLS
 
-![overview](tls-overview.svg)
+![overview](images/tls-overview.svg)
 
 For Gateways, there are two connections involved:
 
