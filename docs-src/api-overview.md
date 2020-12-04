@@ -86,7 +86,7 @@ define an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:
 
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
-![schema](schema-uml.svg)
+![schema](images/schema-uml.svg)
 
 ## Request flow
 

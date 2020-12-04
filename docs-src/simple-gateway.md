@@ -5,7 +5,7 @@ deployed together by the same owner. This represents a similar kind of model
 used for Ingress. In this guide, a Gateway and HTTPRoute are deployed which
 match all HTTP traffic and directs it to a single Service named `foo-svc`. 
 
-![Simple Gateway](single-service-gateway.png)
+![Simple Gateway](images/single-service-gateway.png)
 
 ```yaml  
 {% include 'simple-gateway/gateway.yaml' %} 
@@ -38,4 +38,4 @@ While Route resources are often used to filter traffic to many different
 backends (potentially with different owners), this demonstrates the simplest
 possible route with a single Service backend. This example shows how a service
 owner can deploy both the Gateway and the HTTPRoute for their usage alone,
-giving them more control and autonomy for how the service is exposed. 
+giving them more control and autonomy for how the service is exposed.
