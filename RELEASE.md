@@ -9,20 +9,10 @@ The Service APIs project is an API project that has the following two components
 This repository is the home for both of the above components.
 
 ## Versioning strategy
+The versioning strategy for this project is covered in detail in [the release
+documentation].
 
-Releases in this repository follow Go module versioning conventions and
-semantic versioning.
-During the `alpha` and `beta` stage of the API, version tags will take the form
-of `v0.x.y`.
-Minor version must be incremented whenever a new API version is introduced for
-any resource or even when smaller backwards-compatible additions are made to the API.
-Bug fixes and clarifications in the spec will lead to patch number being incremented.
-
-During GA (when `apiVersion` changes to `v1`), the Git version tag will be bumped
-up to `v1.0.0`.
-
-> The first release candidate was tagged as `v1alpha1-rc1`. It predates this
-document and is an exception.
+[the release documentation]: https://kubernetes-sigs.github.io/service-apis/releases/#versioning
 
 ## Releasing a new version
 
