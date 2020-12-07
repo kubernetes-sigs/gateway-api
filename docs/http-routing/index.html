@@ -36,7 +36,7 @@
     
     
       
-        <title>Enhancement requests - Kubernetes Service APIs</title>
+        <title>HTTP routing - Kubernetes Service APIs</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#enhancement-tracking-and-backlog" tabindex="1" class="md-skip">
+      <a href="#http-routing" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -101,7 +101,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Enhancement requests
+                HTTP routing
               
             </span>
           
@@ -305,10 +305,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
     
     <label class="md-nav__link" for="nav-4">
       Guides
@@ -360,11 +362,20 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../http-routing/" title="HTTP routing" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+    <a href="./" title="HTTP routing" class="md-nav__link md-nav__link--active">
       HTTP routing
     </a>
+    
   </li>
 
         
@@ -449,12 +460,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-6" type="checkbox" id="nav-6">
     
     <label class="md-nav__link" for="nav-6">
       Contributing
@@ -482,77 +491,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Enhancement requests
-      </label>
-    
-    <a href="./" title="Enhancement requests" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../enhancement-requests/" title="Enhancement requests" class="md-nav__link">
       Enhancement requests
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    Quick start
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-considered-an-enhancement" class="md-nav__link">
-    What is Considered an Enhancement?
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-create-a-new-enhancement" class="md-nav__link">
-    When to Create a New Enhancement
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-are-enhancements-tracked" class="md-nav__link">
-    Why are Enhancements Tracked
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-comment-on-an-enhancement-issue" class="md-nav__link">
-    When to Comment on an Enhancement Issue
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -602,50 +545,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#quick-start" class="md-nav__link">
-    Quick start
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-is-considered-an-enhancement" class="md-nav__link">
-    What is Considered an Enhancement?
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-create-a-new-enhancement" class="md-nav__link">
-    When to Create a New Enhancement
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-are-enhancements-tracked" class="md-nav__link">
-    Why are Enhancements Tracked
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-to-comment-on-an-enhancement-issue" class="md-nav__link">
-    When to Comment on an Enhancement Issue
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -657,56 +556,103 @@
               
                 
                 
-                <h1 id="enhancement-tracking-and-backlog">Enhancement Tracking and Backlog</h1>
-<p>Inspired by <a href="https://github.com/kubernetes/enhancements">Kubernetes enhancements</a>, service-api's
-provides a process for introducing new functionality or considerable changes to the project. The
-enhancement process will evolve over time as the project matures.</p>
-<p>Enhancements provides the basis of a community roadmap. Enhancements may be filed by anyone, but
-require approval from a maintainer to accept the enhancement into the project.</p>
-<h2 id="quick-start">Quick start</h2>
-<ol>
-<li>Create an <a href="https://github.com/kubernetes-sigs/service-apis/issues/new/choose">Issue</a> and select
-"Enhancement Request".</li>
-<li>Follow the instructions in the enhancement request template and submit the Issue.</li>
-</ol>
-<h2 id="what-is-considered-an-enhancement">What is Considered an Enhancement?</h2>
-<p>An enhancement is generally anything that:</p>
+                <h1 id="http-routing">HTTP routing</h1>
+<p>The <a href="../httproute/">HTTPRoute resource</a> allows you to match on HTTP traffic and 
+direct it to Kubernetes backends. This guide shows how the HTTPRoute matches
+traffic on host, header, and path fields and forwards it to different 
+Kubernetes Services.</p>
+<p>The following diagram describes a required traffic flow across three different
+Services:</p>
 <ul>
-<li>impacts how a cluster is operated including addition or removal of significant
-  capabilities</li>
-<li>introduces changes to an api</li>
-<li>needs significant effort to implement</li>
-<li>requires documentation to utilize</li>
+<li>Traffic to <code>foo.example.com/login</code> is forwarded to <code>foo-svc</code> </li>
+<li>Traffic to <code>bar.example.com/*</code> with a <code>env: canary</code> header is forwarded 
+to <code>bar-svc-canary</code></li>
+<li>Traffic to <code>bar.example.com/*</code> without the header is forwarded to <code>bar-svc</code> </li>
 </ul>
-<p>It is unlikely to require an enhancement if it:</p>
-<ul>
-<li>fixes a bug</li>
-<li>adds more testing</li>
-<li>code refactors</li>
-<li>minimal impact to a release</li>
-</ul>
-<p>If you're unsure the proposed work requires an enhancement, file an issue
-and ask.</p>
-<h2 id="when-to-create-a-new-enhancement">When to Create a New Enhancement</h2>
-<p>Create an enhancement once you have:</p>
-<ul>
-<li>circulated your idea to see if there is interest.</li>
-<li>identified community members who agree to work on and maintain the enhancement.</li>
-<li>enhancements may take several releases to complete.</li>
-<li>a prototype in your own fork (optional)</li>
-</ul>
-<h2 id="why-are-enhancements-tracked">Why are Enhancements Tracked</h2>
-<p>As the project evolves, it's important that the service-api's community understands
-how the enhancement affects the project.  Individually, it's hard to understand how
-all parts of the system interact, but as a community we can work together to build
-the right design and approach before getting too deep into an implementation.</p>
-<h2 id="when-to-comment-on-an-enhancement-issue">When to Comment on an Enhancement Issue</h2>
-<p>Please comment on the enhancement issue to:</p>
-<ul>
-<li>request a review or clarification on the process</li>
-<li>update status of the enhancement effort</li>
-<li>link to relevant issues in other repos</li>
-</ul>
+<p><img alt="HTTP Routinng" src="../images/http-routing.png" /></p>
+<p>The dotted lines show the Gateway resources deployed to configure this routing
+behavior. There are two HTTPRoute resources that create routing rules on the
+same <code>prod-web</code> Gateway. This illustrates how more than one Route can bind to a
+Gateway which allows Routes to merge on a Gateway as
+long as they don't conflict. </p>
+<p>The following <code>prod-web</code> Gateway is defined from the <code>acme-lb</code> GatewayClass.
+<code>prod-web</code> listens for HTTP traffic on port 80 and will bind to all Routes in
+the same Namespace that have the matching <code>gateway: prod-web-gw</code> label.
+Route labels and Gateway label selectors allow Routes and Gateways to be 
+bound to each other by their respective owners.</p>
+<pre><code class="yaml">kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: prod-web
+spec:
+  gatewayClassName: acme-lb
+  listeners:  
+  - protocol: HTTP
+    port: 80
+    routes:
+      kind: HTTPRoute
+      selector:
+        matchLabels:
+          gateway: prod-web-gw  
+</code></pre>
+
+<p>An HTTPRoute can match against a <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">single set of
+hostnames</a>.
+These hostnames are matched before any other matching within the HTTPRoute takes
+place. Since <code>foo.example.com</code> and <code>bar.example.com</code> are separate hosts with
+different routing requirements, each is deployed as its own HTTPRoute -
+<code>foo-route</code> and <code>bar-route</code>.</p>
+<p>The following <code>foo-route</code> will match any traffic for <code>foo.example.com</code> and apply
+its routing rules to forward the traffic to the correct backend. Since there is
+only one match specified, only <code>foo.example.com/login/*</code> traffic will be
+forwarded. Traffic to any other paths that do not begin with <code>/login</code> will not
+be matched by this Route.</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: foo-route
+  labels:
+    gateway: prod-web-gw
+spec:
+  hostnames:
+  - &quot;foo.example.com&quot;
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /login
+    forwardTo:
+    - serviceName: foo-svc
+      port: 8080  
+</code></pre>
+
+<p>Similarly, the <code>bar-route</code> HTTPRoute matches traffic for <code>bar.example.com</code>. All
+traffic for this hostname will be evaluated against the routing rules. The most
+specific match will take precedence which means that any traffic with the <code>env:
+canary</code> header will be forwarded to <code>bar-svc-canary</code> and if the header is
+missing or not <code>canary</code> then it'll be forwarded to <code>bar-svc</code>.</p>
+<pre><code class="yaml">kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: bar-route
+  labels:
+    gateway: prod-web-gw
+spec:
+  hostnames:
+  - &quot;bar.example.com&quot;
+  rules:
+  - matches:
+    - headers:
+        type: Exact
+        values:
+          env: canary
+    forwardTo:
+    - serviceName: bar-svc-canary
+      port: 8080
+  - forwardTo:
+    - serviceName: bar-svc
+      port: 8080  
+</code></pre>
                 
                   
                 
@@ -728,7 +674,7 @@ the right design and approach before getting too deep into an implementation.</p
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../devguide/" title="Developer guide" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../simple-gateway/" title="Simple Gateway" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -737,19 +683,19 @@ the right design and approach before getting too deep into an implementation.</p
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                Developer guide
+                Simple Gateway
               </span>
             </div>
           </a>
         
         
-          <a href="../community/" title="Community" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../multiple-ns/" title="Multiple namespaces and routes" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                Community
+                Multiple namespaces and routes
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
