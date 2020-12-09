@@ -68,7 +68,7 @@ type TCPRouteRule struct {
 	// be sent.
 	//
 	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=4
+	// +kubebuilder:validation:MaxItems=16
 	ForwardTo []RouteForwardTo `json:"forwardTo"`
 }
 

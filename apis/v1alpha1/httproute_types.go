@@ -202,7 +202,7 @@ type HTTPRouteRule struct {
 	// error code is returned.
 	//
 	// +optional
-	// +kubebuilder:validation:MaxItems=4
+	// +kubebuilder:validation:MaxItems=16
 	ForwardTo []HTTPRouteForwardTo `json:"forwardTo,omitempty"`
 }
 
