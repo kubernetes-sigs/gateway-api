@@ -53,7 +53,7 @@
       a proud tradition of extending Ingress objects.
 
     * Use API-defined extension points. Some Service
-      API objects have explicit [extension points](/api-overview/#extension-points)
+      API objects have explicit [extension points](api-overview.md#extension-points)
       for implementations to use.
 
 *  **Q: Where can I find Service API releases?<br>**
