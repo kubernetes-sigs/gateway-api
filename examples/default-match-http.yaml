@@ -11,7 +11,6 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: default-match-gw
-  namespace: default
 spec:
   gatewayClassName: default-match-example
   listeners:
@@ -35,7 +34,6 @@ kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: default-match-route
-  namespace: default
   labels:
     app: default-match
 spec:
