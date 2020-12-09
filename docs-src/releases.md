@@ -18,10 +18,38 @@ Service API releases will include four components:
 
 ## Versioning
 
-Versioning will be completely separate from the Kubernetes release process, but
-similar methodology will be used. Service API versions will use the [same
-version level requirements as other Kubernetes
-features](https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions).
+This project uses 2 different but related forms of versioning:
+
+- [Kubernetes API Versioning] (example: v1alpha1)
+- [Semantic Versioning] (example: v0.1.0)
+
+Each new API version will be released with a new semantic version. For example,
+v1alpha1 was released with v0.1.0. Before we release an API version, we may
+provide some release candidates such as v0.1.0-rc1 as a way to evaluate a new
+API version before it is formally released. All releases will be compatible with
+[Go modules versioning].
+
+As the API evolves, we will make intermediate releases that improve upon an
+existing API version. These releases will be fully backwards compatible and will
+be limited to either bug fixes or additions to the API.
+
+This project may release one or more additional alpha API versions. New alpha
+API versions may include breaking changes such as removing or renaming fields or
+resources.
+
+Following [Semantic Versioning], new patch releases will be limited to bug
+fixes. New minor releases may include new fields or resources in addition to bug
+fixes. New API versions will be released with new minor or major versions.
+
+Our changelog and release notes will always include both the semantic version
+and API version(s) included in the release. 
+
+[Kubernetes API Version]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions
+[Semantic Versioning]: https://semver.org/
+[Go modules versioning]: https://golang.org/ref/mod#versions
+
+> The first release candidate was tagged as `v1alpha1-rc1`. It predates this
+documentation and is an exception.
 
 ## Installation
 
