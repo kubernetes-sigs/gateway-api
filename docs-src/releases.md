@@ -51,6 +51,13 @@ and API version(s) included in the release.
 > The first release candidate was tagged as `v1alpha1-rc1`. It predates this
 documentation and is an exception.
 
+## Branching
+This project will have frequent updates to the master branch. There are no
+compatibility guarantees associated with code in any branch, including master,
+until it has been released. For example, changes may be reverted before a
+release is published. For the best results, use the latest published release of
+this project.
+
 ## Installation
 
 This project will be responsible for providing straightforward and reliable ways
