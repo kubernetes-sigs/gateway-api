@@ -13,7 +13,6 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: my-gateway
-  namespace: default
 spec:
   gatewayClassName: acme-lb
   listeners:  # Use GatewayClass defaults for listener definition.
@@ -31,7 +30,6 @@ kind: UDPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: udp-app-1
-  namespace: default
   labels:
     app: foo
 spec:

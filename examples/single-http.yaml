@@ -2,7 +2,6 @@ kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: gateway
-  namespace: default
 spec:
   gatewayClassName: default-class
   addresses:
