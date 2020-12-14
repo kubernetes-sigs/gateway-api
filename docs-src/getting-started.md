@@ -8,7 +8,7 @@ be installed into any Kubernetes (>= 1.16) cluster.
 To install the CRDs, please execute:
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=master" \
+kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0" \
 | kubectl apply -f -
 ```
 
@@ -56,6 +56,6 @@ your cluster. If you have been using these resources for any other purpose do
 not uninstall these CRDs.
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=master" \
+kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0" \
 | kubectl delete -f -
 ```
