@@ -25,6 +25,7 @@ nav:
       - HTTP routing: http-routing.md 
       - Multiple namespaces and routes: multiple-ns.md
       - TLS: tls.md
+      - TCP routing: tcp.md
   - References:
       - API specification: spec.md
       - Releases: releases.md

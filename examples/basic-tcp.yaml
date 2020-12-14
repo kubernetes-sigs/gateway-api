@@ -12,10 +12,10 @@ spec:
 kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
-  name: my-gateway
+  name: my-tcp-gateway
 spec:
   gatewayClassName: acme-lb
-  listeners:  # Use GatewayClass defaults for listener definition.
+  listeners:
   - protocol: TCP
     port: 8080
     routes:
@@ -23,8 +23,13 @@ spec:
       selector:
         matchLabels:
           "app": "foo"
-      namespaces:
-        from: "All"
+  - protocol: TCP
+    port: 8090
+    routes:
+      kind: TCPRoute
+      selector:
+        matchLabels:
+          "app": "bar"
 ---
 kind: TCPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -35,5 +40,18 @@ metadata:
 spec:
   rules:
   - forwardTo:
-    - serviceName: my-service
+    - serviceName: my-foo-service
+      port: 6000
+---
+kind: TCPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tcp-app-2
+  namespace: default
+  labels:
+    app: bar
+spec:
+  rules:
+  - forwardTo:
+    - serviceName: my-bar-service
       port: 6000
