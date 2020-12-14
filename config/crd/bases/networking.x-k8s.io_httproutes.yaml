@@ -118,10 +118,10 @@ spec:
                               add:
                                 additionalProperties:
                                   type: string
-                                description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: Extended"
+                                description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo bar \n Support: Extended"
                                 type: object
                               remove:
-                                description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: Extended"
+                                description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"
                                 items:
                                   type: string
                                 maxItems: 16
@@ -129,7 +129,7 @@ spec:
                               set:
                                 additionalProperties:
                                   type: string
-                                description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   My-Header: ABC \n Config:   set: {\"my-header\": \"XYZ\"} \n Output:   GET /foo HTTP/1.1   my-header: XYZ \n Support: Extended"
+                                description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   set: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: bar \n Support: Extended"
                                 type: object
                             type: object
                           requestMirror:
@@ -245,10 +245,10 @@ spec:
                                     add:
                                       additionalProperties:
                                         type: string
-                                      description: "Add adds the given header (name, value) to the request before the action. \n Input:   GET /foo HTTP/1.1 \n Config:   add: {\"my-header\": \"foo\"} \n Output:   GET /foo HTTP/1.1   my-header: foo \n Support: Extended"
+                                      description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo bar \n Support: Extended"
                                       type: object
                                     remove:
-                                      description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   My-Header1: ABC   My-Header2: DEF   My-Header2: GHI \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   My-Header2: DEF \n Support: Extended"
+                                      description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"
                                       items:
                                         type: string
                                       maxItems: 16
@@ -256,7 +256,7 @@ spec:
                                     set:
                                       additionalProperties:
                                         type: string
-                                      description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   My-Header: ABC \n Config:   set: {\"my-header\": \"XYZ\"} \n Output:   GET /foo HTTP/1.1   my-header: XYZ \n Support: Extended"
+                                      description: "Set overwrites the request with the given header (name, value) before the action. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   set: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: bar \n Support: Extended"
                                       type: object
                                   type: object
                                 requestMirror:

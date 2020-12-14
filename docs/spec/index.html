@@ -2282,12 +2282,12 @@ map[string]string
 before the action.</p>
 <p>Input:
 GET /foo HTTP/1.1
-My-Header: ABC</p>
+my-header: foo</p>
 <p>Config:
-set: {&ldquo;my-header&rdquo;: &ldquo;XYZ&rdquo;}</p>
+set: {&ldquo;my-header&rdquo;: &ldquo;bar&rdquo;}</p>
 <p>Output:
 GET /foo HTTP/1.1
-my-header: XYZ</p>
+my-header: bar</p>
 <p>Support: Extended</p>
 </td>
 </tr>
@@ -2301,14 +2301,16 @@ map[string]string
 <td>
 <em>(Optional)</em>
 <p>Add adds the given header (name, value) to the request
-before the action.</p>
+before the action. It appends to any existing values associated
+with the header name.</p>
 <p>Input:
-GET /foo HTTP/1.1</p>
-<p>Config:
-add: {&ldquo;my-header&rdquo;: &ldquo;foo&rdquo;}</p>
-<p>Output:
 GET /foo HTTP/1.1
 my-header: foo</p>
+<p>Config:
+add: {&ldquo;my-header&rdquo;: &ldquo;bar&rdquo;}</p>
+<p>Output:
+GET /foo HTTP/1.1
+my-header: foo bar</p>
 <p>Support: Extended</p>
 </td>
 </tr>
@@ -2327,14 +2329,14 @@ names. Note that the header names are case-insensitive
 [RFC-2616 4.2].</p>
 <p>Input:
 GET /foo HTTP/1.1
-My-Header1: ABC
-My-Header2: DEF
-My-Header2: GHI</p>
+my-header1: foo
+my-header2: bar
+my-header3: baz</p>
 <p>Config:
 remove: [&ldquo;my-header1&rdquo;, &ldquo;my-header3&rdquo;]</p>
 <p>Output:
 GET /foo HTTP/1.1
-My-Header2: DEF</p>
+my-header2: bar</p>
 <p>Support: Extended</p>
 </td>
 </tr>
