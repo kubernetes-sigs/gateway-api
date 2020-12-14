@@ -648,7 +648,7 @@
 <p>This project provides a collection of Custom Resource Definitions (CRDs) that can
 be installed into any Kubernetes (&gt;= 1.16) cluster.</p>
 <p>To install the CRDs, please execute:</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=master&quot; \
+<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0&quot; \
 | kubectl apply -f -
 </code></pre>
 
@@ -748,7 +748,7 @@ spec:
 command. Note that this will remove all GatewayClass and Gateway resources in
 your cluster. If you have been using these resources for any other purpose do
 not uninstall these CRDs.</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=master&quot; \
+<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0&quot; \
 | kubectl delete -f -
 </code></pre>
                 
