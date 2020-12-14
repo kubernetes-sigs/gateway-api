@@ -1767,7 +1767,8 @@ my-header: foo</p>
 add: {&ldquo;my-header&rdquo;: &ldquo;bar&rdquo;}</p>
 <p>Output:
 GET /foo HTTP/1.1
-my-header: foo bar</p>
+my-header: foo
+my-header: bar</p>
 <p>Support: Extended</p>
 </td>
 </tr>

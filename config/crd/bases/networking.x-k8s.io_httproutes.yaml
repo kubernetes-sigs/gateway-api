@@ -118,7 +118,7 @@ spec:
                               add:
                                 additionalProperties:
                                   type: string
-                                description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo bar \n Support: Extended"
+                                description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo   my-header: bar \n Support: Extended"
                                 type: object
                               remove:
                                 description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"
@@ -245,7 +245,7 @@ spec:
                                     add:
                                       additionalProperties:
                                         type: string
-                                      description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo bar \n Support: Extended"
+                                      description: "Add adds the given header (name, value) to the request before the action. It appends to any existing values associated with the header name. \n Input:   GET /foo HTTP/1.1   my-header: foo \n Config:   add: {\"my-header\": \"bar\"} \n Output:   GET /foo HTTP/1.1   my-header: foo   my-header: bar \n Support: Extended"
                                       type: object
                                     remove:
                                       description: "Remove the given header(s) from the HTTP request before the action. The value of RemoveHeader is a list of HTTP header names. Note that the header names are case-insensitive [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1   my-header1: foo   my-header2: bar   my-header3: baz \n Config:   remove: [\"my-header1\", \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2: bar \n Support: Extended"

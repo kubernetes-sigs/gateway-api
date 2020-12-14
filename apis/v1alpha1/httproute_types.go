@@ -463,7 +463,8 @@ type HTTPRequestHeaderFilter struct {
 	//
 	// Output:
 	//   GET /foo HTTP/1.1
-	//   my-header: foo bar
+	//   my-header: foo
+	//   my-header: bar
 	//
 	// Support: Extended
 	// +optional
