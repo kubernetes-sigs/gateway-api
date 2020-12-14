@@ -1443,12 +1443,52 @@ with the &ldquo;UnsupportedAddress&rdquo; reason.</li>
 </ul>
 <p>A NamedAddress might be a cloud-dependent ID for a &ldquo;static&rdquo; or &ldquo;elastic&rdquo; IP</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;IPAddress&#34;</p></td>
+<td><p>IPAddressType a textual representation of a numeric IP
+address. IPv4 addresses must be in dotted-decimal
+form. IPv6 addresses must be in a standard IPv6 text
+representation (see RFC 5952).</p>
+<p>If the requested address is unsupported, the controller
+should raise the &ldquo;Detached&rdquo; listener status condition on
+the Gateway with the &ldquo;UnsupportedAddress&rdquo; reason.</p>
+<p>Support: Extended.</p>
+</td>
+</tr><tr><td><p>&#34;NamedAddress&#34;</p></td>
+<td><p>NamedAddressType is an opaque identifier. The interpretation
+of the name is dependent on the controller. If a NamedAddress is
+requested but unsupported by an implementation, the controller
+should raise the &ldquo;Detached&rdquo; listener status condition on the Gateway
+with the &ldquo;UnsupportedAddress&rdquo; reason.</p>
+<p>Support: Implementation-specific.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.BackendPolicyConditionType">BackendPolicyConditionType
 (<code>string</code> alias)</p></h3>
 <p>
 <p>BackendPolicyConditionType is a type of condition associated with a
 BackendPolicy.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;NoSuchBackend&#34;</p></td>
+<td><p>ConditionNoSuchBackend indicates that one or more of the the specified
+Backends does not exist.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.BackendPolicySpec">BackendPolicySpec
 </h3>
 <p>
@@ -1713,12 +1753,54 @@ values will depend on <code>Type</code> and support by the controller.</p>
 <p>
 <p>GatewayAllowType specifies which Gateways should be allowed to use a Route.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;All&#34;</p></td>
+<td><p>GatewayAllowAll indicates that all Gateways will be able to use this
+route.</p>
+</td>
+</tr><tr><td><p>&#34;FromList&#34;</p></td>
+<td><p>GatewayAllowFromList indicates that only Gateways that have been
+specified in GatewayRefs will be able to use this route.</p>
+</td>
+</tr><tr><td><p>&#34;SameNamespace&#34;</p></td>
+<td><p>GatewayAllowSameNamespace indicates that only Gateways within the same
+namespace will be able to use this route.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassConditionType">GatewayClassConditionType
 (<code>string</code> alias)</p></h3>
 <p>
 <p>GatewayClassConditionType is the type of status conditions. This
 type should be used with the GatewayClassStatus.Conditions field.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Admitted&#34;</p></td>
+<td><p>GatewayClassConditionStatusAdmitted indicates that the GatewayClass
+has been admitted by the controller set in the <code>spec.controller</code>
+field.</p>
+<p>It defaults to False, and MUST be set by a controller when it sees
+a GatewayClass using its controller string.
+The status of this condition MUST be set to true if the controller will support
+provisioning Gateways using this class. Otherwise, this status MUST be set to false.
+If the status is set to false, the controller SHOULD set a Message and Reason as an
+explanation.
+GatewayClassNotAdmittedInvalidParameters is provided as an example Reason.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec
 </h3>
 <p>
@@ -1816,6 +1898,49 @@ this GatewayClass.</p>
 <p>GatewayConditionReason defines the set of reasons that explain
 why a particular Gateway condition type has been raised.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;AddressNotAssigned&#34;</p></td>
+<td><p>GatewayReasonAddressNotAssigned is used when the requested
+address has not been assigned to the Gateway. This reason
+can be used to express a range of circumstances, including
+(but not limited to) IPAM address exhaustion, invalid
+or unsupported address requests, or a named address not
+being found.</p>
+</td>
+</tr><tr><td><p>&#34;ListenersNotReady&#34;</p></td>
+<td><p>GatewayReasonListenersNotReady is used when one or more
+Listeners are not ready to serve traffic.</p>
+</td>
+</tr><tr><td><p>&#34;ListenersNotValid&#34;</p></td>
+<td><p>GatewayReasonListenersNotValid is used when one or more
+Listeners have an invalid or unsupported configuration
+and cannot be configured on the Gateway.</p>
+</td>
+</tr><tr><td><p>&#34;NoResources&#34;</p></td>
+<td><p>GatewayReasonNoResources is used when the Gateway is
+not scheduled because no infrastructure resources are
+available for this Gateway.</p>
+</td>
+</tr><tr><td><p>&#34;NoSuchGatewayClass&#34;</p></td>
+<td><p>GatewayReasonNoSuchGatewayClass is used when the Gateway is
+not scheduled because there is no controller that recognizes
+the GatewayClassName. This reason should only be set by
+a controller that has cluster-wide visibility of all the
+installed GatewayClasses.</p>
+</td>
+</tr><tr><td><p>&#34;NotReconciled&#34;</p></td>
+<td><p>GatewayReasonNotReconciled is used when the Gateway is
+not scheduled because it recently been created and no
+controller has reconciled it yet.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayConditionType">GatewayConditionType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -1823,6 +1948,48 @@ why a particular Gateway condition type has been raised.</p>
 Gateway. This type should be used with the GatewayStatus.Conditions
 field.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>GatewayConditionReady indicates whether the Gateway is able
+to serve traffic. Note that this does not indicate that the
+Gateway configuration is current or even complete (e.g. the
+controller may still not have reconciled the latest version,
+or some parts of the configuration could be missing).</p>
+<p>If both the &ldquo;ListenersNotValid&rdquo; and &ldquo;ListenersNotReady&rdquo;
+reasons are true, the Gateway controller should prefer the
+&ldquo;ListenersNotValid&rdquo; reason.</p>
+<p>Possible reasons for this condition to be false are:</p>
+<ul>
+<li>&ldquo;ListenersNotValid&rdquo;</li>
+<li>&ldquo;ListenersNotReady&rdquo;</li>
+<li>&ldquo;AddressNotAssigned&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.`</p>
+</td>
+</tr><tr><td><p>&#34;Scheduled&#34;</p></td>
+<td><p>GatewayConditionScheduled indicates whether the controller
+managing the Gateway has scheduled the Gateway to the
+underlying network infrastructure.</p>
+<p>Possible reasons for this condition to be false are:</p>
+<ul>
+<li>&ldquo;NotReconciled&rdquo;</li>
+<li>&ldquo;NoSuchGatewayClass&rdquo;</li>
+<li>&ldquo;NoResources&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayReference">GatewayReference
 </h3>
 <p>
@@ -2508,6 +2675,34 @@ extended filters.</p>
 <p>
 <p>HTTPRouteFilterType identifies a type of HTTPRoute filter.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;ExtensionRef&#34;</p></td>
+<td><p>HTTPRouteFilterExtensionRef should be used for configuring custom
+HTTP filters.</p>
+<p>Support in HTTPRouteRule: Custom
+Support in HTTPRouteForwardTo: Custom</p>
+</td>
+</tr><tr><td><p>&#34;RequestHeaderModifier&#34;</p></td>
+<td><p>HTTPRouteFilterRequestHeaderModifier can be used to add or remove an HTTP
+header from an HTTP request before it is sent to the upstream target.</p>
+<p>Support in HTTPRouteRule: Core
+Support in HTTPRouteForwardTo: Extended</p>
+</td>
+</tr><tr><td><p>&#34;RequestMirror&#34;</p></td>
+<td><p>HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
+different backend. The responses from this backend MUST be ignored by
+the Gateway.</p>
+<p>Support in HTTPRouteRule: Extended
+Support in HTTPRouteForwardTo: Extended</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">HTTPRouteForwardTo
 </h3>
 <p>
@@ -2978,6 +3173,21 @@ compared. Valid HeaderMatchType values are:</p>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Exact&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;ImplementationSpecific&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;RegularExpression&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.Hostname">Hostname
 (<code>string</code> alias)</p></h3>
 <p>
@@ -3154,6 +3364,77 @@ invalid, the rest of the Route should still be supported.</p>
 <p>ListenerConditionReason defines the set of reasons that explain
 why a particular Listener condition type has been raised.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;DegradedRoutes&#34;</p></td>
+<td><p>ListenerReasonDegradedRoutes indicates that not all of the routes
+selected by this Listener could be configured. The specific reason
+for the degraded route should be indicated in the route&rsquo;s
+.Status.Conditions field.</p>
+</td>
+</tr><tr><td><p>&#34;HostnameConflict&#34;</p></td>
+<td><p>ListenerReasonHostnameConflict is used when the Listener conflicts with
+hostnames in other Listeners. For example, this reason would be used when
+multiple Listeners on the same port use &ldquo;</em>&rdquo; in the hostname field.</p>
+</td>
+</tr><tr><td><p>&#34;Invalid&#34;</p></td>
+<td><p>ListenerReasonInvalid is used when the Listener is
+syntactically or semantically invalid.</p>
+</td>
+</tr><tr><td><p>&#34;InvalidCertificateRef&#34;</p></td>
+<td><p>ListenerReasonInvalidCertificateRef is used when the
+Listener has a TLS configuration with a TLS CertificateRef
+that is invalid or cannot be resolved.</p>
+</td>
+</tr><tr><td><p>&#34;InvalidRoutesRef&#34;</p></td>
+<td><p>ListenerReasonInvalidRoutesRef is used when the Listener&rsquo;s Routes
+selector or kind is invalid or cannot be resolved. Note that it is not
+an error for this selector to not resolve any Routes, and the
+&ldquo;ResolvedRefs&rdquo; status condition should not be raised in that case.</p>
+</td>
+</tr><tr><td><p>&#34;Pending&#34;</p></td>
+<td><p>ListenerReasonPending is used when the Listener is not
+yet not online and ready to accept client traffic.</p>
+</td>
+</tr><tr><td><p>&#34;PortUnavailable&#34;</p></td>
+<td><p>ListenerReasonPortUnavailable is used when the Listener
+requests a port that cannot be used on the Gateway.</p>
+</td>
+</tr><tr><td><p>&#34;ProtocolConflict&#34;</p></td>
+<td><p>ListenerReasonProtocolConflict is used when multiple
+Listeners are specified with the same Listener port number,
+but have conflicting protocol specifications.</p>
+</td>
+</tr><tr><td><p>&#34;RouteConflict&#34;</p></td>
+<td><p>ListenerReasonRouteConflict is used when the route
+resources selected for this Listener conflict with other
+specified properties of the Listener (e.g. Protocol).
+For example, a Listener that specifies &ldquo;UDP&rdquo; as the protocol
+but a route selector that resolves &ldquo;TCPRoute&rdquo; objects.</p>
+</td>
+</tr><tr><td><p>&#34;UnsupportedAddress&#34;</p></td>
+<td><p>ListenerReasonUnsupportedAddress is used when the Listener
+could not be attached to the Gateway because the requested
+address is not supported.</p>
+</td>
+</tr><tr><td><p>&#34;UnsupportedExtension&#34;</p></td>
+<td><p>ListenerReasonUnsupportedExtension is used when the
+controller detects that an implementation-specific Listener
+extension is being requested, but is not able to support
+the extension.</p>
+</td>
+</tr><tr><td><p>&#34;UnsupportedProtocol&#34;</p></td>
+<td><p>ListenerReasonUnsupportedProtocol is used when the
+Listener could not be attached to be Gateway because its
+protocol type is not supported.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerConditionType">ListenerConditionType
 (<code>string</code> alias)</p></h3>
 <p>
@@ -3161,6 +3442,77 @@ why a particular Listener condition type has been raised.</p>
 listener. This type should be used with the ListenerStatus.Conditions
 field.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Conflicted&#34;</p></td>
+<td><p>ListenerConditionConflicted indicates that the controller
+was unable to resolve conflicting specification requirements
+for this Listener. If a Listener is conflicted, its network
+port should not be configured on any network elements.</p>
+<p>Possible reasons for this condition to be true are:</p>
+<ul>
+<li>&ldquo;HostnameConflict&rdquo;</li>
+<li>&ldquo;ProtocolConflict&rdquo;</li>
+<li>&ldquo;RouteConflict&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.</p>
+</td>
+</tr><tr><td><p>&#34;Detached&#34;</p></td>
+<td><p>ListenerConditionDetached indicates that, even though
+the listener is syntactically and semantically valid, the
+controller is not able to configure it on the underlying
+Gateway infrastructure.</p>
+<p>A Listener is specified as a logical requirement, but needs to be
+configured on a network endpoint (i.e. address and port) by a
+controller. The controller may be unable to attach the Listener
+if it specifies an unsupported requirement, or prerequisite
+resources are not available.</p>
+<p>Possible reasons for this condition to be true are:</p>
+<ul>
+<li>&ldquo;PortUnavailable&rdquo;</li>
+<li>&ldquo;UnsupportedExtension&rdquo;</li>
+<li>&ldquo;UnsupportedProtocol&rdquo;</li>
+<li>&ldquo;UnsupportedAddress&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.</p>
+</td>
+</tr><tr><td><p>&#34;Ready&#34;</p></td>
+<td><p>ListenerConditionReady indicates whether the Listener
+has been configured on the Gateway.</p>
+<p>Possible reasons for this condition to be false are:</p>
+<ul>
+<li>&ldquo;Invalid&rdquo;</li>
+<li>&ldquo;Pending&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.</p>
+</td>
+</tr><tr><td><p>&#34;ResolvedRefs&#34;</p></td>
+<td><p>ListenerConditionResolvedRefs indicates whether the
+controller was able to resolve all the object references
+for the Listener.</p>
+<p>Possible reasons for this condition to be false are:</p>
+<ul>
+<li>&ldquo;DegradedRoutes&rdquo;</li>
+<li>&ldquo;InvalidCertificateRef&rdquo;</li>
+<li>&ldquo;InvalidRoutesRef&rdquo;</li>
+</ul>
+<p>Controllers may raise this condition with other reasons,
+but should prefer to use the reasons listed above to improve
+interoperability.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.ListenerStatus">ListenerStatus
 </h3>
 <p>
@@ -3320,6 +3672,23 @@ Valid PathMatchType values are:</p>
 - For prefix paths, a trailing &lsquo;/&rsquo; character in the Path is ignored,
 e.g. /abc and /abc/ specify the same match.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Exact&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;ImplementationSpecific&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;Prefix&#34;</p></td>
+<td></td>
+</tr><tr><td><p>&#34;RegularExpression&#34;</p></td>
+<td></td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.PortNumber">PortNumber
 (<code>int32</code> alias)</p></h3>
 <p>
@@ -3361,6 +3730,30 @@ exist. Such definitions must use prefixed name, such as
 protocols. Any protocol defined by implementations will fall under custom
 conformance.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;HTTP&#34;</p></td>
+<td><p>HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.</p>
+</td>
+</tr><tr><td><p>&#34;HTTPS&#34;</p></td>
+<td><p>HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.</p>
+</td>
+</tr><tr><td><p>&#34;TCP&#34;</p></td>
+<td><p>TCPProtocolType accepts TCP sessions.</p>
+</td>
+</tr><tr><td><p>&#34;TLS&#34;</p></td>
+<td><p>TLSProtocolType accepts TLS sessions over TCP.</p>
+</td>
+</tr><tr><td><p>&#34;UDP&#34;</p></td>
+<td><p>UDPProtocolType accepts UDP packets.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteBindingSelector">RouteBindingSelector
 </h3>
 <p>
@@ -3459,6 +3852,19 @@ this listener with the &ldquo;InvalidRoutesRef&rdquo; reason.</p>
 <p>
 <p>RouteConditionType is a type of condition for a route.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Admitted&#34;</p></td>
+<td><p>ConditionRouteAdmitted indicates whether the route has been admitted
+or rejected by a Gateway, and why.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteForwardTo">RouteForwardTo
 </h3>
 <p>
@@ -3738,6 +4144,27 @@ Gateway. This field is ignored for other values of &ldquo;From&rdquo;.</p>
 <p>
 <p>RouteSelectType specifies where Routes should be selected by a Gateway.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;All&#34;</p></td>
+<td><p>RouteSelectAll indicates that Routes in all namespaces may be used by
+this Gateway.</p>
+</td>
+</tr><tr><td><p>&#34;Same&#34;</p></td>
+<td><p>RouteSelectSame indicates that Only Routes in the same namespace may be
+used by this Gateway.</p>
+</td>
+</tr><tr><td><p>&#34;Selector&#34;</p></td>
+<td><p>RouteSelectSelector indicates that only Routes in namespaces selected by
+the selector may be used by this Gateway.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.RouteStatus">RouteStatus
 </h3>
 <p>
@@ -4003,6 +4430,26 @@ RouteStatus
 <p>
 <p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Passthrough&#34;</p></td>
+<td><p>TLSModePassthrough represents the Passthrough mode.
+In this mode, the TLS session NOT terminated by the Gateway. This
+implies that the Gateway can&rsquo;t decipher the TLS stream except for
+the ClientHello message of the TLS protocol.</p>
+</td>
+</tr><tr><td><p>&#34;Terminate&#34;</p></td>
+<td><p>TLSModeTerminate represents the Terminate mode.
+In this mode, TLS session between the downstream client
+and the Gateway is terminated at the Gateway.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSOverridePolicy">TLSOverridePolicy
 </h3>
 <p>
@@ -4076,7 +4523,7 @@ dot of a network host (e.g. &ldquo;foo.example.com&rdquo;) or &ldquo;wildcard&rd
 a domain name prefixed with a single wildcard label (e.g. &ldquo;<em>.example.com&rdquo;).
 The wildcard character &lsquo;</em>&rsquo; must appear by itself as the first DNS label
 and matches only a single label. You cannot have a wildcard label by
-itself (e.g. Host == &ldquo;</em>&rdquo;).</p>
+itself (e.g. Host == &ldquo;*&rdquo;).</p>
 <p>Requests will be matched against the Host field in the following order:</p>
 <ol>
 <li>If SNI is precise, the request matches this rule if the SNI in
@@ -4124,6 +4571,21 @@ the error more specifically.</p>
 <p>TLSRouteOverrideType type defines the level of allowance for Routes
 to override a specific TLS setting.</p>
 </p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;Allow&#34;</p></td>
+<td><p>TLSROuteOVerrideAllow allows the parameter to be configured from all routes.</p>
+</td>
+</tr><tr><td><p>&#34;Deny&#34;</p></td>
+<td><p>TLSRouteOverrideDeny prohibits the parameter to be configured from any route.</p>
+</td>
+</tr></tbody>
+</table>
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRouteRule">TLSRouteRule
 </h3>
 <p>

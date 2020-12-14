@@ -22,6 +22,27 @@
     {{ safe (renderComments .CommentLines) }}
 </p>
 
+{{ with (constantsOfType .) }}
+<table>
+    <thead>
+        <tr>
+            <th>Value</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+      {{- range . -}}
+      <tr>
+        {{- /* renderComments implicitly creates a <p> element, so we do the
+               same here to make the value line up nicely.  */ -}}
+        <td><p>{{ typeDisplayName . }}</p></td>
+        <td>{{ safe (renderComments .CommentLines) }}</td>
+      </tr>
+      {{- end -}}
+    </tbody>
+</table>
+{{ end }}
+
 {{ if .Members }}
 <table>
     <thead>
