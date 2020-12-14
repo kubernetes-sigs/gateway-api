@@ -36,7 +36,7 @@
     
     
       
-        <title>Gateway - Kubernetes Service APIs</title>
+        <title>TCP routing - Kubernetes Service APIs</title>
       
     
     
@@ -75,10 +75,6 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#gateway" tabindex="1" class="md-skip">
-        Skip to content
-      </a>
-    
     
       <header class="md-header" data-md-component="header">
   <nav class="md-header-nav md-grid">
@@ -101,7 +97,7 @@
             </span>
             <span class="md-header-nav__topic">
               
-                Gateway
+                TCP routing
               
             </span>
           
@@ -245,12 +241,10 @@
       
       
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+  <li class="md-nav__item md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3" checked>
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
     
     <label class="md-nav__link" for="nav-3">
       API Types
@@ -278,56 +272,11 @@
           
           
 
-  
 
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
-        Gateway
-      </label>
-    
-    <a href="./" title="Gateway" class="md-nav__link md-nav__link--active">
+  <li class="md-nav__item">
+    <a href="../gateway/" title="Gateway" class="md-nav__link">
       Gateway
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#deployment-models" class="md-nav__link">
-    Deployment models
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gateway-status" class="md-nav__link">
-    Gateway Status
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-    
   </li>
 
         
@@ -352,10 +301,12 @@
       
       
 
+  
 
-  <li class="md-nav__item md-nav__item--nested">
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
     
-      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4">
+      <input class="md-toggle md-nav__toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
     
     <label class="md-nav__link" for="nav-4">
       Guides
@@ -443,11 +394,18 @@
           
           
 
+  
 
-  <li class="md-nav__item">
-    <a href="../tcp/" title="TCP routing" class="md-nav__link">
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+    
+    <a href="./" title="TCP routing" class="md-nav__link md-nav__link--active">
       TCP routing
     </a>
+    
   </li>
 
         
@@ -583,91 +541,94 @@
               </div>
             
             
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">Table of contents</label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#deployment-models" class="md-nav__link">
-    Deployment models
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#gateway-status" class="md-nav__link">
-    Gateway Status
-  </a>
-  
-</li>
-      
-      
-      
-      
-      
-    </ul>
-  
-</nav>
-                  </div>
-                </div>
-              </div>
-            
           
           <div class="md-content">
             <article class="md-content__inner md-typeset">
               
                 
                 
-                <h1 id="gateway">Gateway</h1>
-<p>A <code>Gateway</code> is 1:1 with the life cycle of the configuration of infrastructure.
-When a user creates a <code>Gateway</code>, some load balancing infrastructure is
-provisioned or configured (see below for details) by the <code>GatewayClass</code>
-controller. <code>Gateway</code> is the resource that triggers actions in this API. Other
-resources in this API are configuration snippets until a Gateway has been
-created to link the resources together.</p>
-<p>The <code>Gateway</code> spec defines the following:</p>
+                  <h1>TCP routing</h1>
+                
+                <p>Service APIs is designed to work with multiple protocols.
+<a href="spec/#networking.x-k8s.io/v1alpha1.TCPRoute">TCPRoute</a> is one such route which
+allows for managing TCP traffic.</p>
+<p>In this example, we have one Gateway resource and two TCPRoute resources that
+distribute the traffic with the following rules:</p>
 <ul>
-<li><code>GatewayClassName</code>- Defines the name of a <code>GatewayClass</code> object used by
-    this Gateway.</li>
-<li><code>Listeners</code>-  Define the hostnames, ports, protocol, termination, TLS
-    settings and which routes should be associated to a listener.</li>
-<li><code>Addresses</code>- Define the network addresses requested for this gateway.</li>
+<li>All TCP streams on port 8080 of the Gateway are forwarded to port 6000 of
+  <code>my-foo-service</code> Kubernetes Service.</li>
+<li>All TCP streams on port 8090 of the Gateway are forwarded to port 6000 of
+  <code>my-bar-service</code> Kubernetes Service.</li>
 </ul>
-<p>If the desired configuration specified in Gateway spec cannot be achieved, the
-Gateway will be in an error state with details provided by status conditions.</p>
-<h3 id="deployment-models">Deployment models</h3>
-<p>Depending on the <code>GatewayClass</code>, the creation of a <code>Gateway</code> could do any of
-the following actions:</p>
+<p>Please note the following:</p>
 <ul>
-<li>Use cloud APIs to create an LB instance.</li>
-<li>Spawn a new instance of a software LB (in this or another cluster).</li>
-<li>Add a configuration stanza to an already instantiated LB to handle the new
-  routes.</li>
-<li>Program the SDN to implement the configuration.</li>
-<li>Something else we haven’t thought of yet...</li>
+<li>The <code>protocol</code> of listeners on the Gateway is <code>TCP</code>.</li>
+<li>Each listener selects exactly one TCPRoute. This is important since the routing
+  decision is performed based on destination port only. If more metadata is used
+  for routing decisions, then one may associate multiple TCPRoutes to a single
+  Gateway listener. Implementations can support such use-cases by adding a custom
+  resource to specify advanced routing properties and then referencing it in
+  <code>spec.rules[].matches[].extensionRef</code>. Conflicts due to routing colisions should
+  be resolved as per the <a href="../guidelines/#conflicts">conflict resolution</a> guidelines.</li>
 </ul>
-<p>The API does not specify which one of these actions will be taken.</p>
-<h3 id="gateway-status">Gateway Status</h3>
-<p><code>GatewayStatus</code> is used to surface the status of a <code>Gateway</code> relative to the
-desired state represented in <code>spec</code>. <code>GatewayStatus</code> consists of the following:</p>
-<ul>
-<li><code>Addresses</code>- Lists the IP addresses that have actually been bound to the
-  Gateway.</li>
-<li><code>Listeners</code>- Provide status for each unique listener port defined in <code>spec</code>.</li>
-<li><code>Conditions</code>- Describe the current status conditions of the Gateway.  </li>
-</ul>
-<p>Both <code>Conditions</code> and <code>Listeners.conditions</code> follow the conditions pattern used
-elsewhere in Kubernetes. This is a list that includes a type of condition, the
-status of the condition and the last time this condition changed.</p>
+<pre><code>kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: acme-lb
+spec:
+  controller: acme.io/gateway-controller
+  parametersRef:
+    name: acme-lb
+    group: acme.io
+    kind: Parameters
+---
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: my-tcp-gateway
+spec:
+  gatewayClassName: acme-lb
+  listeners:
+  - protocol: TCP
+    port: 8080
+    routes:
+      kind: TCPRoute
+      selector:
+        matchLabels:
+          &quot;app&quot;: &quot;foo&quot;
+  - protocol: TCP
+    port: 8090
+    routes:
+      kind: TCPRoute
+      selector:
+        matchLabels:
+          &quot;app&quot;: &quot;bar&quot;
+---
+kind: TCPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tcp-app-1
+  labels:
+    app: foo
+spec:
+  rules:
+  - forwardTo:
+    - serviceName: my-foo-service
+      port: 6000
+---
+kind: TCPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: tcp-app-2
+  namespace: default
+  labels:
+    app: bar
+spec:
+  rules:
+  - forwardTo:
+    - serviceName: my-bar-service
+      port: 6000
+</code></pre>
                 
                   
                 
@@ -689,7 +650,7 @@ status of the condition and the last time this condition changed.</p>
     <div class="md-footer-nav">
       <nav class="md-footer-nav__inner md-grid">
         
-          <a href="../gatewayclass/" title="GatewayClass" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+          <a href="../tls/" title="TLS" class="md-flex md-footer-nav__link md-footer-nav__link--prev" rel="prev">
             <div class="md-flex__cell md-flex__cell--shrink">
               <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
             </div>
@@ -698,19 +659,19 @@ status of the condition and the last time this condition changed.</p>
                 <span class="md-footer-nav__direction">
                   Previous
                 </span>
-                GatewayClass
+                TLS
               </span>
             </div>
           </a>
         
         
-          <a href="../httproute/" title="HTTPRoute" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
+          <a href="../spec/" title="API specification" class="md-flex md-footer-nav__link md-footer-nav__link--next" rel="next">
             <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
               <span class="md-flex__ellipsis">
                 <span class="md-footer-nav__direction">
                   Next
                 </span>
-                HTTPRoute
+                API specification
               </span>
             </div>
             <div class="md-flex__cell md-flex__cell--shrink">
