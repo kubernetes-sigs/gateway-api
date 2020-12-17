@@ -23,7 +23,7 @@ ROOT := $(abspath $(TOP))
 
 CONTROLLER_GEN=go run sigs.k8s.io/controller-tools/cmd/controller-gen
 
-all: generate vet fmt verify
+all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
@@ -43,6 +43,10 @@ fmt:
 # Run go vet against code
 vet:
 	go vet ./...
+
+# Run go test against code
+test:
+	go test ./...
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
