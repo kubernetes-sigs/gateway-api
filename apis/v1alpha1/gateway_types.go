@@ -241,13 +241,7 @@ type Listener struct {
 // should raise a "Detached" condition for the affected Listener with
 // a reason of "UnsupportedProtocol".
 //
-// Core ProtocolType values are:
-//
-// * "HTTP"
-// * "HTTPS"
-// * "TLS"
-// * "TCP"
-// * "UDP"
+// Core ProtocolType values are listed in the table below.
 //
 // Implementations can define their own protocols if a core ProtocolType does not
 // exist. Such definitions must use prefixed name, such as
@@ -257,19 +251,19 @@ type Listener struct {
 type ProtocolType string
 
 const (
-	// HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.
+	// Accepts cleartext HTTP/1.1 sessions over TCP.
 	HTTPProtocolType ProtocolType = "HTTP"
 
-	// HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.
+	// Accepts HTTP/1.1 or HTTP/2 sessions over TLS.
 	HTTPSProtocolType ProtocolType = "HTTPS"
 
-	// TLSProtocolType accepts TLS sessions over TCP.
+	// Accepts TLS sessions over TCP.
 	TLSProtocolType ProtocolType = "TLS"
 
-	// TCPProtocolType accepts TCP sessions.
+	// Accepts TCP sessions.
 	TCPProtocolType ProtocolType = "TCP"
 
-	// UDPProtocolType accepts UDP packets.
+	// Accepts UDP packets.
 	UDPProtocolType ProtocolType = "UDP"
 )
 
@@ -280,10 +274,10 @@ const (
 type TLSRouteOverrideType string
 
 const (
-	// TLSROuteOVerrideAllow allows the parameter to be configured from all routes.
+	// Allows the parameter to be configured from all routes.
 	TLSROuteOVerrideAllow TLSRouteOverrideType = "Allow"
 
-	// TLSRouteOverrideDeny prohibits the parameter to be configured from any route.
+	// Prohibits the parameter from being configured from any route.
 	TLSRouteOverrideDeny TLSRouteOverrideType = "Deny"
 )
 
@@ -304,7 +298,8 @@ type TLSOverridePolicy struct {
 
 // GatewayTLSConfig describes a TLS configuration.
 //
-// References
+// References:
+//
 // - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
 // - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
 // - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
@@ -341,6 +336,7 @@ type GatewayTLSConfig struct {
 	// "mycertificates" in group "networking.acme.io").
 	//
 	// Support: Core (Kubernetes Secrets)
+	//
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +optional
@@ -367,23 +363,22 @@ type GatewayTLSConfig struct {
 	// then it will make sense to loft that as a core API
 	// construct.
 	//
-	// Support: Implementation-specific.
+	// Support: Implementation-specific
 	//
 	// +optional
 	Options map[string]string `json:"options,omitempty"`
 }
 
-// TLSModeType type defines behavior of gateway with TLS protocol.
+// TLSModeType type defines how a Gateway handles TLS sessions.
+//
 // +kubebuilder:validation:Enum=Terminate;Passthrough
 type TLSModeType string
 
 const (
-	// TLSModeTerminate represents the Terminate mode.
 	// In this mode, TLS session between the downstream client
 	// and the Gateway is terminated at the Gateway.
 	TLSModeTerminate TLSModeType = "Terminate"
-	// TLSModePassthrough represents the Passthrough mode.
-	// In this mode, the TLS session NOT terminated by the Gateway. This
+	// In this mode, the TLS session is NOT terminated by the Gateway. This
 	// implies that the Gateway can't decipher the TLS stream except for
 	// the ClientHello message of the TLS protocol.
 	TLSModePassthrough TLSModeType = "Passthrough"
@@ -451,14 +446,11 @@ type RouteBindingSelector struct {
 type RouteSelectType string
 
 const (
-	// RouteSelectAll indicates that Routes in all namespaces may be used by
-	// this Gateway.
+	// Routes in all namespaces may be used by this Gateway.
 	RouteSelectAll RouteSelectType = "All"
-	// RouteSelectSelector indicates that only Routes in namespaces selected by
-	// the selector may be used by this Gateway.
+	// Only Routes in namespaces selected by the selector may be used by this Gateway.
 	RouteSelectSelector RouteSelectType = "Selector"
-	// RouteSelectSame indicates that Only Routes in the same namespace may be
-	// used by this Gateway.
+	// Only Routes in the same namespace as the Gateway may be used by this Gateway.
 	RouteSelectSame RouteSelectType = "Same"
 )
 
@@ -489,7 +481,7 @@ type RouteNamespaces struct {
 
 // GatewayAddress describes an address that can be bound to a Gateway.
 type GatewayAddress struct {
-	// Type of the Address. This is either "IPAddress" or "NamedAddress".
+	// Type of the address.
 	//
 	// Support: Extended
 	//
@@ -497,8 +489,10 @@ type GatewayAddress struct {
 	// +kubebuilder:default=IPAddress
 	Type AddressType `json:"type,omitempty"`
 
-	// Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the
-	// values will depend on `Type` and support by the controller.
+	// Value of the address. The validity of the values will depend
+	// on the type and support by the controller.
+	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
@@ -506,40 +500,29 @@ type GatewayAddress struct {
 }
 
 // AddressType defines how a network address is represented as a text string.
-// Valid AddressType values are:
 //
-// * "IPAddress": an IPv4 or IPv6 address
-// * "NamedAddress": an opaque identifier. The interpretation
-// of the name is dependent on the controller. If a NamedAddress is
-// requested but unsupported by an implementation, the controller
-// should raise the "Detached" listener status condition on the Gateway
-// with the "UnsupportedAddress" reason.
-//
-// A NamedAddress might be a cloud-dependent ID for a "static" or "elastic" IP
+// If the requested address is unsupported, the controller
+// should raise the "Detached" listener status condition on
+// the Gateway with the "UnsupportedAddress" reason.
 //
 // +kubebuilder:validation:Enum=IPAddress;NamedAddress
 type AddressType string
 
 const (
-	// IPAddressType a textual representation of a numeric IP
-	// address. IPv4 addresses must be in dotted-decimal
-	// form. IPv6 addresses must be in a standard IPv6 text
-	// representation (see RFC 5952).
+	// A textual representation of a numeric IP address. IPv4
+	// addresses must be in dotted-decimal form. IPv6 addresses
+	// must be in a standard IPv6 text representation
+	// (see [RFC 5952](https://tools.ietf.org/html/rfc5952)).
 	//
-	// If the requested address is unsupported, the controller
-	// should raise the "Detached" listener status condition on
-	// the Gateway with the "UnsupportedAddress" reason.
-	//
-	// Support: Extended.
+	// Support: Extended
 	IPAddressType AddressType = "IPAddress"
 
-	// NamedAddressType is an opaque identifier. The interpretation
-	// of the name is dependent on the controller. If a NamedAddress is
-	// requested but unsupported by an implementation, the controller
-	// should raise the "Detached" listener status condition on the Gateway
-	// with the "UnsupportedAddress" reason.
+	// An opaque identifier that represents a specific IP address. The
+	// interpretation of the name is dependent on the controller. For
+	// example, a "NamedAddress" might be a cloud-dependent identifier
+	// for a static or elastic IP.
 	//
-	// Support: Implementation-specific.
+	// Support: Implementation-specific
 	NamedAddressType AddressType = "NamedAddress"
 )
 
@@ -594,9 +577,9 @@ type GatewayConditionType string
 type GatewayConditionReason string
 
 const (
-	// GatewayConditionScheduled indicates whether the controller
-	// managing the Gateway has scheduled the Gateway to the
-	// underlying network infrastructure.
+	// This condition is true when the controller managing the
+	// Gateway has scheduled the Gateway to the underlying network
+	// infrastructure.
 	//
 	// Possible reasons for this condition to be false are:
 	//
@@ -609,26 +592,25 @@ const (
 	// interoperability.
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
-	// GatewayReasonNotReconciled is used when the Gateway is
-	// not scheduled because it recently been created and no
-	// controller has reconciled it yet.
+	// This reason is used with the "Scheduled" condition when
+	// been recently created and no controller has reconciled it yet.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
-	// GatewayReasonNoSuchGatewayClass is used when the Gateway is
-	// not scheduled because there is no controller that recognizes
+	// This reason is used with the "Scheduled" condition when the Gateway
+	// is not scheduled because there is no controller that recognizes
 	// the GatewayClassName. This reason should only be set by
 	// a controller that has cluster-wide visibility of all the
 	// installed GatewayClasses.
 	GatewayReasonNoSuchGatewayClass GatewayConditionReason = "NoSuchGatewayClass"
 
-	// GatewayReasonNoResources is used when the Gateway is
-	// not scheduled because no infrastructure resources are
-	// available for this Gateway.
+	// This reason is used with the "Scheduled" condition when the
+	// Gateway is not scheduled because insufficient infrastructure
+	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
 )
 
 const (
-	// GatewayConditionReady indicates whether the Gateway is able
+	// This condition is true when the Gateway is expected to be able
 	// to serve traffic. Note that this does not indicate that the
 	// Gateway configuration is current or even complete (e.g. the
 	// controller may still not have reconciled the latest version,
@@ -646,19 +628,19 @@ const (
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
-	// interoperability.`
+	// interoperability.
 	GatewayConditionReady GatewayConditionType = "Ready"
 
-	// GatewayReasonListenersNotValid is used when one or more
-	// Listeners have an invalid or unsupported configuration
+	// This reason is used with the "Ready" condition when one or
+	// more Listeners have an invalid or unsupported configuration
 	// and cannot be configured on the Gateway.
 	GatewayReasonListenersNotValid GatewayConditionReason = "ListenersNotValid"
 
-	// GatewayReasonListenersNotReady is used when one or more
-	// Listeners are not ready to serve traffic.
+	// This reason is used with the "Ready" condition when one or
+	// more Listeners are not ready to serve traffic.
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
 
-	// GatewayReasonAddressNotAssigned is used when the requested
+	// This reason is used with the "Ready" condition when the requested
 	// address has not been assigned to the Gateway. This reason
 	// can be used to express a range of circumstances, including
 	// (but not limited to) IPAM address exhaustion, invalid
@@ -679,6 +661,7 @@ type ListenerStatus struct {
 
 	// Hostname is the Listener hostname value for which this message is
 	// reporting the status.
+	//
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
 
@@ -700,10 +683,10 @@ type ListenerConditionType string
 type ListenerConditionReason string
 
 const (
-	// ListenerConditionConflicted indicates that the controller
-	// was unable to resolve conflicting specification requirements
-	// for this Listener. If a Listener is conflicted, its network
-	// port should not be configured on any network elements.
+	// This condition indicates that the controller was unable to resolve
+	// conflicting specification requirements for this Listener. If a
+	// Listener is conflicted, its network port should not be configured
+	// on any network elements.
 	//
 	// Possible reasons for this condition to be true are:
 	//
@@ -716,17 +699,18 @@ const (
 	// interoperability.
 	ListenerConditionConflicted ListenerConditionType = "Conflicted"
 
-	// ListenerReasonHostnameConflict is used when the Listener conflicts with
-	// hostnames in other Listeners. For example, this reason would be used when
-	// multiple Listeners on the same port use `*` in the hostname field.
+	// This reason is used with the "Conflicted" condition when
+	// the Listener conflicts with hostnames in other Listeners. For
+	// example, this reason would be used when multiple Listeners on
+	// the same port use `*` in the hostname field.
 	ListenerReasonHostnameConflict ListenerConditionReason = "HostnameConflict"
 
-	// ListenerReasonProtocolConflict is used when multiple
-	// Listeners are specified with the same Listener port number,
-	// but have conflicting protocol specifications.
+	// This reason is used with the "Conflicted" condition when
+	// multiple Listeners are specified with the same Listener port
+	// number, but have conflicting protocol specifications.
 	ListenerReasonProtocolConflict ListenerConditionReason = "ProtocolConflict"
 
-	// ListenerReasonRouteConflict is used when the route
+	// This reason is used with the "Conflicted" condition when the route
 	// resources selected for this Listener conflict with other
 	// specified properties of the Listener (e.g. Protocol).
 	// For example, a Listener that specifies "UDP" as the protocol
@@ -735,10 +719,9 @@ const (
 )
 
 const (
-	// ListenerConditionDetached indicates that, even though
-	// the listener is syntactically and semantically valid, the
-	// controller is not able to configure it on the underlying
-	// Gateway infrastructure.
+	// This condition indicates that, even though the listener is
+	// syntactically and semantically valid, the controller is not able
+	// to configure it on the underlying Gateway infrastructure.
 	//
 	// A Listener is specified as a logical requirement, but needs to be
 	// configured on a network endpoint (i.e. address and port) by a
@@ -758,31 +741,30 @@ const (
 	// interoperability.
 	ListenerConditionDetached ListenerConditionType = "Detached"
 
-	// ListenerReasonPortUnavailable is used when the Listener
-	// requests a port that cannot be used on the Gateway.
+	// This reason is used with the "Detached" condition when the
+	// Listener requests a port that cannot be used on the Gateway.
 	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
 
-	// ListenerReasonUnsupportedExtension is used when the
+	// This reason is used with the "Detached" condition when the
 	// controller detects that an implementation-specific Listener
 	// extension is being requested, but is not able to support
 	// the extension.
 	ListenerReasonUnsupportedExtension ListenerConditionReason = "UnsupportedExtension"
 
-	// ListenerReasonUnsupportedProtocol is used when the
+	// This reason is used with the "Detached" condition when the
 	// Listener could not be attached to be Gateway because its
 	// protocol type is not supported.
 	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
 
-	// ListenerReasonUnsupportedAddress is used when the Listener
-	// could not be attached to the Gateway because the requested
-	// address is not supported.
+	// This reason is used with the "Detached" condition when
+	// the Listener could not be attached to the Gateway because the
+	// requested address is not supported.
 	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
 )
 
 const (
-	// ListenerConditionResolvedRefs indicates whether the
-	// controller was able to resolve all the object references
-	// for the Listener.
+	// This condition indicates whether the controller was able to
+	// resolve all the object references for the Listener.
 	//
 	// Possible reasons for this condition to be false are:
 	//
@@ -795,27 +777,28 @@ const (
 	// interoperability.
 	ListenerConditionResolvedRefs ListenerConditionType = "ResolvedRefs"
 
-	// ListenerReasonDegradedRoutes indicates that not all of the routes
-	// selected by this Listener could be configured. The specific reason
-	// for the degraded route should be indicated in the route's
-	// .Status.Conditions field.
+	// This reason is used with the "ResolvedRefs" condition
+	// when not all of the routes selected by this Listener could be
+	// configured. The specific reason for the degraded route should
+	// be indicated in the route's .Status.Conditions field.
 	ListenerReasonDegradedRoutes ListenerConditionReason = "DegradedRoutes"
 
-	// ListenerReasonInvalidCertificateRef is used when the
+	// This reason is used with the "ResolvedRefs" condition when the
 	// Listener has a TLS configuration with a TLS CertificateRef
 	// that is invalid or cannot be resolved.
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 
-	// ListenerReasonInvalidRoutesRef is used when the Listener's Routes
-	// selector or kind is invalid or cannot be resolved. Note that it is not
-	// an error for this selector to not resolve any Routes, and the
-	// "ResolvedRefs" status condition should not be raised in that case.
+	// This reason is used with the "ResolvedRefs" condition when
+	// the Listener's Routes selector or kind is invalid or cannot
+	// be resolved. Note that it is not an error for this selector to
+	// not resolve any Routes, and the "ResolvedRefs" status condition
+	// should not be raised in that case.
 	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRoutesRef"
 )
 
 const (
-	// ListenerConditionReady indicates whether the Listener
-	// has been configured on the Gateway.
+	// This condition indicates whether the Listener has been
+	// configured on the Gateway.
 	//
 	// Possible reasons for this condition to be false are:
 	//
@@ -827,11 +810,12 @@ const (
 	// interoperability.
 	ListenerConditionReady ListenerConditionType = "Ready"
 
-	// ListenerReasonInvalid is used when the Listener is
-	// syntactically or semantically invalid.
+	// This reason is used with the "Ready" condition when the
+	// Listener is syntactically or semantically invalid.
 	ListenerReasonInvalid ListenerConditionReason = "Invalid"
 
-	// ListenerReasonPending is used when the Listener is not
-	// yet not online and ready to accept client traffic.
+	// This reason is used with the "Ready" condition when the
+	// Listener is not yet not online and ready to accept client
+	// traffic.
 	ListenerReasonPending ListenerConditionReason = "Pending"
 )

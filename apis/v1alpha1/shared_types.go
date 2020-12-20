@@ -24,14 +24,11 @@ import (
 type GatewayAllowType string
 
 const (
-	// GatewayAllowAll indicates that all Gateways will be able to use this
-	// route.
+	// Any Gateway will be able to use this route.
 	GatewayAllowAll GatewayAllowType = "All"
-	// GatewayAllowFromList indicates that only Gateways that have been
-	// specified in GatewayRefs will be able to use this route.
+	// Only Gateways that have been  specified in GatewayRefs will be able to use this route.
 	GatewayAllowFromList GatewayAllowType = "FromList"
-	// GatewayAllowSameNamespace indicates that only Gateways within the same
-	// namespace will be able to use this route.
+	// Only Gateways within the same namespace as the route will be able to use this route.
 	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
 )
 
@@ -133,7 +130,6 @@ type RouteForwardTo struct {
 	// with the "DegradedRoutes" reason. The gateway status for this route should
 	// be updated with a condition that describes the error more specifically.
 	//
-	//
 	// Support: Custom
 	//
 	// +optional
@@ -174,7 +170,7 @@ type RouteForwardTo struct {
 type RouteConditionType string
 
 const (
-	// ConditionRouteAdmitted indicates whether the route has been admitted
+	// This condition indicates whether the route has been admitted
 	// or rejected by a Gateway, and why.
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
 )
@@ -218,6 +214,7 @@ type RouteStatus struct {
 }
 
 // Hostname is used to specify a hostname that should be matched.
+//
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
 type Hostname string
