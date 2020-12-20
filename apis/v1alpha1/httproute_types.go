@@ -432,18 +432,39 @@ const (
 // HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
 // filter.
 type HTTPRequestHeaderFilter struct {
-	// Add adds the given header (name, value) to the request
+	// Set overwrites the request with the given header (name, value)
 	// before the action.
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
+	//   my-header: foo
 	//
 	// Config:
-	//   add: {"my-header": "foo"}
+	//   set: {"my-header": "bar"}
+	//
+	// Output:
+	//   GET /foo HTTP/1.1
+	//   my-header: bar
+	//
+	// Support: Extended
+	// +optional
+	Set map[string]string `json:"set,omitempty"`
+
+	// Add adds the given header (name, value) to the request
+	// before the action. It appends to any existing values associated
+	// with the header name.
+	//
+	// Input:
+	//   GET /foo HTTP/1.1
+	//   my-header: foo
+	//
+	// Config:
+	//   add: {"my-header": "bar"}
 	//
 	// Output:
 	//   GET /foo HTTP/1.1
 	//   my-header: foo
+	//   my-header: bar
 	//
 	// Support: Extended
 	// +optional
@@ -456,16 +477,16 @@ type HTTPRequestHeaderFilter struct {
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
-	//   My-Header1: ABC
-	//   My-Header2: DEF
-	//   My-Header2: GHI
+	//   my-header1: foo
+	//   my-header2: bar
+	//   my-header3: baz
 	//
 	// Config:
 	//   remove: ["my-header1", "my-header3"]
 	//
 	// Output:
 	//   GET /foo HTTP/1.1
-	//   My-Header2: DEF
+	//   my-header2: bar
 	//
 	// Support: Extended
 	// +optional
