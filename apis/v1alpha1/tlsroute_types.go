@@ -24,12 +24,12 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// TLSRoute is the Schema for the TLSRoute resource. TLSRoute is similar to
-// TCPRoute but can be configured to match against TLS-specific metadata.
-// This allows more flexibility in matching streams for a given TLS listener.
+// The TLSRoute resource is similar to TCPRoute, but can be configured
+// to match against TLS-specific metadata. This allows more flexibility
+// in matching streams for a given TLS listener.
 //
 // If you need to forward traffic to a single target for a TLS listener, you
-// could chose to use a TCPRoute with a TLS listener.
+// could choose to use a TCPRoute with a TLS listener.
 type TLSRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -41,7 +41,7 @@ type TLSRoute struct {
 	Status TLSRouteStatus `json:"status,omitempty"`
 }
 
-// TLSRouteSpec defines the desired state of TLSRoute.
+// TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpec struct {
 	// Rules are a list of TLS matchers and actions.
 	//
@@ -105,7 +105,7 @@ type TLSRouteMatch struct {
 	//    listener will match. This can be used to define a default backend
 	//    for a TLS listener.
 	//
-	// Support: core
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
@@ -119,7 +119,7 @@ type TLSRouteMatch struct {
 	// status for this route should be updated with a condition that describes
 	// the error more specifically.
 	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`

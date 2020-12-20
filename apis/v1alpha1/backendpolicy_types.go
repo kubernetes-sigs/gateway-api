@@ -116,7 +116,7 @@ type BackendTLSConfig struct {
 	// Options are a list of key/value pairs to give extended options to the
 	// provider.
 	//
-	// Support: Implementation-specific.
+	// Support: Implementation-specific
 	//
 	// +optional
 	Options map[string]string `json:"options,omitempty"`
@@ -134,12 +134,11 @@ type BackendPolicyStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-// BackendPolicyConditionType is a type of condition associated with a
-// BackendPolicy.
+// BackendPolicyConditionType is a type of condition used to express the current
+// state of a BackendPolicy resource.
 type BackendPolicyConditionType string
 
 const (
-	// ConditionNoSuchBackend indicates that one or more of the the specified
-	// Backends does not exist.
+	// Indicates that one or more of the the specified backend references could not be resolved.
 	ConditionNoSuchBackend BackendPolicyConditionType = "NoSuchBackend"
 )

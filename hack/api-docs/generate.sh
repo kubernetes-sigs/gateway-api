@@ -50,4 +50,4 @@ fi
 gendoc::build
 gendoc::exec \
     -api-dir sigs.k8s.io/gateway-api/apis/v1alpha1 \
-    -out-file "$1"
+    -out-file /dev/stdout | sed '-es|&quot;*\*|\&quot;\&ast;|g' > "$1"

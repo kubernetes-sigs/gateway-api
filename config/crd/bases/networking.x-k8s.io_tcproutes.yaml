@@ -39,7 +39,7 @@ spec:
                 properties:
                   allow:
                     default: SameNamespace
-                    description: 'Allow indicates which Gateways will be allowed to use this route. Possible values are: * All: Gateways in any namespace can use this route. * FromList: Only Gateways specified in GatewayRefs may use this route. * SameNamespace: Only Gateways in the same namespace may use this route.'
+                    description: Allow indicates which Gateways will be allowed to use this route.
                     enum:
                     - All
                     - FromList
@@ -126,7 +126,7 @@ spec:
                         description: TCPRouteMatch defines the predicate used to match connections to a given action.
                         properties:
                           extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  For example, resource \"mytcproutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: custom"
+                            description: "ExtensionRef is an optional, implementation-specific extension to the \"match\" behavior.  For example, resource \"mytcproutematcher\" in group \"networking.acme.io\". If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent.

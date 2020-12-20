@@ -117,30 +117,41 @@ type ParametersReference struct {
 	Namespace string `json:"namespace,omitempty"`
 }
 
-// GatewayClassConditionType is the type of status conditions. This
-// type should be used with the GatewayClassStatus.Conditions field.
+// GatewayClassConditionType is the type for status conditions on
+// Gateway resources. This type should be used with the
+// GatewayClassStatus.Conditions field.
 type GatewayClassConditionType string
 
+// GatewayClassConditionReason defines the set of reasons that explain why
+// a particular GatewayClass condition type has been raised.
+type GatewayClassConditionReason string
+
 const (
-	// GatewayClassConditionStatusAdmitted indicates that the GatewayClass
-	// has been admitted by the controller set in the `spec.controller`
+	// This condition indicates whether the GatewayClass has been
+	// admitted by the controller requested in the `spec.controller`
 	// field.
 	//
-	// It defaults to False, and MUST be set by a controller when it sees
+	// This condition defaults to False, and MUST be set by a controller when it sees
 	// a GatewayClass using its controller string.
 	// The status of this condition MUST be set to true if the controller will support
 	// provisioning Gateways using this class. Otherwise, this status MUST be set to false.
 	// If the status is set to false, the controller SHOULD set a Message and Reason as an
 	// explanation.
-	// GatewayClassNotAdmittedInvalidParameters is provided as an example Reason.
+	//
+	// Controllers should prefer to use the values of GatewayClassConditionReason
+	// for the corresponding Reason, where appropriate.
 	GatewayClassConditionStatusAdmitted GatewayClassConditionType = "Admitted"
 
-	// GatewayClassNotAdmittedInvalidParameters should be used as a Reason on the Admitted
-	// condition if the parametersRef field is invalid, with more detail in the message.
-	GatewayClassNotAdmittedInvalidParameters string = "InvalidParameters"
+	// This reason is used with the "Admitted" condition when the
+	// GatewayClass was not admitted because the parametersRef field
+	// was invalid, with more detail in the message.
+	GatewayClassNotAdmittedInvalidParameters GatewayClassConditionReason = "InvalidParameters"
 
-	// GatewayClasssNotAdmittedWaiting is the default Reason on a new GatewayClass.
-	GatewayClasssNotAdmittedWaiting string = "Waiting"
+	// This reason is used with the "Admitted" condition when the
+	// requested controller has not yet made a decision about whether
+	// to admit the GatewayClass. It is the default Reason on a new
+	// GatewayClass. It indicates
+	GatewayClassNotAdmittedWaiting GatewayClassConditionReason = "Waiting"
 
 	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
 	// GatewayClass whenever there are provisioned Gateways using a GatewayClass.
@@ -151,6 +162,9 @@ const (
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
+	//
+	// Controllers should prefer to publish conditions using values
+	// of GatewayClassConditionType for the type of each Condition.
 	//
 	// +optional
 	// +listType=map

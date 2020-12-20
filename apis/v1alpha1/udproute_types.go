@@ -24,7 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 
-// UDPRoute is the Schema for the UDPRoute resource.
+// UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.
 type UDPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -87,7 +87,7 @@ type UDPRouteMatch struct {
 	// status for this route should be updated with a condition that describes
 	// the error more specifically.
 	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
