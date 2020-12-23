@@ -1,0 +1,13 @@
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: simple-split
+spec:
+  rules:
+  - forwardTo:
+    - serviceName: foo-v1
+      port: 8080
+      weight: 90
+    - serviceName: foo-v2
+      port: 8080
+      weight: 10
