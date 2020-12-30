@@ -34,39 +34,33 @@ Service APIs meetings as well as any other SIG-Network meetings.
 
 * Wednesday 11am Pacific (7pm UTC) <a target="_blank" href="https://zoom.us/j/441530404">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MjUxOHEzdXNpZWwxYmRmYXFidGltbWU1dWFfMjAyMDEyMDJUMTkwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
 
-### Meeting notes
+### Meeting Notes and Recordings
 
-Meeting agendas and notes are recorded in the [meeting notes doc][meeting-notes].
+Meeting agendas and notes are maintained in the [meeting notes
+doc][meeting-notes]. Feel free to add topics for discussion at an upcoming
+meeting.
 
-All meetings are recorded and automatically uploaded to youtube:
-[Meeting recordings](https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb).
+All meetings are recorded and automatically uploaded to the [Kubernetes
+SIG-NETWORK playlist on YouTube][sig-net-yt-playlist].
 
-Some initial recordings of this working group were done manually and can be
-found in the below table:
+#### Early Meetings
+Some early community meetings were uploaded to a [separate YouTube
+playlist][early-yt-playlist].
 
-| Date               |                                |
-|--------------------|--------------------------------|
-| Future meetings    | Check the calendar             |
-| February 27, 2019  | [meeting notes][meeting-notes], [recording](https://youtu.be/QoInpFSTQbQ)   |
-| February 20, 2019  | [meeting notes][meeting-notes], [recording](https://youtu.be/i_oDQuPEhd8)   |
-| February 13, 2019  | [meeting notes][meeting-notes], [recording](https://youtu.be/bdFLubKi9_0)   |
-| February 6, 2019   | [meeting notes][meeting-notes], [recording](https://youtu.be/XvpCFaTrtBA)   |
-| January 30, 2019   | [meeting notes][meeting-notes], [recording](https://youtu.be/cTTqIR3muGk)   |
-| January 23, 2019   | [meeting notes][meeting-notes], recording TODO |
-| January 16, 2019   | [meeting notes][meeting-notes], [recording](https://youtu.be/ydA-epcZJQo)   |
-| January 9, 2019    | [meeting notes][meeting-notes], [recording](https://youtu.be/C3zO67lXGrg)   |
-| January 2, 2020    | [meeting notes][meeting-notes], recording didn't work :-( look at the notes |
-| December 19, 2019  | [meeting notes][meeting-notes], [recording](https://youtu.be/FIcySpPkGa4)   |
-| November, 2019     | [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion] |
-| November, 2019     | [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync] |
-| May, 2019          | [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion] |
+#### Initial Design Discussions
 
+* [Kubecon 2019 San Diego: API evolution design discussion][kubecon-2019-na-design-discussion]
+* [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync]
+* [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion]
+
+[sig-net-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb
+[early-yt-playlist]: https://www.youtube.com/playlist?list=PL7KjrPTDcs4Xe6SZj-51WvBfufKf-la1O
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
 [sig-net-2019-11-sync]: https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview
 [meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
 
-## Presentations, Talks
+## Presentations and Talks
 
 | Date           | Title |    |
 |----------------|-------|----|
