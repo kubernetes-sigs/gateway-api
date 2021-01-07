@@ -29,7 +29,7 @@ all: generate vet fmt verify test
 .PHONY: generate
 generate:
 	$(CONTROLLER_GEN) \
-		object:headerFile=./hack/boilerplate/boilerplate.go.txt,year=$$(date +%Y) \
+		object:headerFile=./hack/boilerplate/boilerplate.generatego.txt,year=$$(date +%Y) \
 		crd:crdVersions=v1 \
 		output:crd:artifacts:config=config/crd/bases \
 		paths=./...
