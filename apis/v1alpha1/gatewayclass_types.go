@@ -64,12 +64,14 @@ type GatewayClassSpec struct {
 	// +kubebuilder:validation:MaxLength=253
 	Controller string `json:"controller"`
 
-	// ParametersRef is a controller-specific resource containing the
-	// configuration parameters corresponding to this class. This is optional if
-	// the controller does not require any additional configuration.
+	// ParametersRef is a reference to a resource that contains the configuration
+	// parameters corresponding to the GatewayClass. This is optional if the
+	// controller does not require any additional configuration.
 	//
-	// Parameters resources are implementation specific custom resources. These
-	// resources must be cluster-scoped.
+	// ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+	// or an implementation-specific custom resource. The resource can be
+	// cluster-scoped or namespace-scoped as with ConfigMap, if the namespace is
+	// known by the implementation.
 	//
 	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
 	// status condition will be true.

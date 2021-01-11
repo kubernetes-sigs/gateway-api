@@ -384,11 +384,13 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the
-configuration parameters corresponding to this class. This is optional if
-the controller does not require any additional configuration.</p>
-<p>Parameters resources are implementation specific custom resources. These
-resources must be cluster-scoped.</p>
+<p>ParametersRef is a reference to a resource that contains the configuration
+parameters corresponding to the GatewayClass. This is optional if the
+controller does not require any additional configuration.</p>
+<p>ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+or an implementation-specific custom resource. The resource can be
+cluster-scoped or namespace-scoped as with ConfigMap, if the namespace is
+known by the implementation.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>
@@ -1304,11 +1306,13 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the
-configuration parameters corresponding to this class. This is optional if
-the controller does not require any additional configuration.</p>
-<p>Parameters resources are implementation specific custom resources. These
-resources must be cluster-scoped.</p>
+<p>ParametersRef is a reference to a resource that contains the configuration
+parameters corresponding to the GatewayClass. This is optional if the
+controller does not require any additional configuration.</p>
+<p>ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+or an implementation-specific custom resource. The resource can be
+cluster-scoped or namespace-scoped as with ConfigMap, if the namespace is
+known by the implementation.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>
@@ -3088,7 +3092,8 @@ reporting the status.</p>
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
 <p>
-<p>LocalObjectReference identifies an API object within a known namespace.</p>
+<p>LocalObjectReference identifies an API object that is cluster-scoped
+or is within a known namespace.</p>
 </p>
 <table>
 <thead>

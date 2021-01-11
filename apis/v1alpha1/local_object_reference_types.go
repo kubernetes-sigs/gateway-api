@@ -16,7 +16,8 @@ limitations under the License.
 
 package v1alpha1
 
-// LocalObjectReference identifies an API object within a known namespace.
+// LocalObjectReference identifies an API object that is cluster-scoped
+// or is within a known namespace.
 type LocalObjectReference struct {
 	// Group is the group of the referent.
 	// +kubebuilder:validation:MinLength=1
