@@ -43,7 +43,7 @@ if [[ "${VERIFY_CODEGEN:-}" == "true" ]]; then
   readonly VERIFY_FLAG="--verify-only"
 fi
 
-readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boilerplate/boilerplate.go.txt"
+readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
 
 echo "Generating deepcopy funcs"
 go run k8s.io/code-generator/cmd/deepcopy-gen \
