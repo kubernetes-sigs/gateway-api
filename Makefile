@@ -70,7 +70,7 @@ uninstall:
 # Run static analysis.
 .PHONY: verify
 verify:
-	hack/verify-all.sh -v
+	hack/verify-all.sh
 
 # Build the documentation.
 .PHONY: docs
