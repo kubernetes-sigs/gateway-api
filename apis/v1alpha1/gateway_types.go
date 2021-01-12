@@ -134,9 +134,9 @@ type GatewaySpec struct {
 // validating webhook.
 type Listener struct {
 	// Hostname specifies the virtual hostname to match for protocol types that
-	// define this concept. When unspecified or "*", all hostnames are matched.
-	// This field can be omitted for protocols that don't require hostname based
-	// matching.
+	// define this concept. When unspecified, "", or "*", all hostnames are
+	// matched. This field can be omitted for protocols that don't require
+	// hostname based matching.
 	//
 	// Hostname is the fully qualified domain name of a network host, as defined
 	// by RFC 3986. Note the following deviations from the "host" part of the
