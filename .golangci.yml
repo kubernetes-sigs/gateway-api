@@ -1,0 +1,45 @@
+run:
+  timeout: 10m
+  issues-exit-code: 1
+  tests: true
+  skip-dirs-use-default: true
+  modules-download-mode: readonly
+  allow-parallel-runners: false
+
+linters:
+  fast: false
+  enable:
+  - gofmt
+  - goimports
+  - golint
+  - govet
+  - misspell
+  disable-all: false
+  presets:
+  - bugs
+  - unused
+
+# all available settings of specific linters
+linters-settings:
+  gofmt:
+    # simplify code: gofmt with `-s` option, true by default
+    simplify: true
+  goimports:
+    local-prefixes: sigs.k8s.io/service-apis
+  golint:
+    min-confidence: 0.9
+  govet:
+    # report about shadowed variables
+    check-shadowing: true
+  misspell:
+    locale: US
+    ignore-words:
+
+issues:
+  exclude-rules:
+    # Exclude some linters from running on tests files.
+    - path: _test\.go
+      linters:
+        - gocyclo
+        - errcheck
+        - dupl
