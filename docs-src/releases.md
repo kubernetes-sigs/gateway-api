@@ -44,7 +44,7 @@ fixes. New API versions will be released with new minor or major versions.
 Our changelog and release notes will always include both the semantic version
 and API version(s) included in the release. 
 
-[Kubernetes API Version]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions
+[Kubernetes API Versioning]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions
 [Semantic Versioning]: https://semver.org/
 [Go modules versioning]: https://golang.org/ref/mod#versions
 
