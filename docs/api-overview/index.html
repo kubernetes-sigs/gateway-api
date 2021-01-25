@@ -278,6 +278,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#route-binding" class="md-nav__link">
+    Route binding
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#route-selection" class="md-nav__link">
+    Route Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#route-exposure" class="md-nav__link">
+    Route Exposure
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#combined-types" class="md-nav__link">
     Combined types
   </a>
@@ -702,6 +729,33 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#route-binding" class="md-nav__link">
+    Route binding
+  </a>
+  
+    <nav class="md-nav">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#route-selection" class="md-nav__link">
+    Route Selection
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#route-exposure" class="md-nav__link">
+    Route Exposure
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#combined-types" class="md-nav__link">
     Combined types
   </a>
@@ -778,7 +832,7 @@ the cluster.</p>
 <h3 id="gatewayclass">GatewayClass</h3>
 <p>GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
-controllers MAY handle more than one.</p>
+controllers MAY handle more than one GatewayClass.</p>
 <p>GatewayClass is a cluster-scoped resource. There MUST be at least one
 GatewayClass defined in order to be able to have functional Gateways. A
 controller that implements the Gateway API does so by providing an associated
@@ -795,8 +849,9 @@ IngressClass object.</p>
 cluster. That is, it defines a request for a way to translate traffic from
 somewhere that does not know about Kubernetes to somewhere that does. For
 example, traffic sent to a Kubernetes Service by a cloud load balancer, an
-in-cluster proxy or external hardware load balancer. While many use cases have
-client traffic originating “outside” the cluster, this is not a requirement.</p>
+in-cluster proxy, or an external hardware load balancer. While many use cases 
+have client traffic originating “outside” the cluster, this is not a 
+requirement.</p>
 <p>It defines a request for a specific load balancer config that implements the
 GatewayClass’ configuration and behaviour contract. The resource MAY be created
 by an operator directly, or MAY be created by a controller handling a
@@ -825,6 +880,125 @@ backend. In those cases, configuration fields will be placed on Routes and not
 BackendPolicy. For more information on what may be configured with this resource
 in the future, refer to the related <a href="https://github.com/kubernetes-sigs/service-apis/issues/196">GitHub
 issue</a>.</p>
+<h3 id="route-binding">Route binding</h3>
+<p>When a Route binds to a Gateway it represents configuration that is applied on
+the Gateway that configures the underlying load balancer or proxy. How and which
+Routes bind to Gateways is controlled by the resources themselves. Route and
+Gateway resources have built-in controls to permit or constrain how they select
+each other. This is useful for enforcing organizational policies for how Routes
+are exposed and on which Gateways. Consider the following example:</p>
+<blockquote>
+<p>A Kubernetes cluster admin has deployed a Gateway “shared-gw” in the “Infra”
+Namespace to be used by different application teams for exposing their
+applications outside the cluster. Teams A and B (in Namespaces “A” and “B”
+respectively) bind their Routes to this Gateway. They are unaware of each other
+and as long as their Route rules do not conflict with each other they can
+continue operating in isolation. Team C has special networking needs (perhaps
+performance, security, or criticality) and they need a dedicated Gateway to
+proxy their application to the outside world. Team C deploys their own Gateway 
+“dedicated-gw”  in the “C” Namespace that can only be used by apps in the "C" 
+Namespace.</p>
+</blockquote>
+<!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
+
+<p><img alt="route binding" src="../images/gateway-route-binding.png" /></p>
+<p>There is a lot of flexibility in how Routes can bind to Gateways to achieve
+different organizational policies and scopes of responsibility. These are 
+different relationships that Gateways and Routes can have:</p>
+<ul>
+<li><strong>One-to-one</strong> - A Gateway and Route may be deployed and used by a single 
+  owner and have a one-to-one relationship. Team C is an example of this. </li>
+<li><strong>One-to-many</strong> - A Gateway can have many Routes bound to it that are owned by
+  different teams from across different Namespaces. Teams A and B are an example 
+  of this.</li>
+<li><strong>Many-to-one</strong> - Routes can also be bound to more than one Gateway, allowing 
+  a single Route to control application exposure simultaneously across different
+  IPs, load balancers, or networks.</li>
+</ul>
+<p><em>In summary, Gateways select Routes and Routes control their exposure. When a
+Gateway selects a Route that allows itself to be exposed, then the Route will
+bind to the Gateway. When Routes are bound to a Gateway it means their
+collective routing rules are configured on the underlying load balancers or
+proxies that are managed by that Gateway. Thus, a Gateway is a logical
+representation of a networking data plane that can be configured through
+Routes.</em></p>
+<h4 id="route-selection">Route Selection</h4>
+<p>A Gateway selects routes based on the Route metadata, specifically the kind,
+namespace, and labels of Route resources. Routes are actually bound to specific
+listeners within the Gateway so each listener has a <code>listener.routes</code> field
+which selects Routes by one or more of the following criterea:</p>
+<ul>
+<li><strong>Label</strong> - A Gateway can select Routes via labels that exist on the 
+resource (similar to how Services select Pods via Pod labels).</li>
+<li><strong>Kind</strong> - A Gateway listener can only select a single type of Route 
+resource. This could be an HTTPRoute, TCPRoute, or a custom Route type.</li>
+<li><strong>Namespace</strong> - A Gateway can also control from which Namespaces Routes can be
+selected via the <code>namespaces.from</code> field. It supports three possible values:<ul>
+<li><code>SameNamespace</code> is the default option. Only Routes in the same namespace 
+  as this Gateway will be selected. </li>
+<li><code>All</code> will select Routes from all Namespaces.</li>
+<li><code>Selector</code> means that Routes from a subset of Namespaces selected by a 
+  Namespace label selector will be selected by this Gateway. When <code>Selector</code> 
+  is used then the <code>listeners.routes.namespaces.selector</code> field can be used 
+  to specify label selectors. This field is not supported with <code>All</code> or 
+  <code>SameNamespace</code>.</li>
+</ul>
+</li>
+</ul>
+<p>The below Gateway will select all HTTPRoute resources with the <code>expose:
+prod-web-gw</code> across all Namespaces in the cluster.</p>
+<pre><code>kind: Gateway
+...
+spec:
+  listeners:  
+  - routes:
+      kind: HTTPRoute
+      selector:
+        matchLabels:
+          expose: prod-web-gw 
+      namespaces:
+        from: All
+</code></pre>
+
+<h4 id="route-exposure">Route Exposure</h4>
+<p>Routes can determine how they are exposed through Gateways. The <code>gateways.allow</code>
+field supports three values:</p>
+<ul>
+<li><code>All</code> is the default value if none is specified. This leaves all binding 
+to the Route label and Namespace selectors on the Gateway. </li>
+<li><code>SameNamespace</code> only allows this Route to bind with Gateways from the 
+same Namespace.</li>
+<li><code>FromList</code> allows an explicit list of Gateways to be specifiied that a 
+Route will bind with. <code>gateways.gatewayRefs</code> is only supported with this option. </li>
+</ul>
+<p>The following <code>my-route</code> Route selects only the <code>foo-gateway</code> in the
+<code>foo-namespace</code> and will not be able to bind with any other Gateways. Note that
+<code>foo-gateway</code> is in a different Namespace. If the <code>foo-gateway</code> allows
+cross-Namespace binding and also selects this Route then <code>my-route</code> will bind to
+it. </p>
+<pre><code class="yaml">kind: HTTPRoute
+metadata:
+  name: my-route
+  namespace: bar-namespace
+spec:
+  gateways:
+    allow: FromList
+    gatewayRefs:
+    - name: foo-gateway
+      namespace: foo-namespace
+</code></pre>
+
+<p>Note that Gateway and Route binding is bi-directional. This means that both
+resources must select each other for them to bind. If a Gateway has Route label
+selectors that do not match any existing Route then nothing will bind to it even
+if a Route's <code>spec.gateways.allow = All</code>. Similarly, if a Route references a
+specific Gateway, but that Gateway is not selecting the Route's Namespace, then
+they will not bind. A binding will only take place if both resources select each
+other.</p>
+<p>It may not always be apparent from the resource specifications which Gateways
+and Routes are bound, but binding can be determined from the resource status.
+The <a href="../httproute/#routestatus">Route status</a> will list all of the Gateways that
+a Route is bound to and any relevant conditions for the binding.</p>
 <h3 id="combined-types">Combined types</h3>
 <p>The combination of <code>GatewayClass</code>, <code>Gateway</code>, <code>xRoute</code> and <code>Service</code>(s) will
 define an implementable load-balancer. The diagram below illustrates the
