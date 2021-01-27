@@ -23,6 +23,7 @@ nav:
       - Getting started: getting-started.md
       - Simple Gateway: simple-gateway.md
       - HTTP routing: http-routing.md 
+      - HTTP traffic splitting: traffic-splitting.md
       - Multiple namespaces and routes: multiple-ns.md
       - TLS: tls.md
       - TCP routing: tcp.md
