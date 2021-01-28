@@ -2269,11 +2269,13 @@ TLSModeType
 <p>Mode defines the TLS behavior for the TLS session initiated by the client.
 There are two possible modes:
 - Terminate: The TLS session between the downstream client
-and the Gateway is terminated at the Gateway.
+and the Gateway is terminated at the Gateway. This mode requires
+certificateRef to be set.
 - Passthrough: The TLS session is NOT terminated by the Gateway. This
 implies that the Gateway can&rsquo;t decipher the TLS stream except for
 the ClientHello message of the TLS protocol.
 CertificateRef field is ignored in this mode.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
@@ -2287,15 +2289,16 @@ LocalObjectReference
 </td>
 <td>
 <em>(Optional)</em>
-<p>CertificateRef is the reference to Kubernetes object that
-contain a TLS certificate and private key.
-This certificate MUST be used for TLS handshakes for the domain
-this GatewayTLSConfig is associated with.
-If an entry in this list omits or specifies the empty
-string for both the group and the resource, the resource defaults to &ldquo;secrets&rdquo;.
-An implementation may support other resources (for example, resource
-&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Support: Core (Kubernetes Secrets)
+<p>CertificateRef is the reference to Kubernetes object that contain a
+TLS certificate and private key. This certificate MUST be used for
+TLS handshakes for the domain this GatewayTLSConfig is associated with.</p>
+<p>This field is required when mode is set to &ldquo;Terminate&rdquo; (default) and
+optional otherwise.</p>
+<p>If an entry in this list omits or specifies the empty string for both
+the group and the resource, the resource defaults to &ldquo;secrets&rdquo;. An
+implementation may support other resources (for example, resource
+&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
+<p>Support: Core (Kubernetes Secrets)
 Support: Implementation-specific (Other resource types)</p>
 </td>
 </tr>
@@ -2314,6 +2317,7 @@ via Routes or not.</p>
 <p>CertificateRef must be defined even if <code>routeOverride.certificate</code> is
 set to &lsquo;Allow&rsquo; as it will be used as the default certificate for the
 listener.</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>

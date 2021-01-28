@@ -310,21 +310,30 @@ type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	// - Terminate: The TLS session between the downstream client
-	//   and the Gateway is terminated at the Gateway.
+	//   and the Gateway is terminated at the Gateway. This mode requires
+	//   certificateRef to be set.
 	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
 	//   implies that the Gateway can't decipher the TLS stream except for
 	//   the ClientHello message of the TLS protocol.
 	//   CertificateRef field is ignored in this mode.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:default=Terminate
 	Mode TLSModeType `json:"mode,omitempty"`
 
-	// CertificateRef is the reference to Kubernetes object that
-	// contain a TLS certificate and private key.
-	// This certificate MUST be used for TLS handshakes for the domain
-	// this GatewayTLSConfig is associated with.
-	// If an entry in this list omits or specifies the empty
-	// string for both the group and the resource, the resource defaults to "secrets".
-	// An implementation may support other resources (for example, resource
+	// CertificateRef is the reference to Kubernetes object that contain a
+	// TLS certificate and private key. This certificate MUST be used for
+	// TLS handshakes for the domain this GatewayTLSConfig is associated with.
+	//
+	// This field is required when mode is set to "Terminate" (default) and
+	// optional otherwise.
+	//
+	// If an entry in this list omits or specifies the empty string for both
+	// the group and the resource, the resource defaults to "secrets". An
+	// implementation may support other resources (for example, resource
 	// "mycertificates" in group "networking.acme.io").
+	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
@@ -337,6 +346,8 @@ type GatewayTLSConfig struct {
 	// CertificateRef must be defined even if `routeOverride.certificate` is
 	// set to 'Allow' as it will be used as the default certificate for the
 	// listener.
+	//
+	// Support: Core
 	//
 	// +kubebuilder:default={certificate:Deny}
 	RouteOverride TLSOverridePolicy `json:"routeOverride,omitempty"`
@@ -357,7 +368,6 @@ type GatewayTLSConfig struct {
 
 // TLSModeType type defines behavior of gateway with TLS protocol.
 // +kubebuilder:validation:Enum=Terminate;Passthrough
-// +kubebuilder:default=Terminate
 type TLSModeType string
 
 const (
