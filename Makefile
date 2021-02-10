@@ -21,20 +21,13 @@ TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
-CONTROLLER_GEN=go run sigs.k8s.io/controller-tools/cmd/controller-gen
-
 all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
 generate:
-	$(CONTROLLER_GEN) \
-		object:headerFile=./hack/boilerplate/boilerplate.generatego.txt,year=$$(date +%Y) \
-		crd:crdVersions=v1 \
-		output:crd:artifacts:config=config/crd/bases \
-		paths=./...
-	$(MAKE) docs
 	hack/update-codegen.sh
+	$(MAKE) docs
 
 # Run go fmt against code
 fmt:

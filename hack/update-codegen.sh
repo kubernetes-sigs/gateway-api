@@ -45,12 +45,12 @@ fi
 
 readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
 
-echo "Generating deepcopy funcs"
-go run k8s.io/code-generator/cmd/deepcopy-gen \
-        --input-dirs "${FQ_APIS}" \
-        -O zz_generated.deepcopy \
-        --bounding-dirs "${APIS_PKG}" \
-        ${COMMON_FLAGS}
+echo "Generating CRDs and deepcopy"
+go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+        object:headerFile=./hack/boilerplate/boilerplate.generatego.txt \
+        crd:crdVersions=v1 \
+        output:crd:artifacts:config=config/crd/bases \
+        paths=./...
 
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
 go run k8s.io/code-generator/cmd/client-gen \

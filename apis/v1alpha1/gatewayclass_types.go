@@ -26,8 +26,6 @@ import (
 // +kubebuilder:resource:scope=Cluster,shortName=gc
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Controller",type=string,JSONPath=`.spec.controller`
-// +k8s:openapi-gen=true
-// +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 
 // GatewayClass describes a class of Gateways available to the user
 // for creating Gateway resources.
