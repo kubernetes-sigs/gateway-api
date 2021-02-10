@@ -24,9 +24,9 @@ import (
 	"k8s.io/client-go/discovery"
 	fakediscovery "k8s.io/client-go/discovery/fake"
 	"k8s.io/client-go/testing"
-	clientset "sigs.k8s.io/service-apis/pkg/client/clientset/versioned"
-	networkingv1alpha1 "sigs.k8s.io/service-apis/pkg/client/clientset/versioned/typed/apis/v1alpha1"
-	fakenetworkingv1alpha1 "sigs.k8s.io/service-apis/pkg/client/clientset/versioned/typed/apis/v1alpha1/fake"
+	clientset "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
+	networkingv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha1"
+	fakenetworkingv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha1/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.

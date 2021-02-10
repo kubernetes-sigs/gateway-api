@@ -18,5 +18,5 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Install all example service-apis resources.
+# Install all example gateway-api resources.
 kubectl apply -f examples

@@ -1,6 +1,6 @@
 # TLS details
 
-Service APIs allow for a variety of ways to configure TLS. This document lays
+Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.
 
@@ -13,8 +13,8 @@ For Gateways, there are two connections involved:
 - **downstream**: This is the connection between the client and the Gateway.
 - **upstream**: This is the connection between the Gateway and backend resources
    specified by routes. These backend resources will usually be Services.
-  
-With Service APIs, TLS configuration of downstream and
+
+With Gateway API, TLS configuration of downstream and
 upstream connections is managed independently.
 
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
@@ -26,7 +26,7 @@ which is the default setting.
 
 Downstream TLS settings are configured using listeners at the Gateway level.
 
-### Listeners and TLS 
+### Listeners and TLS
 
 Listeners expose the TLS setting on a per domain or sub-domain basis.
 TLS settings of a listener are applied to all domains that satisfy the

@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug encountered with the service-apis project
+about: Report a bug encountered with the gateway-api project
 labels: kind/bug
 
 ---

@@ -1,11 +1,11 @@
 # Security Model
 
 ## Introduction
-The Service APIs have been designed to enable granular authorization for each
-role in a typical organization. 
+The Gateway API have been designed to enable granular authorization for each
+role in a typical organization.
 
 ## Resources
-The Service APIs have 3 primary API resources:
+The Gateway API have 3 primary API resources:
 
 * **GatewayClass** defines a set of gateways with a common configuration and
   behavior.
@@ -30,7 +30,7 @@ their users.
 
 We have found that the self-service model does not fully capture some of the
 more complex deployment and team structures that our users are seeing. The
-Service APIs are designed to target the following personas:
+Gateway API are designed to target the following personas:
 
 * **Infrastructure provider**: The infrastructure provider (infra) is
   responsible for the overall environment that the cluster(s) are operating in.
@@ -59,7 +59,7 @@ For example, giving the user all the above roles replicates the self-service
 model.
 
 ## The Security Model
-There are two primary components to the Service APIs security model: RBAC and
+There are two primary components to the Gateway API security model: RBAC and
 namespace restrictions.
 
 ## RBAC
@@ -69,14 +69,14 @@ resources in specific scopes. RBAC can be used to enable each of the roles
 defined above. In most cases, it will be desirable to have all resources be
 readable by most roles, so instead we'll focus on write access for this model.
 
-### Write Permissions for Simple 3 Tier Model 
+### Write Permissions for Simple 3 Tier Model
 | | GatewayClass | Gateway | Route |
 |-|-|-|-|
 | Infrastructure Provider | Yes | Yes | Yes |
 | Cluster Operators | No | Yes | Yes |
 | Application Developers | No | No | Yes |
 
-### Write Permissions for Advanced 4 Tier Model 
+### Write Permissions for Advanced 4 Tier Model
 | | GatewayClass | Gateway | Route |
 |-|-|-|-|
 | Infrastructure Provider | Yes | Yes | Yes |
@@ -88,25 +88,25 @@ readable by most roles, so instead we'll focus on write access for this model.
 Some infrastructure providers or cluster operators may wish to limit the
 namespaces where a GatewayClass can be used. At this point, we do not have a
 solution for this built into the API. We continue to [explore
-options](https://github.com/kubernetes-sigs/service-apis/issues/375) to improve
+options](https://github.com/kubernetes-sigs/gateway-api/issues/375) to improve
 support for this. Until then, we recommend using a policy agent such as Open
 Policy Agent and [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
 to enforce these kinds of policies. For reference, we've created an [example of
 configuration](https://github.com/open-policy-agent/gatekeeper-library/pull/24)
 that could be used for this.
-  
+
 ## Route Namespaces
-Service APIs allow Gateways to select Routes across multiple Namespaces.
+Gateway API allow Gateways to select Routes across multiple Namespaces.
 Although this can be remarkably powerful, this capability needs to be used
 carefully. Gateways include a `RouteNamespaces` field that allows selecting
 multiple namespaces with a label selector. By default, this is limited to Routes
 in the same namespace as the Gateway. Additionally, Routes include a `Gateways`
 field that allows them to restrict which Gateways use them. If the Gateways
 field is not specified (i.e. its empty), then the Route will default to allowing
-selection by Gateways in the same namespace. 
+selection by Gateways in the same namespace.
 
 ## Controller Requirements
-To be considered conformant with the Service APIs spec, controllers need to:
+To be considered conformant with the Gateway API spec, controllers need to:
 
 * Populate status fields on Gateways and Resources to indicate if they are
   compatible with the corresponding GatewayClass configuration.
@@ -139,7 +139,7 @@ Instead of having the `routeNamespaceSelector` field on GatewayClass, we would
 use a boolean `multiNamespaceRoutes` field to indicate if Gateways of this class
 can target routes in multiple namespaces. This would default to false. A false
 value here would indicate that routes could only be targeted in the current
-namespace. 
+namespace.
 
 **Benefits**
 
@@ -155,15 +155,15 @@ namespace.
 ### Validating Webhook
 A validating webhook could potentially handle some of the cross-resource
 validation necessary for this security model and provide more immediate feedback
-to end users. 
+to end users.
 
 **Benefits**
 
 * Immediate validation feedback.
-* More validation logic stays in core Service APIs codebase.
+* More validation logic stays in core Gateway API codebase.
 
 **Downsides**
 
 * Imperfect solution for cross-resource validation. For example, a change to a
   GatewayClass could affect the validity of corresponding Gateway.
-* Additional complexity involved in installing Service APIs in a cluster.
+* Additional complexity involved in installing Gateway API in a cluster.

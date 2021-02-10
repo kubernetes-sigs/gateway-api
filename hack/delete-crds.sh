@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# Delete all CR and CRDs installed by service-apis.
+# Delete all CR and CRDs installed by gateway-api.
 
 RESOURCES=$(kubectl api-resources --api-group=networking.x-k8s.io -o name)
 

@@ -36,7 +36,7 @@
     
     
       
-        <title>TLS - Kubernetes Service APIs</title>
+        <title>TLS - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -802,7 +802,7 @@
                 
                 
                 <h1 id="tls-details">TLS details</h1>
-<p>Service APIs allow for a variety of ways to configure TLS. This document lays
+<p>Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.</p>
 <h2 id="clientserver-and-tls">Client/Server and TLS</h2>
@@ -813,7 +813,7 @@ effectively.</p>
 <li><strong>upstream</strong>: This is the connection between the Gateway and backend resources
    specified by routes. These backend resources will usually be Services.</li>
 </ul>
-<p>With Service APIs, TLS configuration of downstream and
+<p>With Gateway API, TLS configuration of downstream and
 upstream connections is managed independently.</p>
 <p>Please note that in case of <code>Passthrough</code> TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway.

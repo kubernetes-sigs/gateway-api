@@ -1,8 +1,8 @@
 <!--  Thanks for sending a pull request! Here are some tips for you:
 
-1. If this is your first time contributing to Service APIs, please read our
-   developer guide (https://kubernetes-sigs.github.io/service-apis/devguide/)
-   and our community page (https://kubernetes-sigs.github.io/service-apis/community/).
+1. If this is your first time contributing to Gateway API, please read our
+   developer guide (https://kubernetes-sigs.github.io/gateway-api/devguide/)
+   and our community page (https://kubernetes-sigs.github.io/gateway-api/community/).
 2. If this is your first time contributing to a Kubernetes project, please read
    our contributor guidelines:
    https://git.k8s.io/community/contributors/guide/first-contribution.md#your-first-contribution

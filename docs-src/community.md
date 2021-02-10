@@ -7,14 +7,14 @@ discussions around the APIs.
 
 Feedback and bug reports should be filed as [Github Issues][gh-issues] on this repo.
 
-[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues/new/choose
+[gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 
 ## Communications
 
 Major discussions and notifications will be sent on the [SIG-NETWORK mailing
 list][signetg].
 
-We also have a [Slack channel (sig-network-service-apis)][slack] on k8s.io for day-to-day
+We also have a [Slack channel (sig-network-gateway-api)][slack] on k8s.io for day-to-day
 questions, discussions.
 
 [signetg]: https://groups.google.com/forum/#!forum/kubernetes-sig-network
@@ -22,9 +22,9 @@ questions, discussions.
 
 ## Meetings
 
-Meetings discussing the evolution of the service APIs will alternate times to
+Meetings discussing the evolution of the Gateway API will alternate times to
 accommodate participants from various time zones. This calendar includes all
-Service APIs meetings as well as any other SIG-Network meetings.
+Gateway API meetings as well as any other SIG-Network meetings.
 
 <iframe
   src="https://calendar.google.com/calendar/embed?src=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com"

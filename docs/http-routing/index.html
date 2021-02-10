@@ -36,7 +36,7 @@
     
     
       
-        <title>HTTP routing - Kubernetes Service APIs</title>
+        <title>HTTP routing - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -581,28 +581,28 @@
                 
                 
                 <h1 id="http-routing">HTTP routing</h1>
-<p>The <a href="../httproute/">HTTPRoute resource</a> allows you to match on HTTP traffic and 
+<p>The <a href="../httproute/">HTTPRoute resource</a> allows you to match on HTTP traffic and
 direct it to Kubernetes backends. This guide shows how the HTTPRoute matches
-traffic on host, header, and path fields and forwards it to different 
+traffic on host, header, and path fields and forwards it to different
 Kubernetes Services.</p>
 <p>The following diagram describes a required traffic flow across three different
 Services:</p>
 <ul>
-<li>Traffic to <code>foo.example.com/login</code> is forwarded to <code>foo-svc</code> </li>
-<li>Traffic to <code>bar.example.com/*</code> with a <code>env: canary</code> header is forwarded 
+<li>Traffic to <code>foo.example.com/login</code> is forwarded to <code>foo-svc</code></li>
+<li>Traffic to <code>bar.example.com/*</code> with a <code>env: canary</code> header is forwarded
 to <code>bar-svc-canary</code></li>
-<li>Traffic to <code>bar.example.com/*</code> without the header is forwarded to <code>bar-svc</code> </li>
+<li>Traffic to <code>bar.example.com/*</code> without the header is forwarded to <code>bar-svc</code></li>
 </ul>
 <p><img alt="HTTP Routinng" src="../images/http-routing.png" /></p>
 <p>The dotted lines show the Gateway resources deployed to configure this routing
 behavior. There are two HTTPRoute resources that create routing rules on the
 same <code>prod-web</code> Gateway. This illustrates how more than one Route can bind to a
 Gateway which allows Routes to merge on a Gateway as
-long as they don't conflict. </p>
+long as they don't conflict.</p>
 <p>The following <code>prod-web</code> Gateway is defined from the <code>acme-lb</code> GatewayClass.
 <code>prod-web</code> listens for HTTP traffic on port 80 and will bind to all Routes in
 the same Namespace that have the matching <code>gateway: prod-web-gw</code> label.
-Route labels and Gateway label selectors allow Routes and Gateways to be 
+Route labels and Gateway label selectors allow Routes and Gateways to be
 bound to each other by their respective owners.</p>
 <pre><code class="yaml">kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
@@ -617,10 +617,10 @@ spec:
       kind: HTTPRoute
       selector:
         matchLabels:
-          gateway: prod-web-gw  
+          gateway: prod-web-gw
 </code></pre>
 
-<p>An HTTPRoute can match against a <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">single set of
+<p>An HTTPRoute can match against a <a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec">single set of
 hostnames</a>.
 These hostnames are matched before any other matching within the HTTPRoute takes
 place. Since <code>foo.example.com</code> and <code>bar.example.com</code> are separate hosts with
@@ -647,7 +647,7 @@ spec:
         value: /login
     forwardTo:
     - serviceName: foo-svc
-      port: 8080  
+      port: 8080
 </code></pre>
 
 <p>Similarly, the <code>bar-route</code> HTTPRoute matches traffic for <code>bar.example.com</code>. All
@@ -675,7 +675,7 @@ spec:
       port: 8080
   - forwardTo:
     - serviceName: bar-svc
-      port: 8080  
+      port: 8080
 </code></pre>
                 
                   

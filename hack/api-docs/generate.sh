@@ -49,5 +49,5 @@ fi
 
 gendoc::build
 gendoc::exec \
-    -api-dir sigs.k8s.io/service-apis/apis/v1alpha1 \
+    -api-dir sigs.k8s.io/gateway-api/apis/v1alpha1 \
     -out-file "$1"

@@ -1,9 +1,9 @@
 # Routes in multiple namespaces
 
-With the Service APIs, a single Gateway can target routes across multiple
-namespaces. 
+With the Gateway API, a single Gateway can target routes across multiple
+namespaces.
 
-This guide assumes that you have installed Service APIs CRDs and a conformant
+This guide assumes that you have installed Gateway API CRDs and a conformant
 controller.
 
 In the following example:
@@ -14,7 +14,7 @@ In the following example:
   on port 80 which selects routes that have the label `product: baz` in any
   namespace.  Notice how the `routes.namespaces.from` field in the listener is
   set to `All`.
-- `service-apis-example-ns1` and `service-apis-example-ns2` Namespaces: These
+- `gateway-api-example-ns1` and `gateway-api-example-ns2` Namespaces: These
   are the namespaces in which route resources are instantiated.
 - `http-app-1` and `http-app-2` HTTPRoutes: These are two resources that are
   installed in separate namespaces. These routes will be bound to Gateway

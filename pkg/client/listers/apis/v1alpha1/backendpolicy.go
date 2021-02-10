@@ -22,7 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/tools/cache"
-	v1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
+	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
 )
 
 // BackendPolicyLister helps list BackendPolicies.

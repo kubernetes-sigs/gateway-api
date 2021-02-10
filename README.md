@@ -1,6 +1,6 @@
-# Kubernetes Service APIs
+# Kubernetes Gateway API
 
-The Service APIs is a part of the [SIG Network][sn], and this repository
+The Gateway API is a part of the [SIG Network][sn], and this repository
 contains the specification and Custom Resource Definitions (CRDs).
 
 ## Documentation
@@ -8,7 +8,7 @@ contains the specification and Custom Resource Definitions (CRDs).
 ### Website
 
 The API specification and detailed documentation is available on the project
-website: [https://kubernetes-sigs.github.io/service-apis][ghp].
+website: [https://kubernetes-sigs.github.io/gateway-api][ghp].
 
 ### Get started
 
@@ -27,30 +27,30 @@ the API.
 A complete API reference, please refer to:
 
 - [API reference][spec]
-- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1)
+- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1)
 
 ## Contributing
 
 Community meeting schedule, notes and developer guide can be found on the
 [community page][cm].
-Our Kubernetes Slack channel is [#sig-network-service-apis][slack].
+Our Kubernetes Slack channel is [#sig-network-gateway-api][slack].
 
 ## Technical Leads
 
 - @bowei
-- @thockin 
+- @thockin
 
 ### Code of conduct
 
 Participation in the Kubernetes community is governed by the
 [Kubernetes Code of Conduct](code-of-conduct.md).
 
-[ghp]: https://kubernetes-sigs.github.io/service-apis/
+[ghp]: https://kubernetes-sigs.github.io/gateway-api/
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
-[cm]: https://kubernetes-sigs.github.io/service-apis/community
-[slack]: https://kubernetes.slack.com/messages/sig-network-service-apis
-[guides]: https://kubernetes-sigs.github.io/service-apis/guides
-[spec]: https://kubernetes-sigs.github.io/service-apis/spec
-[concepts]: https://kubernetes-sigs.github.io/service-apis/api-overview
-[security-model]: https://kubernetes-sigs.github.io/service-apis/security-model
+[cm]: https://kubernetes-sigs.github.io/gateway-api/community
+[slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
+[guides]: https://kubernetes-sigs.github.io/gateway-api/guides
+[spec]: https://kubernetes-sigs.github.io/gateway-api/spec
+[concepts]: https://kubernetes-sigs.github.io/gateway-api/api-overview
+[security-model]: https://kubernetes-sigs.github.io/gateway-api/security-model
 

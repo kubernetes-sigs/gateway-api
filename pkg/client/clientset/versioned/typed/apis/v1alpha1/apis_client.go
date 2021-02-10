@@ -20,8 +20,8 @@ package v1alpha1
 
 import (
 	rest "k8s.io/client-go/rest"
-	v1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
-	"sigs.k8s.io/service-apis/pkg/client/clientset/versioned/scheme"
+	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
+	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
 type NetworkingV1alpha1Interface interface {

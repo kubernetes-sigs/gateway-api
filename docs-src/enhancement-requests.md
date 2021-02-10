@@ -9,7 +9,7 @@ require approval from a maintainer to accept the enhancement into the project.
 
 ## Quick start
 
-1. Create an [Issue](https://github.com/kubernetes-sigs/service-apis/issues/new/choose) and select
+1. Create an [Issue](https://github.com/kubernetes-sigs/gateway-api/issues/new/choose) and select
 "Enhancement Request".
 2. Follow the instructions in the enhancement request template and submit the Issue.
 

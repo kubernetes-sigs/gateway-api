@@ -25,7 +25,7 @@ linters-settings:
     # simplify code: gofmt with `-s` option, true by default
     simplify: true
   goimports:
-    local-prefixes: sigs.k8s.io/service-apis
+    local-prefixes: sigs.k8s.io/gateway-api
   golint:
     min-confidence: 0.9
   govet:

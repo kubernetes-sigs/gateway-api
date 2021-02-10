@@ -36,7 +36,7 @@
     
     
       
-        <title>Kubernetes Service APIs</title>
+        <title>Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href="." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href="." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href="." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href="." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -202,8 +202,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-the-goal-of-service-apis" class="md-nav__link">
-    What is the goal of Service APIs?
+  <a href="#what-is-the-goal-of-gateway-api" class="md-nav__link">
+    What is the goal of Gateway API?
   </a>
   
 </li>
@@ -614,8 +614,8 @@
     <ul class="md-nav__list" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-the-goal-of-service-apis" class="md-nav__link">
-    What is the goal of Service APIs?
+  <a href="#what-is-the-goal-of-gateway-api" class="md-nav__link">
+    What is the goal of Gateway API?
   </a>
   
 </li>
@@ -652,46 +652,46 @@
                 
                 
                 <h1 id="introduction">Introduction</h1>
-<p>Service APIs is an open source project managed by the <a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>
+<p>Gateway API is an open source project managed by the <a href="https://github.com/kubernetes/community/tree/master/sig-network">SIG-NETWORK</a>
 community. The project's goal is to evolve service networking APIs within the
-Kubernetes ecosystem. Service APIs provide interfaces to expose Kubernetes
-applications - Services, Ingress, and more. </p>
-<h3 id="what-is-the-goal-of-service-apis">What is the goal of Service APIs?</h3>
-<p>Service APIs aims to improve service networking by providing expressive,
+Kubernetes ecosystem. Gateway API provide interfaces to expose Kubernetes
+applications - Services, Ingress, and more.</p>
+<h3 id="what-is-the-goal-of-gateway-api">What is the goal of Gateway API?</h3>
+<p>Gateway API aims to improve service networking by providing expressive,
 extensible, role-oriented interfaces that are implemented by many vendors and
-have broad industry support. </p>
-<p>Service APIs is a collection of API resources - <code>Service</code>, <code>GatewayClass</code>,
+have broad industry support.</p>
+<p>Gateway API is a collection of API resources - <code>Service</code>, <code>GatewayClass</code>,
 <code>Gateway</code>, <code>HTTPRoute</code>, <code>TCPRoute</code>, etc. Together these resources model a wide
 variety of networking use-cases.</p>
-<p><img alt="Service API Model" src="images/api-model.png" /></p>
-<p>How do Service APIs improve upon current standards like Ingress?</p>
+<p><img alt="Gateway API Model" src="images/api-model.png" /></p>
+<p>How do Gateway API improve upon current standards like Ingress?</p>
 <ul>
 <li><strong>More expressive</strong> - They express more core functionality for things like
 header-based matching, traffic weighting, and other capabilities that were only
-possible in Ingress through custom means.    </li>
+possible in Ingress through custom means.</li>
 <li><strong>More extensible</strong> - They allow for custom resources to be linked at various
 layers of the API. This allows for more granular customization at the
 appropriate places within the API structure.</li>
 <li><strong>Role oriented</strong> - They are separated into different API resources that map
-to the common roles for running applications on Kubernetes.    </li>
+to the common roles for running applications on Kubernetes.</li>
 <li><strong>Generic</strong> - This isn't an improvement but rather something
 that should stay the same. Just as Ingress is a universal specification with
 <a href="https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/">numerous implementations</a>,
-Service APIs are designed to be a portable specification supported by many
+Gateway API are designed to be a portable specification supported by many
 implementations.</li>
 </ul>
 <p>Some other notable capabilities include …</p>
 <ul>
 <li><strong>Shared Gateways</strong> - They allow the sharing of load balancers and VIPs by
 permitting independent Route resources to bind to the same Gateway. This allows
-teams to share infrastructure safely without requiring direct coordination.  </li>
+teams to share infrastructure safely without requiring direct coordination.</li>
 <li><strong>Typed backend references</strong> - With typed backend references Routes can
 reference Kubernetes Services, but also any kind of Kubernetes resource that is
-designed to be a Gateway backend.  </li>
-<li><strong>Cross-Namespace references</strong> - Routes across different Namespaces can bind<br />
-to Gateways. This allows for shared networking infrastructure despite Namespace<br />
-segmentation for workloads.  </li>
-<li><strong>Classes</strong> - GatewayClasses formalize types of load balancing implementations. 
+designed to be a Gateway backend.</li>
+<li><strong>Cross-Namespace references</strong> - Routes across different Namespaces can bind
+to Gateways. This allows for shared networking infrastructure despite Namespace
+segmentation for workloads.</li>
+<li><strong>Classes</strong> - GatewayClasses formalize types of load balancing implementations.
 These classes make it easy and explicit for users to understand what kind of
 capabilities are available as a resource model itself.</li>
 </ul>
@@ -703,18 +703,18 @@ please follow one of our <a href="guides/">guides</a> to dive deeper into differ
 of the API.</p>
 <p>For a complete API reference, please refer to:</p>
 <ul>
-<li><a href="spec/">API reference</a> </li>
-<li><a href="https://pkg.go.dev/sigs.k8s.io/service-apis/apis/v1alpha1">Go docs for the package</a></li>
+<li><a href="spec/">API reference</a></li>
+<li><a href="https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1">Go docs for the package</a></li>
 </ul>
 <h3 id="how-to-get-involved">How to get involved</h3>
 <p>This project has many contributors, and we welcome anybody and everybody to get
 involved. Join our weekly meetings, file issues, or ask questions in Slack. No
-contribution is too small - even opinions matter! </p>
+contribution is too small - even opinions matter!</p>
 <ul>
-<li><a href="community/#meetings">Weekly meeting schedule</a> </li>
-<li><a href="https://kubernetes.slack.com/messages/sig-network-service-apis">Service APIs Slack</a> </li>
-<li><a href="enhancement-requests/">Enhancement requests</a>  </li>
-<li><a href="https://raw.githubusercontent.com/kubernetes-sigs/service-apis/master/OWNERS">Project owners</a></li>
+<li><a href="community/#meetings">Weekly meeting schedule</a></li>
+<li><a href="https://kubernetes.slack.com/messages/sig-network-gateway-api">Gateway API Slack</a></li>
+<li><a href="enhancement-requests/">Enhancement requests</a></li>
+<li><a href="https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/master/OWNERS">Project owners</a></li>
 </ul>
                 
                   

@@ -36,7 +36,7 @@
     
     
       
-        <title>Releases - Kubernetes Service APIs</title>
+        <title>Releases - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -668,14 +668,14 @@
                 
                 
                 <h1 id="releases">Releases</h1>
-<p>Although Service APIs are an official Kubernetes project, and represent official
+<p>Although Gateway API are an official Kubernetes project, and represent official
 APIs, these APIs will not be installed by default on Kubernetes clusters at this
 time. This project will use Custom Resource Definitions (CRDs) to represent the
-new API types that Service APIs include.</p>
+new API types that Gateway API include.</p>
 <p>Similar to other Kubernetes APIs, these will go through a formal Kubernetes
-Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Service API
+Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Gateway API
 releases will be independent from Kubernetes releases initially.</p>
-<p>Service API releases will include four components:</p>
+<p>Gateway API releases will include four components:</p>
 <ul>
 <li>Custom Resource Definitions to define the API.</li>
 <li>Go client libraries.</li>
@@ -703,7 +703,7 @@ resources.</p>
 fixes. New minor releases may include new fields or resources in addition to bug
 fixes. New API versions will be released with new minor or major versions.</p>
 <p>Our changelog and release notes will always include both the semantic version
-and API version(s) included in the release. </p>
+and API version(s) included in the release.</p>
 <blockquote>
 <p>The first release candidate was tagged as <code>v1alpha1-rc1</code>. It predates this
 documentation and is an exception.</p>
@@ -716,13 +716,13 @@ release is published. For the best results, use the latest published release of
 this project.</p>
 <h2 id="installation">Installation</h2>
 <p>This project will be responsible for providing straightforward and reliable ways
-to install releases of Service APIs.</p>
+to install releases of Gateway API.</p>
 <h2 id="other-official-custom-resources">Other Official Custom Resources</h2>
 <p>This is a relatively new concept, and there is only one previous example of
 official custom resources being used:
 <a href="https://kubernetes.io/blog/2018/10/09/introducing-volume-snapshot-alpha-for-kubernetes/">VolumeSnapshots</a>.
 Although VolumeSnapshot CRDs can be installed directly by CSI drivers that
-support them, Service APIs must support multiple controllers per cluster, so the
+support them, Gateway API must support multiple controllers per cluster, so the
 CRDs will live in and be installed from this repo.</p>
                 
                   

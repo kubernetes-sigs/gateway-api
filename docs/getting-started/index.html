@@ -36,7 +36,7 @@
     
     
       
-        <title>Getting started - Kubernetes Service APIs</title>
+        <title>Getting started - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -672,7 +672,7 @@
 <p>This project provides a collection of Custom Resource Definitions (CRDs) that can
 be installed into any Kubernetes (&gt;= 1.16) cluster.</p>
 <p>To install the CRDs, please execute:</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0&quot; \
+<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0&quot; \
 | kubectl apply -f -
 </code></pre>
 
@@ -682,7 +682,7 @@ You will need to either install an implementation or verify that one is already
 setup for your cluster.</p>
 <h2 id="sample-gateway">Sample Gateway</h2>
 <p>Once you have the CRDs and an implementation installed, you are ready to
-use Service APIs.</p>
+use Gateway API.</p>
 <p>In this example, we are installing three resources:</p>
 <ul>
 <li>An <code>acme-lb</code> GatewayClass which is being managed by a <code>acme.io/gateway-controller</code>
@@ -772,7 +772,7 @@ spec:
 command. Note that this will remove all GatewayClass and Gateway resources in
 your cluster. If you have been using these resources for any other purpose do
 not uninstall these CRDs.</p>
-<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0&quot; \
+<pre><code>kubectl kustomize &quot;github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0&quot; \
 | kubectl delete -f -
 </code></pre>
                 

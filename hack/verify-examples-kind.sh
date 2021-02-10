@@ -21,7 +21,7 @@ set -o pipefail
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
-readonly CLUSTER_NAME="verify-service-apis"
+readonly CLUSTER_NAME="verify-gateway-api"
 readonly KUBECONFIG="${GOPATH}/.kubeconfig"
 
 export GOFLAGS GO111MODULE GOPATH
@@ -54,7 +54,7 @@ kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res
 # Install CRDs
 kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/bases || res=$?
 
-# Install all example service-apis resources.
+# Install all example gateway-api resources.
 kubectl apply --kubeconfig "${KUBECONFIG}" -f examples || res=$?
 
 # Clean up and exit

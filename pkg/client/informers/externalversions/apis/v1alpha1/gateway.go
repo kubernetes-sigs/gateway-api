@@ -26,10 +26,10 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	watch "k8s.io/apimachinery/pkg/watch"
 	cache "k8s.io/client-go/tools/cache"
-	apisv1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
-	versioned "sigs.k8s.io/service-apis/pkg/client/clientset/versioned"
-	internalinterfaces "sigs.k8s.io/service-apis/pkg/client/informers/externalversions/internalinterfaces"
-	v1alpha1 "sigs.k8s.io/service-apis/pkg/client/listers/apis/v1alpha1"
+	apisv1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
+	versioned "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
+	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha1"
 )
 
 // GatewayInformer provides access to a shared informer and lister for

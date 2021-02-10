@@ -1,10 +1,10 @@
 # See the OWNERS docs at https://go.k8s.io/owners
-# See the OWNERS_ALIASES file at https://github.com/kubernetes-sigs/service-apis/blob/master/OWNERS_ALIASES for a list of members for each alias. 
+# See the OWNERS_ALIASES file at https://github.com/kubernetes-sigs/gateway-api/blob/master/OWNERS_ALIASES for a list of members for each alias.
 
 approvers:
   - sig-network-leads
-  - service-apis-admins
-  - service-apis-maintainers
+  - gateway-api-admins
+  - gateway-api-maintainers
 
 reviewers:
-  - service-apis-maintainers
+  - gateway-api-maintainers

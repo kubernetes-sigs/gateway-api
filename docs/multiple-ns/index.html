@@ -36,7 +36,7 @@
     
     
       
-        <title>Multiple namespaces and routes - Kubernetes Service APIs</title>
+        <title>Multiple namespaces and routes - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -581,9 +581,9 @@
                 
                 
                 <h1 id="routes-in-multiple-namespaces">Routes in multiple namespaces</h1>
-<p>With the Service APIs, a single Gateway can target routes across multiple
-namespaces. </p>
-<p>This guide assumes that you have installed Service APIs CRDs and a conformant
+<p>With the Gateway API, a single Gateway can target routes across multiple
+namespaces.</p>
+<p>This guide assumes that you have installed Gateway API CRDs and a conformant
 controller.</p>
 <p>In the following example:</p>
 <ul>
@@ -593,7 +593,7 @@ controller.</p>
   on port 80 which selects routes that have the label <code>product: baz</code> in any
   namespace.  Notice how the <code>routes.namespaces.from</code> field in the listener is
   set to <code>All</code>.</li>
-<li><code>service-apis-example-ns1</code> and <code>service-apis-example-ns2</code> Namespaces: These
+<li><code>gateway-api-example-ns1</code> and <code>gateway-api-example-ns2</code> Namespaces: These
   are the namespaces in which route resources are instantiated.</li>
 <li><code>http-app-1</code> and <code>http-app-2</code> HTTPRoutes: These are two resources that are
   installed in separate namespaces. These routes will be bound to Gateway
@@ -641,13 +641,13 @@ spec:
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: service-apis-example-ns1
+  name: gateway-api-example-ns1
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-1
-  namespace: service-apis-example-ns1
+  namespace: gateway-api-example-ns1
   labels:
     product: baz
 spec:
@@ -678,13 +678,13 @@ spec:
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: service-apis-example-ns2
+  name: gateway-api-example-ns2
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-2
-  namespace: service-apis-example-ns2
+  namespace: gateway-api-example-ns2
   labels:
     product: baz
 spec:
