@@ -30,13 +30,16 @@ type HTTPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   HTTPRouteSpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of HTTPRoute.
+	Spec HTTPRouteSpec `json:"spec,omitempty"`
+
+	// Status defines the current state of HTTPRoute.
 	Status HTTPRouteStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// HTTPRouteList contains a list of HTTPRoute
+// HTTPRouteList contains a list of HTTPRoute.
 type HTTPRouteList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -46,6 +49,8 @@ type HTTPRouteList struct {
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpec struct {
 	// Gateways defines which Gateways can use this Route.
+	//
+	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
 
@@ -104,9 +109,10 @@ type HTTPRouteSpec struct {
 
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
-	// +kubebuilder:validation:MinItems=1
+	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	Rules []HTTPRouteRule `json:"rules"`
+	// +kubebuilder:default={{matches: {{path: {type: "Prefix", value: "/"}}}}}
+	Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
 
 // RouteTLSConfig describes a TLS configuration defined at the Route level.
@@ -119,10 +125,10 @@ type RouteTLSConfig struct {
 	// string for both the group and kind, the resource defaults to "secrets".
 	// An implementation may support other resources (for example, resource
 	// "mycertificates" in group "networking.acme.io").
+	//
 	// Support: Core (Kubernetes Secrets)
 	// Support: Implementation-specific (Other resource types)
 	//
-	// +required
 	CertificateRef LocalObjectReference `json:"certificateRef"`
 }
 
@@ -172,8 +178,10 @@ type HTTPRouteRule struct {
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
 	// * The Route appearing first in alphabetical order (namespace/name) for
 	//   example, foo/bar is given precedence over foo/baz.
-	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
+	//
+	// +optional
 	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
@@ -260,6 +268,7 @@ type HTTPPathMatch struct {
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	//
+	// +optional
 	// +kubebuilder:default=Prefix
 	Type PathMatchType `json:"type,omitempty"`
 
@@ -284,6 +293,7 @@ type HTTPHeaderMatch struct {
 	//
 	// HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2).
 	//
+	// +optional
 	// +kubebuilder:default=Exact
 	Type HeaderMatchType `json:"type,omitempty"`
 
@@ -318,13 +328,14 @@ type HTTPRouteMatch struct {
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
 	//
+	// +optional
 	// +kubebuilder:default={type: "Prefix", value: "/"}
 	Path HTTPPathMatch `json:"path,omitempty"`
 
 	// Headers specifies a HTTP request header matcher.
 	//
 	// +optional
-	Headers *HTTPHeaderMatch `json:"headers"`
+	Headers *HTTPHeaderMatch `json:"headers,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
@@ -447,6 +458,7 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: bar
 	//
 	// Support: Extended
+	//
 	// +optional
 	Set map[string]string `json:"set,omitempty"`
 
@@ -467,6 +479,7 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: bar
 	//
 	// Support: Extended
+	//
 	// +optional
 	Add map[string]string `json:"add,omitempty"`
 
@@ -489,6 +502,7 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header2: bar
 	//
 	// Support: Extended
+	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	Remove []string `json:"remove,omitempty"`
@@ -529,7 +543,11 @@ type HTTPRequestMirrorFilter struct {
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
 	//
-	Port PortNumber `json:"port"`
+	// If unspecified, the destination port in the request is used
+	// when forwarding to a backendRef or serviceName.
+	//
+	// +optional
+	Port *PortNumber `json:"port,omitempty"`
 }
 
 // HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
@@ -577,10 +595,13 @@ type HTTPRouteForwardTo struct {
 
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
+	// If unspecified, the destination port in the request is used
+	// when forwarding to a backendRef or serviceName.
 	//
 	// Support: Core
 	//
-	Port PortNumber `json:"port"`
+	// +optional
+	Port *PortNumber `json:"port,omitempty"`
 
 	// Weight specifies the proportion of HTTP requests forwarded to the backend
 	// referenced by the ServiceName or BackendRef field. This is computed as
@@ -596,6 +617,7 @@ type HTTPRouteForwardTo struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=1000000

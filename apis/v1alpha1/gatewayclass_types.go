@@ -31,15 +31,15 @@ import (
 // for creating Gateway resources.
 //
 // GatewayClass is a Cluster level resource.
-//
-// Support: Core.
 type GatewayClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec for this GatewayClass.
+	// Spec defines the desired state of GatewayClass.
 	Spec GatewayClassSpec `json:"spec,omitempty"`
-	// Status of the GatewayClass.
+
+	// Status defines the current state of GatewayClass.
+	//
 	// +kubebuilder:default={conditions: {{type: "Admitted", status: "False", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
@@ -113,6 +113,7 @@ type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	//
+	// +optional
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8

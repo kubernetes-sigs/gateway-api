@@ -83,3 +83,14 @@ We expect there will be varying levels of conformance among the
 different providers in the early days of this API. Users can use the
 results of the conformance tests to understand areas where there may
 be differences in behavior from the spec.
+
+## API Conventions
+
+Service APIs follow Kubernetes API [conventions][1]. These conventions
+are intended to ease client development and ensure that configuration
+mechanisms can consistently be implemented across a diverse set of use
+cases. One variation from the Kubernetes conventions is for fields with
+default values. These fields are considered optional but are not pointers
+since they will never be empty. 
+
+[1]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md

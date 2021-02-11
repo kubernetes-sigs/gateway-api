@@ -292,6 +292,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#api-conventions" class="md-nav__link">
+    API Conventions
+  </a>
+  
+</li>
+      
       
       
       
@@ -662,6 +669,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#api-conventions" class="md-nav__link">
+    API Conventions
+  </a>
+  
+</li>
+      
       
       
       
@@ -752,6 +766,13 @@ graduate to CORE when support is widespread.</p>
 different providers in the early days of this API. Users can use the
 results of the conformance tests to understand areas where there may
 be differences in behavior from the spec.</p>
+<h2 id="api-conventions">API Conventions</h2>
+<p>Service APIs follow Kubernetes API <a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md">conventions</a>. These conventions
+are intended to ease client development and ensure that configuration
+mechanisms can consistently be implemented across a diverse set of use
+cases. One variation from the Kubernetes conventions is for fields with
+default values. These fields are considered optional but are not pointers
+since they will never be empty. </p>
                 
                   
                 

@@ -25,7 +25,7 @@ spec:
     name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources. \n GatewayClass is a Cluster level resource. \n Support: Core."
+        description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources. \n GatewayClass is a Cluster level resource."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -36,7 +36,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: Spec for this GatewayClass.
+            description: Spec defines the desired state of GatewayClass.
             properties:
               controller:
                 description: "Controller is a domain/path string that indicates the controller that is managing Gateways of this class. \n Example: \"acme.io/gateway-controller\". \n This field is not mutable and cannot be empty. \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names). \n Support: Core"
@@ -76,7 +76,7 @@ spec:
                 reason: Waiting
                 status: "False"
                 type: Admitted
-            description: Status of the GatewayClass.
+            description: Status defines the current state of GatewayClass.
             properties:
               conditions:
                 default:

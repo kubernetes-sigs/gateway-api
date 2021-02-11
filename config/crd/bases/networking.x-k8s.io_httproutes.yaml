@@ -34,7 +34,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: HTTPRouteSpec defines the desired state of HTTPRoute
+            description: Spec defines the desired state of HTTPRoute.
             properties:
               gateways:
                 default:
@@ -80,6 +80,11 @@ spec:
                 maxItems: 16
                 type: array
               rules:
+                default:
+                - matches:
+                  - path:
+                      type: Prefix
+                      value: /
                 description: Rules are a list of HTTP matchers, filters and actions.
                 items:
                   description: HTTPRouteRule defines semantics for matching an HTTP request based on conditions, optionally executing additional processing steps, and forwarding the request to an API object.
@@ -159,7 +164,7 @@ spec:
                                 - name
                                 type: object
                               port:
-                                description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
+                                description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName."
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -168,8 +173,6 @@ spec:
                                 description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                 maxLength: 253
                                 type: string
-                            required:
-                            - port
                             type: object
                           type:
                             description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -286,7 +289,7 @@ spec:
                                       - name
                                       type: object
                                     port:
-                                      description: Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field.
+                                      description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName."
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -295,8 +298,6 @@ spec:
                                       description: "ServiceName refers to the name of the Service to mirror matched requests to. When specified, this takes the place of BackendRef. If both BackendRef and ServiceName are specified, ServiceName will be given precedence. \n If the referent cannot be found, the rule is not included in the route. The controller should raise the \"ResolvedRefs\" condition on the Gateway with the \"DegradedRoutes\" reason. The gateway status for this route should be updated with a condition that describes the error more specifically. \n Support: Core"
                                       maxLength: 253
                                       type: string
-                                  required:
-                                  - port
                                   type: object
                                 type:
                                   description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels: \n - Core: Filter types and their corresponding configuration defined by   \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All   implementations must support core filters. \n - Extended: Filter types and their corresponding configuration defined by   \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers   are encouraged to support extended filters. \n - Custom: Filters that are defined and supported by specific vendors.   In the future, filters showing convergence in behavior across multiple   implementations will be considered for inclusion in extended or core   conformance levels. Filter-specific configuration for such filters   is specified using the ExtensionRef field. `Type` should be set to   \"ExtensionRef\" for custom filters. \n Implementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior."
@@ -311,7 +312,7 @@ spec:
                             maxItems: 16
                             type: array
                           port:
-                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. \n Support: Core"
+                            description: "Port specifies the destination port number to use for the backend referenced by the ServiceName or BackendRef field. If unspecified, the destination port in the request is used when forwarding to a backendRef or serviceName. \n Support: Core"
                             format: int32
                             maximum: 65535
                             minimum: 1
@@ -327,8 +328,6 @@ spec:
                             maximum: 1000000
                             minimum: 0
                             type: integer
-                        required:
-                        - port
                         type: object
                       maxItems: 16
                       type: array
@@ -410,13 +409,12 @@ spec:
                       type: array
                   type: object
                 maxItems: 16
-                minItems: 1
                 type: array
               tls:
                 description: "TLS defines the TLS certificate to use for Hostnames defined in this Route. This configuration only takes effect if the AllowRouteOverride field is set to true in the associated Gateway resource. \n Collisions can happen if multiple HTTPRoutes define a TLS certificate for the same hostname. In such a case, conflict resolution guiding principles apply, specificallly, if hostnames are same and two different certificates are specified then the certificate in the oldest resource wins. \n Please note that HTTP Route-selection takes place after the TLS Handshake (ClientHello). Due to this, TLS certificate defined here will take precedence even if the request has the potential to match multiple routes (in case multiple HTTPRoutes share the same hostname). \n Support: Core"
                 properties:
                   certificateRef:
-                    description: 'CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and kind, the resource defaults to "secrets". An implementation may support other resources (for example, resource "mycertificates" in group "networking.acme.io"). Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)'
+                    description: "CertificateRef refers to a Kubernetes object that contains a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this RouteTLSConfig is associated with. If an entry in this list omits or specifies the empty string for both the group and kind, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)"
                     properties:
                       group:
                         description: Group is the group of the referent.
@@ -441,11 +439,9 @@ spec:
                 required:
                 - certificateRef
                 type: object
-            required:
-            - rules
             type: object
           status:
-            description: HTTPRouteStatus defines the observed state of HTTPRoute.
+            description: Status defines the current state of HTTPRoute.
             properties:
               gateways:
                 description: "Gateways is a list of the Gateways that are associated with the route, and the status of the route with respect to each of these Gateways. When a Gateway selects this route, the controller that manages the Gateway should add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route is modified. \n A maximum of 100 Gateways will be represented in this list. If this list is full, there may be additional Gateways using this Route that are not included in the list."

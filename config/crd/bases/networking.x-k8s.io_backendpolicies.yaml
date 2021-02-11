@@ -32,12 +32,12 @@ spec:
           metadata:
             type: object
           spec:
-            description: BackendPolicySpec defines desired policy for a backend.
+            description: Spec defines the desired state of BackendPolicy.
             properties:
               backendRefs:
                 description: "BackendRefs define which backends this policy should be applied to. This policy can only apply to backends within the same namespace. If more than one BackendPolicy targets the same backend, precedence must be given to the oldest BackendPolicy. \n Support: Core"
                 items:
-                  description: BackendRef identifies an API object within a known namespace that defaults group to core and resource to services if unspecified.
+                  description: BackendRef identifies an API object within the same namespace as the BackendPolicy.
                   properties:
                     group:
                       description: Group is the group of the referent.
@@ -59,6 +59,7 @@ spec:
                       type: integer
                   required:
                   - group
+                  - kind
                   - name
                   type: object
                 maxItems: 16
@@ -99,7 +100,7 @@ spec:
             - backendRefs
             type: object
           status:
-            description: BackendPolicyStatus defines the observed state of BackendPolicy. Conditions that are related to a specific Route or Gateway should be placed on the Route(s) using backends configured by this BackendPolicy.
+            description: Status defines the current state of BackendPolicy.
             properties:
               conditions:
                 description: Conditions describe the current conditions of the BackendPolicy.
