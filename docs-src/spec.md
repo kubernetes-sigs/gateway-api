@@ -83,6 +83,7 @@ BackendPolicySpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of BackendPolicy.</p>
 <br/>
 <br/>
 <table>
@@ -131,6 +132,7 @@ BackendPolicyStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of BackendPolicy.</p>
 </td>
 </tr>
 </tbody>
@@ -194,6 +196,7 @@ GatewaySpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of Gateway.</p>
 <br/>
 <br/>
 <table>
@@ -290,6 +293,7 @@ GatewayStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of Gateway.</p>
 </td>
 </tr>
 </tbody>
@@ -300,7 +304,6 @@ GatewayStatus
 <p>GatewayClass describes a class of Gateways available to the user
 for creating Gateway resources.</p>
 <p>GatewayClass is a Cluster level resource.</p>
-<p>Support: Core.</p>
 </p>
 <table>
 <thead>
@@ -351,7 +354,7 @@ GatewayClassSpec
 </em>
 </td>
 <td>
-<p>Spec for this GatewayClass.</p>
+<p>Spec defines the desired state of GatewayClass.</p>
 <br/>
 <br/>
 <table>
@@ -407,7 +410,7 @@ GatewayClassStatus
 </em>
 </td>
 <td>
-<p>Status of the GatewayClass.</p>
+<p>Status defines the current state of GatewayClass.</p>
 </td>
 </tr>
 </tbody>
@@ -466,6 +469,7 @@ HTTPRouteSpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of HTTPRoute.</p>
 <br/>
 <br/>
 <table>
@@ -479,6 +483,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -557,6 +562,7 @@ hostname).</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Rules are a list of HTTP matchers, filters and actions.</p>
 </td>
 </tr>
@@ -573,6 +579,7 @@ HTTPRouteStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of HTTPRoute.</p>
 </td>
 </tr>
 </tbody>
@@ -631,6 +638,7 @@ TCPRouteSpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of TCPRoute.</p>
 <br/>
 <br/>
 <table>
@@ -657,6 +665,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -673,6 +682,7 @@ TCPRouteStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of TCPRoute.</p>
 </td>
 </tr>
 </tbody>
@@ -735,6 +745,7 @@ TLSRouteSpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of TLSRoute.</p>
 <br/>
 <br/>
 <table>
@@ -761,6 +772,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -777,6 +789,7 @@ TLSRouteStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of TLSRoute.</p>
 </td>
 </tr>
 </tbody>
@@ -835,6 +848,7 @@ UDPRouteSpec
 </em>
 </td>
 <td>
+<p>Spec defines the desired state of UDPRoute.</p>
 <br/>
 <br/>
 <table>
@@ -861,6 +875,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -877,6 +892,7 @@ UDPRouteStatus
 </em>
 </td>
 <td>
+<p>Status defines the current state of UDPRoute.</p>
 </td>
 </tr>
 </tbody>
@@ -1005,7 +1021,7 @@ BackendTLSConfig
 </p>
 <p>
 <p>BackendPolicyStatus defines the observed state of BackendPolicy. Conditions
-that are related to a specific Route or Gateway should be placed on the
+that are related to a specific Route or Gateway must be placed on the
 Route(s) using backends configured by this BackendPolicy.</p>
 </p>
 <table>
@@ -1038,8 +1054,8 @@ Route(s) using backends configured by this BackendPolicy.</p>
 <a href="#networking.x-k8s.io/v1alpha1.BackendPolicySpec">BackendPolicySpec</a>)
 </p>
 <p>
-<p>BackendRef identifies an API object within a known namespace that defaults
-group to core and resource to services if unspecified.</p>
+<p>BackendRef identifies an API object within the same namespace
+as the BackendPolicy.</p>
 </p>
 <table>
 <thead>
@@ -1183,6 +1199,7 @@ AddressType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Type of the Address. This is either &ldquo;IPAddress&rdquo; or &ldquo;NamedAddress&rdquo;.</p>
 <p>Support: Extended</p>
 </td>
@@ -1343,6 +1360,7 @@ status condition will be true.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Conditions is the current status from the controller for
 this GatewayClass.</p>
 </td>
@@ -1637,6 +1655,7 @@ assigns an address from a reserved pool.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Conditions describe the current conditions of the Gateway.</p>
 <p>Implementations should prefer to express Gateway conditions
 using the <code>GatewayConditionType</code> and <code>GatewayConditionReason</code>
@@ -1699,6 +1718,7 @@ TLSModeType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Mode defines the TLS behavior for the TLS session initiated by the client.
 There are two possible modes:
 - Terminate: The TLS session between the downstream client
@@ -1745,6 +1765,7 @@ TLSOverridePolicy
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>RouteOverride dictates if TLS settings can be configured
 via Routes or not.</p>
 <p>CertificateRef must be defined even if <code>routeOverride.certificate</code> is
@@ -1801,6 +1822,7 @@ HeaderMatchType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Type specifies how to match against the value of the header.</p>
 <p>Support: core (Exact)
 Support: custom (RegularExpression, ImplementationSpecific)</p>
@@ -1857,6 +1879,7 @@ PathMatchType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Type specifies how to match against the path Value.</p>
 <p>Support: core (Exact, Prefix)
 Support: custom (RegularExpression, ImplementationSpecific)</p>
@@ -2039,8 +2062,11 @@ PortNumber
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
 backend referenced by the ServiceName or BackendRef field.</p>
+<p>If unspecified, the destination port in the request is used
+when forwarding to a backendRef or serviceName.</p>
 </td>
 </tr>
 </tbody>
@@ -2267,8 +2293,11 @@ PortNumber
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
-backend referenced by the ServiceName or BackendRef field.</p>
+backend referenced by the ServiceName or BackendRef field.
+If unspecified, the destination port in the request is used
+when forwarding to a backendRef or serviceName.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2280,6 +2309,7 @@ int32
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Weight specifies the proportion of HTTP requests forwarded to the backend
 referenced by the ServiceName or BackendRef field. This is computed as
 weight/(sum of all weights in this ForwardTo list). For non-zero values,
@@ -2350,6 +2380,7 @@ HTTPPathMatch
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Path specifies a HTTP request path matcher. If this field is not
 specified, a default prefix match on the &ldquo;/&rdquo; path is provided.</p>
 </td>
@@ -2420,6 +2451,7 @@ the request to an API object.</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Matches define conditions used for matching the rule against
 incoming HTTP requests.
 Each match is independent, i.e. this rule will be matched
@@ -2527,6 +2559,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -2605,6 +2638,7 @@ hostname).</p>
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Rules are a list of HTTP matchers, filters and actions.</p>
 </td>
 </tr>
@@ -3269,6 +3303,7 @@ RouteNamespaces
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Namespaces indicates in which namespaces Routes should be selected
 for this Gateway. This is restricted to the namespace of this Gateway by
 default.</p>
@@ -3301,6 +3336,7 @@ string
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Group is the group of the route resource to select. Omitting the value or specifying
 the empty string indicates the networking.x-k8s.io API group.
 For example, use the following to select an HTTPRoute:</p>
@@ -3429,8 +3465,11 @@ PortNumber
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Port specifies the destination port number to use for the
-backend referenced by the ServiceName or BackendRef field.</p>
+backend referenced by the ServiceName or BackendRef field.
+If unspecified, the destination port in the request is used
+when forwarding to a backendRef or serviceName.</p>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -3442,6 +3481,7 @@ int32
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Weight specifies the proportion of HTTP requests forwarded to the backend
 referenced by the ServiceName or BackendRef field. This is computed as
 weight/(sum of all weights in this ForwardTo list). For non-zero values,
@@ -3541,6 +3581,7 @@ GatewayAllowType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Allow indicates which Gateways will be allowed to use this route.
 Possible values are:
 * All: Gateways in any namespace can use this route.
@@ -3593,6 +3634,7 @@ RouteSelectType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>From indicates where Routes will be selected for this Gateway. Possible
 values are:
 * All: Routes in all namespaces may be used by this Gateway.
@@ -3729,8 +3771,8 @@ this RouteTLSConfig is associated with.
 If an entry in this list omits or specifies the empty
 string for both the group and kind, the resource defaults to &ldquo;secrets&rdquo;.
 An implementation may support other resources (for example, resource
-&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).
-Support: Core (Kubernetes Secrets)
+&ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
+<p>Support: Core (Kubernetes Secrets)
 Support: Implementation-specific (Other resource types)</p>
 </td>
 </tr>
@@ -3868,6 +3910,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -3964,6 +4007,7 @@ TLSRouteOverrideType
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Certificate dictates if TLS certificates can be configured
 via Routes. If set to &lsquo;Allow&rsquo;, a TLS certificate for a hostname
 defined in a Route takes precedence over the certificate defined in
@@ -4130,7 +4174,7 @@ sent.</p>
 <a href="#networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute</a>)
 </p>
 <p>
-<p>TLSRouteSpec defines the desired state of TLSRoute</p>
+<p>TLSRouteSpec defines the desired state of TLSRoute.</p>
 </p>
 <table>
 <thead>
@@ -4163,6 +4207,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>
@@ -4334,6 +4379,7 @@ RouteGateways
 </em>
 </td>
 <td>
+<em>(Optional)</em>
 <p>Gateways defines which Gateways can use this Route.</p>
 </td>
 </tr>

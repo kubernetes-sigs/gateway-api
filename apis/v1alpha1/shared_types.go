@@ -62,12 +62,16 @@ type RouteGateways struct {
 	// * All: Gateways in any namespace can use this route.
 	// * FromList: Only Gateways specified in GatewayRefs may use this route.
 	// * SameNamespace: Only Gateways in the same namespace may use this route.
+	//
+	// +optional
 	// +kubebuilder:validation:Enum=All;FromList;SameNamespace
 	// +kubebuilder:default=SameNamespace
 	Allow GatewayAllowType `json:"allow,omitempty"`
+
 	// GatewayRefs must be specified when Allow is set to "FromList". In that
 	// case, only Gateways referenced in this list will be allowed to use this
 	// route. This field is ignored for other values of "Allow".
+	//
 	// +optional
 	GatewayRefs []GatewayReference `json:"gatewayRefs,omitempty"`
 }
@@ -81,10 +85,13 @@ type PortNumber int32
 // GatewayReference identifies a Gateway in a specified namespace.
 type GatewayReference struct {
 	// Name is the name of the referent.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
+
 	// Namespace is the namespace of the referent.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Namespace string `json:"namespace"`
@@ -134,9 +141,13 @@ type RouteForwardTo struct {
 
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
+	// If unspecified, the destination port in the request is used
+	// when forwarding to a backendRef or serviceName.
 	//
 	// Support: Core
-	Port PortNumber `json:"port"`
+	//
+	// +optional
+	Port *PortNumber `json:"port,omitempty"`
 
 	// Weight specifies the proportion of HTTP requests forwarded to the backend
 	// referenced by the ServiceName or BackendRef field. This is computed as
@@ -152,6 +163,7 @@ type RouteForwardTo struct {
 	//
 	// Support: Extended
 	//
+	// +optional
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=1000000
@@ -173,6 +185,7 @@ type RouteGatewayStatus struct {
 	// GatewayRef is a reference to a Gateway object that is associated with
 	// the route.
 	GatewayRef GatewayReference `json:"gatewayRef"`
+
 	// Conditions describes the status of the route with respect to the
 	// Gateway.  For example, the "Admitted" condition indicates whether the
 	// route has been admitted or rejected by the Gateway, and why.  Note

@@ -37,15 +37,18 @@ type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	// Spec defines the desired state of Gateway.
 	Spec GatewaySpec `json:"spec,omitempty"`
 
+	// Status defines the current state of Gateway.
+	//
 	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// GatewayList contains a list of Gateway
+// GatewayList contains a list of Gateway.
 type GatewayList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -61,6 +64,7 @@ type GatewayList struct {
 type GatewaySpec struct {
 	// GatewayClassName used for this Gateway. This is the name of a
 	// GatewayClass resource.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	GatewayClassName string `json:"gatewayClassName"`
@@ -293,8 +297,9 @@ type TLSOverridePolicy struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default=Deny
-	Certificate TLSRouteOverrideType `json:"certificate"`
+	Certificate TLSRouteOverrideType `json:"certificate,omitempty"`
 }
 
 // GatewayTLSConfig describes a TLS configuration.
@@ -319,6 +324,7 @@ type GatewayTLSConfig struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default=Terminate
 	Mode TLSModeType `json:"mode,omitempty"`
 
@@ -338,7 +344,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +optional
-	CertificateRef LocalObjectReference `json:"certificateRef,omitempty"`
+	CertificateRef *LocalObjectReference `json:"certificateRef,omitempty"`
 
 	// RouteOverride dictates if TLS settings can be configured
 	// via Routes or not.
@@ -349,6 +355,7 @@ type GatewayTLSConfig struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default={certificate:Deny}
 	RouteOverride TLSOverridePolicy `json:"routeOverride,omitempty"`
 
@@ -363,7 +370,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific.
 	//
 	// +optional
-	Options map[string]string `json:"options"`
+	Options map[string]string `json:"options,omitempty"`
 }
 
 // TLSModeType type defines behavior of gateway with TLS protocol.
@@ -391,8 +398,10 @@ type RouteBindingSelector struct {
 	// default.
 	//
 	// Support: Core
-	// +kubebuilder:default={from: "Same"}
-	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
+	//
+	// +optional
+	// +kubebuilder:default={from: Same}
+	Namespaces RouteNamespaces `json:"namespaces,omitempty"`
 	// Selector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If this Selector is defined,
 	// only routes matching the Selector are associated with the Gateway.
@@ -418,6 +427,7 @@ type RouteBindingSelector struct {
 	//
 	// Support: Core
 	//
+	// +optional
 	// +kubebuilder:default=networking.x-k8s.io
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
@@ -436,8 +446,8 @@ type RouteBindingSelector struct {
 }
 
 // RouteSelectType specifies where Routes should be selected by a Gateway.
+//
 // +kubebuilder:validation:Enum=All;Selector;Same
-// +kubebuilder:default=Same
 type RouteSelectType string
 
 const (
@@ -462,6 +472,9 @@ type RouteNamespaces struct {
 	// * Same: Only Routes in the same namespace may be used by this Gateway.
 	//
 	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=Same
 	From RouteSelectType `json:"from,omitempty"`
 
 	// Selector must be specified when From is set to "Selector". In that case,
@@ -480,6 +493,7 @@ type GatewayAddress struct {
 	//
 	// Support: Extended
 	//
+	// +optional
 	// +kubebuilder:default=IPAddress
 	Type AddressType `json:"type,omitempty"`
 
@@ -540,7 +554,7 @@ type GatewayStatus struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	Addresses []GatewayAddress `json:"addresses"`
+	Addresses []GatewayAddress `json:"addresses,omitempty"`
 
 	// Conditions describe the current conditions of the Gateway.
 	//
@@ -554,6 +568,7 @@ type GatewayStatus struct {
 	// * "Scheduled"
 	// * "Ready"
 	//
+	// +optional
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8

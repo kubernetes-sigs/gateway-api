@@ -36,7 +36,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: "GatewaySpec defines the desired state of Gateway. \n Not all possible combinations of options specified in the Spec are valid. Some invalid configurations can be caught synchronously via a webhook, but there are many cases that will require asynchronous signaling via the GatewayStatus block."
+            description: Spec defines the desired state of Gateway.
             properties:
               addresses:
                 description: "Addresses requested for this gateway. This is optional and behavior can depend on the GatewayClass. If a value is set in the spec and the requested address is invalid, the GatewayClass MUST indicate this in the associated entry in GatewayStatus.Addresses. \n If no Addresses are specified, the GatewayClass may schedule the Gateway in an implementation-defined manner, assigning an appropriate set of Addresses. \n The GatewayClass MUST bind all Listeners to every GatewayAddress that it assigns to the Gateway. \n Support: Core"
@@ -102,6 +102,7 @@ spec:
                           description: "Namespaces indicates in which namespaces Routes should be selected for this Gateway. This is restricted to the namespace of this Gateway by default. \n Support: Core"
                           properties:
                             from:
+                              default: Same
                               description: "From indicates where Routes will be selected for this Gateway. Possible values are: * All: Routes in all namespaces may be used by this Gateway. * Selector: Routes in namespaces selected by the selector may be used by   this Gateway. * Same: Only Routes in the same namespace may be used by this Gateway. \n Support: Core"
                               enum:
                               - All
@@ -222,8 +223,6 @@ spec:
                               - Allow
                               - Deny
                               type: string
-                          required:
-                          - certificate
                           type: object
                       type: object
                   required:
@@ -246,7 +245,7 @@ spec:
                 reason: NotReconciled
                 status: "False"
                 type: Scheduled
-            description: GatewayStatus defines the observed state of Gateway.
+            description: Status defines the current state of Gateway.
             properties:
               addresses:
                 description: "Addresses lists the IP addresses that have actually been bound to the Gateway. These addresses may differ from the addresses in the Spec, e.g. if the Gateway automatically assigns an address from a reserved pool. \n These addresses should all be of type \"IPAddress\"."

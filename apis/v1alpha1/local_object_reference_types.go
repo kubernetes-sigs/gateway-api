@@ -19,14 +19,19 @@ package v1alpha1
 // LocalObjectReference identifies an API object within a known namespace.
 type LocalObjectReference struct {
 	// Group is the group of the referent.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
+
 	// Kind is kind of the referent.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Kind string `json:"kind"`
+
 	// Name is the name of the referent.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`

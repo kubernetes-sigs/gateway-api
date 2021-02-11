@@ -34,11 +34,14 @@ type TLSRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TLSRouteSpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of TLSRoute.
+	Spec TLSRouteSpec `json:"spec,omitempty"`
+
+	// Status defines the current state of TLSRoute.
 	Status TLSRouteStatus `json:"status,omitempty"`
 }
 
-// TLSRouteSpec defines the desired state of TLSRoute
+// TLSRouteSpec defines the desired state of TLSRoute.
 type TLSRouteSpec struct {
 	// Rules are a list of TLS matchers and actions.
 	//
@@ -47,6 +50,8 @@ type TLSRouteSpec struct {
 	Rules []TLSRouteRule `json:"rules"`
 
 	// Gateways defines which Gateways can use this Route.
+	//
+	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
 }
@@ -105,6 +110,7 @@ type TLSRouteMatch struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	SNIs []Hostname `json:"snis,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  For example, resource "mytlsroutematcher" in group
 	// "networking.acme.io". If the referent cannot be found, the rule is not

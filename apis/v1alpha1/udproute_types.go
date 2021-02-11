@@ -29,7 +29,10 @@ type UDPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   UDPRouteSpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of UDPRoute.
+	Spec UDPRouteSpec `json:"spec,omitempty"`
+
+	// Status defines the current state of UDPRoute.
 	Status UDPRouteStatus `json:"status,omitempty"`
 }
 
@@ -42,6 +45,8 @@ type UDPRouteSpec struct {
 	Rules []UDPRouteRule `json:"rules"`
 
 	// Gateways defines which Gateways can use this Route.
+	//
+	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
 }

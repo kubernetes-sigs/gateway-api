@@ -29,7 +29,10 @@ type TCPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   TCPRouteSpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of TCPRoute.
+	Spec TCPRouteSpec `json:"spec,omitempty"`
+
+	// Status defines the current state of TCPRoute.
 	Status TCPRouteStatus `json:"status,omitempty"`
 }
 
@@ -43,6 +46,7 @@ type TCPRouteSpec struct {
 
 	// Gateways defines which Gateways can use this Route.
 	//
+	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways RouteGateways `json:"gateways,omitempty"`
 }

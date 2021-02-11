@@ -34,13 +34,16 @@ type BackendPolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   BackendPolicySpec   `json:"spec,omitempty"`
+	// Spec defines the desired state of BackendPolicy.
+	Spec BackendPolicySpec `json:"spec,omitempty"`
+
+	// Status defines the current state of BackendPolicy.
 	Status BackendPolicyStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// BackendPolicyList contains a list of BackendPolicy
+// BackendPolicyList contains a list of BackendPolicy.
 type BackendPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -55,33 +58,39 @@ type BackendPolicySpec struct {
 	// the oldest BackendPolicy.
 	//
 	// Support: Core
+	//
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []BackendRef `json:"backendRefs"`
 
 	// TLS is the TLS configuration for these backends.
 	//
 	// Support: Extended
+	//
 	// +optional
 	TLS *BackendTLSConfig `json:"tls,omitempty"`
 }
 
-// BackendRef identifies an API object within a known namespace that defaults
-// group to core and resource to services if unspecified.
+// BackendRef identifies an API object within the same namespace
+// as the BackendPolicy.
 type BackendRef struct {
 	// Group is the group of the referent.
+	//
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
 
 	// Kind is the kind of the referent.
+	//
 	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind,omitempty"`
+	Kind string `json:"kind"`
 
 	// Name is the name of the referent.
+	//
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 
 	// Port is the port of the referent. If unspecified, this policy applies to
 	// all ports on the backend.
+	//
 	// +optional
 	Port *PortNumber `json:"port,omitempty"`
 }
@@ -108,12 +117,13 @@ type BackendTLSConfig struct {
 	// provider.
 	//
 	// Support: Implementation-specific.
+	//
 	// +optional
 	Options map[string]string `json:"options,omitempty"`
 }
 
 // BackendPolicyStatus defines the observed state of BackendPolicy. Conditions
-// that are related to a specific Route or Gateway should be placed on the
+// that are related to a specific Route or Gateway must be placed on the
 // Route(s) using backends configured by this BackendPolicy.
 type BackendPolicyStatus struct {
 	// Conditions describe the current conditions of the BackendPolicy.
