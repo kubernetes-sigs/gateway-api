@@ -252,8 +252,8 @@ type Listener struct {
 // Implementations can define their own protocols if a core ProtocolType does not
 // exist. Such definitions must use prefixed name, such as
 // `mycompany.com/my-custom-protocol`. Un-prefixed names are reserved for core
-// protocols. Any protocol defined by implementations will fall under custom
-// conformance.
+// and extended protocols. Any protocol defined by implementations will fall
+// under custom conformance.
 type ProtocolType string
 
 const (

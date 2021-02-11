@@ -3247,8 +3247,8 @@ a reason of &ldquo;UnsupportedProtocol&rdquo;.</p>
 <p>Implementations can define their own protocols if a core ProtocolType does not
 exist. Such definitions must use prefixed name, such as
 <code>mycompany.com/my-custom-protocol</code>. Un-prefixed names are reserved for core
-protocols. Any protocol defined by implementations will fall under custom
-conformance.</p>
+and extended protocols. Any protocol defined by implementations will fall
+under custom conformance.</p>
 </p>
 <table>
 <thead>
