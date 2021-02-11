@@ -92,7 +92,7 @@ type HTTPRouteSpec struct {
 	//
 	// Collisions can happen if multiple HTTPRoutes define a TLS certificate
 	// for the same hostname. In such a case, conflict resolution guiding
-	// principles apply, specificallly, if hostnames are same and two different
+	// principles apply, specifically, if hostnames are same and two different
 	// certificates are specified then the certificate in the
 	// oldest resource wins.
 	//

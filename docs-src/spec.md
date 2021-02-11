@@ -541,7 +541,7 @@ Route. This configuration only takes effect if the AllowRouteOverride
 field is set to true in the associated Gateway resource.</p>
 <p>Collisions can happen if multiple HTTPRoutes define a TLS certificate
 for the same hostname. In such a case, conflict resolution guiding
-principles apply, specificallly, if hostnames are same and two different
+principles apply, specifically, if hostnames are same and two different
 certificates are specified then the certificate in the
 oldest resource wins.</p>
 <p>Please note that HTTP Route-selection takes place after the
@@ -2617,7 +2617,7 @@ Route. This configuration only takes effect if the AllowRouteOverride
 field is set to true in the associated Gateway resource.</p>
 <p>Collisions can happen if multiple HTTPRoutes define a TLS certificate
 for the same hostname. In such a case, conflict resolution guiding
-principles apply, specificallly, if hostnames are same and two different
+principles apply, specifically, if hostnames are same and two different
 certificates are specified then the certificate in the
 oldest resource wins.</p>
 <p>Please note that HTTP Route-selection takes place after the
