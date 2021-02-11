@@ -4107,10 +4107,10 @@ the route.</p>
 </td>
 <td>
 <p>Conditions describes the status of the route with respect to the
-Gateway.  For example, the &ldquo;Admitted&rdquo; condition indicates whether the
-route has been admitted or rejected by the Gateway, and why.  Note
-that the route&rsquo;s availability is also subject to the Gateway&rsquo;s own
-status conditions and listener status.</p>
+Gateway. The &ldquo;Admitted&rdquo; condition must always be specified by controllers
+to indicate whether the route has been admitted or rejected by the Gateway,
+and why. Note that the route&rsquo;s availability is also subject to the Gateway&rsquo;s
+own status conditions and listener status.</p>
 </td>
 </tr>
 </tbody>
@@ -4291,15 +4291,16 @@ all route types.</p>
 </em>
 </td>
 <td>
-<p>Gateways is a list of the Gateways that are associated with the
-route, and the status of the route with respect to each of these
-Gateways. When a Gateway selects this route, the controller that
-manages the Gateway should add an entry to this list when the
-controller first sees the route and should update the entry as
-appropriate when the route is modified.</p>
+<p>Gateways is a list of Gateways that are associated with the route,
+and the status of the route with respect to each Gateway. When a
+Gateway selects this route, the controller that manages the Gateway
+must add an entry to this list when the controller first sees the
+route and should update the entry as appropriate when the route is
+modified.</p>
 <p>A maximum of 100 Gateways will be represented in this list. If this list
 is full, there may be additional Gateways using this Route that are not
-included in the list.</p>
+included in the list. An empty list means the route has not been admitted
+by any Gateway.</p>
 </td>
 </tr>
 </tbody>

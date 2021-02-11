@@ -187,10 +187,10 @@ type RouteGatewayStatus struct {
 	GatewayRef GatewayReference `json:"gatewayRef"`
 
 	// Conditions describes the status of the route with respect to the
-	// Gateway.  For example, the "Admitted" condition indicates whether the
-	// route has been admitted or rejected by the Gateway, and why.  Note
-	// that the route's availability is also subject to the Gateway's own
-	// status conditions and listener status.
+	// Gateway. The "Admitted" condition must always be specified by controllers
+	// to indicate whether the route has been admitted or rejected by the Gateway,
+	// and why. Note that the route's availability is also subject to the Gateway's
+	// own status conditions and listener status.
 	//
 	// +listType=map
 	// +listMapKey=type
@@ -201,16 +201,17 @@ type RouteGatewayStatus struct {
 // RouteStatus defines the observed state that is required across
 // all route types.
 type RouteStatus struct {
-	// Gateways is a list of the Gateways that are associated with the
-	// route, and the status of the route with respect to each of these
-	// Gateways. When a Gateway selects this route, the controller that
-	// manages the Gateway should add an entry to this list when the
-	// controller first sees the route and should update the entry as
-	// appropriate when the route is modified.
+	// Gateways is a list of Gateways that are associated with the route,
+	// and the status of the route with respect to each Gateway. When a
+	// Gateway selects this route, the controller that manages the Gateway
+	// must add an entry to this list when the controller first sees the
+	// route and should update the entry as appropriate when the route is
+	// modified.
 	//
 	// A maximum of 100 Gateways will be represented in this list. If this list
 	// is full, there may be additional Gateways using this Route that are not
-	// included in the list.
+	// included in the list. An empty list means the route has not been admitted
+	// by any Gateway.
 	//
 	// +kubebuilder:validation:MaxItems=100
 	Gateways []RouteGatewayStatus `json:"gateways"`
