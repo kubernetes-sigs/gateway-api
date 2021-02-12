@@ -36,7 +36,7 @@
     
     
       
-        <title>HTTPRoute - Kubernetes Service APIs</title>
+        <title>HTTPRoute - Kubernetes Gateway API</title>
       
     
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -814,19 +814,19 @@
                 
                 
                 <h1 id="httproute">HTTPRoute</h1>
-<p><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a> is a Service APIs type for specifying routing behavior
+<p><a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute">HTTPRoute</a> is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.</p>
 <h2 id="spec">Spec</h2>
 <p>The specification of an HTTPRoute consists of:</p>
 <ul>
-<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteGateways">Gateways</a>- Define which Gateways can use this HTTPRoute.</li>
-<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.Hostname">Hostnames</a> (optional)- Define a list of hostnames to use for
+<li><a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.RouteGateways">Gateways</a>- Define which Gateways can use this HTTPRoute.</li>
+<li><a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.Hostname">Hostnames</a> (optional)- Define a list of hostnames to use for
   matching the Host header of HTTP requests.</li>
-<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig">TLS</a> (optional)- Defines the TLS certificate to use for
+<li><a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig">TLS</a> (optional)- Defines the TLS certificate to use for
   Hostnames defined in this Route.</li>
-<li><a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule">Rules</a>- Define a list of rules to perform actions against
+<li><a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule">Rules</a>- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists
-  of <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">matches</a>, <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">filters</a> (optional), and <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a>
+  of <a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch">matches</a>, <a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">filters</a> (optional), and <a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a>
   (optional) fields.</li>
 </ul>
 <p>The following illustrates an HTTPRoute that sends all traffic to one Service:
@@ -1156,7 +1156,7 @@ spec:
       weight: 50
 </code></pre>
 
-<p>Reference the <a href="https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a> API documentation for additional details
+<p>Reference the <a href="https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo">forwardTo</a> API documentation for additional details
 of <code>weight</code> and other fields.</p>
 <h2 id="status">Status</h2>
 <p>Status defines the observed state of HTTPRoute.</p>

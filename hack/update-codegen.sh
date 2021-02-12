@@ -30,11 +30,11 @@ export GO111MODULE GOFLAGS GOPATH
 # a traditional GOPATH directory, so fake on up to point to the current
 # workspace.
 mkdir -p "$GOPATH/src/sigs.k8s.io"
-ln -s "${SCRIPT_ROOT}" "$GOPATH/src/sigs.k8s.io/service-apis"
+ln -s "${SCRIPT_ROOT}" "$GOPATH/src/sigs.k8s.io/gateway-api"
 
-readonly OUTPUT_PKG=sigs.k8s.io/service-apis/pkg/client
-readonly FQ_APIS=sigs.k8s.io/service-apis/apis/v1alpha1
-readonly APIS_PKG=sigs.k8s.io/service-apis
+readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
+readonly FQ_APIS=sigs.k8s.io/gateway-api/apis/v1alpha1
+readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
 

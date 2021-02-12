@@ -1,6 +1,6 @@
 # HTTPRoute
 
-[HTTPRoute][httproute] is a Service APIs type for specifying routing behavior
+[HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
 
 ## Spec
@@ -44,7 +44,7 @@ Possible values for `allow` are:
 - `FromList`: Only Gateways specified in `gatewayRefs` may use this route.
 - `SameNamespace` (default): Only Gateways in the same namespace may use this
   route.
-	
+
 If `allow` results in preventing the selection of an HTTPRoute by a Gateway, an
 “Admitted: false” condition must be set on the Gateway for this Route.
 
@@ -160,7 +160,7 @@ Conformance levels are defined by the filter type:
  - "Custom" filters have no API guarantees across implementations.
 
 Specifying a core filter multiple times has unspecified or custom conformance.
-	
+
 #### ForwardTo (optional)
 
 ForwardTo defines API objects where matching requests should be sent. If
@@ -228,12 +228,12 @@ A maximum of 100 Gateways can be represented in this list. If this list is full,
 there may be additional Gateways using this Route that are not included in the
 list.
 
-[httproute]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
-[gateways]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteGateways
-[httprouterule]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule
-[hostname]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.Hostname
-[tls-config]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig
+[httproute]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
+[gateways]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.RouteGateways
+[httprouterule]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule
+[hostname]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.Hostname
+[tls-config]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch
-[filters]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter
-[forwardto]: https://kubernetes-sigs.github.io/service-apis/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo
+[matches]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch
+[filters]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter
+[forwardto]: https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo

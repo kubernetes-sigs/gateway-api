@@ -1,6 +1,6 @@
 ---
 name: Enhancement Request
-about: Suggest an enhancement to the service-apis project
+about: Suggest an enhancement to the gateway-api project
 labels: kind/feature
 
 ---

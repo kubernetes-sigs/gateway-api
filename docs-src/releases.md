@@ -1,15 +1,15 @@
 # Releases
 
-Although Service APIs are an official Kubernetes project, and represent official
+Although Gateway API are an official Kubernetes project, and represent official
 APIs, these APIs will not be installed by default on Kubernetes clusters at this
 time. This project will use Custom Resource Definitions (CRDs) to represent the
-new API types that Service APIs include.
+new API types that Gateway API include.
 
 Similar to other Kubernetes APIs, these will go through a formal Kubernetes
-Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Service API
+Enhancement Proposal (KEP) review. Unlike other Kubernetes APIs, Gateway API
 releases will be independent from Kubernetes releases initially.
 
-Service API releases will include four components:
+Gateway API releases will include four components:
 
 * Custom Resource Definitions to define the API.
 * Go client libraries.
@@ -42,7 +42,7 @@ fixes. New minor releases may include new fields or resources in addition to bug
 fixes. New API versions will be released with new minor or major versions.
 
 Our changelog and release notes will always include both the semantic version
-and API version(s) included in the release. 
+and API version(s) included in the release.
 
 [Kubernetes API Versioning]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api_changes.md#alpha-beta-and-stable-versions
 [Semantic Versioning]: https://semver.org/
@@ -61,7 +61,7 @@ this project.
 ## Installation
 
 This project will be responsible for providing straightforward and reliable ways
-to install releases of Service APIs.
+to install releases of Gateway API.
 
 ## Other Official Custom Resources
 
@@ -69,5 +69,5 @@ This is a relatively new concept, and there is only one previous example of
 official custom resources being used:
 [VolumeSnapshots](https://kubernetes.io/blog/2018/10/09/introducing-volume-snapshot-alpha-for-kubernetes/).
 Although VolumeSnapshot CRDs can be installed directly by CSI drivers that
-support them, Service APIs must support multiple controllers per cluster, so the
+support them, Gateway API must support multiple controllers per cluster, so the
 CRDs will live in and be installed from this repo.

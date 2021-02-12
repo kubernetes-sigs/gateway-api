@@ -29,13 +29,13 @@ spec:
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: service-apis-example-ns1
+  name: gateway-api-example-ns1
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-1
-  namespace: service-apis-example-ns1
+  namespace: gateway-api-example-ns1
   labels:
     product: baz
 spec:
@@ -66,13 +66,13 @@ spec:
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: service-apis-example-ns2
+  name: gateway-api-example-ns2
 ---
 kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
 metadata:
   name: http-app-2
-  namespace: service-apis-example-ns2
+  namespace: gateway-api-example-ns2
   labels:
     product: baz
 spec:

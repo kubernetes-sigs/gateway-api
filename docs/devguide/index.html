@@ -36,7 +36,7 @@
     
     
       
-        <title>Developer guide - Kubernetes Service APIs</title>
+        <title>Developer guide - Kubernetes Gateway API</title>
       
     
     
@@ -75,7 +75,7 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
     
-      <a href="#developing-service-apis" tabindex="1" class="md-skip">
+      <a href="#developing-gateway-api" tabindex="1" class="md-skip">
         Skip to content
       </a>
     
@@ -84,7 +84,7 @@
   <nav class="md-header-nav md-grid">
     <div class="md-flex">
       <div class="md-flex__cell md-flex__cell--shrink">
-        <a href=".." title="Kubernetes Service APIs" class="md-header-nav__button md-logo">
+        <a href=".." title="Kubernetes Gateway API" class="md-header-nav__button md-logo">
           
             <i class="md-icon"></i>
           
@@ -97,7 +97,7 @@
         <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
           
             <span class="md-header-nav__topic">
-              Kubernetes Service APIs
+              Kubernetes Gateway API
             </span>
             <span class="md-header-nav__topic">
               
@@ -118,7 +118,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -145,12 +145,12 @@
                   <div class="md-sidebar__inner">
                     <nav class="md-nav md-nav--primary" data-md-level="0">
   <label class="md-nav__title md-nav__title--site" for="__drawer">
-    <a href=".." title="Kubernetes Service APIs" class="md-nav__button md-logo">
+    <a href=".." title="Kubernetes Gateway API" class="md-nav__button md-logo">
       
         <i class="md-icon"></i>
       
     </a>
-    Kubernetes Service APIs
+    Kubernetes Gateway API
   </label>
   
     <div class="md-nav__source">
@@ -159,7 +159,7 @@
 
   
 
-<a href="http://sigs.k8s.io/service-apis" title="Go to repository" class="md-source" data-md-source="">
+<a href="http://sigs.k8s.io/gateway-api" title="Go to repository" class="md-source" data-md-source="">
   
   <div class="md-source__repository">
     GitHub
@@ -596,12 +596,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<h2 id="developing-service-apis">Developing Service APIs</h2>
+<h2 id="developing-gateway-api">Developing Gateway API</h2>
 <p>You must have a working <a href="https://golang.org/doc/install">Go environment</a> and then clone the repo:</p>
 <pre><code>mkdir -p $GOPATH/src/sigs.k8s.io
 cd $GOPATH/src/sigs.k8s.io
-git clone https://github.com/kubernetes-sigs/service-apis
-cd service-apis
+git clone https://github.com/kubernetes-sigs/gateway-api
+cd gateway-api
 </code></pre>
 
 <p>This project works with Go modules; you can chose to setup your environment
@@ -612,12 +612,12 @@ outside $GOPATH as well.</p>
 <p>We are using the Github issues and project dashboard to manage the list of TODOs
 for this project:</p>
 <ul>
-<li><a href="https://github.com/kubernetes-sigs/service-apis/issues">Open issues</a></li>
-<li><a href="https://github.com/kubernetes-sigs/service-apis/projects/1">Project dashboard</a></li>
+<li><a href="https://github.com/kubernetes-sigs/gateway-api/issues">Open issues</a></li>
+<li><a href="https://github.com/kubernetes-sigs/gateway-api/projects/1">Project dashboard</a></li>
 </ul>
 <p>Issues labeled <code>good first issue</code> and <code>help wanted</code> are especially good for a
 first contribution.
-We use <a href="https://github.com/kubernetes-sigs/service-apis/milestones">milestones</a> to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.</p>
+We use <a href="https://github.com/kubernetes-sigs/gateway-api/milestones">milestones</a> to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.</p>
 <h2 id="building-the-code">Building the code</h2>
 <p>The project uses <code>make</code> to drive the build.
 <code>make</code> will run code generators, and run static analysis against the code and
@@ -627,7 +627,7 @@ You can kick off an overall build from the top-level makefile:</p>
 </code></pre>
 
 <h2 id="install-crds">Install CRDs</h2>
-<p>To install service-apis CRDs into a Kubernetes cluster:</p>
+<p>To install gateway-api CRDs into a Kubernetes cluster:</p>
 <pre><code class="shell">make install
 </code></pre>
 
@@ -636,7 +636,7 @@ You can kick off an overall build from the top-level makefile:</p>
 </code></pre>
 
 <h2 id="submitting-a-pull-request">Submitting a Pull Request</h2>
-<p>Service APIs follows a similar pull request process as <a href="https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md">Kubernetes</a>.
+<p>Gateway API follows a similar pull request process as <a href="https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md">Kubernetes</a>.
 Merging a pull request requires the following steps to be completed before the
 pull request will be merged automatically.</p>
 <ul>
@@ -647,7 +647,7 @@ pull request will be merged automatically.</p>
 </ul>
 <h3 id="verify">Verify</h3>
 <p>Make sure you run the static analysis over the repo before submitting your
-changes. The <a href="https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis">Prow presubmit</a> will not let your change merge if
+changes. The <a href="https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/gateway-api">Prow presubmit</a> will not let your change merge if
 verification fails.</p>
 <pre><code class="shell">make verify
 </code></pre>
@@ -669,7 +669,7 @@ Github Pages.</p>
 </code></pre>
 
 <h3 id="publishing">Publishing</h3>
-<p>The docs are published automatically to <a href="https://kubernetes-sigs.github.io/service-apis/">Github pages</a>. When making changes to the
+<p>The docs are published automatically to <a href="https://kubernetes-sigs.github.io/gateway-api/">Github pages</a>. When making changes to the
 documentation, generate the new documentation and make the generated code a
 self-contained commit (e.g. the changes to <code>docs/</code>). This will keep the code
 reviews simple and clearly delineate user vs generated content.</p>

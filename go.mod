@@ -1,4 +1,4 @@
-module sigs.k8s.io/service-apis
+module sigs.k8s.io/gateway-api
 
 go 1.15
 

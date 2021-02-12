@@ -1,5 +1,5 @@
-site_name: Kubernetes Service APIs
-repo_url: http://sigs.k8s.io/service-apis
+site_name: Kubernetes Gateway API
+repo_url: http://sigs.k8s.io/gateway-api
 repo_name: GitHub
 site_dir: docs
 docs_dir: docs-src
@@ -22,7 +22,7 @@ nav:
       - Introduction: guides.md
       - Getting started: getting-started.md
       - Simple Gateway: simple-gateway.md
-      - HTTP routing: http-routing.md 
+      - HTTP routing: http-routing.md
       - HTTP traffic splitting: traffic-splitting.md
       - Multiple namespaces and routes: multiple-ns.md
       - TLS: tls.md

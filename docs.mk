@@ -17,7 +17,7 @@
 # `make help` for a summary of top-level targets.
 
 DOCKER ?= docker
-MKDOCS_IMAGE ?= k8s.gcr.io/service-apis-mkdocs:latest
+MKDOCS_IMAGE ?= k8s.gcr.io/gateway-api-mkdocs:latest
 MKDOCS ?= mkdocs
 SERVE_BIND_ADDRESS ?= 127.0.0.1
 

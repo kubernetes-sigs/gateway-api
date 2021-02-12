@@ -14,15 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-## Developing Service APIs
+## Developing Gateway API
 
 You must have a working [Go environment] and then clone the repo:
 
 ```
 mkdir -p $GOPATH/src/sigs.k8s.io
 cd $GOPATH/src/sigs.k8s.io
-git clone https://github.com/kubernetes-sigs/service-apis
-cd service-apis
+git clone https://github.com/kubernetes-sigs/gateway-api
+cd gateway-api
 ```
 
 This project works with Go modules; you can chose to setup your environment
@@ -44,9 +44,9 @@ Issues labeled `good first issue` and `help wanted` are especially good for a
 first contribution.
 We use [milestones][gh-milestones] to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.
 
-[gh-issues]: https://github.com/kubernetes-sigs/service-apis/issues
-[gh-dashboard]: https://github.com/kubernetes-sigs/service-apis/projects/1
-[gh-milestones]: https://github.com/kubernetes-sigs/service-apis/milestones
+[gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues
+[gh-dashboard]: https://github.com/kubernetes-sigs/gateway-api/projects/1
+[gh-milestones]: https://github.com/kubernetes-sigs/gateway-api/milestones
 
 ## Building the code
 
@@ -61,7 +61,7 @@ make
 
 ## Install CRDs
 
-To install service-apis CRDs into a Kubernetes cluster:
+To install gateway-api CRDs into a Kubernetes cluster:
 
 ```shell
 make install
@@ -75,7 +75,7 @@ make uninstall
 
 ## Submitting a Pull Request
 
-Service APIs follows a similar pull request process as [Kubernetes].
+Gateway API follows a similar pull request process as [Kubernetes].
 Merging a pull request requires the following steps to be completed before the
 pull request will be merged automatically.
 
@@ -94,7 +94,7 @@ verification fails.
 make verify
 ```
 
-[prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/service-apis
+[prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/gateway-api
 
 ## Documentation
 
@@ -127,7 +127,7 @@ documentation, generate the new documentation and make the generated code a
 self-contained commit (e.g. the changes to `docs/`). This will keep the code
 reviews simple and clearly delineate user vs generated content.
 
-[ghp]: https://kubernetes-sigs.github.io/service-apis/
+[ghp]: https://kubernetes-sigs.github.io/gateway-api/
 [mkdocs]: https://www.mkdocs.org/
 [Go environment]: https://golang.org/doc/install
 [Kubernetes]: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md

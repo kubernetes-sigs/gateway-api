@@ -8,7 +8,7 @@ be installed into any Kubernetes (>= 1.16) cluster.
 To install the CRDs, please execute:
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0" \
 | kubectl apply -f -
 ```
 
@@ -21,7 +21,7 @@ setup for your cluster.
 ## Sample Gateway
 
 Once you have the CRDs and an implementation installed, you are ready to
-use Service APIs.
+use Gateway API.
 
 In this example, we are installing three resources:
 
@@ -56,6 +56,6 @@ your cluster. If you have been using these resources for any other purpose do
 not uninstall these CRDs.
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/service-apis/config/crd?ref=v0.1.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0" \
 | kubectl delete -f -
 ```

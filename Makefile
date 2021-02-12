@@ -71,7 +71,7 @@ docs:
 	# Generate API docs first
 	./hack/api-docs/generate.sh docs-src/spec.md
 	# The docs image must be built locally until issue #141 is fixed.
-	docker build --tag k8s.gcr.io/service-apis-mkdocs:latest -f mkdocs.dockerfile .
+	docker build --tag k8s.gcr.io/gateway-api-mkdocs:latest -f mkdocs.dockerfile .
 	$(MAKE) -f docs.mk
 
 # Serve the docs site locally at http://localhost:8000.

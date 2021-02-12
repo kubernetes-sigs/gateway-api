@@ -19,8 +19,8 @@ limitations under the License.
 package apis
 
 import (
-	v1alpha1 "sigs.k8s.io/service-apis/pkg/client/informers/externalversions/apis/v1alpha1"
-	internalinterfaces "sigs.k8s.io/service-apis/pkg/client/informers/externalversions/internalinterfaces"
+	v1alpha1 "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/apis/v1alpha1"
+	internalinterfaces "sigs.k8s.io/gateway-api/pkg/client/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

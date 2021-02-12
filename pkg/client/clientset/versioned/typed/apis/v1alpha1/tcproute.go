@@ -26,8 +26,8 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
-	v1alpha1 "sigs.k8s.io/service-apis/apis/v1alpha1"
-	scheme "sigs.k8s.io/service-apis/pkg/client/clientset/versioned/scheme"
+	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
+	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
 
 // TCPRoutesGetter has a method to return a TCPRouteInterface.
