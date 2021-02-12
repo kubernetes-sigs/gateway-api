@@ -69,10 +69,10 @@ type HTTPRouteSpec struct {
 	//
 	// Hostname can be "precise" which is a domain name without the terminating
 	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. "*.example.com").
-	// The wildcard character '*' must appear by itself as the first DNS
+	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+	// The wildcard character `*` must appear by itself as the first DNS
 	// label and matches only a single label.
-	// You cannot have a wildcard label by itself (e.g. Host == "*").
+	// You cannot have a wildcard label by itself (e.g. Host == `*`).
 	// Requests will be matched against the Host field in the following order:
 	// 1. If Host is precise, the request matches this rule if
 	//    the http host header is equal to Host.

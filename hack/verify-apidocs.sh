@@ -19,7 +19,7 @@ set -o nounset
 set -o pipefail
 
 readonly SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
-readonly APIDOC="${SCRIPT_ROOT}/docs-src/spec.md"
+readonly APIDOC="${SCRIPT_ROOT}/docs-src/spec.html"
 
 ret=0
 diff -Naq "$APIDOC" <(./hack/api-docs/generate.sh /dev/fd/1 2>/dev/null) || ret=$?
