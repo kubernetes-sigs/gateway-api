@@ -16,7 +16,8 @@ limitations under the License.
 
 package v1alpha1
 
-// LocalObjectReference identifies an API object within a known namespace.
+// LocalObjectReference identifies an API object within the namespace of the
+// referrer.
 type LocalObjectReference struct {
 	// Group is the group of the referent.
 	//
