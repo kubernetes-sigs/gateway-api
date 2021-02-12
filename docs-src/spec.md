@@ -380,18 +380,19 @@ and PATH are valid Kubernetes names
 <td>
 <code>parametersRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.ParametersReference">
+ParametersReference
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the
-configuration parameters corresponding to this class. This is optional if
-the controller does not require any additional configuration.</p>
-<p>Parameters resources are implementation specific custom resources. These
-resources must be cluster-scoped.</p>
+<p>ParametersRef is a reference to a resource that contains the configuration
+parameters corresponding to the GatewayClass. This is optional if the
+controller does not require any additional configuration.</p>
+<p>ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+or an implementation-specific custom resource. The resource can be
+cluster-scoped or namespace-scoped.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>
@@ -1314,18 +1315,19 @@ and PATH are valid Kubernetes names
 <td>
 <code>parametersRef</code></br>
 <em>
-<a href="#networking.x-k8s.io/v1alpha1.LocalObjectReference">
-LocalObjectReference
+<a href="#networking.x-k8s.io/v1alpha1.ParametersReference">
+ParametersReference
 </a>
 </em>
 </td>
 <td>
 <em>(Optional)</em>
-<p>ParametersRef is a controller-specific resource containing the
-configuration parameters corresponding to this class. This is optional if
-the controller does not require any additional configuration.</p>
-<p>Parameters resources are implementation specific custom resources. These
-resources must be cluster-scoped.</p>
+<p>ParametersRef is a reference to a resource that contains the configuration
+parameters corresponding to the GatewayClass. This is optional if the
+controller does not require any additional configuration.</p>
+<p>ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
+or an implementation-specific custom resource. The resource can be
+cluster-scoped or namespace-scoped.</p>
 <p>If the referent cannot be found, the GatewayClass&rsquo;s &ldquo;InvalidParameters&rdquo;
 status condition will be true.</p>
 <p>Support: Custom</p>
@@ -3113,7 +3115,6 @@ reporting the status.</p>
 <p>
 (<em>Appears on:</em>
 <a href="#networking.x-k8s.io/v1alpha1.BackendTLSConfig">BackendTLSConfig</a>, 
-<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRequestMirrorFilter">HTTPRequestMirrorFilter</a>, 
 <a href="#networking.x-k8s.io/v1alpha1.HTTPRouteFilter">HTTPRouteFilter</a>, 
@@ -3126,7 +3127,8 @@ reporting the status.</p>
 <a href="#networking.x-k8s.io/v1alpha1.UDPRouteMatch">UDPRouteMatch</a>)
 </p>
 <p>
-<p>LocalObjectReference identifies an API object within a known namespace.</p>
+<p>LocalObjectReference identifies an API object within the namespace of the
+referrer.</p>
 </p>
 <table>
 <thead>
@@ -3167,6 +3169,86 @@ string
 </td>
 <td>
 <p>Name is the name of the referent.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.ParametersReference">ParametersReference
+</h3>
+<p>
+(<em>Appears on:</em>
+<a href="#networking.x-k8s.io/v1alpha1.GatewayClassSpec">GatewayClassSpec</a>)
+</p>
+<p>
+<p>ParametersReference identifies an API object containing controller-specific
+configuration resource within the cluster.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<code>group</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Group is the group of the referent.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>kind</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Kind is kind of the referent.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>name</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<p>Name is the name of the referent.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>scope</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Scope represents if the referent is a Cluster or Namespace scoped resource.
+This may be set to &ldquo;Cluster&rdquo; or &ldquo;Namespace&rdquo;.</p>
+</td>
+</tr>
+<tr>
+<td>
+<code>namespace</code></br>
+<em>
+string
+</em>
+</td>
+<td>
+<em>(Optional)</em>
+<p>Namespace is the namespace of the referent.
+This field is required when scope is set to &ldquo;Namespace&rdquo; and ignored when
+scope is set to &ldquo;Cluster&rdquo;.</p>
 </td>
 </tr>
 </tbody>
