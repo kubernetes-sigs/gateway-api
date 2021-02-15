@@ -55,7 +55,7 @@ images: .mkdocs.dockerfile.timestamp
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && $(MKDOCS) build; find /d/docs -exec chown $(UID):$(GID) {} \;"
+		/bin/bash -c "cd /d && $(MKDOCS) build && sed -i -e '/REPLACE_WITH_GENERATED_CONTENT/{r docs-src/spec.html' -e 'd}' docs/spec/index.html; find /d/docs -exec chown $(UID):$(GID) {} \;"
 	# Remove sitemap as it contains the timestamp, which is a source of a lot
 	# of merge conflicts.
 	rm docs/sitemap.xml docs/sitemap.xml.gz
@@ -72,7 +72,7 @@ verify: images
 		--sig-proxy=true \
 		--rm \
 		$(MKDOCS_IMAGE) \
-		/bin/bash -c "cd /d && $(MKDOCS) build --site-dir=/tmp/d && diff -X /d/docs-src/.mkdocs-exclude -qr /d/docs /tmp/d"
+		/bin/bash -c "cd /d && $(MKDOCS) build --site-dir=/tmp/d && sed -i -e '/REPLACE_WITH_GENERATED_CONTENT/{r docs-src/spec.html' -e 'd}' /tmp/d/spec/index.html && diff -X /d/docs-src/.mkdocs-exclude -qr /d/docs /tmp/d "
 
 # clean deletes generated files
 .PHONY: clean

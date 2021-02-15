@@ -89,10 +89,10 @@ type TLSRouteMatch struct {
 	//
 	// SNI can be "precise" which is a domain name without the terminating
 	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. "*.example.com").
-	// The wildcard character '*' must appear by itself as the first DNS label
+	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+	// The wildcard character `*` must appear by itself as the first DNS label
 	// and matches only a single label. You cannot have a wildcard label by
-	// itself (e.g. Host == "*").
+	// itself (e.g. Host == `*`).
 	//
 	// Requests will be matched against the Host field in the following order:
 	//

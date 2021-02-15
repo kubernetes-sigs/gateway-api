@@ -138,7 +138,7 @@ type GatewaySpec struct {
 // validating webhook.
 type Listener struct {
 	// Hostname specifies the virtual hostname to match for protocol types that
-	// define this concept. When unspecified, "", or "*", all hostnames are
+	// define this concept. When unspecified, "", or `*`, all hostnames are
 	// matched. This field can be omitted for protocols that don't require
 	// hostname based matching.
 	//
@@ -151,8 +151,8 @@ type Listener struct {
 	//
 	// Hostname can be "precise" which is a domain name without the terminating
 	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
-	// domain name prefixed with a single wildcard label (e.g. "*.example.com").
-	// The wildcard character '*' must appear by itself as the first DNS label
+	// domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+	// The wildcard character `*` must appear by itself as the first DNS label
 	// and matches only a single label.
 	//
 	// Support: Core
@@ -718,7 +718,7 @@ const (
 
 	// ListenerReasonHostnameConflict is used when the Listener conflicts with
 	// hostnames in other Listeners. For example, this reason would be used when
-	// multiple Listeners on the same port use "*" in the hostname field.
+	// multiple Listeners on the same port use `*` in the hostname field.
 	ListenerReasonHostnameConflict ListenerConditionReason = "HostnameConflict"
 
 	// ListenerReasonProtocolConflict is used when multiple

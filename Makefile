@@ -69,7 +69,7 @@ verify:
 .PHONY: docs
 docs:
 	# Generate API docs first
-	./hack/api-docs/generate.sh docs-src/spec.md
+	./hack/api-docs/generate.sh docs-src/spec.html
 	# The docs image must be built locally until issue #141 is fixed.
 	docker build --tag k8s.gcr.io/gateway-api-mkdocs:latest -f mkdocs.dockerfile .
 	$(MAKE) -f docs.mk
