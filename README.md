@@ -1,7 +1,10 @@
 # Kubernetes Gateway API
 
-The Gateway API is a part of the [SIG Network][sn], and this repository
-contains the specification and Custom Resource Definitions (CRDs).
+The Gateway API is a part of the [SIG Network][sn], and this repository contains
+the specification and Custom Resource Definitions (CRDs).
+
+*Note: This project was previously named "Service APIs" until being renamed to
+"Gateway API" in February 2021.*
 
 ## Documentation
 

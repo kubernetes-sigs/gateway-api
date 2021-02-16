@@ -5,6 +5,9 @@ community. The project's goal is to evolve service networking APIs within the
 Kubernetes ecosystem. Gateway API provide interfaces to expose Kubernetes
 applications - Services, Ingress, and more.
 
+*Note: This project was previously named "Service APIs" until being renamed to
+"Gateway API" in February 2021.*
+
 ### What is the goal of Gateway API?
 
 Gateway API aims to improve service networking by providing expressive,
