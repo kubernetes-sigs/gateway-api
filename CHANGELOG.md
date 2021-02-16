@@ -2,9 +2,54 @@
 
 ## Table of Contents
 
+- [v0.2.0](#v020)
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+
+## v0.2.0
+
+API Version: v1alpha1
+
+### API changes
+
+Service APIs has been renamed to Gateway API.
+[#536](https://github.com/kubernetes-sigs/service-apis/issues/536).
+
+
+#### GatewayClass
+- The default status condition of GatewayClass resource is now `Admitted:false`
+  instead of `InvalidParameters:Unknown`.
+  [#471](https://github.com/kubernetes-sigs/service-apis/pull/471).
+- `GatewayClass.spec.parametersRef` now has an optional `namespace` field to
+  refer to a namespace-scoped resource in addition to cluster-scoped resource.
+  [#543](https://github.com/kubernetes-sigs/service-apis/pull/543).
+
+#### Gateway
+- `spec.listeners[].tls.mode` now defaults to `Terminate`.
+  [#518](https://github.com/kubernetes-sigs/service-apis/pull/518).
+- Empty `hostname` in a listener matches all request.
+  [#525](https://github.com/kubernetes-sigs/service-apis/pull/525).
+
+#### HTTPRoute
+- New `set` property has been introduced for `HTTPRequestHeader` Filter. Headers
+  specified under `set` are overriden instead of added.
+  [#475](https://github.com/kubernetes-sigs/service-apis/pull/475).
+
+#### Misc
+- Maximum limit for `forwardTo` has been increased from `4` to `16` for all
+  route types.
+  [#493](https://github.com/kubernetes-sigs/service-apis/pull/493).
+- Various changes have been made in the Kubernetes and Go API to align with
+  upstream Kubernetes API conventions. Some of the fields have been changed to
+  pointers in the Go API for this reason.
+  [#538](https://github.com/kubernetes-sigs/service-apis/pull/538).
+
+### Documentation
+
+There are minor improvements to docs all around.
+New guides, clarifications and various typos have been fixed.
 
 ## v0.1.0
 
