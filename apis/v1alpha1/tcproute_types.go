@@ -87,7 +87,7 @@ type TCPRouteMatch struct {
 	// status for this route should be updated with a condition that describes
 	// the error more specifically.
 	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`

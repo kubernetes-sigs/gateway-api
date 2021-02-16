@@ -45,13 +45,13 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
                       - NamedAddress
                       type: string
                     value:
-                      description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      description: "Value of the address. The validity of the values will depend on the type and support by the controller. \n Examples: `1.2.3.4`, `128::1`, `my-ip-address`."
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -177,7 +177,7 @@ spec:
                       description: "TLS is the TLS configuration for the Listener. This field is required if the Protocol field is \"HTTPS\" or \"TLS\" and ignored otherwise. \n The association of SNIs to Certificate defined in GatewayTLSConfig is defined based on the Hostname field for this listener. \n The GatewayClass MUST use the longest matching SNI out of all available certificates for any TLS handshake. \n Support: Core"
                       properties:
                         certificateRef:
-                          description: "CertificateRef is the reference to Kubernetes object that contain a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this GatewayTLSConfig is associated with. \n This field is required when mode is set to \"Terminate\" (default) and optional otherwise. \n If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) Support: Implementation-specific (Other resource types)"
+                          description: "CertificateRef is the reference to Kubernetes object that contain a TLS certificate and private key. This certificate MUST be used for TLS handshakes for the domain this GatewayTLSConfig is associated with. \n This field is required when mode is set to \"Terminate\" (default) and optional otherwise. \n If an entry in this list omits or specifies the empty string for both the group and the resource, the resource defaults to \"secrets\". An implementation may support other resources (for example, resource \"mycertificates\" in group \"networking.acme.io\"). \n Support: Core (Kubernetes Secrets) \n Support: Implementation-specific (Other resource types)"
                           properties:
                             group:
                               description: Group is the group of the referent.
@@ -209,7 +209,7 @@ spec:
                         options:
                           additionalProperties:
                             type: string
-                          description: "Options are a list of key/value pairs to give extended options to the provider. \n There variation among providers as to how ciphersuites are expressed. If there is a common subset for expressing ciphers then it will make sense to loft that as a core API construct. \n Support: Implementation-specific."
+                          description: "Options are a list of key/value pairs to give extended options to the provider. \n There variation among providers as to how ciphersuites are expressed. If there is a common subset for expressing ciphers then it will make sense to loft that as a core API construct. \n Support: Implementation-specific"
                           type: object
                         routeOverride:
                           default:
@@ -254,13 +254,13 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the Address. This is either \"IPAddress\" or \"NamedAddress\". \n Support: Extended"
+                      description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
                       - NamedAddress
                       type: string
                     value:
-                      description: 'Value. Examples: "1.2.3.4", "128::1", "my-ip-address". Validity of the values will depend on `Type` and support by the controller.'
+                      description: "Value of the address. The validity of the values will depend on the type and support by the controller. \n Examples: `1.2.3.4`, `128::1`, `my-ip-address`."
                       maxLength: 253
                       minLength: 1
                       type: string

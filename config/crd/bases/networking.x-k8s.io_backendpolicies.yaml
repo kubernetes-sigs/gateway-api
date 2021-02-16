@@ -93,7 +93,7 @@ spec:
                   options:
                     additionalProperties:
                       type: string
-                    description: "Options are a list of key/value pairs to give extended options to the provider. \n Support: Implementation-specific."
+                    description: "Options are a list of key/value pairs to give extended options to the provider. \n Support: Implementation-specific"
                     type: object
                 type: object
             required:

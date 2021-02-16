@@ -74,10 +74,11 @@ type HTTPRouteSpec struct {
 	// label and matches only a single label.
 	// You cannot have a wildcard label by itself (e.g. Host == `*`).
 	// Requests will be matched against the Host field in the following order:
+	//
 	// 1. If Host is precise, the request matches this rule if
-	//    the http host header is equal to Host.
+	//    the HTTP Host header is equal to Host.
 	// 2. If Host is a wildcard, then the request matches this rule if
-	//    the http host header is to equal to the suffix
+	//    the HTTP Host header is to equal to the suffix
 	//    (removing the first label) of the wildcard rule.
 	//
 	// Support: Core
@@ -127,6 +128,7 @@ type RouteTLSConfig struct {
 	// "mycertificates" in group "networking.acme.io").
 	//
 	// Support: Core (Kubernetes Secrets)
+	//
 	// Support: Implementation-specific (Other resource types)
 	//
 	CertificateRef LocalObjectReference `json:"certificateRef"`
@@ -170,6 +172,7 @@ type HTTPRouteRule struct {
 	//
 	// A client request may match multiple HTTP route rules. Matching precedence
 	// MUST be determined in order of the following criteria, continuing on ties:
+	//
 	// * The longest matching hostname.
 	// * The longest matching path.
 	// * The largest number of header matches
@@ -191,6 +194,7 @@ type HTTPRouteRule struct {
 	// This can change in the future based on feedback during the alpha stage.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
+	//
 	// - ALL core filters MUST be supported by all implementations.
 	// - Implementers are encouraged to support extended filters.
 	// - Implementation-specific custom filters have no API guarantees across
@@ -198,7 +202,7 @@ type HTTPRouteRule struct {
 	//
 	// Specifying a core filter multiple times has unspecified or custom conformance.
 	//
-	// Support: core
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
@@ -223,10 +227,11 @@ type HTTPRouteRule struct {
 // * "ImplementationSpecific"
 //
 // Prefix and Exact paths must be syntactically valid:
-// 	- Must begin with the '/' character
-// 	- Must not contain consecutive '/' characters (e.g. /foo///, //).
-// 	- For prefix paths, a trailing '/' character in the Path is ignored,
-//      e.g. /abc and /abc/ specify the same match.
+//
+// - Must begin with the '/' character
+// - Must not contain consecutive '/' characters (e.g. /foo///, //).
+// - For prefix paths, a trailing '/' character in the Path is ignored,
+// e.g. /abc and /abc/ specify the same match.
 //
 // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
 type PathMatchType string
@@ -260,8 +265,9 @@ const (
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
 	//
-	// Support: core (Exact, Prefix)
-	// Support: custom (RegularExpression, ImplementationSpecific)
+	// Support: Core (Exact, Prefix)
+	//
+	// Support: Custom (RegularExpression, ImplementationSpecific)
 	//
 	// Since RegularExpression PathType has custom conformance, implementations
 	// can support POSIX, PCRE or any other dialects of regular expressions.
@@ -283,8 +289,9 @@ type HTTPPathMatch struct {
 type HTTPHeaderMatch struct {
 	// Type specifies how to match against the value of the header.
 	//
-	// Support: core (Exact)
-	// Support: custom (RegularExpression, ImplementationSpecific)
+	// Support: Core (Exact)
+	//
+	// Support: Custom (RegularExpression, ImplementationSpecific)
 	//
 	// Since RegularExpression PathType has custom conformance, implementations
 	// can support POSIX, PCRE or any other dialects of regular expressions.
@@ -345,7 +352,7 @@ type HTTPRouteMatch struct {
 	// status for this route should be updated with a condition that describes
 	// the error more specifically.
 	//
-	// Support: custom
+	// Support: Custom
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
@@ -421,6 +428,7 @@ const (
 	// header from an HTTP request before it is sent to the upstream target.
 	//
 	// Support in HTTPRouteRule: Core
+	//
 	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
 
@@ -429,6 +437,7 @@ const (
 	// the Gateway.
 	//
 	// Support in HTTPRouteRule: Extended
+	//
 	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
 
@@ -436,6 +445,7 @@ const (
 	// HTTP filters.
 	//
 	// Support in HTTPRouteRule: Custom
+	//
 	// Support in HTTPRouteForwardTo: Custom
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )

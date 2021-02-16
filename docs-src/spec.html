@@ -517,12 +517,14 @@ a domain name prefixed with a single wildcard label (e.g. <code>*.example.com</c
 The wildcard character <code>*</code> must appear by itself as the first DNS
 label and matches only a single label.
 You cannot have a wildcard label by itself (e.g. Host == <code>*</code>).
-Requests will be matched against the Host field in the following order:
-1. If Host is precise, the request matches this rule if
-the http host header is equal to Host.
-2. If Host is a wildcard, then the request matches this rule if
-the http host header is to equal to the suffix
-(removing the first label) of the wildcard rule.</p>
+Requests will be matched against the Host field in the following order:</p>
+<ol>
+<li>If Host is precise, the request matches this rule if
+the HTTP Host header is equal to Host.</li>
+<li>If Host is a wildcard, then the request matches this rule if
+the HTTP Host header is to equal to the suffix
+(removing the first label) of the wildcard rule.</li>
+</ol>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -691,11 +693,11 @@ TCPRouteStatus
 <h3 id="networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute
 </h3>
 <p>
-<p>TLSRoute is the Schema for the TLSRoute resource. TLSRoute is similar to
-TCPRoute but can be configured to match against TLS-specific metadata.
-This allows more flexibility in matching streams for a given TLS listener.</p>
+<p>The TLSRoute resource is similar to TCPRoute, but can be configured
+to match against TLS-specific metadata. This allows more flexibility
+in matching streams for a given TLS listener.</p>
 <p>If you need to forward traffic to a single target for a TLS listener, you
-could chose to use a TCPRoute with a TLS listener.</p>
+could choose to use a TCPRoute with a TLS listener.</p>
 </p>
 <table>
 <thead>
@@ -798,7 +800,7 @@ TLSRouteStatus
 <h3 id="networking.x-k8s.io/v1alpha1.UDPRoute">UDPRoute
 </h3>
 <p>
-<p>UDPRoute is the Schema for the UDPRoute resource.</p>
+<p>UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.</p>
 </p>
 <table>
 <thead>
@@ -905,17 +907,10 @@ UDPRouteStatus
 <a href="#networking.x-k8s.io/v1alpha1.GatewayAddress">GatewayAddress</a>)
 </p>
 <p>
-<p>AddressType defines how a network address is represented as a text string.
-Valid AddressType values are:</p>
-<ul>
-<li>&ldquo;IPAddress&rdquo;: an IPv4 or IPv6 address</li>
-<li>&ldquo;NamedAddress&rdquo;: an opaque identifier. The interpretation
-of the name is dependent on the controller. If a NamedAddress is
-requested but unsupported by an implementation, the controller
-should raise the &ldquo;Detached&rdquo; listener status condition on the Gateway
-with the &ldquo;UnsupportedAddress&rdquo; reason.</li>
-</ul>
-<p>A NamedAddress might be a cloud-dependent ID for a &ldquo;static&rdquo; or &ldquo;elastic&rdquo; IP</p>
+<p>AddressType defines how a network address is represented as a text string.</p>
+<p>If the requested address is unsupported, the controller
+should raise the &ldquo;Detached&rdquo; listener status condition on
+the Gateway with the &ldquo;UnsupportedAddress&rdquo; reason.</p>
 </p>
 <table>
 <thead>
@@ -925,30 +920,26 @@ with the &ldquo;UnsupportedAddress&rdquo; reason.</li>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;IPAddress&#34;</p></td>
-<td><p>IPAddressType a textual representation of a numeric IP
-address. IPv4 addresses must be in dotted-decimal
-form. IPv6 addresses must be in a standard IPv6 text
-representation (see RFC 5952).</p>
-<p>If the requested address is unsupported, the controller
-should raise the &ldquo;Detached&rdquo; listener status condition on
-the Gateway with the &ldquo;UnsupportedAddress&rdquo; reason.</p>
-<p>Support: Extended.</p>
+<td><p>A textual representation of a numeric IP address. IPv4
+addresses must be in dotted-decimal form. IPv6 addresses
+must be in a standard IPv6 text representation
+(see <a href="https://tools.ietf.org/html/rfc5952">RFC 5952</a>).</p>
+<p>Support: Extended</p>
 </td>
 </tr><tr><td><p>&#34;NamedAddress&#34;</p></td>
-<td><p>NamedAddressType is an opaque identifier. The interpretation
-of the name is dependent on the controller. If a NamedAddress is
-requested but unsupported by an implementation, the controller
-should raise the &ldquo;Detached&rdquo; listener status condition on the Gateway
-with the &ldquo;UnsupportedAddress&rdquo; reason.</p>
-<p>Support: Implementation-specific.</p>
+<td><p>An opaque identifier that represents a specific IP address. The
+interpretation of the name is dependent on the controller. For
+example, a &ldquo;NamedAddress&rdquo; might be a cloud-dependent identifier
+for a static or elastic IP.</p>
+<p>Support: Implementation-specific</p>
 </td>
 </tr></tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.BackendPolicyConditionType">BackendPolicyConditionType
 (<code>string</code> alias)</p></h3>
 <p>
-<p>BackendPolicyConditionType is a type of condition associated with a
-BackendPolicy.</p>
+<p>BackendPolicyConditionType is a type of condition used to express the current
+state of a BackendPolicy resource.</p>
 </p>
 <table>
 <thead>
@@ -958,8 +949,7 @@ BackendPolicy.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;NoSuchBackend&#34;</p></td>
-<td><p>ConditionNoSuchBackend indicates that one or more of the the specified
-Backends does not exist.</p>
+<td><p>Indicates that one or more of the the specified backend references could not be resolved.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1167,7 +1157,7 @@ map[string]string
 <em>(Optional)</em>
 <p>Options are a list of key/value pairs to give extended options to the
 provider.</p>
-<p>Support: Implementation-specific.</p>
+<p>Support: Implementation-specific</p>
 </td>
 </tr>
 </tbody>
@@ -1201,7 +1191,7 @@ AddressType
 </td>
 <td>
 <em>(Optional)</em>
-<p>Type of the Address. This is either &ldquo;IPAddress&rdquo; or &ldquo;NamedAddress&rdquo;.</p>
+<p>Type of the address.</p>
 <p>Support: Extended</p>
 </td>
 </tr>
@@ -1213,8 +1203,9 @@ string
 </em>
 </td>
 <td>
-<p>Value. Examples: &ldquo;1.2.3.4&rdquo;, &ldquo;128::1&rdquo;, &ldquo;my-ip-address&rdquo;. Validity of the
-values will depend on <code>Type</code> and support by the controller.</p>
+<p>Value of the address. The validity of the values will depend
+on the type and support by the controller.</p>
+<p>Examples: <code>1.2.3.4</code>, <code>128::1</code>, <code>my-ip-address</code>.</p>
 </td>
 </tr>
 </tbody>
@@ -1236,24 +1227,48 @@ values will depend on <code>Type</code> and support by the controller.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;All&#34;</p></td>
-<td><p>GatewayAllowAll indicates that all Gateways will be able to use this
-route.</p>
+<td><p>Any Gateway will be able to use this route.</p>
 </td>
 </tr><tr><td><p>&#34;FromList&#34;</p></td>
-<td><p>GatewayAllowFromList indicates that only Gateways that have been
-specified in GatewayRefs will be able to use this route.</p>
+<td><p>Only Gateways that have been  specified in GatewayRefs will be able to use this route.</p>
 </td>
 </tr><tr><td><p>&#34;SameNamespace&#34;</p></td>
-<td><p>GatewayAllowSameNamespace indicates that only Gateways within the same
-namespace will be able to use this route.</p>
+<td><p>Only Gateways within the same namespace as the route will be able to use this route.</p>
+</td>
+</tr></tbody>
+</table>
+<h3 id="networking.x-k8s.io/v1alpha1.GatewayClassConditionReason">GatewayClassConditionReason
+(<code>string</code> alias)</p></h3>
+<p>
+<p>GatewayClassConditionReason defines the set of reasons that explain why
+a particular GatewayClass condition type has been raised.</p>
+</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr><td><p>&#34;InvalidParameters&#34;</p></td>
+<td><p>This reason is used with the &ldquo;Admitted&rdquo; condition when the
+GatewayClass was not admitted because the parametersRef field
+was invalid, with more detail in the message.</p>
+</td>
+</tr><tr><td><p>&#34;Waiting&#34;</p></td>
+<td><p>This reason is used with the &ldquo;Admitted&rdquo; condition when the
+requested controller has not yet made a decision about whether
+to admit the GatewayClass. It is the default Reason on a new
+GatewayClass. It indicates</p>
 </td>
 </tr></tbody>
 </table>
 <h3 id="networking.x-k8s.io/v1alpha1.GatewayClassConditionType">GatewayClassConditionType
 (<code>string</code> alias)</p></h3>
 <p>
-<p>GatewayClassConditionType is the type of status conditions. This
-type should be used with the GatewayClassStatus.Conditions field.</p>
+<p>GatewayClassConditionType is the type for status conditions on
+Gateway resources. This type should be used with the
+GatewayClassStatus.Conditions field.</p>
 </p>
 <table>
 <thead>
@@ -1263,16 +1278,17 @@ type should be used with the GatewayClassStatus.Conditions field.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Admitted&#34;</p></td>
-<td><p>GatewayClassConditionStatusAdmitted indicates that the GatewayClass
-has been admitted by the controller set in the <code>spec.controller</code>
+<td><p>This condition indicates whether the GatewayClass has been
+admitted by the controller requested in the <code>spec.controller</code>
 field.</p>
-<p>It defaults to False, and MUST be set by a controller when it sees
+<p>This condition defaults to False, and MUST be set by a controller when it sees
 a GatewayClass using its controller string.
 The status of this condition MUST be set to true if the controller will support
 provisioning Gateways using this class. Otherwise, this status MUST be set to false.
 If the status is set to false, the controller SHOULD set a Message and Reason as an
-explanation.
-GatewayClassNotAdmittedInvalidParameters is provided as an example Reason.</p>
+explanation.</p>
+<p>Controllers should prefer to use the values of GatewayClassConditionReason
+for the corresponding Reason, where appropriate.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1365,6 +1381,8 @@ status condition will be true.</p>
 <em>(Optional)</em>
 <p>Conditions is the current status from the controller for
 this GatewayClass.</p>
+<p>Controllers should prefer to publish conditions using values
+of GatewayClassConditionType for the type of each Condition.</p>
 </td>
 </tr>
 </tbody>
@@ -1383,7 +1401,7 @@ why a particular Gateway condition type has been raised.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;AddressNotAssigned&#34;</p></td>
-<td><p>GatewayReasonAddressNotAssigned is used when the requested
+<td><p>This reason is used with the &ldquo;Ready&rdquo; condition when the requested
 address has not been assigned to the Gateway. This reason
 can be used to express a range of circumstances, including
 (but not limited to) IPAM address exhaustion, invalid
@@ -1391,30 +1409,29 @@ or unsupported address requests, or a named address not
 being found.</p>
 </td>
 </tr><tr><td><p>&#34;ListenersNotReady&#34;</p></td>
-<td><p>GatewayReasonListenersNotReady is used when one or more
-Listeners are not ready to serve traffic.</p>
+<td><p>This reason is used with the &ldquo;Ready&rdquo; condition when one or
+more Listeners are not ready to serve traffic.</p>
 </td>
 </tr><tr><td><p>&#34;ListenersNotValid&#34;</p></td>
-<td><p>GatewayReasonListenersNotValid is used when one or more
-Listeners have an invalid or unsupported configuration
+<td><p>This reason is used with the &ldquo;Ready&rdquo; condition when one or
+more Listeners have an invalid or unsupported configuration
 and cannot be configured on the Gateway.</p>
 </td>
 </tr><tr><td><p>&#34;NoResources&#34;</p></td>
-<td><p>GatewayReasonNoResources is used when the Gateway is
-not scheduled because no infrastructure resources are
-available for this Gateway.</p>
+<td><p>This reason is used with the &ldquo;Scheduled&rdquo; condition when the
+Gateway is not scheduled because insufficient infrastructure
+resources are available.</p>
 </td>
 </tr><tr><td><p>&#34;NoSuchGatewayClass&#34;</p></td>
-<td><p>GatewayReasonNoSuchGatewayClass is used when the Gateway is
-not scheduled because there is no controller that recognizes
+<td><p>This reason is used with the &ldquo;Scheduled&rdquo; condition when the Gateway
+is not scheduled because there is no controller that recognizes
 the GatewayClassName. This reason should only be set by
 a controller that has cluster-wide visibility of all the
 installed GatewayClasses.</p>
 </td>
 </tr><tr><td><p>&#34;NotReconciled&#34;</p></td>
-<td><p>GatewayReasonNotReconciled is used when the Gateway is
-not scheduled because it recently been created and no
-controller has reconciled it yet.</p>
+<td><p>This reason is used with the &ldquo;Scheduled&rdquo; condition when
+been recently created and no controller has reconciled it yet.</p>
 </td>
 </tr></tbody>
 </table>
@@ -1433,7 +1450,7 @@ field.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Ready&#34;</p></td>
-<td><p>GatewayConditionReady indicates whether the Gateway is able
+<td><p>This condition is true when the Gateway is expected to be able
 to serve traffic. Note that this does not indicate that the
 Gateway configuration is current or even complete (e.g. the
 controller may still not have reconciled the latest version,
@@ -1449,12 +1466,12 @@ reasons are true, the Gateway controller should prefer the
 </ul>
 <p>Controllers may raise this condition with other reasons,
 but should prefer to use the reasons listed above to improve
-interoperability.`</p>
+interoperability.</p>
 </td>
 </tr><tr><td><p>&#34;Scheduled&#34;</p></td>
-<td><p>GatewayConditionScheduled indicates whether the controller
-managing the Gateway has scheduled the Gateway to the
-underlying network infrastructure.</p>
+<td><p>This condition is true when the controller managing the
+Gateway has scheduled the Gateway to the underlying network
+infrastructure.</p>
 <p>Possible reasons for this condition to be false are:</p>
 <ul>
 <li>&ldquo;NotReconciled&rdquo;</li>
@@ -1694,13 +1711,15 @@ vocabulary to describe Gateway state.</p>
 </p>
 <p>
 <p>GatewayTLSConfig describes a TLS configuration.</p>
-<p>References
-- nginx: <a href="https://nginx.org/en/docs/http/configuring_https_servers.html">https://nginx.org/en/docs/http/configuring_https_servers.html</a>
-- envoy: <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto">https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto</a>
-- haproxy: <a href="https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/">https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/</a>
-- gcp: <a href="https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile">https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile</a>
-- aws: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies</a>
-- azure: <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112">https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112</a></p>
+<p>References:</p>
+<ul>
+<li>nginx: <a href="https://nginx.org/en/docs/http/configuring_https_servers.html">https://nginx.org/en/docs/http/configuring_https_servers.html</a></li>
+<li>envoy: <a href="https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto">https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto</a></li>
+<li>haproxy: <a href="https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/">https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/</a></li>
+<li>gcp: <a href="https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile">https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile</a></li>
+<li>aws: <a href="https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies">https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies</a></li>
+<li>azure: <a href="https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112">https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112</a></li>
+</ul>
 </p>
 <table>
 <thead>
@@ -1753,8 +1772,8 @@ optional otherwise.</p>
 the group and the resource, the resource defaults to &ldquo;secrets&rdquo;. An
 implementation may support other resources (for example, resource
 &ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>Support: Core (Kubernetes Secrets)
-Support: Implementation-specific (Other resource types)</p>
+<p>Support: Core (Kubernetes Secrets)</p>
+<p>Support: Implementation-specific (Other resource types)</p>
 </td>
 </tr>
 <tr>
@@ -1791,7 +1810,7 @@ to the provider.</p>
 expressed. If there is a common subset for expressing ciphers
 then it will make sense to loft that as a core API
 construct.</p>
-<p>Support: Implementation-specific.</p>
+<p>Support: Implementation-specific</p>
 </td>
 </tr>
 </tbody>
@@ -1826,8 +1845,8 @@ HeaderMatchType
 <td>
 <em>(Optional)</em>
 <p>Type specifies how to match against the value of the header.</p>
-<p>Support: core (Exact)
-Support: custom (RegularExpression, ImplementationSpecific)</p>
+<p>Support: Core (Exact)</p>
+<p>Support: Custom (RegularExpression, ImplementationSpecific)</p>
 <p>Since RegularExpression PathType has custom conformance, implementations
 can support POSIX, PCRE or any other dialects of regular expressions.
 Please read the implementation&rsquo;s documentation to determine the supported
@@ -1883,8 +1902,8 @@ PathMatchType
 <td>
 <em>(Optional)</em>
 <p>Type specifies how to match against the path Value.</p>
-<p>Support: core (Exact, Prefix)
-Support: custom (RegularExpression, ImplementationSpecific)</p>
+<p>Support: Core (Exact, Prefix)</p>
+<p>Support: Custom (RegularExpression, ImplementationSpecific)</p>
 <p>Since RegularExpression PathType has custom conformance, implementations
 can support POSIX, PCRE or any other dialects of regular expressions.
 Please read the implementation&rsquo;s documentation to determine the supported
@@ -2199,21 +2218,21 @@ extended filters.</p>
 <tbody><tr><td><p>&#34;ExtensionRef&#34;</p></td>
 <td><p>HTTPRouteFilterExtensionRef should be used for configuring custom
 HTTP filters.</p>
-<p>Support in HTTPRouteRule: Custom
-Support in HTTPRouteForwardTo: Custom</p>
+<p>Support in HTTPRouteRule: Custom</p>
+<p>Support in HTTPRouteForwardTo: Custom</p>
 </td>
 </tr><tr><td><p>&#34;RequestHeaderModifier&#34;</p></td>
 <td><p>HTTPRouteFilterRequestHeaderModifier can be used to add or remove an HTTP
 header from an HTTP request before it is sent to the upstream target.</p>
-<p>Support in HTTPRouteRule: Core
-Support in HTTPRouteForwardTo: Extended</p>
+<p>Support in HTTPRouteRule: Core</p>
+<p>Support in HTTPRouteForwardTo: Extended</p>
 </td>
 </tr><tr><td><p>&#34;RequestMirror&#34;</p></td>
 <td><p>HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 different backend. The responses from this backend MUST be ignored by
 the Gateway.</p>
-<p>Support in HTTPRouteRule: Extended
-Support in HTTPRouteForwardTo: Extended</p>
+<p>Support in HTTPRouteRule: Extended</p>
+<p>Support in HTTPRouteForwardTo: Extended</p>
 </td>
 </tr></tbody>
 </table>
@@ -2419,7 +2438,7 @@ included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo
 condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
 status for this route should be updated with a condition that describes
 the error more specifically.</p>
-<p>Support: custom</p>
+<p>Support: Custom</p>
 </td>
 </tr>
 </tbody>
@@ -2480,15 +2499,17 @@ match conditions that should be ANDed together.</p>
 path match on &ldquo;/&rdquo;, which has the effect of matching every
 HTTP request.</p>
 <p>A client request may match multiple HTTP route rules. Matching precedence
-MUST be determined in order of the following criteria, continuing on ties:
-* The longest matching hostname.
-* The longest matching path.
-* The largest number of header matches
-* The oldest Route based on creation timestamp. For example, a Route with
+MUST be determined in order of the following criteria, continuing on ties:</p>
+<ul>
+<li>The longest matching hostname.</li>
+<li>The longest matching path.</li>
+<li>The largest number of header matches</li>
+<li>The oldest Route based on creation timestamp. For example, a Route with
 a creation timestamp of &ldquo;2020-09-08 01:02:03&rdquo; is given precedence over
-a Route with a creation timestamp of &ldquo;2020-09-08 01:02:04&rdquo;.
-* The Route appearing first in alphabetical order (namespace/name) for
-example, foo/bar is given precedence over foo/baz.</p>
+a Route with a creation timestamp of &ldquo;2020-09-08 01:02:04&rdquo;.</li>
+<li>The Route appearing first in alphabetical order (namespace/name) for
+example, foo/bar is given precedence over foo/baz.</li>
+</ul>
 </td>
 </tr>
 <tr>
@@ -2506,13 +2527,15 @@ example, foo/bar is given precedence over foo/baz.</p>
 this rule.</p>
 <p>The effects of ordering of multiple behaviors are currently unspecified.
 This can change in the future based on feedback during the alpha stage.</p>
-<p>Conformance-levels at this level are defined based on the type of filter:
-- ALL core filters MUST be supported by all implementations.
-- Implementers are encouraged to support extended filters.
-- Implementation-specific custom filters have no API guarantees across
-implementations.</p>
+<p>Conformance-levels at this level are defined based on the type of filter:</p>
+<ul>
+<li>ALL core filters MUST be supported by all implementations.</li>
+<li>Implementers are encouraged to support extended filters.</li>
+<li>Implementation-specific custom filters have no API guarantees across
+implementations.</li>
+</ul>
 <p>Specifying a core filter multiple times has unspecified or custom conformance.</p>
-<p>Support: core</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
@@ -2594,12 +2617,14 @@ a domain name prefixed with a single wildcard label (e.g. <code>*.example.com</c
 The wildcard character <code>*</code> must appear by itself as the first DNS
 label and matches only a single label.
 You cannot have a wildcard label by itself (e.g. Host == <code>*</code>).
-Requests will be matched against the Host field in the following order:
-1. If Host is precise, the request matches this rule if
-the http host header is equal to Host.
-2. If Host is a wildcard, then the request matches this rule if
-the http host header is to equal to the suffix
-(removing the first label) of the wildcard rule.</p>
+Requests will be matched against the Host field in the following order:</p>
+<ol>
+<li>If Host is precise, the request matches this rule if
+the HTTP Host header is equal to Host.</li>
+<li>If Host is a wildcard, then the request matches this rule if
+the HTTP Host header is to equal to the suffix
+(removing the first label) of the wildcard rule.</li>
+</ol>
 <p>Support: Core</p>
 </td>
 </tr>
@@ -2894,64 +2919,67 @@ why a particular Listener condition type has been raised.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;DegradedRoutes&#34;</p></td>
-<td><p>ListenerReasonDegradedRoutes indicates that not all of the routes
-selected by this Listener could be configured. The specific reason
-for the degraded route should be indicated in the route&rsquo;s
-.Status.Conditions field.</p>
+<td><p>This reason is used with the &ldquo;ResolvedRefs&rdquo; condition
+when not all of the routes selected by this Listener could be
+configured. The specific reason for the degraded route should
+be indicated in the route&rsquo;s .Status.Conditions field.</p>
 </td>
 </tr><tr><td><p>&#34;HostnameConflict&#34;</p></td>
-<td><p>ListenerReasonHostnameConflict is used when the Listener conflicts with
-hostnames in other Listeners. For example, this reason would be used when
-multiple Listeners on the same port use <code>*</code> in the hostname field.</p>
+<td><p>This reason is used with the &ldquo;Conflicted&rdquo; condition when
+the Listener conflicts with hostnames in other Listeners. For
+example, this reason would be used when multiple Listeners on
+the same port use <code>*</code> in the hostname field.</p>
 </td>
 </tr><tr><td><p>&#34;Invalid&#34;</p></td>
-<td><p>ListenerReasonInvalid is used when the Listener is
-syntactically or semantically invalid.</p>
+<td><p>This reason is used with the &ldquo;Ready&rdquo; condition when the
+Listener is syntactically or semantically invalid.</p>
 </td>
 </tr><tr><td><p>&#34;InvalidCertificateRef&#34;</p></td>
-<td><p>ListenerReasonInvalidCertificateRef is used when the
+<td><p>This reason is used with the &ldquo;ResolvedRefs&rdquo; condition when the
 Listener has a TLS configuration with a TLS CertificateRef
 that is invalid or cannot be resolved.</p>
 </td>
 </tr><tr><td><p>&#34;InvalidRoutesRef&#34;</p></td>
-<td><p>ListenerReasonInvalidRoutesRef is used when the Listener&rsquo;s Routes
-selector or kind is invalid or cannot be resolved. Note that it is not
-an error for this selector to not resolve any Routes, and the
-&ldquo;ResolvedRefs&rdquo; status condition should not be raised in that case.</p>
+<td><p>This reason is used with the &ldquo;ResolvedRefs&rdquo; condition when
+the Listener&rsquo;s Routes selector or kind is invalid or cannot
+be resolved. Note that it is not an error for this selector to
+not resolve any Routes, and the &ldquo;ResolvedRefs&rdquo; status condition
+should not be raised in that case.</p>
 </td>
 </tr><tr><td><p>&#34;Pending&#34;</p></td>
-<td><p>ListenerReasonPending is used when the Listener is not
-yet not online and ready to accept client traffic.</p>
+<td><p>This reason is used with the &ldquo;Ready&rdquo; condition when the
+Listener is not yet not online and ready to accept client
+traffic.</p>
 </td>
 </tr><tr><td><p>&#34;PortUnavailable&#34;</p></td>
-<td><p>ListenerReasonPortUnavailable is used when the Listener
-requests a port that cannot be used on the Gateway.</p>
+<td><p>This reason is used with the &ldquo;Detached&rdquo; condition when the
+Listener requests a port that cannot be used on the Gateway.</p>
 </td>
 </tr><tr><td><p>&#34;ProtocolConflict&#34;</p></td>
-<td><p>ListenerReasonProtocolConflict is used when multiple
-Listeners are specified with the same Listener port number,
-but have conflicting protocol specifications.</p>
+<td><p>This reason is used with the &ldquo;Conflicted&rdquo; condition when
+multiple Listeners are specified with the same Listener port
+number, but have conflicting protocol specifications.</p>
 </td>
 </tr><tr><td><p>&#34;RouteConflict&#34;</p></td>
-<td><p>ListenerReasonRouteConflict is used when the route
+<td><p>This reason is used with the &ldquo;Conflicted&rdquo; condition when the route
 resources selected for this Listener conflict with other
 specified properties of the Listener (e.g. Protocol).
 For example, a Listener that specifies &ldquo;UDP&rdquo; as the protocol
 but a route selector that resolves &ldquo;TCPRoute&rdquo; objects.</p>
 </td>
 </tr><tr><td><p>&#34;UnsupportedAddress&#34;</p></td>
-<td><p>ListenerReasonUnsupportedAddress is used when the Listener
-could not be attached to the Gateway because the requested
-address is not supported.</p>
+<td><p>This reason is used with the &ldquo;Detached&rdquo; condition when
+the Listener could not be attached to the Gateway because the
+requested address is not supported.</p>
 </td>
 </tr><tr><td><p>&#34;UnsupportedExtension&#34;</p></td>
-<td><p>ListenerReasonUnsupportedExtension is used when the
+<td><p>This reason is used with the &ldquo;Detached&rdquo; condition when the
 controller detects that an implementation-specific Listener
 extension is being requested, but is not able to support
 the extension.</p>
 </td>
 </tr><tr><td><p>&#34;UnsupportedProtocol&#34;</p></td>
-<td><p>ListenerReasonUnsupportedProtocol is used when the
+<td><p>This reason is used with the &ldquo;Detached&rdquo; condition when the
 Listener could not be attached to be Gateway because its
 protocol type is not supported.</p>
 </td>
@@ -2972,10 +3000,10 @@ field.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Conflicted&#34;</p></td>
-<td><p>ListenerConditionConflicted indicates that the controller
-was unable to resolve conflicting specification requirements
-for this Listener. If a Listener is conflicted, its network
-port should not be configured on any network elements.</p>
+<td><p>This condition indicates that the controller was unable to resolve
+conflicting specification requirements for this Listener. If a
+Listener is conflicted, its network port should not be configured
+on any network elements.</p>
 <p>Possible reasons for this condition to be true are:</p>
 <ul>
 <li>&ldquo;HostnameConflict&rdquo;</li>
@@ -2987,10 +3015,9 @@ but should prefer to use the reasons listed above to improve
 interoperability.</p>
 </td>
 </tr><tr><td><p>&#34;Detached&#34;</p></td>
-<td><p>ListenerConditionDetached indicates that, even though
-the listener is syntactically and semantically valid, the
-controller is not able to configure it on the underlying
-Gateway infrastructure.</p>
+<td><p>This condition indicates that, even though the listener is
+syntactically and semantically valid, the controller is not able
+to configure it on the underlying Gateway infrastructure.</p>
 <p>A Listener is specified as a logical requirement, but needs to be
 configured on a network endpoint (i.e. address and port) by a
 controller. The controller may be unable to attach the Listener
@@ -3008,8 +3035,8 @@ but should prefer to use the reasons listed above to improve
 interoperability.</p>
 </td>
 </tr><tr><td><p>&#34;Ready&#34;</p></td>
-<td><p>ListenerConditionReady indicates whether the Listener
-has been configured on the Gateway.</p>
+<td><p>This condition indicates whether the Listener has been
+configured on the Gateway.</p>
 <p>Possible reasons for this condition to be false are:</p>
 <ul>
 <li>&ldquo;Invalid&rdquo;</li>
@@ -3020,9 +3047,8 @@ but should prefer to use the reasons listed above to improve
 interoperability.</p>
 </td>
 </tr><tr><td><p>&#34;ResolvedRefs&#34;</p></td>
-<td><p>ListenerConditionResolvedRefs indicates whether the
-controller was able to resolve all the object references
-for the Listener.</p>
+<td><p>This condition indicates whether the controller was able to
+resolve all the object references for the Listener.</p>
 <p>Possible reasons for this condition to be false are:</p>
 <ul>
 <li>&ldquo;DegradedRoutes&rdquo;</li>
@@ -3268,11 +3294,13 @@ Valid PathMatchType values are:</p>
 <li>&ldquo;RegularExpression&rdquo;</li>
 <li>&ldquo;ImplementationSpecific&rdquo;</li>
 </ul>
-<p>Prefix and Exact paths must be syntactically valid:
-- Must begin with the &lsquo;/&rsquo; character
-- Must not contain consecutive &lsquo;/&rsquo; characters (e.g. /foo///, //).
-- For prefix paths, a trailing &lsquo;/&rsquo; character in the Path is ignored,
-e.g. /abc and /abc/ specify the same match.</p>
+<p>Prefix and Exact paths must be syntactically valid:</p>
+<ul>
+<li>Must begin with the &lsquo;/&rsquo; character</li>
+<li>Must not contain consecutive &lsquo;/&rsquo; characters (e.g. /foo///, //).</li>
+<li>For prefix paths, a trailing &lsquo;/&rsquo; character in the Path is ignored,
+e.g. /abc and /abc/ specify the same match.</li>
+</ul>
 </p>
 <table>
 <thead>
@@ -3318,14 +3346,7 @@ Implementations are not required to accept all the defined protocols.
 If an implementation does not support a specified protocol, it
 should raise a &ldquo;Detached&rdquo; condition for the affected Listener with
 a reason of &ldquo;UnsupportedProtocol&rdquo;.</p>
-<p>Core ProtocolType values are:</p>
-<ul>
-<li>&ldquo;HTTP&rdquo;</li>
-<li>&ldquo;HTTPS&rdquo;</li>
-<li>&ldquo;TLS&rdquo;</li>
-<li>&ldquo;TCP&rdquo;</li>
-<li>&ldquo;UDP&rdquo;</li>
-</ul>
+<p>Core ProtocolType values are listed in the table below.</p>
 <p>Implementations can define their own protocols if a core ProtocolType does not
 exist. Such definitions must use prefixed name, such as
 <code>mycompany.com/my-custom-protocol</code>. Un-prefixed names are reserved for core
@@ -3340,19 +3361,19 @@ conformance.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;HTTP&#34;</p></td>
-<td><p>HTTPProtocolType accepts cleartext HTTP/1.1 sessions over TCP.</p>
+<td><p>Accepts cleartext HTTP/1.1 sessions over TCP.</p>
 </td>
 </tr><tr><td><p>&#34;HTTPS&#34;</p></td>
-<td><p>HTTPSProtocolType accepts HTTP/1.1 or HTTP/2 sessions over TLS.</p>
+<td><p>Accepts HTTP/1.1 or HTTP/2 sessions over TLS.</p>
 </td>
 </tr><tr><td><p>&#34;TCP&#34;</p></td>
-<td><p>TCPProtocolType accepts TCP sessions.</p>
+<td><p>Accepts TCP sessions.</p>
 </td>
 </tr><tr><td><p>&#34;TLS&#34;</p></td>
-<td><p>TLSProtocolType accepts TLS sessions over TCP.</p>
+<td><p>Accepts TLS sessions over TCP.</p>
 </td>
 </tr><tr><td><p>&#34;UDP&#34;</p></td>
-<td><p>UDPProtocolType accepts UDP packets.</p>
+<td><p>Accepts UDP packets.</p>
 </td>
 </tr></tbody>
 </table>
@@ -3464,7 +3485,7 @@ this listener with the &ldquo;InvalidRoutesRef&rdquo; reason.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Admitted&#34;</p></td>
-<td><p>ConditionRouteAdmitted indicates whether the route has been admitted
+<td><p>This condition indicates whether the route has been admitted
 or rejected by a Gateway, and why.</p>
 </td>
 </tr></tbody>
@@ -3762,16 +3783,13 @@ Gateway. This field is ignored for other values of &ldquo;From&rdquo;.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;All&#34;</p></td>
-<td><p>RouteSelectAll indicates that Routes in all namespaces may be used by
-this Gateway.</p>
+<td><p>Routes in all namespaces may be used by this Gateway.</p>
 </td>
 </tr><tr><td><p>&#34;Same&#34;</p></td>
-<td><p>RouteSelectSame indicates that Only Routes in the same namespace may be
-used by this Gateway.</p>
+<td><p>Only Routes in the same namespace as the Gateway may be used by this Gateway.</p>
 </td>
 </tr><tr><td><p>&#34;Selector&#34;</p></td>
-<td><p>RouteSelectSelector indicates that only Routes in namespaces selected by
-the selector may be used by this Gateway.</p>
+<td><p>Only Routes in namespaces selected by the selector may be used by this Gateway.</p>
 </td>
 </tr></tbody>
 </table>
@@ -3855,8 +3873,8 @@ If an entry in this list omits or specifies the empty
 string for both the group and kind, the resource defaults to &ldquo;secrets&rdquo;.
 An implementation may support other resources (for example, resource
 &ldquo;mycertificates&rdquo; in group &ldquo;networking.acme.io&rdquo;).</p>
-<p>Support: Core (Kubernetes Secrets)
-Support: Implementation-specific (Other resource types)</p>
+<p>Support: Core (Kubernetes Secrets)</p>
+<p>Support: Implementation-specific (Other resource types)</p>
 </td>
 </tr>
 </tbody>
@@ -3897,7 +3915,7 @@ included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo
 condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
 status for this route should be updated with a condition that describes
 the error more specifically.</p>
-<p>Support: custom</p>
+<p>Support: Custom</p>
 </td>
 </tr>
 </tbody>
@@ -4040,7 +4058,7 @@ RouteStatus
 <a href="#networking.x-k8s.io/v1alpha1.GatewayTLSConfig">GatewayTLSConfig</a>)
 </p>
 <p>
-<p>TLSModeType type defines behavior of gateway with TLS protocol.</p>
+<p>TLSModeType type defines how a Gateway handles TLS sessions.</p>
 </p>
 <table>
 <thead>
@@ -4050,14 +4068,12 @@ RouteStatus
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Passthrough&#34;</p></td>
-<td><p>TLSModePassthrough represents the Passthrough mode.
-In this mode, the TLS session NOT terminated by the Gateway. This
+<td><p>In this mode, the TLS session is NOT terminated by the Gateway. This
 implies that the Gateway can&rsquo;t decipher the TLS stream except for
 the ClientHello message of the TLS protocol.</p>
 </td>
 </tr><tr><td><p>&#34;Terminate&#34;</p></td>
-<td><p>TLSModeTerminate represents the Terminate mode.
-In this mode, TLS session between the downstream client
+<td><p>In this mode, TLS session between the downstream client
 and the Gateway is terminated at the Gateway.</p>
 </td>
 </tr></tbody>
@@ -4148,7 +4164,7 @@ wildcard rule.</li>
 listener will match. This can be used to define a default backend
 for a TLS listener.</li>
 </ol>
-<p>Support: core</p>
+<p>Support: Core</p>
 </td>
 </tr>
 <tr>
@@ -4169,7 +4185,7 @@ included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo
 condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
 status for this route should be updated with a condition that describes
 the error more specifically.</p>
-<p>Support: custom</p>
+<p>Support: Custom</p>
 </td>
 </tr>
 </tbody>
@@ -4192,10 +4208,10 @@ to override a specific TLS setting.</p>
 </tr>
 </thead>
 <tbody><tr><td><p>&#34;Allow&#34;</p></td>
-<td><p>TLSROuteOVerrideAllow allows the parameter to be configured from all routes.</p>
+<td><p>Allows the parameter to be configured from all routes.</p>
 </td>
 </tr><tr><td><p>&#34;Deny&#34;</p></td>
-<td><p>TLSRouteOverrideDeny prohibits the parameter to be configured from any route.</p>
+<td><p>Prohibits the parameter from being configured from any route.</p>
 </td>
 </tr></tbody>
 </table>
@@ -4257,7 +4273,7 @@ sent.</p>
 <a href="#networking.x-k8s.io/v1alpha1.TLSRoute">TLSRoute</a>)
 </p>
 <p>
-<p>TLSRouteSpec defines the desired state of TLSRoute.</p>
+<p>TLSRouteSpec defines the desired state of a TLSRoute resource.</p>
 </p>
 <table>
 <thead>
@@ -4366,7 +4382,7 @@ included in the route. The controller should raise the &ldquo;ResolvedRefs&rdquo
 condition on the Gateway with the &ldquo;DegradedRoutes&rdquo; reason. The gateway
 status for this route should be updated with a condition that describes
 the error more specifically.</p>
-<p>Support: custom</p>
+<p>Support: Custom</p>
 </td>
 </tr>
 </tbody>
