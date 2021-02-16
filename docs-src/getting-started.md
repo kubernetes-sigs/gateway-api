@@ -8,7 +8,7 @@ be installed into any Kubernetes (>= 1.16) cluster.
 To install the CRDs, please execute:
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.2.0" \
 | kubectl apply -f -
 ```
 
