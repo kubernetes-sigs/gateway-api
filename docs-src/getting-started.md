@@ -1,4 +1,4 @@
-# Getting started with Services APIs
+# Getting started with Gateway APIs
 
 ## Installing CRDs
 
