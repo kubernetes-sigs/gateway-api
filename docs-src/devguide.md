@@ -98,36 +98,17 @@ make verify
 
 ## Documentation
 
-The site documentation is written in [mkdocs][mkdocs] format. The files are
-contained in `docs-src/`. Generated files are in `docs/` and published to
-Github Pages.
-
-Building the docs:
+The site documentation is written in Markdown and compiled with [mkdocs]. Each PR
+will automatically include a [Netlify] deploy preview. When new code merges, it will
+automatically be deployed with Netlify to [gateway-api.sigs.k8s.io]. If you want to manually
+preview docs changes locally, you can install mkdocs and run:
 
 ```shell
 make docs
 ```
 
-Live preview for editing (view on [http://localhost:8000](http://localhost:8000), CTRL-C to quit):
-
-```shell
-make serve
-```
-
-Remove generated documentation files:
-
-```shell
-make clean
-```
-
-### Publishing
-
-The docs are published automatically to [Github pages][ghp]. When making changes to the
-documentation, generate the new documentation and make the generated code a
-self-contained commit (e.g. the changes to `docs/`). This will keep the code
-reviews simple and clearly delineate user vs generated content.
-
-[ghp]: https://kubernetes-sigs.github.io/gateway-api/
 [mkdocs]: https://www.mkdocs.org/
+[Netlify]: https://netlify.com/
+[gateway-api.sigs.k8s.io]: https://gateway-api.sigs.k8s.io
 [Go environment]: https://golang.org/doc/install
 [Kubernetes]: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md

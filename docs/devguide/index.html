@@ -653,26 +653,12 @@ verification fails.</p>
 </code></pre>
 
 <h2 id="documentation">Documentation</h2>
-<p>The site documentation is written in <a href="https://www.mkdocs.org/">mkdocs</a> format. The files are
-contained in <code>docs-src/</code>. Generated files are in <code>docs/</code> and published to
-Github Pages.</p>
-<p>Building the docs:</p>
+<p>The site documentation is written in Markdown and compiled with <a href="https://www.mkdocs.org/">mkdocs</a>. Each PR
+will automatically include a <a href="https://netlify.com/">Netlify</a> deploy preview. When new code merges, it will
+automatically be deployed with Netlify to <a href="https://gateway-api.sigs.k8s.io">gateway-api.sigs.k8s.io</a>. If you want to manually
+preview docs changes locally, you can install mkdocs and run:</p>
 <pre><code class="shell">make docs
 </code></pre>
-
-<p>Live preview for editing (view on <a href="http://localhost:8000">http://localhost:8000</a>, CTRL-C to quit):</p>
-<pre><code class="shell">make serve
-</code></pre>
-
-<p>Remove generated documentation files:</p>
-<pre><code class="shell">make clean
-</code></pre>
-
-<h3 id="publishing">Publishing</h3>
-<p>The docs are published automatically to <a href="https://kubernetes-sigs.github.io/gateway-api/">Github pages</a>. When making changes to the
-documentation, generate the new documentation and make the generated code a
-self-contained commit (e.g. the changes to <code>docs/</code>). This will keep the code
-reviews simple and clearly delineate user vs generated content.</p>
                 
                   
                 

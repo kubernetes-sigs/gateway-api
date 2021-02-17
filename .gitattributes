@@ -9,7 +9,5 @@ apis/generated/** linguist-generated=true
 apis/**/generated.pb.go linguist-generated=true
 apis/**/generated.proto linguist-generated=true
 config/crd/bases/** linguist-generated=true
-docs/spec/index.html linguist-generated=true
-docs-src/spec.md linguist-generated=true
 pkg/client/** linguist-generated=true
 
