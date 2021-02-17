@@ -49,5 +49,4 @@ Session.vim
 .vscode
 /www/test_out
 .*.timestamp
-/docs/sitemap.xml
-/docs/sitemap.xml.gz
+/site
