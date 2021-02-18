@@ -1,11 +1,12 @@
 site_name: Kubernetes Gateway API
 repo_url: http://sigs.k8s.io/gateway-api
 repo_name: GitHub
-site_dir: docs
-docs_dir: docs-src
+site_dir: site
+docs_dir: site-src
 theme:
   name: material
 plugins:
+  - search
   - macros:
       include_dir: examples
 nav:
