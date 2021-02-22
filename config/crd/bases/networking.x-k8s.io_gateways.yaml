@@ -202,7 +202,6 @@ spec:
                             desired, specify the desired group: \n routes:   group:
                             acme.io   kind: FooRoute \n Support: Core"
                           maxLength: 253
-                          minLength: 1
                           type: string
                         kind:
                           description: "Kind is the kind of the route resource to
@@ -363,7 +362,6 @@ spec:
                             group:
                               description: Group is the group of the referent.
                               maxLength: 253
-                              minLength: 1
                               type: string
                             kind:
                               description: Kind is kind of the referent.

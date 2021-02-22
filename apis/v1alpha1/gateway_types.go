@@ -424,7 +424,6 @@ type RouteBindingSelector struct {
 	//
 	// +optional
 	// +kubebuilder:default=networking.x-k8s.io
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group *string `json:"group,omitempty"`
 	// Kind is the kind of the route resource to select.

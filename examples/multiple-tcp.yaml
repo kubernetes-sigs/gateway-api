@@ -38,7 +38,7 @@ spec:
       certificateRef:
         name: ssh-server
         kind: Secret
-        group: core
+        group: ""
     routes:
       kind: TCPRoute
       selector:
