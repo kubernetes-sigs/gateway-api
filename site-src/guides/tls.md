@@ -53,7 +53,7 @@ listeners:
     mode: Terminate # If protocol is `TLS`, `Passthrough` is a possible mode
     certificateRef:
       kind: Secret
-      group: core
+      group: ""
       name: default-cert
     routeOverride:
       certificate: Deny
