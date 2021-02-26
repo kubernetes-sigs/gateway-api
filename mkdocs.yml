@@ -31,6 +31,7 @@ nav:
   - References:
       - API specification: spec.md
       - Releases: releases.md
+      - Implementations: implementations.md
   - Contributing:
       - Developer guide: devguide.md
       - Enhancement requests: enhancement-requests.md
