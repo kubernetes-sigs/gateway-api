@@ -39,13 +39,16 @@ Note that not all of the `v0.2.0` specification is completed yet, [contributions
 [contour-1]:https://projectcontour.io/guides/gateway-api/
 [contour-2]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
 
-### Google Cloud Platform
+### Google Kubernetes Engine
 
-The [Google Cloud Platform (GCP)][gcp] is a cloud computing platform and infrastructure provider.
+The [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered by Google Cloud.
 
-GCP is actively working towards an implementation of the Gateway API `v0.2.x` specification, and status updates and documentation will be provided here as the work progresses.
+GKE is actively working towards an implementation of the Gateway API for orchestration of [Google Cloud Load Balancing][gclb].
 
-[gcp]:https://cloud.google.com
+The GKE Gateway Controller will become a managed component of GKE to automate and ease load balancing for containers.
+
+[gke]:https://cloud.google.com/kubernetes-engine
+[gclb]:https://cloud.google.com/load-balancing
 
 ### Istio
 
