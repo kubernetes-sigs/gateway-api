@@ -323,17 +323,16 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:default=Terminate
 	Mode *TLSModeType `json:"mode,omitempty"`
 
-	// CertificateRef is the reference to Kubernetes object that contain a
-	// TLS certificate and private key. This certificate MUST be used for
-	// TLS handshakes for the domain this GatewayTLSConfig is associated with.
+	// CertificateRef is a reference to a Kubernetes object that contains a TLS
+	// certificate and private key. This certificate is used to establish a TLS
+	// handshake for requests that match the hostname of the associated listener.
+	// The referenced object MUST reside in the same namespace as Gateway.
 	//
 	// This field is required when mode is set to "Terminate" (default) and
 	// optional otherwise.
 	//
-	// If an entry in this list omits or specifies the empty string for both
-	// the group and the resource, the resource defaults to "secrets". An
-	// implementation may support other resources (for example, resource
-	// "mycertificates" in group "networking.acme.io").
+	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
+	// or an implementation-specific custom resource.
 	//
 	// Support: Core (Kubernetes Secrets)
 	//
