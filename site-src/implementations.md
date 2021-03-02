@@ -10,15 +10,13 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Google Cloud][2] (work in progress)
 - [Istio][3] (alpha)
 - [Kong][4] (work in progress)
-- [Knative][5] (work in progress)
-- [Traefik][6] (alpha)
+- [Traefik][5] (alpha)
 
 [1]:#contour
 [2]:#google-cloud-platform
 [3]:#istio
 [4]:#kong
-[5]:#knative
-[6]:#traefik
+[5]:#traefik
 
 ## Project References
 
@@ -71,14 +69,6 @@ You can subscribe to [kong/kubernetes-ingress-controller/issues/692][kong-1] to 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-1]:https://github.com/kong/kubernetes-ingress-controller/issues/692
-
-### Knative
-
-[Knative][knative] is an open source Kubernetes-based platform to deploy and manage modern serverless workloads.
-
-Knative is actively working towards an implementation of the Gateway API, status updates and documentation will be provided here as the work progresses.
-
-[knative]:https://knative.dev/
 
 ### Traefik
 
