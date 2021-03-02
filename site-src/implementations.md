@@ -6,14 +6,12 @@ Implementors of Gateway API are encouraged to update this document with status i
 
 ## Implementation Status
 
-|                | [Contour][1]       | [GCP][2]           | [Istio][3]         | [Kong][4]         | [Knative][5]       | [Traefik][6]       |
-| :------------- | :----------------: | :----------------: | :----------------: | :---------------: | :----------------: | :----------------: |
-| [v0.1.x][v0.1] | :heavy_minus_sign: | :heavy_minus_sign: | :heavy_check_mark: |:heavy_minus_sign: | :heavy_minus_sign: | :heavy_check_mark: |
-| [v0.2.x][v0.2] | :heavy_check_mark: | :heavy_plus_sign:  | :heavy_plus_sign:  |:heavy_plus_sign:  | :heavy_minus_sign: | :heavy_plus_sign:  |
-
-- :heavy_check_mark: available
-- :heavy_plus_sign: in progress
-- :heavy_minus_sign: not planned
+- [Contour][1] (alpha)
+- [Google Cloud][2] (work in progress)
+- [Istio][3] (alpha)
+- [Kong][4] (work in progress)
+- [Knative][5] (work in progress)
+- [Traefik][6] (alpha)
 
 [1]:#contour
 [2]:#google-cloud-platform
@@ -21,9 +19,6 @@ Implementors of Gateway API are encouraged to update this document with status i
 [4]:#kong
 [5]:#knative
 [6]:#traefik
-
-[v0.1]:https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.1.0
-[v0.2]:https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.2.0
 
 ## Project References
 
