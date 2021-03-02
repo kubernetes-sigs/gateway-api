@@ -76,7 +76,7 @@ You can subscribe to [kong/kubernetes-ingress-controller/issues/692][kong-1] to 
 
 Traefik currently supports the previous `v0.1.x` Gateway API specification, check the [Kubernetes Gateway Documentation][traefik-1] for information on how to deploy and use Traefik's Gateway implementation.
 
-Traefik is currently working on implementing `v0.2.x`, status updates and documentation will be provided here as the work progresses.
+Traefik is currently working on implementing TCP, status updates and documentation will be provided here as the work progresses.
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
