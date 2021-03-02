@@ -28,13 +28,16 @@ In this section you will find specific links to blog posts, documentation and ot
 
 [Contour][contour] is an open source ingress controller for Kubernetes.
 
-Contour currently implements the latest `v0.2.x` Gateway API Specification.
+Contour started implementing Gateway API `v0.1.0` but held on releasing that in favor of `v0.2.0` once it released.
 
 See the [Contour Gateway API Guide][contour-1] for information on how to deploy and use Contours's Gateway implementation.
+
+Note that not all of the `v0.2.0` specification is completed yet, [contributions welcome!][contour-2].
 
 [contour]:https://projectcontour.io
 [latest]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 [contour-1]:https://projectcontour.io/guides/gateway-api/
+[contour-2]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
 
 ### Google Cloud Platform
 
