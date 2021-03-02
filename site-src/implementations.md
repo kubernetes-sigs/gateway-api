@@ -64,11 +64,12 @@ Istio is actively working towards an implementation of the Gateway API and you c
 
 Kong is actively working towards an implementation of the Gateway API `v0.2.x` specification for it's [Kubernetes Ingress Controller][kic] and status updates and documentation will be provided here as the work progresses.
 
-You can subscribe to [kong/kubernetes-ingress-controller/issues/692][kong-1] to track the implementation progress and contribute.
+You can subscribe to [kong/kubernetes-ingress-controller/issues/692][kong-1] to track the implementation progress and [contribute][kong-2]!
 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-1]:https://github.com/kong/kubernetes-ingress-controller/issues/692
+[kong-2]:https://github.com/Kong/kubernetes-ingress-controller/blob/main/CONTRIBUTING.md
 
 ### Traefik
 
