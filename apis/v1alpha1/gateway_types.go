@@ -405,7 +405,7 @@ type RouteBindingSelector struct {
 	// Support: Core
 	//
 	// +optional
-	Selector metav1.LabelSelector `json:"selector,omitempty"`
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 	// Group is the group of the route resource to select. Omitting the value or specifying
 	// the empty string indicates the networking.x-k8s.io API group.
 	// For example, use the following to select an HTTPRoute:
