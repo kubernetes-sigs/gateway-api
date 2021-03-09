@@ -337,7 +337,7 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default={type: "Prefix", value: "/"}
-	Path HTTPPathMatch `json:"path,omitempty"`
+	Path *HTTPPathMatch `json:"path,omitempty"`
 
 	// Headers specifies a HTTP request header matcher.
 	//
