@@ -25,10 +25,8 @@ spec:
   ports:
   - name: http
     port: 80
-    targetPort: 8000
   - name: https
     port: 443
-    targetPort: 8443
   selector:
     app: my-service
 ---
@@ -46,4 +44,4 @@ spec:
         value: /
     forwardTo:
     - serviceName: my-service
-      port: 8443
+      port: 443
