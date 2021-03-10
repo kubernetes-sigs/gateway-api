@@ -63,7 +63,7 @@ type RouteGateways struct {
 	// +optional
 	// +kubebuilder:validation:Enum=All;FromList;SameNamespace
 	// +kubebuilder:default=SameNamespace
-	Allow GatewayAllowType `json:"allow,omitempty"`
+	Allow *GatewayAllowType `json:"allow,omitempty"`
 
 	// GatewayRefs must be specified when Allow is set to "FromList". In that
 	// case, only Gateways referenced in this list will be allowed to use this
@@ -163,7 +163,7 @@ type RouteForwardTo struct {
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=1000000
-	Weight int32 `json:"weight,omitempty"`
+	Weight *int32 `json:"weight,omitempty"`
 }
 
 // RouteConditionType is a type of condition for a route.

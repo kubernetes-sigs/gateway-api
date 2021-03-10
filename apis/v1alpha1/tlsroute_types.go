@@ -53,7 +53,7 @@ type TLSRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
+	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // TLSRouteStatus defines the observed state of TLSRoute

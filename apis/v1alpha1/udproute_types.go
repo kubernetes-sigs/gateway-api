@@ -48,7 +48,7 @@ type UDPRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
+	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // UDPRouteStatus defines the observed state of UDPRoute.

@@ -48,7 +48,7 @@ type TCPRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
+	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // TCPRouteStatus defines the observed state of TCPRoute
