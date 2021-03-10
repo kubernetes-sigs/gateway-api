@@ -7,7 +7,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 ## Implementation Status
 
 - [Contour][1] (alpha)
-- [Google Cloud][2] (work in progress)
+- [Google Kubernetes Engine][2] (work in progress)
 - [Istio][3] (alpha)
 - [Kong][4] (work in progress)
 - [Traefik][5] (alpha)
