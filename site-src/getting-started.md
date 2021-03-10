@@ -14,9 +14,9 @@ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.2.0"
 
 ## Install an implementation
 
-Multiple projects implement the APIs defined by this project.
-You will need to either install an implementation or verify that one is already
-setup for your cluster.
+[Multiple projects](implementations.md) implement the APIs defined by this
+project.  You will need to either install an implementation or verify that one
+is already setup for your cluster.
 
 ## Sample Gateway
 
