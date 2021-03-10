@@ -8,7 +8,10 @@ applications - Services, Ingress, and more.
 *Note: This project was previously named "Service APIs" until being renamed to
 "Gateway API" in February 2021.*
 
-### What is the goal of Gateway API?
+Want to get started using the API right away? [Follow this
+guide](getting-started.md)!
+
+## What is the goal of Gateway API?
 
 Gateway API aims to improve service networking by providing expressive,
 extensible, role-oriented interfaces that are implemented by many vendors and
@@ -54,7 +57,7 @@ capabilities are available as a resource model itself.
 
 [sig-network]: https://github.com/kubernetes/community/tree/master/sig-network
 
-### Where to get started
+## Where to get started
 
 To get started, please read through [API overview](api-overview.md). These
 documents give the necessary background to understand the API and the use-cases
@@ -67,7 +70,7 @@ For a complete API reference, please refer to:
 - [API reference](spec.md)
 - [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1)
 
-### How to get involved
+## How to get involved
 
 This project has many contributors, and we welcome anybody and everybody to get
 involved. Join our weekly meetings, file issues, or ask questions in Slack. No
