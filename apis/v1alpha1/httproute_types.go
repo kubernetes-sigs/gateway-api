@@ -280,8 +280,9 @@ type HTTPPathMatch struct {
 
 	// Value of the HTTP path to match against.
 	//
-	// +kubebuilder:validation:MinLength=1
-	Value string `json:"value"`
+	// +optional
+	// +kubebuilder:default="/"
+	Value *string `json:"value,omitempty"`
 }
 
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
