@@ -1,61 +1,55 @@
 # Getting started with Gateway APIs
 
-## Installing CRDs
 
-This project provides a collection of Custom Resource Definitions (CRDs) that can
-be installed into any Kubernetes (>= 1.16) cluster.
+**1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
+ _OR_  **[install the Gateway API CRDs manually](#installing-gateway-api-crds-manually)** 
 
-To install the CRDs, please execute:
+_THEN_
+
+**2.**   **Try out one of the available guides:**
+
+- [Simple Gateway](simple-gateway.md) (a good one to start out with)
+- [HTTP routing](http-routing.md)
+- [HTTP traffic splitting](traffic-splitting.md)
+- [Routing across Namespaces](multiple-ns.md)
+- [Configuring TLS](tls.md)
+- [TCP routing](tcp.md)
+
+## Installing a Gateway controller
+
+There are [multiple projects](implementations.md) that support the Gateway
+API. By installing a Gateway controller in your Kubernetes cluster, you can
+try out the guides above. This will demonstrate that the desired routing
+configuration is actually being implemented by your Gateway resources (and the
+network infrastructure that your Gateway resources represent). Note that many 
+of the Gateway controller setups will install and remove the Gateway API CRDs 
+for you.
+f
+## Installing Gateway API CRDs manually
+
+The following command will install the Gateway API CRDs. This includes the
+GatewayClass, Gateway, HTTPRoute, TCPRoute, and more. Note that a running 
+Gateway controller in your Kubernetes cluster is required to actually act on 
+these resources. Installing the CRDs will just allow you to see and apply the 
+resources, though they won't do anything.
 
 ```
 kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.2.0" \
 | kubectl apply -f -
 ```
 
-## Install an implementation
+After you're done, you can clean up after yourself by uninstalling the 
+Gateway API CRDs. The following command will remove all GatewayClass, Gateway, 
+and associated resources in your cluster. If these resources are in-use or
+if they were installed by a Gateway controller, then do not uninstall them. 
+This will uninstall the Gateway API CRDs for the entire cluster. Do not do 
+this if they might be in-use by someone else as this will break anything using
+these resources.
 
-[Multiple projects](/references/implementations) implement the APIs defined by this
-project.  You will need to either install an implementation or verify that one
-is already setup for your cluster.
-
-## Sample Gateway
-
-Once you have the CRDs and an implementation installed, you are ready to
-use Gateway API.
-
-In this example, we are installing three resources:
-
-- An `acme-lb` GatewayClass which is being managed by a `acme.io/gateway-controller`
-  controller running in the cluster. Typically, a GatewayClass is provided by
-  the implementation and must be installed in the cluster.
-- A Gateway which is of type `acme-lb`:
-    - This gateway has a single HTTP listener on port 80 which selects HTTPRoutes
-      from all namespaces which have the label `app: foo` on them.
-
-- Finally, we have an HTTPRoute resource which is attached to the above Gateway
-  and has two rules:
-    - All requests with path beginning with `/bar` are forwarded to my-service1
-      Kubernetes Service.
-    - All requests with path beginning with `/some/thing` AND have an HTTP header
-      `magic: foo` are forwarded to my-service2 Kubernetes Service.
-
-With this configuration, you now have a Gateway resource which is forwarding
-traffic to two Kubernetes Services based on HTTP request metadata.
 
 ```
-{% include 'basic-http.yaml' %}
-```
-
-For more advanced examples, please read the other [guides](/guides/).
-
-## Uninstalling the CRDs
-
-To uninstall the CRDs and all resources created with them, run the following
-command. Note that this will remove all GatewayClass and Gateway resources in
-your cluster. If you have been using these resources for any other purpose do
-not uninstall these CRDs.
-
-```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.1.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.2.0" \
 | kubectl delete -f -
 ```
+
+
