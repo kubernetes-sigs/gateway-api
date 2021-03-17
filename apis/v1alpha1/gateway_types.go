@@ -293,7 +293,7 @@ type TLSOverridePolicy struct {
 	//
 	// +optional
 	// +kubebuilder:default=Deny
-	Certificate TLSRouteOverrideType `json:"certificate,omitempty"`
+	Certificate *TLSRouteOverrideType `json:"certificate,omitempty"`
 }
 
 // GatewayTLSConfig describes a TLS configuration.
@@ -321,7 +321,7 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	// +kubebuilder:default=Terminate
-	Mode TLSModeType `json:"mode,omitempty"`
+	Mode *TLSModeType `json:"mode,omitempty"`
 
 	// CertificateRef is the reference to Kubernetes object that contain a
 	// TLS certificate and private key. This certificate MUST be used for
@@ -353,7 +353,7 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	// +kubebuilder:default={certificate:Deny}
-	RouteOverride TLSOverridePolicy `json:"routeOverride,omitempty"`
+	RouteOverride *TLSOverridePolicy `json:"routeOverride,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
@@ -396,7 +396,7 @@ type RouteBindingSelector struct {
 	//
 	// +optional
 	// +kubebuilder:default={from: Same}
-	Namespaces RouteNamespaces `json:"namespaces,omitempty"`
+	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 	// Selector specifies a set of route labels used for selecting
 	// routes to associate with the Gateway. If this Selector is defined,
 	// only routes matching the Selector are associated with the Gateway.
@@ -426,7 +426,7 @@ type RouteBindingSelector struct {
 	// +kubebuilder:default=networking.x-k8s.io
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group,omitempty"`
+	Group *string `json:"group,omitempty"`
 	// Kind is the kind of the route resource to select.
 	//
 	// Kind MUST correspond to kinds of routes that are compatible with the
@@ -467,7 +467,7 @@ type RouteNamespaces struct {
 	//
 	// +optional
 	// +kubebuilder:default=Same
-	From RouteSelectType `json:"from,omitempty"`
+	From *RouteSelectType `json:"from,omitempty"`
 
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only Routes in Namespaces matching this Selector will be selected by this
@@ -476,7 +476,7 @@ type RouteNamespaces struct {
 	// Support: Core
 	//
 	// +optional
-	Selector metav1.LabelSelector `json:"selector,omitempty"`
+	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
@@ -487,7 +487,7 @@ type GatewayAddress struct {
 	//
 	// +optional
 	// +kubebuilder:default=IPAddress
-	Type AddressType `json:"type,omitempty"`
+	Type *AddressType `json:"type,omitempty"`
 
 	// Value of the address. The validity of the values will depend
 	// on the type and support by the controller.

@@ -52,7 +52,7 @@ type HTTPRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways RouteGateways `json:"gateways,omitempty"`
+	Gateways *RouteGateways `json:"gateways,omitempty"`
 
 	// Hostnames defines a set of hostname that should match against
 	// the HTTP Host header to select a HTTPRoute to process the request.
@@ -276,7 +276,7 @@ type HTTPPathMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Prefix
-	Type PathMatchType `json:"type,omitempty"`
+	Type *PathMatchType `json:"type,omitempty"`
 
 	// Value of the HTTP path to match against.
 	//
@@ -302,7 +302,7 @@ type HTTPHeaderMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Exact
-	Type HeaderMatchType `json:"type,omitempty"`
+	Type *HeaderMatchType `json:"type,omitempty"`
 
 	// Values is a map of HTTP Headers to be matched.
 	// It MUST contain at least one entry.
@@ -631,7 +631,7 @@ type HTTPRouteForwardTo struct {
 	// +kubebuilder:default=1
 	// +kubebuilder:validation:Minimum=0
 	// +kubebuilder:validation:Maximum=1000000
-	Weight int32 `json:"weight,omitempty"`
+	Weight *int32 `json:"weight,omitempty"`
 
 	// Filters defined at this-level should be executed if and only if the
 	// request is being forwarded to the backend defined here.
