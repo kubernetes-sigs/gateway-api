@@ -23,6 +23,7 @@ import (
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Gateways",type=string,JSONPath=`.status.admittedGateways`
 
 // UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.
 type UDPRoute struct {

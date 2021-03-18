@@ -23,6 +23,7 @@ import (
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Gateways",type=string,JSONPath=`.status.admittedGateways`
 
 // The TLSRoute resource is similar to TCPRoute, but can be configured
 // to match against TLS-specific metadata. This allows more flexibility

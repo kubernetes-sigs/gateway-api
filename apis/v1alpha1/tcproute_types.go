@@ -23,6 +23,7 @@ import (
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Gateways",type=string,JSONPath=`.status.admittedGateways`
 
 // TCPRoute is the Schema for the TCPRoute resource.
 type TCPRoute struct {

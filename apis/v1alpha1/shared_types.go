@@ -211,6 +211,19 @@ type RouteStatus struct {
 	//
 	// +kubebuilder:validation:MaxItems=100
 	Gateways []RouteGatewayStatus `json:"gateways"`
+
+	// AdmittedGateways is a list of Gateways that have admitted this route.
+	// This list includes the namespace and name of each Gateway in a
+	// namespace/name format. This field is primarily used to provide kubectl
+	// output.
+	//
+	// A maximum of 100 Gateways will be represented in this list. If this list
+	// is full, there may be additional Gateways using this Route that are not
+	// included in the list. An empty list means the route has not been admitted
+	// by any Gateway.
+	//
+	// +kubebuilder:validation:MaxItems=100
+	AdmittedGateways []string `json:"admittedGateways"`
 }
 
 // Hostname is used to specify a hostname that should be matched.

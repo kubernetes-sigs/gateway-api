@@ -24,6 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
+// +kubebuilder:printcolumn:name="Gateways",type=string,JSONPath=`.status.admittedGateways`
 
 // HTTPRoute is the Schema for the HTTPRoute resource.
 type HTTPRoute struct {
