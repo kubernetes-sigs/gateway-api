@@ -1,82 +1,114 @@
-# Introduction
+## What is the Gateway API?
 
 Gateway API is an open source project managed by the [SIG-NETWORK][sig-network]
-community. The project's goal is to evolve service networking APIs within the
-Kubernetes ecosystem. Gateway API provide interfaces to expose Kubernetes
-applications - Services, Ingress, and more.
+community. It's is a collection of resources that model service networking 
+in Kubernetes. These resources - `GatewayClass`,`Gateway`, `HTTPRoute`, 
+`TCPRoute`, `Service`, etc - aim to evolve Kubernetes service networking through 
+expressive, extensible, and role-oriented interfaces that are implemented by 
+many vendors and have broad industry support. 
 
 *Note: This project was previously named "Service APIs" until being renamed to
 "Gateway API" in February 2021.*
 
-Want to get started using the API right away? [Follow this
-guide](getting-started.md)!
-
-## What is the goal of Gateway API?
-
-Gateway API aims to improve service networking by providing expressive,
-extensible, role-oriented interfaces that are implemented by many vendors and
-have broad industry support.
-
-Gateway API is a collection of API resources - `Service`, `GatewayClass`,
-`Gateway`, `HTTPRoute`, `TCPRoute`, etc. Together these resources model a wide
-variety of networking use-cases.
-
 ![Gateway API Model](./images/api-model.png)
 
+## Getting started
 
-How do Gateway API improve upon current standards like Ingress?
+Whether you are a user interested in using the Gateway API or an implementer 
+interested in conforming to the API, the following resources will help give 
+you the necessary background:
 
-- **More expressive** - They express more core functionality for things like
-header-based matching, traffic weighting, and other capabilities that were only
-possible in Ingress through custom means.
-- **More extensible** - They allow for custom resources to be linked at various
-layers of the API. This allows for more granular customization at the
-appropriate places within the API structure.
-- **Role oriented** - They are separated into different API resources that map
-to the common roles for running applications on Kubernetes.
-- **Generic** - This isn't an improvement but rather something
+- [API overview](api-overview.md) 
+- [User guides](getting-started.md) 
+- [Gateway controller implementations](implementations.md) 
+- [API reference spec](spec.md) 
+- [Community links](community.md) and [developer guide](devguide.md)
+
+
+## Gateway API concepts
+The following design goals drive the concepts of the Gateway API. These 
+demonstrate how Gateway aims to improve upon current standards like Ingress.
+
+
+- **Role-oriented** - Gateway is composed of API resources which model 
+organizational roles that use and configure Kubernetes service networking. 
+- **Portable** - This isn't an improvement but rather something
 that should stay the same. Just as Ingress is a universal specification with
 [numerous implementations](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/),
-Gateway API are designed to be a portable specification supported by many
+Gateway API is designed to be a portable specification supported by many
 implementations.
+- **Expressive** - Gateway API resources support core functionality for things 
+like header-based matching, traffic weighting, and other capabilities that 
+were only possible in Ingress through custom annotations.
+- **Extensible** - Gateway API allows for custom resources to be linked at 
+various layers of the API. This makes granular customization possible at the
+appropriate places within the API structure.
 
-Some other notable capabilities include …
+Some other notable capabilities include:
 
-- **Shared Gateways** - They allow the sharing of load balancers and VIPs by
-permitting independent Route resources to bind to the same Gateway. This allows
-teams to share infrastructure safely without requiring direct coordination.
-- **Typed backend references** - With typed backend references Routes can
-reference Kubernetes Services, but also any kind of Kubernetes resource that is
-designed to be a Gateway backend.
-- **Cross-Namespace references** - Routes across different Namespaces can bind
-to Gateways. This allows for shared networking infrastructure despite Namespace
-segmentation for workloads.
-- **Classes** - GatewayClasses formalize types of load balancing implementations.
-These classes make it easy and explicit for users to understand what kind of
-capabilities are available as a resource model itself.
+- **GatewayClasses** - GatewayClasses formalize types of load balancing 
+implementations. These classes make it easy and explicit for users to 
+understand what kind of capabilities are available via the Kubernetes resource 
+model.
+- **Shared Gateways and cross-Namespace support** - They allow the sharing of
+load balancers and VIPs by permitting independent Route resources to bind to
+the same Gateway. This allows teams (even across Namespaces) to share
+infrastructure safely without direct coordination.
+- **Typed Routes and typed backends** - The Gateway API supports typed Route 
+resources and also different types of backends. This allows the API to be 
+flexible in supporting various protocols (like HTTP and gRPC) and
+various backend targets (like Kubernetes Services, storage buckets, or
+functions). 
+
+
+## Why does a role-oriented API matter?
+
+Whether it’s roads, power, data centers, or Kubernetes clusters,
+infrastructure is built to be shared. However, shared infrastructure raises a
+common challenge - how to provide flexibility to users of the infrastructure
+while maintaining control by owners of the infrastructure? 
+
+The Gateway API accomplishes this through a role-oriented design for
+Kubernetes service networking that strikes a balance between distributed
+flexibility and centralized control. It allows shared network infrastructure
+(hardware load balancers, cloud networking, cluster-hosted proxies etc) to be
+used by many different and non-coordinating teams, all bound by the policies
+and constraints set by cluster operators. The following example shows how this
+works in practice.
+
+A cluster operator creates a [Gateway](gateway.md) resource derived from a
+[GatewayClass](gatewayclass.md). This Gateway deploys or configures the
+underlying network resources that it represents. Through [Route binding
+policy](api-overview.md#route-binding) set on the Gateway, the operator
+permits (or denies) specific teams to bind to this Gateway and expose their
+applications through it. Centralized policies [such as
+TLS](tls.md#downstream-tls) can be enforced on the Gateway by the cluster
+operator. Meanwhile, the store and site teams run [in their own
+Namespaces](multiple-ns.md), but bind their Routes against the same shared
+Gateway, allowing them to independently control their [routing
+logic](http-routing.md). This separation of concerns allows the store team to
+manage their own [traffic splitting rollout](traffic-splitting.md) while
+leaving centralized policies and control to the cluster operators.
+
+![Gateway API Roles](./images/gateway-roles.png)
+
+This flexibility allows the API to adapt to different vastly different
+organizational models and implementations while remaining a portable and
+standard API.
+
+
+## Who is working on Gateway?
+
+The Gateway API is a
+[SIG-Network](https://github.com/kubernetes/community/tree/master/sig-network)
+project being built to improve and standardize service networking in
+Kubernetes. Current and in-progress implementations include Contour, Google
+Kubernetes Engine (GKE), Istio, Kong, and Traefik. Check out the
+[implementations reference](implementations.md) to see the latest projects &
+products that support Gateway. If you are interested in contributing to or
+building an implementation using the Gateway API then don’t hesitate to [get
+involved!](community.md)
 
 [sig-network]: https://github.com/kubernetes/community/tree/master/sig-network
 
-## Where to get started
 
-To get started, please read through [API overview](api-overview.md). These
-documents give the necessary background to understand the API and the use-cases
-it targets. Once you have a good understanding of the API at a higher-level,
-please follow one of our [guides](guides.md) to dive deeper into different parts
-of the API.
-
-For a complete API reference, please refer to:
-
-- [API reference](spec.md)
-- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1)
-
-## How to get involved
-
-This project has many contributors, and we welcome anybody and everybody to get
-involved. Join our weekly meetings, file issues, or ask questions in Slack. No
-contribution is too small - even opinions matter!
-
-- [Weekly meeting schedule](community.md#meetings)
-- [Gateway API Slack](https://kubernetes.slack.com/messages/sig-network-gateway-api)
-- [Enhancement requests](enhancement-requests.md)
-- [Project owners](https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/master/OWNERS)
