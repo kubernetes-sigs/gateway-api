@@ -11,7 +11,7 @@ the specification and Custom Resource Definitions (CRDs).
 ### Website
 
 The API specification and detailed documentation is available on the project
-website: [https://kubernetes-sigs.github.io/gateway-api][ghp].
+website: [https://gateway-api.sigs.k8s.io][ghp].
 
 ### Get started
 
@@ -48,12 +48,12 @@ Our Kubernetes Slack channel is [#sig-network-gateway-api][slack].
 Participation in the Kubernetes community is governed by the
 [Kubernetes Code of Conduct](code-of-conduct.md).
 
-[ghp]: https://kubernetes-sigs.github.io/gateway-api/
+[ghp]: https://gateway-api.sigs.k8s.io/
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
-[cm]: https://kubernetes-sigs.github.io/gateway-api/community
+[cm]: https://gateway-api.sigs.k8s.io/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
-[guides]: https://kubernetes-sigs.github.io/gateway-api/guides
-[spec]: https://kubernetes-sigs.github.io/gateway-api/spec
-[concepts]: https://kubernetes-sigs.github.io/gateway-api/api-overview
-[security-model]: https://kubernetes-sigs.github.io/gateway-api/security-model
+[guides]: https://gateway-api.sigs.k8s.io/guides
+[spec]: https://gateway-api.sigs.k8s.io/spec
+[concepts]: https://gateway-api.sigs.k8s.io/api-overview
+[security-model]: https://gateway-api.sigs.k8s.io/security-model
 

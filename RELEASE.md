@@ -12,7 +12,7 @@ This repository is the home for both of the above components.
 The versioning strategy for this project is covered in detail in [the release
 documentation].
 
-[the release documentation]: https://kubernetes-sigs.github.io/gateway-api/releases/#versioning
+[the release documentation]: https://gateway-api.sigs.k8s.io/releases/#versioning
 
 ## Releasing a new version
 

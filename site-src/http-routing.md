@@ -32,7 +32,7 @@ bound to each other by their respective owners.
 ```
 
 An HTTPRoute can match against a [single set of
-hostnames](https://kubernetes-sigs.github.io/gateway-api/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec).
+hostnames](https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec).
 These hostnames are matched before any other matching within the HTTPRoute takes
 place. Since `foo.example.com` and `bar.example.com` are separate hosts with
 different routing requirements, each is deployed as its own HTTPRoute -
