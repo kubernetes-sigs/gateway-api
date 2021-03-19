@@ -10,6 +10,8 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: Gateway
     listKind: GatewayList
     plural: gateways
@@ -22,6 +24,9 @@ spec:
     - jsonPath: .spec.gatewayClassName
       name: Class
       type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:

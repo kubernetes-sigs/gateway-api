@@ -10,6 +10,8 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: BackendPolicy
     listKind: BackendPolicyList
     plural: backendpolicies
@@ -18,7 +20,11 @@ spec:
     singular: backendpolicy
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: BackendPolicy defines policies associated with backends. For the purpose of this API, a backend is defined as any resource that a route can forward traffic to. A common example of a backend is a Service. Configuration that is implementation specific may be represented with similar implementation specific custom resources.

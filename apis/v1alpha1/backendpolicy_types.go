@@ -22,8 +22,9 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:shortName=bp
+// +kubebuilder:resource:categories=gateway-api,shortName=bp
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // BackendPolicy defines policies associated with backends. For the purpose of
 // this API, a backend is defined as any resource that a route can forward

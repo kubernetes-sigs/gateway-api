@@ -23,9 +23,10 @@ import (
 // +genclient
 // +genclient:nonNamespaced
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:scope=Cluster,shortName=gc
+// +kubebuilder:resource:categories=gateway-api,scope=Cluster,shortName=gc
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Controller",type=string,JSONPath=`.spec.controller`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // GatewayClass describes a class of Gateways available to the user
 // for creating Gateway resources.

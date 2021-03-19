@@ -22,7 +22,9 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // The TLSRoute resource is similar to TCPRoute, but can be configured
 // to match against TLS-specific metadata. This allows more flexibility
