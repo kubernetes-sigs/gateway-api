@@ -398,11 +398,9 @@ spec:
                                 - ImplementationSpecific
                                 type: string
                               value:
+                                default: /
                                 description: Value of the HTTP path to match against.
-                                minLength: 1
                                 type: string
-                            required:
-                            - value
                             type: object
                         type: object
                       maxItems: 8
