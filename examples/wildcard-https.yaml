@@ -16,7 +16,7 @@ spec:
       certificateRef:
         name: example-wildcard
         kind: Secret
-        group: "" 
+        group: ""
     routes:
       kind: HTTPRoute
       selector:

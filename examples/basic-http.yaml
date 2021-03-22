@@ -20,6 +20,7 @@ spec:
     port: 80
     routes:
       kind: HTTPRoute
+      group: networking.x-k8s.io
       selector:
         matchLabels:
           app: foo

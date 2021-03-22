@@ -23,7 +23,7 @@ spec:
     tls:
       certificateRef:
         kind: Secret
-        group: "" 
+        group: ""
         name: wildcard-example-com-cert
       routeOverride:
         certificate: Deny
