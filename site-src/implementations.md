@@ -41,10 +41,10 @@ Note that not all of the `v0.2.0` specification is completed yet, [contributions
 
 ### Gloo Edge
 
-Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that brings [Gloo Edge](ge) functionality to Istio. The [Solo.io](solo) team is actively working towards an implementation of the Gateway API.
+Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that brings [Gloo Edge][glooedge] functionality to Istio. The [Solo.io][solo] team is actively working towards an implementation of the Gateway API.
 
-[ge]: https://docs.solo.io/gloo-edge/
-[solo]: https://www.solo.io
+[glooedge]:https://docs.solo.io/gloo-edge/
+[solo]:https://www.solo.io
 
 ### Google Kubernetes Engine
 
