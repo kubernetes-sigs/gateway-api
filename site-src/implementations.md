@@ -7,16 +7,18 @@ Implementors of Gateway API are encouraged to update this document with status i
 ## Implementation Status
 
 - [Contour][1] (alpha)
-- [Google Kubernetes Engine][2] (work in progress)
-- [Istio][3] (alpha)
-- [Kong][4] (work in progress)
-- [Traefik][5] (alpha)
+- [Gloo Edge 2.0][2] (work in progress)
+- [Google Kubernetes Engine][3] (work in progress)
+- [Istio][4] (alpha)
+- [Kong][5] (work in progress)
+- [Traefik][6] (alpha)
 
 [1]:#contour
-[2]:#google-cloud-platform
-[3]:#istio
-[4]:#kong
-[5]:#traefik
+[2]:#gloo-edge
+[3]:#google-cloud-platform
+[4]:#istio
+[5]:#kong
+[6]:#traefik
 
 ## Project References
 
@@ -36,6 +38,13 @@ Note that not all of the `v0.2.0` specification is completed yet, [contributions
 [latest]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 [contour-1]:https://projectcontour.io/guides/gateway-api/
 [contour-2]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
+
+### Gloo Edge
+
+Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that brings [Gloo Edge][glooedge] functionality to Istio. The [Solo.io][solo] team is actively working towards an implementation of the Gateway API.
+
+[glooedge]:https://docs.solo.io/gloo-edge/
+[solo]:https://www.solo.io
 
 ### Google Kubernetes Engine
 
