@@ -118,14 +118,16 @@ type HTTPRouteSpec struct {
 
 // RouteTLSConfig describes a TLS configuration defined at the Route level.
 type RouteTLSConfig struct {
-	// CertificateRef refers to a Kubernetes object that
-	// contains a TLS certificate and private key.
-	// This certificate MUST be used for TLS handshakes for the domain
-	// this RouteTLSConfig is associated with.
-	// If an entry in this list omits or specifies the empty
-	// string for both the group and kind, the resource defaults to "secrets".
-	// An implementation may support other resources (for example, resource
-	// "mycertificates" in group "networking.acme.io").
+	// CertificateRef is a reference to a Kubernetes object that contains a TLS
+	// certificate and private key. This certificate is used to establish a TLS
+	// handshake for requests that match the hostname of the associated HTTPRoute.
+	// The referenced object MUST reside in the same namespace as HTTPRoute.
+	//
+	// This field is required when the TLS configuration mode of the associated
+	// Gateway listener is set to "Passthrough".
+	//
+	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
+	// or an implementation-specific custom resource.
 	//
 	// Support: Core (Kubernetes Secrets)
 	//
