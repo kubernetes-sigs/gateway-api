@@ -59,13 +59,13 @@ The GKE Gateway Controller will become a managed component of GKE to automate an
 
 ### Istio
 
-[Istio][istio] is an open source [service mesh][mesh] for Kubernetes clusters.
+[Istio][istio] is an open source [service mesh][mesh].
 
 Istio is actively working towards an implementation of the Gateway API and you can use the [Istio Gateway API Documentation][istio-1] to deploy the Istio Gateway API in it's current state.
 
 [istio]:https://istio.io
 [mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
-[istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/service-apis/
+[istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
 ### Kong
 
