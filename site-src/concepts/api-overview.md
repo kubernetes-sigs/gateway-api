@@ -12,7 +12,7 @@ There are 3 primary roles in Gateway API:
 
 There could be a fourth role of Application Admin in some use cases.
 
-Please refer to the [roles and personas](security-model.md#roles-and-personas)
+Please refer to the [roles and personas](/concepts/security-model.md#roles-and-personas)
 section in the Security model for details.
 
 ## Resource model
@@ -118,7 +118,7 @@ are exposed and on which Gateways. Consider the following example:
 > Namespace.
 
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
-![route binding](images/gateway-route-binding.png)
+![route binding](/images/gateway-route-binding.png)
 
 There is a lot of flexibility in how Routes can bind to Gateways to achieve
 different organizational policies and scopes of responsibility. These are
@@ -231,7 +231,7 @@ define an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:
 
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
-![schema](images/schema-uml.svg)
+![schema](/images/schema-uml.svg)
 
 ## Request flow
 
@@ -255,7 +255,7 @@ reverse proxy is:
 TLS is configured on Gateway listeners. Additionally, TLS certificates
 can be configured on route objects for certain self-service use cases.
 
-Please refer to [TLS details](tls.md) for a deep dive on TLS.
+Please refer to [TLS details](/guides/tls.md) for a deep dive on TLS.
 
 
 ## Extension points

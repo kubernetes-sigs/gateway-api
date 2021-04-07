@@ -1,6 +1,6 @@
 # HTTP traffic splitting
 
-The [HTTPRoute resource](httproute.md) allows you to specify weights to shift
+The [HTTPRoute resource](/api-types/httproute.md) allows you to specify weights to shift
 traffic between different backends. This is useful for splitting traffic during
 rollouts, canarying changes, or for emergencies. The HTTPRoute
 `spec.rules.forwardTo` accepts a list of backends that a route rule will send
@@ -9,7 +9,7 @@ between them. The following YAML snippet shows how two Services are listed as
 backends for a single route rule. This route rule will split traffic 90% to
 `foo-v1` and 10% to `foo-v2`.
 
-![Traffic splitting](./images/simple-split.png)
+![Traffic splitting](/images/simple-split.png)
 
 ```yaml
 {% include 'traffic-splitting/simple-split.yaml' %}  
@@ -45,7 +45,7 @@ precedence](spec.md#networking.x-k8s.io/v1alpha1.HTTPRouteRule) ensures that
 all traffic with the matching host and header (the most specific match) will
 be sent to `foo-v2`.
 
-![Traffic splitting](./images/traffic-splitting-1.png)
+![Traffic splitting](/images/traffic-splitting-1.png)
 
 
 ```yaml
@@ -61,7 +61,7 @@ as a backend along with weights. The weights add up to a total of 100 so
 `foo-v1` recieves 90/100=90% of the traffic and `foo-v2` recieves
 10/100=10% of the traffic.
 
-![Traffic splitting](./images/traffic-splitting-2.png)
+![Traffic splitting](/images/traffic-splitting-2.png)
 
 
 ```yaml
@@ -74,7 +74,7 @@ Finally, if all signals are positive, it is time to fully shift traffic to
 `foo-v2` and complete the rollout. The weight for `foo-v1` is set to
 `0` so that it is configured to accept zero traffic. 
 
-![Traffic splitting](./images/traffic-splitting-3.png)
+![Traffic splitting](/images/traffic-splitting-3.png)
 
 
 ```yaml

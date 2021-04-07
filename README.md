@@ -50,10 +50,10 @@ Participation in the Kubernetes community is governed by the
 
 [ghp]: https://gateway-api.sigs.k8s.io/
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
-[cm]: https://gateway-api.sigs.k8s.io/community
+[cm]: https://gateway-api.sigs.k8s.io/contributing/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
 [guides]: https://gateway-api.sigs.k8s.io/guides
-[spec]: https://gateway-api.sigs.k8s.io/spec
-[concepts]: https://gateway-api.sigs.k8s.io/api-overview
-[security-model]: https://gateway-api.sigs.k8s.io/security-model
+[spec]: https://gateway-api.sigs.k8s.io/references/spec
+[concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
+[security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
 
