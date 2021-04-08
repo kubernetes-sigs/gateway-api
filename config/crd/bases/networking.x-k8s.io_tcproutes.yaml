@@ -10,13 +10,19 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: TCPRoute
     listKind: TCPRouteList
     plural: tcproutes
     singular: tcproute
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: TCPRoute is the Schema for the TCPRoute resource.

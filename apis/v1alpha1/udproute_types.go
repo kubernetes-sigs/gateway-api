@@ -22,7 +22,9 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.
 type UDPRoute struct {

@@ -10,6 +10,8 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: HTTPRoute
     listKind: HTTPRouteList
     plural: httproutes
@@ -20,6 +22,9 @@ spec:
     - jsonPath: .spec.hostnames
       name: Hostnames
       type: string
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
     name: v1alpha1
     schema:
       openAPIV3Schema:

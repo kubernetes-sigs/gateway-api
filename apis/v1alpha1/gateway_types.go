@@ -22,9 +22,10 @@ import (
 
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:shortName=gtw
+// +kubebuilder:resource:categories=gateway-api,shortName=gtw
 // +kubebuilder:subresource:status
 // +kubebuilder:printcolumn:name="Class",type=string,JSONPath=`.spec.gatewayClassName`
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Gateway represents an instantiation of a service-traffic handling
 // infrastructure by binding Listeners to a set of IP addresses.

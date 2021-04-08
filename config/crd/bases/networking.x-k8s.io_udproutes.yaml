@@ -10,13 +10,19 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: UDPRoute
     listKind: UDPRouteList
     plural: udproutes
     singular: udproute
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.

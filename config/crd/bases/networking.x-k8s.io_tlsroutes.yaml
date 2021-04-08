@@ -10,13 +10,19 @@ metadata:
 spec:
   group: networking.x-k8s.io
   names:
+    categories:
+    - gateway-api
     kind: TLSRoute
     listKind: TLSRouteList
     plural: tlsroutes
     singular: tlsroute
   scope: Namespaced
   versions:
-  - name: v1alpha1
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
     schema:
       openAPIV3Schema:
         description: "The TLSRoute resource is similar to TCPRoute, but can be configured to match against TLS-specific metadata. This allows more flexibility in matching streams for a given TLS listener. \n If you need to forward traffic to a single target for a TLS listener, you could choose to use a TCPRoute with a TLS listener."
