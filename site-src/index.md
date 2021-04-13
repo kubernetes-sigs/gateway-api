@@ -18,11 +18,11 @@ Whether you are a user interested in using the Gateway API or an implementer
 interested in conforming to the API, the following resources will help give 
 you the necessary background:
 
-- [API overview](api-overview.md) 
-- [User guides](getting-started.md) 
-- [Gateway controller implementations](implementations.md) 
-- [API reference spec](spec.md) 
-- [Community links](community.md) and [developer guide](devguide.md)
+- [API overview](concepts/api-overview.md) 
+- [User guides](guides/getting-started.md) 
+- [Gateway controller implementations](references/implementations.md) 
+- [API reference spec](references/spec.md) 
+- [Community links](contributing/community.md) and [developer guide](contributing/devguide.md)
 
 
 ## Gateway API concepts
@@ -79,14 +79,14 @@ works in practice.
 A cluster operator creates a [Gateway](gateway.md) resource derived from a
 [GatewayClass](gatewayclass.md). This Gateway deploys or configures the
 underlying network resources that it represents. Through [Route binding
-policy](api-overview.md#route-binding) set on the Gateway, the operator
+policy](guides/api-overview.md#route-binding) set on the Gateway, the operator
 permits (or denies) specific teams to bind to this Gateway and expose their
 applications through it. Centralized policies [such as
-TLS](tls.md#downstream-tls) can be enforced on the Gateway by the cluster
+TLS](guides/tls.md#downstream-tls) can be enforced on the Gateway by the cluster
 operator. Meanwhile, the store and site teams run [in their own
-Namespaces](multiple-ns.md), but bind their Routes against the same shared
+Namespaces](guides/multiple-ns.md), but bind their Routes against the same shared
 Gateway, allowing them to independently control their [routing
-logic](http-routing.md). This separation of concerns allows the store team to
+logic](guides/http-routing.md). This separation of concerns allows the store team to
 manage their own [traffic splitting rollout](traffic-splitting.md) while
 leaving centralized policies and control to the cluster operators.
 
@@ -104,7 +104,7 @@ The Gateway API is a
 project being built to improve and standardize service networking in
 Kubernetes. Current and in-progress implementations include Contour, Google
 Kubernetes Engine (GKE), Istio, Kong, and Traefik. Check out the
-[implementations reference](implementations.md) to see the latest projects &
+[implementations reference](references/implementations.md) to see the latest projects &
 products that support Gateway. If you are interested in contributing to or
 building an implementation using the Gateway API then don’t hesitate to [get
 involved!](community.md)

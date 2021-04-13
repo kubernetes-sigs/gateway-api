@@ -46,7 +46,7 @@ traffic to two Kubernetes Services based on HTTP request metadata.
 {% include 'basic-http.yaml' %}
 ```
 
-For more advanced examples, please read the other [guides](guides.md).
+For more advanced examples, please read the other [guides](/guides/index.md).
 
 ## Uninstalling the CRDs
 

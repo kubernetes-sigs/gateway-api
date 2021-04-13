@@ -1,6 +1,6 @@
 # HTTP routing
 
-The [HTTPRoute resource](httproute.md) allows you to match on HTTP traffic and
+The [HTTPRoute resource](/api-types/httproute.md) allows you to match on HTTP traffic and
 direct it to Kubernetes backends. This guide shows how the HTTPRoute matches
 traffic on host, header, and path fields and forwards it to different
 Kubernetes Services.
@@ -13,7 +13,7 @@ Services:
 to `bar-svc-canary`
 - Traffic to `bar.example.com/*` without the header is forwarded to `bar-svc`
 
-![HTTP Routinng](./images/http-routing.png)
+![HTTP Routing](/images/http-routing.png)
 
 The dotted lines show the Gateway resources deployed to configure this routing
 behavior. There are two HTTPRoute resources that create routing rules on the
@@ -32,7 +32,7 @@ bound to each other by their respective owners.
 ```
 
 An HTTPRoute can match against a [single set of
-hostnames](https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec).
+hostnames](https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec).
 These hostnames are matched before any other matching within the HTTPRoute takes
 place. Since `foo.example.com` and `bar.example.com` are separate hosts with
 different routing requirements, each is deployed as its own HTTPRoute -

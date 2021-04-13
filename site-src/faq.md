@@ -37,7 +37,7 @@
         control policy. This is an example of matching the object by name.
 
         Gateway API uses this decorator pattern with the
-        [`BackendPolicy`](/spec/#networking.x-k8s.io/v1alpha1.BackendPolicy)
+        [`BackendPolicy`](/references/spec/#networking.x-k8s.io/v1alpha1.BackendPolicy)
         resource, which modifies how a `Gateway` should forward traffic
         to a backend target (commonly a Kubernetes `Service`). This is
         an example of using explicit object references.
@@ -53,7 +53,7 @@
       a proud tradition of extending Ingress objects.
 
     * Use API-defined extension points. Some Service
-      API objects have explicit [extension points](api-overview.md#extension-points)
+      API objects have explicit [extension points](/concepts/api-overview.md#extension-points)
       for implementations to use.
 
 *  **Q: Where can I find Gateway API releases?<br>**

@@ -135,5 +135,5 @@ acme.io/gateway/v2   // Use version 2
 acme.io/gateway      // Use the default version
 ```
 
-[gatewayclass]: https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.GatewayClass
+[gatewayclass]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.GatewayClass
 [ingress-class-api]: https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingressclass-resource

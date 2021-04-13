@@ -12,29 +12,29 @@ plugins:
 nav:
   - Introduction: index.md
   - Concepts:
-      API overview: api-overview.md
-      Security Model: security-model.md
-      Implementation Guidelines: guidelines.md
+      API overview: concepts/api-overview.md
+      Security Model: concepts/security-model.md
+      Implementation Guidelines: concepts/guidelines.md
   - API Types:
-      GatewayClass: gatewayclass.md
-      Gateway: gateway.md
-      HTTPRoute: httproute.md
+      GatewayClass: api-types/gatewayclass.md
+      Gateway: api-types/gateway.md
+      HTTPRoute: api-types/httproute.md
   - Guides:
-      - Introduction: guides.md
-      - Getting started: getting-started.md
-      - Simple Gateway: simple-gateway.md
-      - HTTP routing: http-routing.md
-      - HTTP traffic splitting: traffic-splitting.md
-      - Multiple namespaces and routes: multiple-ns.md
-      - TLS: tls.md
-      - TCP routing: tcp.md
+      - Introduction: guides/index.md
+      - Getting started: guides/getting-started.md
+      - Simple Gateway: guides/simple-gateway.md
+      - HTTP routing: guides/http-routing.md
+      - HTTP traffic splitting: guides/traffic-splitting.md
+      - Multiple namespaces and routes: guides/multiple-ns.md
+      - TLS: guides/tls.md
+      - TCP routing: guides/tcp.md
   - References:
-      - API specification: spec.md
-      - Releases: releases.md
-      - Implementations: implementations.md
+      - API specification: references/spec.md
+      - Releases: references/releases.md
+      - Implementations: references/implementations.md
   - Contributing:
-      - Developer guide: devguide.md
-      - Enhancement requests: enhancement-requests.md
-      - Community: community.md
+      - Developer guide: contributing/devguide.md
+      - Enhancement requests: contributing/enhancement-requests.md
+      - Community: contributing/community.md
   - FAQ: faq.md
 

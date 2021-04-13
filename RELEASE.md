@@ -23,6 +23,6 @@ documentation].
   be done using the `git` CLI or Github's [release][release]
   page. This step can be performed only by [Gateway API maintainers][gateway-api-team].
 
-[release]: https://github.com/kubernetes-sigs/gateway-api/releases
+[release]: https://gateway-api.sigs.k8s.io/references/releases/
 [gateway-api-team]: https://github.com/kubernetes/org/blob/master/config/kubernetes-sigs/sig-network/teams.yaml
 
