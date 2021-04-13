@@ -1,7 +1,7 @@
 # Frequently Asked Questions (FAQ)
 
 *   **Q: How can I get involved with Gateway API?<br>**
-    A: The [community](/community) page keeps track of how to get
+    A: The [community](/contributing/community) page keeps track of how to get
     involved with the project.
 
 *   **Q: Will Gateway API replace the Ingress API?<br>**
@@ -53,7 +53,7 @@
       a proud tradition of extending Ingress objects.
 
     * Use API-defined extension points. Some Service
-      API objects have explicit [extension points](/concepts/api-overview.md#extension-points)
+      API objects have explicit [extension points](/concepts/api-overview#extension-points)
       for implementations to use.
 
 *  **Q: Where can I find Gateway API releases?<br>**

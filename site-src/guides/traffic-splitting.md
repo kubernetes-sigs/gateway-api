@@ -41,7 +41,7 @@ production user traffic for `foo.example.com`. The following HTTPRoute has no
 recieve 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
 traffic before splitting any production user traffic to `foo-v2`. [Routing
-precedence](spec.md#networking.x-k8s.io/v1alpha1.HTTPRouteRule) ensures that
+precedence](/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule) ensures that
 all traffic with the matching host and header (the most specific match) will
 be sent to `foo-v2`.
 
