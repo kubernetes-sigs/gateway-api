@@ -76,18 +76,18 @@ used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators. The following example shows how this
 works in practice.
 
-A cluster operator creates a [Gateway](gateway.md) resource derived from a
-[GatewayClass](gatewayclass.md). This Gateway deploys or configures the
+A cluster operator creates a [Gateway](/api-types/gateway) resource derived from a
+[GatewayClass](/api-types/gatewayclass). This Gateway deploys or configures the
 underlying network resources that it represents. Through [Route binding
-policy](guides/api-overview.md#route-binding) set on the Gateway, the operator
+policy](/concepts/api-overview#route-binding) set on the Gateway, the operator
 permits (or denies) specific teams to bind to this Gateway and expose their
 applications through it. Centralized policies [such as
-TLS](guides/tls.md#downstream-tls) can be enforced on the Gateway by the cluster
+TLS](/guides/tls#downstream-tls) can be enforced on the Gateway by the cluster
 operator. Meanwhile, the store and site teams run [in their own
-Namespaces](guides/multiple-ns.md), but bind their Routes against the same shared
+Namespaces](/guides/multiple-ns), but bind their Routes against the same shared
 Gateway, allowing them to independently control their [routing
-logic](guides/http-routing.md). This separation of concerns allows the store team to
-manage their own [traffic splitting rollout](traffic-splitting.md) while
+logic](/guides/http-routing). This separation of concerns allows the store team to
+manage their own [traffic splitting rollout](/guides/traffic-splitting) while
 leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)
@@ -107,7 +107,7 @@ Kubernetes Engine (GKE), Istio, Kong, and Traefik. Check out the
 [implementations reference](references/implementations.md) to see the latest projects &
 products that support Gateway. If you are interested in contributing to or
 building an implementation using the Gateway API then don’t hesitate to [get
-involved!](community.md)
+involved!](/contributing/community)
 
 [sig-network]: https://github.com/kubernetes/community/tree/master/sig-network
 

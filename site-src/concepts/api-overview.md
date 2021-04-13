@@ -12,7 +12,7 @@ There are 3 primary roles in Gateway API:
 
 There could be a fourth role of Application Admin in some use cases.
 
-Please refer to the [roles and personas](/concepts/security-model.md#roles-and-personas)
+Please refer to the [roles and personas](/concepts/security-model#roles-and-personas)
 section in the Security model for details.
 
 ## Resource model
@@ -221,7 +221,7 @@ other.
 
 It may not always be apparent from the resource specifications which Gateways
 and Routes are bound, but binding can be determined from the resource status.
-The [Route status](httproute.md#routestatus) will list all of the Gateways that
+The [Route status](/api-types/httproute#routestatus) will list all of the Gateways that
 a Route is bound to and any relevant conditions for the binding.
 
 ### Combined types
@@ -255,7 +255,7 @@ reverse proxy is:
 TLS is configured on Gateway listeners. Additionally, TLS certificates
 can be configured on route objects for certain self-service use cases.
 
-Please refer to [TLS details](/guides/tls.md) for a deep dive on TLS.
+Please refer to [TLS details](/guides/tls) for a deep dive on TLS.
 
 
 ## Extension points

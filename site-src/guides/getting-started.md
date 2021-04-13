@@ -14,7 +14,7 @@ kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.2.0"
 
 ## Install an implementation
 
-[Multiple projects](implementations.md) implement the APIs defined by this
+[Multiple projects](/references/implementations) implement the APIs defined by this
 project.  You will need to either install an implementation or verify that one
 is already setup for your cluster.
 
@@ -46,7 +46,7 @@ traffic to two Kubernetes Services based on HTTP request metadata.
 {% include 'basic-http.yaml' %}
 ```
 
-For more advanced examples, please read the other [guides](/guides/index.md).
+For more advanced examples, please read the other [guides](/guides/).
 
 ## Uninstalling the CRDs
 
