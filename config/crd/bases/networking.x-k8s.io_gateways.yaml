@@ -86,8 +86,12 @@ spec:
                 maxItems: 16
                 type: array
               gatewayClassName:
-                description: GatewayClassName used for this Gateway. This is the name
-                  of a GatewayClass resource.
+                description: "GatewayClassName used for this Gateway. This may refer
+                  to a GatewayClass resource by name. \n Implementations may also
+                  support using this field to specify a controller name directly without
+                  a corresponding GatewayClass resource. This is particularly useful
+                  for namespace-scoped implementations that may not have access to
+                  the cluster-scoped GatewayClass resource."
                 maxLength: 253
                 minLength: 1
                 type: string

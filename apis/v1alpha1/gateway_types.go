@@ -63,8 +63,13 @@ type GatewayList struct {
 // webhook, but there are many cases that will require asynchronous
 // signaling via the GatewayStatus block.
 type GatewaySpec struct {
-	// GatewayClassName used for this Gateway. This is the name of a
-	// GatewayClass resource.
+	// GatewayClassName used for this Gateway. This may refer to a GatewayClass
+	// resource by name.
+	//
+	// Implementations may also support using this field to specify a controller
+	// name directly without a corresponding GatewayClass resource. This is
+	// particularly useful for namespace-scoped implementations that may not
+	// have access to the cluster-scoped GatewayClass resource.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
