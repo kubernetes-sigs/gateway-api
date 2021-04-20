@@ -8,12 +8,12 @@ _THEN_
 
 **2.**   **Try out one of the available guides:**
 
-- [Simple Gateway](simple-gateway.md) (a good one to start out with)
-- [HTTP routing](http-routing.md)
-- [HTTP traffic splitting](traffic-splitting.md)
-- [Routing across Namespaces](multiple-ns.md)
-- [Configuring TLS](tls.md)
-- [TCP routing](tcp.md)
+- [Simple Gateway](/guides/simple-gateway) (a good one to start out with)
+- [HTTP routing](/guides/http-routing)
+- [HTTP traffic splitting](/guides/traffic-splitting)
+- [Routing across Namespaces](/guides/multiple-ns)
+- [Configuring TLS](/guides/tls)
+- [TCP routing](/guides/tcp)
 
 ## Installing a Gateway controller
 

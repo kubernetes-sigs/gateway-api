@@ -1,6 +1,6 @@
 # HTTP traffic splitting
 
-The [HTTPRoute resource](/api-types/httproute.md) allows you to specify weights to shift
+The [HTTPRoute resource](/api-types/httproute) allows you to specify weights to shift
 traffic between different backends. This is useful for splitting traffic during
 rollouts, canarying changes, or for emergencies. The HTTPRoute
 `spec.rules.forwardTo` accepts a list of backends that a route rule will send
