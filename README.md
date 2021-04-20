@@ -13,17 +13,17 @@ the specification and Custom Resource Definitions (CRDs).
 The API specification and detailed documentation is available on the project
 website: [https://gateway-api.sigs.k8s.io][ghp].
 
-### Get started
+### Concepts
 
 To get started, please read through [API concepts][concepts] and
 [Security model][security-model]. These documents give the necessary background
 to understand the API and the use-cases it targets.
 
-### Guides
+### Getting started
 
-Once you have a good understanding of the API at a higher-level, please
-follow one of our [guides][guides] to dive deeper into different parts of
-the API.
+Once you have a good understanding of the API at a higher-level, check out 
+[getting started][getting-started] to install your first Gateway controller and try out 
+one of the guides. 
 
 ### References
 
@@ -52,7 +52,7 @@ Participation in the Kubernetes community is governed by the
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
 [cm]: https://gateway-api.sigs.k8s.io/contributing/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
-[guides]: https://gateway-api.sigs.k8s.io/guides
+[getting-started]: https://gateway-api.sigs.k8s.io/guides/getting-started
 [spec]: https://gateway-api.sigs.k8s.io/references/spec
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model

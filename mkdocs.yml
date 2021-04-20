@@ -20,7 +20,6 @@ nav:
       Gateway: api-types/gateway.md
       HTTPRoute: api-types/httproute.md
   - Guides:
-      - Introduction: guides/index.md
       - Getting started: guides/getting-started.md
       - Simple Gateway: guides/simple-gateway.md
       - HTTP routing: guides/http-routing.md
