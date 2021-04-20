@@ -18,11 +18,11 @@ Whether you are a user interested in using the Gateway API or an implementer
 interested in conforming to the API, the following resources will help give 
 you the necessary background:
 
-- [API overview](concepts/api-overview.md) 
-- [User guides](guides/getting-started.md) 
-- [Gateway controller implementations](references/implementations.md) 
-- [API reference spec](references/spec.md) 
-- [Community links](contributing/community.md) and [developer guide](contributing/devguide.md)
+- [API overview](/concepts/api-overview)
+- [User guides](/guides/getting-started)
+- [Gateway controller implementations](/references/implementations)
+- [API reference spec](/references/spec)
+- [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 
 ## Gateway API concepts
