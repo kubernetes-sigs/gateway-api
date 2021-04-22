@@ -179,12 +179,17 @@ type HTTPRouteRule struct {
 	//
 	// * The longest matching hostname.
 	// * The longest matching path.
-	// * The largest number of header matches
+	// * The largest number of header matches.
+	//
+	// If ties still exist across multiple Routes:
 	// * The oldest Route based on creation timestamp. For example, a Route with
 	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
 	// * The Route appearing first in alphabetical order (namespace/name) for
 	//   example, foo/bar is given precedence over foo/baz.
+	//
+	// If ties still exist within the Route that has been given precedence:
+	// * The first matching rule meeting the above criteria.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
