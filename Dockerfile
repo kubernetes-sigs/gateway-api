@@ -16,11 +16,14 @@ FROM golang:1.16 AS build-env
 RUN mkdir -p /go/src/sig.k8s.io/gateway-api
 WORKDIR /go/src/sig.k8s.io/gateway-api
 COPY  . .
-RUN useradd -u 10001 webhook
-RUN cd cmd/admission/ && CGO_ENABLED=0 GOOS=linux go build -a -o gateway-api-webhook && chmod +x gateway-api-webhook
+ARG TAG
+ARG COMMIT
+RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -o gateway-api-webhook \
+      -ldflags "-s -w -X main.VERSION=$TAG -X main.COMMIT=$COMMIT" ./cmd/admission
 
-FROM scratch
-COPY --from=build-env /go/src/sig.k8s.io/gateway-api/cmd/admission/gateway-api-webhook .
-COPY --from=build-env /etc/passwd /etc/passwd
-USER webhook
+FROM gcr.io/distroless/static:nonroot
+WORKDIR /
+COPY --from=build-env /go/src/sig.k8s.io/gateway-api/gateway-api-webhook .
+# Use uid of nonroot user (65532) because kubernetes expects numeric user when applying pod security policies
+USER 65532
 ENTRYPOINT ["/gateway-api-webhook"]
