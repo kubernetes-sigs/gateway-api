@@ -142,9 +142,8 @@ type RouteTLSConfig struct {
 // conditions, optionally executing additional processing steps, and forwarding
 // the request to an API object.
 type HTTPRouteRule struct {
-	// Matches define conditions used for matching the rule against
-	// incoming HTTP requests.
-	// Each match is independent, i.e. this rule will be matched
+	// Matches define conditions used for matching the rule against incoming
+	// HTTP requests. Each match is independent, i.e. this rule will be matched
 	// if **any** one of the matches is satisfied.
 	//
 	// For example, take the following matches configuration:
@@ -174,22 +173,27 @@ type HTTPRouteRule struct {
 	// HTTP request.
 	//
 	//
-	// A client request may match multiple HTTP route rules. Matching precedence
-	// MUST be determined in order of the following criteria, continuing on ties:
+	// Each client request MUST map to a maximum of one route rule. If a request
+	// matches multiple rules, matching precedence MUST be determined in order
+	// of the following criteria, continuing on ties:
 	//
 	// * The longest matching hostname.
 	// * The longest matching path.
 	// * The largest number of header matches.
 	//
-	// If ties still exist across multiple Routes:
+	// If ties still exist across multiple Routes, matching precedence MUST be
+	// determined in order of the following criteria, continuing on ties:
+	//
 	// * The oldest Route based on creation timestamp. For example, a Route with
 	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
-	// * The Route appearing first in alphabetical order (namespace/name) for
-	//   example, foo/bar is given precedence over foo/baz.
+	// * The Route appearing first in alphabetical order by
+	//   "<namespace>/<name>". For example, foo/bar is given precedence over
+	//   foo/baz.
 	//
-	// If ties still exist within the Route that has been given precedence:
-	// * The first matching rule meeting the above criteria.
+	// If ties still exist within the Route that has been given precedence,
+	// matching precedence MUST be granted to the first matching rule meeting
+	// the above criteria.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
