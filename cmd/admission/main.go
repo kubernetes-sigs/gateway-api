@@ -38,7 +38,10 @@ var (
 	showVersion, help               bool
 )
 
-const version = "0.0.1"
+var (
+	VERSION = "dev"
+	COMMIT  = "dev"
+)
 
 func main() {
 	flag.StringVar(&tlsCertFilePath, "tlsCertFile", "/etc/certs/tls.crt", "File with x509 certificate")
@@ -99,5 +102,5 @@ func main() {
 }
 
 func printVersion() {
-	fmt.Printf("gateway-api-admission-webhook version: %v\n", version)
+	fmt.Printf("gateway-api-admission-webhook version: %v (%v)\n", VERSION, COMMIT)
 }
