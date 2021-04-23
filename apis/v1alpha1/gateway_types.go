@@ -43,7 +43,7 @@ type Gateway struct {
 
 	// Status defines the current state of Gateway.
 	//
-	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "ValidReferences", status: "Unknown", reason:"NotValidated", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
@@ -555,7 +555,7 @@ type GatewayStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"},{type: "ValidReferences", status: "Unknown", reason:"NotValidated", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
@@ -584,7 +584,6 @@ const (
 	// Possible reasons for this condition to be false are:
 	//
 	// * "NotReconciled"
-	// * "NoSuchGatewayClass"
 	// * "NoResources"
 	//
 	// Controllers may raise this condition with other reasons,
@@ -595,13 +594,6 @@ const (
 	// This reason is used with the "Scheduled" condition when
 	// been recently created and no controller has reconciled it yet.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
-
-	// This reason is used with the "Scheduled" condition when the Gateway
-	// is not scheduled because there is no controller that recognizes
-	// the GatewayClassName. This reason should only be set by
-	// a controller that has cluster-wide visibility of all the
-	// installed GatewayClasses.
-	GatewayReasonNoSuchGatewayClass GatewayConditionReason = "NoSuchGatewayClass"
 
 	// This reason is used with the "Scheduled" condition when the
 	// Gateway is not scheduled because insufficient infrastructure
@@ -647,6 +639,32 @@ const (
 	// or unsupported address requests, or a named address not
 	// being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
+)
+
+const (
+	// This condition is true when resources referenced by this Gateway exist.
+	// This covers any direct references to resources in the Gateway, including
+	// GatewayClassName and CertificateRef. This does not include selector
+	// references. This does not reflect the validity of the referenced
+	// resources, simply if the referenced resources exist.
+	//
+	// Possible reasons for this condition to be "Unknown" include:
+	//
+	// * "NotValidated"
+	//
+	// Possible reasons for this condition to be "False" include:
+	//
+	// * "InvalidReference"
+	//
+	GatewayConditionValidReferences GatewayConditionType = "ValidReferences"
+
+	// This reason is used with the "ValidReference" condition when references
+	// have not yet been validated.
+	GatewayReasonNotValidated GatewayConditionReason = "NotValidated"
+
+	// This reason is used with the "ValidReference" condition when one or
+	// more references are invalid.
+	GatewayReasonInvalidReference GatewayConditionReason = "InvalidReference"
 )
 
 // ListenerStatus is the status associated with a Listener.
