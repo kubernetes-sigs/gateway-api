@@ -180,7 +180,7 @@ const (
 type RouteGatewayStatus struct {
 	// GatewayRef is a reference to a Gateway object that is associated with
 	// the route.
-	GatewayRef GatewayReference `json:"gatewayRef"`
+	GatewayRef RouteStatusGatewayReference `json:"gatewayRef"`
 
 	// Conditions describes the status of the route with respect to the
 	// Gateway. The "Admitted" condition must always be specified by controllers
@@ -192,6 +192,37 @@ type RouteGatewayStatus struct {
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+
+// RouteStatusGatewayReference identifies a Gateway in a specified namespace.
+// This reference also includes a controller name to simplify cleaning up status
+// entries.
+type RouteStatusGatewayReference struct {
+	// Name is the name of the referent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// Namespace is the namespace of the referent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Namespace string `json:"namespace"`
+
+	// Controller is a domain/path string that indicates the controller
+	// implementing the Gateway. This corresponds with the controller field on
+	// GatewayClass.
+	//
+	// Example: "acme.io/gateway-controller".
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+	// valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	Controller *string `json:"controller"`
 }
 
 // RouteStatus defines the observed state that is required across

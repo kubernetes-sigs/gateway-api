@@ -887,6 +887,15 @@ spec:
                       description: GatewayRef is a reference to a Gateway object that
                         is associated with the route.
                       properties:
+                        controller:
+                          description: "Controller is a domain/path string that indicates
+                            the controller implementing the Gateway. This corresponds
+                            with the controller field on GatewayClass. \n Example:
+                            \"acme.io/gateway-controller\". \n The format of this
+                            field is DOMAIN \"/\" PATH, where DOMAIN and PATH are
+                            valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
+                          maxLength: 253
+                          type: string
                         name:
                           description: Name is the name of the referent.
                           maxLength: 253
