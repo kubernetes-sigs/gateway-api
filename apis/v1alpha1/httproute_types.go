@@ -270,6 +270,23 @@ const (
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
 )
 
+// QueryParamMatchType specifies the semantics of how HTTP query parameter
+// values should be compared. Valid QueryParamMatchType values are:
+//
+// * "Exact"
+// * "RegularExpression"
+// * "ImplementationSpecific"
+//
+// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
+type QueryParamMatchType string
+
+// QueryParamMatchType constants.
+const (
+	QueryParamMatchExact                  QueryParamMatchType = "Exact"
+	QueryParamMatchRegularExpression      QueryParamMatchType = "RegularExpression"
+	QueryParamMatchImplementationSpecific QueryParamMatchType = "ImplementationSpecific"
+)
+
 // HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
@@ -326,6 +343,38 @@ type HTTPHeaderMatch struct {
 	Values map[string]string `json:"values"`
 }
 
+// HTTPQueryParamMatch describes how to select a HTTP route by matching HTTP
+// query parameters.
+type HTTPQueryParamMatch struct {
+	// Type specifies how to match against the value of the query parameter.
+	//
+	// Support: Extended (Exact)
+	//
+	// Support: Custom (RegularExpression, ImplementationSpecific)
+	//
+	// Since RegularExpression QueryParamMatchType has custom conformance,
+	// implementations can support POSIX, PCRE or any other dialects of regular
+	// expressions. Please read the implementation's documentation to determine
+	// the supported dialect.
+	//
+	// HTTP query parameter matching MUST be case-sensitive for both keys and
+	// values.
+	//
+	// +optional
+	// +kubebuilder:default=Exact
+	Type *QueryParamMatchType `json:"type,omitempty"`
+
+	// Values is a map of HTTP query parameters to be matched. It MUST contain
+	// at least one entry.
+	//
+	// The query parameter name to match is the map key, and the value of the
+	// query parameter is the map value.
+	//
+	// Multiple match values are ANDed together, meaning, a request must match
+	// all the specified query parameters to select the route.
+	Values map[string]string `json:"values"`
+}
+
 // HTTPRouteMatch defines the predicate used to match requests to a given
 // action. Multiple match types are ANDed together, i.e. the match will
 // evaluate to true only if all conditions are satisfied.
@@ -353,6 +402,11 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	Headers *HTTPHeaderMatch `json:"headers,omitempty"`
+
+	// QueryParams specifies a HTTP query parameter matcher.
+	//
+	// +optional
+	QueryParams *HTTPQueryParamMatch `json:"queryParams,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
