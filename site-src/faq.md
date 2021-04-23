@@ -13,7 +13,7 @@
     A: Ingress primarily targets exposing HTTP applications with a
     simple, declarative syntax. Gateway API exposes a more general API
     for proxying that can be used for more protocols than just HTTP,
-    and models more infrastucture components to provide better
+    and models more infrastructure components to provide better
     deployment and management options for cluster operators.
 
 *   **Q: Will there be a default controller implementation (in this repo)?<br>**
