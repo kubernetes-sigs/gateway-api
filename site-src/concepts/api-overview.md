@@ -43,7 +43,7 @@ controller that implements the Gateway API does so by providing an associated
 GatewayClass resource that the user can reference from their Gateway(s).
 
 This is similar to
-[IngressClass](https://github.com/kubernetes/enhancements/blob/master/keps/sig-network/20190125-ingress-api-group.md#ingress-class)
+[IngressClass](https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/758-ingress-api-group#ingress-class)
 for Ingress and
 [StorageClass](https://kubernetes.io/docs/concepts/storage/storage-classes/) for
 PersistentVolumes. In Ingress v1beta1, the closest analog to GatewayClass is the
