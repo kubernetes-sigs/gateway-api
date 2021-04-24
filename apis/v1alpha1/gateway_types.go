@@ -235,22 +235,23 @@ type Listener struct {
 	// Support: Core
 	Routes RouteBindingSelector `json:"routes"`
 
-	// BackendRef is a local object reference to route requests to.
+	// RouteTo defines how to route requests directly to a backend without
+	// creating an xRoute resource.
 	//
 	// If the referent cannot be found, the controller should raise
 	// the "ResolvedRefs" condition on the Gateway with the "DegradedListeners"
 	// reason. The gateway status should be updated with a condition
 	// that describes the error more specifically.
 	//
-	// Support: Custom
+	// Support: Extended
 	//
 	// +optional
-	BackendRef *GatewayBackendRef `json:"backendRef,omitempty"`
+	RouteTo *ListenerRouteTo `json:"routeTo,omitempty"`
 }
 
-// GatewayBackendRef defines how a Listener can forward traffic to
-// a backendRef directly.
-type GatewayBackendRef struct {
+// ListenerRouteTo defines how a Listener can forward traffic to
+// a service name & port directly.
+type ListenerRouteTo struct {
 	// ServiceName refers to the name of the Service route requests to.
 	//
 	// If the referent cannot be found, the controller should raise
@@ -260,15 +261,12 @@ type GatewayBackendRef struct {
 	//
 	// Support: Core
 	//
-	// +optional
 	// +kubebuilder:validation:MaxLength=253
-	ServiceName *string `json:"serviceName,omitempty"`
+	ServiceName string `json:"serviceName"`
 
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName.
-	//
-	// +optional
-	Port *PortNumber `json:"port,omitempty"`
+	Port PortNumber `json:"port"`
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
