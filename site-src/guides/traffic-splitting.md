@@ -84,4 +84,4 @@ Finally, if all signals are positive, it is time to fully shift traffic to
 At this point 100% of the traffic is being routed to `foo-v2` and the
 rollout is complete. If for any reason `foo-v2` experiences errors, the
 weights can be updated to quickly shift traffic back to `foo-v1`. Once
-the rollout is deemed final, v1 can be fully decomissioned.
+the rollout is deemed final, v1 can be fully decommissioned.
