@@ -24,7 +24,7 @@ configuration is actually being implemented by your Gateway resources (and the
 network infrastructure that your Gateway resources represent). Note that many 
 of the Gateway controller setups will install and remove the Gateway API CRDs 
 for you.
-f
+
 ## Installing Gateway API CRDs manually
 
 The following command will install the Gateway API CRDs. This includes the
