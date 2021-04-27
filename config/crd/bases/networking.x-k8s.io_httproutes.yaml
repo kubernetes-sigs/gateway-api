@@ -726,6 +726,41 @@ spec:
                                 description: Value of the HTTP path to match against.
                                 type: string
                             type: object
+                          queryParams:
+                            description: QueryParams specifies a HTTP query parameter
+                              matcher.
+                            properties:
+                              type:
+                                default: Exact
+                                description: "Type specifies how to match against
+                                  the value of the query parameter. \n Support: Extended
+                                  (Exact) \n Support: Custom (RegularExpression, ImplementationSpecific)
+                                  \n Since RegularExpression QueryParamMatchType has
+                                  custom conformance, implementations can support
+                                  POSIX, PCRE or any other dialects of regular expressions.
+                                  Please read the implementation's documentation to
+                                  determine the supported dialect. \n HTTP query parameter
+                                  matching MUST be case-sensitive for both keys and
+                                  values."
+                                enum:
+                                - Exact
+                                - RegularExpression
+                                - ImplementationSpecific
+                                type: string
+                              values:
+                                additionalProperties:
+                                  type: string
+                                description: "Values is a map of HTTP query parameters
+                                  to be matched. It MUST contain at least one entry.
+                                  \n The query parameter name to match is the map
+                                  key, and the value of the query parameter is the
+                                  map value. \n Multiple match values are ANDed together,
+                                  meaning, a request must match all the specified
+                                  query parameters to select the route."
+                                type: object
+                            required:
+                            - values
+                            type: object
                         type: object
                       maxItems: 8
                       type: array

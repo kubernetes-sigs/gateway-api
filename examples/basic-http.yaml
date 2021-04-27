@@ -48,6 +48,10 @@ spec:
         type: Exact
         values:
           magic: foo
+      queryParams:
+        type: Exact
+        values:
+          great: example
       path:
         type: Prefix
         value: /some/thing
