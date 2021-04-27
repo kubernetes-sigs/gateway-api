@@ -80,7 +80,7 @@ before an HTTP request is sent from the client.
 [TLS Certificate in Route](#tls-certificate-in-route) provides an example
 of how this feature can be used.
 
-Also, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) is dependant on the protocol on the listener level. Listener Protocol `HTTPS` or `HTTP` allowes to bind against `HTTPRoute` as the TLS Termination is done at the listener level and thus, only http information are used for routing.
+Also, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) is dependant on the protocol on the listener level. Listener Protocol `HTTPS` or `HTTP` allows to bind against `HTTPRoute` as the TLS Termination is done at the listener level and thus, only http information are used for routing.
 
 For `TLSRoute`, its allowed to bind against `TCP` and `TLS` depending on the mode. If the mode is `Terminate`, plain `TCP` routing is possible. If its `TLS`, its also possible to forward all TLS information for `TLS` Routing.
 
