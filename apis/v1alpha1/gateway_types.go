@@ -596,11 +596,11 @@ const (
 	// been recently created and no controller has reconciled it yet.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
-	// This reason is used with the "Scheduled" condition when the Gateway
-	// is not scheduled because there is no controller that recognizes
-	// the GatewayClassName. This reason should only be set by
-	// a controller that has cluster-wide visibility of all the
-	// installed GatewayClasses.
+	// This reason is used with the "Scheduled" condition when the Gateway is
+	// not scheduled because there is no controller that recognizes the
+	// GatewayClassName. This reason has been deprecated and will be removed in
+	// a future release.
+	// +deprecated
 	GatewayReasonNoSuchGatewayClass GatewayConditionReason = "NoSuchGatewayClass"
 
 	// This reason is used with the "Scheduled" condition when the
