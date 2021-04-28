@@ -357,9 +357,6 @@ type HTTPQueryParamMatch struct {
 	// expressions. Please read the implementation's documentation to determine
 	// the supported dialect.
 	//
-	// HTTP query parameter matching MUST be case-sensitive for both keys and
-	// values.
-	//
 	// +optional
 	// +kubebuilder:default=Exact
 	Type *QueryParamMatchType `json:"type,omitempty"`
@@ -372,6 +369,12 @@ type HTTPQueryParamMatch struct {
 	//
 	// Multiple match values are ANDed together, meaning, a request must match
 	// all the specified query parameters to select the route.
+	//
+	// HTTP query parameter matching MUST be case-sensitive for both keys and
+	// values. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
+	//
+	// Note that the query parameter key MUST always be an exact match by string
+	// comparison.
 	Values map[string]string `json:"values"`
 }
 
