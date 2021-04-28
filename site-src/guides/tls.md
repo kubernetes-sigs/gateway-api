@@ -17,6 +17,14 @@ For Gateways, there are two connections involved:
 With Gateway API, TLS configuration of downstream and
 upstream connections is managed independently.
 
+Depending on the Listener Protocol, different TLS modes and Route types are supported.
+
+Listener Protocol | TLS Mode | Route Type Supported
+--- | --- | ---
+TLS | Passthrough | TLSRoute
+TLS | Terminate | TCPRoute
+HTTPS | Terminate | HTTPRoute
+
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway.
 The rest of the document assumes that TLS is being terminated at the Gateway,
@@ -59,9 +67,6 @@ centralizes TLS configuration within the Gateway specification and should
 suffice for the majority of use-cases. Please take a look at the examples below
 for various alternatives.
 
-If the protocol is `HTTPS`, the allowed mode is `Terminate` to terminate TLS on the listener level.
-If you choose to use the protocol `TLS`, its allowed to use `Passthrough` on the mode. That will be forward the plain TLS information to the route.
-
 ### Routes and TLS
 
 If `listeners[].tls.routeOverride.certificate` is set to `Allow`, TLS certificates
@@ -80,7 +85,7 @@ before an HTTP request is sent from the client.
 [TLS Certificate in Route](#tls-certificate-in-route) provides an example
 of how this feature can be used.
 
-Also, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) is dependant on the protocol on the listener level. Listener Protocol `HTTPS` or `HTTP` allows to bind against `HTTPRoute` as the TLS Termination is done at the listener level and thus, only http information are used for routing.
+Also, as mentioned above, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) is dependant on the protocol on the listener level. Listener Protocol `HTTPS` or `HTTP` allows to bind against `HTTPRoute` as the TLS Termination is done at the listener level and thus, only http information are used for routing.
 
 For `TLSRoute`, its allowed to bind against `TCP` and `TLS` depending on the mode. If the mode is `Terminate`, plain `TCP` routing is possible. If its `TLS`, its also possible to forward all TLS information for `TLS` Routing.
 
