@@ -17,6 +17,14 @@ For Gateways, there are two connections involved:
 With Gateway API, TLS configuration of downstream and
 upstream connections is managed independently.
 
+Depending on the Listener Protocol, different TLS modes and Route types are supported.
+
+Listener Protocol | TLS Mode | Route Type Supported
+--- | --- | ---
+TLS | Passthrough | TLSRoute
+TLS | Terminate | TCPRoute
+HTTPS | Terminate | HTTPRoute
+
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway.
 The rest of the document assumes that TLS is being terminated at the Gateway,
@@ -42,7 +50,7 @@ listeners:
 - protocol: HTTPS # Other possible value is `TLS`
   port: 443
   tls:
-    mode: Terminate
+    mode: Terminate # If protocol is `TLS`, `Passthrough` is a possible mode
     certificateRef:
       kind: Secret
       group: core
@@ -76,6 +84,15 @@ before an HTTP request is sent from the client.
 
 [TLS Certificate in Route](#tls-certificate-in-route) provides an example
 of how this feature can be used.
+
+Also, as mentioned above, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) 
+is dependent on the protocol on the listener level. Listeners with `HTTPS` or 
+`HTTP` protocols can use `HTTPRoute` as the TLS Termination is done at the 
+listener level and thus, only HTTP information is used for routing.
+
+Listeners with the `TLS` protocol must use `TLSRoute` when the mode is set to `Passthrough` and `TCPRoute` when the mode is `Terminate`.
+
+Listeners with the TCP protocol must use `TCPRoute` for plain TCP Routing.
 
 ### Examples
 
