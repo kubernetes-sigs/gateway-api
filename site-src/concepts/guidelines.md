@@ -84,6 +84,24 @@ different providers in the early days of this API. Users can use the
 results of the conformance tests to understand areas where there may
 be differences in behavior from the spec.
 
+### Implementation-specific
+
+In some aspects of the API, we give the user an ability to specify usage of the
+feature, however, the exact behavior may depend on the underlying
+implementation. For example, regular expression matching is present in all
+implementations but specifying an exact behavior is impossible due to
+subtle differences between the underlying libraries used (e.g. PCRE, ECMA,
+Re2). It is still useful for our users to spec out the feature as much as
+possible, but we acknowledge that the behavior for some subset of the API may
+still vary (and that's ok).
+
+These cases will be specified as defining delimited parts of the API
+"implementation-specific".
+
+The "implementation-specific" designation allows a CORE or EXTENDED feature to
+be well-defined taking into account the realities of some features that are
+mostly but not entirely portable.
+
 ## API Conventions
 
 Service APIs follow Kubernetes API [conventions][1]. These conventions
@@ -91,6 +109,6 @@ are intended to ease client development and ensure that configuration
 mechanisms can consistently be implemented across a diverse set of use
 cases. One variation from the Kubernetes conventions is for fields with
 default values. These fields are considered optional but are not pointers
-since they will never be empty. 
+since they will never be empty.
 
 [1]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
