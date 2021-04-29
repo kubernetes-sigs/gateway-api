@@ -2,10 +2,54 @@
 
 ## Table of Contents
 
+- [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.3.0
+
+API Version: v1alpha1
+
+### API changes
+
+#### Gateway
+- The `NoSuchGatewayClass` status reason has been deprecated.
+  [#635](https://github.com/kubernetes-sigs/gateway-api/pull/635)
+
+#### HTTPRoute
+- `.spec.rules.matches.path` now has a default `prefix` match on the `/` path.
+  [#584](https://github.com/kubernetes-sigs/gateway-api/pull/584)
+- Conflict resolution guidance has been added for rules within a route.
+  [#620](https://github.com/kubernetes-sigs/gateway-api/pull/620)
+- HTTPRoute now supports query param matching.
+  [#631](https://github.com/kubernetes-sigs/gateway-api/pull/631)
+
+#### All Route Types
+- Route status now includes controller name for each Gateway.
+  [#616](https://github.com/kubernetes-sigs/gateway-api/pull/616)
+- Conflict resolution guidance has been added for non-HTTP routes.
+  [#626](https://github.com/kubernetes-sigs/gateway-api/pull/626)
+
+#### Misc
+- Fields of type LocalObjectRef do not default to "secrets". All LocalObjectRef
+  fields must be specified.
+  [#570](https://github.com/kubernetes-sigs/gateway-api/pull/570)
+- CRDs have been added to gateway-api category
+  [#592](https://github.com/kubernetes-sigs/gateway-api/pull/592)
+- New "Age" column has been added to all resources in `kubectl get` output.
+  [#592](https://github.com/kubernetes-sigs/gateway-api/pull/592)
+- A variety of Go types have been changed to pointers to better reflect their
+  optional status.
+  [#564](https://github.com/kubernetes-sigs/gateway-api/pull/564)
+  [#572](https://github.com/kubernetes-sigs/gateway-api/pull/572)
+  [#579](https://github.com/kubernetes-sigs/gateway-api/pull/579)
+
+#### Validation
+- A new experimental validation package and validating webhook have been added.
+  [#597](https://github.com/kubernetes-sigs/gateway-api/pull/597)
+  [#617](https://github.com/kubernetes-sigs/gateway-api/pull/617)
 
 
 ## v0.2.0
