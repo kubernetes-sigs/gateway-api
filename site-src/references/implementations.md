@@ -45,9 +45,11 @@ Note that not all of the `v0.2.0` specification is completed yet, [contributions
 
 [Emissary-Ingress][emissary] (formerly known as Ambassador API Gateway) is an open source CNCF project that
 provides an ingress controller and API gateway for Kubernetes built on top of [Envoy Proxy][envoy].
+See [here][emissary-gateway-api] for more details on using the Gateway API with Emissary.
 
 [emissary]:https://www.getambassador.io/docs/edge-stack
 [envoy]:https://envoyproxy.io
+[emissary-gateway-api]:https://www.getambassador.io/docs/edge-stack/latest/topics/using/gateway-api/
 
 ### Gloo Edge
 
