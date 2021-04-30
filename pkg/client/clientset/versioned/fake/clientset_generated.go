@@ -27,6 +27,8 @@ import (
 	clientset "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
 	networkingv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha1"
 	fakenetworkingv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha1/fake"
+	networkingv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
+	fakenetworkingv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2/fake"
 )
 
 // NewSimpleClientset returns a clientset that will respond with the provided objects.
@@ -79,4 +81,9 @@ var _ clientset.Interface = &Clientset{}
 // NetworkingV1alpha1 retrieves the NetworkingV1alpha1Client
 func (c *Clientset) NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface {
 	return &fakenetworkingv1alpha1.FakeNetworkingV1alpha1{Fake: &c.Fake}
+}
+
+// NetworkingV1alpha2 retrieves the NetworkingV1alpha2Client
+func (c *Clientset) NetworkingV1alpha2() networkingv1alpha2.NetworkingV1alpha2Interface {
+	return &fakenetworkingv1alpha2.FakeNetworkingV1alpha2{Fake: &c.Fake}
 }
