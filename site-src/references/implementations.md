@@ -15,7 +15,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Traefik][7] (alpha)
 
 [1]:#contour
-[2]:#emissary
+[2]:#emissary-ingress-ambassador-api-gateway
 [3]:#gloo-edge
 [4]:#google-cloud-platform
 [5]:#istio
