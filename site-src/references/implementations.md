@@ -7,18 +7,20 @@ Implementors of Gateway API are encouraged to update this document with status i
 ## Implementation Status
 
 - [Contour][1] (alpha)
-- [Gloo Edge 2.0][2] (work in progress)
-- [Google Kubernetes Engine][3] (work in progress)
-- [Istio][4] (alpha)
-- [Kong][5] (work in progress)
-- [Traefik][6] (alpha)
+- [Emissary-Ingress (Ambassador API Gateway)][2] (alpha)
+- [Gloo Edge 2.0][3] (work in progress)
+- [Google Kubernetes Engine][4] (work in progress)
+- [Istio][5] (alpha)
+- [Kong][6] (work in progress)
+- [Traefik][7] (alpha)
 
 [1]:#contour
-[2]:#gloo-edge
-[3]:#google-cloud-platform
-[4]:#istio
-[5]:#kong
-[6]:#traefik
+[2]:#emissary-ingress-ambassador-api-gateway
+[3]:#gloo-edge
+[4]:#google-cloud-platform
+[5]:#istio
+[6]:#kong
+[7]:#traefik
 
 ## Project References
 
@@ -38,6 +40,16 @@ _Note that not all of the `v0.3.0` specification is completed yet, [contribution
 [latest]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 [contour-1]:https://projectcontour.io/guides/gateway-api/
 [contour-2]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
+
+### Emissary-Ingress (Ambassador API Gateway)
+
+[Emissary-Ingress][emissary] (formerly known as Ambassador API Gateway) is an open source CNCF project that
+provides an ingress controller and API gateway for Kubernetes built on top of [Envoy Proxy][envoy].
+See [here][emissary-gateway-api] for more details on using the Gateway API with Emissary.
+
+[emissary]:https://www.getambassador.io/docs/edge-stack
+[envoy]:https://envoyproxy.io
+[emissary-gateway-api]:https://www.getambassador.io/docs/edge-stack/latest/topics/using/gateway-api/
 
 ### Gloo Edge
 
