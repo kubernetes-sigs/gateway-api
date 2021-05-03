@@ -51,3 +51,5 @@ Session.vim
 .*.timestamp
 /site
 admission
+
+/cache
