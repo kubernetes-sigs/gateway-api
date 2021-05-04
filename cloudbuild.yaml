@@ -13,7 +13,7 @@ steps:
     - DOCKER_CLI_EXPERIMENTAL=enabled
     - TAG=$_GIT_TAG
     args:
-    - release
+    - release-staging
 substitutions:
   # _GIT_TAG will be filled with a git-based tag for the image, of the form vYYYYMMDD-hash, and
   # can be used as a substitution
