@@ -25,11 +25,13 @@ import (
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 	networkingv1alpha1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha1"
+	networkingv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface
+	NetworkingV1alpha2() networkingv1alpha2.NetworkingV1alpha2Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -37,11 +39,17 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	networkingV1alpha1 *networkingv1alpha1.NetworkingV1alpha1Client
+	networkingV1alpha2 *networkingv1alpha2.NetworkingV1alpha2Client
 }
 
 // NetworkingV1alpha1 retrieves the NetworkingV1alpha1Client
 func (c *Clientset) NetworkingV1alpha1() networkingv1alpha1.NetworkingV1alpha1Interface {
 	return c.networkingV1alpha1
+}
+
+// NetworkingV1alpha2 retrieves the NetworkingV1alpha2Client
+func (c *Clientset) NetworkingV1alpha2() networkingv1alpha2.NetworkingV1alpha2Interface {
+	return c.networkingV1alpha2
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -69,6 +77,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+	cs.networkingV1alpha2, err = networkingv1alpha2.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
@@ -82,6 +94,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
 	cs.networkingV1alpha1 = networkingv1alpha1.NewForConfigOrDie(c)
+	cs.networkingV1alpha2 = networkingv1alpha2.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -91,6 +104,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.networkingV1alpha1 = networkingv1alpha1.New(c)
+	cs.networkingV1alpha2 = networkingv1alpha2.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

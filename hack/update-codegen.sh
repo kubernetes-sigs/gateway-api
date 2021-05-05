@@ -33,7 +33,7 @@ mkdir -p "$GOPATH/src/sigs.k8s.io"
 ln -s "${SCRIPT_ROOT}" "$GOPATH/src/sigs.k8s.io/gateway-api"
 
 readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
-readonly FQ_APIS=sigs.k8s.io/gateway-api/apis/v1alpha1
+readonly FQ_APIS=sigs.k8s.io/gateway-api/apis/v1alpha1,sigs.k8s.io/gateway-api/apis/v1alpha2
 readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
