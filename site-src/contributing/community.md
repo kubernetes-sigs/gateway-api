@@ -32,7 +32,18 @@ Gateway API meetings as well as any other SIG-Network meetings.
   scrolling="no">
 </iframe>
 
-* Wednesday 11am Pacific (7pm UTC) <a target="_blank" href="https://zoom.us/j/441530404">[Zoom Link]</a> <a target="_blank" href="https://calendar.google.com/event?action=TEMPLATE&tmeid=MjUxOHEzdXNpZWwxYmRmYXFidGltbWU1dWFfMjAyMDEyMDJUMTkwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL"><img border="0" src="https://www.google.com/calendar/images/ext/gc_button1_en.gif"></a>
+Gateway API community meetings happen weekly, alternating between the following
+times. Refer to the calendar above to find the current place in the rotation.
+
+* **Mondays at 3pm Pacific (11pm UTC)**
+    * [Zoom link](https://zoom.us/j/441530404)
+    * [Convert to your timezone](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)
+    * [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NXU4OXYyY2pqNzEzYzUwYnVsYmZwdXJzZDlfMjAyMTA1MTBUMjIwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
+* **Tuesdays at 10am Pacific (6pm UTC)**
+    * [Zoom link](https://zoom.us/j/441530404)
+    * [Convert to your timezone](http://www.thetimezoneconverter.com/?t=10:00&tz=PT%20%28Pacific%20Time%29)
+    * [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NmowbnNxdDRkYjEzNjlrcWRkdXBmczU1bnNfMjAyMTA1MThUMTcwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
+
 
 ### Meeting Notes and Recordings
 
