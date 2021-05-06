@@ -185,6 +185,70 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
+				name: "valid v1alpha2 HTTPRoute resource",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "httproutes"
+							},
+							"object": {
+   								"kind": "HTTPRoute",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "http-app-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+   								   "hostnames": [
+   								      "foo.com"
+   								   ],
+   								   "rules": [
+   								      {
+   								         "matches": [
+   								            {
+   								               "path": {
+   								                  "type": "Prefix",
+   								                  "value": "/bar"
+   								               }
+   								            }
+   								         ],
+   								         "filters": [
+   								            {
+   								               "type": "RequestMirror",
+   								               "requestMirror": {
+   								                  "serviceName": "my-service1-staging",
+   								                  "port": 8080
+   								               }
+   								            }
+   								         ],
+   								         "forwardTo": [
+   								            {
+   								               "serviceName": "my-service1",
+   								               "port": 8080
+   								            }
+   								         ]
+   								      }
+   								   ]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
 				name: "invalid HTTPRoute resource with two request mirror filters",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -199,6 +263,80 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"object": {
    								"kind": "HTTPRoute",
    								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "http-app-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+   								   "hostnames": [
+   								      "foo.com"
+   								   ],
+   								   "rules": [
+   								      {
+   								         "matches": [
+   								            {
+   								               "path": {
+   								                  "type": "Prefix",
+   								                  "value": "/bar"
+   								               }
+   								            }
+   								         ],
+   								         "filters": [
+   								            {
+   								               "type": "RequestMirror",
+   								               "requestMirror": {
+   								                  "serviceName": "my-service1-staging",
+   								                  "port": 8080
+   								               }
+   								            },
+   								            {
+   								               "type": "RequestMirror",
+   								               "requestMirror": {
+   								                  "serviceName": "my-service2-staging",
+   								                  "port": 8080
+   								               }
+   								            }
+   								         ],
+   								         "forwardTo": [
+   								            {
+   								               "serviceName": "my-service1",
+   								               "port": 8080
+   								            }
+   								         ]
+   								      }
+   								   ]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    400,
+						Message: "spec.rules[0].filters: Invalid value: \"RequestMirror\": cannot be used multiple times in the same rule",
+					},
+				},
+			},
+			{
+				name: "invalid v1alpha2 HTTPRoute resource with two request mirror filters",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "httproutes"
+							},
+							"object": {
+   								"kind": "HTTPRoute",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "http-app-1",
    								   "labels": {
