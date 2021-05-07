@@ -59,6 +59,10 @@ func TestServeHTTPInvalidMethod(t *testing.T) {
 }
 
 func TestServeHTTPSubmissions(t *testing.T) {
+
+	const invalidHostname = "!@!.foo.com"
+	const lowercaseRFC1123ErrorMessage = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')"
+
 	for _, apiVersion := range []string{
 		"admission.k8s.io/v1",
 		"admission.k8s.io/v1",
@@ -119,6 +123,208 @@ func TestServeHTTPSubmissions(t *testing.T) {
 					}`),
 				wantRespCode:       http.StatusBadRequest,
 				wantFailureMessage: "submitted object is not of kind AdmissionReview\n",
+			},
+			{
+				name: "valid v1alpha1 Gateway resource",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha1",
+								"resource": "gateways"
+							},
+							"object": {
+   								"kind": "Gateway",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+									"gatewayClassName": "contour-class",
+									"listeners": [
+										{
+											"port": 80,
+											"protocol": "HTTP",
+											"hostname": "foo.com",
+											"routes": {
+												"group": "networking.x-k8s.io",
+												"kind": "HTTPRoute",
+												"namespaces": {
+													"from": "All"
+												}
+											}
+										}
+									]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "invalid v1alpha1 Gateway resource with bad listener hostname",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha1",
+								"resource": "gateways"
+							},
+							"object": {
+   								"kind": "Gateway",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+									"gatewayClassName": "contour-class",
+									"listeners": [
+										{
+											"port": 80,
+											"protocol": "HTTP",
+											"hostname": "` + invalidHostname + `",
+											"routes": {
+												"group": "networking.x-k8s.io",
+												"kind": "HTTPRoute",
+												"namespaces": {
+													"from": "All"
+												}
+											}
+										}
+									]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    400,
+						Message: fmt.Sprintf("spec.listeners[0].hostname: Invalid value: %q: %s", invalidHostname, lowercaseRFC1123ErrorMessage),
+					},
+				},
+			},
+			{
+				name: "valid v1alpha2 Gateway resource",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "gateways"
+							},
+							"object": {
+   								"kind": "Gateway",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+									"gatewayClassName": "contour-class",
+									"listeners": [
+										{
+											"port": 80,
+											"protocol": "HTTP",
+											"hostname": "foo.com",
+											"routes": {
+												"group": "networking.x-k8s.io",
+												"kind": "HTTPRoute",
+												"namespaces": {
+													"from": "All"
+												}
+											}
+										}
+									]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "invalid v1alpha2 Gateway resource with bad listener hostname",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "gateways"
+							},
+							"object": {
+   								"kind": "Gateway",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-1",
+   								   "labels": {
+   								      "app": "foo"
+   								   }
+   								},
+   								"spec": {
+									"gatewayClassName": "contour-class",
+									"listeners": [
+										{
+											"port": 80,
+											"protocol": "HTTP",
+											"hostname": "` + invalidHostname + `",
+											"routes": {
+												"group": "networking.x-k8s.io",
+												"kind": "HTTPRoute",
+												"namespaces": {
+													"from": "All"
+												}
+											}
+										}
+									]
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    400,
+						Message: fmt.Sprintf("spec.listeners[0].hostname: Invalid value: %q: %s", invalidHostname, lowercaseRFC1123ErrorMessage),
+					},
+				},
 			},
 			{
 				name: "valid HTTPRoute resource",

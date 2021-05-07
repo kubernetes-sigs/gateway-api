@@ -51,6 +51,16 @@ var (
 		Version:  v1alpha2.SchemeGroupVersion.Version,
 		Resource: "httproutes",
 	}
+	v1a1gatewayGVR = meta.GroupVersionResource{
+		Group:    v1alpha1.SchemeGroupVersion.Group,
+		Version:  v1alpha1.SchemeGroupVersion.Version,
+		Resource: "gateways",
+	}
+	v1a2gatewayGVR = meta.GroupVersionResource{
+		Group:    v1alpha2.SchemeGroupVersion.Group,
+		Version:  v1alpha2.SchemeGroupVersion.Version,
+		Resource: "gateways",
+	}
 )
 
 func log500(w http.ResponseWriter, err error) {
@@ -157,7 +167,24 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 		if err != nil {
 			return nil, err
 		}
+
 		fieldErr = v1a2Validation.ValidateHTTPRoute(&hRoute)
+	case v1a1gatewayGVR:
+		var gateway v1alpha1.Gateway
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
+		if err != nil {
+			return nil, err
+		}
+
+		fieldErr = v1a1Validation.ValidateGateway(&gateway)
+	case v1a2gatewayGVR:
+		var gateway v1alpha2.Gateway
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
+		if err != nil {
+			return nil, err
+		}
+
+		fieldErr = v1a2Validation.ValidateGateway(&gateway)
 	default:
 		return nil, fmt.Errorf("unknown resource '%v'", request.Resource.Resource)
 	}
