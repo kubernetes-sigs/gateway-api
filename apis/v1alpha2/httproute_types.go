@@ -258,40 +258,6 @@ const (
 	PathMatchImplementationSpecific PathMatchType = "ImplementationSpecific"
 )
 
-// HeaderMatchType specifies the semantics of how HTTP header values should be
-// compared. Valid HeaderMatchType values are:
-//
-// * "Exact"
-// * "RegularExpression"
-// * "ImplementationSpecific"
-//
-// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
-type HeaderMatchType string
-
-// HeaderMatchType constants.
-const (
-	HeaderMatchExact                  HeaderMatchType = "Exact"
-	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
-	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
-)
-
-// QueryParamMatchType specifies the semantics of how HTTP query parameter
-// values should be compared. Valid QueryParamMatchType values are:
-//
-// * "Exact"
-// * "RegularExpression"
-// * "ImplementationSpecific"
-//
-// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
-type QueryParamMatchType string
-
-// QueryParamMatchType constants.
-const (
-	QueryParamMatchExact                  QueryParamMatchType = "Exact"
-	QueryParamMatchRegularExpression      QueryParamMatchType = "RegularExpression"
-	QueryParamMatchImplementationSpecific QueryParamMatchType = "ImplementationSpecific"
-)
-
 // HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
@@ -316,6 +282,23 @@ type HTTPPathMatch struct {
 	Value *string `json:"value,omitempty"`
 }
 
+// HeaderMatchType specifies the semantics of how HTTP header values should be
+// compared. Valid HeaderMatchType values are:
+//
+// * "Exact"
+// * "RegularExpression"
+// * "ImplementationSpecific"
+//
+// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
+type HeaderMatchType string
+
+// HeaderMatchType constants.
+const (
+	HeaderMatchExact                  HeaderMatchType = "Exact"
+	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
+	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
+)
+
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
 // headers.
 type HTTPHeaderMatch struct {
@@ -330,23 +313,46 @@ type HTTPHeaderMatch struct {
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	//
-	// HTTP Header name matching MUST be case-insensitive (RFC 2616 - section 4.2).
-	//
 	// +optional
 	// +kubebuilder:default=Exact
 	Type *HeaderMatchType `json:"type,omitempty"`
 
-	// Values is a map of HTTP Headers to be matched.
-	// It MUST contain at least one entry.
+	// Name is the name of the HTTP Header to be matched. Name matching MUST be
+	// case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
-	// The HTTP header field name to match is the map key, and the
-	// value of the HTTP header is the map value. HTTP header field name matching
-	// MUST be case-insensitive.
+	// If multiple entries specify equivalent header names, only the first entry
+	// with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent header name MUST be ignored. Due to the
+	// case-insensitivity of header names, "foo" and "Foo" are considered
+	// equivalent.
 	//
-	// Multiple match values are ANDed together, meaning, a request
-	// must match all the specified headers to select the route.
-	Values map[string]string `json:"values"`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+
+	// Value is the value of HTTP Header to be matched.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
 }
+
+// QueryParamMatchType specifies the semantics of how HTTP query parameter
+// values should be compared. Valid QueryParamMatchType values are:
+//
+// * "Exact"
+// * "RegularExpression"
+// * "ImplementationSpecific"
+//
+// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
+type QueryParamMatchType string
+
+// QueryParamMatchType constants.
+const (
+	QueryParamMatchExact                  QueryParamMatchType = "Exact"
+	QueryParamMatchRegularExpression      QueryParamMatchType = "RegularExpression"
+	QueryParamMatchImplementationSpecific QueryParamMatchType = "ImplementationSpecific"
+)
 
 // HTTPQueryParamMatch describes how to select a HTTP route by matching HTTP
 // query parameters.
@@ -366,21 +372,19 @@ type HTTPQueryParamMatch struct {
 	// +kubebuilder:default=Exact
 	Type *QueryParamMatchType `json:"type,omitempty"`
 
-	// Values is a map of HTTP query parameters to be matched. It MUST contain
-	// at least one entry.
+	// Name is the name of the HTTP query param to be matched. This must be an
+	// exact string match. (See
+	// https://tools.ietf.org/html/rfc7230#section-2.7.3).
 	//
-	// The query parameter name to match is the map key, and the value of the
-	// query parameter is the map value.
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+
+	// Value is the value of HTTP query param to be matched.
 	//
-	// Multiple match values are ANDed together, meaning, a request must match
-	// all the specified query parameters to select the route.
-	//
-	// HTTP query parameter matching MUST be case-sensitive for both keys and
-	// values. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
-	//
-	// Note that the query parameter key MUST always be an exact match by string
-	// comparison.
-	Values map[string]string `json:"values"`
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=1024
+	Value string `json:"value"`
 }
 
 // HTTPRouteMatch defines the predicate used to match requests to a given
@@ -406,15 +410,19 @@ type HTTPRouteMatch struct {
 	// +kubebuilder:default={type: "Prefix", value: "/"}
 	Path *HTTPPathMatch `json:"path,omitempty"`
 
-	// Headers specifies a HTTP request header matcher.
+	// Headers specifies HTTP request header matchers. Multiple match values are
+	// ANDed together, meaning, a request must match all the specified headers
+	// to select the route.
 	//
 	// +optional
-	Headers *HTTPHeaderMatch `json:"headers,omitempty"`
+	Headers []HTTPHeaderMatch `json:"headers,omitempty"`
 
-	// QueryParams specifies a HTTP query parameter matcher.
+	// QueryParams specifies HTTP query parameter matchers. Multiple match
+	// values are ANDed together, meaning, a request must match all the
+	// specified query parameters to select the route.
 	//
 	// +optional
-	QueryParams *HTTPQueryParamMatch `json:"queryParams,omitempty"`
+	QueryParams []HTTPQueryParamMatch `json:"queryParams,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
@@ -568,7 +576,7 @@ type HTTPRequestHeaderFilter struct {
 	// Remove the given header(s) from the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
 	// names. Note that the header names are case-insensitive
-	// [RFC-2616 4.2].
+	// (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
 	//
 	// Input:
 	//   GET /foo HTTP/1.1

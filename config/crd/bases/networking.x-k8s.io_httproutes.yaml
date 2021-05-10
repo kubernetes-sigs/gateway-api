@@ -1144,11 +1144,12 @@ spec:
                                 description: "Remove the given header(s) from the
                                   HTTP request before the action. The value of RemoveHeader
                                   is a list of HTTP header names. Note that the header
-                                  names are case-insensitive [RFC-2616 4.2]. \n Input:
-                                  \  GET /foo HTTP/1.1   my-header1: foo   my-header2:
-                                  bar   my-header3: baz \n Config:   remove: [\"my-header1\",
-                                  \"my-header3\"] \n Output:   GET /foo HTTP/1.1   my-header2:
-                                  bar \n Support: Extended"
+                                  names are case-insensitive (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
+                                  \n Input:   GET /foo HTTP/1.1   my-header1: foo
+                                  \  my-header2: bar   my-header3: baz \n Config:
+                                  \  remove: [\"my-header1\", \"my-header3\"] \n Output:
+                                  \  GET /foo HTTP/1.1   my-header2: bar \n Support:
+                                  Extended"
                                 items:
                                   type: string
                                 maxItems: 16
@@ -1365,11 +1366,12 @@ spec:
                                         the HTTP request before the action. The value
                                         of RemoveHeader is a list of HTTP header names.
                                         Note that the header names are case-insensitive
-                                        [RFC-2616 4.2]. \n Input:   GET /foo HTTP/1.1
-                                        \  my-header1: foo   my-header2: bar   my-header3:
-                                        baz \n Config:   remove: [\"my-header1\",
-                                        \"my-header3\"] \n Output:   GET /foo HTTP/1.1
-                                        \  my-header2: bar \n Support: Extended"
+                                        (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
+                                        \n Input:   GET /foo HTTP/1.1   my-header1:
+                                        foo   my-header2: bar   my-header3: baz \n
+                                        Config:   remove: [\"my-header1\", \"my-header3\"]
+                                        \n Output:   GET /foo HTTP/1.1   my-header2:
+                                        bar \n Support: Extended"
                                       items:
                                         type: string
                                       maxItems: 16
@@ -1612,39 +1614,53 @@ spec:
                             - name
                             type: object
                           headers:
-                            description: Headers specifies a HTTP request header matcher.
-                            properties:
-                              type:
-                                default: Exact
-                                description: "Type specifies how to match against
-                                  the value of the header. \n Support: Core (Exact)
-                                  \n Support: Custom (RegularExpression, ImplementationSpecific)
-                                  \n Since RegularExpression PathType has custom conformance,
-                                  implementations can support POSIX, PCRE or any other
-                                  dialects of regular expressions. Please read the
-                                  implementation's documentation to determine the
-                                  supported dialect. \n HTTP Header name matching
-                                  MUST be case-insensitive (RFC 2616 - section 4.2)."
-                                enum:
-                                - Exact
-                                - RegularExpression
-                                - ImplementationSpecific
-                                type: string
-                              values:
-                                additionalProperties:
+                            description: Headers specifies HTTP request header matchers.
+                              Multiple match values are ANDed together, meaning, a
+                              request must match all the specified headers to select
+                              the route.
+                            items:
+                              description: HTTPHeaderMatch describes how to select
+                                a HTTP route by matching HTTP request headers.
+                              properties:
+                                name:
+                                  description: "Name is the name of the HTTP Header
+                                    to be matched. Name matching MUST be case insensitive.
+                                    (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                    \n If multiple entries specify equivalent header
+                                    names, only the first entry with an equivalent
+                                    name MUST be considered for a match. Subsequent
+                                    entries with an equivalent header name MUST be
+                                    ignored. Due to the case-insensitivity of header
+                                    names, \"foo\" and \"Foo\" are considered equivalent."
+                                  maxLength: 256
+                                  minLength: 1
                                   type: string
-                                description: "Values is a map of HTTP Headers to be
-                                  matched. It MUST contain at least one entry. \n
-                                  The HTTP header field name to match is the map key,
-                                  and the value of the HTTP header is the map value.
-                                  HTTP header field name matching MUST be case-insensitive.
-                                  \n Multiple match values are ANDed together, meaning,
-                                  a request must match all the specified headers to
-                                  select the route."
-                                type: object
-                            required:
-                            - values
-                            type: object
+                                type:
+                                  default: Exact
+                                  description: "Type specifies how to match against
+                                    the value of the header. \n Support: Core (Exact)
+                                    \n Support: Custom (RegularExpression, ImplementationSpecific)
+                                    \n Since RegularExpression PathType has custom
+                                    conformance, implementations can support POSIX,
+                                    PCRE or any other dialects of regular expressions.
+                                    Please read the implementation's documentation
+                                    to determine the supported dialect."
+                                  enum:
+                                  - Exact
+                                  - RegularExpression
+                                  - ImplementationSpecific
+                                  type: string
+                                value:
+                                  description: Value is the value of HTTP Header to
+                                    be matched.
+                                  maxLength: 4096
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                            type: array
                           path:
                             default:
                               type: Prefix
@@ -1675,42 +1691,47 @@ spec:
                                 type: string
                             type: object
                           queryParams:
-                            description: QueryParams specifies a HTTP query parameter
-                              matcher.
-                            properties:
-                              type:
-                                default: Exact
-                                description: "Type specifies how to match against
-                                  the value of the query parameter. \n Support: Extended
-                                  (Exact) \n Support: Custom (RegularExpression, ImplementationSpecific)
-                                  \n Since RegularExpression QueryParamMatchType has
-                                  custom conformance, implementations can support
-                                  POSIX, PCRE or any other dialects of regular expressions.
-                                  Please read the implementation's documentation to
-                                  determine the supported dialect."
-                                enum:
-                                - Exact
-                                - RegularExpression
-                                - ImplementationSpecific
-                                type: string
-                              values:
-                                additionalProperties:
+                            description: QueryParams specifies HTTP query parameter
+                              matchers. Multiple match values are ANDed together,
+                              meaning, a request must match all the specified query
+                              parameters to select the route.
+                            items:
+                              description: HTTPQueryParamMatch describes how to select
+                                a HTTP route by matching HTTP query parameters.
+                              properties:
+                                name:
+                                  description: Name is the name of the HTTP query
+                                    param to be matched. This must be an exact string
+                                    match. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
+                                  maxLength: 256
+                                  minLength: 1
                                   type: string
-                                description: "Values is a map of HTTP query parameters
-                                  to be matched. It MUST contain at least one entry.
-                                  \n The query parameter name to match is the map
-                                  key, and the value of the query parameter is the
-                                  map value. \n Multiple match values are ANDed together,
-                                  meaning, a request must match all the specified
-                                  query parameters to select the route. \n HTTP query
-                                  parameter matching MUST be case-sensitive for both
-                                  keys and values. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
-                                  \n Note that the query parameter key MUST always
-                                  be an exact match by string comparison."
-                                type: object
-                            required:
-                            - values
-                            type: object
+                                type:
+                                  default: Exact
+                                  description: "Type specifies how to match against
+                                    the value of the query parameter. \n Support:
+                                    Extended (Exact) \n Support: Custom (RegularExpression,
+                                    ImplementationSpecific) \n Since RegularExpression
+                                    QueryParamMatchType has custom conformance, implementations
+                                    can support POSIX, PCRE or any other dialects
+                                    of regular expressions. Please read the implementation's
+                                    documentation to determine the supported dialect."
+                                  enum:
+                                  - Exact
+                                  - RegularExpression
+                                  - ImplementationSpecific
+                                  type: string
+                                value:
+                                  description: Value is the value of HTTP query param
+                                    to be matched.
+                                  maxLength: 1024
+                                  minLength: 1
+                                  type: string
+                              required:
+                              - name
+                              - value
+                              type: object
+                            type: array
                         type: object
                       maxItems: 8
                       type: array
