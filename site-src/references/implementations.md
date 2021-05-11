@@ -9,7 +9,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Contour][1] (alpha)
 - [Emissary-Ingress (Ambassador API Gateway)][2] (alpha)
 - [Gloo Edge 2.0][3] (work in progress)
-- [Google Kubernetes Engine][4] (work in progress)
+- [Google Kubernetes Engine][4] (public preview)
 - [Istio][5] (alpha)
 - [Kong][6] (work in progress)
 - [Traefik][7] (alpha)
@@ -17,7 +17,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 [1]:#contour
 [2]:#emissary-ingress-ambassador-api-gateway
 [3]:#gloo-edge
-[4]:#google-cloud-platform
+[4]:#google-kubernetes-engine
 [5]:#istio
 [6]:#kong
 [7]:#traefik
@@ -60,14 +60,15 @@ Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that br
 
 ### Google Kubernetes Engine
 
-The [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered by Google Cloud.
+[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform
+offered by Google Cloud.
 
-GKE is actively working towards an implementation of the Gateway API for orchestration of [Google Cloud Load Balancing][gclb].
-
-The GKE Gateway Controller will become a managed component of GKE to automate and ease load balancing for containers.
+GKE support for the Gateway API for orchestration of [Google Cloud Load
+Balancing][gclb] is available in [public preview][gke-gateway].
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gclb]:https://cloud.google.com/load-balancing
+[gke-gateway]: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
 
 ### Istio
 
