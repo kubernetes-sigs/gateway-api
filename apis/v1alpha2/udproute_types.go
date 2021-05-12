@@ -33,7 +33,7 @@ type UDPRoute struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of UDPRoute.
-	Spec UDPRouteSpec `json:"spec,omitempty"`
+	Spec UDPRouteSpec `json:"spec"`
 
 	// Status defines the current state of UDPRoute.
 	Status UDPRouteStatus `json:"status,omitempty"`

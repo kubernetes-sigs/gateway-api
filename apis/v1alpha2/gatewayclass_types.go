@@ -38,7 +38,7 @@ type GatewayClass struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of GatewayClass.
-	Spec GatewayClassSpec `json:"spec,omitempty"`
+	Spec GatewayClassSpec `json:"spec"`
 
 	// Status defines the current state of GatewayClass.
 	//

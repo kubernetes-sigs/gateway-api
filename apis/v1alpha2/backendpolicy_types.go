@@ -37,7 +37,7 @@ type BackendPolicy struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of BackendPolicy.
-	Spec BackendPolicySpec `json:"spec,omitempty"`
+	Spec BackendPolicySpec `json:"spec"`
 
 	// Status defines the current state of BackendPolicy.
 	Status BackendPolicyStatus `json:"status,omitempty"`
