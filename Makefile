@@ -89,6 +89,8 @@ build:
 	docker build --build-arg COMMIT=$(COMMIT) --build-arg TAG=$(TAG) \
 			-t $(REGISTRY)/admission-server:$(TAG) .
 
-.PHONY: release
-release: build
+.PHONY: release-staging
+release-staging: build
 	docker push $(REGISTRY)/admission-server:$(TAG)
+	docker tag $(REGISTRY)/admission-server:$(TAG) $(REGISTRY)/admission-server:latest
+	docker push $(REGISTRY)/admission-server:latest
