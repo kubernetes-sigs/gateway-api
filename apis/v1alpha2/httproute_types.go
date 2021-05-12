@@ -34,7 +34,7 @@ type HTTPRoute struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of HTTPRoute.
-	Spec HTTPRouteSpec `json:"spec,omitempty"`
+	Spec HTTPRouteSpec `json:"spec"`
 
 	// Status defines the current state of HTTPRoute.
 	Status HTTPRouteStatus `json:"status,omitempty"`

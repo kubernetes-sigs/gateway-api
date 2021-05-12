@@ -38,7 +38,7 @@ type TLSRoute struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of TLSRoute.
-	Spec TLSRouteSpec `json:"spec,omitempty"`
+	Spec TLSRouteSpec `json:"spec"`
 
 	// Status defines the current state of TLSRoute.
 	Status TLSRouteStatus `json:"status,omitempty"`

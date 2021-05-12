@@ -33,7 +33,7 @@ type TCPRoute struct {
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
 	// Spec defines the desired state of TCPRoute.
-	Spec TCPRouteSpec `json:"spec,omitempty"`
+	Spec TCPRouteSpec `json:"spec"`
 
 	// Status defines the current state of TCPRoute.
 	Status TCPRouteStatus `json:"status,omitempty"`
