@@ -29,7 +29,9 @@ import (
 	"k8s.io/klog/v2"
 
 	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha1/validation"
+	v1a1Validation "sigs.k8s.io/gateway-api/apis/v1alpha1/validation"
+	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1a2Validation "sigs.k8s.io/gateway-api/apis/v1alpha2/validation"
 )
 
 var (
@@ -38,9 +40,14 @@ var (
 )
 
 var (
-	httpRouteGVR = meta.GroupVersionResource{
+	v1a1httpRouteGVR = meta.GroupVersionResource{
 		Group:    v1alpha1.SchemeGroupVersion.Group,
 		Version:  v1alpha1.SchemeGroupVersion.Version,
+		Resource: "httproutes",
+	}
+	v1a2httpRouteGVR = meta.GroupVersionResource{
+		Group:    v1alpha2.SchemeGroupVersion.Group,
+		Version:  v1alpha2.SchemeGroupVersion.Version,
 		Resource: "httproutes",
 	}
 )
@@ -135,7 +142,7 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 	}
 
 	switch request.Resource {
-	case httpRouteGVR:
+	case v1a1httpRouteGVR:
 		var hRoute v1alpha1.HTTPRoute
 		deserializer := codecs.UniversalDeserializer()
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
@@ -143,7 +150,22 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 			return nil, err
 		}
 
-		fieldErr := validation.ValidateHTTPRoute(&hRoute)
+		fieldErr := v1a1Validation.ValidateHTTPRoute(&hRoute)
+		if fieldErr != nil {
+			message = fmt.Sprintf("%s", fieldErr.ToAggregate())
+			ok = false
+		} else {
+			ok = true
+		}
+	case v1a2httpRouteGVR:
+		var hRoute v1alpha2.HTTPRoute
+		deserializer := codecs.UniversalDeserializer()
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
+		if err != nil {
+			return nil, err
+		}
+
+		fieldErr := v1a2Validation.ValidateHTTPRoute(&hRoute)
 		if fieldErr != nil {
 			message = fmt.Sprintf("%s", fieldErr.ToAggregate())
 			ok = false
