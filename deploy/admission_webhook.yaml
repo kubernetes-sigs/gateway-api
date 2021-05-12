@@ -64,9 +64,7 @@ spec:
     spec:
       containers:
         - name: webhook
-          # TODO(hbagdi): Swap image name to the k8s official image once
-          # https://github.com/kubernetes-sigs/gateway-api/pull/621 merges in
-          image: TODO
+          image: gcr.io/k8s-staging-gateway-api/admission-server:latest
           imagePullPolicy: Always
           args:
             - -logtostderr
