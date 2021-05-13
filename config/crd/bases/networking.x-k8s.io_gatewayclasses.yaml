@@ -213,6 +213,7 @@ spec:
       type: date
     - jsonPath: .spec.description
       name: Description
+      priority: 1
       type: string
     name: v1alpha2
     schema:
@@ -248,7 +249,6 @@ spec:
               description:
                 description: Description helps describe a GatewayClass with more details.
                 maxLength: 64
-                minLength: 1
                 type: string
               parametersRef:
                 description: "ParametersRef is a reference to a resource that contains
