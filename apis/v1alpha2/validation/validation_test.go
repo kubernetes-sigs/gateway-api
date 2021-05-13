@@ -17,11 +17,13 @@ limitations under the License.
 package validation
 
 import (
+	"reflect"
 	"testing"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilpointer "k8s.io/utils/pointer"
 )
 
@@ -423,4 +425,77 @@ func pathMatchTypePtr(s string) *gatewayv1a2.PathMatchType {
 func portNumberPtr(p int) *gatewayv1a2.PortNumber {
 	result := gatewayv1a2.PortNumber(p)
 	return &result
+}
+
+func TestValidateGatewayClassUpdate(t *testing.T) {
+	type args struct {
+		oldClass *gatewayv1a2.GatewayClass
+		newClass *gatewayv1a2.GatewayClass
+	}
+	tests := []struct {
+		name string
+		args args
+		want field.ErrorList
+	}{
+		{
+			name: "changing parameters reference is allowed",
+			args: args{
+				oldClass: &gatewayv1a2.GatewayClass{
+					Spec: gatewayv1a2.GatewayClassSpec{
+						Controller: "foo",
+					},
+				},
+				newClass: &gatewayv1a2.GatewayClass{
+					Spec: gatewayv1a2.GatewayClassSpec{
+						Controller: "foo",
+						ParametersRef: &gatewayv1a2.ParametersReference{
+							Group: "example.com",
+							Kind:  "GatewayClassConfig",
+							Name:  "foo",
+						},
+					},
+				},
+			},
+			want: nil,
+		},
+		{
+			name: "changing controller field results in an error",
+			args: args{
+				oldClass: &gatewayv1a2.GatewayClass{
+					Spec: gatewayv1a2.GatewayClassSpec{
+						Controller: "foo",
+					},
+				},
+				newClass: &gatewayv1a2.GatewayClass{
+					Spec: gatewayv1a2.GatewayClassSpec{
+						Controller: "bar",
+					},
+				},
+			},
+			want: field.ErrorList{
+				{
+					Type:     field.ErrorTypeInvalid,
+					Field:    "spec.controller",
+					Detail:   "cannot update an immutable field",
+					BadValue: "bar",
+				},
+			},
+		},
+		{
+			name: "nil input result in no errors",
+			args: args{
+				oldClass: nil,
+				newClass: nil,
+			},
+			want: nil,
+		},
+	}
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ValidateGatewayClassUpdate(tt.args.oldClass, tt.args.newClass); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("ValidateGatewayClassUpdate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

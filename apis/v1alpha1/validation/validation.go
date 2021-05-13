@@ -122,3 +122,18 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a1.HTTPRouteRule, path *fie
 
 	return errs
 }
+
+// ValidateGatewayClassUpdate validates an update to oldClass according to the
+// Gateway API specification. For additional details of the GatewayClass spec, refer to:
+// https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha2.GatewayClass
+func ValidateGatewayClassUpdate(oldClass, newClass *gatewayv1a1.GatewayClass) field.ErrorList {
+	if oldClass == nil || newClass == nil {
+		return nil
+	}
+	var errs field.ErrorList
+	if oldClass.Spec.Controller != newClass.Spec.Controller {
+		errs = append(errs, field.Invalid(field.NewPath("spec.controller"), newClass.Spec.Controller,
+			"cannot update an immutable field"))
+	}
+	return errs
+}
