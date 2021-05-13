@@ -26,6 +26,7 @@ import (
 	meta "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/klog/v2"
 
 	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
@@ -129,9 +130,9 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionResponse, error) {
 
 	var (
-		response admission.AdmissionResponse
-		message  string
-		ok       bool
+		response     admission.AdmissionResponse
+		deserializer = codecs.UniversalDeserializer()
+		fieldErr     field.ErrorList
 	)
 
 	if request.Operation == admission.Delete ||
@@ -144,45 +145,37 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 	switch request.Resource {
 	case v1a1httpRouteGVR:
 		var hRoute v1alpha1.HTTPRoute
-		deserializer := codecs.UniversalDeserializer()
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
 		if err != nil {
 			return nil, err
 		}
 
-		fieldErr := v1a1Validation.ValidateHTTPRoute(&hRoute)
-		if fieldErr != nil {
-			message = fmt.Sprintf("%s", fieldErr.ToAggregate())
-			ok = false
-		} else {
-			ok = true
-		}
+		fieldErr = v1a1Validation.ValidateHTTPRoute(&hRoute)
 	case v1a2httpRouteGVR:
 		var hRoute v1alpha2.HTTPRoute
-		deserializer := codecs.UniversalDeserializer()
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
 		if err != nil {
 			return nil, err
 		}
-
-		fieldErr := v1a2Validation.ValidateHTTPRoute(&hRoute)
-		if fieldErr != nil {
-			message = fmt.Sprintf("%s", fieldErr.ToAggregate())
-			ok = false
-		} else {
-			ok = true
-		}
+		fieldErr = v1a2Validation.ValidateHTTPRoute(&hRoute)
 	default:
 		return nil, fmt.Errorf("unknown resource '%v'", request.Resource.Resource)
 	}
 
-	response.UID = request.UID
-	response.Allowed = ok
-	response.Result = &meta.Status{
-		Message: message,
+	if len(fieldErr) > 0 {
+		return &admission.AdmissionResponse{
+			UID:     request.UID,
+			Allowed: false,
+			Result: &meta.Status{
+				Message: fmt.Sprintf("%s", fieldErr.ToAggregate()),
+				Code:    400,
+			},
+		}, nil
 	}
-	if !ok {
-		response.Result.Code = 400
-	}
-	return &response, nil
+
+	return &admission.AdmissionResponse{
+		UID:     request.UID,
+		Allowed: true,
+		Result:  &meta.Status{},
+	}, nil
 }
