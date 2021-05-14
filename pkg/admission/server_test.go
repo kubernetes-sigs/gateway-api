@@ -603,6 +603,262 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
+				name: "v1a1 GatewayClass create events do not result in an error",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha1",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "update to v1alpha1 GatewayClass parameters field does" +
+					" not result in an error",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha1",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+							"oldObject": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+									"controller": "example.com/foo",
+									"parametersRef": {
+										"name": "foo",
+										"namespace": "bar",
+										"scope": "Namespace",
+										"group": "example.com",
+										"kind": "ExampleConfig"
+									}
+   								}
+							},
+						"operation": "UPDATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "update to v1alpha1 GatewayClass controller field" +
+					" results in an error ",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha1",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+							"oldObject": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha1",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/bar"
+   								}
+							},
+						"operation": "UPDATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    400,
+						Message: `spec.controller: Invalid value: "example.com/foo": cannot update an immutable field`,
+					},
+				},
+			},
+			{
+				name: "v1a2 GatewayClass create events do not result in an error",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+						"operation": "CREATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "update to v1alpha2 GatewayClass parameters field does" +
+					" not result in an error",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+							"oldObject": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+									"controller": "example.com/foo",
+									"parametersRef": {
+										"name": "foo",
+										"namespace": "bar",
+										"scope": "Namespace",
+										"group": "example.com",
+										"kind": "ExampleConfig"
+									}
+   								}
+							},
+						"operation": "UPDATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: true,
+					Result:  &metav1.Status{},
+				},
+			},
+			{
+				name: "update to v1alpha2 GatewayClass controller field" +
+					" results in an error ",
+				reqBody: dedent.Dedent(`{
+						"kind": "AdmissionReview",
+						"apiVersion": "` + apiVersion + `",
+						"request": {
+							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+							"resource": {
+								"group": "networking.x-k8s.io",
+								"version": "v1alpha2",
+								"resource": "gatewayclasses"
+							},
+							"object": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/foo"
+   								}
+							},
+							"oldObject": {
+   								"kind": "GatewayClass",
+   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"metadata": {
+   								   "name": "gateway-class-1"
+   								},
+   								"spec": {
+   								   "controller": "example.com/bar"
+   								}
+							},
+						"operation": "UPDATE"
+						}
+					}`),
+				wantRespCode: http.StatusOK,
+				wantSuccessResponse: admission.AdmissionResponse{
+					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
+					Allowed: false,
+					Result: &metav1.Status{
+						Code:    400,
+						Message: `spec.controller: Invalid value: "example.com/foo": cannot update an immutable field`,
+					},
+				},
+			},
+			{
 				name: "unknown resource under networking.x-k8s.io",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
