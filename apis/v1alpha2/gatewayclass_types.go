@@ -28,6 +28,7 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Controller",type=string,JSONPath=`.spec.controller`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:printcolumn:name="Description",type=string,JSONPath=`.spec.description`,priority=1
 
 // GatewayClass describes a class of Gateways available to the user
 // for creating Gateway resources.
@@ -79,6 +80,13 @@ type GatewayClassSpec struct {
 	//
 	// +optional
 	ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
+
+	// Description helps describe a GatewayClass with more details.
+	//
+	//
+	// +kubebuilder:validation:MaxLength=64
+	// +optional
+	Description *string `json:"description,omitempty"`
 }
 
 // ParametersReference identifies an API object containing controller-specific

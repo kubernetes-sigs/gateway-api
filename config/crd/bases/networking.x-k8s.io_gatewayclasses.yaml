@@ -211,6 +211,10 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    - jsonPath: .spec.description
+      name: Description
+      priority: 1
+      type: string
     name: v1alpha2
     schema:
       openAPIV3Schema:
@@ -241,6 +245,10 @@ spec:
                   where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
                   \n Support: Core"
                 maxLength: 253
+                type: string
+              description:
+                description: Description helps describe a GatewayClass with more details.
+                maxLength: 64
                 type: string
               parametersRef:
                 description: "ParametersRef is a reference to a resource that contains
