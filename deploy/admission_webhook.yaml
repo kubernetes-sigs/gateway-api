@@ -16,7 +16,7 @@ webhooks:
       - operations: [ "CREATE" , "UPDATE" ]
         apiGroups: [ "networking.x-k8s.io" ]
         apiVersions: [ "v1alpha1", "v1alpha2" ]
-        resources: [ "httproutes", "gateways" ]
+        resources: [ "gateways", "gatewayclasses", "httproutes" ]
     failurePolicy: Fail
     sideEffects: None
     admissionReviewVersions:
