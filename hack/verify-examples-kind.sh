@@ -55,7 +55,7 @@ kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res
 kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/bases || res=$?
 
 # Install all example gateway-api resources.
-kubectl apply --kubeconfig "${KUBECONFIG}" -f examples || res=$?
+kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples || res=$?
 
 # Clean up and exit
 cleanup || res=$?
