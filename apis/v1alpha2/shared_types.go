@@ -220,9 +220,9 @@ type RouteStatusGatewayReference struct {
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
 	//
+	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	// +optional
-	Controller *string `json:"controller"`
+	Controller string `json:"controller"`
 }
 
 // RouteStatus defines the observed state that is required across
