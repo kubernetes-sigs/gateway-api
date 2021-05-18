@@ -502,7 +502,7 @@ type GatewayAddress struct {
 // should raise the "Detached" listener status condition on
 // the Gateway with the "UnsupportedAddress" reason.
 //
-// +kubebuilder:validation:Enum=IPAddress;NamedAddress
+// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
 type AddressType string
 
 const (
@@ -514,12 +514,19 @@ const (
 	// Support: Extended
 	IPAddressType AddressType = "IPAddress"
 
-	// An opaque identifier that represents a specific IP address. The
-	// interpretation of the name is dependent on the controller. For
-	// example, a "NamedAddress" might be a cloud-dependent identifier
-	// for a static or elastic IP.
+	// A Hostname represents a DNS based ingress point. This is similar to the
+	// corresponding hostname field in Kubernetes load balancer status. For
+	// example, this concept may be used for cloud load balancers where a DNS
+	// name is used to expose a load balancer.
 	//
-	// Support: Implementation-specific
+	// Support: Extended
+	HostnameAddressType AddressType = "Hostname"
+
+	// A NamedAddress provides a way to reference a specific IP address by name.
+	// For example, this may be a name or other unique identifier that refers
+	// to a resource on a cloud provider such as a static IP.
+	//
+	// Support: Implementation-Specific
 	NamedAddressType AddressType = "NamedAddress"
 )
 

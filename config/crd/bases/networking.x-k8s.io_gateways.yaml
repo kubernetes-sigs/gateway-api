@@ -732,6 +732,7 @@ spec:
                       description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
+                      - Hostname
                       - NamedAddress
                       type: string
                     value:
@@ -1123,6 +1124,7 @@ spec:
                       description: "Type of the address. \n Support: Extended"
                       enum:
                       - IPAddress
+                      - Hostname
                       - NamedAddress
                       type: string
                     value:
