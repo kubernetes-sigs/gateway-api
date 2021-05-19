@@ -18,8 +18,9 @@ to `bar-svc-canary`
 The dotted lines show the Gateway resources deployed to configure this routing
 behavior. There are two HTTPRoute resources that create routing rules on the
 same `prod-web` Gateway. This illustrates how more than one Route can bind to a
-Gateway which allows Routes to merge on a Gateway as
-long as they don't conflict.
+Gateway which allows Routes to merge on a Gateway as long as they don't
+conflict. For more information on Route merging, refer to the [HTTPRoute
+documentation](/api-types/httproute#merging).
 
 The following `prod-web` Gateway is defined from the `acme-lb` GatewayClass.
 `prod-web` listens for HTTP traffic on port 80 and will bind to all Routes in
@@ -32,7 +33,7 @@ bound to each other by their respective owners.
 ```
 
 An HTTPRoute can match against a [single set of
-hostnames](https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteSpec).
+hostnames](https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteSpec).
 These hostnames are matched before any other matching within the HTTPRoute takes
 place. Since `foo.example.com` and `bar.example.com` are separate hosts with
 different routing requirements, each is deployed as its own HTTPRoute -

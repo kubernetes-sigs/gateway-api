@@ -1,5 +1,5 @@
 Gateway API is designed to work with multiple protocols.
-[TCPRoute](/references/spec/#networking.x-k8s.io/v1alpha1.TCPRoute) is one such route which
+[TCPRoute](/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.TCPRoute) is one such route which
 allows for managing TCP traffic.
 
 In this example, we have one Gateway resource and two TCPRoute resources that

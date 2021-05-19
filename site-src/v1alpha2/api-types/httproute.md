@@ -228,12 +228,18 @@ A maximum of 100 Gateways can be represented in this list. If this list is full,
 there may be additional Gateways using this Route that are not included in the
 list.
 
-[httproute]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
-[gateways]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.RouteGateways
-[httprouterule]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule
-[hostname]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.Hostname
-[tls-config]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig
+### Merging
+Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
+only one Route rule may match each request. For more information on how conflict
+resolution applies to merging, refer to the [API specification](httprouterule).
+
+
+[httproute]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRoute
+[gateways]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.RouteGateways
+[httprouterule]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteRule
+[hostname]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.Hostname
+[tls-config]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.RouteTLSConfig
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch
-[filters]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter
-[forwardto]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo
+[matches]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteMatch
+[filters]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteFilter
+[forwardto]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteForwardTo
