@@ -22,6 +22,8 @@ import (
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 
+	apivalidation "k8s.io/apimachinery/pkg/api/validation"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
@@ -33,6 +35,23 @@ var (
 		gatewayv1a2.HTTPRouteFilterExtensionRef,
 	}
 )
+
+// ValidateGatewayClassName validates that the given name can be used as
+// a GatewayClass name.
+var ValidateGatewayClassName = apivalidation.NameIsDNSSubdomain
+
+// ValidateGatewayClass validates gc according to the Gateway API specification.
+// For additional details of the GatewayClass spec, refer to:
+// https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha2.GatewayClass
+func ValidateGatewayClass(gc *gatewayv1a2.GatewayClass) field.ErrorList {
+	return validateGatewayClassObjMeta(&gc.ObjectMeta, field.NewPath("metadata"))
+}
+
+// validateGatewayClassObjMeta validates whether required fields of metadata are set according
+// to the Gateway API specification.
+func validateGatewayClassObjMeta(meta *metav1.ObjectMeta, path *field.Path) field.ErrorList {
+	return apivalidation.ValidateObjectMeta(meta, false, ValidateGatewayClassName, path)
+}
 
 // ValidateGateway validates gw according to the Gateway API specification.
 // For additional details of the Gateway spec, refer to:

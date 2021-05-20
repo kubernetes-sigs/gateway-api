@@ -27,6 +27,51 @@ import (
 	utilpointer "k8s.io/utils/pointer"
 )
 
+func TestValidateGatewayClass(t *testing.T) {
+	baseClass := gatewayv1a2.GatewayClass{}
+
+	testCases := map[string]struct {
+		mutate             func(gc *gatewayv1a2.GatewayClass)
+		expectErrsOnFields []string
+	}{
+		"valid name": {
+			mutate: func(gc *gatewayv1a2.GatewayClass) {
+				gc.Name = "valid"
+			},
+			expectErrsOnFields: []string{},
+		},
+		"invalid space in name": {
+			mutate: func(gc *gatewayv1a2.GatewayClass) {
+				gc.Name = "invalid name"
+			},
+			expectErrsOnFields: []string{"metadata.name"},
+		},
+		"invalid * in name": {
+			mutate: func(gc *gatewayv1a2.GatewayClass) {
+				gc.Name = "invalid*name"
+			},
+			expectErrsOnFields: []string{"metadata.name"},
+		},
+	}
+
+	for name, tc := range testCases {
+		tc := tc
+		t.Run(name, func(t *testing.T) {
+			gc := baseClass.DeepCopy()
+			tc.mutate(gc)
+			errs := ValidateGatewayClass(gc)
+			if len(tc.expectErrsOnFields) != len(errs) {
+				t.Fatalf("Expected %d errors, got %d errors: %v", len(tc.expectErrsOnFields), len(errs), errs)
+			}
+			for i, err := range errs {
+				if err.Field != tc.expectErrsOnFields[i] {
+					t.Errorf("Expected error on field: %s, got: %s", tc.expectErrsOnFields[i], err.Error())
+				}
+			}
+		})
+	}
+}
+
 func TestValidateGateway(t *testing.T) {
 	listeners := []gatewayv1a2.Listener{
 		{
