@@ -788,17 +788,15 @@ spec:
                         for protocol types that define this concept. When unspecified,
                         \"\", or `*`, all hostnames are matched. This field can be
                         omitted for protocols that don't require hostname based matching.
-                        \n Hostname is the fully qualified domain name of a network
-                        host, as defined by RFC 3986. Note the following deviations
-                        from the \"host\" part of the URI as defined in the RFC: \n
-                        1. IP literals are not allowed. 2. The `:` delimiter is not
-                        respected because ports are not allowed. \n Hostname can be
-                        \"precise\" which is a domain name without the terminating
-                        dot of a network host (e.g. \"foo.example.com\") or \"wildcard\",
-                        which is a domain name prefixed with a single wildcard label
-                        (e.g. `*.example.com`). The wildcard character `*` must appear
-                        by itself as the first DNS label and matches only a single
-                        label. \n Support: Core"
+                        \n For HTTPRoute objects, there is an interaction with the
+                        `spec.hostnames` array. When both listener and route specify
+                        hostnames, there must be an intersection between the values
+                        for a Route to be admitted. For example, a Gateway with `*.example.com`
+                        would admit a Route that included `foo.example.com` as a hostname,
+                        but not a Route that *only* included `foo.acme.io` as a hostname.
+                        A Route that included both `foo.example.com` and `foo.acme.io`
+                        would be admitted, but the `foo.acme.io` hostname would be
+                        silently ignored. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       type: string
