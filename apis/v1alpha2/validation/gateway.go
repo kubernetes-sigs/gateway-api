@@ -20,18 +20,10 @@ import (
 	"net"
 	"strings"
 
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-
 	"k8s.io/apimachinery/pkg/util/validation"
 	"k8s.io/apimachinery/pkg/util/validation/field"
-)
 
-var (
-	// repeatableHTTPRouteFilters are filter types that can are allowed to be
-	// repeated multiple times in a rule.
-	repeatableHTTPRouteFilters = []gatewayv1a2.HTTPRouteFilterType{
-		gatewayv1a2.HTTPRouteFilterExtensionRef,
-	}
+	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -80,60 +72,6 @@ func validateListenerHostname(listeners []gatewayv1a2.Listener, path *field.Path
 				errs = append(errs, field.Invalid(path.Index(i).Child("hostname"), hostname, msg))
 			}
 		}
-	}
-	return errs
-}
-
-// ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
-// For additional details of the HTTPRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha2.HTTPRoute
-func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
-	return validateHTTPRouteSpec(&route.Spec, field.NewPath("spec"))
-}
-
-// validateHTTPRouteSpec validates that required fields of spec are set according to the
-// HTTPRoute specification.
-func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
-}
-
-// validateHTTPRouteUniqueFilters validates whether each core and extended filter
-// is used at most once in each rule.
-func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *field.Path) field.ErrorList {
-	var errs field.ErrorList
-
-	for i, rule := range rules {
-		counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
-		for _, filter := range rule.Filters {
-			counts[filter.Type]++
-		}
-		// custom filters don't have any validation
-		for _, key := range repeatableHTTPRouteFilters {
-			counts[key] = 0
-		}
-
-		for filterType, count := range counts {
-			if count > 1 {
-				errs = append(errs, field.Invalid(path.Index(i).Child("filters"), filterType, "cannot be used multiple times in the same rule"))
-			}
-		}
-
-	}
-
-	return errs
-}
-
-// ValidateGatewayClassUpdate validates an update to oldClass according to the
-// Gateway API specification. For additional details of the GatewayClass spec, refer to:
-// https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha2.GatewayClass
-func ValidateGatewayClassUpdate(oldClass, newClass *gatewayv1a2.GatewayClass) field.ErrorList {
-	if oldClass == nil || newClass == nil {
-		return nil
-	}
-	var errs field.ErrorList
-	if oldClass.Spec.Controller != newClass.Spec.Controller {
-		errs = append(errs, field.Invalid(field.NewPath("spec.controller"), newClass.Spec.Controller,
-			"cannot update an immutable field"))
 	}
 	return errs
 }
