@@ -190,6 +190,7 @@ type RouteGatewayStatus struct {
 	//
 	// +listType=map
 	// +listMapKey=type
+	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
