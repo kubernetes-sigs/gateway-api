@@ -131,7 +131,7 @@ the path portion. An example scheme could be (similar to container URIs):
 
 ```text
 acme.io/gateway/v1   // Use version 1
-acme.io/gateway/v2   // Use version 2
+acme.io/gateway/v2.1 // Use version 2.1
 acme.io/gateway      // Use the default version
 ```
 

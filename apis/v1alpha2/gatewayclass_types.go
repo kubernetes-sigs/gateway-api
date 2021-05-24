@@ -56,9 +56,9 @@ type GatewayClassSpec struct {
 	//
 	// This field is not mutable and cannot be empty.
 	//
-	// The format of this field is DOMAIN "/" PATH, where DOMAIN
-	// and PATH are valid Kubernetes names
-	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN is a valid
+	// Kubernetes name (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
+	// and PATH is a valid HTTP path as defined by RFC 3986.
 	//
 	// Support: Core
 	//
