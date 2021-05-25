@@ -242,8 +242,9 @@ spec:
                   controller that is managing Gateways of this class. \n Example:
                   \"acme.io/gateway-controller\". \n This field is not mutable and
                   cannot be empty. \n The format of this field is DOMAIN \"/\" PATH,
-                  where DOMAIN and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-                  \n Support: Core"
+                  where DOMAIN is a valid Kubernetes name (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
+                  and PATH is a valid HTTP path as defined by RFC 3986. \n Support:
+                  Core"
                 maxLength: 253
                 type: string
               description:
