@@ -9,3 +9,8 @@ labels: kind/feature
 **What would you like to be added**:
 
 **Why is this needed**:
+
+NOTE: depending on the scope of the enhancement, you may be asked to use the
+GEP process to document your work:
+
+https://gateway-api.sigs.k8s.io/contributing/gep/
