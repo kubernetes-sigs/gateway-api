@@ -685,10 +685,11 @@ type HTTPRouteForwardTo struct {
 
 	// Port specifies the destination port number to use for the
 	// backend referenced by the ServiceName or BackendRef field.
-	// If unspecified, the destination port in the request is used
-	// when forwarding to a backendRef or serviceName.
+	// Port is required when the request is being forwarded to a Kubernetes
+	// Service. Port is optional with BackendRef to enable use cases where
+	// the port should be read from the referrant resource.
 	//
-	// Support: Core
+	// Support: Core for Kubernetes Service
 	//
 	// +optional
 	Port *PortNumber `json:"port,omitempty"`
