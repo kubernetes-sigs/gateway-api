@@ -1,3 +1,7 @@
+---
+labels: 'tide/merge-method-squash'
+---
+
 <!--  Thanks for sending a pull request! Here are some tips for you:
 
 1. If this is your first time contributing to Gateway API, please read our
