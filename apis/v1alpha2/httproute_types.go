@@ -70,19 +70,40 @@ type HTTPRouteSpec struct {
 	// HTTPRoute rules. If no hostname is specified, traffic is routed
 	// based on the HTTPRouteRules.
 	//
-	// Hostname can be "precise" which is a domain name without the terminating
-	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-	// The wildcard character `*` must appear by itself as the first DNS
-	// label and matches only a single label.
-	// You cannot have a wildcard label by itself (e.g. Host == `*`).
 	// Requests will be matched against the Host field in the following order:
 	//
-	// 1. If Host is precise, the request matches this rule if
-	//    the HTTP Host header is equal to Host.
-	// 2. If Host is a wildcard, then the request matches this rule if
+	// 1. If Hostname is precise, the request matches this rule if
+	//    the HTTP Host header is equal to the Hostname.
+	// 2. If Hostname is a wildcard, then the request matches this rule if
 	//    the HTTP Host header is to equal to the suffix
 	//    (removing the first label) of the wildcard rule.
+	// 3. If Hostname is unspecified, empty, or `*`, then any request will match
+	//    this route.
+	//
+	// If a hostname is specified by the Listener that the HTTPRoute is bound
+	// to, at least one hostname specified here must match the Listener specified
+	// hostname as per the rules above. Other hostnames will not affect processing
+	// of the route in that case.
+	//
+	// If no hostname is specified by the Listener, then that value will be treated
+	// as '*', match any hostname, and so any hostname on this Route will match.
+	//
+	// If all hostnames do not match, then the HTTPRoute is not admitted, and
+	// the implementation must raise an 'Admitted' Condition with a status of
+	// `false` for that Listener.
+	//
+	// Examples:
+	// - A Listener with unspecified, empty, or `*` values for Hostname matches
+	//   any HTTPRoute hostname.
+	// - A HTTPRoute with unspecified, empty, or `*` values for Hostname matches
+	//   any Listener hostname.
+	// - A Listener with `test.foo.com` as the hostname matches *only*
+	//   `test.foo.com` or `*.foo.com`. Any other hostnames present must be ignored.
+	// - A Listener with `*.foo.com` as hostname, all hostnames in the HTTPRoute
+	//   must have any single label where the star is, and the rest of the hostname
+	//   must match exactly. So, `test.foo.com`, `*.foo.com` or `blog.foo.com` match.
+	//   `test.blog.foo.com`, `test.bar.com`, or `bar.com` do not. Hostnames that do
+	//   not match will be ignored.
 	//
 	// Support: Core
 	//

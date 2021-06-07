@@ -245,7 +245,22 @@ type RouteStatus struct {
 	Gateways []RouteGatewayStatus `json:"gateways"`
 }
 
-// Hostname is used to specify a hostname that should be matched.
+// Hostname is the fully qualified domain name of a network host, as defined
+// by RFC 3986. Note the following deviations from the "host" part of the
+// URI as defined in the RFC:
+//
+// 1. IP literals are not allowed.
+// 2. The `:` delimiter is not respected because ports are not allowed.
+//
+// Hostname can be "precise" which is a domain name without the terminating
+// dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
+// domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+// The wildcard character `*` must appear by itself as the first DNS label
+// and matches only a single label.
+//
+// Note that as per RFC1035 and RFC1123, a *label* must consist of lower case
+// alphanumeric characters or '-', and must start and end with an alphanumeric
+// character. No other punctuation is allowed.
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253

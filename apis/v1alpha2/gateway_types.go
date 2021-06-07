@@ -144,18 +144,14 @@ type Listener struct {
 	// matched. This field can be omitted for protocols that don't require
 	// hostname based matching.
 	//
-	// Hostname is the fully qualified domain name of a network host, as defined
-	// by RFC 3986. Note the following deviations from the "host" part of the
-	// URI as defined in the RFC:
-	//
-	// 1. IP literals are not allowed.
-	// 2. The `:` delimiter is not respected because ports are not allowed.
-	//
-	// Hostname can be "precise" which is a domain name without the terminating
-	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
-	// domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-	// The wildcard character `*` must appear by itself as the first DNS label
-	// and matches only a single label.
+	// For HTTPRoute objects, there is an interaction with the
+	// `spec.hostnames` array. When both listener and route specify hostnames,
+	// there must be an intersection between the values for a Route to be admitted.
+	// For example, a Gateway with `*.example.com` would admit a Route that included
+	// `foo.example.com` as a hostname, but not a Route that *only* included
+	// `foo.acme.io` as a hostname. A Route that included both `foo.example.com`
+	// and `foo.acme.io` would be admitted, but the `foo.acme.io` hostname would
+	// be silently ignored.
 	//
 	// Support: Core
 	//
