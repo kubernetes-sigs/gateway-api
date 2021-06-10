@@ -10,17 +10,19 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Emissary-Ingress (Ambassador API Gateway)][2] (alpha)
 - [Gloo Edge 2.0][3] (work in progress)
 - [Google Kubernetes Engine][4] (public preview)
-- [Istio][5] (alpha)
-- [Kong][6] (work in progress)
-- [Traefik][7] (alpha)
+- [HAProxy Ingress][5] (alpha)
+- [Istio][6] (alpha)
+- [Kong][7] (work in progress)
+- [Traefik][8] (alpha)
 
 [1]:#contour
 [2]:#emissary-ingress-ambassador-api-gateway
 [3]:#gloo-edge
 [4]:#google-kubernetes-engine
-[5]:#istio
-[6]:#kong
-[7]:#traefik
+[5]:#haproxy-ingress
+[6]:#istio
+[7]:#kong
+[8]:#traefik
 
 ## Project References
 
@@ -69,6 +71,15 @@ Balancing][gclb] is available in [public preview][gke-gateway].
 [gke]:https://cloud.google.com/kubernetes-engine
 [gclb]:https://cloud.google.com/load-balancing
 [gke-gateway]: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+
+### HAProxy Ingress
+
+[HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
+
+HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specification. See the [controller's Gateway API documentation][h2] to get informed about conformance and roadmap.
+
+[h1]:https://haproxy-ingress.github.io/
+[h2]:https://haproxy-ingress.github.io/v0.13/docs/configuration/gateway-api/
 
 ### Istio
 
