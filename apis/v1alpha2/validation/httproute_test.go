@@ -142,7 +142,12 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 									RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-										Set: map[string]string{"special-header": "foo"},
+										Set: []gatewayv1a2.HTTPHeader{
+											{
+												Name:  "special-header",
+												Value: "foo",
+											},
+										},
 									},
 								},
 								{
@@ -155,7 +160,12 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 									RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-										Add: map[string]string{"my-header": "bar"},
+										Add: []gatewayv1a2.HTTPHeader{
+											{
+												Name:  "my-header",
+												Value: "bar",
+											},
+										},
 									},
 								},
 							},
@@ -190,7 +200,12 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 									RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-										Set: map[string]string{"special-header": "foo"},
+										Set: []gatewayv1a2.HTTPHeader{
+											{
+												Name:  "special-header",
+												Value: "foo",
+											},
+										},
 									},
 								},
 								{
@@ -203,7 +218,12 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 									RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-										Add: map[string]string{"my-header": "bar"},
+										Add: []gatewayv1a2.HTTPHeader{
+											{
+												Name:  "my-header",
+												Value: "bar",
+											},
+										},
 									},
 								},
 								{
@@ -238,7 +258,12 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 									RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-										Set: map[string]string{"special-header": "foo"},
+										Set: []gatewayv1a2.HTTPHeader{
+											{
+												Name:  "special-header",
+												Value: "foo",
+											},
+										},
 									},
 								},
 								{

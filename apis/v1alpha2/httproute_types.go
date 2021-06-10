@@ -530,6 +530,28 @@ const (
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 
+// HTTPHeader represents an HTTP Header name and value as defined by RFC 7230.
+type HTTPHeader struct {
+	// Name is the name of the HTTP Header to be matched. Name matching MUST be
+	// case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+	//
+	// If multiple entries specify equivalent header names, only the first entry
+	// with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent header name MUST be ignored. Due to the
+	// case-insensitivity of header names, "foo" and "Foo" are considered
+	// equivalent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=256
+	Name string `json:"name"`
+
+	// Value is the value of HTTP Header to be matched.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+
 // HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
 // filter.
 type HTTPRequestHeaderFilter struct {
@@ -550,9 +572,9 @@ type HTTPRequestHeaderFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	Set map[string]string `json:"set,omitempty"`
+	Set []HTTPHeader `json:"set,omitempty"`
 
-	// Add adds the given header (name, value) to the request
+	// Add adds the given header(s) (name, value) to the request
 	// before the action. It appends to any existing values associated
 	// with the header name.
 	//
@@ -571,7 +593,7 @@ type HTTPRequestHeaderFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	Add map[string]string `json:"add,omitempty"`
+	Add []HTTPHeader `json:"add,omitempty"`
 
 	// Remove the given header(s) from the HTTP request before the
 	// action. The value of RemoveHeader is a list of HTTP header
