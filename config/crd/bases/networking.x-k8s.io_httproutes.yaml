@@ -1156,16 +1156,42 @@ spec:
                               Core"
                             properties:
                               add:
-                                additionalProperties:
-                                  type: string
-                                description: "Add adds the given header (name, value)
-                                  to the request before the action. It appends to
-                                  any existing values associated with the header name.
-                                  \n Input:   GET /foo HTTP/1.1   my-header: foo \n
-                                  Config:   add: {\"my-header\": \"bar\"} \n Output:
-                                  \  GET /foo HTTP/1.1   my-header: foo   my-header:
+                                description: "Add adds the given header(s) (name,
+                                  value) to the request before the action. It appends
+                                  to any existing values associated with the header
+                                  name. \n Input:   GET /foo HTTP/1.1   my-header:
+                                  foo \n Config:   add: {\"my-header\": \"bar\"} \n
+                                  Output:   GET /foo HTTP/1.1   my-header: foo   my-header:
                                   bar \n Support: Extended"
-                                type: object
+                                items:
+                                  description: HTTPHeader represents an HTTP Header
+                                    name and value as defined by RFC 7230.
+                                  properties:
+                                    name:
+                                      description: "Name is the name of the HTTP Header
+                                        to be matched. Name matching MUST be case
+                                        insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        \n If multiple entries specify equivalent
+                                        header names, only the first entry with an
+                                        equivalent name MUST be considered for a match.
+                                        Subsequent entries with an equivalent header
+                                        name MUST be ignored. Due to the case-insensitivity
+                                        of header names, \"foo\" and \"Foo\" are considered
+                                        equivalent."
+                                      maxLength: 256
+                                      minLength: 1
+                                      type: string
+                                    value:
+                                      description: Value is the value of HTTP Header
+                                        to be matched.
+                                      maxLength: 4096
+                                      minLength: 1
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
                               remove:
                                 description: "Remove the given header(s) from the
                                   HTTP request before the action. The value of RemoveHeader
@@ -1181,14 +1207,40 @@ spec:
                                 maxItems: 16
                                 type: array
                               set:
-                                additionalProperties:
-                                  type: string
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
                                   Input:   GET /foo HTTP/1.1   my-header: foo \n Config:
                                   \  set: {\"my-header\": \"bar\"} \n Output:   GET
                                   /foo HTTP/1.1   my-header: bar \n Support: Extended"
-                                type: object
+                                items:
+                                  description: HTTPHeader represents an HTTP Header
+                                    name and value as defined by RFC 7230.
+                                  properties:
+                                    name:
+                                      description: "Name is the name of the HTTP Header
+                                        to be matched. Name matching MUST be case
+                                        insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                        \n If multiple entries specify equivalent
+                                        header names, only the first entry with an
+                                        equivalent name MUST be considered for a match.
+                                        Subsequent entries with an equivalent header
+                                        name MUST be ignored. Due to the case-insensitivity
+                                        of header names, \"foo\" and \"Foo\" are considered
+                                        equivalent."
+                                      maxLength: 256
+                                      minLength: 1
+                                      type: string
+                                    value:
+                                      description: Value is the value of HTTP Header
+                                        to be matched.
+                                      maxLength: 4096
+                                      minLength: 1
+                                      type: string
+                                  required:
+                                  - name
+                                  - value
+                                  type: object
+                                type: array
                             type: object
                           requestMirror:
                             description: "RequestMirror defines a schema for a filter
@@ -1376,9 +1428,7 @@ spec:
                                     Support: Core"
                                   properties:
                                     add:
-                                      additionalProperties:
-                                        type: string
-                                      description: "Add adds the given header (name,
+                                      description: "Add adds the given header(s) (name,
                                         value) to the request before the action. It
                                         appends to any existing values associated
                                         with the header name. \n Input:   GET /foo
@@ -1386,7 +1436,37 @@ spec:
                                         {\"my-header\": \"bar\"} \n Output:   GET
                                         /foo HTTP/1.1   my-header: foo   my-header:
                                         bar \n Support: Extended"
-                                      type: object
+                                      items:
+                                        description: HTTPHeader represents an HTTP
+                                          Header name and value as defined by RFC
+                                          7230.
+                                        properties:
+                                          name:
+                                            description: "Name is the name of the
+                                              HTTP Header to be matched. Name matching
+                                              MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              \n If multiple entries specify equivalent
+                                              header names, only the first entry with
+                                              an equivalent name MUST be considered
+                                              for a match. Subsequent entries with
+                                              an equivalent header name MUST be ignored.
+                                              Due to the case-insensitivity of header
+                                              names, \"foo\" and \"Foo\" are considered
+                                              equivalent."
+                                            maxLength: 256
+                                            minLength: 1
+                                            type: string
+                                          value:
+                                            description: Value is the value of HTTP
+                                              Header to be matched.
+                                            maxLength: 4096
+                                            minLength: 1
+                                            type: string
+                                        required:
+                                        - name
+                                        - value
+                                        type: object
+                                      type: array
                                     remove:
                                       description: "Remove the given header(s) from
                                         the HTTP request before the action. The value
@@ -1403,15 +1483,43 @@ spec:
                                       maxItems: 16
                                       type: array
                                     set:
-                                      additionalProperties:
-                                        type: string
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
                                         action. \n Input:   GET /foo HTTP/1.1   my-header:
                                         foo \n Config:   set: {\"my-header\": \"bar\"}
                                         \n Output:   GET /foo HTTP/1.1   my-header:
                                         bar \n Support: Extended"
-                                      type: object
+                                      items:
+                                        description: HTTPHeader represents an HTTP
+                                          Header name and value as defined by RFC
+                                          7230.
+                                        properties:
+                                          name:
+                                            description: "Name is the name of the
+                                              HTTP Header to be matched. Name matching
+                                              MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
+                                              \n If multiple entries specify equivalent
+                                              header names, only the first entry with
+                                              an equivalent name MUST be considered
+                                              for a match. Subsequent entries with
+                                              an equivalent header name MUST be ignored.
+                                              Due to the case-insensitivity of header
+                                              names, \"foo\" and \"Foo\" are considered
+                                              equivalent."
+                                            maxLength: 256
+                                            minLength: 1
+                                            type: string
+                                          value:
+                                            description: Value is the value of HTTP
+                                              Header to be matched.
+                                            maxLength: 4096
+                                            minLength: 1
+                                            type: string
+                                        required:
+                                        - name
+                                        - value
+                                        type: object
+                                      type: array
                                   type: object
                                 requestMirror:
                                   description: "RequestMirror defines a schema for
