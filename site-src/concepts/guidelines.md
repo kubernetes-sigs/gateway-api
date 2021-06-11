@@ -119,6 +119,6 @@ in our CRDs. We use the following rules:
 - If the field name is a verb, use a singular value.
 
 So for example, in HTTPRoute, `hostnames` uses a plural, but `forwardTo` is singular,
-although they are both lists. 
+although they are both lists.
 
 [1]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
