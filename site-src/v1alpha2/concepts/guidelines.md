@@ -104,11 +104,21 @@ mostly but not entirely portable.
 
 ## API Conventions
 
-Service APIs follow Kubernetes API [conventions][1]. These conventions
+Gateway API follows Kubernetes API [conventions][1]. These conventions
 are intended to ease client development and ensure that configuration
 mechanisms can consistently be implemented across a diverse set of use
-cases. One variation from the Kubernetes conventions is for fields with
-default values. These fields are considered optional but are not pointers
-since they will never be empty.
+cases. In addition to the Kubernetes API conventions, Gateway API has the
+following conventions:
+
+### List Names
+
+Another convention this project uses is for plural field names for lists
+in our CRDs. We use the following rules:
+
+- If the field name is a noun, use a plural value.
+- If the field name is a verb, use a singular value.
+
+So for example, in HTTPRoute, `hostnames` uses a plural, but `forwardTo` is singular,
+although they are both lists.
 
 [1]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
