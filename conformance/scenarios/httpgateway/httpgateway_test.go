@@ -19,57 +19,51 @@ package httpgateway
 import (
 	"context"
 	"fmt"
+	"testing"
 	"time"
 
-	"github.com/cucumber/godog"
-	"github.com/cucumber/messages-go/v10"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"k8s.io/klog"
 	tstate "sigs.k8s.io/gateway-api/conformance/state"
 	"sigs.k8s.io/gateway-api/conformance/utils"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/wait"
 )
 
 var (
 	state *tstate.Scenario
 )
 
-// InitializeScenario configures the Feature to test
-func InitializeScenario(ctx *godog.ScenarioContext) {
-	ctx.Step(`^a new random namespace$`, aNewRandomNamespace)
-	ctx.Step(`^the "([^"]*)" scenario$`, theScenario)
-	ctx.Step(`^Gateway "([^"]*)" should have "([^"]*)" condition should be set to "([^"]*)" within (\d+) minutes$`, conditionMustBeTrueWithin)
-	ctx.Step(`^Gateway "([^"]*)" should have an address in status within (\d+) minutes`, mustHaveAddressWithin)
-
-	ctx.BeforeScenario(func(*godog.Scenario) {
-		state = tstate.New()
+func TestHTTPGateway(t *testing.T) {
+	state = tstate.New("gateway-conformance")
+	t.Cleanup(func() {
+		utils.CleanupScenario(t, state.Namespace, "httpgateway")
 	})
 
-	ctx.AfterScenario(func(*messages.Pickle, error) {
-		// delete namespace an all the content
-		_ = utils.DeleteNamespace(state.Namespace)
+	utils.SetupScenario(t, state.Namespace, "httpgateway")
+
+	t.Run("The gateway should have Scheduled condition set to True within 3 minutes", func(t *testing.T) {
+		err := conditionMustBeTrueWithin(t, "gateway-conformance", "Scheduled", "True", 3)
+		if err != nil {
+			t.Errorf("Timed out waiting for Scheduled condition to be set to True: %v", err)
+		}
+	})
+
+	t.Run("The gateway should have Ready condition set to True within 3 minutes", func(t *testing.T) {
+		err := conditionMustBeTrueWithin(t, "gateway-conformance", "Ready", "True", 3)
+		if err != nil {
+			t.Errorf("Timed out waiting for Ready condition to be set to True: %v", err)
+		}
+	})
+
+	t.Run("The gateway should have at least one address within 3 minutes", func(t *testing.T) {
+		err := mustHaveAddressWithin(t, "gateway-conformance", 3)
+		if err != nil {
+			t.Errorf("Timed out waiting for Gateway to have at least one address: %v", err)
+		}
 	})
 }
 
-func aNewRandomNamespace() error {
-	ns, err := utils.NewNamespace()
-	if err != nil {
-		return err
-	}
-
-	state.Namespace = ns
-	return nil
-}
-
-func theScenario(name string) error {
-	dp := utils.DynamicParams{
-		Path:      fmt.Sprintf("features/%s/%s.yaml", name, name),
-		Namespace: state.Namespace,
-	}
-	return utils.DynamicApply(dp)
-}
-
-func conditionMustBeTrueWithin(gwName, condName, condValue string, minutes int) error {
+func conditionMustBeTrueWithin(t *testing.T, gwName, condName, condValue string, minutes int) error {
 	waitFor := time.Duration(minutes) * time.Minute
 	waitErr := wait.PollImmediate(5*time.Second, waitFor, func() (bool, error) {
 		gw, getErr := utils.GWClient.NetworkingV1alpha1().Gateways(state.Namespace).Get(context.TODO(), gwName, metav1.GetOptions{})
@@ -84,12 +78,12 @@ func conditionMustBeTrueWithin(gwName, condName, condValue string, minutes int) 
 				if cond.Status == metav1.ConditionStatus(condValue) {
 					return true, nil
 				}
-				klog.Warningf("%s condition set to %s, expected %s", condName, cond.Status, condValue)
+				t.Logf("%s condition set to %s, expected %s", condName, cond.Status, condValue)
 			}
 		}
 
 		if !condFound {
-			klog.Warningf("%s was not in conditions list", condName)
+			t.Logf("%s was not in conditions list", condName)
 		}
 
 		return false, nil
@@ -97,7 +91,7 @@ func conditionMustBeTrueWithin(gwName, condName, condValue string, minutes int) 
 	return waitErr
 }
 
-func mustHaveAddressWithin(gwName string, minutes int) error {
+func mustHaveAddressWithin(t *testing.T, gwName string, minutes int) error {
 	waitFor := time.Duration(minutes) * time.Minute
 	waitErr := wait.PollImmediate(5*time.Second, waitFor, func() (bool, error) {
 		gw, getErr := utils.GWClient.NetworkingV1alpha1().Gateways(state.Namespace).Get(context.TODO(), gwName, metav1.GetOptions{})
@@ -109,7 +103,7 @@ func mustHaveAddressWithin(gwName string, minutes int) error {
 			return true, nil
 		}
 
-		klog.Warningf("Gateway.Status.Addresses empty")
+		t.Logf("Gateway.Status.Addresses empty")
 
 		return false, nil
 	})

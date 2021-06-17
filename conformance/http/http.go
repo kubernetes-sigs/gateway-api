@@ -1,21 +1,23 @@
 /*
 Copyright 2020 The Kubernetes Authors.
 
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use
-this file except in compliance with the License. You may obtain a copy of the
-License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software distributed
-under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-CONDITIONS OF ANY KIND, either express or implied. See the License for the
-specific language governing permissions and limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 */
 
 package http
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -72,6 +74,7 @@ func CaptureRoundTrip(method, scheme, hostname, path, location string) (*Capture
 		TLSClientConfig: &tls.Config{
 			// Skip all usual TLS verifications, since we are using self-signed
 			// certificates.
+			// nolint:gosec
 			InsecureSkipVerify: true,
 			VerifyPeerCertificate: func(certificates [][]byte, _ [][]*x509.Certificate) error {
 				certs := make([]*x509.Certificate, len(certificates))
@@ -104,9 +107,9 @@ func CaptureRoundTrip(method, scheme, hostname, path, location string) (*Capture
 
 	url := fmt.Sprintf("%s://%s/%s", scheme, location, strings.TrimPrefix(path, "/"))
 
-	req, err := http.NewRequest(method, url, nil)
-	if err != nil {
-		return nil, nil, err
+	req, reqErr := http.NewRequestWithContext(context.TODO(), method, url, nil)
+	if reqErr != nil {
+		return nil, nil, reqErr
 	}
 
 	if hostname != "" {
@@ -114,24 +117,24 @@ func CaptureRoundTrip(method, scheme, hostname, path, location string) (*Capture
 	}
 
 	if EnableDebug {
-		dump, err := httputil.DumpRequestOut(req, true)
-		if err != nil {
-			return nil, nil, err
+		dump, dumpErr := httputil.DumpRequestOut(req, true)
+		if dumpErr != nil {
+			return nil, nil, dumpErr
 		}
 
 		fmt.Printf("Sending request:\n%s\n\n", formatDump(dump, "> "))
 	}
 
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, nil, err
+	resp, respErr := client.Do(req)
+	if respErr != nil {
+		return nil, nil, respErr
 	}
 	defer resp.Body.Close()
 
 	if EnableDebug {
-		dump, err := httputil.DumpResponse(resp, true)
-		if err != nil {
-			return nil, nil, err
+		dump, dumpErr := httputil.DumpResponse(resp, true)
+		if dumpErr != nil {
+			return nil, nil, dumpErr
 		}
 
 		fmt.Printf("Received response:\n%s\n\n", formatDump(dump, "< "))
@@ -154,9 +157,9 @@ func CaptureRoundTrip(method, scheme, hostname, path, location string) (*Capture
 
 	// we cannot assume the response is JSON
 	if isJSON(body) {
-		err = json.Unmarshal(body, &capReq)
-		if err != nil {
-			return nil, nil, fmt.Errorf("unexpected error reading response: %w", err)
+		jsonErr := json.Unmarshal(body, &capReq)
+		if jsonErr != nil {
+			return nil, nil, fmt.Errorf("unexpected error reading response: %w", jsonErr)
 		}
 	}
 

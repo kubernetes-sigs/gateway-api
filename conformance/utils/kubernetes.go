@@ -34,10 +34,11 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"testing"
 	"text/template"
 	"time"
 
-	gwclientset "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned"
+	gwclientset "sigs.k8s.io/gateway-api/pkg/client/clientset/networking/versioned"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -52,7 +53,6 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/restmapper"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/klog/v2"
 
 	// ensure auth plugins are loaded
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -63,24 +63,22 @@ var (
 	GWClient   *gwclientset.Clientset
 )
 
-// LoadClientset returns clientsets for connecting to kubernetes clusters.
-func LoadClientset() (*clientset.Clientset, *gwclientset.Clientset, error) {
+// LoadClientsets returns clientsets for connecting to kubernetes clusters.
+func LoadClientsets(t *testing.T) {
 	config, err := kubeConfig()
 	if err != nil {
-		return nil, nil, err
+		t.Fatalf("Error loading kube-config: %v", err)
 	}
 
-	client, err := clientset.NewForConfig(config)
+	KubeClient, err = clientset.NewForConfig(config)
 	if err != nil {
-		return nil, nil, err
+		t.Fatalf("Error loading clientset: %v", err)
 	}
 
-	saclient, err := gwclientset.NewForConfig(config)
+	GWClient, err = gwclientset.NewForConfig(config)
 	if err != nil {
-		return nil, nil, err
+		t.Fatalf("Error loading gateway clientset: %v", err)
 	}
-
-	return client, saclient, nil
 }
 
 // DynamicParams are used to call DynamicApply.
@@ -93,7 +91,7 @@ type DynamicParams struct {
 
 // DynamicApply creates or updates Kubernetes resources defined with YAML at the
 // provided path. This supports references to directories or individual files.
-func DynamicApply(dp DynamicParams) error {
+func DynamicApply(t *testing.T, dp DynamicParams) error {
 	path, err := filepath.Abs(dp.Path)
 	if err != nil {
 		return fmt.Errorf("error calculating filepath: %w", err)
@@ -109,7 +107,7 @@ func DynamicApply(dp DynamicParams) error {
 			return ioErr
 		}
 		for _, file := range files {
-			applyErr := DynamicApply(DynamicParams{
+			applyErr := DynamicApply(t, DynamicParams{
 				Path:      dp.Path + "/" + file.Name(),
 				Namespace: dp.Namespace,
 				Delete:    dp.Delete,
@@ -121,7 +119,12 @@ func DynamicApply(dp DynamicParams) error {
 		return nil
 	}
 
-	klog.V(5).Infof("Applying YAML in %s", path)
+	if dp.Delete {
+		t.Logf("Deleting resources defined by YAML in %s", path)
+	} else {
+		t.Logf("Applying YAML in %s", path)
+	}
+
 	config, err := kubeConfig()
 	if err != nil {
 		return fmt.Errorf("error getting kubeconfig: %w", err)
@@ -163,11 +166,10 @@ func DynamicApply(dp DynamicParams) error {
 			if errors.Is(err, io.EOF) {
 				break
 			}
-			klog.Infof("manifest: %s", string(b))
+			t.Logf("manifest: %s", string(b))
 			return fmt.Errorf("error parsing manifest: %w", err)
 		}
 		if len(uObj.Object) == 0 {
-			// klog.Warningf("Found empty object in %s, continuing", path)
 			continue
 		}
 		gvk := uObj.GroupVersionKind()
@@ -201,7 +203,7 @@ func DynamicApply(dp DynamicParams) error {
 			if !apierrors.IsNotFound(err) {
 				return fmt.Errorf("error getting resource: %w", err)
 			}
-			klog.V(5).Infof("Creating %s %s", uObj.GetName(), gvk.Kind)
+			t.Logf("Creating %s %s", uObj.GetName(), gvk.Kind)
 			_, err = dri.Create(context.TODO(), &uObj, metav1.CreateOptions{})
 			if err != nil {
 				return fmt.Errorf("error creating resource: %w", err)
@@ -209,7 +211,7 @@ func DynamicApply(dp DynamicParams) error {
 			continue
 		}
 		uObj.SetResourceVersion(res.GetResourceVersion())
-		klog.Infof("Updating %s %s", uObj.GetName(), gvk.Kind)
+		t.Logf("Updating %s %s", uObj.GetName(), gvk.Kind)
 		_, err = dri.Update(context.TODO(), &uObj, metav1.UpdateOptions{})
 
 		if err != nil {
@@ -220,9 +222,8 @@ func DynamicApply(dp DynamicParams) error {
 	return nil
 }
 
-// NewNamespace creates a new namespace using gateway-api-conformance- as
-// prefix.
-func NewNamespace() (string, error) {
+// EnsureNamespace ensures a namespace exists for gateway-conformance tests.
+func EnsureNamespace() (string, error) {
 	ns := &corev1.Namespace{
 		ObjectMeta: metav1.ObjectMeta{
 			// GenerateName: "gateway-api-conformance-",
@@ -233,14 +234,46 @@ func NewNamespace() (string, error) {
 		},
 	}
 
-	var err error
-
-	ns, err = KubeClient.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
-	if err != nil {
-		return "", fmt.Errorf("unable to create namespace: %w", err)
+	_, getErr := KubeClient.CoreV1().Namespaces().Get(context.TODO(), ns.Name, metav1.GetOptions{})
+	if getErr != nil {
+		_, createErr := KubeClient.CoreV1().Namespaces().Create(context.TODO(), ns, metav1.CreateOptions{})
+		if createErr != nil {
+			return "", fmt.Errorf("unable to create namespace: %w", createErr)
+		}
+	} else {
+		_, updateErr := KubeClient.CoreV1().Namespaces().Update(context.TODO(), ns, metav1.UpdateOptions{})
+		if updateErr != nil {
+			return "", fmt.Errorf("unable to update namespace: %w", updateErr)
+		}
 	}
 
 	return ns.Name, nil
+}
+
+// SetupScenario sets up a scenario using the provided yaml filename.
+func SetupScenario(t *testing.T, namespace, name string) {
+	LoadClientsets(t)
+	dp := DynamicParams{
+		Path:      fmt.Sprintf("%s.yaml", name),
+		Namespace: namespace,
+	}
+	err := DynamicApply(t, dp)
+	if err != nil {
+		t.Fatalf("Error setting up %s scenario: %v", name, err)
+	}
+}
+
+// CleanupScenario cleans up a scenario using the provided yaml filename.
+func CleanupScenario(t *testing.T, namespace, name string) {
+	dp := DynamicParams{
+		Path:      fmt.Sprintf("%s.yaml", name),
+		Namespace: namespace,
+		Delete:    true,
+	}
+	err := DynamicApply(t, dp)
+	if err != nil {
+		t.Fatalf("Error cleaning up %s scenario: %v", name, err)
+	}
 }
 
 // DeleteNamespace deletes a namespace and all the objects inside

@@ -4,12 +4,9 @@ metadata:
   name: gateway-conformance
 spec:
   gatewayClassName: gateway-conformance
-  # addresses:
-  # - type: NamedAddress
-  #   value: istio-ingressgateway.istio-system.svc.cluster.local
   listeners:
   - protocol: HTTP
-    port: 8080
+    port: 80
     routes:
       kind: HTTPRoute
       selector:

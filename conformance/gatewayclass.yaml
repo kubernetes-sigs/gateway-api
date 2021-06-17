@@ -1,13 +1,13 @@
 # These conformance tests rely on a GatewayClass with the gateway-conformance
 # name existing in the cluster they run in. This should refer to the appropriate
 # controller name and params for the implementation being tested.
-# kind: GatewayClass
-# apiVersion: networking.x-k8s.io/v1alpha1
-# metadata:
-#   name: gateway-conformance
-# spec:
-#   # Replace with the appropriate controller name.
-#   controller: istio.io/gateway-controller
+kind: GatewayClass
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: gateway-conformance
+spec:
+  # Replace with the appropriate controller name.
+  controller: istio.io/gateway-controller
 # ---
 # apiVersion: operator.projectcontour.io/v1alpha1
 # kind: Contour
@@ -17,9 +17,9 @@
 # spec:
 #   gatewayClassRef: gateway-conformance
 # ---
-kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha1
-metadata:
-  name: gateway-conformance
-spec:
-  controller: projectcontour.io/contour-operator
+# kind: GatewayClass
+# apiVersion: networking.x-k8s.io/v1alpha1
+# metadata:
+#   name: gateway-conformance
+# spec:
+#   controller: projectcontour.io/contour-operator
