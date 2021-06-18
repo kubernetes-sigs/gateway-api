@@ -179,6 +179,58 @@ spec:
                             - kind
                             - name
                             type: object
+                          requestAuthorization:
+                            description: "RequestAuhtorization defines a schema for
+                              a filter that authorizes requests. \n Support: Extended"
+                            properties:
+                              failModeAllow:
+                                default: false
+                                description: "FailModeAllow defines how this authorization
+                                  filter should be handled if it timeouts or fails
+                                  to contact the URL defined. This field accepts two
+                                  options: \n - True: Fail open. Traffic will be allowed
+                                  even if URL can't be contacted or timeouts - False:
+                                  Fail closed. Default value. Traffic will be denied
+                                  if the gateway can't reach the URL or timeouts.
+                                  \n Support: Extended"
+                                type: boolean
+                              metadata:
+                                additionalProperties:
+                                  type: string
+                                description: "Metadata can be used to provide additional
+                                  context information for the authorization service
+                                  to make a decision. \n Support: Extended"
+                                type: object
+                              protocol:
+                                default: http
+                                description: "Protocol is used to define the Protocol
+                                  that the gateway will use to communicate with the
+                                  authorization service. If not set, it will default
+                                  to \"http\" or inferred from the scheme in URL.
+                                  Examples: \"grpc\",\"http2\" \n Support: Extended"
+                                type: string
+                              requestBody:
+                                default: false
+                                description: "RequestBody allows to define if the
+                                  body of the request should be sent to the authorization
+                                  service. \n - True: The request body will be sent
+                                  to the authorization endpoint. - False: Don't send
+                                  the request body. Default value. \n Support: Extended"
+                                type: boolean
+                              timeoutMs:
+                                default: 100
+                                description: "TimeoutMs is the duration that the authorization
+                                  call is allowed to operate. Default if unset is
+                                  100 \n Support: Extended"
+                                type: integer
+                              url:
+                                description: "URL specifies the address of the service
+                                  used to perform the authorization check. \n Support:
+                                  Extended"
+                                type: string
+                            required:
+                            - url
+                            type: object
                           requestHeaderModifier:
                             description: "RequestHeaderModifier defines a schema for
                               a filter that modifies request headers. \n Support:
@@ -304,6 +356,7 @@ spec:
                             - RequestHeaderModifier
                             - RequestMirror
                             - ExtensionRef
+                            - RequestAuthorization
                             type: string
                         required:
                         - type
@@ -397,6 +450,62 @@ spec:
                                   - group
                                   - kind
                                   - name
+                                  type: object
+                                requestAuthorization:
+                                  description: "RequestAuhtorization defines a schema
+                                    for a filter that authorizes requests. \n Support:
+                                    Extended"
+                                  properties:
+                                    failModeAllow:
+                                      default: false
+                                      description: "FailModeAllow defines how this
+                                        authorization filter should be handled if
+                                        it timeouts or fails to contact the URL defined.
+                                        This field accepts two options: \n - True:
+                                        Fail open. Traffic will be allowed even if
+                                        URL can't be contacted or timeouts - False:
+                                        Fail closed. Default value. Traffic will be
+                                        denied if the gateway can't reach the URL
+                                        or timeouts. \n Support: Extended"
+                                      type: boolean
+                                    metadata:
+                                      additionalProperties:
+                                        type: string
+                                      description: "Metadata can be used to provide
+                                        additional context information for the authorization
+                                        service to make a decision. \n Support: Extended"
+                                      type: object
+                                    protocol:
+                                      default: http
+                                      description: "Protocol is used to define the
+                                        Protocol that the gateway will use to communicate
+                                        with the authorization service. If not set,
+                                        it will default to \"http\" or inferred from
+                                        the scheme in URL. Examples: \"grpc\",\"http2\"
+                                        \n Support: Extended"
+                                      type: string
+                                    requestBody:
+                                      default: false
+                                      description: "RequestBody allows to define if
+                                        the body of the request should be sent to
+                                        the authorization service. \n - True: The
+                                        request body will be sent to the authorization
+                                        endpoint. - False: Don't send the request
+                                        body. Default value. \n Support: Extended"
+                                      type: boolean
+                                    timeoutMs:
+                                      default: 100
+                                      description: "TimeoutMs is the duration that
+                                        the authorization call is allowed to operate.
+                                        Default if unset is 100 \n Support: Extended"
+                                      type: integer
+                                    url:
+                                      description: "URL specifies the address of the
+                                        service used to perform the authorization
+                                        check. \n Support: Extended"
+                                      type: string
+                                  required:
+                                  - url
                                   type: object
                                 requestHeaderModifier:
                                   description: "RequestHeaderModifier defines a schema
@@ -530,6 +639,7 @@ spec:
                                   - RequestHeaderModifier
                                   - RequestMirror
                                   - ExtensionRef
+                                  - RequestAuthorization
                                   type: string
                               required:
                               - type
