@@ -46,17 +46,44 @@ type TLSRoute struct {
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpec struct {
-	// Rules are a list of TLS matchers and actions.
-	//
-	// +kubebuilder:validation:MinItems=1
-	// +kubebuilder:validation:MaxItems=16
-	Rules []TLSRouteRule `json:"rules"`
-
 	// Gateways defines which Gateways can use this Route.
 	//
 	// +optional
 	// +kubebuilder:default={allow: "SameNamespace"}
 	Gateways *RouteGateways `json:"gateways,omitempty"`
+
+	// Hostnames defines a set of SNI names that should match against the
+	// SNI attribute of TLS ClientHello message in TLS handshake.
+	//
+	// SNI can be "precise" which is a domain name without the terminating
+	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
+	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
+	// The wildcard character `*` must appear by itself as the first DNS label
+	// and matches only a single label. You cannot have a wildcard label by
+	// itself (e.g. Host == `*`).
+	//
+	// Requests will be matched against the Host field in the following order:
+	//
+	// 1. If SNI is precise, the request matches this rule if the SNI in
+	//    ClientHello is equal to one of the defined SNIs.
+	// 2. If SNI is a wildcard, then the request matches this rule if the
+	//    SNI is to equal to the suffix (removing the first label) of the
+	//    wildcard rule.
+	// 3. If SNIs is unspecified, all requests associated with the gateway TLS
+	//    listener will match. This can be used to define a default backend
+	//    for a TLS listener.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Hostnames []Hostname `json:"hostnames,omitempty"`
+
+	// Rules are a list of TLS matchers and actions.
+	//
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	Rules []TLSRouteRule `json:"rules"`
 }
 
 // TLSRouteStatus defines the observed state of TLSRoute
@@ -111,33 +138,6 @@ type TLSRouteRule struct {
 // TLSRouteMatch defines the predicate used to match connections to a
 // given action.
 type TLSRouteMatch struct {
-	// SNIs defines a set of SNI names that should match against the
-	// SNI attribute of TLS ClientHello message in TLS handshake.
-	//
-	// SNI can be "precise" which is a domain name without the terminating
-	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-	// The wildcard character `*` must appear by itself as the first DNS label
-	// and matches only a single label. You cannot have a wildcard label by
-	// itself (e.g. Host == `*`).
-	//
-	// Requests will be matched against the Host field in the following order:
-	//
-	// 1. If SNI is precise, the request matches this rule if the SNI in
-	//    ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this rule if the
-	//    SNI is to equal to the suffix (removing the first label) of the
-	//    wildcard rule.
-	// 3. If SNIs is unspecified, all requests associated with the gateway TLS
-	//    listener will match. This can be used to define a default backend
-	//    for a TLS listener.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=16
-	SNIs []Hostname `json:"snis,omitempty"`
-
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior.  For example, resource "mytlsroutematcher" in group
 	// "networking.acme.io". If the referent cannot be found, the rule is not
