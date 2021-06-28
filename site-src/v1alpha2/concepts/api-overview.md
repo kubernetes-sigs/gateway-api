@@ -67,7 +67,7 @@ GatewayClass.
 
 As the Gateway spec captures user intent, it may not contain a complete
 specification for all attributes in the spec. For example, the user may omit
-fields such as addresses, ports, TLS settings. This allows the controller
+fields such as addresses, TLS settings. This allows the controller
 managing the GatewayClass to provide these settings for the user, resulting in a
 more portable spec. This behaviour will be made clear using the GatewayClass
 Status object.
