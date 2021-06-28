@@ -63,14 +63,18 @@ Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that br
 ### Google Kubernetes Engine
 
 [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform
-offered by Google Cloud.
+offered by Google Cloud. GKE's implementation of the Gateway API is through the 
+[GKE Gateway controller][gke-gateway] (currently in Preview) which provisions 
+Google Cloud Load Balancers for Pods in GKE clusters. 
 
-GKE support for the Gateway API for orchestration of [Google Cloud Load
-Balancing][gclb] is available in [public preview][gke-gateway].
+The GKE Gateway controller supports weighted traffic splitting, mirroring, 
+advanced routing, multi-cluster load balancing and more. See the docs to deploy 
+[private or public Gateways][gke-gateway-deploy] and also [multi-cluster Gateways][gke-multi-cluster-gateway]. 
 
 [gke]:https://cloud.google.com/kubernetes-engine
-[gclb]:https://cloud.google.com/load-balancing
-[gke-gateway]: https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+[gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+[gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
+[gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
 
 ### HAProxy Ingress
 
