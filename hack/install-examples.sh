@@ -19,4 +19,4 @@ set -o nounset
 set -o pipefail
 
 # Install all example gateway-api resources.
-kubectl apply -f examples
+kubectl apply --recursive -f examples
