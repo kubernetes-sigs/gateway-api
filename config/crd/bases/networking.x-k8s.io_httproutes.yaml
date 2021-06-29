@@ -1303,6 +1303,34 @@ spec:
                                 maxLength: 253
                                 type: string
                             type: object
+                          requestRedirect:
+                            description: "RequestRedirect defines a schema for a filter
+                              that redirects request. \n Support: Core"
+                            properties:
+                              hostname:
+                                description: Hostname is the hostname to be used in
+                                  the value of the `Location` header in the response.
+                                  When empty, the hostname of the request is used.
+                                type: string
+                              port:
+                                description: Port is the port to be used in the value
+                                  of the `Location` header in the response. When empty,
+                                  port (if specified) of the request is used.
+                                type: integer
+                              protocol:
+                                description: Protocol is the protocol to be used in
+                                  the value of the `Location` header in the response.
+                                  When empty, the protocol of the request is used.
+                                enum:
+                                - HTTP
+                                - HTTPS
+                                type: string
+                              redirect_status_code:
+                                default: 302
+                                description: StatusCode is the HTTP status code to
+                                  be used in response.
+                                type: integer
+                            type: object
                           type:
                             description: "Type identifies the type of filter to apply.
                               As with other API fields, types are classified into
@@ -1327,6 +1355,7 @@ spec:
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
+                            - RequestRedirect
                             - ExtensionRef
                             type: string
                         required:
@@ -1585,6 +1614,37 @@ spec:
                                       maxLength: 253
                                       type: string
                                   type: object
+                                requestRedirect:
+                                  description: "RequestRedirect defines a schema for
+                                    a filter that redirects request. \n Support: Core"
+                                  properties:
+                                    hostname:
+                                      description: Hostname is the hostname to be
+                                        used in the value of the `Location` header
+                                        in the response. When empty, the hostname
+                                        of the request is used.
+                                      type: string
+                                    port:
+                                      description: Port is the port to be used in
+                                        the value of the `Location` header in the
+                                        response. When empty, port (if specified)
+                                        of the request is used.
+                                      type: integer
+                                    protocol:
+                                      description: Protocol is the protocol to be
+                                        used in the value of the `Location` header
+                                        in the response. When empty, the protocol
+                                        of the request is used.
+                                      enum:
+                                      - HTTP
+                                      - HTTPS
+                                      type: string
+                                    redirect_status_code:
+                                      default: 302
+                                      description: StatusCode is the HTTP status code
+                                        to be used in response.
+                                      type: integer
+                                  type: object
                                 type:
                                   description: "Type identifies the type of filter
                                     to apply. As with other API fields, types are
@@ -1610,6 +1670,7 @@ spec:
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
+                                  - RequestRedirect
                                   - ExtensionRef
                                   type: string
                               required:
