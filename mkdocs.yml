@@ -33,6 +33,7 @@ nav:
       - Implementations: references/implementations.md
   - Contributing:
       - Developer guide: contributing/devguide.md
+      - Gateway Enhancement Proposal: contributing/gep.md
       - Enhancement requests: contributing/enhancement-requests.md
       - Community: contributing/community.md
   - FAQ: faq.md
