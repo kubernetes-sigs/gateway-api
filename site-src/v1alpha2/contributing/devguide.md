@@ -104,9 +104,25 @@ automatically be deployed with Netlify to [gateway-api.sigs.k8s.io]. If you want
 preview docs changes locally, you can install mkdocs and run:
 
 ```shell
-make docs
+ make docs
 ```
 
+To make it easier to use the right version of [mkdocs], there is a `.venv`
+target to create a Python virtualenv that includes [mkdocs]. To use the
+[mkdocs] live preview server while you edit, you can run [mkdocs] from
+the virtualenv:
+
+```shell
+$ make .venv
+Creating a virtualenv in .venv... OK
+To enter the virtualenv type "source .venv/bin/activate", to exit type "deactivate"
+(.venv) $ source .venv/bin/activate
+(.venv) $ mkdocs serve
+INFO    -  Building documentation...
+...
+```
+
+ [mkdocs]: https://www.mkdocs.org/
 [mkdocs]: https://www.mkdocs.org/
 [Netlify]: https://netlify.com/
 [gateway-api.sigs.k8s.io]: https://gateway-api.sigs.k8s.io

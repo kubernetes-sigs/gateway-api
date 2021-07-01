@@ -94,3 +94,15 @@ release-staging: build
 	docker push $(REGISTRY)/admission-server:$(TAG)
 	docker tag $(REGISTRY)/admission-server:$(TAG) $(REGISTRY)/admission-server:latest
 	docker push $(REGISTRY)/admission-server:latest
+
+# Generate a virtualenv install, which is useful for hacking on the
+# docs since it installs mkdocs and all the right dependencies.
+#
+# On Ubuntu, this requires the python3-venv package.
+virtualenv: .venv
+.venv: requirements.txt
+	@echo Creating a virtualenv in $@"... "
+	@python3 -m venv $@ || (rm -rf $@ && exit 1)
+	@echo Installing packages in $@"... "
+	@$@/bin/python3 -m pip install -q -r requirements.txt || (rm -rf $@ && exit 1)
+	@echo To enter the virtualenv type \"source $@/bin/activate\",  to exit type \"deactivate\"
