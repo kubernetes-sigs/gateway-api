@@ -5,6 +5,8 @@ site_dir: site
 docs_dir: site-src
 theme:
   name: material
+extra_css:
+  - css/extra.css
 plugins:
   - search
   - macros:
