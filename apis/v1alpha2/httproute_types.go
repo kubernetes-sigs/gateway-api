@@ -509,6 +509,13 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
+	// RequestRedirect defines a schema for a filter that redirects request.
+	//
+	// Support: Core
+	//
+	// +optional
+	RequestRedirect *HTTPRequestRedirect `json:"requestRedirect,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.acme.io"). ExtensionRef MUST NOT be used for core and
@@ -521,7 +528,7 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef
+// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
 type HTTPRouteFilterType string
 
 const (
@@ -532,6 +539,15 @@ const (
 	//
 	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
+
+	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
+	// another location. This filter can also be used for HTTP to HTTPS
+	// redirects.
+	//
+	// Support in HTTPRouteRule: Core
+	//
+	// Support in HTTPRouteForwardTo: Extended
+	HTTPRouteFilterRequestRedirect HTTPRouteFilterType = "RequestRedirect"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 	// different backend. The responses from this backend MUST be ignored by
@@ -639,6 +655,35 @@ type HTTPRequestHeaderFilter struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	Remove []string `json:"remove,omitempty"`
+}
+
+// HTTPRequestRedirect defines configuration for the RequestRedirect filter.
+type HTTPRequestRedirect struct {
+	// Protocol is the protocol to be used in the value of the `Location`
+	// header in the response.
+	// When empty, the protocol of the request is used.
+	//
+	// +optional
+	// +kubebuilder:validation:Enum=HTTP;HTTPS
+	Protocol *string `json:"protocol,omitempty"`
+	// Hostname is the hostname to be used in the value of the `Location`
+	// header in the response.
+	// When empty, the hostname of the request is used.
+	//
+	// +optional
+	Hostname *string `json:"hostname,omitempty"`
+	// Port is the port to be used in the value of the `Location`
+	// header in the response.
+	// When empty, port (if specified) of the request is used.
+	//
+	// +optional
+	Port *int `json:"port,omitempty"`
+	// StatusCode is the HTTP status code to be used in response.
+	//
+	// +optional
+	// +kubebuilder:default=302
+	// +kubebuilder:validation=301;302
+	StatusCode *int `json:"redirect_status_code,omitempty"`
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
