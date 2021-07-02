@@ -683,7 +683,7 @@ type HTTPRequestRedirect struct {
 	// +optional
 	// +kubebuilder:default=302
 	// +kubebuilder:validation=301;302
-	StatusCode *int `json:"redirect_status_code,omitempty"`
+	StatusCode *int `json:"statusCode,omitempty"`
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.

@@ -1325,7 +1325,7 @@ spec:
                                 - HTTP
                                 - HTTPS
                                 type: string
-                              redirect_status_code:
+                              statusCode:
                                 default: 302
                                 description: StatusCode is the HTTP status code to
                                   be used in response.
@@ -1639,7 +1639,7 @@ spec:
                                       - HTTP
                                       - HTTPS
                                       type: string
-                                    redirect_status_code:
+                                    statusCode:
                                       default: 302
                                       description: StatusCode is the HTTP status code
                                         to be used in response.
