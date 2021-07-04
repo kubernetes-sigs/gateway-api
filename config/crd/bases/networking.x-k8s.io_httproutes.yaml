@@ -1378,8 +1378,8 @@ spec:
                               forward matched requests to. If both BackendRef and
                               ServiceName are specified, ServiceName will be given
                               precedence. \n If the referent cannot be found, the
-                              route must be dropped from the Gateway. The controller
-                              should raise the \"ResolvedRefs\" condition on the Gateway
+                              rule is not included in the route. The controller should
+                              raise the \"ResolvedRefs\" condition on the Gateway
                               with the \"DegradedRoutes\" reason. The gateway status
                               for this route should be updated with a condition that
                               describes the error more specifically. \n Support: Custom"
@@ -1694,14 +1694,14 @@ spec:
                               takes the place of BackendRef. If both BackendRef and
                               ServiceName are specified, ServiceName will be given
                               precedence. \n If the referent cannot be found, the
-                              route must be dropped from the Gateway. The controller
-                              should raise the \"ResolvedRefs\" condition on the Gateway
+                              rule is not included in the route. The controller should
+                              raise the \"ResolvedRefs\" condition on the Gateway
                               with the \"DegradedRoutes\" reason. The gateway status
                               for this route should be updated with a condition that
                               describes the error more specifically. \n The protocol
-                              to use should be specified with the AppProtocol field
-                              on Service resources. This field was introduced in Kubernetes
-                              1.18. If using an earlier version of Kubernetes, a `networking.x-k8s.io/app-protocol`
+                              to use is defined using AppProtocol field (introduced
+                              in Kubernetes 1.18) in the Service resource. In the
+                              absence of the AppProtocol field a `networking.x-k8s.io/app-protocol`
                               annotation on the BackendPolicy resource may be used
                               to define the protocol. If the AppProtocol field is
                               available, this annotation should not be used. The AppProtocol
@@ -1723,7 +1723,7 @@ spec:
                               and the sum of weights does not need to equal 100. \n
                               If only one backend is specified and it has a weight
                               greater than 0, 100% of the traffic is forwarded to
-                              that backend. If weight is set to 0, traffic must not
+                              that backend. If weight is set to 0, no traffic should
                               be forwarded for this entry. If unspecified, weight
                               defaults to 1. \n Support: Core"
                             format: int32

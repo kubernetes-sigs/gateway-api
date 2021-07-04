@@ -157,7 +157,7 @@ type RouteForwardTo struct {
 	// traffic should be forwarded for this entry. If unspecified, weight
 	// defaults to 1.
 	//
-	// Support: Extended
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=1

@@ -625,7 +625,7 @@ spec:
                               greater than 0, 100% of the traffic is forwarded to
                               that backend. If weight is set to 0, no traffic should
                               be forwarded for this entry. If unspecified, weight
-                              defaults to 1. \n Support: Extended"
+                              defaults to 1. \n Support: Core"
                             format: int32
                             maximum: 1000000
                             minimum: 0

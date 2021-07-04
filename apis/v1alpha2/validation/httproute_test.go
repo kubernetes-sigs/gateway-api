@@ -48,9 +48,11 @@ func TestValidateHTTPRoute(t *testing.T) {
 							},
 							ForwardTo: []gatewayv1a2.HTTPRouteForwardTo{
 								{
-									ServiceName: &testService,
-									Port:        portNumberPtr(8080),
-									Weight:      utilpointer.Int32(100),
+									RouteForwardTo: gatewayv1a2.RouteForwardTo{
+										ServiceName: &testService,
+										Port:        portNumberPtr(8080),
+										Weight:      utilpointer.Int32(100),
+									},
 								},
 							},
 						},
