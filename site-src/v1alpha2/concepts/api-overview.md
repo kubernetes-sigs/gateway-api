@@ -17,7 +17,7 @@ section in the Security model for details.
 
 ## Resource model
 
-> Note: Resources will initially live in the `networking.x-k8s.io` API group as
+> Note: Resources will initially live in the `gateway.networking.k8s.io` API group as
 > Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
 > be in this API group.
 

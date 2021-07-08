@@ -743,7 +743,7 @@ type HTTPRouteForwardTo struct {
 	//
 	// The protocol to use should be specified with the AppProtocol field on Service
 	// resources. This field was introduced in Kubernetes 1.18. If using an earlier version
-	// of Kubernetes, a `networking.x-k8s.io/app-protocol` annotation on the
+	// of Kubernetes, a `gateway.networking.k8s.io/app-protocol` annotation on the
 	// BackendPolicy resource may be used to define the protocol. If the
 	// AppProtocol field is available, this annotation should not be used. The
 	// AppProtocol field, when populated, takes precedence over the annotation

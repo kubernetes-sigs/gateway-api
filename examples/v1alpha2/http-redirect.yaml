@@ -1,5 +1,5 @@
 kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: filter-lb
 spec: 
@@ -15,7 +15,7 @@ metadata:
   name: gateway-api-example-ns1
 ---
 kind: Gateway
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: my-filter-gateway
   namespace: gateway-api-example-ns1
@@ -42,7 +42,7 @@ spec:
           from: "All"
 ---
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: http-filter-1
   namespace: gateway-api-example-ns1
@@ -62,7 +62,7 @@ spec:
           protocol: HTTPS
 ---
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: http-filter-1
   labels:

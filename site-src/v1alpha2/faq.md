@@ -37,7 +37,7 @@
         control policy. This is an example of matching the object by name.
 
         Gateway API uses this decorator pattern with the
-        [`BackendPolicy`](/references/spec/#networking.x-k8s.io/v1alpha1.BackendPolicy)
+        [`BackendPolicy`](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.BackendPolicy)
         resource, which modifies how a `Gateway` should forward traffic
         to a backend target (commonly a Kubernetes `Service`). This is
         an example of using explicit object references.

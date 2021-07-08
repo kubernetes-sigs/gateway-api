@@ -44,9 +44,9 @@ const (
 	//
 	// Examples:
 	//
-	// - `networking.x-k8s.io/app-protocol: https`
-	// - `networking.x-k8s.io/app-protocol: tls`
-	AnnotationAppProtocol = "networking.x-k8s.io/app-protocol"
+	// - `gateway.networking.k8s.io/app-protocol: https`
+	// - `gateway.networking.k8s.io/app-protocol: tls`
+	AnnotationAppProtocol = "gateway.networking.k8s.io/app-protocol"
 )
 
 // RouteGateways defines which Gateways will be able to use a route. If this
@@ -108,7 +108,7 @@ type RouteForwardTo struct {
 	//
 	// The protocol to use is defined using AppProtocol field (introduced in
 	// Kubernetes 1.18) in the Service resource. In the absence of the
-	// AppProtocol field a `networking.x-k8s.io/app-protocol` annotation on the
+	// AppProtocol field a `gateway.networking.k8s.io/app-protocol` annotation on the
 	// BackendPolicy resource may be used to define the protocol. If the
 	// AppProtocol field is available, this annotation should not be used. The
 	// AppProtocol field, when populated, takes precedence over the annotation
