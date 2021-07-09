@@ -9,18 +9,20 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Contour][1] (alpha)
 - [Emissary-Ingress (Ambassador API Gateway)][2] (alpha)
 - [Gloo Edge 2.0][3] (work in progress)
-- [Google Kubernetes Engine][4] (work in progress)
-- [Istio][5] (alpha)
-- [Kong][6] (work in progress)
-- [Traefik][7] (alpha)
+- [Google Kubernetes Engine][4] (public preview)
+- [HAProxy Ingress][5] (alpha)
+- [Istio][6] (alpha)
+- [Kong][7] (work in progress)
+- [Traefik][8] (alpha)
 
 [1]:#contour
 [2]:#emissary-ingress-ambassador-api-gateway
 [3]:#gloo-edge
-[4]:#google-cloud-platform
-[5]:#istio
-[6]:#kong
-[7]:#traefik
+[4]:#google-kubernetes-engine
+[5]:#haproxy-ingress
+[6]:#istio
+[7]:#kong
+[8]:#traefik
 
 ## Project References
 
@@ -60,14 +62,28 @@ Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that br
 
 ### Google Kubernetes Engine
 
-The [Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered by Google Cloud.
+[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform
+offered by Google Cloud. GKE's implementation of the Gateway API is through the 
+[GKE Gateway controller][gke-gateway] (currently in Preview) which provisions 
+Google Cloud Load Balancers for Pods in GKE clusters. 
 
-GKE is actively working towards an implementation of the Gateway API for orchestration of [Google Cloud Load Balancing][gclb].
-
-The GKE Gateway Controller will become a managed component of GKE to automate and ease load balancing for containers.
+The GKE Gateway controller supports weighted traffic splitting, mirroring, 
+advanced routing, multi-cluster load balancing and more. See the docs to deploy 
+[private or public Gateways][gke-gateway-deploy] and also [multi-cluster Gateways][gke-multi-cluster-gateway]. 
 
 [gke]:https://cloud.google.com/kubernetes-engine
-[gclb]:https://cloud.google.com/load-balancing
+[gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
+[gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
+[gke-multi-cluster-gateway]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-multi-cluster-gateways
+
+### HAProxy Ingress
+
+[HAProxy Ingress][h1] is a community driven ingress controller implementation for HAProxy.
+
+HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specification. See the [controller's Gateway API documentation][h2] to get informed about conformance and roadmap.
+
+[h1]:https://haproxy-ingress.github.io/
+[h2]:https://haproxy-ingress.github.io/v0.13/docs/configuration/gateway-api/
 
 ### Istio
 
