@@ -52,30 +52,42 @@ go run sigs.k8s.io/controller-tools/cmd/controller-gen \
         output:crd:artifacts:config=config/crd/bases \
         paths=./...
 
-echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
-go run k8s.io/code-generator/cmd/client-gen \
-        --clientset-name "${CLIENTSET_NAME}" \
-        --input-base "" \
-        --input "${FQ_APIS}" \
-        --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
-        ${COMMON_FLAGS}
+# TODO(robscott): Change this once v1alpha2 has received formal API approval.
+sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.5\.0/api\-approved\.kubernetes\.io\:\ unapproved/g' config/crd/bases/gateway.networking.k8s.io*
 
-echo "Generating listers at ${OUTPUT_PKG}/listers"
-go run k8s.io/code-generator/cmd/lister-gen \
-        --input-dirs "${FQ_APIS}" \
-        --output-package "${OUTPUT_PKG}/listers" \
-        ${COMMON_FLAGS}
 
-echo "Generating informers at ${OUTPUT_PKG}/informers"
-go run k8s.io/code-generator/cmd/informer-gen \
-         --input-dirs "${FQ_APIS}" \
-         --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
-         --listers-package "${OUTPUT_PKG}/listers" \
-         --output-package "${OUTPUT_PKG}/informers" \
-         ${COMMON_FLAGS}
+for VERSION in v1alpha1 v1alpha2
+do
+        GROUP="gateway"
+        if [[ "${VERSION}" == "v1alpha1" ]]; then
+                GROUP="networking"
+        fi
+        echo "Generating ${VERSION} clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${GROUP}"
+        go run k8s.io/code-generator/cmd/client-gen \
+                --clientset-name "${CLIENTSET_NAME}" \
+                --input-base "" \
+                --input "${APIS_PKG}/apis/${VERSION}" \
+                --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${GROUP}" \
+                ${COMMON_FLAGS}
 
-echo "Generating register at ${FQ_APIS}"
-go run k8s.io/code-generator/cmd/register-gen \
-        --input-dirs "${FQ_APIS}" \
-        --output-package "${FQ_APIS}" \
-        ${COMMON_FLAGS}
+        echo "Generating ${VERSION} listers at ${OUTPUT_PKG}/listers/${GROUP}"
+        go run k8s.io/code-generator/cmd/lister-gen \
+                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+                --output-package "${OUTPUT_PKG}/listers/${GROUP}" \
+                ${COMMON_FLAGS}
+
+        echo "Generating ${VERSION} informers at ${OUTPUT_PKG}/informers/${GROUP}"
+        go run k8s.io/code-generator/cmd/informer-gen \
+                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+                --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${GROUP}/${CLIENTSET_NAME}" \
+                --listers-package "${OUTPUT_PKG}/listers/${GROUP}" \
+                --output-package "${OUTPUT_PKG}/informers/${GROUP}" \
+                ${COMMON_FLAGS}
+
+        echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
+        go run k8s.io/code-generator/cmd/register-gen \
+                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+                --output-package "${APIS_PKG}/apis/${VERSION}" \
+                ${COMMON_FLAGS}
+
+done

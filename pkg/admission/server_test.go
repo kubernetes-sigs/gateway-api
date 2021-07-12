@@ -233,13 +233,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "gateways"
 							},
 							"object": {
    								"kind": "Gateway",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-1",
    								   "labels": {
@@ -254,7 +254,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 											"protocol": "HTTP",
 											"hostname": "foo.com",
 											"routes": {
-												"group": "networking.x-k8s.io",
+												"group": "gateway.networking.k8s.io",
 												"kind": "HTTPRoute",
 												"namespaces": {
 													"from": "All"
@@ -282,13 +282,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "gateways"
 							},
 							"object": {
    								"kind": "Gateway",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-1",
    								   "labels": {
@@ -303,7 +303,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 											"protocol": "HTTP",
 											"hostname": "` + invalidHostname + `",
 											"routes": {
-												"group": "networking.x-k8s.io",
+												"group": "gateway.networking.k8s.io",
 												"kind": "HTTPRoute",
 												"namespaces": {
 													"from": "All"
@@ -398,13 +398,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "httproutes"
 							},
 							"object": {
    								"kind": "HTTPRoute",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "http-app-1",
    								   "labels": {
@@ -536,13 +536,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "httproutes"
 							},
 							"object": {
    								"kind": "HTTPRoute",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "http-app-1",
    								   "labels": {
@@ -738,13 +738,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -771,13 +771,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -787,7 +787,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							},
 							"oldObject": {
    								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -821,13 +821,13 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
+								"group": "gateway.networking.k8s.io",
 								"version": "v1alpha2",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -837,7 +837,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							},
 							"oldObject": {
    								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},

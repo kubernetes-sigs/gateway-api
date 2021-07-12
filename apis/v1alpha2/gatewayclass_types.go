@@ -165,7 +165,7 @@ const (
 
 	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
 	// GatewayClass whenever there are provisioned Gateways using a GatewayClass.
-	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.networking.x-k8s.io"
+	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.gateway.networking.k8s.io"
 )
 
 // GatewayClassStatus is the current status for the GatewayClass.

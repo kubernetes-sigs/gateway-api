@@ -28,7 +28,7 @@ import (
 
 // ValidateGateway validates gw according to the Gateway API specification.
 // For additional details of the Gateway spec, refer to:
-//  https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha2.Gateway
+//  https://gateway-api.sigs.k8s.io/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
 	return validateGatewaySpec(&gw.Spec, field.NewPath("spec"))
 }

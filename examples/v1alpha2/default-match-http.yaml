@@ -1,12 +1,12 @@
 kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: default-match-example
 spec:
   controller: acme.io/gateway-controller
 ---
 kind: Gateway
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: default-match-gw
 spec:
@@ -27,7 +27,7 @@ spec:
 # matches every HTTP request and ensures that route rules always have at
 # least one valid match.
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: default-match-route
   labels:

@@ -31,7 +31,7 @@ import (
 // Gateway represents an instantiation of a service-traffic handling
 // infrastructure by binding Listeners to a set of IP addresses.
 //
-// Implementations should add the `gateway-exists-finalizer.networking.x-k8s.io`
+// Implementations should add the `gateway-exists-finalizer.gateway.networking.k8s.io`
 // finalizer on the associated GatewayClass whenever Gateway(s) is running.
 // This ensures that a GatewayClass associated with a Gateway(s) is not
 // deleted while in use.
@@ -202,7 +202,7 @@ type Listener struct {
 	// a cluster resource (i.e. Service) by externally-reachable
 	// URL, load-balance traffic and terminate SSL/TLS.  Typically,
 	// a route is a "HTTPRoute" or "TCPRoute" in group
-	// "networking.x-k8s.io", however, an implementation may support
+	// "gateway.networking.k8s.io", however, an implementation may support
 	// other types of resources.
 	//
 	// The Routes selector MUST select a set of objects that
@@ -404,7 +404,7 @@ type RouteBindingSelector struct {
 	// +optional
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 	// Group is the group of the route resource to select. Omitting the value or specifying
-	// the empty string indicates the networking.x-k8s.io API group.
+	// the empty string indicates the gateway.networking.k8s.io API group.
 	// For example, use the following to select an HTTPRoute:
 	//
 	// routes:
@@ -420,7 +420,7 @@ type RouteBindingSelector struct {
 	// Support: Core
 	//
 	// +optional
-	// +kubebuilder:default=networking.x-k8s.io
+	// +kubebuilder:default=gateway.networking.k8s.io
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group *string `json:"group,omitempty"`

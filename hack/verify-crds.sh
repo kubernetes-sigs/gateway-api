@@ -42,6 +42,9 @@ cp -a "${DIFFROOT}"/* "${TMP_DIFFROOT}"
 ${CONTROLLER_GEN} ${CRD_OPTIONS} rbac:roleName=manager-role webhook \
 paths="./..." output:crd:artifacts:config=${TMP_DIFFROOT}
 
+# TODO(robscott): Change this once v1alpha2 has received formal API approval.
+sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.5\.0/api\-approved\.kubernetes\.io\:\ unapproved/g' ${TMP_DIFFROOT}/gateway.networking.k8s.io*
+
 echo "diffing ${DIFFROOT} against freshly generated codegen in ${TMP_DIFFROOT}"
 ret=0
 diff -Naupr "${DIFFROOT}" "${TMP_DIFFROOT}" || ret=$?

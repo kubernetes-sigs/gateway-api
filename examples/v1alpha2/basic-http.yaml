@@ -1,5 +1,5 @@
 kind: GatewayClass
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: acme-lb
 spec:
@@ -10,7 +10,7 @@ spec:
     kind: Parameters
 ---
 kind: Gateway
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: my-gateway
 spec:
@@ -27,7 +27,7 @@ spec:
         from: "Same"
 ---
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: http-app-1
   labels:

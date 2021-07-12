@@ -29,7 +29,7 @@ namespace.
 The following example allows Gateways from namespace "httproute-ns-example":
 ```yaml
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha1
 metadata:
   name: httproute-example
   namespace: httproute-ns-example
@@ -67,7 +67,7 @@ The following example defines hostname "my.example.com" and allows Gateways
 from the same namespace as HTTPRoute "httproute-example":
 ```yaml
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha1
 metadata:
   name: httproute-example
 spec:
@@ -114,7 +114,7 @@ independent, i.e. this rule will be matched if any single match is satisfied.
 Take the following matches configuration as an example:
 ```yaml
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha1
 ...
 matches:
   - path:
@@ -210,7 +210,7 @@ The following example indicates HTTPRoute "http-example" has been admitted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
 kind: HTTPRoute
-apiVersion: networking.x-k8s.io/v1alpha1
+apiVersion: gateway.networking.k8s.io/v1alpha1
 metadata:
   name: http-example
 ...
@@ -234,12 +234,12 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification](httprouterule).
 
 
-[httproute]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRoute
-[gateways]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.RouteGateways
-[httprouterule]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteRule
-[hostname]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.Hostname
-[tls-config]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.RouteTLSConfig
+[httproute]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
+[gateways]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.RouteGateways
+[httprouterule]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule
+[hostname]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Hostname
+[tls-config]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.RouteTLSConfig
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteMatch
-[filters]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteFilter
-[forwardto]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha2.HTTPRouteForwardTo
+[matches]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteMatch
+[filters]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteFilter
+[forwardto]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteForwardTo
