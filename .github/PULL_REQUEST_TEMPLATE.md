@@ -24,6 +24,7 @@ Add one of the following kinds:
 /kind documentation
 /kind feature
 /kind design
+/kind gep
 
 Optionally add one or more of the following kinds if applicable:
 /kind api-change
