@@ -606,8 +606,6 @@ type HTTPRequestHeaderFilter struct {
 	//   GET /foo HTTP/1.1
 	//   my-header: bar
 	//
-	// Support: Extended
-	//
 	// +optional
 	Set []HTTPHeader `json:"set,omitempty"`
 
@@ -626,8 +624,6 @@ type HTTPRequestHeaderFilter struct {
 	//   GET /foo HTTP/1.1
 	//   my-header: foo
 	//   my-header: bar
-	//
-	// Support: Extended
 	//
 	// +optional
 	Add []HTTPHeader `json:"add,omitempty"`
@@ -649,8 +645,6 @@ type HTTPRequestHeaderFilter struct {
 	// Output:
 	//   GET /foo HTTP/1.1
 	//   my-header2: bar
-	//
-	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
