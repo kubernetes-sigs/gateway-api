@@ -217,7 +217,7 @@ spec:
                                   name. \n Input:   GET /foo HTTP/1.1   my-header:
                                   foo \n Config:   add: {\"my-header\": \"bar\"} \n
                                   Output:   GET /foo HTTP/1.1   my-header: foo   my-header:
-                                  bar \n Support: Extended"
+                                  bar"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.
@@ -255,8 +255,7 @@ spec:
                                   \n Input:   GET /foo HTTP/1.1   my-header1: foo
                                   \  my-header2: bar   my-header3: baz \n Config:
                                   \  remove: [\"my-header1\", \"my-header3\"] \n Output:
-                                  \  GET /foo HTTP/1.1   my-header2: bar \n Support:
-                                  Extended"
+                                  \  GET /foo HTTP/1.1   my-header2: bar"
                                 items:
                                   type: string
                                 maxItems: 16
@@ -266,7 +265,7 @@ spec:
                                   given header (name, value) before the action. \n
                                   Input:   GET /foo HTTP/1.1   my-header: foo \n Config:
                                   \  set: {\"my-header\": \"bar\"} \n Output:   GET
-                                  /foo HTTP/1.1   my-header: bar \n Support: Extended"
+                                  /foo HTTP/1.1   my-header: bar"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.
@@ -519,7 +518,7 @@ spec:
                                         HTTP/1.1   my-header: foo \n Config:   add:
                                         {\"my-header\": \"bar\"} \n Output:   GET
                                         /foo HTTP/1.1   my-header: foo   my-header:
-                                        bar \n Support: Extended"
+                                        bar"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
@@ -561,7 +560,7 @@ spec:
                                         foo   my-header2: bar   my-header3: baz \n
                                         Config:   remove: [\"my-header1\", \"my-header3\"]
                                         \n Output:   GET /foo HTTP/1.1   my-header2:
-                                        bar \n Support: Extended"
+                                        bar"
                                       items:
                                         type: string
                                       maxItems: 16
@@ -572,7 +571,7 @@ spec:
                                         action. \n Input:   GET /foo HTTP/1.1   my-header:
                                         foo \n Config:   set: {\"my-header\": \"bar\"}
                                         \n Output:   GET /foo HTTP/1.1   my-header:
-                                        bar \n Support: Extended"
+                                        bar"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
