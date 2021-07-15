@@ -362,27 +362,30 @@ spec:
                               that redirects request. \n Support: Core"
                             properties:
                               hostname:
-                                description: Hostname is the hostname to be used in
-                                  the value of the `Location` header in the response.
+                                description: "Hostname is the hostname to be used
+                                  in the value of the `Location` header in the response.
                                   When empty, the hostname of the request is used.
+                                  \n Support: Core"
                                 type: string
                               port:
-                                description: Port is the port to be used in the value
+                                description: "Port is the port to be used in the value
                                   of the `Location` header in the response. When empty,
-                                  port (if specified) of the request is used.
+                                  port (if specified) of the request is used. \n Support:
+                                  Extended"
                                 type: integer
                               protocol:
-                                description: Protocol is the protocol to be used in
-                                  the value of the `Location` header in the response.
+                                description: "Protocol is the protocol to be used
+                                  in the value of the `Location` header in the response.
                                   When empty, the protocol of the request is used.
+                                  \n Support: Extended"
                                 enum:
                                 - HTTP
                                 - HTTPS
                                 type: string
                               statusCode:
                                 default: 302
-                                description: StatusCode is the HTTP status code to
-                                  be used in response.
+                                description: "StatusCode is the HTTP status code to
+                                  be used in response. \n Support: Core"
                                 type: integer
                             type: object
                           type:
@@ -673,30 +676,30 @@ spec:
                                     a filter that redirects request. \n Support: Core"
                                   properties:
                                     hostname:
-                                      description: Hostname is the hostname to be
+                                      description: "Hostname is the hostname to be
                                         used in the value of the `Location` header
                                         in the response. When empty, the hostname
-                                        of the request is used.
+                                        of the request is used. \n Support: Core"
                                       type: string
                                     port:
-                                      description: Port is the port to be used in
+                                      description: "Port is the port to be used in
                                         the value of the `Location` header in the
                                         response. When empty, port (if specified)
-                                        of the request is used.
+                                        of the request is used. \n Support: Extended"
                                       type: integer
                                     protocol:
-                                      description: Protocol is the protocol to be
+                                      description: "Protocol is the protocol to be
                                         used in the value of the `Location` header
                                         in the response. When empty, the protocol
-                                        of the request is used.
+                                        of the request is used. \n Support: Extended"
                                       enum:
                                       - HTTP
                                       - HTTPS
                                       type: string
                                     statusCode:
                                       default: 302
-                                      description: StatusCode is the HTTP status code
-                                        to be used in response.
+                                      description: "StatusCode is the HTTP status
+                                        code to be used in response. \n Support: Core"
                                       type: integer
                                   type: object
                                 type:
