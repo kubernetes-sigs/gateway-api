@@ -1,0 +1,19 @@
+kind: Gateway
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: shared-gateway
+  namespace: infra
+spec:
+  gatewayClassName: acme-lb
+  listeners:  
+  - hostname:
+    - foo.example.com
+    protocol: HTTPS
+    port: 443
+    routes:
+      kind: HTTPRoute
+      namespaces:
+        from: "All"
+    tls:
+      certificateRef:
+        name: foo-example-com

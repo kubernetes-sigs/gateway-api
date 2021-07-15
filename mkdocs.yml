@@ -26,7 +26,7 @@ nav:
       - Simple Gateway: guides/simple-gateway.md
       - HTTP routing: guides/http-routing.md
       - HTTP traffic splitting: guides/traffic-splitting.md
-      - Multiple namespaces and routes: guides/multiple-ns.md
+      - Cross-Namespace routing: guides/multiple-ns.md
       - TLS: guides/tls.md
       - TCP routing: guides/tcp.md
   - References:
