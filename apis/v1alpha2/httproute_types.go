@@ -657,6 +657,8 @@ type HTTPRequestRedirect struct {
 	// header in the response.
 	// When empty, the protocol of the request is used.
 	//
+	// Support: Extended
+	//
 	// +optional
 	// +kubebuilder:validation:Enum=HTTP;HTTPS
 	Protocol *string `json:"protocol,omitempty"`
@@ -664,15 +666,21 @@ type HTTPRequestRedirect struct {
 	// header in the response.
 	// When empty, the hostname of the request is used.
 	//
+	// Support: Core
+	//
 	// +optional
 	Hostname *string `json:"hostname,omitempty"`
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	// When empty, port (if specified) of the request is used.
 	//
+	// Support: Extended
+	//
 	// +optional
 	Port *int `json:"port,omitempty"`
 	// StatusCode is the HTTP status code to be used in response.
+	//
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=302
