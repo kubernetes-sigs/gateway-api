@@ -479,6 +479,13 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
+	// RequestAuhtorization defines a schema for a filter that authorizes requests.
+	//
+	// Support: Extended
+	//
+	// +optional
+	RequestAuthorization *HTTPRequestAuthorization `json:"requestAuthorization,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.acme.io"). ExtensionRef MUST NOT be used for core and
@@ -491,7 +498,7 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef
+// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef;RequestAuthorization
 type HTTPRouteFilterType string
 
 const (
@@ -511,6 +518,13 @@ const (
 	//
 	// Support in HTTPRouteForwardTo: Extended
 	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
+
+	// HTTPRouteFilterRequestAuthorization can be used to authorize a request with an
+	// external authorization endpoint before being sent to the upstream target.
+	//
+	// Support in HTTPRouteRule: Extended
+	// Support in HTTPRouteForwardTo: Extended
+	HTTPRouteFilterRequestAuthorization HTTPRouteFilterType = "RequestAuthorization"
 
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
@@ -629,6 +643,65 @@ type HTTPRequestMirrorFilter struct {
 	//
 	// +optional
 	Port *PortNumber `json:"port,omitempty"`
+}
+
+// HTTPRequestAuthorization defines configuration for the RequestAuthorization filter.
+type HTTPRequestAuthorization struct {
+	// URL specifies the address of the service used to perform the authorization check.
+	//
+	// Support: Extended
+	//
+	URL string `json:"url"`
+
+	// Protocol is used to define the Protocol that the gateway will use to communicate with the authorization
+	// service. If not set, it will default to "http" or inferred from the scheme in URL.
+	// Examples: "grpc","http2"
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=http
+	Protocol string `json:"protocol,omitempty"`
+
+	// FailModeAllow defines how this authorization filter should be handled if it timeouts or fails to
+	// contact the URL defined. This field accepts two options:
+	//
+	// - True: Fail open. Traffic will be allowed even if URL can't be contacted or timeouts
+	// - False: Fail closed. Default value. Traffic will be denied if the gateway can't reach the URL or timeouts.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=false
+	FailModeAllow *bool `json:"failModeAllow,omitempty"`
+
+	// RequestBody allows to define if the body of the request should be sent to the authorization service.
+	//
+	// - True: The request body will be sent to the authorization endpoint.
+	// - False: Don't send the request body. Default value.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=false
+	RequestBody *bool `json:"requestBody,omitempty"`
+
+	// TimeoutMs is the duration that the authorization call is allowed to operate.
+	// Default if unset is 100
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +kubebuilder:default=100
+	TimeoutMs int `json:"timeoutMs,omitempty"`
+
+	// Metadata can be used to provide additional context information for the authorization
+	// service to make a decision.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Metadata map[string]string `json:"metadata,omitempty"`
 }
 
 // HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
