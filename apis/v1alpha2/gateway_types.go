@@ -576,8 +576,11 @@ type GatewayStatus struct {
 // field.
 type GatewayConditionType string
 
-// GatewayConditionReason defines the set of reasons that explain
-// why a particular Gateway condition type has been raised.
+// GatewayConditionReason defines the set of reasons that explain why a
+// particular Gateway condition type has been raised. Reasons of this type are
+// focused on why a condition might be unhealthy. Unless otherwise specified,
+// when a condition is healthy, the Reason should be identical to the Condition
+// name.
 type GatewayConditionReason string
 
 const (
@@ -688,9 +691,9 @@ type ListenerConditionReason string
 
 const (
 	// This condition indicates that the controller was unable to resolve
-	// conflicting specification requirements for this Listener. If a
-	// Listener is conflicted, its network port should not be configured
-	// on any network elements.
+	// conflicting specification requirements for this Listener. If a Listener
+	// is conflicted, its network port should not be configured on any network
+	// elements. This condition MUST only be present when it is true.
 	//
 	// Possible reasons for this condition to be true are:
 	//
@@ -723,9 +726,10 @@ const (
 )
 
 const (
-	// This condition indicates that, even though the listener is
-	// syntactically and semantically valid, the controller is not able
-	// to configure it on the underlying Gateway infrastructure.
+	// This condition indicates that, even though the listener is syntactically
+	// and semantically valid, the controller is not able to configure it on the
+	// underlying Gateway infrastructure. This condition MUST only be present
+	// when it is true.
 	//
 	// A Listener is specified as a logical requirement, but needs to be
 	// configured on a network endpoint (i.e. address and port) by a
