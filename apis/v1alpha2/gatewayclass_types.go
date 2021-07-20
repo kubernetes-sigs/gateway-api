@@ -132,8 +132,11 @@ type ParametersReference struct {
 // GatewayClassStatus.Conditions field.
 type GatewayClassConditionType string
 
-// GatewayClassConditionReason defines the set of reasons that explain why
-// a particular GatewayClass condition type has been raised.
+// GatewayClassConditionReason defines the set of reasons that explain why a
+// particular GatewayClass condition type has been raised. Reasons of this type
+// are focused on why a condition might be unhealthy. Unless otherwise
+// specified, when a condition is healthy, the Reason should be identical to the
+// Condition name.
 type GatewayClassConditionReason string
 
 const (
