@@ -85,9 +85,9 @@ before an HTTP request is sent from the client.
 [TLS Certificate in Route](#tls-certificate-in-route) provides an example
 of how this feature can be used.
 
-Also, as mentioned above, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`) 
-is dependent on the protocol on the listener level. Listeners with `HTTPS` or 
-`HTTP` protocols can use `HTTPRoute` as the TLS Termination is done at the 
+Also, as mentioned above, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`)
+is dependent on the protocol on the listener level. Listeners with `HTTPS` or
+`HTTP` protocols can use `HTTPRoute` as the TLS Termination is done at the
 listener level and thus, only HTTP information is used for routing.
 
 Listeners with the `TLS` protocol must use `TLSRoute` when the mode is set to `Passthrough` and `TCPRoute` when the mode is `Terminate`.
@@ -128,28 +128,6 @@ there are two HTTPRoute resources which specify certificates for
 
 ```yaml
 {% include 'tls-cert-in-route.yaml' %}
-```
-
-## Upstream TLS
-
-Upstream TLS configuration applies to the connection between the Gateway
-and Service.
-
-There is only one way to configure upstream TLS: using the `BackendPolicy`
-resource.
-
-Please note that the TLS configuration is related to the Service or backend
-resource and not related to a specific route resource.
-
-### Example
-
-The following example shows how upstream TLS can be configured. We have
-omitted downstream TLS configuration for simplicity. As noted before, it
-doesn't matter how downstream TLS is configured for the specific listener or
-route.
-
-```yaml
-{% include 'upstream-tls.yaml' %}
 ```
 
 ## Extensions

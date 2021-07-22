@@ -24,8 +24,6 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// BackendPolicies returns a BackendPolicyInformer.
-	BackendPolicies() BackendPolicyInformer
 	// Gateways returns a GatewayInformer.
 	Gateways() GatewayInformer
 	// GatewayClasses returns a GatewayClassInformer.
@@ -49,11 +47,6 @@ type version struct {
 // New returns a new Interface.
 func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakListOptions internalinterfaces.TweakListOptionsFunc) Interface {
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
-}
-
-// BackendPolicies returns a BackendPolicyInformer.
-func (v *version) BackendPolicies() BackendPolicyInformer {
-	return &backendPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // Gateways returns a GatewayInformer.
