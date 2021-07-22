@@ -22,6 +22,7 @@ Depending on the Listener Protocol, different TLS modes and Route types are supp
 Listener Protocol | TLS Mode | Route Type Supported
 --- | --- | ---
 TLS | Passthrough | TLSRoute
+TLS | Terminate | TLSRoute
 TLS | Terminate | TCPRoute
 HTTPS | Terminate | HTTPRoute
 
