@@ -33,6 +33,8 @@ nav:
       - API specification: references/spec.md
       - Releases: references/releases.md
       - Implementations: references/implementations.md
+  - Enhancement Proposals:
+      - "709: Cross Namespace References from Routes": geps/gep-709.md
   - Contributing:
       - Developer guide: contributing/devguide.md
       - Gateway Enhancement Proposal: contributing/gep.md
