@@ -913,6 +913,15 @@ spec:
                               - value
                               type: object
                             type: array
+                          methods:
+                            description: Method specifies HTTP method matchers. Multiple
+                              match values are ORed together, meaning, a request must
+                              match any of the specified methods to select the route.
+                            items:
+                              description: HTTPMethod describes how to select a HTTP
+                                route by matching the HTTP method.
+                              type: string
+                            type: array
                           path:
                             default:
                               type: Prefix

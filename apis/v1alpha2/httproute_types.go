@@ -408,6 +408,10 @@ type HTTPQueryParamMatch struct {
 	Value string `json:"value"`
 }
 
+// HTTPMethod describes how to select a HTTP route by matching the HTTP
+// method.
+type HTTPMethod string
+
 // HTTPRouteMatch defines the predicate used to match requests to a given
 // action. Multiple match types are ANDed together, i.e. the match will
 // evaluate to true only if all conditions are satisfied.
@@ -457,6 +461,13 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
+
+	// Method specifies HTTP method matchers. Multiple match
+	// values are ORed together, meaning, a request must match any of the
+	// specified methods to select the route.
+	//
+	// +optional
+	Method []HTTPMethod `json:"methods,omitempty"`
 }
 
 // HTTPRouteFilter defines additional processing steps that must be completed
