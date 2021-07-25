@@ -576,14 +576,18 @@ type GatewayStatus struct {
 // field.
 type GatewayConditionType string
 
-// GatewayConditionReason defines the set of reasons that explain
-// why a particular Gateway condition type has been raised.
+// GatewayConditionReason defines the set of reasons that explain why a
+// particular Gateway condition type has been raised.
 type GatewayConditionReason string
 
 const (
 	// This condition is true when the controller managing the
 	// Gateway has scheduled the Gateway to the underlying network
 	// infrastructure.
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "Scheduled"
 	//
 	// Possible reasons for this condition to be false are:
 	//
@@ -595,6 +599,10 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
+
+	// This reason is used with the "Scheduled" condition when the condition is
+	// true.
+	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
 	// This reason is used with the "Scheduled" condition when
 	// been recently created and no controller has reconciled it yet.
@@ -624,6 +632,10 @@ const (
 	// reasons are true, the Gateway controller should prefer the
 	// "ListenersNotValid" reason.
 	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "Ready"
+	//
 	// Possible reasons for this condition to be false are:
 	//
 	// * "ListenersNotValid"
@@ -634,6 +646,10 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	GatewayConditionReady GatewayConditionType = "Ready"
+
+	// This reason is used with the "Ready" condition when the condition is
+	// true.
+	GatewayReasonReady GatewayConditionReason = "Ready"
 
 	// This reason is used with the "Ready" condition when one or
 	// more Listeners have an invalid or unsupported configuration
@@ -698,6 +714,10 @@ const (
 	// * "ProtocolConflict"
 	// * "RouteConflict"
 	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "NoConflicts"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -720,6 +740,10 @@ const (
 	// For example, a Listener that specifies "UDP" as the protocol
 	// but a route selector that resolves "TCPRoute" objects.
 	ListenerReasonRouteConflict ListenerConditionReason = "RouteConflict"
+
+	// This reason is used with the "Conflicted" condition when the condition
+	// is false.
+	ListenerReasonNoConflicts ListenerConditionReason = "NoConflicts"
 )
 
 const (
@@ -739,6 +763,10 @@ const (
 	// * "UnsupportedExtension"
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "Attached"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -764,11 +792,19 @@ const (
 	// the Listener could not be attached to the Gateway because the
 	// requested address is not supported.
 	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
+
+	// This reason is used with the "Detached" condition when the condition is
+	// false.
+	ListenerReasonAttached ListenerConditionReason = "Attached"
 )
 
 const (
 	// This condition indicates whether the controller was able to
 	// resolve all the object references for the Listener.
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "ResolvedRefs"
 	//
 	// Possible reasons for this condition to be false are:
 	//
@@ -780,6 +816,10 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	ListenerConditionResolvedRefs ListenerConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	ListenerReasonResolvedRefs ListenerConditionReason = "ResolvedRefs"
 
 	// This reason is used with the "ResolvedRefs" condition
 	// when not all of the routes selected by this Listener could be
@@ -804,6 +844,10 @@ const (
 	// This condition indicates whether the Listener has been
 	// configured on the Gateway.
 	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "Ready"
+	//
 	// Possible reasons for this condition to be false are:
 	//
 	// * "Invalid"
@@ -813,6 +857,10 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	ListenerConditionReady ListenerConditionType = "Ready"
+
+	// This reason is used with the "Ready" condition when the condition is
+	// true.
+	ListenerReasonReady ListenerConditionReason = "Ready"
 
 	// This reason is used with the "Ready" condition when the
 	// Listener is syntactically or semantically invalid.
