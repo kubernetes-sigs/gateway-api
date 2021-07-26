@@ -419,7 +419,7 @@ type HTTPMethod string
 const (
 	HTTPMethodUndefined HTTPMethod = "NONE"
 	HTTPMethodGet       HTTPMethod = "GET"
-	HTTPMethodHeader    HTTPMethod = "HEADER"
+	HTTPMethodHead      HTTPMethod = "HEAD"
 	HTTPMethodPost      HTTPMethod = "POST"
 	HTTPMethodPut       HTTPMethod = "PUT"
 	HTTPMethodDelete    HTTPMethod = "DELETE"
