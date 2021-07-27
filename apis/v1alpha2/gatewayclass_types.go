@@ -94,7 +94,6 @@ type GatewayClassSpec struct {
 type ParametersReference struct {
 	// Group is the group of the referent.
 	//
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
 

@@ -188,7 +188,6 @@ spec:
                               group:
                                 description: Group is the group of the referent.
                                 maxLength: 253
-                                minLength: 1
                                 type: string
                               kind:
                                 description: Kind is kind of the referent.
@@ -315,7 +314,6 @@ spec:
                                   group:
                                     description: Group is the group of the referent.
                                     maxLength: 253
-                                    minLength: 1
                                     type: string
                                   kind:
                                     description: Kind is kind of the referent.
@@ -444,7 +442,6 @@ spec:
                               group:
                                 description: Group is the group of the referent.
                                 maxLength: 253
-                                minLength: 1
                                 type: string
                               kind:
                                 description: Kind is kind of the referent.
@@ -491,7 +488,6 @@ spec:
                                     group:
                                       description: Group is the group of the referent.
                                       maxLength: 253
-                                      minLength: 1
                                       type: string
                                     kind:
                                       description: Kind is kind of the referent.
@@ -627,7 +623,6 @@ spec:
                                         group:
                                           description: Group is the group of the referent.
                                           maxLength: 253
-                                          minLength: 1
                                           type: string
                                         kind:
                                           description: Kind is kind of the referent.
@@ -848,7 +843,6 @@ spec:
                               group:
                                 description: Group is the group of the referent.
                                 maxLength: 253
-                                minLength: 1
                                 type: string
                               kind:
                                 description: Kind is kind of the referent.
@@ -1020,7 +1014,6 @@ spec:
                       group:
                         description: Group is the group of the referent.
                         maxLength: 253
-                        minLength: 1
                         type: string
                       kind:
                         description: Kind is kind of the referent.
