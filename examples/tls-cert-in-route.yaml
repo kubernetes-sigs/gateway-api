@@ -15,7 +15,7 @@ spec:
       mode: Terminate
       certificateRef:
         kind: Secret
-        group: ""
+        group: core
         name: default-cert
       routeOverride:
         certificate: Allow
@@ -32,7 +32,7 @@ spec:
   tls:
     certificateRef:
       kind: Secret
-      group: ""
+      group: core
       name: foo-example-com-cert
   rules:
   - matches:
@@ -53,7 +53,7 @@ spec:
   tls:
     certificateRef:
       kind: Secret
-      group: ""
+      group: core
       name: bar-example-com-cert
   rules:
   - matches:

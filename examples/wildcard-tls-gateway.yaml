@@ -11,7 +11,7 @@ spec:
     tls:
       certificateRef:
         kind: Secret
-        group: ""
+        group: core
         name: foo-example-com-cert
       routeOverride:
         certificate: Deny
@@ -23,7 +23,7 @@ spec:
     tls:
       certificateRef:
         kind: Secret
-        group: ""
+        group: core
         name: wildcard-example-com-cert
       routeOverride:
         certificate: Deny

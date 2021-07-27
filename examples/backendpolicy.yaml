@@ -5,11 +5,11 @@ metadata:
 spec:
   backendRefs:
     - name: my-service
-      group: ""
+      group: core
       kind: Service
   tls:
     certificateAuthorityRef: 
       name: my-app-ca
-      group: ""
+      group: core
       kind: Secret
     options: {}

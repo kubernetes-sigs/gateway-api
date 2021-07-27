@@ -7,13 +7,13 @@ metadata:
 spec:
   backendRefs:
   - name: my-service
-    group: ""
+    group: core
     kind: Service
     port: 443
   tls:
     certificateAuthorityRef:
       name: my-cluster-ca
-      group: ""
+      group: core
       kind: Secret
     options: {}
 ---
