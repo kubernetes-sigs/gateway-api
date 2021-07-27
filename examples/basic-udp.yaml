@@ -20,7 +20,6 @@ spec:
     port: 8080
     routes:
       kind: UDPRoute
-      group: networking.x-k8s.io
       selector:
         matchLabels:
           "app": "foo"

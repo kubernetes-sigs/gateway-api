@@ -13,7 +13,6 @@ spec:
     protocol: TCP
     routes:
       kind: TCPRoute
-      group: networking.x-k8s.io
       selector:
         matchLabels:
           app: sshd-honeypot
@@ -24,7 +23,6 @@ spec:
     protocol: TCP
     routes:
       kind: TCPRoute
-      group: networking.x-k8s.io
       selector:
         matchLabels:
           app: sshd-legitimate
@@ -43,7 +41,6 @@ spec:
         group: ""
     routes:
       kind: TCPRoute
-      group: networking.x-k8s.io
       selector:
         matchLabels:
           app: sshd-legitimate

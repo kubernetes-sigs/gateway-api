@@ -19,7 +19,6 @@ spec:
   - protocol: TCP
     port: 8080
     routes:
-      group: networking.x-k8s.io
       kind: TCPRoute
       selector:
         matchLabels:
@@ -27,7 +26,6 @@ spec:
   - protocol: TCP
     port: 8090
     routes:
-      group: networking.x-k8s.io
       kind: TCPRoute
       selector:
         matchLabels:

@@ -13,7 +13,6 @@ spec:
     protocol: HTTP
     routes:
       kind: HTTPRoute
-      group: networking.x-k8s.io
       selector:
         matchLabels:
           # This label selects httpbin.example.com and
