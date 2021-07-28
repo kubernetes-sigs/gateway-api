@@ -28,10 +28,6 @@ type FakeGatewayV1alpha2 struct {
 	*testing.Fake
 }
 
-func (c *FakeGatewayV1alpha2) BackendPolicies(namespace string) v1alpha2.BackendPolicyInterface {
-	return &FakeBackendPolicies{c, namespace}
-}
-
 func (c *FakeGatewayV1alpha2) Gateways(namespace string) v1alpha2.GatewayInterface {
 	return &FakeGateways{c, namespace}
 }
