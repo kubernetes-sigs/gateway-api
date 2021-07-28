@@ -113,21 +113,26 @@ type HTTPRouteSpec struct {
 
 	// TLS defines the TLS certificate to use for Hostnames defined in this
 	// Route. This configuration only takes effect if the AllowRouteOverride
-	// field is set to true in the associated Gateway resource.
+	// field is set to true in the associated Gateway Listener.
 	//
-	// Collisions can happen if multiple HTTPRoutes define a TLS certificate
-	// for the same hostname. In such a case, conflict resolution guiding
-	// principles apply, specifically, if hostnames are same and two different
-	// certificates are specified then the certificate in the
-	// oldest resource wins.
+	// Attaching a TLS certificate to HTTPRoutes provides a way for HTTPRoute
+	// owners to effectively populate certificates on Gateway Listeners. Note
+	// that only one certificate may be attached to a Gateway Listener for a
+	// specified hostname. It is not possible to use different certificates for
+	// different HTTPRoutes for the same hostname on the same Gateway Listener.
 	//
-	// Please note that HTTP Route-selection takes place after the
-	// TLS Handshake (ClientHello). Due to this, TLS certificate defined
-	// here will take precedence even if the request has the potential to
-	// match multiple routes (in case multiple HTTPRoutes share the same
-	// hostname).
+	// If multiple HTTPRoutes define a TLS certificate for the same hostname and
+	// are bound to the same Gateway Listener, precedence MUST be determined in
+	// order of the following criteria, continuing on ties:
 	//
-	// Support: Core
+	// * The oldest Route based on creation timestamp. For example, a Route with
+	//   a creation timestamp of "2021-07-28 01:02:03" is given precedence over
+	//   a Route with a creation timestamp of "2021-07-28 01:02:04".
+	// * The Route appearing first in alphabetical order by
+	//   "<namespace>/<name>". For example, foo/bar is given precedence over
+	//   foo/baz.
+	//
+	// Support: Extended
 	//
 	// +optional
 	TLS *RouteTLSConfig `json:"tls,omitempty"`
