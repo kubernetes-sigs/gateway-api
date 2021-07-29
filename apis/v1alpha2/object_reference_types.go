@@ -36,3 +36,33 @@ type LocalObjectReference struct {
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 }
+
+// ObjectReference identifies an API object including its namespace.
+type ObjectReference struct {
+	// Group is the group of the referent.
+	//
+	// +kubebuilder:validation:MaxLength=253
+	Group string `json:"group"`
+
+	// Kind is kind of the referent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Kind string `json:"kind"`
+
+	// Name is the name of the referent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// Namespace is the namespace of the backend. When unspecified, the local
+	// namespace is inferred.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	Namespace *string `json:"namespace,omitempty"`
+}
