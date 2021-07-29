@@ -916,7 +916,7 @@ spec:
                           method:
                             description: "Method specifies HTTP method matchers. If
                               specified this matcher will only be picked if the request
-                              has the corresponding method \n Support: Core"
+                              has the corresponding method \n Support: Extended"
                             enum:
                             - GET
                             - HEADER

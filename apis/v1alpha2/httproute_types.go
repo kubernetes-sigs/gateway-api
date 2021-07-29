@@ -417,16 +417,15 @@ type HTTPQueryParamMatch struct {
 type HTTPMethod string
 
 const (
-	HTTPMethodUndefined HTTPMethod = "NONE"
-	HTTPMethodGet       HTTPMethod = "GET"
-	HTTPMethodHead      HTTPMethod = "HEAD"
-	HTTPMethodPost      HTTPMethod = "POST"
-	HTTPMethodPut       HTTPMethod = "PUT"
-	HTTPMethodDelete    HTTPMethod = "DELETE"
-	HTTPMethodConnect   HTTPMethod = "CONNECT"
-	HTTPMethodOptions   HTTPMethod = "OPTIONS"
-	HTTPMethodTrace     HTTPMethod = "TRACE"
-	HTTPMethodPatch     HTTPMethod = "PATCH"
+	HTTPMethodGet     HTTPMethod = "GET"
+	HTTPMethodHead    HTTPMethod = "HEAD"
+	HTTPMethodPost    HTTPMethod = "POST"
+	HTTPMethodPut     HTTPMethod = "PUT"
+	HTTPMethodDelete  HTTPMethod = "DELETE"
+	HTTPMethodConnect HTTPMethod = "CONNECT"
+	HTTPMethodOptions HTTPMethod = "OPTIONS"
+	HTTPMethodTrace   HTTPMethod = "TRACE"
+	HTTPMethodPatch   HTTPMethod = "PATCH"
 )
 
 // HTTPRouteMatch defines the predicate used to match requests to a given
@@ -482,7 +481,7 @@ type HTTPRouteMatch struct {
 	// Method specifies HTTP method matchers.
 	// If specified this matcher will only be picked if the request has the corresponding method
 	//
-	// Support: Core
+	// Support: Extended
 	//
 	// +optional
 	Method *HTTPMethod `json:"method,omitempty"`
