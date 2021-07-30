@@ -412,7 +412,7 @@ type HTTPQueryParamMatch struct {
 // method as defined by
 // [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4) and
 // [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789#section-2).
-// The value is expected in upper case
+// The value is expected in upper case.
 // +kubebuilder:validation:Enum=GET;HEADER;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 type HTTPMethod string
 
