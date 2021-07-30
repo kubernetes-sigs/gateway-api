@@ -478,8 +478,8 @@ type HTTPRouteMatch struct {
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 
-	// Method specifies HTTP method matchers.
-	// If specified this matcher will only be picked if the request has the corresponding method
+	// Method specifies HTTP method matcher.
+	// When specified, this route will be matched only if the request has the specified method.
 	//
 	// Support: Extended
 	//
