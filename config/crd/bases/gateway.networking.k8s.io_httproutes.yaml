@@ -914,9 +914,9 @@ spec:
                               type: object
                             type: array
                           method:
-                            description: "Method specifies HTTP method matchers. If
-                              specified this matcher will only be picked if the request
-                              has the corresponding method \n Support: Extended"
+                            description: "Method specifies HTTP method matcher. When
+                              specified, this route will be matched only if the request
+                              has the specified method. \n Support: Extended"
                             enum:
                             - GET
                             - HEADER
