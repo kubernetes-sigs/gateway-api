@@ -899,6 +899,21 @@ spec:
                               - value
                               type: object
                             type: array
+                          method:
+                            description: "Method specifies HTTP method matcher. When
+                              specified, this route will be matched only if the request
+                              has the specified method. \n Support: Extended"
+                            enum:
+                            - GET
+                            - HEAD
+                            - POST
+                            - PUT
+                            - DELETE
+                            - CONNECT
+                            - OPTIONS
+                            - TRACE
+                            - PATCH
+                            type: string
                           path:
                             default:
                               type: Prefix

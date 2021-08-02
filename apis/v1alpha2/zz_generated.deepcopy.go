@@ -660,6 +660,11 @@ func (in *HTTPRouteMatch) DeepCopyInto(out *HTTPRouteMatch) {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
+	if in.Method != nil {
+		in, out := &in.Method, &out.Method
+		*out = new(HTTPMethod)
+		**out = **in
+	}
 	if in.ExtensionRef != nil {
 		in, out := &in.ExtensionRef, &out.ExtensionRef
 		*out = new(LocalObjectReference)

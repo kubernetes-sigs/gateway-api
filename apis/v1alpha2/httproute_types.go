@@ -408,6 +408,26 @@ type HTTPQueryParamMatch struct {
 	Value string `json:"value"`
 }
 
+// HTTPMethod describes how to select a HTTP route by matching the HTTP
+// method as defined by
+// [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4) and
+// [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789#section-2).
+// The value is expected in upper case.
+// +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
+type HTTPMethod string
+
+const (
+	HTTPMethodGet     HTTPMethod = "GET"
+	HTTPMethodHead    HTTPMethod = "HEAD"
+	HTTPMethodPost    HTTPMethod = "POST"
+	HTTPMethodPut     HTTPMethod = "PUT"
+	HTTPMethodDelete  HTTPMethod = "DELETE"
+	HTTPMethodConnect HTTPMethod = "CONNECT"
+	HTTPMethodOptions HTTPMethod = "OPTIONS"
+	HTTPMethodTrace   HTTPMethod = "TRACE"
+	HTTPMethodPatch   HTTPMethod = "PATCH"
+)
+
 // HTTPRouteMatch defines the predicate used to match requests to a given
 // action. Multiple match types are ANDed together, i.e. the match will
 // evaluate to true only if all conditions are satisfied.
@@ -444,6 +464,15 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	QueryParams []HTTPQueryParamMatch `json:"queryParams,omitempty"`
+
+	// Method specifies HTTP method matcher.
+	// When specified, this route will be matched only if the request has the
+	// specified method.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Method *HTTPMethod `json:"method,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
