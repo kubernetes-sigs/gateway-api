@@ -18,6 +18,12 @@ package v1alpha2
 
 import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+// +genclient
+// +kubebuilder:object:root=true
+// +kubebuilder:resource:categories=gateway-api,shortName=refpol
+// +kubebuilder:storageversion
+// +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+
 // ReferencePolicy identifies kinds of resources in other namespaces that are
 // trusted to reference the specified kinds of resources in the local namespace.
 // Each ReferencePolicy can be used to represent a unique trust relationship.
@@ -29,6 +35,18 @@ type ReferencePolicy struct {
 
 	// Spec defines the desired state of ReferencePolicy.
 	Spec ReferencePolicySpec `json:"spec,omitempty"`
+
+	// Note that we are explicitly *excluding* ReferencePolicy status at the
+	// moment, as designing it is more difficult than it would seem.
+	// As it is an additive change, we can make changes later.
+}
+
+// +kubebuilder:object:root=true
+// ReferencePolicyList contains a list of ReferencePolicy.
+type ReferencePolicyList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []ReferencePolicy `json:"items"`
 }
 
 // ReferencePolicySpec identifies a cross namespace relationship that is trusted

@@ -65,6 +65,7 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&HTTPRoute{},
 		&HTTPRouteList{},
 		&ReferencePolicy{},
+		&ReferencePolicyList{},
 		&TCPRoute{},
 		&TCPRouteList{},
 		&TLSRoute{},

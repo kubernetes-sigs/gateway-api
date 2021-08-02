@@ -10,13 +10,21 @@ metadata:
 spec:
   group: gateway.networking.k8s.io
   names:
+    categories:
+    - gateway-api
     kind: ReferencePolicy
     listKind: ReferencePolicyList
     plural: referencepolicies
+    shortNames:
+    - refpol
     singular: referencepolicy
   scope: Namespaced
   versions:
-  - name: v1alpha2
+  - additionalPrinterColumns:
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha2
     schema:
       openAPIV3Schema:
         description: ReferencePolicy identifies kinds of resources in other namespaces
@@ -114,6 +122,7 @@ spec:
         type: object
     served: true
     storage: true
+    subresources: {}
 status:
   acceptedNames:
     kind: ""
