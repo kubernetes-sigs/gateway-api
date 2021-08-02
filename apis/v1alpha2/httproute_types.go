@@ -466,7 +466,8 @@ type HTTPRouteMatch struct {
 	QueryParams []HTTPQueryParamMatch `json:"queryParams,omitempty"`
 
 	// Method specifies HTTP method matcher.
-	// When specified, this route will be matched only if the request has the specified method.
+	// When specified, this route will be matched only if the request has the
+	// specified method.
 	//
 	// Support: Extended
 	//
