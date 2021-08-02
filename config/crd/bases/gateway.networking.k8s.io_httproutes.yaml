@@ -919,7 +919,7 @@ spec:
                               has the specified method. \n Support: Extended"
                             enum:
                             - GET
-                            - HEADER
+                            - HEAD
                             - POST
                             - PUT
                             - DELETE

@@ -413,7 +413,7 @@ type HTTPQueryParamMatch struct {
 // [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4) and
 // [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789#section-2).
 // The value is expected in upper case.
-// +kubebuilder:validation:Enum=GET;HEADER;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
+// +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 type HTTPMethod string
 
 const (
@@ -465,6 +465,14 @@ type HTTPRouteMatch struct {
 	// +optional
 	QueryParams []HTTPQueryParamMatch `json:"queryParams,omitempty"`
 
+	// Method specifies HTTP method matcher.
+	// When specified, this route will be matched only if the request has the specified method.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Method *HTTPMethod `json:"method,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
 	// "networking.acme.io". If the referent cannot be found, the rule is not
@@ -477,14 +485,6 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
-
-	// Method specifies HTTP method matcher.
-	// When specified, this route will be matched only if the request has the specified method.
-	//
-	// Support: Extended
-	//
-	// +optional
-	Method *HTTPMethod `json:"method,omitempty"`
 }
 
 // HTTPRouteFilter defines additional processing steps that must be completed
