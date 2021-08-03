@@ -24,12 +24,6 @@ spec:
     - jsonPath: .spec.gatewayClassName
       name: Class
       type: string
-    - jsonPath: .status.addresses[*].value
-      name: Address
-      type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
-      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
