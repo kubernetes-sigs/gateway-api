@@ -55,7 +55,6 @@ spec:
       path:
         type: Prefix
         value: /some/thing
-      method: GET
     forwardTo:
     - serviceName: my-service2
       port: 8080

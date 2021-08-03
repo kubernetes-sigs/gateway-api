@@ -54,6 +54,9 @@ kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res
 # Install CRDs
 kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/bases || res=$?
 
+# Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
+sleep 8
+
 # Install all example gateway-api resources.
 kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples || res=$?
 
