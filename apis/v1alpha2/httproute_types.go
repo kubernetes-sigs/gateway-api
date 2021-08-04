@@ -147,9 +147,6 @@ type RouteTLSConfig struct {
 	// handshake for requests that match the hostname of the associated HTTPRoute.
 	// The referenced object MUST reside in the same namespace as HTTPRoute.
 	//
-	// This field is required when the TLS configuration mode of the associated
-	// Gateway listener is set to "Passthrough".
-	//
 	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
 	// or an implementation-specific custom resource.
 	//
