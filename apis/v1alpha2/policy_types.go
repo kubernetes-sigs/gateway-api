@@ -16,7 +16,11 @@ limitations under the License.
 
 package v1alpha2
 
-// PolicyTargetReference identifies an API object to apply policy to.
+// PolicyTargetReference identifies an API object to apply policy to. This
+// should be used as part of Policy resources that can target Gateway API
+// resources. For more information on how this policy attachment model works,
+// and a sample Policy resource, refer to the policy attachment documentation
+// for Gateway API.
 type PolicyTargetReference struct {
 	// Group is the group of the target resource.
 	//

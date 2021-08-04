@@ -1,17 +1,22 @@
 # Policy Attachment
 
-Policies attached to Gateway API resources and implementations should use the
+Many implementations of the API support additional functionality that is not
+covered by the API directly. For example, concepts like timeouts, retries, or
+even CDN configuration are not sufficiently portable to be defined within the
+Gateway API. Instead, implementations may choose to represent these concepts
+with custom Policy resources.
+
+Policies attached to Gateway API resources and implementations must use the
 following approach to ensure consistency across implementations of the API.
 There are three primary components of this pattern:
 
-* A shared means of attaching policy to resources.
+* A standardized means of attaching policy to resources.
 * Support for configuring both default and override values within policy
   resources.
-* A shared hierarchy to illustrate how default and override values should
-  interact.
+* A hierarchy to illustrate how default and override values should interact.
 
-This kind of standardization will not only enable consistent patterns, it will
-enable tooling such as kubectl plugins to be able to visualize all policies that
+This kind of standardization not only enables consistent patterns, it allows
+future tooling such as kubectl plugins to be able to visualize all policies that
 have been applied to a given resource.
 
 ## Policy Attachment for Ingress
@@ -20,7 +25,7 @@ straightforward. A policy can reference the resource it wants to apply to.
 Access is granted with RBAC - anyone that has access to create a RetryPolicy in
 a given namespace can attach it to any resource within that namespace.
 
-![Simple Ingress Example](/geps/images/713-ingress-simple.png)
+![Simple Ingress Example](/images/policy/ingress-simple.png)
 
 To build on that example, it’s possible to attach policies to more resources.
 Each policy applies to the referenced resource and everything below it in terms
@@ -28,15 +33,15 @@ of hierarchy. Although this example is likely more complex than many real world
 use cases, it helps demonstrate how policy attachment can work across
 namespaces.
 
-![Complex Ingress Example](/geps/images/713-ingress-complex.png)
+![Complex Ingress Example](/images/policy/ingress-complex.png)
 
 ## Policy Attachment for Mesh
 Although there is a great deal of overlap between ingress and mesh use cases,
-mesh enables more complex policy attachment scenarios. For example, you may want
-to apply policy to requests from a specific namespace to a backend in another
-namespace.
+mesh enables more complex policy attachment scenarios. For example, users may
+want to apply policy to requests from a specific namespace to a backend in
+another namespace.
 
-![Simple Mesh Example](/geps/images/713-mesh-simple.png)
+![Simple Mesh Example](/images/policy/mesh-simple.png)
 
 Policy attachment can be quite simple with mesh. Policy can be applied to any
 resource in any namespace but it can only apply to requests from the same
@@ -47,7 +52,7 @@ workload to a backend in another namespace. A route can be used to intercept
 these requests and split them between different backends (foo-a and foo-b in
 this case).
 
-![Complex Mesh Example](/geps/images/713-mesh-complex.png)
+![Complex Mesh Example](/images/policy/mesh-complex.png)
 
 ## Target Reference API
 
@@ -111,13 +116,11 @@ type ACMEServicePolicyStatus struct {
 ```
 
 ### Hierarchy
-Each policy MAY include default or override values. Default values are given
-precedence from the bottom up, while override values are top down. That means
-that a default attached to a Backend will have the highest precedence among
-default values while an override value attached to a GatewayClass will have the
-highest precedence overall.
+Each policy MAY include default or override values. Overrides enable admins to
+enforce policy from the top down. Defaults enable app owners to provide default
+values from the bottom up for each individual application.
 
-![Ingress and Sidecar Hierarchy](/geps/images/713-hierarchy.png)
+![Policy Hierarchy](/images/policy/hierarchy.png)
 
 To illustrate this, consider 3 resources with the following hierarchy:
 A > B > C. When attaching the concept of defaults and overrides to that, the
@@ -141,7 +144,7 @@ be enabled and provides some default configuration for that. The policy attached
 to the Route changes the value for one of those fields (includeQueryString).
 
 ```yaml
-kind: GKEServicePolicy # Example of implementation specific policy name
+kind: AcmeServicePolicy # Example of implementation specific policy name
 spec:
   override:
     cdn:
@@ -156,7 +159,7 @@ spec:
     kind: Gateway
     name: example
 ---
-kind: GKEServicePolicy
+kind: AcmeServicePolicy
 spec:
   default:
     cdn:
@@ -172,13 +175,7 @@ precedence over the default drainTimeout value attached to the Route. At the
 same time, we can see that the default connectionTimeout attached to the Route
 has precedence over the default attached to the Gateway.
 
-![Hierarchical Policy Example](/geps/images/713-policy-hierarchy.png)
-
-#### Supported Resources
-It is important to note that not every implementation will be able to support
-policy attachment to each resource described in the hierarchy above. When that
-is the case, implementations MUST clearly document which resources a policy may
-be attached to.
+![Hierarchical Policy Example](/images/policy/policy-hierarchy.png)
 
 #### Attaching Policy to GatewayClass
 GatewayClass may be the trickiest resource to attach policy to. Policy
@@ -193,9 +190,9 @@ easier for some implementations to support. These parameters can similarly be
 used to set defaults and requirements for an entire GatewayClass.
 
 ### Targeting External Services
-In some cases (likely limited to mesh) we may want to apply policies to requests
-to external services. To accomplish this, implementations can choose to support
-a refernce to a virtual resource type:
+In some cases (likely limited to mesh) users may want to apply policies to
+requests to external services. To accomplish this, implementations can choose to
+support a refernce to a virtual resource type:
 
 ```yaml
 kind: RetryPolicy
@@ -224,17 +221,14 @@ ties:
 * The Policy appearing first in alphabetical order by "<namespace>/<name>". For
   example, foo/bar is given precedence over foo/baz.
 
-For a better user experience, a validating webhook can be implemented to prevent
-these kinds of conflicts all together.
-
 ### Kubectl Plugin
 To help improve UX and standardization, a kubectl plugin will be developed that
 will be capable of describing the computed sum of policy that applies to a given
 resource, including policies applied to parent resources.
 
 Each Policy CRD that wants to be supported by this plugin will need to follow
-the API structure defined above and add a `gateway.networking.k8s.io/policy:
-true` label to the CRD.
+the API structure defined above and add a
+`gateway.networking.k8s.io/policy-attachment: true` label to the CRD.
 
 ### Status
 In the future, we may consider adding a new `Policies` field to status on
@@ -291,4 +285,6 @@ controller implementation:
 This policy attachment pattern is associated with an "EXTENDED" conformance
 level. The implementations that support this policy attachment model will have
 the same behavior and semantics, although they may not be able to support
-attachment of all types of policy at all potential attachment points.
+attachment of all types of policy at all potential attachment points. When that
+is the case, implementations MUST clearly document which resources a policy may
+be attached to.
