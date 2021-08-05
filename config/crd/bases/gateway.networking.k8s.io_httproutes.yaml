@@ -1010,9 +1010,7 @@ spec:
                       that contains a TLS certificate and private key. This certificate
                       is used to establish a TLS handshake for requests that match
                       the hostname of the associated HTTPRoute. The referenced object
-                      MUST reside in the same namespace as HTTPRoute. \n This field
-                      is required when the TLS configuration mode of the associated
-                      Gateway listener is set to \"Passthrough\". \n CertificateRef
+                      MUST reside in the same namespace as HTTPRoute. \n CertificateRef
                       can reference a standard Kubernetes resource, i.e. Secret, or
                       an implementation-specific custom resource. \n Support: Core
                       (Kubernetes Secrets) \n Support: Implementation-specific (Other
