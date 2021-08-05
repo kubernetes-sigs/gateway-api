@@ -46,42 +46,7 @@ can easily find previous discussions and alternatives considered.
 
 ## Format
 
-``` markdown
-# GEP-1234: Add Chaosnet protocol support
-
-Status: (provisional, implementable, implemented, deferred, rejected, withdrawn, or replaced)
-
-(See definitions in: https://github.com/kubernetes/enhancements/blob/master/keps/NNNN-kep-template/kep.yaml#L9)
-
-## TLDR
-
-(1-2 sentence summary of the proposal)
-
-## Motivation/User Journeys/Background
-
-(Can link to external doc -- but we should bias towards copying
-the content into the GEP as online documents are easier to lose
--- e.g. owner messes up the permissions, accidental deletion)
-
-## API
-
-(... details, can point to PR with changes)
-
-
-## Alternatives
-
-(List other design alternatives and why we did not go in that
-direction)
-
-## Out of scope
-
-(What is out of scope for this proposal.)
-
-## References
-
-(Add any additional document links. Again, we should try to avoid
-too much content not in version control to avoid broken links)
-```
+GEPs should match the format of the template found in [GEP-696](/geps/gep-696).
 
 ## Out of scope
 
