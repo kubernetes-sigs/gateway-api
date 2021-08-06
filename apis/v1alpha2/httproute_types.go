@@ -29,6 +29,9 @@ import (
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // HTTPRoute is the Schema for the HTTPRoute resource.
+//
+// Support: Core
+//
 type HTTPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

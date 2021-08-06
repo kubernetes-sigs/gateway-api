@@ -37,6 +37,9 @@ import (
 // finalizer on the associated GatewayClass whenever Gateway(s) is running.
 // This ensures that a GatewayClass associated with a Gateway(s) is not
 // deleted while in use.
+//
+// Support: Core
+//
 type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

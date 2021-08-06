@@ -25,7 +25,8 @@ spec:
     name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: TCPRoute is the Schema for the TCPRoute resource.
+        description: "TCPRoute is the Schema for the TCPRoute resource. \n Support:
+          Extended"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation

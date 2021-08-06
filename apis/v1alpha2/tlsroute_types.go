@@ -33,6 +33,9 @@ import (
 //
 // If you need to forward traffic to a single target for a TLS listener, you
 // could choose to use a TCPRoute with a TLS listener.
+//
+// Support: Extended
+//
 type TLSRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

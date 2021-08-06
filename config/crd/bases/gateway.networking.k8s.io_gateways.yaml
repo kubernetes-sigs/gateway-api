@@ -41,7 +41,7 @@ spec:
           should add the `gateway-exists-finalizer.gateway.networking.k8s.io` finalizer
           on the associated GatewayClass whenever Gateway(s) is running. This ensures
           that a GatewayClass associated with a Gateway(s) is not deleted while in
-          use."
+          use. \n Support: Core"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation

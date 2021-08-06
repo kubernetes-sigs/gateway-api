@@ -29,7 +29,7 @@ spec:
           to match against TLS-specific metadata. This allows more flexibility in
           matching streams for a given TLS listener. \n If you need to forward traffic
           to a single target for a TLS listener, you could choose to use a TCPRoute
-          with a TLS listener."
+          with a TLS listener. \n Support: Extended"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation

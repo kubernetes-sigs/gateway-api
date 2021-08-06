@@ -34,6 +34,9 @@ import (
 // for creating Gateway resources.
 //
 // GatewayClass is a Cluster level resource.
+//
+// Support: Core
+//
 type GatewayClass struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

@@ -36,7 +36,7 @@ spec:
       openAPIV3Schema:
         description: "GatewayClass describes a class of Gateways available to the
           user for creating Gateway resources. \n GatewayClass is a Cluster level
-          resource."
+          resource. \n Support: Core"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
