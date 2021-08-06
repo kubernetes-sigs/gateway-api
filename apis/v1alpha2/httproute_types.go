@@ -240,14 +240,19 @@ type HTTPRouteRule struct {
 	// +kubebuilder:validation:MaxItems=16
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
-	// ForwardTo defines the backend(s) where matching requests should be sent.
-	// If unspecified, the rule performs no forwarding. If unspecified and no
-	// filters are specified that would result in a response being sent, a 503
-	// error code is returned.
+	// BackendRefs defines the backend(s) where matching requests should be
+	// sent. If unspecified, the rule performs no forwarding. If unspecified and
+	// no filters are specified that would result in a response being sent,
+	// a HTTP 503 status code is returned.
+	//
+	// Support: Core for Kubernetes Service
+	// Support: Custom for any other resource
+	//
+	// Support for weight: Core
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	ForwardTo []HTTPRouteForwardTo `json:"forwardTo,omitempty"`
+	BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
@@ -563,7 +568,7 @@ const (
 	//
 	// Support in HTTPRouteRule: Core
 	//
-	// Support in HTTPRouteForwardTo: Extended
+	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
 
 	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
@@ -572,7 +577,7 @@ const (
 	//
 	// Support in HTTPRouteRule: Core
 	//
-	// Support in HTTPRouteForwardTo: Extended
+	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestRedirect HTTPRouteFilterType = "RequestRedirect"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
@@ -581,7 +586,7 @@ const (
 	//
 	// Support in HTTPRouteRule: Extended
 	//
-	// Support in HTTPRouteForwardTo: Extended
+	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
 
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
@@ -589,7 +594,7 @@ const (
 	//
 	// Support in HTTPRouteRule: Custom
 	//
-	// Support in HTTPRouteForwardTo: Custom
+	// Support in HTTPBackendRef: Custom
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 
@@ -716,112 +721,30 @@ type HTTPRequestRedirect struct {
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 type HTTPRequestMirrorFilter struct {
-	// ServiceName refers to the name of the Service to mirror matched requests
-	// to. When specified, this takes the place of BackendRef. If both
-	// BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
+	// BackendRef references a resource where mirrored requests are sent.
 	//
 	// If the referent cannot be found, the rule is not included in the route.
 	// The controller should raise the "ResolvedRefs" condition on the Gateway
 	// with the "DegradedRoutes" reason. The gateway status for this route should
 	// be updated with a condition that describes the error more specifically.
 	//
-	// Support: Core
+	// Support: Extended for Kubernetes Service
+	// Support: Custom for any other resource
 	//
 	// +optional
-	// +kubebuilder:validation:MaxLength=253
-	ServiceName *string `json:"serviceName,omitempty"`
-
-	// BackendRef is a local object reference to mirror matched requests to. If
-	// both BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
-	//
-	// Support: Custom
-	//
-	// +optional
-	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
-
-	// Port specifies the destination port number to use for the
-	// backend referenced by the ServiceName or BackendRef field.
-	//
-	// If unspecified, the destination port in the request is used
-	// when forwarding to a backendRef or serviceName.
-	//
-	// +optional
-	Port *PortNumber `json:"port,omitempty"`
+	BackendRef *BackendObjectReference `json:"backendRef,omitempty"`
 }
 
-// HTTPRouteForwardTo defines how a HTTPRoute should forward a request.
-type HTTPRouteForwardTo struct {
-	// ServiceName refers to the name of the Service to forward matched requests
-	// to. When specified, this takes the place of BackendRef. If both
-	// BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
+// HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.
+type HTTPBackendRef struct {
+	// BackendRef defines how a Route should forward a request to a Kubernetes
+	// resource.
 	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
-	//
-	// The protocol to use should be specified with the AppProtocol field on
-	// Service resources.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:validation:MaxLength=253
-	ServiceName *string `json:"serviceName,omitempty"`
-
-	// BackendRef is a reference to a backend to forward matched requests to. If
-	// both BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the route must be dropped
-	// from the Gateway. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason.
-	// The gateway status for this route should be updated with a
-	// condition that describes the error more specifically.
-	//
-	// Support: Custom
-	//
-	// +optional
-	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
-
-	// Port specifies the destination port number to use for the
-	// backend referenced by the ServiceName or BackendRef field.
-	// If unspecified, the destination port in the request is used
-	// when forwarding to a backendRef or serviceName.
-	//
-	// Support: Core
-	//
-	// +optional
-	Port *PortNumber `json:"port,omitempty"`
-
-	// Weight specifies the proportion of HTTP requests forwarded to the backend
-	// referenced by the ServiceName or BackendRef field. This is computed as
-	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
-	// there may be some epsilon from the exact proportion defined here
-	// depending on the precision an implementation supports. Weight is not a
-	// percentage and the sum of weights does not need to equal 100.
-	//
-	// If only one backend is specified and it has a weight greater than 0, 100%
-	// of the traffic is forwarded to that backend. If weight is set to 0,
-	// traffic must not be forwarded for this entry. If unspecified, weight
-	// defaults to 1.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default=1
-	// +kubebuilder:validation:Minimum=0
-	// +kubebuilder:validation:Maximum=1000000
-	Weight *int32 `json:"weight,omitempty"`
+	// If the referent cannot be found, the rule is not included in the route.
+	// The controller should raise the "ResolvedRefs" condition on the Gateway
+	// with the "DegradedRoutes" reason. The gateway status for this route should
+	// be updated with a condition that describes the error more specifically.
+	BackendRef `json:",inline"`
 
 	// Filters defined at this-level should be executed if and only if the
 	// request is being forwarded to the backend defined here.

@@ -75,7 +75,7 @@ spec:
       - path:
           type: Prefix
           value: /
-      forwardTo:
-      - serviceName: my-filter-svc1
+      backendRefs:
+      - name: my-filter-svc1
         weight: 1
         port: 80

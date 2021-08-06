@@ -41,16 +41,15 @@ spec:
       - type: Exact
         name: magic
         value: default-match
-    forwardTo:
-    - port: 8080
-      backendRef:
-        name: my-custom-resource
-        group: acme.io
-        kind: CustomBackend
+    backendRefs:
+    - group: acme.io
+      kind: CustomBackend
+      name: my-custom-resource
+      port: 8080
   - matches:
     - path:
         type: Exact
         value: /example/exact
-    forwardTo:
-    - serviceName: my-service-2
+    backendRefs:
+    - name: my-service-2
       port: 8080

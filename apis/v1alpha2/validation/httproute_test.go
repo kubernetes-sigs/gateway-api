@@ -46,11 +46,15 @@ func TestValidateHTTPRoute(t *testing.T) {
 									},
 								},
 							},
-							ForwardTo: []gatewayv1a2.HTTPRouteForwardTo{
+							BackendRefs: []gatewayv1a2.HTTPBackendRef{
 								{
-									ServiceName: &testService,
-									Port:        portNumberPtr(8080),
-									Weight:      utilpointer.Int32(100),
+									BackendRef: gatewayv1a2.BackendRef{
+										BackendObjectReference: gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
+										Weight: utilpointer.Int32(100),
+									},
 								},
 							},
 						},
@@ -77,8 +81,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8081),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8081),
+										},
 									},
 								},
 							},
@@ -106,15 +112,19 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &specialService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: specialService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 							},
@@ -153,8 +163,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 								{
@@ -193,8 +205,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 								{
@@ -211,8 +225,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 								{
@@ -229,8 +245,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &specialService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: specialService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 							},
@@ -269,8 +287,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										ServiceName: &testService,
-										Port:        portNumberPtr(8080),
+										BackendRef: &gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: portNumberPtr(8080),
+										},
 									},
 								},
 								{
