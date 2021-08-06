@@ -23,22 +23,22 @@ nav:
       Gateway: api-types/gateway.md
       HTTPRoute: api-types/httproute.md
   - Guides:
-      - Getting started: guides/getting-started.md
-      - Simple Gateway: guides/simple-gateway.md
-      - HTTP routing: guides/http-routing.md
-      - HTTP traffic splitting: guides/traffic-splitting.md
-      - Multiple namespaces and routes: guides/multiple-ns.md
-      - TLS: guides/tls.md
-      - TCP routing: guides/tcp.md
+    - Getting started: guides/getting-started.md
+    - Simple Gateway: guides/simple-gateway.md
+    - HTTP routing: guides/http-routing.md
+    - HTTP traffic splitting: guides/traffic-splitting.md
+    - Multiple namespaces and routes: guides/multiple-ns.md
+    - TLS: guides/tls.md
+    - TCP routing: guides/tcp.md
   - References:
-      - API specification: references/spec.md
-      - Releases: references/releases.md
-      - Implementations: references/implementations.md
+    - API specification: references/spec.md
+    - Releases: references/releases.md
+    - Implementations: references/implementations.md
   - ... | geps/gep-*.md
   - Contributing:
-      - Developer guide: contributing/devguide.md
-      - Gateway Enhancement Proposal: contributing/gep.md
-      - Enhancement requests: contributing/enhancement-requests.md
-      - Community: contributing/community.md
+    - Developer guide: contributing/devguide.md
+    - Gateway Enhancement Proposal: contributing/gep.md
+    - Enhancement requests: contributing/enhancement-requests.md
+    - Community: contributing/community.md
   - FAQ: faq.md
 
