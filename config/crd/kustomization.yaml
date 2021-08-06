@@ -6,3 +6,9 @@ resources:
 - bases/networking.x-k8s.io_tlsroutes.yaml
 - bases/networking.x-k8s.io_udproutes.yaml
 - bases/networking.x-k8s.io_backendpolicies.yaml
+- bases/gateway.networking.k8s.io_gatewayclasses.yaml
+- bases/gateway.networking.k8s.io_gateways.yaml
+- bases/gateway.networking.k8s.io_httproutes.yaml
+- bases/gateway.networking.k8s.io_tcproutes.yaml
+- bases/gateway.networking.k8s.io_tlsroutes.yaml
+- bases/gateway.networking.k8s.io_udproutes.yaml
