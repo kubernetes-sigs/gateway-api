@@ -40,6 +40,7 @@ type LocalObjectReference struct {
 // ObjectReference identifies an API object including its namespace.
 type ObjectReference struct {
 	// Group is the group of the referent.
+	// When empty, the "core" API group is inferred.
 	//
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`

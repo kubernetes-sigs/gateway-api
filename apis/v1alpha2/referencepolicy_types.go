@@ -1,5 +1,5 @@
 /*
-Copyright 2020 The Kubernetes Authors.
+Copyright 2021 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -25,10 +25,15 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // ReferencePolicy identifies kinds of resources in other namespaces that are
-// trusted to reference the specified kinds of resources in the local namespace.
+// trusted to reference the specified kinds of resources in the same namespace
+// as the policy.
+//
 // Each ReferencePolicy can be used to represent a unique trust relationship.
 // Additional Reference Policies can be used to add to the set of trusted
 // sources of inbound references for the namespace they are defined within.
+//
+// All cross-namespace references in Gateway API (with the exception of cross-namespace
+// Gateway-route attachment) require a ReferencePolicy.
 type ReferencePolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -36,9 +41,9 @@ type ReferencePolicy struct {
 	// Spec defines the desired state of ReferencePolicy.
 	Spec ReferencePolicySpec `json:"spec,omitempty"`
 
-	// Note that we are explicitly *excluding* ReferencePolicy status at the
-	// moment, as designing it is more difficult than it would seem.
-	// As it is an additive change, we can make changes later.
+	// Note that `Status` sub-resource has been excluded at the
+	// moment as it was difficult to work out the design.
+	// `Status` sub-resource may be added in future.
 }
 
 // +kubebuilder:object:root=true
@@ -60,6 +65,7 @@ type ReferencePolicySpec struct {
 	// Support: Core
 	//
 	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	From []ReferencePolicyFrom `json:"from"`
 
 	// To describes the resources that may be referenced by the resources
@@ -70,12 +76,14 @@ type ReferencePolicySpec struct {
 	// Support: Core
 	//
 	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
 	To []ReferencePolicyTo `json:"to"`
 }
 
 // ReferencePolicyFrom describes trusted namespaces and kinds.
 type ReferencePolicyFrom struct {
 	// Group is the group of the referent.
+	// When empty, the "core" API group is inferred.
 	//
 	// Support: Core
 	//
@@ -109,6 +117,7 @@ type ReferencePolicyFrom struct {
 // references.
 type ReferencePolicyTo struct {
 	// Group is the group of the referent.
+	// When empty, the "core" API group is inferred.
 	//
 	// Support: Core
 	//

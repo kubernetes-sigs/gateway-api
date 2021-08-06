@@ -27,12 +27,14 @@ spec:
     name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: ReferencePolicy identifies kinds of resources in other namespaces
-          that are trusted to reference the specified kinds of resources in the local
-          namespace. Each ReferencePolicy can be used to represent a unique trust
-          relationship. Additional Reference Policies can be used to add to the set
-          of trusted sources of inbound references for the namespace they are defined
-          within.
+        description: "ReferencePolicy identifies kinds of resources in other namespaces
+          that are trusted to reference the specified kinds of resources in the same
+          namespace as the policy. \n Each ReferencePolicy can be used to represent
+          a unique trust relationship. Additional Reference Policies can be used to
+          add to the set of trusted sources of inbound references for the namespace
+          they are defined within. \n All cross-namespace references in Gateway API
+          (with the exception of cross-namespace Gateway-route attachment) require
+          a ReferencePolicy."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -60,8 +62,8 @@ spec:
                     kinds.
                   properties:
                     group:
-                      description: "Group is the group of the referent. \n Support:
-                        Core"
+                      description: "Group is the group of the referent. When empty,
+                        the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -83,6 +85,7 @@ spec:
                   - group
                   - kind
                   type: object
+                maxItems: 16
                 minItems: 1
                 type: array
               to:
@@ -96,8 +99,8 @@ spec:
                     as targets of the references.
                   properties:
                     group:
-                      description: "Group is the group of the referent. \n Support:
-                        Core"
+                      description: "Group is the group of the referent. When empty,
+                        the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -113,6 +116,7 @@ spec:
                   - group
                   - kind
                   type: object
+                maxItems: 16
                 minItems: 1
                 type: array
             required:

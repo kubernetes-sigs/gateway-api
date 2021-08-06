@@ -812,7 +812,7 @@ const (
 	// * "DegradedRoutes"
 	// * "InvalidCertificateRef"
 	// * "InvalidRoutesRef"
-	// * "ReferenceNotPermitted"
+	// * "RefNotPermitted"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
