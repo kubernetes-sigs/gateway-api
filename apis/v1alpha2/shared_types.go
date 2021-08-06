@@ -77,53 +77,49 @@ type GatewayReference struct {
 	Namespace string `json:"namespace"`
 }
 
-// RouteForwardTo defines how a Route should forward a request.
-type RouteForwardTo struct {
-	// ServiceName refers to the name of the Service to forward matched requests
-	// to. When specified, this takes the place of BackendRef. If both
-	// BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
-	//
-	// The protocol to use should be specified with the AppProtocol field on
-	// Service resources.
-	//
-	// Support: Core
+// BackendObjectReference defines how an ObjectReference that is
+// specific to BackendRef. It includes a few additional fields and features
+// than a regular ObjectReference.
+type BackendObjectReference struct {
+	// Group is the group of the referent.
+	// When unspecified (empty string), core API group is inferred.
 	//
 	// +optional
+	// +kubebuilder:default=""
 	// +kubebuilder:validation:MaxLength=253
-	ServiceName *string `json:"serviceName,omitempty"`
+	Group *string `json:"group"`
 
-	// BackendRef is a reference to a backend to forward matched requests to. If
-	// both BackendRef and ServiceName are specified, ServiceName will be given
-	// precedence.
-	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
-	//
-	// Support: Custom
+	// Kind is kind of the referent.
 	//
 	// +optional
-	BackendRef *LocalObjectReference `json:"backendRef,omitempty"`
+	// +kubebuilder:default=Service
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Kind *string `json:"kind"`
 
-	// Port specifies the destination port number to use for the
-	// backend referenced by the ServiceName or BackendRef field.
-	// If unspecified, the destination port in the request is used
-	// when forwarding to a backendRef or serviceName.
+	// Name is the name of the referent.
 	//
-	// Support: Core
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// Port specifies the destination port number to use for this resource.
+	// Port is required when the referent is a Kubernetes Service.
+	// For other resources, destination port can be derived from the referent
+	// resource or this field.
 	//
 	// +optional
 	Port *PortNumber `json:"port,omitempty"`
+}
 
-	// Weight specifies the proportion of HTTP requests forwarded to the backend
-	// referenced by the ServiceName or BackendRef field. This is computed as
+// BackendRef defines how a Route should forward a request to a Kubernetes
+// resource.
+type BackendRef struct {
+	// BackendObjectReference references a Kubernetes object.
+	BackendObjectReference `json:",inline"`
+
+	// Weight specifies the proportion of HTTP requests forwarded to the
+	// referenced backend. This is computed as
 	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
 	// there may be some epsilon from the exact proportion defined here
 	// depending on the precision an implementation supports. Weight is not a
@@ -134,7 +130,7 @@ type RouteForwardTo struct {
 	// traffic should be forwarded for this entry. If unspecified, weight
 	// defaults to 1.
 	//
-	// Support: Extended
+	// Support for this field varies based on the context where used.
 	//
 	// +optional
 	// +kubebuilder:default=1

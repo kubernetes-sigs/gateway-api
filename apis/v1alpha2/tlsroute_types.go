@@ -127,12 +127,17 @@ type TLSRouteRule struct {
 	// +kubebuilder:validation:MaxItems=8
 	Matches []TLSRouteMatch `json:"matches,omitempty"`
 
-	// ForwardTo defines the backend(s) where matching requests should be
+	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
+	//
+	// Support: Core for Kubernetes Service
+	// Support: Custom for any other resource
+	//
+	// Support for weight: Extended
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	ForwardTo []RouteForwardTo `json:"forwardTo"`
+	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
 }
 
 // TLSRouteMatch defines the predicate used to match connections to a

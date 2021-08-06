@@ -8,14 +8,14 @@ spec:
   hostnames:
   - foo.example.com
   rules:
-  - forwardTo:
-    - serviceName: foo-v1
+  - backendRefs:
+    - name: foo-v1
       port: 8080
   - matches:
     - headers:
       - type: Exact
         name: traffic
         value: test
-    forwardTo:
-    - serviceName: foo-v2
+    backendRefs:
+    - name: foo-v2
       port: 8080

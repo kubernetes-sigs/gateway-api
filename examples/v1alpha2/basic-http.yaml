@@ -40,8 +40,8 @@ spec:
     - path:
         type: Prefix
         value: /bar
-    forwardTo:
-    - serviceName: my-service1
+    backendRefs:
+    - name: my-service1
       port: 8080
   - matches:
     - headers:
@@ -56,6 +56,6 @@ spec:
         type: Prefix
         value: /some/thing
       method: GET
-    forwardTo:
-    - serviceName: my-service2
+    backendRefs:
+    - name: my-service2
       port: 8080
