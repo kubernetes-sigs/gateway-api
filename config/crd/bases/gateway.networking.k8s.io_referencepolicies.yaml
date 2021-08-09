@@ -34,7 +34,7 @@ spec:
           add to the set of trusted sources of inbound references for the namespace
           they are defined within. \n All cross-namespace references in Gateway API
           (with the exception of cross-namespace Gateway-route attachment) require
-          a ReferencePolicy."
+          a ReferencePolicy. \n Support: Core"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -65,7 +65,6 @@ spec:
                       description: "Group is the group of the referent. When empty,
                         the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
-                      minLength: 1
                       type: string
                     kind:
                       description: "Kind is the kind of the referent. Although implementations
@@ -102,13 +101,11 @@ spec:
                       description: "Group is the group of the referent. When empty,
                         the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
-                      minLength: 1
                       type: string
                     kind:
                       description: "Kind is the kind of the referent. Although implementations
                         may support additional resources, the following types are
-                        part of the \"Core\" support level for this field: \n * Service
-                        * HTTPRoute * TCPRoute * TLSRoute * UDPRoute"
+                        part of the \"Core\" support level for this field: \n * Service"
                       maxLength: 253
                       minLength: 1
                       type: string

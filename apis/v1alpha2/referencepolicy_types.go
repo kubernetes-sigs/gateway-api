@@ -34,6 +34,9 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 //
 // All cross-namespace references in Gateway API (with the exception of cross-namespace
 // Gateway-route attachment) require a ReferencePolicy.
+//
+// Support: Core
+//
 type ReferencePolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -87,7 +90,6 @@ type ReferencePolicyFrom struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
 
@@ -121,7 +123,6 @@ type ReferencePolicyTo struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Group string `json:"group"`
 
@@ -130,10 +131,6 @@ type ReferencePolicyTo struct {
 	// support level for this field:
 	//
 	// * Service
-	// * HTTPRoute
-	// * TCPRoute
-	// * TLSRoute
-	// * UDPRoute
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253

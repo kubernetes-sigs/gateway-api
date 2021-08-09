@@ -723,10 +723,11 @@ type HTTPRequestRedirect struct {
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
+	// If the referent cannot be found, this HTTPBackendRef is invalid
+	// and must be dropped from the Gateway. The controller must ensure the
+	// "ResolvedRefs" condition on the Gateway is set to `status: true`
+	// with the "DegradedRoutes" reason, and not configure this backend in the
+	// underlying implemenation.
 	//
 	// If there is a cross-namespace reference to an *existing* object
 	// that is not covered by a ReferencePolicy, the controller must ensure the

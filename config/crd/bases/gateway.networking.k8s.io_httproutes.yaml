@@ -318,15 +318,24 @@ spec:
                                     backendRef:
                                       description: "BackendRef references a resource
                                         where mirrored requests are sent. \n If the
-                                        referent cannot be found, the rule is not
-                                        included in the route. The controller should
-                                        raise the \"ResolvedRefs\" condition on the
-                                        Gateway with the \"DegradedRoutes\" reason.
-                                        The gateway status for this route should be
-                                        updated with a condition that describes the
-                                        error more specifically. \n Support: Extended
-                                        for Kubernetes Service Support: Custom for
-                                        any other resource"
+                                        referent cannot be found, this HTTPBackendRef
+                                        is invalid and must be dropped from the Gateway.
+                                        The controller must ensure the \"ResolvedRefs\"
+                                        condition on the Gateway is set to `status:
+                                        true` with the \"DegradedRoutes\" reason,
+                                        and not configure this backend in the underlying
+                                        implemenation. \n If there is a cross-namespace
+                                        reference to an *existing* object that is
+                                        not covered by a ReferencePolicy, the controller
+                                        must ensure the \"ResolvedRefs\"  condition
+                                        on the Gateway is set to `status: true`, with
+                                        the \"RefNotPermitted\" reason and not configure
+                                        this backend in the underlying implementation.
+                                        \n In either error case, the Message of the
+                                        `ResolvedRefs` Condition should be used to
+                                        provide more detail about the problem. \n
+                                        Support: Extended for Kubernetes Service Support:
+                                        Custom for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -343,6 +352,18 @@ spec:
                                           type: string
                                         name:
                                           description: Name is the name of the referent.
+                                          maxLength: 253
+                                          minLength: 1
+                                          type: string
+                                        namespace:
+                                          description: "Namespace is the namespace
+                                            of the backend. When unspecified, the
+                                            local namespace is inferred. \n Note that
+                                            when a namespace is specified, a ReferencePolicy
+                                            object is required in the referent namespace
+                                            to allow that namespace's owner to accept
+                                            the reference. See the ReferencePolicy
+                                            object for details. \n Support: Core"
                                           maxLength: 253
                                           minLength: 1
                                           type: string
@@ -439,6 +460,17 @@ spec:
                             type: string
                           name:
                             description: Name is the name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            description: "Namespace is the namespace of the backend.
+                              When unspecified, the local namespace is inferred. \n
+                              Note that when a namespace is specified, a ReferencePolicy
+                              object is required in the referent namespace to allow
+                              that namespace's owner to accept the reference. See
+                              the ReferencePolicy object for details. \n Support:
+                              Core"
                             maxLength: 253
                             minLength: 1
                             type: string
@@ -624,13 +656,22 @@ spec:
                               backendRef:
                                 description: "BackendRef references a resource where
                                   mirrored requests are sent. \n If the referent cannot
-                                  be found, the rule is not included in the route.
-                                  The controller should raise the \"ResolvedRefs\"
-                                  condition on the Gateway with the \"DegradedRoutes\"
-                                  reason. The gateway status for this route should
-                                  be updated with a condition that describes the error
-                                  more specifically. \n Support: Extended for Kubernetes
-                                  Service Support: Custom for any other resource"
+                                  be found, this HTTPBackendRef is invalid and must
+                                  be dropped from the Gateway. The controller must
+                                  ensure the \"ResolvedRefs\" condition on the Gateway
+                                  is set to `status: true` with the \"DegradedRoutes\"
+                                  reason, and not configure this backend in the underlying
+                                  implemenation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not covered
+                                  by a ReferencePolicy, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Gateway is
+                                  set to `status: true`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service Support: Custom
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -647,6 +688,17 @@ spec:
                                     type: string
                                   name:
                                     description: Name is the name of the referent.
+                                    maxLength: 253
+                                    minLength: 1
+                                    type: string
+                                  namespace:
+                                    description: "Namespace is the namespace of the
+                                      backend. When unspecified, the local namespace
+                                      is inferred. \n Note that when a namespace is
+                                      specified, a ReferencePolicy object is required
+                                      in the referent namespace to allow that namespace's
+                                      owner to accept the reference. See the ReferencePolicy
+                                      object for details. \n Support: Core"
                                     maxLength: 253
                                     minLength: 1
                                     type: string

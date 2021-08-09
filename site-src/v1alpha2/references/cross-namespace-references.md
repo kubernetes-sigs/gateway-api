@@ -112,7 +112,7 @@ effective safeguards are in place.
 ### Conformance Level
 
 ReferencePolicy support is a "CORE" conformance level requirement for
-cross-namespace references inside the following objects:
+cross-namespace references that originate from the following objects:
 - HTTPRoute
 - TLSRoute
 - TCPRoute
