@@ -146,6 +146,14 @@ spec:
                       maxLength: 253
                       minLength: 1
                       type: string
+                    name:
+                      description: "Name is the name of the Listener. If more than
+                        one Listener is present each Listener MUST specify a name.
+                        The names of Listeners MUST be unique within a Gateway. \n
+                        Support: Core"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
                     port:
                       description: "Port is the network port. Multiple listeners may
                         use the same port, subject to the Listener compatibility rules.
@@ -167,16 +175,11 @@ spec:
                         at both the TLS and HTTP protocol layers. \n Support: Core"
                       type: string
                     routes:
-                      description: "Routes specifies a schema for associating routes
-                        with the Listener using selectors. A Route is a resource capable
-                        of servicing a request and allows a cluster operator to expose
-                        a cluster resource (i.e. Service) by externally-reachable
-                        URL, load-balance traffic and terminate SSL/TLS.  Typically,
-                        a route is a \"HTTPRoute\" or \"TCPRoute\" in group \"gateway.networking.k8s.io\",
-                        however, an implementation may support other types of resources.
-                        \n The Routes selector MUST select a set of objects that are
-                        compatible with the application protocol specified in the
-                        Protocol field. \n Although a client request may technically
+                      default:
+                        namespaces:
+                          from: Same
+                      description: "Routes specifies which Routes may be attached
+                        to this Listener. \n Although a client request may technically
                         match multiple route rules, only one rule may ultimately receive
                         the request. Matching precedence MUST be determined in order
                         of the following criteria: \n * The most specific match. For
@@ -197,31 +200,43 @@ spec:
                         by a Route is invalid, the rest of the Route should still
                         be supported. \n Support: Core"
                       properties:
-                        group:
-                          default: gateway.networking.k8s.io
-                          description: "Group is the group of the route resource to
-                            select. Omitting the value indicates the gateway.networking.k8s.io
-                            API group. For example, use the following to select an
-                            HTTPRoute: \n routes:   kind: HTTPRoute \n Otherwise,
-                            if an alternative API group is desired, specify the desired
-                            group: \n routes:   group: acme.io   kind: FooRoute \n
-                            Support: Core"
-                          maxLength: 253
-                          type: string
-                        kind:
-                          description: "Kind is the kind of the route resource to
-                            select. \n Kind MUST correspond to kinds of routes that
-                            are compatible with the application protocol specified
-                            in the Listener's Protocol field. \n If an implementation
-                            does not support or recognize this resource type, it SHOULD
-                            set the \"ResolvedRefs\" condition to false for this listener
-                            with the \"InvalidRoutesRef\" reason. \n Support: Core"
-                          type: string
+                        kinds:
+                          description: "Kinds specifies the groups and kinds of Routes
+                            that are allowed to bind to this Gateway listener. When
+                            unspecified or empty, the kinds of Routes selected are
+                            determined using the Listener protocol. \n Kind MUST correspond
+                            to kinds of Routes that are compatible with the application
+                            protocol specified in the Listener's Protocol field. If
+                            an implementation does not support or recognize this resource
+                            type, it SHOULD set the \"ResolvedRefs\" condition to
+                            false for this listener with the \"InvalidRoutesRef\"
+                            reason. \n Support: Core"
+                          items:
+                            description: RouteGroupKind indicates the group and kind
+                              of a Route resource.
+                            properties:
+                              group:
+                                default: gateway.networking.k8s.io
+                                description: "Group is the group of the Route. \n
+                                  Support: Core"
+                                maxLength: 253
+                                type: string
+                              kind:
+                                description: "Kind is the kind of the Route. \n Support:
+                                  Core"
+                                maxLength: 253
+                                minLength: 1
+                                type: string
+                            required:
+                            - kind
+                            type: object
+                          maxItems: 8
+                          type: array
                         namespaces:
                           default:
                             from: Same
-                          description: "Namespaces indicates in which namespaces Routes
-                            should be selected for this Gateway. This is restricted
+                          description: "Namespaces indicates which namespaces Routes
+                            may be attached to this Listener from. This is restricted
                             to the namespace of this Gateway by default. \n Support:
                             Core"
                           properties:
@@ -290,57 +305,6 @@ spec:
                                   type: object
                               type: object
                           type: object
-                        selector:
-                          description: "Selector specifies a set of route labels used
-                            for selecting routes to associate with the Gateway. If
-                            this Selector is defined, only routes matching the Selector
-                            are associated with the Gateway. An empty Selector matches
-                            all routes. \n Support: Core"
-                          properties:
-                            matchExpressions:
-                              description: matchExpressions is a list of label selector
-                                requirements. The requirements are ANDed.
-                              items:
-                                description: A label selector requirement is a selector
-                                  that contains values, a key, and an operator that
-                                  relates the key and values.
-                                properties:
-                                  key:
-                                    description: key is the label key that the selector
-                                      applies to.
-                                    type: string
-                                  operator:
-                                    description: operator represents a key's relationship
-                                      to a set of values. Valid operators are In,
-                                      NotIn, Exists and DoesNotExist.
-                                    type: string
-                                  values:
-                                    description: values is an array of string values.
-                                      If the operator is In or NotIn, the values array
-                                      must be non-empty. If the operator is Exists
-                                      or DoesNotExist, the values array must be empty.
-                                      This array is replaced during a strategic merge
-                                      patch.
-                                    items:
-                                      type: string
-                                    type: array
-                                required:
-                                - key
-                                - operator
-                                type: object
-                              type: array
-                            matchLabels:
-                              additionalProperties:
-                                type: string
-                              description: matchLabels is a map of {key,value} pairs.
-                                A single {key,value} in the matchLabels map is equivalent
-                                to an element of matchExpressions, whose key field
-                                is "key", the operator is "In", and the values array
-                                contains only "value". The requirements are ANDed.
-                              type: object
-                          type: object
-                      required:
-                      - kind
                       type: object
                     tls:
                       description: "TLS is the TLS configuration for the Listener.
@@ -434,7 +398,6 @@ spec:
                   required:
                   - port
                   - protocol
-                  - routes
                   type: object
                 maxItems: 64
                 minItems: 1
@@ -573,6 +536,11 @@ spec:
                 items:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
+                    attachedRoutes:
+                      description: AttachedRoutes represents the total number of Routes
+                        that have been successfully attached to this Listener.
+                      format: int32
+                      type: integer
                     conditions:
                       description: Conditions describe the current condition of this
                         listener.
@@ -652,33 +620,46 @@ spec:
                       x-kubernetes-list-map-keys:
                       - type
                       x-kubernetes-list-type: map
-                    hostname:
-                      description: Hostname is the Listener hostname value for which
-                        this message is reporting the status.
+                    name:
+                      description: Name is the name of the Listener.
                       maxLength: 253
                       minLength: 1
                       type: string
-                    port:
-                      description: Port is the unique Listener port value for which
-                        this message is reporting the status.
-                      format: int32
-                      maximum: 65535
-                      minimum: 1
-                      type: integer
-                    protocol:
-                      description: Protocol is the Listener protocol value for which
-                        this message is reporting the status.
-                      type: string
+                    supportedKinds:
+                      description: SupportedKinds is the list indicating the Kinds
+                        supported by this listener. When this is not specified on
+                        the Listener, this MUST represent the kinds an implementation
+                        supports for the specified protocol. When there are kinds
+                        specified on the Listener, this MUST represent the intersection
+                        of those kinds and the kinds supported by the implementation
+                        for the specified protocol.
+                      items:
+                        description: RouteGroupKind indicates the group and kind of
+                          a Route resource.
+                        properties:
+                          group:
+                            default: gateway.networking.k8s.io
+                            description: "Group is the group of the Route. \n Support:
+                              Core"
+                            maxLength: 253
+                            type: string
+                          kind:
+                            description: "Kind is the kind of the Route. \n Support:
+                              Core"
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                        required:
+                        - kind
+                        type: object
+                      maxItems: 8
+                      type: array
                   required:
+                  - attachedRoutes
                   - conditions
-                  - port
-                  - protocol
                   type: object
                 maxItems: 64
                 type: array
-                x-kubernetes-list-map-keys:
-                - port
-                x-kubernetes-list-type: map
             type: object
         required:
         - spec

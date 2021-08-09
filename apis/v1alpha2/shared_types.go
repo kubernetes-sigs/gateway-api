@@ -20,40 +20,88 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GatewayAllowType specifies which Gateways should be allowed to use a Route.
-type GatewayAllowType string
-
-const (
-	// Any Gateway will be able to use this route.
-	GatewayAllowAll GatewayAllowType = "All"
-	// Only Gateways that have been  specified in GatewayRefs will be able to use this route.
-	GatewayAllowFromList GatewayAllowType = "FromList"
-	// Only Gateways within the same namespace as the route will be able to use this route.
-	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
-)
-
-// RouteGateways defines which Gateways will be able to use a route. If this
-// field results in preventing the selection of a Route by a Gateway, an
-// "Admitted" condition with a status of false must be set for the Gateway on
-// that Route.
-type RouteGateways struct {
-	// Allow indicates which Gateways will be allowed to use this route.
-	// Possible values are:
-	// * All: Gateways in any namespace can use this route.
-	// * FromList: Only Gateways specified in GatewayRefs may use this route.
-	// * SameNamespace: Only Gateways in the same namespace may use this route.
+// ParentRef identifies an API object (usually a Gateway) that can be considered
+// a parent of this resource (usually a route). The only kind of parent resource
+// with "Core" support is Gateway. This API may be extended in the future to
+// support additional kinds of parent resources, such as HTTPRoute.
+type ParentRef struct {
+	// Group is the group of the referent.
 	//
-	// +optional
-	// +kubebuilder:validation:Enum=All;FromList;SameNamespace
-	// +kubebuilder:default=SameNamespace
-	Allow *GatewayAllowType `json:"allow,omitempty"`
-
-	// GatewayRefs must be specified when Allow is set to "FromList". In that
-	// case, only Gateways referenced in this list will be allowed to use this
-	// route. This field is ignored for other values of "Allow".
+	// Support: Core
 	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:default=gateway.networking.k8s.io
+	// +default
+	Group *string `json:"group,omitempty"`
+
+	// Kind is kind of the referent.
+	//
+	// Support: Core (Gateway)
+	// Support: Extended (Other Resources)
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:default=Gateway
 	// +optional
-	GatewayRefs []GatewayReference `json:"gatewayRefs,omitempty"`
+	Kind *string `json:"kind,omitempty"`
+
+	// Namespace is the namespace of the referent. When unspecified (empty
+	// string), this will either be:
+	//
+	// * local namespace of the target is a namespace scoped resource
+	// * no namespace (not applicable) if the target is cluster-scoped.
+	//
+	// Support: Extended
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	Namespace *string `json:"namespace,omitempty"`
+
+	// Scope represents if this refers to a cluster or namespace scoped resource.
+	// This may be set to "Cluster" or "Namespace".
+	//
+	// Support: Core (Namespace)
+	// Support: Extended (Cluster)
+	//
+	// +kubebuilder:validation:Enum=Cluster;Namespace
+	// +kubebuilder:default=Namespace
+	// +optional
+	Scope *string `json:"scope,omitempty"`
+
+	// Name is the name of the referent.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// SectionName is the name of a section within the target resource. In the
+	// following resources, SectionName is interpreted as the following:
+	//
+	// * Gateway: Listener Name
+	//
+	// Implementations MAY choose to support attaching Routes to other resources.
+	// If that is the case, they MUST clearly document how SectionName is
+	// interpreted.
+	//
+	// When unspecified (empty string), this will reference the entire resource.
+	// For the purpose of status, an attachment is considered successful if at
+	// least one section in the parent resource accepts it. For example, Gateway
+	// listeners can restrict which Routes can bind to them by Route kind,
+	// namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
+	// the referencing Route, the Route MUST be considered successfully
+	// attached. If no Gateway listeners accept attachment from this Route, the
+	// Route MUST be considered detached from the Gateway.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	SectionName *string `json:"sectionName,omitempty"`
 }
 
 // PortNumber defines a network port.
@@ -61,21 +109,6 @@ type RouteGateways struct {
 // +kubebuilder:validation:Minimum=1
 // +kubebuilder:validation:Maximum=65535
 type PortNumber int32
-
-// GatewayReference identifies a Gateway in a specified namespace.
-type GatewayReference struct {
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Namespace is the namespace of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Namespace string `json:"namespace"`
-}
 
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.
@@ -118,12 +151,26 @@ const (
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
 )
 
-// RouteGatewayStatus describes the status of a route with respect to an
-// associated Gateway.
-type RouteGatewayStatus struct {
-	// GatewayRef is a reference to a Gateway object that is associated with
-	// the route.
-	GatewayRef RouteStatusGatewayReference `json:"gatewayRef"`
+// RouteParentStatus describes the status of a route with respect to an
+// associated Parent.
+type RouteParentStatus struct {
+	// ParentRef is a reference to the parent resource that the route wants to
+	// be attached to.
+	ParentRef ParentRef `json:"parentRef"`
+
+	// Controller is a domain/path string that indicates the controller that
+	// wrote this status. This corresponds with the controller field on
+	// GatewayClass.
+	//
+	// Example: "acme.io/gateway-controller".
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+	// valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Controller string `json:"controller"`
 
 	// Conditions describes the status of the route with respect to the
 	// Gateway. The "Admitted" condition must always be specified by controllers
@@ -136,37 +183,6 @@ type RouteGatewayStatus struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=8
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
-}
-
-// RouteStatusGatewayReference identifies a Gateway in a specified namespace.
-// This reference also includes a controller name to simplify cleaning up status
-// entries.
-type RouteStatusGatewayReference struct {
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Namespace is the namespace of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Namespace string `json:"namespace"`
-
-	// Controller is a domain/path string that indicates the controller
-	// implementing the Gateway. This corresponds with the controller field on
-	// GatewayClass.
-	//
-	// Example: "acme.io/gateway-controller".
-	//
-	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
-	// valid Kubernetes names
-	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Controller string `json:"controller"`
 }
 
 // RouteStatus defines the observed state that is required across
@@ -185,7 +201,7 @@ type RouteStatus struct {
 	// by any Gateway.
 	//
 	// +kubebuilder:validation:MaxItems=100
-	Gateways []RouteGatewayStatus `json:"gateways"`
+	Parents []RouteParentStatus `json:"parents"`
 }
 
 // Hostname is the fully qualified domain name of a network host, as defined

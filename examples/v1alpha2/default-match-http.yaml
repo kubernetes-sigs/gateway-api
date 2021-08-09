@@ -14,13 +14,6 @@ spec:
   listeners:
   - protocol: HTTP
     port: 80
-    routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          app: default-match
-      namespaces:
-        from: "All"
 ---
 # This HTTPRoute demonstrates patch match defaulting. If no path match is
 # specified, CRD defaults adds a default prefix match on the path "/". This
@@ -33,6 +26,8 @@ metadata:
   labels:
     app: default-match
 spec:
+  parentRefs:
+  - name: default-match-gw
   hostnames:
     - default-match.com
   rules:

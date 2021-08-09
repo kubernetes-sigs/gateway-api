@@ -141,6 +141,17 @@ type GatewaySpec struct {
 // combination of Hostname, Port, and Protocol. This will be enforced by a
 // validating webhook.
 type Listener struct {
+	// Name is the name of the Listener. If more than one Listener is present
+	// each Listener MUST specify a name. The names of Listeners MUST be unique
+	// within a Gateway.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	Name *string `json:"name,omitempty"`
+
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, "", or `*`, all hostnames are
 	// matched. This field can be omitted for protocols that don't require
@@ -198,18 +209,7 @@ type Listener struct {
 	// +optional
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
-	// Routes specifies a schema for associating routes with the
-	// Listener using selectors. A Route is a resource capable of
-	// servicing a request and allows a cluster operator to expose
-	// a cluster resource (i.e. Service) by externally-reachable
-	// URL, load-balance traffic and terminate SSL/TLS.  Typically,
-	// a route is a "HTTPRoute" or "TCPRoute" in group
-	// "gateway.networking.k8s.io", however, an implementation may support
-	// other types of resources.
-	//
-	// The Routes selector MUST select a set of objects that
-	// are compatible with the application protocol specified in
-	// the Protocol field.
+	// Routes specifies which Routes may be attached to this Listener.
 	//
 	// Although a client request may technically match multiple route rules,
 	// only one rule may ultimately receive the request. Matching precedence
@@ -232,7 +232,9 @@ type Listener struct {
 	// invalid, the rest of the Route should still be supported.
 	//
 	// Support: Core
-	Routes RouteBindingSelector `json:"routes"`
+	// +kubebuilder:default={namespaces:{from: Same}}
+	// +optional
+	Routes *ListenerRoutes `json:"routes,omitempty"`
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
@@ -374,12 +376,10 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// RouteBindingSelector defines a schema for associating routes with the Gateway.
-// If Namespaces and Selector are defined, only routes matching both selectors are
-// associated with the Gateway.
-type RouteBindingSelector struct {
-	// Namespaces indicates in which namespaces Routes should be selected
-	// for this Gateway. This is restricted to the namespace of this Gateway by
+// ListenerRoutes defines which Routes may be attached to this Listener.
+type ListenerRoutes struct {
+	// Namespaces indicates which namespaces Routes may be attached to this
+	// Listener from. This is restricted to the namespace of this Gateway by
 	// default.
 	//
 	// Support: Core
@@ -387,46 +387,22 @@ type RouteBindingSelector struct {
 	// +optional
 	// +kubebuilder:default={from: Same}
 	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
-	// Selector specifies a set of route labels used for selecting
-	// routes to associate with the Gateway. If this Selector is defined,
-	// only routes matching the Selector are associated with the Gateway.
-	// An empty Selector matches all routes.
+
+	// Kinds specifies the groups and kinds of Routes that are allowed to bind
+	// to this Gateway listener. When unspecified or empty, the kinds of Routes
+	// selected are determined using the Listener protocol.
+	//
+	// Kind MUST correspond to kinds of Routes that are compatible with the
+	// application protocol specified in the Listener's Protocol field. If an
+	// implementation does not support or recognize this resource type, it
+	// SHOULD set the "ResolvedRefs" condition to false for this listener with
+	// the "InvalidRoutesRef" reason.
 	//
 	// Support: Core
 	//
 	// +optional
-	Selector *metav1.LabelSelector `json:"selector,omitempty"`
-	// Group is the group of the route resource to select. Omitting the value
-	// indicates the gateway.networking.k8s.io API group.
-	// For example, use the following to select an HTTPRoute:
-	//
-	// routes:
-	//   kind: HTTPRoute
-	//
-	// Otherwise, if an alternative API group is desired, specify the desired
-	// group:
-	//
-	// routes:
-	//   group: acme.io
-	//   kind: FooRoute
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default=gateway.networking.k8s.io
-	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group,omitempty"`
-	// Kind is the kind of the route resource to select.
-	//
-	// Kind MUST correspond to kinds of routes that are compatible with the
-	// application protocol specified in the Listener's Protocol field.
-	//
-	// If an implementation does not support or recognize this
-	// resource type, it SHOULD set the "ResolvedRefs" condition to false for
-	// this listener with the "InvalidRoutesRef" reason.
-	//
-	// Support: Core
-	Kind string `json:"kind"`
+	// +kubebuilder:validation:MaxItems=8
+	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
 // RouteSelectType specifies where Routes should be selected by a Gateway.
@@ -466,6 +442,26 @@ type RouteNamespaces struct {
 	//
 	// +optional
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+}
+
+// RouteGroupKind indicates the group and kind of a Route resource.
+type RouteGroupKind struct {
+	// Group is the group of the Route.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:default=gateway.networking.k8s.io
+	// +kubebuilder:validation:MaxLength=253
+	Group *string `json:"group,omitempty"`
+
+	// Kind is the kind of the Route.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Kind string `json:"kind"`
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
@@ -557,8 +553,6 @@ type GatewayStatus struct {
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
-	// +listType=map
-	// +listMapKey=port
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
@@ -663,19 +657,26 @@ const (
 
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
-	// Port is the unique Listener port value for which this message is
-	// reporting the status.
-	Port PortNumber `json:"port"`
-
-	// Protocol is the Listener protocol value for which this message is
-	// reporting the status.
-	Protocol ProtocolType `json:"protocol"`
-
-	// Hostname is the Listener hostname value for which this message is
-	// reporting the status.
+	// Name is the name of the Listener.
 	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Hostname *Hostname `json:"hostname,omitempty"`
+	Name *string `json:"name,omitempty"`
+
+	// SupportedKinds is the list indicating the Kinds supported by this
+	// listener. When this is not specified on the Listener, this MUST represent
+	// the kinds an implementation supports for the specified protocol. When
+	// there are kinds specified on the Listener, this MUST represent the
+	// intersection of those kinds and the kinds supported by the implementation
+	// for the specified protocol.
+	//
+	// +kubebuilder:validation:MaxItems=8
+	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
+
+	// AttachedRoutes represents the total number of Routes that have been
+	// successfully attached to this Listener.
+	AttachedRoutes int32 `json:"attachedRoutes"`
 
 	// Conditions describe the current condition of this listener.
 	//

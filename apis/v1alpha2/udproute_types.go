@@ -41,17 +41,35 @@ type UDPRoute struct {
 
 // UDPRouteSpec defines the desired state of UDPRoute.
 type UDPRouteSpec struct {
+	// ParentRefs references the resources (usually Gateways) that a Route wants
+	// to be attached to. Note that the referenced parent resource needs to
+	// allow this for the attachment to be complete. For Gateways, that means
+	// the Gateway needs to allow attachment from Routes of this kind and
+	// namespace.
+	//
+	// The only kind of parent resource with "Core" support is Gateway. This API
+	// may be extended in the future to support additional kinds of parent
+	// resources such as one of the route kinds.
+	//
+	// It is invalid to reference an identical parent more than once. It is
+	// valid to reference multiple distinct sections within the same parent
+	// resource, such as 2 Listeners within a Gateway.
+	//
+	// It is possible to separately reference multiple distinct objects that may
+	// be collapsed by an implementation. For example, some implementations may
+	// choose to merge compatible Gateway Listeners together. If that is the
+	// case, the list of routes attached to those resources should also be
+	// merged.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	ParentRefs []ParentRef `json:"parentRefs,omitempty"`
+
 	// Rules are a list of UDP matchers and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Rules []UDPRouteRule `json:"rules"`
-
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // UDPRouteStatus defines the observed state of UDPRoute.
