@@ -15,6 +15,9 @@ plugins:
 markdown_extensions:
   - admonition
 nav:
+  - VERSIONS:
+      v1alpha1: /
+      v1alpha2: /v1alpha2
   - Introduction: index.md
   - Concepts:
       API overview: concepts/api-overview.md
