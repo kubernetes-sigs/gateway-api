@@ -128,7 +128,9 @@ type TLSRouteRule struct {
 	Matches []TLSRouteMatch `json:"matches,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent.
+	// sent. If unspecified or invalid, the rule performs no forwarding; if
+	// no filters are specified that would result in a response being sent,
+	// a HTTP 503 status code is returned.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource
