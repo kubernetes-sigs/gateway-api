@@ -135,8 +135,12 @@ spec:
                         Support: Custom for any other resource \n Support for weight:
                         Extended"
                       items:
-                        description: BackendRef defines how a Route should forward
-                          a request to a Kubernetes resource.
+                        description: "BackendRef defines how a Route should forward
+                          a request to a Kubernetes resource. \n Note that when a
+                          namespace is specified, a ReferencePolicy object is required
+                          in the referent namespace to allow that namespace's owner
+                          to accept the reference. See the ReferencePolicy documentation
+                          for details."
                         properties:
                           group:
                             default: ""
@@ -152,6 +156,17 @@ spec:
                             type: string
                           name:
                             description: Name is the name of the referent.
+                            maxLength: 253
+                            minLength: 1
+                            type: string
+                          namespace:
+                            description: "Namespace is the namespace of the backend.
+                              When unspecified, the local namespace is inferred. \n
+                              Note that when a namespace is specified, a ReferencePolicy
+                              object is required in the referent namespace to allow
+                              that namespace's owner to accept the reference. See
+                              the ReferencePolicy documentation for details. \n Support:
+                              Core"
                             maxLength: 253
                             minLength: 1
                             type: string

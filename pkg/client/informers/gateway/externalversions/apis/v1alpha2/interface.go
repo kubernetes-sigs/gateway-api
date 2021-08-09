@@ -30,6 +30,8 @@ type Interface interface {
 	GatewayClasses() GatewayClassInformer
 	// HTTPRoutes returns a HTTPRouteInformer.
 	HTTPRoutes() HTTPRouteInformer
+	// ReferencePolicies returns a ReferencePolicyInformer.
+	ReferencePolicies() ReferencePolicyInformer
 	// TCPRoutes returns a TCPRouteInformer.
 	TCPRoutes() TCPRouteInformer
 	// TLSRoutes returns a TLSRouteInformer.
@@ -62,6 +64,11 @@ func (v *version) GatewayClasses() GatewayClassInformer {
 // HTTPRoutes returns a HTTPRouteInformer.
 func (v *version) HTTPRoutes() HTTPRouteInformer {
 	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// ReferencePolicies returns a ReferencePolicyInformer.
+func (v *version) ReferencePolicies() ReferencePolicyInformer {
+	return &referencePolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TCPRoutes returns a TCPRouteInformer.

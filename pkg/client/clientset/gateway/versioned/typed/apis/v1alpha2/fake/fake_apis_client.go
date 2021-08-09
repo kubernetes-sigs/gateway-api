@@ -40,6 +40,10 @@ func (c *FakeGatewayV1alpha2) HTTPRoutes(namespace string) v1alpha2.HTTPRouteInt
 	return &FakeHTTPRoutes{c, namespace}
 }
 
+func (c *FakeGatewayV1alpha2) ReferencePolicies(namespace string) v1alpha2.ReferencePolicyInterface {
+	return &FakeReferencePolicies{c, namespace}
+}
+
 func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
 	return &FakeTCPRoutes{c, namespace}
 }

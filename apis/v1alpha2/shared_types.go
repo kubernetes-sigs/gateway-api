@@ -77,43 +77,13 @@ type GatewayReference struct {
 	Namespace string `json:"namespace"`
 }
 
-// BackendObjectReference defines how an ObjectReference that is
-// specific to BackendRef. It includes a few additional fields and features
-// than a regular ObjectReference.
-type BackendObjectReference struct {
-	// Group is the group of the referent.
-	// When unspecified (empty string), core API group is inferred.
-	//
-	// +optional
-	// +kubebuilder:default=""
-	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group"`
-
-	// Kind is kind of the referent.
-	//
-	// +optional
-	// +kubebuilder:default=Service
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind *string `json:"kind"`
-
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Port specifies the destination port number to use for this resource.
-	// Port is required when the referent is a Kubernetes Service.
-	// For other resources, destination port can be derived from the referent
-	// resource or this field.
-	//
-	// +optional
-	Port *PortNumber `json:"port,omitempty"`
-}
-
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.
+//
+// Note that when a namespace is specified, a ReferencePolicy object
+// is required in the referent namespace to allow that namespace's
+// owner to accept the reference. See the ReferencePolicy documentation
+// for details.
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
 	BackendObjectReference `json:",inline"`

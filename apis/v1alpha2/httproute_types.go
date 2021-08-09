@@ -723,10 +723,20 @@ type HTTPRequestRedirect struct {
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
+	// If the referent cannot be found, this HTTPBackendRef is invalid
+	// and must be dropped from the Gateway. The controller must ensure the
+	// "ResolvedRefs" condition on the Gateway is set to `status: true`
+	// with the "DegradedRoutes" reason, and not configure this backend in the
+	// underlying implemenation.
+	//
+	// If there is a cross-namespace reference to an *existing* object
+	// that is not allowed by a ReferencePolicy, the controller must ensure the
+	// "ResolvedRefs"  condition on the Gateway is set to `status: true`,
+	// with the "RefNotPermitted" reason and not configure this backend in the
+	// underlying implementation.
+	//
+	// In either error case, the Message of the `ResolvedRefs` Condition
+	// should be used to provide more detail about the problem.
 	//
 	// Support: Extended for Kubernetes Service
 	// Support: Custom for any other resource
@@ -737,13 +747,26 @@ type HTTPRequestMirrorFilter struct {
 
 // HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.
 type HTTPBackendRef struct {
-	// BackendRef defines how a Route should forward a request to a Kubernetes
-	// resource.
+	// BackendRef is a reference to a backend to forward matched requests to.
 	//
-	// If the referent cannot be found, the rule is not included in the route.
-	// The controller should raise the "ResolvedRefs" condition on the Gateway
-	// with the "DegradedRoutes" reason. The gateway status for this route should
-	// be updated with a condition that describes the error more specifically.
+	// If the referent cannot be found, this HTTPBackendRef is invalid
+	// and must be dropped from the Gateway. The controller must ensure the
+	// "ResolvedRefs" condition on the Gateway is set to `status: true`
+	// with the "DegradedRoutes" reason, and not configure this backend in the
+	// underlying implemenation.
+	//
+	// If there is a cross-namespace reference to an *existing* object
+	// that is not covered by a ReferencePolicy, the controller must ensure the
+	// "ResolvedRefs"  condition on the Gateway is set to `status: true`,
+	// with the "RefNotPermitted" reason and not configure this backend in the
+	// underlying implementation.
+	//
+	// In either error case, the Message of the `ResolvedRefs` Condition
+	// should be used to provide more detail about the problem.
+	//
+	// Support: Custom
+	//
+	// +optional
 	BackendRef `json:",inline"`
 
 	// Filters defined at this-level should be executed if and only if the

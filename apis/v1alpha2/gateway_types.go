@@ -812,6 +812,7 @@ const (
 	// * "DegradedRoutes"
 	// * "InvalidCertificateRef"
 	// * "InvalidRoutesRef"
+	// * "RefNotPermitted"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -839,6 +840,12 @@ const (
 	// not resolve any Routes, and the "ResolvedRefs" status condition
 	// should not be raised in that case.
 	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRoutesRef"
+
+	// This reason is used with the "ResolvedRefs" condition when
+	// one of the Listener's Routes has a BackendRef to an object in
+	// another namespace, where the object in the other namespace does
+	// not have a ReferencePolicy explicitly allowing the reference.
+	ListenerReasonRefNotPermitted ListenerConditionReason = "RefNotPermitted"
 )
 
 const (

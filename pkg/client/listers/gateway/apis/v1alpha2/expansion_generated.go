@@ -38,6 +38,14 @@ type HTTPRouteListerExpansion interface{}
 // HTTPRouteNamespaceLister.
 type HTTPRouteNamespaceListerExpansion interface{}
 
+// ReferencePolicyListerExpansion allows custom methods to be added to
+// ReferencePolicyLister.
+type ReferencePolicyListerExpansion interface{}
+
+// ReferencePolicyNamespaceListerExpansion allows custom methods to be added to
+// ReferencePolicyNamespaceLister.
+type ReferencePolicyNamespaceListerExpansion interface{}
+
 // TCPRouteListerExpansion allows custom methods to be added to
 // TCPRouteLister.
 type TCPRouteListerExpansion interface{}
