@@ -66,7 +66,8 @@ type ObjectReference struct {
 	//
 	// Note that when a namespace is specified, a ReferencePolicy object
 	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferencePolicy object for details.
+	// owner to accept the reference. See the ReferencePolicy documentation
+	// for details.
 	//
 	// Support: Core
 	//
@@ -82,7 +83,8 @@ type ObjectReference struct {
 //
 // Note that when a namespace is specified, a ReferencePolicy object
 // is required in the referent namespace to allow that namespace's
-// owner to accept the reference. See the ReferencePolicy object for details.
+// owner to accept the reference. See the ReferencePolicy documentation
+// for details.
 type BackendObjectReference struct {
 	// Group is the group of the referent.
 	// When unspecified (empty string), core API group is inferred.
@@ -90,7 +92,7 @@ type BackendObjectReference struct {
 	// +optional
 	// +kubebuilder:default=""
 	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group"`
+	Group *string `json:"group,omitempty"`
 
 	// Kind is kind of the referent.
 	//
@@ -98,7 +100,7 @@ type BackendObjectReference struct {
 	// +kubebuilder:default=Service
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	Kind *string `json:"kind"`
+	Kind *string `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
 	//
@@ -111,7 +113,8 @@ type BackendObjectReference struct {
 	//
 	// Note that when a namespace is specified, a ReferencePolicy object
 	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferencePolicy object for details.
+	// owner to accept the reference. See the ReferencePolicy documentation
+	// for details.
 	//
 	// Support: Core
 	//

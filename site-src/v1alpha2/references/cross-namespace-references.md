@@ -1,20 +1,23 @@
 # Cross namespace references and ReferencePolicy
 
-### Terminology note
-When discussing the process of creating cross-namespace object references, this
-document and the documentation on the API itself refers to the object being
-referred to as "the referent object", using the meaning of "referent" to be
-"the person, thing, or idea that a word, phrase, or object refers to".[1](https://dictionary.cambridge.org/dictionary/english/referent)
-
 ## Introduction
 In the Gateway API, it is possible to have references between objects cross
-namespace boundaries. In particular, that Services may be referred to by Routes
+namespace boundaries. In particular, Services may be referred to by Routes
 in a another namespace, or possibly Secrets may be referred to by Gateways or
 Routes in another namespace.
 
 In the past, we've seen that forwarding traffic across namespace boundaries is a
-desired feature, but without the kinds of safeguards proposed here,
+desired feature, but a safeguard like ReferencePolicy,
 [vulnerabilities](https://github.com/kubernetes/kubernetes/issues/103675) can emerge.
+
+!!!note
+
+    When discussing the process of creating cross-namespace object references, this
+    document and the documentation on the API itself refers to the object being
+    referred to as "the referent object", using the
+    [meaning](https://dictionary.cambridge.org/dictionary/english/referent)
+    of "referent" to be "the person, thing, or idea that a word, phrase, or object
+    refers to".
 
 In order to bring cross-namespace references under the control
 of the owner of the referent object's namespace, the Gateway API has a
@@ -24,8 +27,6 @@ reference to be successful.
 To put this another way, if an object is referred to from outside its namespace,
 the object's owner must create a ReferencePolicy object that describes how that
 reference is allowed. This page explains how this process works.
-
-
 
 ## ReferencePolicy
 
@@ -68,7 +69,7 @@ spec:
     kind: HTTPRoute
     namespace: foo
   to:
-  - group: core
+  - group: ""
     kind: Service
 ```
 

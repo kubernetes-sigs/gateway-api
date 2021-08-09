@@ -99,7 +99,7 @@ spec:
                           a request to a Kubernetes resource. \n Note that when a
                           namespace is specified, a ReferencePolicy object is required
                           in the referent namespace to allow that namespace's owner
-                          to accept the reference. See the ReferencePolicy object
+                          to accept the reference. See the ReferencePolicy documentation
                           for details."
                         properties:
                           group:
@@ -125,7 +125,7 @@ spec:
                               Note that when a namespace is specified, a ReferencePolicy
                               object is required in the referent namespace to allow
                               that namespace's owner to accept the reference. See
-                              the ReferencePolicy object for details. \n Support:
+                              the ReferencePolicy documentation for details. \n Support:
                               Core"
                             maxLength: 253
                             minLength: 1

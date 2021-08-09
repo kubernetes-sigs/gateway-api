@@ -326,7 +326,7 @@ spec:
                                         and not configure this backend in the underlying
                                         implemenation. \n If there is a cross-namespace
                                         reference to an *existing* object that is
-                                        not covered by a ReferencePolicy, the controller
+                                        not allowed by a ReferencePolicy, the controller
                                         must ensure the \"ResolvedRefs\"  condition
                                         on the Gateway is set to `status: true`, with
                                         the \"RefNotPermitted\" reason and not configure
@@ -363,7 +363,8 @@ spec:
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferencePolicy
-                                            object for details. \n Support: Core"
+                                            documentation for details. \n Support:
+                                            Core"
                                           maxLength: 253
                                           minLength: 1
                                           type: string
@@ -469,7 +470,7 @@ spec:
                               Note that when a namespace is specified, a ReferencePolicy
                               object is required in the referent namespace to allow
                               that namespace's owner to accept the reference. See
-                              the ReferencePolicy object for details. \n Support:
+                              the ReferencePolicy documentation for details. \n Support:
                               Core"
                             maxLength: 253
                             minLength: 1
@@ -662,7 +663,7 @@ spec:
                                   is set to `status: true` with the \"DegradedRoutes\"
                                   reason, and not configure this backend in the underlying
                                   implemenation. \n If there is a cross-namespace
-                                  reference to an *existing* object that is not covered
+                                  reference to an *existing* object that is not allowed
                                   by a ReferencePolicy, the controller must ensure
                                   the \"ResolvedRefs\"  condition on the Gateway is
                                   set to `status: true`, with the \"RefNotPermitted\"
@@ -698,7 +699,7 @@ spec:
                                       specified, a ReferencePolicy object is required
                                       in the referent namespace to allow that namespace's
                                       owner to accept the reference. See the ReferencePolicy
-                                      object for details. \n Support: Core"
+                                      documentation for details. \n Support: Core"
                                     maxLength: 253
                                     minLength: 1
                                     type: string
