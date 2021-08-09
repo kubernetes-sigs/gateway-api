@@ -12,6 +12,8 @@ plugins:
   - awesome-pages
   - macros:
       include_dir: examples
+markdown_extensions:
+  - admonition
 nav:
   - Introduction: index.md
   - Concepts:

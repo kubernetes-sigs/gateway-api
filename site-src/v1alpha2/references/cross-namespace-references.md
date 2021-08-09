@@ -10,11 +10,10 @@ In the past, we've seen that forwarding traffic across namespace boundaries is a
 desired feature, but a safeguard like ReferencePolicy,
 [vulnerabilities](https://github.com/kubernetes/kubernetes/issues/103675) can emerge.
 
-!!!note
-
+!!! note
     When discussing the process of creating cross-namespace object references, this
-    document and the documentation on the API itself refers to the object being
-    referred to as "the referent object", using the
+    document and the documentation on the API itself talk about the object being
+    referred to using the name "the referent object", using the
     [meaning](https://dictionary.cambridge.org/dictionary/english/referent)
     of "referent" to be "the person, thing, or idea that a word, phrase, or object
     refers to".
