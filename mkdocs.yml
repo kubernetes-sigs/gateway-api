@@ -1,10 +1,15 @@
 site_name: Kubernetes Gateway API
-repo_url: http://sigs.k8s.io/gateway-api
-repo_name: GitHub
+repo_url: https://github.com/kubernetes-sigs/gateway-api
+repo_name: kubernetes-sigs/gateway-api
 site_dir: site
 docs_dir: site-src
 theme:
   name: material
+  icon:
+    repo: fontawesome/brands/git-alt
+  features:
+    - search.highlight
+edit_uri: edit/master/site-src/
 extra_css:
   - css/extra.css
 plugins:
@@ -14,6 +19,8 @@ plugins:
       include_dir: examples
 markdown_extensions:
   - admonition
+  - toc:
+      permalink: true
 nav:
   - Introduction: index.md
   - Concepts:
