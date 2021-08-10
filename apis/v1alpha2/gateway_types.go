@@ -297,15 +297,6 @@ type TLSOverridePolicy struct {
 }
 
 // GatewayTLSConfig describes a TLS configuration.
-//
-// References:
-//
-// - nginx: https://nginx.org/en/docs/http/configuring_https_servers.html
-// - envoy: https://www.envoyproxy.io/docs/envoy/latest/api-v2/api/v2/auth/cert.proto
-// - haproxy: https://www.haproxy.com/documentation/aloha/9-5/traffic-management/lb-layer7/tls/
-// - gcp: https://cloud.google.com/load-balancing/docs/use-ssl-policies#creating_an_ssl_policy_with_a_custom_profile
-// - aws: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html#describe-ssl-policies
-// - azure: https://docs.microsoft.com/en-us/azure/app-service/configure-ssl-bindings#enforce-tls-1112
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
