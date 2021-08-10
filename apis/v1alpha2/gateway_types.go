@@ -147,10 +147,8 @@ type Listener struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	// +optional
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, "", or `*`, all hostnames are
@@ -448,16 +446,12 @@ type RouteNamespaces struct {
 type RouteGroupKind struct {
 	// Group is the group of the Route.
 	//
-	// Support: Core
-	//
 	// +optional
 	// +kubebuilder:default=gateway.networking.k8s.io
 	// +kubebuilder:validation:MaxLength=253
 	Group *string `json:"group,omitempty"`
 
 	// Kind is the kind of the Route.
-	//
-	// Support: Core
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
@@ -659,10 +653,8 @@ const (
 type ListenerStatus struct {
 	// Name is the name of the Listener.
 	//
-	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
-	// +optional
-	Name *string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. When this is not specified on the Listener, this MUST represent

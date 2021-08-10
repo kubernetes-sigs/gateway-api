@@ -152,7 +152,6 @@ spec:
                         The names of Listeners MUST be unique within a Gateway. \n
                         Support: Core"
                       maxLength: 253
-                      minLength: 1
                       type: string
                     port:
                       description: "Port is the network port. Multiple listeners may
@@ -217,13 +216,11 @@ spec:
                             properties:
                               group:
                                 default: gateway.networking.k8s.io
-                                description: "Group is the group of the Route. \n
-                                  Support: Core"
+                                description: Group is the group of the Route.
                                 maxLength: 253
                                 type: string
                               kind:
-                                description: "Kind is the kind of the Route. \n Support:
-                                  Core"
+                                description: Kind is the kind of the Route.
                                 maxLength: 253
                                 minLength: 1
                                 type: string
@@ -623,7 +620,6 @@ spec:
                     name:
                       description: Name is the name of the Listener.
                       maxLength: 253
-                      minLength: 1
                       type: string
                     supportedKinds:
                       description: SupportedKinds is the list indicating the Kinds
@@ -639,13 +635,11 @@ spec:
                         properties:
                           group:
                             default: gateway.networking.k8s.io
-                            description: "Group is the group of the Route. \n Support:
-                              Core"
+                            description: Group is the group of the Route.
                             maxLength: 253
                             type: string
                           kind:
-                            description: "Kind is the kind of the Route. \n Support:
-                              Core"
+                            description: Kind is the kind of the Route.
                             maxLength: 253
                             minLength: 1
                             type: string

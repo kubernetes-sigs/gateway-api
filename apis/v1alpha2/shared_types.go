@@ -32,7 +32,7 @@ type ParentRef struct {
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=gateway.networking.k8s.io
-	// +default
+	// +optional
 	Group *string `json:"group,omitempty"`
 
 	// Kind is kind of the referent.
