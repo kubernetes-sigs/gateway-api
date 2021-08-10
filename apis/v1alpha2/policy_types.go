@@ -42,13 +42,13 @@ type PolicyTargetReference struct {
 
 	// Namespace is the namespace of the referent. When unspecified, the local
 	// namespace is inferred. Even when policy targets a resource in a different
-	// namespace, it may only apply to traffic originating from the same
+	// namespace, it MUST only apply to traffic originating from the same
 	// namespace as the policy.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace string `json:"namespace,omitempty"`
+	Namespace *string `json:"namespace,omitempty"`
 
 	// ClassName is the name of the class this policy should apply to. When
 	// unspecified, the policy will apply to all classes that support it.
@@ -56,5 +56,5 @@ type PolicyTargetReference struct {
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	ClassName string `json:"className,omitempty"`
+	ClassName *string `json:"className,omitempty"`
 }

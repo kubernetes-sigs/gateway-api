@@ -1,10 +1,12 @@
 # Policy Attachment
 
-Many implementations of the API support additional functionality that is not
-covered by the API directly. For example, concepts like timeouts, retries, or
-even CDN configuration are not sufficiently portable to be defined within the
-Gateway API. Instead, implementations may choose to represent these concepts
-with custom Policy resources.
+While features like timeouts, retries, and custom health checks are present in
+most implementations, their details vary since there are no standards (RFCs)
+around them. This makes these features less portable. So instead of pulling
+these into the API, we offer a middle ground: a standard way to plug these
+features in the API and offer a uniform UX across implementations. This standard
+approach for policy attachment allows implementations to create their own custom
+policy resources that can essentially extend Gateway API.
 
 Policies attached to Gateway API resources and implementations must use the
 following approach to ensure consistency across implementations of the API.
@@ -22,8 +24,9 @@ have been applied to a given resource.
 ## Policy Attachment for Ingress
 Attaching policy to Gateway resources for ingress use cases is relatively
 straightforward. A policy can reference the resource it wants to apply to.
-Access is granted with RBAC - anyone that has access to create a RetryPolicy in
-a given namespace can attach it to any resource within that namespace.
+Access is granted with RBAC - for example, anyone that has access to create a
+RetryPolicy in a given namespace can attach it to any resource within that
+namespace.
 
 ![Simple Ingress Example](/images/policy/ingress-simple.png)
 
@@ -62,12 +65,13 @@ resources such as Gateways or Namespaces that may apply to multiple child
 resources.
 
 The `targetRef` field MUST be an exact replica of the `PolicyTargetReference`
-struct included in the Gateway API. Where possible, we recommend using that
-struct directly instead of duplicating the type.
+struct included in the Gateway API. Where possible, it is recommended to use
+that struct directly instead of duplicating the type.
 
 ### Policy Boilerplate
-The following structure can be used as a starting point for any Policy resource
-using this API pattern.
+The following structure MUST be used as for any Policy resource using this API
+pattern. Within the spec, policy resources may omit `Override` or `Default`
+fields, but at least one of them MUST be present.
 
 ```go
 // ACMEServicePolicy provides a way to apply Service policy configuration with
@@ -122,9 +126,9 @@ values from the bottom up for each individual application.
 
 ![Policy Hierarchy](/images/policy/hierarchy.png)
 
-To illustrate this, consider 3 resources with the following hierarchy:
-A > B > C. When attaching the concept of defaults and overrides to that, the
-hierarchy would be expanded to this:
+To illustrate this, consider 3 resources with the following hierarchy: A
+(highest) > B > C. When attaching the concept of defaults and overrides to that,
+the hierarchy would be expanded to this:
 
 A override > B override > C override > C default > B default > A default.
 
