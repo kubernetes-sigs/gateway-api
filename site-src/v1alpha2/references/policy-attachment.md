@@ -194,9 +194,9 @@ easier for some implementations to support. These parameters can similarly be
 used to set defaults and requirements for an entire GatewayClass.
 
 ### Targeting External Services
-In some cases (likely limited to mesh) users may want to apply policies to
-requests to external services. To accomplish this, implementations can choose to
-support a refernce to a virtual resource type:
+In some cases (likely limited to mesh or egress) users may want to apply
+policies to requests to external services. To accomplish this, implementations
+can choose to support a refernce to a virtual resource type:
 
 ```yaml
 kind: RetryPolicy
@@ -232,7 +232,7 @@ resource, including policies applied to parent resources.
 
 Each Policy CRD that wants to be supported by this plugin will need to follow
 the API structure defined above and add a
-`gateway.networking.k8s.io/policy-attachment: true` label to the CRD.
+`gateway.networking.k8s.io/policy-attachment: ""` label to the CRD.
 
 ### Status
 In the future, we may consider adding a new `Policies` field to status on
