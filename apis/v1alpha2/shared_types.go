@@ -38,7 +38,7 @@ type ParentRef struct {
 	// Kind is kind of the referent.
 	//
 	// Support: Core (Gateway)
-	// Support: Extended (Other Resources)
+	// Support: Custom (Other Resources)
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
@@ -46,24 +46,24 @@ type ParentRef struct {
 	// +optional
 	Kind *string `json:"kind,omitempty"`
 
-	// Namespace is the namespace of the referent. When unspecified (empty
+	// Namespace is the namespace of the referent. When unspecified (or empty
 	// string), this will either be:
 	//
-	// * local namespace of the target is a namespace scoped resource
-	// * no namespace (not applicable) if the target is cluster-scoped.
+	// * local namespace of the route when scope is set to Namespace.
+	// * no namespace when scope is set to Cluster.
 	//
-	// Support: Extended
+	// Support: Core
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	// +optional
 	Namespace *string `json:"namespace,omitempty"`
 
-	// Scope represents if this refers to a cluster or namespace scoped resource.
-	// This may be set to "Cluster" or "Namespace".
+	// Scope represents if this refers to a cluster or namespace scoped
+	// resource. This may be set to "Cluster" or "Namespace".
 	//
 	// Support: Core (Namespace)
-	// Support: Extended (Cluster)
+	// Support: Custom (Cluster)
 	//
 	// +kubebuilder:validation:Enum=Cluster;Namespace
 	// +kubebuilder:default=Namespace
@@ -102,6 +102,34 @@ type ParentRef struct {
 	// +kubebuilder:validation:MaxLength=253
 	// +optional
 	SectionName *string `json:"sectionName,omitempty"`
+}
+
+// CommonRouteSpec defines the common attributes that all Routes should include
+// within their spec.
+type CommonRouteSpec struct {
+	// ParentRefs references the resources (usually Gateways) that a Route wants
+	// to be attached to. Note that the referenced parent resource needs to
+	// allow this for the attachment to be complete. For Gateways, that means
+	// the Gateway needs to allow attachment from Routes of this kind and
+	// namespace.
+	//
+	// The only kind of parent resource with "Core" support is Gateway. This API
+	// may be extended in the future to support additional kinds of parent
+	// resources such as one of the route kinds.
+	//
+	// It is invalid to reference an identical parent more than once. It is
+	// valid to reference multiple distinct sections within the same parent
+	// resource, such as 2 Listeners within a Gateway.
+	//
+	// It is possible to separately reference multiple distinct objects that may
+	// be collapsed by an implementation. For example, some implementations may
+	// choose to merge compatible Gateway Listeners together. If that is the
+	// case, the list of routes attached to those resources should also be
+	// merged.
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=32
+	ParentRefs []ParentRef `json:"parentRefs,omitempty"`
 }
 
 // PortNumber defines a network port.
@@ -188,19 +216,17 @@ type RouteParentStatus struct {
 // RouteStatus defines the observed state that is required across
 // all route types.
 type RouteStatus struct {
-	// Gateways is a list of Gateways that are associated with the route,
-	// and the status of the route with respect to each Gateway. When a
-	// Gateway selects this route, the controller that manages the Gateway
-	// must add an entry to this list when the controller first sees the
-	// route and should update the entry as appropriate when the route is
-	// modified.
+	// Parents is a list of parent resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each parent. When this route attaches to a parent, the controller that
+	// manages the parent must add an entry to this list when the controller
+	// first sees the route and should update the entry as appropriate when the
+	// route is modified.
 	//
-	// A maximum of 100 Gateways will be represented in this list. If this list
-	// is full, there may be additional Gateways using this Route that are not
-	// included in the list. An empty list means the route has not been admitted
-	// by any Gateway.
+	// A maximum of 32 Gateways will be represented in this list. An empty list
+	// means the route has not been admitted by any Gateway.
 	//
-	// +kubebuilder:validation:MaxItems=100
+	// +kubebuilder:validation:MaxItems=32
 	Parents []RouteParentStatus `json:"parents"`
 }
 

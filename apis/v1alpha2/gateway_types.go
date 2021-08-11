@@ -112,6 +112,8 @@ type GatewaySpec struct {
 	//
 	// Support: Core
 	//
+	// +listType=map
+	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []Listener `json:"listeners"`
@@ -148,7 +150,7 @@ type Listener struct {
 	// Support: Core
 	//
 	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, "", or `*`, all hostnames are
@@ -390,9 +392,9 @@ type ListenerRoutes struct {
 	// to this Gateway listener. When unspecified or empty, the kinds of Routes
 	// selected are determined using the Listener protocol.
 	//
-	// Kind MUST correspond to kinds of Routes that are compatible with the
-	// application protocol specified in the Listener's Protocol field. If an
-	// implementation does not support or recognize this resource type, it
+	// A RouteGroupKind MUST correspond to kinds of Routes that are compatible
+	// with the application protocol specified in the Listener's Protocol field.
+	// If an implementation does not support or recognize this resource type, it
 	// SHOULD set the "ResolvedRefs" condition to false for this listener with
 	// the "InvalidRoutesRef" reason.
 	//
@@ -547,6 +549,8 @@ type GatewayStatus struct {
 	// Listeners provide status for each unique listener port defined in the Spec.
 	//
 	// +optional
+	// +listType=map
+	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
 }
@@ -651,10 +655,12 @@ const (
 
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
-	// Name is the name of the Listener.
+	// Name is the name of the Listener. If the Gateway has more than one
+	// Listener present, each ListenerStatus MUST specify a name. The names of
+	// ListenerStatus objects MUST be unique within a Gateway.
 	//
 	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. When this is not specified on the Listener, this MUST represent
@@ -664,7 +670,7 @@ type ListenerStatus struct {
 	// for the specified protocol.
 	//
 	// +kubebuilder:validation:MaxItems=8
-	SupportedKinds []RouteGroupKind `json:"supportedKinds,omitempty"`
+	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
 	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.

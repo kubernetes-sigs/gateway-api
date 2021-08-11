@@ -75,7 +75,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) Support: Extended (Other Resources)"
+                        (Gateway) Support: Custom (Other Resources)"
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -87,10 +87,9 @@ spec:
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
-                        unspecified (empty string), this will either be: \n * local
-                        namespace of the target is a namespace scoped resource * no
-                        namespace (not applicable) if the target is cluster-scoped.
-                        \n Support: Extended"
+                        unspecified (or empty string), this will either be: \n * local
+                        namespace of the route when scope is set to Namespace. * no
+                        namespace when scope is set to Cluster. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       type: string
@@ -98,7 +97,7 @@ spec:
                       default: Namespace
                       description: "Scope represents if this refers to a cluster or
                         namespace scoped resource. This may be set to \"Cluster\"
-                        or \"Namespace\". \n Support: Core (Namespace) Support: Extended
+                        or \"Namespace\". \n Support: Core (Namespace) Support: Custom
                         (Cluster)"
                       enum:
                       - Cluster
@@ -127,7 +126,7 @@ spec:
                   required:
                   - name
                   type: object
-                maxItems: 16
+                maxItems: 32
                 type: array
               rules:
                 description: Rules are a list of TCP matchers and actions.
@@ -281,15 +280,14 @@ spec:
             description: Status defines the current state of TCPRoute.
             properties:
               parents:
-                description: "Gateways is a list of Gateways that are associated with
-                  the route, and the status of the route with respect to each Gateway.
-                  When a Gateway selects this route, the controller that manages the
-                  Gateway must add an entry to this list when the controller first
-                  sees the route and should update the entry as appropriate when the
-                  route is modified. \n A maximum of 100 Gateways will be represented
-                  in this list. If this list is full, there may be additional Gateways
-                  using this Route that are not included in the list. An empty list
-                  means the route has not been admitted by any Gateway."
+                description: "Parents is a list of parent resources (usually Gateways)
+                  that are associated with the route, and the status of the route
+                  with respect to each parent. When this route attaches to a parent,
+                  the controller that manages the parent must add an entry to this
+                  list when the controller first sees the route and should update
+                  the entry as appropriate when the route is modified. \n A maximum
+                  of 32 Gateways will be represented in this list. An empty list means
+                  the route has not been admitted by any Gateway."
                 items:
                   description: RouteParentStatus describes the status of a route with
                     respect to an associated Parent.
@@ -401,7 +399,7 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) Support: Extended (Other Resources)"
+                            Core (Gateway) Support: Custom (Other Resources)"
                           maxLength: 253
                           minLength: 1
                           type: string
@@ -413,10 +411,10 @@ spec:
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.
-                            When unspecified (empty string), this will either be:
-                            \n * local namespace of the target is a namespace scoped
-                            resource * no namespace (not applicable) if the target
-                            is cluster-scoped. \n Support: Extended"
+                            When unspecified (or empty string), this will either be:
+                            \n * local namespace of the route when scope is set to
+                            Namespace. * no namespace when scope is set to Cluster.
+                            \n Support: Core"
                           maxLength: 253
                           minLength: 1
                           type: string
@@ -425,7 +423,7 @@ spec:
                           description: "Scope represents if this refers to a cluster
                             or namespace scoped resource. This may be set to \"Cluster\"
                             or \"Namespace\". \n Support: Core (Namespace) Support:
-                            Extended (Cluster)"
+                            Custom (Cluster)"
                           enum:
                           - Cluster
                           - Namespace
@@ -457,7 +455,7 @@ spec:
                   - controller
                   - parentRef
                   type: object
-                maxItems: 100
+                maxItems: 32
                 type: array
             required:
             - parents

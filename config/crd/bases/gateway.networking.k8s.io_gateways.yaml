@@ -203,12 +203,12 @@ spec:
                           description: "Kinds specifies the groups and kinds of Routes
                             that are allowed to bind to this Gateway listener. When
                             unspecified or empty, the kinds of Routes selected are
-                            determined using the Listener protocol. \n Kind MUST correspond
-                            to kinds of Routes that are compatible with the application
-                            protocol specified in the Listener's Protocol field. If
-                            an implementation does not support or recognize this resource
-                            type, it SHOULD set the \"ResolvedRefs\" condition to
-                            false for this listener with the \"InvalidRoutesRef\"
+                            determined using the Listener protocol. \n A RouteGroupKind
+                            MUST correspond to kinds of Routes that are compatible
+                            with the application protocol specified in the Listener's
+                            Protocol field. If an implementation does not support
+                            or recognize this resource type, it SHOULD set the \"ResolvedRefs\"
+                            condition to false for this listener with the \"InvalidRoutesRef\"
                             reason. \n Support: Core"
                           items:
                             description: RouteGroupKind indicates the group and kind
@@ -393,12 +393,16 @@ spec:
                           type: object
                       type: object
                   required:
+                  - name
                   - port
                   - protocol
                   type: object
                 maxItems: 64
                 minItems: 1
                 type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
             required:
             - gatewayClassName
             - listeners
@@ -618,7 +622,10 @@ spec:
                       - type
                       x-kubernetes-list-type: map
                     name:
-                      description: Name is the name of the Listener.
+                      description: Name is the name of the Listener. If the Gateway
+                        has more than one Listener present, each ListenerStatus MUST
+                        specify a name. The names of ListenerStatus objects MUST be
+                        unique within a Gateway.
                       maxLength: 253
                       type: string
                     supportedKinds:
@@ -651,9 +658,14 @@ spec:
                   required:
                   - attachedRoutes
                   - conditions
+                  - name
+                  - supportedKinds
                   type: object
                 maxItems: 64
                 type: array
+                x-kubernetes-list-map-keys:
+                - name
+                x-kubernetes-list-type: map
             type: object
         required:
         - spec
