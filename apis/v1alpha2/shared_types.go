@@ -90,7 +90,7 @@ type ParentRef struct {
 	// When unspecified (empty string), this will reference the entire resource.
 	// For the purpose of status, an attachment is considered successful if at
 	// least one section in the parent resource accepts it. For example, Gateway
-	// listeners can restrict which Routes can bind to them by Route kind,
+	// listeners can restrict which Routes can attach to them by Route kind,
 	// namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
 	// the referencing Route, the Route MUST be considered successfully
 	// attached. If no Gateway listeners accept attachment from this Route, the
@@ -221,10 +221,10 @@ type RouteStatus struct {
 	// each parent. When this route attaches to a parent, the controller that
 	// manages the parent must add an entry to this list when the controller
 	// first sees the route and should update the entry as appropriate when the
-	// route is modified.
+	// route or gateway is modified.
 	//
 	// A maximum of 32 Gateways will be represented in this list. An empty list
-	// means the route has not been admitted by any Gateway.
+	// means the route has not been attached to any Gateway.
 	//
 	// +kubebuilder:validation:MaxItems=32
 	Parents []RouteParentStatus `json:"parents"`

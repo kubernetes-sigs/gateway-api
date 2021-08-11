@@ -115,8 +115,8 @@ spec:
                         the purpose of status, an attachment is considered successful
                         if at least one section in the parent resource accepts it.
                         For example, Gateway listeners can restrict which Routes can
-                        bind to them by Route kind, namespace, or hostname. If 1 of
-                        2 Gateway listeners accept attachment from the referencing
+                        attach to them by Route kind, namespace, or hostname. If 1
+                        of 2 Gateway listeners accept attachment from the referencing
                         Route, the Route MUST be considered successfully attached.
                         If no Gateway listeners accept attachment from this Route,
                         the Route MUST be considered detached from the Gateway. \n
@@ -286,9 +286,9 @@ spec:
                   with respect to each parent. When this route attaches to a parent,
                   the controller that manages the parent must add an entry to this
                   list when the controller first sees the route and should update
-                  the entry as appropriate when the route is modified. \n A maximum
-                  of 32 Gateways will be represented in this list. An empty list means
-                  the route has not been admitted by any Gateway."
+                  the entry as appropriate when the route or gateway is modified.
+                  \n A maximum of 32 Gateways will be represented in this list. An
+                  empty list means the route has not been attached to any Gateway."
                 items:
                   description: RouteParentStatus describes the status of a route with
                     respect to an associated Parent.
@@ -440,7 +440,7 @@ spec:
                             resource. For the purpose of status, an attachment is
                             considered successful if at least one section in the parent
                             resource accepts it. For example, Gateway listeners can
-                            restrict which Routes can bind to them by Route kind,
+                            restrict which Routes can attach to them by Route kind,
                             namespace, or hostname. If 1 of 2 Gateway listeners accept
                             attachment from the referencing Route, the Route MUST
                             be considered successfully attached. If no Gateway listeners

@@ -389,13 +389,13 @@ type ListenerRoutes struct {
 	Namespaces *RouteNamespaces `json:"namespaces,omitempty"`
 
 	// Kinds specifies the groups and kinds of Routes that are allowed to bind
-	// to this Gateway listener. When unspecified or empty, the kinds of Routes
+	// to this Gateway Listener. When unspecified or empty, the kinds of Routes
 	// selected are determined using the Listener protocol.
 	//
 	// A RouteGroupKind MUST correspond to kinds of Routes that are compatible
 	// with the application protocol specified in the Listener's Protocol field.
 	// If an implementation does not support or recognize this resource type, it
-	// SHOULD set the "ResolvedRefs" condition to false for this listener with
+	// SHOULD set the "ResolvedRefs" condition to false for this Listener with
 	// the "InvalidRoutesRef" reason.
 	//
 	// Support: Core
