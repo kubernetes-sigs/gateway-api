@@ -872,7 +872,13 @@ spec:
                                     name MUST be considered for a match. Subsequent
                                     entries with an equivalent header name MUST be
                                     ignored. Due to the case-insensitivity of header
-                                    names, \"foo\" and \"Foo\" are considered equivalent."
+                                    names, \"foo\" and \"Foo\" are considered equivalent.
+                                    \n When a header is repeated in an HTTP request,
+                                    it is implementation-specific behavior as to how
+                                    this is represented. Generally, proxies should
+                                    follow the guidance from the RFC: https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2
+                                    regarding processing a repeated header, with special
+                                    handling for \"Set-Cookie\"."
                                   maxLength: 256
                                   minLength: 1
                                   type: string
