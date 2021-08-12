@@ -61,6 +61,7 @@
   guide what revisions are needed for the next release. It is possible
   that the next release will contain breaking changes.
 
+* **Q: what kubernetes versions are supported in alpha release?<br>**
 
 [1]: https://github.com/kubernetes-sigs/gateway-api
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
