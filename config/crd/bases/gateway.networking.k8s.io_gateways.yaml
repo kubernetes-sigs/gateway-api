@@ -317,19 +317,27 @@ spec:
                             object that contains a TLS certificate and private key.
                             This certificate is used to establish a TLS handshake
                             for requests that match the hostname of the associated
-                            listener. The referenced object MUST reside in the same
-                            namespace as Gateway. \n This field is required when mode
-                            is set to \"Terminate\" (default) and optional otherwise.
-                            \n CertificateRef can reference a standard Kubernetes
-                            resource, i.e. Secret, or an implementation-specific custom
-                            resource. \n Support: Core (Kubernetes Secrets) \n Support:
-                            Implementation-specific (Other resource types)"
+                            listener. \n References to a resource in different namespace
+                            are invalid UNLESS there is a ReferencePolicy in the target
+                            namespace that allows the certificate to be attached.
+                            If a ReferencePolicy does not allow this reference, the
+                            \"ResolvedRefs\" condition MUST be set to false for this
+                            listener with the \"InvalidCertificateRef\" reason. \n
+                            This field is required when mode is set to \"Terminate\"
+                            (default) and optional otherwise. \n CertificateRef can
+                            reference a standard Kubernetes resource, i.e. Secret,
+                            or an implementation-specific custom resource. \n Support:
+                            Core (Kubernetes Secrets) \n Support: Implementation-specific
+                            (Other resource types)"
                           properties:
                             group:
-                              description: Group is the group of the referent.
+                              default: ""
+                              description: Group is the group of the referent. When
+                                unspecified (empty string), core API group is inferred.
                               maxLength: 253
                               type: string
                             kind:
+                              default: Service
                               description: Kind is kind of the referent.
                               maxLength: 253
                               minLength: 1
@@ -339,9 +347,18 @@ spec:
                               maxLength: 253
                               minLength: 1
                               type: string
+                            namespace:
+                              description: "Namespace is the namespace of the backend.
+                                When unspecified, the local namespace is inferred.
+                                \n Note that when a namespace is specified, a ReferencePolicy
+                                object is required in the referent namespace to allow
+                                that namespace's owner to accept the reference. See
+                                the ReferencePolicy documentation for details. \n
+                                Support: Core"
+                              maxLength: 253
+                              minLength: 1
+                              type: string
                           required:
-                          - group
-                          - kind
                           - name
                           type: object
                         mode:
@@ -369,27 +386,6 @@ spec:
                             is a common subset for expressing ciphers then it will
                             make sense to loft that as a core API construct. \n Support:
                             Implementation-specific"
-                          type: object
-                        routeOverride:
-                          default:
-                            certificate: Deny
-                          description: "RouteOverride dictates if TLS settings can
-                            be configured via Routes or not. \n CertificateRef must
-                            be defined even if `routeOverride.certificate` is set
-                            to 'Allow' as it will be used as the default certificate
-                            for the listener. \n Support: Core"
-                          properties:
-                            certificate:
-                              default: Deny
-                              description: "Certificate dictates if TLS certificates
-                                can be configured via Routes. If set to 'Allow', a
-                                TLS certificate for a hostname defined in a Route
-                                takes precedence over the certificate defined in Gateway.
-                                \n Support: Core"
-                              enum:
-                              - Allow
-                              - Deny
-                              type: string
                           type: object
                       type: object
                   required:

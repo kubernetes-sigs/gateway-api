@@ -1,4 +1,4 @@
-# TLS details
+# TLS Configuration
 
 Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
@@ -55,55 +55,21 @@ listeners:
       kind: Secret
       group: ""
       name: default-cert
-    routeOverride:
-      certificate: Deny
 ```
 
 If `hostname.match` is set to `Exact`, then the TLS settings apply to only the
 specific hostname that is set in `hostname.name`.
 
-Specifying `tls.routeOverride.certificate: Deny` is recommended because it
-centralizes TLS configuration within the Gateway specification and should
-suffice for the majority of use-cases. Please take a look at the examples below
-for various alternatives.
-
-### Routes and TLS
-
-If `listeners[].tls.routeOverride.certificate` is set to `Allow`, TLS certificates
-can be configured on routes that are bound to the Gateway. This feature is
-primarily meant for a cluster with a self-service model where Application developers
-bring their own TLS certificates. This feature also mirrors the behavior of
-TLS as defined in the Ingress v1 resource. One should use this feature only
-when the Cluster Operator wishes to delegate TLS configuration to the Application Developer.
-With this feature, the certificate defined in the route overrides any certificate defined in
-the Gateway.
-
-When using this feature, please note that the TLS certificate to serve is chosen
-before an HTTPRoute is selected. This is because the TLS handshake is completed
-before an HTTP request is sent from the client.
-
-[TLS Certificate in Route](#tls-certificate-in-route) provides an example
-of how this feature can be used.
-
-Also, as mentioned above, the Route Kind (`HTTPRoute`, `TLSRoute`, `TCPRoute`)
-is dependent on the protocol on the listener level. Listeners with `HTTPS` or
-`HTTP` protocols can use `HTTPRoute` as the TLS Termination is done at the
-listener level and thus, only HTTP information is used for routing.
-
-Listeners with the `TLS` protocol must use `TLSRoute` when the mode is set to `Passthrough` and `TCPRoute` when the mode is `Terminate`.
-
-Listeners with the TCP protocol must use `TCPRoute` for plain TCP Routing.
-
 ### Examples
 
-#### TLS in listener
+#### Listeners with different certificates
 
 In this example, the Gateway is configured to serve the `foo.example.com` and
 `bar.example.com` domains. The certificate for these domains is specified
 in the Gateway.
 
-```
-{% include 'tls-basic.yaml' %}
+```yaml
+{% include 'v1alpha2/tls-basic.yaml' %}
 ```
 
 #### Wildcard TLS listeners
@@ -115,24 +81,22 @@ Since a specific match takes priority, the Gateway will serve
 `wildcard-example-com-cert` for all other requests.
 
 ```yaml
-{% include 'wildcard-tls-gateway.yaml' %}
+{% include 'v1alpha2/wildcard-tls-gateway.yaml' %}
 ```
 
-#### TLS Certificate in Route
+#### Cross namespace certificate references
 
-In this example, the Gateway is configured with a default certificate that will be
-served for all hostnames. In addition, `tls.routeOverride.certificate` is set to
-`Allow`, meaning routes can specify TLS certificates for any domains. Next,
-there are two HTTPRoute resources which specify certificates for
-`foo.example.com` and `bar.example.com`.
+In this example, the Gateway is configured to reference a certificate in a
+different namespace. This is allowed by the ReferencePolicy created in the
+target namespace. Without that ReferencePolicy, the cross-namespace reference
+would be invalid.
 
 ```yaml
-{% include 'tls-cert-in-route.yaml' %}
+{% include 'v1alpha2/tls-cert-cross-namespace.yaml' %}
 ```
 
 ## Extensions
 
-Both upstream and downstream TLS configs provide an `options` map to add
-additional TLS settings for implementation-specific features.
-Some examples of features that could go in here would be TLS version restrictions,
-or ciphers to use.
+Gateway TLS configurations provides an `options` map to add additional TLS
+settings for implementation-specific features. Some examples of features that
+could go in here would be TLS version restrictions, or ciphers to use.

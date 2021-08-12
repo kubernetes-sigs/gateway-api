@@ -10,8 +10,6 @@ The specification of an HTTPRoute consists of:
 - [Gateways][gateways]- Define which Gateways can use this HTTPRoute.
 - [Hostnames][hostname] (optional)- Define a list of hostnames to use for
   matching the Host header of HTTP requests.
-- [TLS][tls-config] (optional)- Defines the TLS certificate to use for
-  Hostnames defined in this Route.
 - [Rules][httprouterule]- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists
   of [matches][matches], [filters][filters] (optional), and [forwardTo][forwardto]
@@ -76,29 +74,6 @@ spec:
   hostnames:
   - my.example.com
 ```
-
-### TLS
-
-TLS defines the TLS certificate used for hostnames defined in this HTTPRoute.
-This configuration only takes effect if `certificate: Allow` is set for
-`routeOverride` in the associated Gateway. For example:
-```yaml
-{% include 'tls-basic.yaml' %}
-```
-
-`CertificateRef` refers to a Kubernetes object that contains a TLS certificate
-and private key. This certificate MUST be used for TLS handshakes for the domain
-this `tls` is associated with. If an entry in this list omits or specifies the
-empty string for both the `group` and `kind`, the resource defaults to “secrets”.
-
-**Notes:**
-
-- HTTPRoute selection takes place after the TLS Handshake (ClientHello). Due to
-this, a TLS certificate in an HTTPRoute will take precedence even if the request
-has the potential to match multiple HTTPRoutes (in case multiple HTTPRoutes
-share the same hostname).
-- Collisions can happen if multiple HTTPRoutes define a TLS certificate for the
-same hostname. In such case, the certificate in the oldest HTTPRoute is selected.
 
 ### Rules
 
@@ -238,7 +213,6 @@ resolution applies to merging, refer to the [API specification](httprouterule).
 [gateways]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.RouteGateways
 [httprouterule]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule
 [hostname]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Hostname
-[tls-config]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.RouteTLSConfig
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
 [matches]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteMatch
 [filters]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteFilter

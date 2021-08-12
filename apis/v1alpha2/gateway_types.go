@@ -269,35 +269,6 @@ const (
 	UDPProtocolType ProtocolType = "UDP"
 )
 
-// TLSRouteOverrideType type defines the level of allowance for Routes
-// to override a specific TLS setting.
-// +kubebuilder:validation:Enum=Allow;Deny
-// +kubebuilder:default=Deny
-type TLSRouteOverrideType string
-
-const (
-	// Allows the parameter to be configured from all routes.
-	TLSROuteOVerrideAllow TLSRouteOverrideType = "Allow"
-
-	// Prohibits the parameter from being configured from any route.
-	TLSRouteOverrideDeny TLSRouteOverrideType = "Deny"
-)
-
-// TLSOverridePolicy defines a schema for overriding TLS settings at the Route
-// level.
-type TLSOverridePolicy struct {
-	// Certificate dictates if TLS certificates can be configured
-	// via Routes. If set to 'Allow', a TLS certificate for a hostname
-	// defined in a Route takes precedence over the certificate defined in
-	// Gateway.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default=Deny
-	Certificate *TLSRouteOverrideType `json:"certificate,omitempty"`
-}
-
 // GatewayTLSConfig describes a TLS configuration.
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
@@ -318,8 +289,14 @@ type GatewayTLSConfig struct {
 
 	// CertificateRef is a reference to a Kubernetes object that contains a TLS
 	// certificate and private key. This certificate is used to establish a TLS
-	// handshake for requests that match the hostname of the associated listener.
-	// The referenced object MUST reside in the same namespace as Gateway.
+	// handshake for requests that match the hostname of the associated
+	// listener.
+	//
+	// References to a resource in different namespace are invalid UNLESS there
+	// is a ReferencePolicy in the target namespace that allows the certificate
+	// to be attached. If a ReferencePolicy does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to false for this listener with the
+	// "InvalidCertificateRef" reason.
 	//
 	// This field is required when mode is set to "Terminate" (default) and
 	// optional otherwise.
@@ -332,20 +309,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +optional
-	CertificateRef *LocalObjectReference `json:"certificateRef,omitempty"`
-
-	// RouteOverride dictates if TLS settings can be configured
-	// via Routes or not.
-	//
-	// CertificateRef must be defined even if `routeOverride.certificate` is
-	// set to 'Allow' as it will be used as the default certificate for the
-	// listener.
-	//
-	// Support: Core
-	//
-	// +optional
-	// +kubebuilder:default={certificate:Deny}
-	RouteOverride *TLSOverridePolicy `json:"routeOverride,omitempty"`
+	CertificateRef *ObjectReference `json:"certificateRef,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
