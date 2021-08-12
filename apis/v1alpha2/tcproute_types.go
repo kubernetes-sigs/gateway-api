@@ -94,7 +94,7 @@ type TCPRouteRule struct {
 	// filters are specified that would result in a response being sent, the
 	// underlying implementation must actively reject connection attempts to
 	// this backend. Connection rejections must respect weight; if an invalid
-	// backend is requested to have 80% of connection, then 80% of connection
+	// backend is requested to have 80% of connections, then 80% of connections
 	// must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
