@@ -1,0 +1,11 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: invalid-header-name
+spec:
+  rules:
+  - matches:
+    - headers:
+      - type: Exact
+        name: magic/
+        value: foo
