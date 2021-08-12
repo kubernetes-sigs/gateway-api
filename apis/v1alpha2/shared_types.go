@@ -182,8 +182,8 @@ const (
 // RouteParentStatus describes the status of a route with respect to an
 // associated Parent.
 type RouteParentStatus struct {
-	// ParentRef is a reference to the parent resource that the route wants to
-	// be attached to.
+	// ParentRef corresponds with a ParentRef in the spec that this
+	// RouteParentStatus struct describes the status of.
 	ParentRef ParentRef `json:"parentRef"`
 
 	// Controller is a domain/path string that indicates the controller that

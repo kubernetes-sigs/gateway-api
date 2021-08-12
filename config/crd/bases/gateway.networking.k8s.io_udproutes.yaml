@@ -387,8 +387,8 @@ spec:
                       minLength: 1
                       type: string
                     parentRef:
-                      description: ParentRef is a reference to the parent resource
-                        that the route wants to be attached to.
+                      description: ParentRef corresponds with a ParentRef in the spec
+                        that this RouteParentStatus struct describes the status of.
                       properties:
                         group:
                           default: gateway.networking.k8s.io

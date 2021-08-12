@@ -395,8 +395,8 @@ type ListenerRoutes struct {
 	// A RouteGroupKind MUST correspond to kinds of Routes that are compatible
 	// with the application protocol specified in the Listener's Protocol field.
 	// If an implementation does not support or recognize this resource type, it
-	// SHOULD set the "ResolvedRefs" condition to false for this Listener with
-	// the "InvalidRoutesRef" reason.
+	// MUST set the "ResolvedRefs" condition to false for this Listener with the
+	// "InvalidRoutesRef" reason.
 	//
 	// Support: Core
 	//
