@@ -51,11 +51,7 @@ type HTTPRouteList struct {
 
 // HTTPRouteSpec defines the desired state of HTTPRoute
 type HTTPRouteSpec struct {
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
+	CommonRouteSpec `json:",inline"`
 
 	// Hostnames defines a set of hostname that should match against
 	// the HTTP Host header to select a HTTPRoute to process the request.

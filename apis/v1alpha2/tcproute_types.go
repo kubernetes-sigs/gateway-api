@@ -41,17 +41,13 @@ type TCPRoute struct {
 
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpec struct {
+	CommonRouteSpec `json:",inline"`
+
 	// Rules are a list of TCP matchers and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Rules []TCPRouteRule `json:"rules"`
-
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // TCPRouteStatus defines the observed state of TCPRoute

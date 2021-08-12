@@ -46,11 +46,7 @@ type TLSRoute struct {
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpec struct {
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
+	CommonRouteSpec `json:",inline"`
 
 	// Hostnames defines a set of SNI names that should match against the
 	// SNI attribute of TLS ClientHello message in TLS handshake.

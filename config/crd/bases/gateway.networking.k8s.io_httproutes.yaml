@@ -45,48 +45,6 @@ spec:
           spec:
             description: Spec defines the desired state of HTTPRoute.
             properties:
-              gateways:
-                default:
-                  allow: SameNamespace
-                description: Gateways defines which Gateways can use this Route.
-                properties:
-                  allow:
-                    default: SameNamespace
-                    description: 'Allow indicates which Gateways will be allowed to
-                      use this route. Possible values are: * All: Gateways in any
-                      namespace can use this route. * FromList: Only Gateways specified
-                      in GatewayRefs may use this route. * SameNamespace: Only Gateways
-                      in the same namespace may use this route.'
-                    enum:
-                    - All
-                    - FromList
-                    - SameNamespace
-                    type: string
-                  gatewayRefs:
-                    description: GatewayRefs must be specified when Allow is set to
-                      "FromList". In that case, only Gateways referenced in this list
-                      will be allowed to use this route. This field is ignored for
-                      other values of "Allow".
-                    items:
-                      description: GatewayReference identifies a Gateway in a specified
-                        namespace.
-                      properties:
-                        name:
-                          description: Name is the name of the referent.
-                          maxLength: 253
-                          minLength: 1
-                          type: string
-                        namespace:
-                          description: Namespace is the namespace of the referent.
-                          maxLength: 253
-                          minLength: 1
-                          type: string
-                      required:
-                      - name
-                      - namespace
-                      type: object
-                    type: array
-                type: object
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
                   against the HTTP Host header to select a HTTPRoute to process the
@@ -141,6 +99,92 @@ spec:
                   minLength: 1
                   type: string
                 maxItems: 16
+                type: array
+              parentRefs:
+                description: "ParentRefs references the resources (usually Gateways)
+                  that a Route wants to be attached to. Note that the referenced parent
+                  resource needs to allow this for the attachment to be complete.
+                  For Gateways, that means the Gateway needs to allow attachment from
+                  Routes of this kind and namespace. \n The only kind of parent resource
+                  with \"Core\" support is Gateway. This API may be extended in the
+                  future to support additional kinds of parent resources such as one
+                  of the route kinds. \n It is invalid to reference an identical parent
+                  more than once. It is valid to reference multiple distinct sections
+                  within the same parent resource, such as 2 Listeners within a Gateway.
+                  \n It is possible to separately reference multiple distinct objects
+                  that may be collapsed by an implementation. For example, some implementations
+                  may choose to merge compatible Gateway Listeners together. If that
+                  is the case, the list of routes attached to those resources should
+                  also be merged."
+                items:
+                  description: ParentRef identifies an API object (usually a Gateway)
+                    that can be considered a parent of this resource (usually a route).
+                    The only kind of parent resource with "Core" support is Gateway.
+                    This API may be extended in the future to support additional kinds
+                    of parent resources, such as HTTPRoute.
+                  properties:
+                    group:
+                      default: gateway.networking.k8s.io
+                      description: "Group is the group of the referent. \n Support:
+                        Core"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    kind:
+                      default: Gateway
+                      description: "Kind is kind of the referent. \n Support: Core
+                        (Gateway) Support: Custom (Other Resources)"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    name:
+                      description: "Name is the name of the referent. \n Support:
+                        Core"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    namespace:
+                      description: "Namespace is the namespace of the referent. When
+                        unspecified (or empty string), this will either be: \n * local
+                        namespace of the route when scope is set to Namespace. * no
+                        namespace when scope is set to Cluster. \n Support: Core"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    scope:
+                      default: Namespace
+                      description: "Scope represents if this refers to a cluster or
+                        namespace scoped resource. This may be set to \"Cluster\"
+                        or \"Namespace\". \n Support: Core (Namespace) Support: Custom
+                        (Cluster)"
+                      enum:
+                      - Cluster
+                      - Namespace
+                      type: string
+                    sectionName:
+                      description: "SectionName is the name of a section within the
+                        target resource. In the following resources, SectionName is
+                        interpreted as the following: \n * Gateway: Listener Name
+                        \n Implementations MAY choose to support attaching Routes
+                        to other resources. If that is the case, they MUST clearly
+                        document how SectionName is interpreted. \n When unspecified
+                        (empty string), this will reference the entire resource. For
+                        the purpose of status, an attachment is considered successful
+                        if at least one section in the parent resource accepts it.
+                        For example, Gateway listeners can restrict which Routes can
+                        attach to them by Route kind, namespace, or hostname. If 1
+                        of 2 Gateway listeners accept attachment from the referencing
+                        Route, the Route MUST be considered successfully attached.
+                        If no Gateway listeners accept attachment from this Route,
+                        the Route MUST be considered detached from the Gateway. \n
+                        Support: Core"
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                  required:
+                  - name
+                  type: object
+                maxItems: 32
                 type: array
               rules:
                 default:
@@ -1045,19 +1089,18 @@ spec:
           status:
             description: Status defines the current state of HTTPRoute.
             properties:
-              gateways:
-                description: "Gateways is a list of Gateways that are associated with
-                  the route, and the status of the route with respect to each Gateway.
-                  When a Gateway selects this route, the controller that manages the
-                  Gateway must add an entry to this list when the controller first
-                  sees the route and should update the entry as appropriate when the
-                  route is modified. \n A maximum of 100 Gateways will be represented
-                  in this list. If this list is full, there may be additional Gateways
-                  using this Route that are not included in the list. An empty list
-                  means the route has not been admitted by any Gateway."
+              parents:
+                description: "Parents is a list of parent resources (usually Gateways)
+                  that are associated with the route, and the status of the route
+                  with respect to each parent. When this route attaches to a parent,
+                  the controller that manages the parent must add an entry to this
+                  list when the controller first sees the route and should update
+                  the entry as appropriate when the route or gateway is modified.
+                  \n A maximum of 32 Gateways will be represented in this list. An
+                  empty list means the route has not been attached to any Gateway."
                 items:
-                  description: RouteGatewayStatus describes the status of a route
-                    with respect to an associated Gateway.
+                  description: RouteParentStatus describes the status of a route with
+                    respect to an associated Parent.
                   properties:
                     conditions:
                       description: Conditions describes the status of the route with
@@ -1143,42 +1186,89 @@ spec:
                       x-kubernetes-list-map-keys:
                       - type
                       x-kubernetes-list-type: map
-                    gatewayRef:
-                      description: GatewayRef is a reference to a Gateway object that
-                        is associated with the route.
+                    controller:
+                      description: "Controller is a domain/path string that indicates
+                        the controller that wrote this status. This corresponds with
+                        the controller field on GatewayClass. \n Example: \"acme.io/gateway-controller\".
+                        \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN
+                        and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    parentRef:
+                      description: ParentRef corresponds with a ParentRef in the spec
+                        that this RouteParentStatus struct describes the status of.
                       properties:
-                        controller:
-                          description: "Controller is a domain/path string that indicates
-                            the controller implementing the Gateway. This corresponds
-                            with the controller field on GatewayClass. \n Example:
-                            \"acme.io/gateway-controller\". \n The format of this
-                            field is DOMAIN \"/\" PATH, where DOMAIN and PATH are
-                            valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
+                        group:
+                          default: gateway.networking.k8s.io
+                          description: "Group is the group of the referent. \n Support:
+                            Core"
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                        kind:
+                          default: Gateway
+                          description: "Kind is kind of the referent. \n Support:
+                            Core (Gateway) Support: Custom (Other Resources)"
                           maxLength: 253
                           minLength: 1
                           type: string
                         name:
-                          description: Name is the name of the referent.
+                          description: "Name is the name of the referent. \n Support:
+                            Core"
                           maxLength: 253
                           minLength: 1
                           type: string
                         namespace:
-                          description: Namespace is the namespace of the referent.
+                          description: "Namespace is the namespace of the referent.
+                            When unspecified (or empty string), this will either be:
+                            \n * local namespace of the route when scope is set to
+                            Namespace. * no namespace when scope is set to Cluster.
+                            \n Support: Core"
+                          maxLength: 253
+                          minLength: 1
+                          type: string
+                        scope:
+                          default: Namespace
+                          description: "Scope represents if this refers to a cluster
+                            or namespace scoped resource. This may be set to \"Cluster\"
+                            or \"Namespace\". \n Support: Core (Namespace) Support:
+                            Custom (Cluster)"
+                          enum:
+                          - Cluster
+                          - Namespace
+                          type: string
+                        sectionName:
+                          description: "SectionName is the name of a section within
+                            the target resource. In the following resources, SectionName
+                            is interpreted as the following: \n * Gateway: Listener
+                            Name \n Implementations MAY choose to support attaching
+                            Routes to other resources. If that is the case, they MUST
+                            clearly document how SectionName is interpreted. \n When
+                            unspecified (empty string), this will reference the entire
+                            resource. For the purpose of status, an attachment is
+                            considered successful if at least one section in the parent
+                            resource accepts it. For example, Gateway listeners can
+                            restrict which Routes can attach to them by Route kind,
+                            namespace, or hostname. If 1 of 2 Gateway listeners accept
+                            attachment from the referencing Route, the Route MUST
+                            be considered successfully attached. If no Gateway listeners
+                            accept attachment from this Route, the Route MUST be considered
+                            detached from the Gateway. \n Support: Core"
                           maxLength: 253
                           minLength: 1
                           type: string
                       required:
-                      - controller
                       - name
-                      - namespace
                       type: object
                   required:
-                  - gatewayRef
+                  - controller
+                  - parentRef
                   type: object
-                maxItems: 100
+                maxItems: 32
                 type: array
             required:
-            - gateways
+            - parents
             type: object
         required:
         - spec

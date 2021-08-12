@@ -20,40 +20,116 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// GatewayAllowType specifies which Gateways should be allowed to use a Route.
-type GatewayAllowType string
+// ParentRef identifies an API object (usually a Gateway) that can be considered
+// a parent of this resource (usually a route). The only kind of parent resource
+// with "Core" support is Gateway. This API may be extended in the future to
+// support additional kinds of parent resources, such as HTTPRoute.
+type ParentRef struct {
+	// Group is the group of the referent.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:default=gateway.networking.k8s.io
+	// +optional
+	Group *string `json:"group,omitempty"`
 
-const (
-	// Any Gateway will be able to use this route.
-	GatewayAllowAll GatewayAllowType = "All"
-	// Only Gateways that have been  specified in GatewayRefs will be able to use this route.
-	GatewayAllowFromList GatewayAllowType = "FromList"
-	// Only Gateways within the same namespace as the route will be able to use this route.
-	GatewayAllowSameNamespace GatewayAllowType = "SameNamespace"
-)
+	// Kind is kind of the referent.
+	//
+	// Support: Core (Gateway)
+	// Support: Custom (Other Resources)
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +kubebuilder:default=Gateway
+	// +optional
+	Kind *string `json:"kind,omitempty"`
 
-// RouteGateways defines which Gateways will be able to use a route. If this
-// field results in preventing the selection of a Route by a Gateway, an
-// "Admitted" condition with a status of false must be set for the Gateway on
-// that Route.
-type RouteGateways struct {
-	// Allow indicates which Gateways will be allowed to use this route.
-	// Possible values are:
-	// * All: Gateways in any namespace can use this route.
-	// * FromList: Only Gateways specified in GatewayRefs may use this route.
-	// * SameNamespace: Only Gateways in the same namespace may use this route.
+	// Namespace is the namespace of the referent. When unspecified (or empty
+	// string), this will either be:
+	//
+	// * local namespace of the route when scope is set to Namespace.
+	// * no namespace when scope is set to Cluster.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	Namespace *string `json:"namespace,omitempty"`
+
+	// Scope represents if this refers to a cluster or namespace scoped
+	// resource. This may be set to "Cluster" or "Namespace".
+	//
+	// Support: Core (Namespace)
+	// Support: Custom (Cluster)
+	//
+	// +kubebuilder:validation:Enum=Cluster;Namespace
+	// +kubebuilder:default=Namespace
+	// +optional
+	Scope *string `json:"scope,omitempty"`
+
+	// Name is the name of the referent.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
+
+	// SectionName is the name of a section within the target resource. In the
+	// following resources, SectionName is interpreted as the following:
+	//
+	// * Gateway: Listener Name
+	//
+	// Implementations MAY choose to support attaching Routes to other resources.
+	// If that is the case, they MUST clearly document how SectionName is
+	// interpreted.
+	//
+	// When unspecified (empty string), this will reference the entire resource.
+	// For the purpose of status, an attachment is considered successful if at
+	// least one section in the parent resource accepts it. For example, Gateway
+	// listeners can restrict which Routes can attach to them by Route kind,
+	// namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from
+	// the referencing Route, the Route MUST be considered successfully
+	// attached. If no Gateway listeners accept attachment from this Route, the
+	// Route MUST be considered detached from the Gateway.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	// +optional
+	SectionName *string `json:"sectionName,omitempty"`
+}
+
+// CommonRouteSpec defines the common attributes that all Routes should include
+// within their spec.
+type CommonRouteSpec struct {
+	// ParentRefs references the resources (usually Gateways) that a Route wants
+	// to be attached to. Note that the referenced parent resource needs to
+	// allow this for the attachment to be complete. For Gateways, that means
+	// the Gateway needs to allow attachment from Routes of this kind and
+	// namespace.
+	//
+	// The only kind of parent resource with "Core" support is Gateway. This API
+	// may be extended in the future to support additional kinds of parent
+	// resources such as one of the route kinds.
+	//
+	// It is invalid to reference an identical parent more than once. It is
+	// valid to reference multiple distinct sections within the same parent
+	// resource, such as 2 Listeners within a Gateway.
+	//
+	// It is possible to separately reference multiple distinct objects that may
+	// be collapsed by an implementation. For example, some implementations may
+	// choose to merge compatible Gateway Listeners together. If that is the
+	// case, the list of routes attached to those resources should also be
+	// merged.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=All;FromList;SameNamespace
-	// +kubebuilder:default=SameNamespace
-	Allow *GatewayAllowType `json:"allow,omitempty"`
-
-	// GatewayRefs must be specified when Allow is set to "FromList". In that
-	// case, only Gateways referenced in this list will be allowed to use this
-	// route. This field is ignored for other values of "Allow".
-	//
-	// +optional
-	GatewayRefs []GatewayReference `json:"gatewayRefs,omitempty"`
+	// +kubebuilder:validation:MaxItems=32
+	ParentRefs []ParentRef `json:"parentRefs,omitempty"`
 }
 
 // PortNumber defines a network port.
@@ -61,21 +137,6 @@ type RouteGateways struct {
 // +kubebuilder:validation:Minimum=1
 // +kubebuilder:validation:Maximum=65535
 type PortNumber int32
-
-// GatewayReference identifies a Gateway in a specified namespace.
-type GatewayReference struct {
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Namespace is the namespace of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Namespace string `json:"namespace"`
-}
 
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.
@@ -118,12 +179,26 @@ const (
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
 )
 
-// RouteGatewayStatus describes the status of a route with respect to an
-// associated Gateway.
-type RouteGatewayStatus struct {
-	// GatewayRef is a reference to a Gateway object that is associated with
-	// the route.
-	GatewayRef RouteStatusGatewayReference `json:"gatewayRef"`
+// RouteParentStatus describes the status of a route with respect to an
+// associated Parent.
+type RouteParentStatus struct {
+	// ParentRef corresponds with a ParentRef in the spec that this
+	// RouteParentStatus struct describes the status of.
+	ParentRef ParentRef `json:"parentRef"`
+
+	// Controller is a domain/path string that indicates the controller that
+	// wrote this status. This corresponds with the controller field on
+	// GatewayClass.
+	//
+	// Example: "acme.io/gateway-controller".
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+	// valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Controller string `json:"controller"`
 
 	// Conditions describes the status of the route with respect to the
 	// Gateway. The "Admitted" condition must always be specified by controllers
@@ -138,54 +213,21 @@ type RouteGatewayStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-// RouteStatusGatewayReference identifies a Gateway in a specified namespace.
-// This reference also includes a controller name to simplify cleaning up status
-// entries.
-type RouteStatusGatewayReference struct {
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Namespace is the namespace of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Namespace string `json:"namespace"`
-
-	// Controller is a domain/path string that indicates the controller
-	// implementing the Gateway. This corresponds with the controller field on
-	// GatewayClass.
-	//
-	// Example: "acme.io/gateway-controller".
-	//
-	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
-	// valid Kubernetes names
-	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Controller string `json:"controller"`
-}
-
 // RouteStatus defines the observed state that is required across
 // all route types.
 type RouteStatus struct {
-	// Gateways is a list of Gateways that are associated with the route,
-	// and the status of the route with respect to each Gateway. When a
-	// Gateway selects this route, the controller that manages the Gateway
-	// must add an entry to this list when the controller first sees the
-	// route and should update the entry as appropriate when the route is
-	// modified.
+	// Parents is a list of parent resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each parent. When this route attaches to a parent, the controller that
+	// manages the parent must add an entry to this list when the controller
+	// first sees the route and should update the entry as appropriate when the
+	// route or gateway is modified.
 	//
-	// A maximum of 100 Gateways will be represented in this list. If this list
-	// is full, there may be additional Gateways using this Route that are not
-	// included in the list. An empty list means the route has not been admitted
-	// by any Gateway.
+	// A maximum of 32 Gateways will be represented in this list. An empty list
+	// means the route has not been attached to any Gateway.
 	//
-	// +kubebuilder:validation:MaxItems=100
-	Gateways []RouteGatewayStatus `json:"gateways"`
+	// +kubebuilder:validation:MaxItems=32
+	Parents []RouteParentStatus `json:"parents"`
 }
 
 // Hostname is the fully qualified domain name of a network host, as defined
