@@ -237,9 +237,11 @@ type HTTPRouteRule struct {
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent. If unspecified, the rule performs no forwarding. If unspecified and
-	// no filters are specified that would result in a response being sent,
-	// a HTTP 503 status code is returned.
+	// sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints),
+	// the rule performs no forwarding; if no filters are specified that would result in a
+	// response being sent, a HTTP 503 status code is returned. 503 responses must be sent so that the overall
+	// weight is respected; if an invalid backend is requested to have 80% of requests, then 80% of requests
+	// must get a 503 instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource

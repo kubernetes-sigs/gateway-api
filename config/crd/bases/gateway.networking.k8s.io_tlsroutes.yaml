@@ -175,9 +175,17 @@ spec:
                   properties:
                     backendRefs:
                       description: "BackendRefs defines the backend(s) where matching
-                        requests should be sent. \n Support: Core for Kubernetes Service
-                        Support: Custom for any other resource \n Support for weight:
-                        Extended"
+                        requests should be sent. If unspecified or invalid (refers
+                        to a non-existent resource or a Service with no endpoints),
+                        the rule performs no forwarding; if no filters are specified
+                        that would result in a response being sent, the underlying
+                        implementation must actively reject request attempts to this
+                        backend, by rejecting the connection or returning a 503 status
+                        code. Request rejections must respect weight; if an invalid
+                        backend is requested to have 80% of requests, then 80% of
+                        requests must be rejected instead. \n Support: Core for Kubernetes
+                        Service Support: Custom for any other resource \n Support
+                        for weight: Extended"
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a
