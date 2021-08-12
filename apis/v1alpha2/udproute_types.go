@@ -93,11 +93,13 @@ type UDPRouteRule struct {
 	Matches []UDPRouteMatch `json:"matches,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints),
-	// the rule performs no forwarding; if no filters are specified that would result in a
-	// response being sent, the underlying implementation must actively reject connection attempts to this backend.
-	// Connection rejections must respect weight; if an invalid backend is requested to have 80% of connection,
-	// then 80% of connection must be rejected instead.
+	// sent. If unspecified or invalid (refers to a non-existent resource or
+	// a Service with no endpoints), the rule performs no forwarding; if no
+	// filters are specified that would result in a response being sent, the
+	// underlying implementation must actively reject connection attempts to
+	// this backend. Connection rejections must respect weight; if an invalid
+	// backend is requested to have 80% of connection, then 80% of connection
+	// must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource
