@@ -107,50 +107,12 @@ type HTTPRouteSpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	Hostnames []Hostname `json:"hostnames,omitempty"`
 
-	// TLS defines the TLS certificate to use for Hostnames defined in this
-	// Route. This configuration only takes effect if the AllowRouteOverride
-	// field is set to true in the associated Gateway resource.
-	//
-	// Collisions can happen if multiple HTTPRoutes define a TLS certificate
-	// for the same hostname. In such a case, conflict resolution guiding
-	// principles apply, specifically, if hostnames are same and two different
-	// certificates are specified then the certificate in the
-	// oldest resource wins.
-	//
-	// Please note that HTTP Route-selection takes place after the
-	// TLS Handshake (ClientHello). Due to this, TLS certificate defined
-	// here will take precedence even if the request has the potential to
-	// match multiple routes (in case multiple HTTPRoutes share the same
-	// hostname).
-	//
-	// Support: Core
-	//
-	// +optional
-	TLS *RouteTLSConfig `json:"tls,omitempty"`
-
 	// Rules are a list of HTTP matchers, filters and actions.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:default={{matches: {{path: {type: "Prefix", value: "/"}}}}}
 	Rules []HTTPRouteRule `json:"rules,omitempty"`
-}
-
-// RouteTLSConfig describes a TLS configuration defined at the Route level.
-type RouteTLSConfig struct {
-	// CertificateRef is a reference to a Kubernetes object that contains a TLS
-	// certificate and private key. This certificate is used to establish a TLS
-	// handshake for requests that match the hostname of the associated HTTPRoute.
-	// The referenced object MUST reside in the same namespace as HTTPRoute.
-	//
-	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
-	// or an implementation-specific custom resource.
-	//
-	// Support: Core (Kubernetes Secrets)
-	//
-	// Support: Implementation-specific (Other resource types)
-	//
-	CertificateRef LocalObjectReference `json:"certificateRef"`
 }
 
 // HTTPRouteRule defines semantics for matching an HTTP request based on

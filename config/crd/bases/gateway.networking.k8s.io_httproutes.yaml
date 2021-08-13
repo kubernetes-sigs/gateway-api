@@ -1047,53 +1047,6 @@ spec:
                   type: object
                 maxItems: 16
                 type: array
-              tls:
-                description: "TLS defines the TLS certificate to use for Hostnames
-                  defined in this Route. This configuration only takes effect if the
-                  AllowRouteOverride field is set to true in the associated Gateway
-                  resource. \n Collisions can happen if multiple HTTPRoutes define
-                  a TLS certificate for the same hostname. In such a case, conflict
-                  resolution guiding principles apply, specifically, if hostnames
-                  are same and two different certificates are specified then the certificate
-                  in the oldest resource wins. \n Please note that HTTP Route-selection
-                  takes place after the TLS Handshake (ClientHello). Due to this,
-                  TLS certificate defined here will take precedence even if the request
-                  has the potential to match multiple routes (in case multiple HTTPRoutes
-                  share the same hostname). \n Support: Core"
-                properties:
-                  certificateRef:
-                    description: "CertificateRef is a reference to a Kubernetes object
-                      that contains a TLS certificate and private key. This certificate
-                      is used to establish a TLS handshake for requests that match
-                      the hostname of the associated HTTPRoute. The referenced object
-                      MUST reside in the same namespace as HTTPRoute. \n CertificateRef
-                      can reference a standard Kubernetes resource, i.e. Secret, or
-                      an implementation-specific custom resource. \n Support: Core
-                      (Kubernetes Secrets) \n Support: Implementation-specific (Other
-                      resource types)"
-                    properties:
-                      group:
-                        description: Group is the group of the referent.
-                        maxLength: 253
-                        type: string
-                      kind:
-                        description: Kind is kind of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                      name:
-                        description: Name is the name of the referent.
-                        maxLength: 253
-                        minLength: 1
-                        type: string
-                    required:
-                    - group
-                    - kind
-                    - name
-                    type: object
-                required:
-                - certificateRef
-                type: object
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
