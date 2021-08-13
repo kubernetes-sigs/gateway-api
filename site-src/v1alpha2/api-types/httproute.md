@@ -7,44 +7,37 @@ of HTTP requests from a Gateway listener to an API object, i.e. Service.
 
 The specification of an HTTPRoute consists of:
 
-- [Gateways][gateways]- Define which Gateways can use this HTTPRoute.
+- [ParentRefs][parentRef]- Define which Gateways this Route wants to be attached
+  to.
 - [Hostnames][hostname] (optional)- Define a list of hostnames to use for
   matching the Host header of HTTP requests.
 - [Rules][httprouterule]- Define a list of rules to perform actions against
-  matching HTTP requests. Each rule consists
-  of [matches][matches], [filters][filters] (optional), and [forwardTo][forwardto]
-  (optional) fields.
+  matching HTTP requests. Each rule consists of [matches][matches],
+  [filters][filters] (optional), and [backendRefs][backendRef] (optional)
+  fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
 ![httproute-basic-example](/images/httproute-basic-example.svg)
 
-### Gateways
+### Attaching to Gateways
 
-Gateways define which Gateways can use the HTTPRoute. If unspecified, `gateways`
-defaults to `allow: SameNamespace` which allows all Gateways in the HTTPRoute's
-namespace.
+Each Route includes a way to reference the parent resources it wants to attach
+to. In most cases, that's going to be Gateways, but there is some flexibility
+here for implementations to support other types of parent resources.
 
-The following example allows Gateways from namespace "httproute-ns-example":
+The following example shows how a Route would attach to the `acme-lb` Gateway:
 ```yaml
 kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
 metadata:
   name: httproute-example
-  namespace: httproute-ns-example
 spec:
-  gateways:
-    allow: SameNamespace
+  parentRefs:
+  - name: acme-lb
 ```
 
-Possible values for `allow` are:
-
-- `All`: Gateways in any namespace can use this route.
-- `FromList`: Only Gateways specified in `gatewayRefs` may use this route.
-- `SameNamespace` (default): Only Gateways in the same namespace may use this
-  route.
-
-If `allow` results in preventing the selection of an HTTPRoute by a Gateway, an
-“Admitted: false” condition must be set on the Gateway for this Route.
+Note that the target Gateway needs to allow HTTPRoutes from the route's
+namespace to be attached for the attachment to be successful.
 
 ### Hostnames
 
@@ -61,16 +54,13 @@ Incoming requests are matched against hostnames before the HTTPRoute rules are
 evaluated. If no hostname is specified, traffic is routed based on HTTPRoute
 rules and filters (optional).
 
-The following example defines hostname "my.example.com" and allows Gateways
-from the same namespace as HTTPRoute "httproute-example":
+The following example defines hostname "my.example.com":
 ```yaml
 kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
 metadata:
   name: httproute-example
 spec:
-  gateways:
-    allow: SameNamespace
   hostnames:
   - my.example.com
 ```
@@ -136,9 +126,9 @@ Conformance levels are defined by the filter type:
 
 Specifying a core filter multiple times has unspecified or custom conformance.
 
-#### ForwardTo (optional)
+#### BackendRefs (optional)
 
-ForwardTo defines API objects where matching requests should be sent. If
+BackendRefs defines API objects where matching requests should be sent. If
 unspecified, the rule performs no forwarding. If unspecified and no filters
 are specified that would result in a response being sent, a 503 error code
 is returned.
@@ -150,11 +140,6 @@ header `magic: foo` to service "my-service2" on port `8080`:
 {% include 'basic-http.yaml' %}
 ```
 
-**Note:** Forwarding to a custom resource instead of a service can be
-accomplished by specifying `backendRef` instead of `serviceName`. A
-`backendRef` follows the standard Kubernetes `group`, `kind` and `name`
-schema.
-
 The following example uses the `weight` field to forward HTTP requests for
 prefix `/bar` equally across service "my-trafficsplit-svc1" and service
 "my-trafficsplit-svc2", i.e. traffic splitting:
@@ -162,7 +147,7 @@ prefix `/bar` equally across service "my-trafficsplit-svc1" and service
 {% include 'http-trafficsplit.yaml' %}
 ```
 
-Reference the [forwardTo][forwardto] API documentation for additional details
+Reference the [backendRef][backendRef] API documentation for additional details
 of `weight` and other fields.
 
 ## Status
@@ -173,13 +158,14 @@ Status defines the observed state of HTTPRoute.
 
 RouteStatus defines the observed state that is required across all route types.
 
-#### Gateways
+#### Parents
 
-Gateways define a list of the Gateways that are associated with the HTTPRoute,
-and the status of the HTTPRoute with respect to each of these Gateways. When a
-Gateway selects this HTTPRoute, the controller that manages the Gateway should
-add an entry to this list when the controller first sees the route and should
-update the entry as appropriate when the route is modified.
+Parents define a list of the Gateways (or other parent resources) that are
+associated with the HTTPRoute, and the status of the HTTPRoute with respect to
+each of these Gateways. When a HTTPRoute adds a reference to a Gateway in
+parentRefs, the controller that manages the Gateway should add an entry to this
+list when the controller first sees the route and should update the entry as
+appropriate when the route is modified.
 
 The following example indicates HTTPRoute "http-example" has been admitted by
 Gateway "gw-example" in namespace "gw-example-ns":
@@ -190,18 +176,14 @@ metadata:
   name: http-example
 ...
 status:
-  gateways:
-  - gatewayRef:
+  parents:
+  - parentRefs:
       name: gw-example
       namespace: gw-example-ns
     conditions:
     - type: Admitted
       status: "True"
 ```
-
-A maximum of 100 Gateways can be represented in this list. If this list is full,
-there may be additional Gateways using this Route that are not included in the
-list.
 
 ### Merging
 Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
@@ -210,10 +192,11 @@ resolution applies to merging, refer to the [API specification](httprouterule).
 
 
 [httproute]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[gateways]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.RouteGateways
 [httprouterule]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule
 [hostname]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
 [matches]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteMatch
 [filters]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteFilter
-[forwardto]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteForwardTo
+[backendRef]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPBackendRef
+[parentRef]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.ParentRef
+
