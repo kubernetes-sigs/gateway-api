@@ -8,13 +8,15 @@ theme:
   icon:
     repo: fontawesome/brands/git-alt
   features:
+    - navigation.tabs
     - search.highlight
 edit_uri: edit/master/site-src/
 extra_css:
   - css/extra.css
 plugins:
   - search
-  - awesome-pages
+  - awesome-pages:
+      collapse_single_pages: true
   - macros:
       include_dir: examples
 markdown_extensions:
@@ -22,32 +24,20 @@ markdown_extensions:
   - toc:
       permalink: true
 nav:
-  - Introduction: index.md
-  - Concepts:
-      API overview: concepts/api-overview.md
-      Security Model: concepts/security-model.md
-      Implementation Guidelines: concepts/guidelines.md
-  - API Types:
-      GatewayClass: api-types/gatewayclass.md
-      Gateway: api-types/gateway.md
-      HTTPRoute: api-types/httproute.md
-  - Guides:
-    - Getting started: guides/getting-started.md
-    - Simple Gateway: guides/simple-gateway.md
-    - HTTP routing: guides/http-routing.md
-    - HTTP traffic splitting: guides/traffic-splitting.md
-    - Multiple namespaces and routes: guides/multiple-ns.md
-    - TLS: guides/tls.md
-    - TCP routing: guides/tcp.md
-  - References:
-    - API specification: references/spec.md
-    - Releases: references/releases.md
-    - Implementations: references/implementations.md
-  - ... | geps/gep-*.md
-  - Contributing:
-    - Developer guide: contributing/devguide.md
-    - Gateway Enhancement Proposal: contributing/gep.md
-    - Enhancement requests: contributing/enhancement-requests.md
-    - Community: contributing/community.md
-  - FAQ: faq.md
-
+  - v1alpha1:
+    - Introduction: index.md
+    - ... | concepts/*.md
+    - ... | api-types/*.md
+    - ... | guides/*.md
+    - ... | references/*.md
+    - ... | contributing/*.md
+    - FAQ: faq.md
+  - v1alpha2:
+    - Introduction: v1alpha2/index.md
+    - ... | v1alpha2/concepts/*.md
+    - ... | v1alpha2/api-types/*.md
+    - ... | v1alpha2/guides/*.md
+    - ... | v1alpha2/references/*.md
+    - ... | v1alpha2/contributing/*.md
+    - ... | geps/gep-*.md
+    - FAQ: v1alpha2/faq.md

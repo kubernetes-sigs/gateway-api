@@ -1,5 +1,7 @@
 ## What is the Gateway API?
 
+!!! danger "This version of the API has not been released yet."
+
 Gateway API is an open source project managed by the [SIG-NETWORK][sig-network]
 community. It's is a collection of resources that model service networking 
 in Kubernetes. These resources - `GatewayClass`,`Gateway`, `HTTPRoute`, 

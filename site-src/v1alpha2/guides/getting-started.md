@@ -1,5 +1,6 @@
 # Getting started with Gateway APIs
 
+!!! danger "This page has not been updated for v1alpha2 yet."
 
 **1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
  _OR_  **[install the Gateway API CRDs manually](#installing-gateway-api-crds-manually)** 

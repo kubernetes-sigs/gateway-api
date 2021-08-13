@@ -1,5 +1,7 @@
 # HTTP routing
 
+!!! danger "This page has not been updated for v1alpha2 yet."
+
 The [HTTPRoute resource](/api-types/httproute) allows you to match on HTTP traffic and
 direct it to Kubernetes backends. This guide shows how the HTTPRoute matches
 traffic on host, header, and path fields and forwards it to different

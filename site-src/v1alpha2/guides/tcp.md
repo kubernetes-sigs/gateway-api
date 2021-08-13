@@ -1,3 +1,7 @@
+# TCP
+
+!!! danger "This page has not been updated for v1alpha2 yet."
+
 Gateway API is designed to work with multiple protocols.
 [TCPRoute](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute) is one such route which
 allows for managing TCP traffic.
