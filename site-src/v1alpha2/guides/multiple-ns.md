@@ -1,5 +1,9 @@
 # Routes in multiple namespaces
 
+!!! danger
+    This page has not been updated for v1alpha2 yet.
+
+
 With the Gateway API, a single Gateway can target routes across multiple
 namespaces.
 

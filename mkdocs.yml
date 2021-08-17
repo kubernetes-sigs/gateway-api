@@ -31,13 +31,16 @@ nav:
         Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
     - Implementations: implementations.md
-  - Reference:
+  - Guides:
+    - v1alpha1:
+      - Getting started: v1alpha1/guides/getting-started.md
+      - Simple Gateway: v1alpha1/guides/simple-gateway.md
+      - HTTP routing: v1alpha1/guides/http-routing.md
+      - HTTP traffic splitting: v1alpha1/guides/traffic-splitting.md
+      - Multiple namespaces and routes: v1alpha1/guides/multiple-ns.md
+      - TLS: v1alpha1/guides/tls.md
+      - TCP routing: v1alpha1/guides/tcp.md
     - v1alpha2(unreleased):
-      - API Types:
-          GatewayClass: v1alpha2/api-types/gatewayclass.md
-          Gateway: v1alpha2/api-types/gateway.md
-          HTTPRoute: v1alpha2/api-types/httproute.md
-      - Guides:
         - Getting started: v1alpha2/guides/getting-started.md
         - Simple Gateway: v1alpha2/guides/simple-gateway.md
         - HTTP routing: v1alpha2/guides/http-routing.md
@@ -45,21 +48,19 @@ nav:
         - Multiple namespaces and routes: v1alpha2/guides/multiple-ns.md
         - TLS: v1alpha2/guides/tls.md
         - TCP routing: v1alpha2/guides/tcp.md
-      - API specification: v1alpha2/references/spec.md    
+  - Reference:
     - v1alpha1:
       - API Types:
           GatewayClass: v1alpha1/api-types/gatewayclass.md
           Gateway: v1alpha1/api-types/gateway.md
           HTTPRoute: v1alpha1/api-types/httproute.md
-      - Guides:
-        - Getting started: v1alpha1/guides/getting-started.md
-        - Simple Gateway: v1alpha1/guides/simple-gateway.md
-        - HTTP routing: v1alpha1/guides/http-routing.md
-        - HTTP traffic splitting: v1alpha1/guides/traffic-splitting.md
-        - Multiple namespaces and routes: v1alpha1/guides/multiple-ns.md
-        - TLS: v1alpha1/guides/tls.md
-        - TCP routing: v1alpha1/guides/tcp.md
       - API specification: v1alpha1/references/spec.md
+    - v1alpha2(unreleased):
+      - API Types:
+          GatewayClass: v1alpha2/api-types/gatewayclass.md
+          Gateway: v1alpha2/api-types/gateway.md
+          HTTPRoute: v1alpha2/api-types/httproute.md
+      - API specification: v1alpha2/references/spec.md    
     - Release policy: references/releases.md
   - Contributing:
     - Developer guide: contributing/devguide.md

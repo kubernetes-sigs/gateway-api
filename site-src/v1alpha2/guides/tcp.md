@@ -1,5 +1,9 @@
+
+!!! danger
+    This page has not been updated for v1alpha2 yet.
+
 Gateway API is designed to work with multiple protocols.
-[TCPRoute](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute) is one such route which
+[TCPRoute](/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute) is one such route which
 allows for managing TCP traffic.
 
 In this example, we have one Gateway resource and two TCPRoute resources that
@@ -19,7 +23,7 @@ Please note the following:
   Gateway listener. Implementations can support such use-cases by adding a custom
   resource to specify advanced routing properties and then referencing it in
   `spec.rules[].matches[].extensionRef`. Conflicts due to routing colisions should
-  be resolved as per the [conflict resolution](/concepts/guidelines#conflicts) guidelines.
+  be resolved as per the [conflict resolution](/v1alpha2/concepts/guidelines#conflicts) guidelines.
 
 ```
 {% include 'basic-tcp.yaml' %}

@@ -1,5 +1,7 @@
 # Security Model
 
+!!! danger
+    This page is very of date and needs to be updated.
 ## Introduction
 The Gateway API have been designed to enable granular authorization for each
 role in a typical organization.
