@@ -1,6 +1,6 @@
 # HTTP routing
 
-The [HTTPRoute resource](/api-types/httproute) allows you to match on HTTP
+The [HTTPRoute resource](/v1alpha1/api-types/httproute) allows you to match on HTTP
 traffic and direct it to Kubernetes backends. This guide shows how the HTTPRoute
 matches traffic on host, header, and path fields and forwards it to different
 Kubernetes Services.
@@ -13,14 +13,14 @@ Services:
 to `bar-svc-canary`
 - Traffic to `bar.example.com/*` without the header is forwarded to `bar-svc`
 
-![HTTP Routing](/images/http-routing.png)
+![HTTP Routing](/v1alpha1/images/http-routing.png)
 
 The dotted lines show the Gateway resources deployed to configure this routing
 behavior. There are two HTTPRoute resources that create routing rules on the
 same `prod-web` Gateway. This illustrates how more than one Route can bind to a
 Gateway which allows Routes to merge on a Gateway as long as they don't
 conflict. For more information on Route merging, refer to the [HTTPRoute
-documentation](/api-types/httproute#merging).
+documentation](/v1alpha1/api-types/httproute#merging).
 
 The following `prod-web` Gateway is defined from the `acme-lb` GatewayClass.
 `prod-web` listens for HTTP traffic on port 80 and will bind to all Routes in

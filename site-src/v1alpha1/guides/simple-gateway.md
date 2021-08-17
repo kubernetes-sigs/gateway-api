@@ -5,7 +5,7 @@ deployed together by the same owner. This represents a similar kind of model
 used for Ingress. In this guide, a Gateway and HTTPRoute are deployed which
 match all HTTP traffic and directs it to a single Service named `foo-svc`. 
 
-![Simple Gateway](/images/single-service-gateway.png)
+![Simple Gateway](/v1alpha1/images/single-service-gateway.png)
 
 ```yaml  
 {% include 'simple-gateway/gateway.yaml' %} 

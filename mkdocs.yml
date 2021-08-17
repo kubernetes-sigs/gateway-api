@@ -9,6 +9,8 @@ theme:
     repo: fontawesome/brands/git-alt
   features:
     - search.highlight
+    - navigation.tabs
+    - navigation.top
 edit_uri: edit/master/site-src/
 extra_css:
   - css/extra.css
@@ -22,32 +24,50 @@ markdown_extensions:
   - toc:
       permalink: true
 nav:
-  - Introduction: index.md
-  - Concepts:
-      API overview: concepts/api-overview.md
-      Security Model: concepts/security-model.md
-      Implementation Guidelines: concepts/guidelines.md
-  - API Types:
-      GatewayClass: api-types/gatewayclass.md
-      Gateway: api-types/gateway.md
-      HTTPRoute: api-types/httproute.md
+  - Overview:
+    - Introduction: index.md
+    - Concepts:
+        API overview: concepts/api-overview.md
+        Security Model: concepts/security-model.md
+        Implementation Guidelines: concepts/guidelines.md
+    - Implementations: implementations.md
   - Guides:
-    - Getting started: guides/getting-started.md
-    - Simple Gateway: guides/simple-gateway.md
-    - HTTP routing: guides/http-routing.md
-    - HTTP traffic splitting: guides/traffic-splitting.md
-    - Multiple namespaces and routes: guides/multiple-ns.md
-    - TLS: guides/tls.md
-    - TCP routing: guides/tcp.md
-  - References:
-    - API specification: references/spec.md
-    - Releases: references/releases.md
-    - Implementations: references/implementations.md
-  - ... | geps/gep-*.md
+    - v1alpha1:
+      - Getting started: v1alpha1/guides/getting-started.md
+      - Simple Gateway: v1alpha1/guides/simple-gateway.md
+      - HTTP routing: v1alpha1/guides/http-routing.md
+      - HTTP traffic splitting: v1alpha1/guides/traffic-splitting.md
+      - Multiple namespaces and routes: v1alpha1/guides/multiple-ns.md
+      - TLS: v1alpha1/guides/tls.md
+      - TCP routing: v1alpha1/guides/tcp.md
+    - v1alpha2(unreleased):
+        - Getting started: v1alpha2/guides/getting-started.md
+        - Simple Gateway: v1alpha2/guides/simple-gateway.md
+        - HTTP routing: v1alpha2/guides/http-routing.md
+        - HTTP traffic splitting: v1alpha2/guides/traffic-splitting.md
+        - Multiple namespaces and routes: v1alpha2/guides/multiple-ns.md
+        - TLS: v1alpha2/guides/tls.md
+        - TCP routing: v1alpha2/guides/tcp.md
+  - Reference:
+    - v1alpha1:
+      - API Types:
+          GatewayClass: v1alpha1/api-types/gatewayclass.md
+          Gateway: v1alpha1/api-types/gateway.md
+          HTTPRoute: v1alpha1/api-types/httproute.md
+      - API specification: v1alpha1/references/spec.md
+    - v1alpha2(unreleased):
+      - API Types:
+          GatewayClass: v1alpha2/api-types/gatewayclass.md
+          Gateway: v1alpha2/api-types/gateway.md
+          HTTPRoute: v1alpha2/api-types/httproute.md
+      - API specification: v1alpha2/references/spec.md    
+    - Release policy: references/releases.md
   - Contributing:
     - Developer guide: contributing/devguide.md
-    - Gateway Enhancement Proposal: contributing/gep.md
-    - Enhancement requests: contributing/enhancement-requests.md
+    - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
     - Community: contributing/community.md
   - FAQ: faq.md
+  - Enhancement Proposals:
+    - Overview: contributing/gep.md
+    - ... | geps/gep-*.md    
 

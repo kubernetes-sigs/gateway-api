@@ -1,12 +1,16 @@
 # TLS Configuration
 
+!!! danger
+    This page has not been updated for v1alpha2 yet.
+
+
 Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.
 
 ## Client/Server and TLS
 
-![overview](/images/tls-overview.svg)
+![overview](/v1alpha2/images/tls-overview.svg)
 
 For Gateways, there are two connections involved:
 

@@ -8,16 +8,16 @@ _THEN_
 
 **2.**   **Try out one of the available guides:**
 
-- [Simple Gateway](/guides/simple-gateway) (a good one to start out with)
-- [HTTP routing](/guides/http-routing)
-- [HTTP traffic splitting](/guides/traffic-splitting)
-- [Routing across Namespaces](/guides/multiple-ns)
-- [Configuring TLS](/guides/tls)
-- [TCP routing](/guides/tcp)
+- [Simple Gateway](/v1alpha1/guides/simple-gateway) (a good one to start out with)
+- [HTTP routing](/v1alpha1/guides/http-routing)
+- [HTTP traffic splitting](/v1alpha1/guides/traffic-splitting)
+- [Routing across Namespaces](/v1alpha1/guides/multiple-ns)
+- [Configuring TLS](/v1alpha1/guides/tls)
+- [TCP routing](/v1alpha1/guides/tcp)
 
 ## Installing a Gateway controller
 
-There are [multiple projects](/references/implementations) that support the Gateway
+There are [multiple projects](/v1alpha1/references/implementations) that support the Gateway
 API. By installing a Gateway controller in your Kubernetes cluster, you can
 try out the guides above. This will demonstrate that the desired routing
 configuration is actually being implemented by your Gateway resources (and the
