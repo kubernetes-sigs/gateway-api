@@ -61,6 +61,10 @@
   guide what revisions are needed for the next release. It is possible
   that the next release will contain breaking changes.
 
+* **Q: Which Kubernetes versions are supported?<br>**
+  A: Generally, we support Kubernetes 1.16+, but certain features like 
+  AppProtocol depend on Kubernetes 1.18 (opt-in) or 1.19 (on by default). 
+  There are not any other exceptions to the 1.16+ guideline right now.
 
 [1]: https://github.com/kubernetes-sigs/gateway-api
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
