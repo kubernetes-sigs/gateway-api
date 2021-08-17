@@ -37,7 +37,7 @@ nav:
       - Simple Gateway: v1alpha1/guides/simple-gateway.md
       - HTTP routing: v1alpha1/guides/http-routing.md
       - HTTP traffic splitting: v1alpha1/guides/traffic-splitting.md
-      - Multiple namespaces and routes: v1alpha1/guides/multiple-ns.md
+      - Cross-Namespace routing: v1alpha1/guides/multiple-ns.md
       - TLS: v1alpha1/guides/tls.md
       - TCP routing: v1alpha1/guides/tcp.md
     - v1alpha2(unreleased):
@@ -45,7 +45,7 @@ nav:
         - Simple Gateway: v1alpha2/guides/simple-gateway.md
         - HTTP routing: v1alpha2/guides/http-routing.md
         - HTTP traffic splitting: v1alpha2/guides/traffic-splitting.md
-        - Multiple namespaces and routes: v1alpha2/guides/multiple-ns.md
+        - Cross-Namespace routing: v1alpha2/guides/multiple-ns.md
         - TLS: v1alpha2/guides/tls.md
         - TCP routing: v1alpha2/guides/tcp.md
   - Reference:
@@ -70,4 +70,3 @@ nav:
   - Enhancement Proposals:
     - Overview: contributing/gep.md
     - ... | geps/gep-*.md    
-
