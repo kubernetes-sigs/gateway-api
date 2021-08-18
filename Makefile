@@ -51,7 +51,7 @@ install: crd example
 # Install the CRD's to a pre-existing cluster.
 .PHONY: crd
 crd:
-	kubectl kustomize config/crd | kubectl apply -f -
+	kubectl kustomize config/crd/v1alpha2 | kubectl apply -f -
 
 # Install the example resources to a pre-existing cluster.
 .PHONY: example
