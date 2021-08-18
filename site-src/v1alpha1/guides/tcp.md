@@ -22,5 +22,5 @@ Please note the following:
   be resolved as per the [conflict resolution](/v1alpha1/concepts/guidelines#conflicts) guidelines.
 
 ```
-{% include 'basic-tcp.yaml' %}
+{% include 'v1alpha1/basic-tcp.yaml' %}
 ```

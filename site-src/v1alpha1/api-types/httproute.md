@@ -83,7 +83,7 @@ TLS defines the TLS certificate used for hostnames defined in this HTTPRoute.
 This configuration only takes effect if `certificate: Allow` is set for
 `routeOverride` in the associated Gateway. For example:
 ```yaml
-{% include 'tls-basic.yaml' %}
+{% include 'v1alpha1/tls-basic.yaml' %}
 ```
 
 `CertificateRef` refers to a Kubernetes object that contains a TLS certificate
@@ -146,7 +146,7 @@ strategies, rate-limiting, and traffic shaping.
 The following example adds header "my-header: foo" to HTTP requests with Host
 header "my.filter.com".
 ```yaml
-{% include 'http-filter.yaml' %}
+{% include 'v1alpha1/http-filter.yaml' %}
 ```
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -172,7 +172,7 @@ The following example forwards HTTP requests for prefiex `/bar` to service
 "my-service1" on port `8080` and HTTP requests for prefex `/some/thing` with
 header `magic: foo` to service "my-service2" on port `8080`:
 ```yaml
-{% include 'basic-http.yaml' %}
+{% include 'v1alpha1/basic-http.yaml' %}
 ```
 
 **Note:** Forwarding to a custom resource instead of a service can be
@@ -184,7 +184,7 @@ The following example uses the `weight` field to forward HTTP requests for
 prefix `/bar` equally across service "my-trafficsplit-svc1" and service
 "my-trafficsplit-svc2", i.e. traffic splitting:
 ```yaml
-{% include 'http-trafficsplit.yaml' %}
+{% include 'v1alpha1/http-trafficsplit.yaml' %}
 ```
 
 Reference the [forwardTo][forwardto] API documentation for additional details

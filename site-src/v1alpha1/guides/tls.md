@@ -103,7 +103,7 @@ In this example, the Gateway is configured to serve the `foo.example.com` and
 in the Gateway.
 
 ```
-{% include 'tls-basic.yaml' %}
+{% include 'v1alpha1/tls-basic.yaml' %}
 ```
 
 #### Wildcard TLS listeners
@@ -115,7 +115,7 @@ Since a specific match takes priority, the Gateway will serve
 `wildcard-example-com-cert` for all other requests.
 
 ```yaml
-{% include 'wildcard-tls-gateway.yaml' %}
+{% include 'v1alpha1/wildcard-tls-gateway.yaml' %}
 ```
 
 #### TLS Certificate in Route
@@ -127,7 +127,7 @@ there are two HTTPRoute resources which specify certificates for
 `foo.example.com` and `bar.example.com`.
 
 ```yaml
-{% include 'tls-cert-in-route.yaml' %}
+{% include 'v1alpha1/tls-cert-in-route.yaml' %}
 ```
 
 ## Upstream TLS
@@ -149,7 +149,7 @@ doesn't matter how downstream TLS is configured for the specific listener or
 route.
 
 ```yaml
-{% include 'upstream-tls.yaml' %}
+{% include 'v1alpha1/upstream-tls.yaml' %}
 ```
 
 ## Extensions
