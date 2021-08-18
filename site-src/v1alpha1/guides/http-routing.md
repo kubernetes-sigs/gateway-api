@@ -29,7 +29,7 @@ Route labels and Gateway label selectors allow Routes and Gateways to be
 bound to each other by their respective owners.
 
 ```yaml
-{% include 'http-routing/gateway.yaml' %}
+{% include 'v1alpha1/http-routing/gateway.yaml' %}
 ```
 
 An HTTPRoute can match against a [single set of
@@ -46,7 +46,7 @@ forwarded. Traffic to any other paths that do not begin with `/login` will not
 be matched by this Route.
 
 ```yaml
-{% include 'http-routing/foo-httproute.yaml' %}
+{% include 'v1alpha1/http-routing/foo-httproute.yaml' %}
 ```
 
 Similarly, the `bar-route` HTTPRoute matches traffic for `bar.example.com`. All
@@ -56,6 +56,6 @@ canary` header will be forwarded to `bar-svc-canary` and if the header is
 missing or not `canary` then it'll be forwarded to `bar-svc`.
 
 ```yaml
-{% include 'http-routing/bar-httproute.yaml' %}
+{% include 'v1alpha1/http-routing/bar-httproute.yaml' %}
 ```
 

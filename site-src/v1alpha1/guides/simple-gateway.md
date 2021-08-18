@@ -8,7 +8,7 @@ match all HTTP traffic and directs it to a single Service named `foo-svc`.
 ![Simple Gateway](/v1alpha1/images/single-service-gateway.png)
 
 ```yaml  
-{% include 'simple-gateway/gateway.yaml' %} 
+{% include 'v1alpha1/simple-gateway/gateway.yaml' %} 
 ```
 
 The Gateway represents the instantation of a logical load balancer. It's
@@ -31,7 +31,7 @@ will match all HTTP traffic that arrives at port 80 of the load balancer and
 send it to the `foo-svc` Pods. 
 
 ```yaml  
-{% include 'simple-gateway/httproute.yaml' %} 
+{% include 'v1alpha1/simple-gateway/httproute.yaml' %} 
 ```
 
 While Route resources are often used to filter traffic to many different

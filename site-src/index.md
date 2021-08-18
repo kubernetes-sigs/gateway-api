@@ -105,7 +105,7 @@ project being built to improve and standardize service networking in
 Kubernetes. Current and in-progress implementations include Contour,
 Emissary-Ingress (Abassador API Gateway), Google Kubernetes Engine (GKE), Istio,
 Kong, and Traefik. Check out the [implementations
-reference](references/implementations.md) to see the latest projects &
+reference](implementations.md) to see the latest projects &
 products that support Gateway. If you are interested in contributing to or
 building an implementation using the Gateway API then don’t hesitate to [get
 involved!](/contributing/community)

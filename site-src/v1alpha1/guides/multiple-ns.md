@@ -67,7 +67,7 @@ The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
 Namespace. 
 
 ```yaml
-{% include 'cross-namespace-routing/gateway.yaml' %}
+{% include 'v1alpha1/cross-namespace-routing/gateway.yaml' %}
 ```
 
 A few notes about this Gateway:
@@ -99,7 +99,7 @@ Meanwhile, the store team deploys their route for the `store` Service in the
 `store-ns` Namespace:
 
 ```yaml
-{% include 'cross-namespace-routing/store-route.yaml' %}
+{% include 'v1alpha1/cross-namespace-routing/store-route.yaml' %}
 ```
 
 This Route has straightforward routing logic as it just matches for 
@@ -140,7 +140,7 @@ Both of these Routes use the same Gateway binding configuration which specifies
 Routes can bind with.
 
 ```yaml
-{% include 'cross-namespace-routing/site-route.yaml' %}
+{% include 'v1alpha1/cross-namespace-routing/site-route.yaml' %}
 ```
 
 After these three Routes are deployed, they will all be bound to the 
