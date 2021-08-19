@@ -17,9 +17,10 @@ section in the Security model for details.
 
 ## Resource model
 
-> Note: Resources will initially live in the `networking.x-k8s.io` API group as
-> Custom Resource Definitions (CRDs). Unqualified resource names will implicitly
-> be in this API group.
+!!! note
+    As of v1alpha2, resources are in the `gateway.networking.k8s.io` API group as
+    Custom Resource Definitions (CRDs). Unqualified resource names below will implicitly
+    be in this API group. Prior to v1alpha1, the apigroup was `networking.x-k8s.io`.
 
 There are three main types of objects in our resource model:
 
@@ -75,27 +76,33 @@ Status object.
 A Gateway MAY contain one or more *Route references which serve to direct
 traffic for a subset of traffic to a specific service.*
 
-### {HTTP,TCP,Foo}Route
+### {HTTP,TLS,TCP,UDP}Route
 
 Route objects define protocol-specific rules for mapping requests from a Gateway
 to Kubernetes Services.
 
-`HTTPRoute` and `TCPRoute` are currently the only defined Route objects.
-Additional protocol-specific Route objects may be added in the future.
+As of v1alpha2, there are four Route types defined in this repo, although it's
+expected that in the future implementations may create their own custom Route
+types.
 
-### BackendPolicy
+#### HTTPRoute
+HTTPRoute is for multiplexing HTTP or terminated HTTPS connections onto a single port or set of ports. It's intended for use in cases where you want to inspect the HTTP stream and use HTTP-level data for either routing or modification. (An example here is using HTTP Headers for routing, or modifying them in-flight).
 
-BackendPolicy provides a way to configure connections between a Gateway and a
-backend. For the purpose of this API, a backend is any resource that a route can
-forward traffic to. A common example of a backend is a Service. Configuration at
-this level is currently limited to TLS, but will expand in the future to support
-more advanced policies such as health checking.
+#### TLSRoute
+TLSRoute is for multiplexing TLS connections, discriminated via SNI, onto a single port or set or ports. It's intended for where you want to use the SNI as the main routing method, and are not interested in properties of the underlying connection (such as whether or not it is HTTP).
 
-Some backend configuration may vary depending on the Route that is targeting the
-backend. In those cases, configuration fields will be placed on Routes and not
-BackendPolicy. For more information on what may be configured with this resource
-in the future, refer to the related [GitHub
-issue](https://github.com/kubernetes-sigs/gateway-api/issues/196).
+#### TCPRoute and UDPRoute
+TCPRoute (and UDPRoute) are intended for use as a mapping between a single port or set of ports and a single backend. In this case, there is no discriminator you can use to choose different backends on the same port, so each TCPRoute really needs a different port on the listener (in general, anyway).
+
+And in table form, the "Routing Discriminator" column below refers to what information can be used to allow multiple Routes to share ports on the Listener.
+
+|Object|OSI Layer|Routing Discriminator|TLS Support|Purpose|
+|------|---------|---------------------|-----------|-------|
+|HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only, can be reencrypted| HTTP and HTTPS Routing|
+|TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or terminated, can be reencrypted if terminated. | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
+|TCPRoute| Layer 4| None | None | Allows for forwarding of a TCP stream from the Listener to the Backends |
+|UDPRoute| Layer 4| None | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
+
 
 ### Route binding
 
@@ -134,69 +141,38 @@ different relationships that Gateways and Routes can have:
   IPs, load balancers, or networks.
 
 *In summary, Gateways select Routes and Routes control their exposure. When a
-Gateway selects a Route that allows itself to be exposed, then the Route will
+Route tries to attach to a Gateway that does not prevent it, then the Route will
 bind to the Gateway. When Routes are bound to a Gateway it means their
 collective routing rules are configured on the underlying load balancers or
 proxies that are managed by that Gateway. Thus, a Gateway is a logical
 representation of a networking data plane that can be configured through
 Routes.*
 
-#### Route Selection
+#### Route binding handshake
 
-A Gateway selects routes based on the Route metadata, specifically the kind,
-namespace, and labels of Route resources. Routes are actually bound to specific
-listeners within the Gateway so each listener has a `listener.routes` field
-which selects Routes by one or more of the following criterea:
+A Route selects what Gateway it wants to attach to, based on the `parentRefs` field,
+which allows the selection of the Group, Kind, name, and namespace of the object.
+Cluster-scoped objects can also be selected by changing the Scope to "Cluster".
+Although only Gateways are currently supported, this is intended to allow for
+later extension. Additionally, the `parentRefs` stanza is a list, so a Route may
+request to attach to more than one Gateway (or other parent object).
 
-- **Label** - A Gateway can select Routes via labels that exist on the
-resource (similar to how Services select Pods via Pod labels).
-- **Kind** - A Gateway listener can only select a single type of Route
-resource. This could be an HTTPRoute, TCPRoute, or a custom Route type.
-- **Namespace** - A Gateway can also control from which Namespaces Routes can be
-selected via the `namespaces.from` field. It supports three possible values:
-    - `SameNamespace` is the default option. Only Routes in the same namespace
-      as this Gateway will be selected.
-    - `All` will select Routes from all Namespaces.
-    - `Selector` means that Routes from a subset of Namespaces selected by a
-      Namespace label selector will be selected by this Gateway. When `Selector`
-      is used then the `listeners.routes.namespaces.selector` field can be used
-      to specify label selectors. This field is not supported with `All` or
-      `SameNamespace`.
+Additionally, Gateways *may* specify what kind of Routes they support
+(defaults to Routes that match the Listener protocol if not specified), and
+where those Routes can be (defaults to same namespace). If a Route wants
+to attach to a Gateway in another namespace, that Gateway must *explicitly*
+allow Routes from its namespace for the binding to succeed.
 
-The below Gateway will select all HTTPRoute resources with the `expose:
-prod-web-gw` across all Namespaces in the cluster.
+The Route becomes attached only when the Gateway and Route specifications intersect.
+Note that this means that the binding requires bidirectional agreement between
+the two objects. This is a critical part of the API's role-based structure.
 
-```
-kind: Gateway
-...
-spec:
-  listeners:
-  - routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          expose: prod-web-gw
-      namespaces:
-        from: All
-```
+#### Gateway - Route binding examples
 
-#### Route Exposure
-
-Routes can determine how they are exposed through Gateways. The `gateways.allow`
-field supports three values:
-
-- `All` is the default value if none is specified. This leaves all binding
-to the Route label and Namespace selectors on the Gateway.
-- `SameNamespace` only allows this Route to bind with Gateways from the
-same Namespace.
-- `FromList` allows an explicit list of Gateways to be specifiied that a
-Route will bind with. `gateways.gatewayRefs` is only supported with this option.
-
-The following `my-route` Route selects only the `foo-gateway` in the
-`foo-namespace` and will not be able to bind with any other Gateways. Note that
-`foo-gateway` is in a different Namespace. If the `foo-gateway` allows
-cross-Namespace binding and also selects this Route then `my-route` will bind to
-it.
+The following `my-route` Route wants to attach to the `foo-gateway` in the
+`foo-namespace` and will not bind with any other Gateways. Note that
+`foo-gateway` is in a different Namespace. The `foo-gateway` must allow
+bindings from HTTPRoutes in the namespace `bar-namespace`.
 
 ```yaml
 kind: HTTPRoute
@@ -204,20 +180,48 @@ metadata:
   name: my-route
   namespace: bar-namespace
 spec:
-  gateways:
-    allow: FromList
-    gatewayRefs:
-    - name: foo-gateway
-      namespace: foo-namespace
+  parentRefs:
+  - kind: Gateway
+    name: foo-gateway
+    namespace: foo-namespace
+...
 ```
 
-Note that Gateway and Route binding is bi-directional. This means that both
-resources must select each other for them to bind. If a Gateway has Route label
-selectors that do not match any existing Route then nothing will bind to it even
-if a Route's `spec.gateways.allow = All`. Similarly, if a Route references a
-specific Gateway, but that Gateway is not selecting the Route's Namespace, then
-they will not bind. A binding will only take place if both resources select each
-other.
+This `foo-gateway` allows the `my-route` HTTPRoute to bind.
+
+```yaml
+kind: Gateway
+metadata:
+  name: foo-gateway
+  namespace: foo-namespace
+spec:
+  listeners:
+  - name: prod-web
+    routes:
+      kinds:
+      - HTTPRoute
+      namespaces:
+      - from: bar-namespace
+```
+
+For a more permissive example, the below Gateway will allow all HTTPRoute resources
+to attach from Namespaces with the "expose-apps: true" label.
+
+```yaml
+kind: Gateway
+...
+spec:
+  listeners:
+  - name: prod-web
+    routes:
+      kinds:
+      - HTTPRoute
+      namespaces:
+      - from: Selector
+        selector:
+          matchLabels:
+            expose-apps: "true"
+```
 
 It may not always be apparent from the resource specifications which Gateways
 and Routes are bound, but binding can be determined from the resource status.
@@ -226,8 +230,8 @@ a Route is bound to and any relevant conditions for the binding.
 
 ### Combined types
 
-The combination of `GatewayClass`, `Gateway`, `xRoute` and `Service`(s) will
-define an implementable load-balancer. The diagram below illustrates the
+The combination of `GatewayClass`, `Gateway`, `xRoute` and `Service`(s)
+defines an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:
 
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
@@ -252,8 +256,7 @@ reverse proxy is:
 
 ## TLS Configuration
 
-TLS is configured on Gateway listeners. Additionally, TLS certificates
-can be configured on route objects for certain self-service use cases.
+TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
 Please refer to [TLS details](/guides/tls) for a deep dive on TLS.
 
