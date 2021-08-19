@@ -51,14 +51,20 @@ res=0
 KIND_CREATE_ATTEMPTED=true
 kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res=$?
 
-# Install CRDs
-kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/bases || res=$?
+for VERSION in v1alpha1 v1alpha2
+do
+  # Install CRDs
+  kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/"${VERSION}" || res=$?
 
-# Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
-sleep 8
+  # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
+  sleep 8
 
-# Install all example gateway-api resources.
-kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples || res=$?
+  # Install all example gateway-api resources.
+  kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/"${VERSION}" || res=$?
+
+  # Uninstall CRDs
+  kubectl delete --kubeconfig "${KUBECONFIG}" -f config/crd/"${VERSION}" || res=$?
+done
 
 # Clean up and exit
 cleanup || res=$?
