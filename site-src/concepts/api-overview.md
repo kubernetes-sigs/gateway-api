@@ -94,13 +94,14 @@ TLSRoute is for multiplexing TLS connections, discriminated via SNI, onto a sing
 #### TCPRoute and UDPRoute
 TCPRoute (and UDPRoute) are intended for use as a mapping between a single port or set of ports and a single backend. In this case, there is no discriminator you can use to choose different backends on the same port, so each TCPRoute really needs a different port on the listener (in general, anyway).
 
-And in table form, the "Routing Discriminator" column below refers to what information can be used to allow multiple Routes to share ports on the Listener.
+#### Route summary table
+The "Routing Discriminator" column below refers to what information can be used to allow multiple Routes to share ports on the Listener.
 
 |Object|OSI Layer|Routing Discriminator|TLS Support|Purpose|
 |------|---------|---------------------|-----------|-------|
 |HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only, can be reencrypted| HTTP and HTTPS Routing|
 |TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or terminated, can be reencrypted if terminated. | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
-|TCPRoute| Layer 4| None | None | Allows for forwarding of a TCP stream from the Listener to the Backends |
+|TCPRoute| Layer 4| None | None (but passthrough will work because the connection is forwarded) | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| None | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
 
@@ -110,7 +111,7 @@ When a Route binds to a Gateway it represents configuration that is applied on
 the Gateway that configures the underlying load balancer or proxy. How and which
 Routes bind to Gateways is controlled by the resources themselves. Route and
 Gateway resources have built-in controls to permit or constrain how they select
-each other. This is useful for enforcing organizational policies for how Routes
+valid partners. This is useful for enforcing organizational policies for how Routes
 are exposed and on which Gateways. Consider the following example:
 
 > A Kubernetes cluster admin has deployed a Gateway “shared-gw” in the “Infra”
@@ -140,22 +141,23 @@ different relationships that Gateways and Routes can have:
   a single Route to control application exposure simultaneously across different
   IPs, load balancers, or networks.
 
-*In summary, Gateways select Routes and Routes control their exposure. When a
-Route tries to attach to a Gateway that does not prevent it, then the Route will
-bind to the Gateway. When Routes are bound to a Gateway it means their
-collective routing rules are configured on the underlying load balancers or
-proxies that are managed by that Gateway. Thus, a Gateway is a logical
+*In summary, Routes attach to Gateways and Gateways choose what attachments to
+allow. When a Route tries to attach to a Gateway that does not prevent it, then
+the Route will bind to the Gateway. When Routes are bound to a Gateway it means
+their collective routing rules are configured on the underlying load balancers
+or proxies that are managed by that Gateway. Thus, a Gateway is a logical
 representation of a networking data plane that can be configured through
 Routes.*
 
 #### Route binding handshake
 
-A Route selects what Gateway it wants to attach to, based on the `parentRefs` field,
-which allows the selection of the Group, Kind, name, and namespace of the object.
-Cluster-scoped objects can also be selected by changing the Scope to "Cluster".
-Although only Gateways are currently supported, this is intended to allow for
-later extension. Additionally, the `parentRefs` stanza is a list, so a Route may
-request to attach to more than one Gateway (or other parent object).
+A Route *must* select what Gateway it wants to attach to, based on the
+`parentRefs` field, which allows the selection of the Group, Kind, name,
+and namespace of the object. Cluster-scoped objects can also be selected by
+changing the Scope to `Cluster`. Although only Gateways are currently supported,
+this is intended to allow for later extension. Additionally, the `parentRefs`
+stanza is a list, so a Route may request to attach to more than one Gateway
+(or other parent object).
 
 Additionally, Gateways *may* specify what kind of Routes they support
 (defaults to Routes that match the Listener protocol if not specified), and
@@ -258,7 +260,7 @@ reverse proxy is:
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
-Please refer to [TLS details](/guides/tls) for a deep dive on TLS.
+Please refer to the [TLS details](/v1alpha2/guides/tls) guide for a deep dive on TLS.
 
 
 ## Extension points
