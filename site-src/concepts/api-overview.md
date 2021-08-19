@@ -76,7 +76,7 @@ Status object.
 A Gateway MAY contain one or more *Route references which serve to direct
 traffic for a subset of traffic to a specific service.*
 
-### {HTTP,TLS,TCP,UDP}Route
+### Route objects
 
 Route objects define protocol-specific rules for mapping requests from a Gateway
 to Kubernetes Services.
