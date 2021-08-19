@@ -65,20 +65,23 @@ spec:
                       description: "Group is the group of the referent. When empty,
                         the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     kind:
                       description: "Kind is the kind of the referent. Although implementations
                         may support additional resources, the following Route types
                         are part of the \"Core\" support level for this field: \n
                         * HTTPRoute * TCPRoute * TLSRoute * UDPRoute"
-                      maxLength: 253
+                      maxLength: 63
                       minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. \n
                         Support: Core"
-                      maxLength: 253
+                      maxLength: 63
                       minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                   required:
                   - group
@@ -101,13 +104,15 @@ spec:
                       description: "Group is the group of the referent. When empty,
                         the \"core\" API group is inferred. \n Support: Core"
                       maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     kind:
                       description: "Kind is the kind of the referent. Although implementations
                         may support additional resources, the following types are
                         part of the \"Core\" support level for this field: \n * Service"
-                      maxLength: 253
+                      maxLength: 63
                       minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                       type: string
                   required:
                   - group

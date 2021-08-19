@@ -145,6 +145,7 @@ spec:
                         silently ignored. \n Support: Core"
                       maxLength: 253
                       minLength: 1
+                      pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     name:
                       description: "Name is the name of the Listener. If more than
@@ -152,6 +153,8 @@ spec:
                         The names of Listeners MUST be unique within a Gateway. \n
                         Support: Core"
                       maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     port:
                       description: "Port is the network port. Multiple listeners may
@@ -218,11 +221,13 @@ spec:
                                 default: gateway.networking.k8s.io
                                 description: Group is the group of the Route.
                                 maxLength: 253
+                                pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               kind:
                                 description: Kind is the kind of the Route.
-                                maxLength: 253
+                                maxLength: 63
                                 minLength: 1
+                                pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                                 type: string
                             required:
                             - kind
@@ -332,15 +337,19 @@ spec:
                           properties:
                             group:
                               default: ""
-                              description: Group is the group of the referent. When
-                                unspecified (empty string), core API group is inferred.
+                              description: Group is the group of the referent. For
+                                example, "networking.k8s.io". When unspecified (empty
+                                string), core API group is inferred.
                               maxLength: 253
+                              pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                               type: string
                             kind:
                               default: Service
-                              description: Kind is kind of the referent.
-                              maxLength: 253
+                              description: Kind is kind of the referent. For example
+                                "HTTPRoute" or "Service".
+                              maxLength: 63
                               minLength: 1
+                              pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                               type: string
                             name:
                               description: Name is the name of the referent.
@@ -355,8 +364,9 @@ spec:
                                 that namespace's owner to accept the reference. See
                                 the ReferencePolicy documentation for details. \n
                                 Support: Core"
-                              maxLength: 253
+                              maxLength: 63
                               minLength: 1
+                              pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                               type: string
                           required:
                           - name
@@ -386,6 +396,7 @@ spec:
                             is a common subset for expressing ciphers then it will
                             make sense to loft that as a core API construct. \n Support:
                             Implementation-specific"
+                          maxProperties: 16
                           type: object
                       type: object
                   required:
@@ -623,6 +634,8 @@ spec:
                         specify a name. The names of ListenerStatus objects MUST be
                         unique within a Gateway.
                       maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     supportedKinds:
                       description: SupportedKinds is the list indicating the Kinds
@@ -640,11 +653,13 @@ spec:
                             default: gateway.networking.k8s.io
                             description: Group is the group of the Route.
                             maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
                           kind:
                             description: Kind is the kind of the Route.
-                            maxLength: 253
+                            maxLength: 63
                             minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                             type: string
                         required:
                         - kind

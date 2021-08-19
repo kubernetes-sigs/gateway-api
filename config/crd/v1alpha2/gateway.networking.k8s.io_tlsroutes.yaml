@@ -79,6 +79,7 @@ spec:
                     other punctuation is allowed."
                   maxLength: 253
                   minLength: 1
+                  pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                   type: string
                 maxItems: 16
                 type: array
@@ -110,14 +111,15 @@ spec:
                       description: "Group is the group of the referent. \n Support:
                         Core"
                       maxLength: 253
-                      minLength: 1
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
                         (Gateway) Support: Custom (Other Resources)"
-                      maxLength: 253
+                      maxLength: 63
                       minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                       type: string
                     name:
                       description: "Name is the name of the referent. \n Support:
@@ -130,8 +132,9 @@ spec:
                         unspecified (or empty string), this will either be: \n * local
                         namespace of the route when scope is set to Namespace. * no
                         namespace when scope is set to Cluster. \n Support: Core"
-                      maxLength: 253
+                      maxLength: 63
                       minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                     scope:
                       default: Namespace
@@ -162,6 +165,7 @@ spec:
                         Support: Core"
                       maxLength: 253
                       minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                   required:
                   - name
@@ -196,15 +200,19 @@ spec:
                         properties:
                           group:
                             default: ""
-                            description: Group is the group of the referent. When
-                              unspecified (empty string), core API group is inferred.
+                            description: Group is the group of the referent. For example,
+                              "networking.k8s.io". When unspecified (empty string),
+                              core API group is inferred.
                             maxLength: 253
+                            pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
                           kind:
                             default: Service
-                            description: Kind is kind of the referent.
-                            maxLength: 253
+                            description: Kind is kind of the referent. For example
+                              "HTTPRoute" or "Service".
+                            maxLength: 63
                             minLength: 1
+                            pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                             type: string
                           name:
                             description: Name is the name of the referent.
@@ -219,8 +227,9 @@ spec:
                               that namespace's owner to accept the reference. See
                               the ReferencePolicy documentation for details. \n Support:
                               Core"
-                            maxLength: 253
+                            maxLength: 63
                             minLength: 1
+                            pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                             type: string
                           port:
                             description: Port specifies the destination port number
@@ -299,13 +308,18 @@ spec:
                               specifically. \n Support: Custom"
                             properties:
                               group:
-                                description: Group is the group of the referent.
+                                description: Group is the group of the referent. For
+                                  example, "networking.k8s.io". When unspecified (empty
+                                  string), core API group is inferred.
                                 maxLength: 253
+                                pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               kind:
-                                description: Kind is kind of the referent.
-                                maxLength: 253
+                                description: Kind is kind of the referent. For example
+                                  "HTTPRoute" or "Service".
+                                maxLength: 63
                                 minLength: 1
+                                pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                                 type: string
                               name:
                                 description: Name is the name of the referent.
@@ -435,6 +449,7 @@ spec:
                         and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
                       maxLength: 253
                       minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
                     parentRef:
                       description: ParentRef corresponds with a ParentRef in the spec
@@ -445,14 +460,15 @@ spec:
                           description: "Group is the group of the referent. \n Support:
                             Core"
                           maxLength: 253
-                          minLength: 1
+                          pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
                             Core (Gateway) Support: Custom (Other Resources)"
-                          maxLength: 253
+                          maxLength: 63
                           minLength: 1
+                          pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                           type: string
                         name:
                           description: "Name is the name of the referent. \n Support:
@@ -466,8 +482,9 @@ spec:
                             \n * local namespace of the route when scope is set to
                             Namespace. * no namespace when scope is set to Cluster.
                             \n Support: Core"
-                          maxLength: 253
+                          maxLength: 63
                           minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         scope:
                           default: Namespace
@@ -498,6 +515,7 @@ spec:
                             detached from the Gateway. \n Support: Core"
                           maxLength: 253
                           minLength: 1
+                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
                       required:
                       - name

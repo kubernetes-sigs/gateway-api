@@ -148,9 +148,7 @@ type Listener struct {
 	// within a Gateway.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
+	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
 	// define this concept. When unspecified, "", or `*`, all hostnames are
@@ -322,6 +320,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific
 	//
 	// +optional
+	// +kubebuilder:validation:MaxProperties=16
 	Options map[string]string `json:"options,omitempty"`
 }
 
@@ -414,14 +413,10 @@ type RouteGroupKind struct {
 	//
 	// +optional
 	// +kubebuilder:default=gateway.networking.k8s.io
-	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group,omitempty"`
+	Group *Group `json:"group,omitempty"`
 
 	// Kind is the kind of the Route.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	Kind Kind `json:"kind"`
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
@@ -622,9 +617,7 @@ type ListenerStatus struct {
 	// Name is the name of the Listener. If the Gateway has more than one
 	// Listener present, each ListenerStatus MUST specify a name. The names of
 	// ListenerStatus objects MUST be unique within a Gateway.
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
+	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
 	// listener. When this is not specified on the Listener, this MUST represent

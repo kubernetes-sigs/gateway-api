@@ -66,6 +66,9 @@ do
   kubectl delete --kubeconfig "${KUBECONFIG}" -f config/crd/"${VERSION}" || res=$?
 done
 
+# None of these examples should be successfully configured
+kubectl apply --recursive -f hack/invalid-examples | grep configured && res=2
+
 # Clean up and exit
 cleanup || res=$?
 exit $res

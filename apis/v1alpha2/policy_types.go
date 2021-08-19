@@ -23,16 +23,10 @@ package v1alpha2
 // for Gateway API.
 type PolicyTargetReference struct {
 	// Group is the group of the target resource.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group"`
+	Group Group `json:"group"`
 
 	// Kind is kind of the target resource.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	Kind Kind `json:"kind"`
 
 	// Name is the name of the target resource.
 	//
@@ -45,10 +39,8 @@ type PolicyTargetReference struct {
 	// namespace, it MUST only apply to traffic originating from the same
 	// namespace as the policy.
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace *string `json:"namespace,omitempty"`
+	Namespace *Namespace `json:"namespace,omitempty"`
 
 	// ClassName is the name of the class this policy should apply to. When
 	// unspecified, the policy will apply to all classes that support it.

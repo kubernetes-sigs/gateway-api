@@ -62,6 +62,8 @@ spec:
                   and PATH is a valid HTTP path as defined by RFC 3986. \n Support:
                   Core"
                 maxLength: 253
+                minLength: 1
+                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                 type: string
               description:
                 description: Description helps describe a GatewayClass with more details.
@@ -80,11 +82,13 @@ spec:
                   group:
                     description: Group is the group of the referent.
                     maxLength: 253
+                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                     type: string
                   kind:
                     description: Kind is kind of the referent.
-                    maxLength: 253
+                    maxLength: 63
                     minLength: 1
+                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                     type: string
                   name:
                     description: Name is the name of the referent.
@@ -95,8 +99,9 @@ spec:
                     description: Namespace is the namespace of the referent. This
                       field is required when scope is set to "Namespace" and ignored
                       when scope is set to "Cluster".
-                    maxLength: 253
+                    maxLength: 63
                     minLength: 1
+                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                     type: string
                   scope:
                     default: Cluster
