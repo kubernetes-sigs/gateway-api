@@ -20,7 +20,7 @@ section in the Security model for details.
 !!! note
     As of v1alpha2, resources are in the `gateway.networking.k8s.io` API group as
     Custom Resource Definitions (CRDs). Unqualified resource names below will implicitly
-    be in this API group. Prior to v1alpha1, the apigroup was `networking.x-k8s.io`.
+    be in this API group. Prior to v1alpha1, the API group was `networking.x-k8s.io`.
 
 There are three main types of objects in our resource model:
 
@@ -81,18 +81,27 @@ traffic for a subset of traffic to a specific service.*
 Route objects define protocol-specific rules for mapping requests from a Gateway
 to Kubernetes Services.
 
-As of v1alpha2, there are four Route types defined in this repo, although it's
+As of v1alpha2, the API defines four Route types, although it's
 expected that in the future implementations may create their own custom Route
 types.
 
 #### HTTPRoute
-HTTPRoute is for multiplexing HTTP or terminated HTTPS connections onto a single port or set of ports. It's intended for use in cases where you want to inspect the HTTP stream and use HTTP-level data for either routing or modification. (An example here is using HTTP Headers for routing, or modifying them in-flight).
+HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
+for use in cases where you want to inspect the HTTP stream and use HTTP-level data
+for either routing or modification, for example using HTTP Headers for routing, or
+modifying them in-flight.
 
 #### TLSRoute
-TLSRoute is for multiplexing TLS connections, discriminated via SNI, onto a single port or set or ports. It's intended for where you want to use the SNI as the main routing method, and are not interested in properties of the underlying connection (such as whether or not it is HTTP).
+TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
+for where you want to use the SNI as the main routing method, and are not interested
+in properties of the underlying connection (such as whether or not it is HTTP).
 
 #### TCPRoute and UDPRoute
-TCPRoute (and UDPRoute) are intended for use as a mapping between a single port or set of ports and a single backend. In this case, there is no discriminator you can use to choose different backends on the same port, so each TCPRoute really needs a different port on the listener (in general, anyway).
+TCPRoute (and UDPRoute) are intended for use as a mapping between a single port or
+set of ports and a single backend. In this case, there is no discriminator you can
+use to choose different backends on the same port, so each TCPRoute really needs a
+different port on the listener (in general, anyway). You can still terminate TLS,
+and passthrough will work since the stream is passed through unchanged. 
 
 #### Route summary table
 The "Routing Discriminator" column below refers to what information can be used to allow multiple Routes to share ports on the Listener.
@@ -101,7 +110,7 @@ The "Routing Discriminator" column below refers to what information can be used 
 |------|---------|---------------------|-----------|-------|
 |HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only, can be reencrypted| HTTP and HTTPS Routing|
 |TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or terminated, can be reencrypted if terminated. | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
-|TCPRoute| Layer 4| None | None (but passthrough will work because the connection is forwarded) | Allows for forwarding of a TCP stream from the Listener to the Backends |
+|TCPRoute| Layer 4| None | Termination (passthrough also will work because the connection is forwarded) | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| None | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
 
@@ -141,7 +150,7 @@ different relationships that Gateways and Routes can have:
   a single Route to control application exposure simultaneously across different
   IPs, load balancers, or networks.
 
-*In summary, Routes attach to Gateways and Gateways choose what attachments to
+*In summary, Routes attach to Gateways and Gateways choose which attachments to
 allow. When a Route tries to attach to a Gateway that does not prevent it, then
 the Route will bind to the Gateway. When Routes are bound to a Gateway it means
 their collective routing rules are configured on the underlying load balancers
@@ -203,7 +212,12 @@ spec:
       kinds:
       - HTTPRoute
       namespaces:
-      - from: bar-namespace
+      - from: Selector
+        selector:
+          matchLabels:
+            # This label is added automatically as of K8s 1.22
+            # to all namespaces
+            kubernetes.io/metadata.name: bar-namespace 
 ```
 
 For a more permissive example, the below Gateway will allow all HTTPRoute resources
