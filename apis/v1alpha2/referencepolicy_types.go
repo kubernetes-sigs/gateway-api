@@ -89,9 +89,7 @@ type ReferencePolicyFrom struct {
 	// When empty, the "core" API group is inferred.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group"`
+	Group Group `json:"group"`
 
 	// Kind is the kind of the referent. Although implementations may support
 	// additional resources, the following Route types are part of the "Core"
@@ -101,18 +99,12 @@ type ReferencePolicyFrom struct {
 	// * TCPRoute
 	// * TLSRoute
 	// * UDPRoute
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	Kind Kind `json:"kind"`
 
 	// Namespace is the namespace of the referent.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Namespace string `json:"namespace,omitempty"`
+	Namespace Namespace `json:"namespace,omitempty"`
 }
 
 // ReferencePolicyTo describes what Kinds are allowed as targets of the
@@ -122,17 +114,12 @@ type ReferencePolicyTo struct {
 	// When empty, the "core" API group is inferred.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group"`
+	Group Group `json:"group"`
 
 	// Kind is the kind of the referent. Although implementations may support
 	// additional resources, the following types are part of the "Core"
 	// support level for this field:
 	//
 	// * Service
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	Kind Kind `json:"kind"`
 }

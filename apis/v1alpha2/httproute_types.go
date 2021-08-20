@@ -262,6 +262,7 @@ type HTTPPathMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default="/"
+	// +kubebuilder:validation:MaxLength=1024
 	Value *string `json:"value,omitempty"`
 }
 
@@ -281,6 +282,24 @@ const (
 	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
 	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
 )
+
+// HTTPHeaderName is the name of an HTTP header.
+//
+// Valid values include:
+//
+// * "Authorization"
+// * "Set-Cookie"
+//
+// Invalid values include:
+//
+// * ":method" - ":" is an invalid character. This means that pseudo headers are
+//   not currently supported by this type.
+// * "/invalid" - "/" is an invalid character
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=256
+// +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+type HTTPHeaderName string
 
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
 // headers.
@@ -314,10 +333,7 @@ type HTTPHeaderMatch struct {
 	// Generally, proxies should follow the guidance from the RFC:
 	// https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding
 	// processing a repeated header, with special handling for "Set-Cookie".
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=256
-	Name string `json:"name"`
+	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
 	//
@@ -423,14 +439,20 @@ type HTTPRouteMatch struct {
 	// ANDed together, meaning, a request must match all the specified headers
 	// to select the route.
 	//
+	// +listType=map
+	// +listMapKey=name
 	// +optional
+	// +kubebuilder:validation:MaxItems=16
 	Headers []HTTPHeaderMatch `json:"headers,omitempty"`
 
 	// QueryParams specifies HTTP query parameter matchers. Multiple match
 	// values are ANDed together, meaning, a request must match all the
 	// specified query parameters to select the route.
 	//
+	// +listType=map
+	// +listMapKey=name
 	// +optional
+	// +kubebuilder:validation:MaxItems=16
 	QueryParams []HTTPQueryParamMatch `json:"queryParams,omitempty"`
 
 	// Method specifies HTTP method matcher.
@@ -574,10 +596,7 @@ type HTTPHeader struct {
 	// entries with an equivalent header name MUST be ignored. Due to the
 	// case-insensitivity of header names, "foo" and "Foo" are considered
 	// equivalent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=256
-	Name string `json:"name"`
+	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
 	//
@@ -604,6 +623,9 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: bar
 	//
 	// +optional
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MaxItems=16
 	Set []HTTPHeader `json:"set,omitempty"`
 
 	// Add adds the given header(s) (name, value) to the request
@@ -623,6 +645,9 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: bar
 	//
 	// +optional
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MaxItems=16
 	Add []HTTPHeader `json:"add,omitempty"`
 
 	// Remove the given header(s) from the HTTP request before the
@@ -659,6 +684,7 @@ type HTTPRequestRedirect struct {
 	// +optional
 	// +kubebuilder:validation:Enum=HTTP;HTTPS
 	Protocol *string `json:"protocol,omitempty"`
+
 	// Hostname is the hostname to be used in the value of the `Location`
 	// header in the response.
 	// When empty, the hostname of the request is used.
@@ -666,7 +692,8 @@ type HTTPRequestRedirect struct {
 	// Support: Core
 	//
 	// +optional
-	Hostname *string `json:"hostname,omitempty"`
+	Hostname *Hostname `json:"hostname,omitempty"`
+
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	// When empty, port (if specified) of the request is used.
@@ -674,14 +701,15 @@ type HTTPRequestRedirect struct {
 	// Support: Extended
 	//
 	// +optional
-	Port *int `json:"port,omitempty"`
+	Port *PortNumber `json:"port,omitempty"`
+
 	// StatusCode is the HTTP status code to be used in response.
 	//
 	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=302
-	// +kubebuilder:validation=301;302
+	// +kubebuilder:validation:Enum=301;302
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 

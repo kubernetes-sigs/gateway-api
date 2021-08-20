@@ -30,17 +30,17 @@ func (in *BackendObjectReference) DeepCopyInto(out *BackendObjectReference) {
 	*out = *in
 	if in.Group != nil {
 		in, out := &in.Group, &out.Group
-		*out = new(string)
+		*out = new(Group)
 		**out = **in
 	}
 	if in.Kind != nil {
 		in, out := &in.Kind, &out.Kind
-		*out = new(string)
+		*out = new(Kind)
 		**out = **in
 	}
 	if in.Namespace != nil {
 		in, out := &in.Namespace, &out.Namespace
-		*out = new(string)
+		*out = new(Namespace)
 		**out = **in
 	}
 	if in.Port != nil {
@@ -548,12 +548,12 @@ func (in *HTTPRequestRedirect) DeepCopyInto(out *HTTPRequestRedirect) {
 	}
 	if in.Hostname != nil {
 		in, out := &in.Hostname, &out.Hostname
-		*out = new(string)
+		*out = new(Hostname)
 		**out = **in
 	}
 	if in.Port != nil {
 		in, out := &in.Port, &out.Port
-		*out = new(int)
+		*out = new(PortNumber)
 		**out = **in
 	}
 	if in.StatusCode != nil {
@@ -897,17 +897,17 @@ func (in *ObjectReference) DeepCopyInto(out *ObjectReference) {
 	*out = *in
 	if in.Group != nil {
 		in, out := &in.Group, &out.Group
-		*out = new(string)
+		*out = new(Group)
 		**out = **in
 	}
 	if in.Kind != nil {
 		in, out := &in.Kind, &out.Kind
-		*out = new(string)
+		*out = new(Kind)
 		**out = **in
 	}
 	if in.Namespace != nil {
 		in, out := &in.Namespace, &out.Namespace
-		*out = new(string)
+		*out = new(Namespace)
 		**out = **in
 	}
 }
@@ -932,7 +932,7 @@ func (in *ParametersReference) DeepCopyInto(out *ParametersReference) {
 	}
 	if in.Namespace != nil {
 		in, out := &in.Namespace, &out.Namespace
-		*out = new(string)
+		*out = new(Namespace)
 		**out = **in
 	}
 }
@@ -952,26 +952,21 @@ func (in *ParentRef) DeepCopyInto(out *ParentRef) {
 	*out = *in
 	if in.Group != nil {
 		in, out := &in.Group, &out.Group
-		*out = new(string)
+		*out = new(Group)
 		**out = **in
 	}
 	if in.Kind != nil {
 		in, out := &in.Kind, &out.Kind
-		*out = new(string)
+		*out = new(Kind)
 		**out = **in
 	}
 	if in.Namespace != nil {
 		in, out := &in.Namespace, &out.Namespace
-		*out = new(string)
+		*out = new(Namespace)
 		**out = **in
 	}
 	if in.Scope != nil {
 		in, out := &in.Scope, &out.Scope
-		*out = new(string)
-		**out = **in
-	}
-	if in.SectionName != nil {
-		in, out := &in.SectionName, &out.SectionName
 		*out = new(string)
 		**out = **in
 	}
@@ -992,7 +987,7 @@ func (in *PolicyTargetReference) DeepCopyInto(out *PolicyTargetReference) {
 	*out = *in
 	if in.Namespace != nil {
 		in, out := &in.Namespace, &out.Namespace
-		*out = new(string)
+		*out = new(Namespace)
 		**out = **in
 	}
 	if in.ClassName != nil {
@@ -1130,7 +1125,7 @@ func (in *RouteGroupKind) DeepCopyInto(out *RouteGroupKind) {
 	*out = *in
 	if in.Group != nil {
 		in, out := &in.Group, &out.Group
-		*out = new(string)
+		*out = new(Group)
 		**out = **in
 	}
 }

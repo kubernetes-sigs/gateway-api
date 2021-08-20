@@ -61,9 +61,7 @@ type GatewayClassSpec struct {
 	// and PATH is a valid HTTP path as defined by RFC 3986.
 	//
 	// Support: Core
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Controller string `json:"controller"`
+	Controller GatewayController `json:"controller"`
 
 	// ParametersRef is a reference to a resource that contains the configuration
 	// parameters corresponding to the GatewayClass. This is optional if the
@@ -83,7 +81,6 @@ type GatewayClassSpec struct {
 
 	// Description helps describe a GatewayClass with more details.
 	//
-	//
 	// +kubebuilder:validation:MaxLength=64
 	// +optional
 	Description *string `json:"description,omitempty"`
@@ -93,15 +90,10 @@ type GatewayClassSpec struct {
 // configuration resource within the cluster.
 type ParametersReference struct {
 	// Group is the group of the referent.
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group"`
+	Group Group `json:"group"`
 
 	// Kind is kind of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
 	//
@@ -111,6 +103,7 @@ type ParametersReference struct {
 
 	// Scope represents if the referent is a Cluster or Namespace scoped resource.
 	// This may be set to "Cluster" or "Namespace".
+	//
 	// +kubebuilder:validation:Enum=Cluster;Namespace
 	// +kubebuilder:default=Cluster
 	// +optional
@@ -120,10 +113,8 @@ type ParametersReference struct {
 	// This field is required when scope is set to "Namespace" and ignored when
 	// scope is set to "Cluster".
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace *string `json:"namespace,omitempty"`
+	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
 // GatewayClassConditionType is the type for status conditions on

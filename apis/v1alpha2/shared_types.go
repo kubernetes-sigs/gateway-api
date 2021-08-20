@@ -29,22 +29,18 @@ type ParentRef struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=gateway.networking.k8s.io
 	// +optional
-	Group *string `json:"group,omitempty"`
+	Group *Group `json:"group,omitempty"`
 
 	// Kind is kind of the referent.
 	//
 	// Support: Core (Gateway)
 	// Support: Custom (Other Resources)
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +kubebuilder:default=Gateway
 	// +optional
-	Kind *string `json:"kind,omitempty"`
+	Kind *Kind `json:"kind,omitempty"`
 
 	// Namespace is the namespace of the referent. When unspecified (or empty
 	// string), this will either be:
@@ -54,10 +50,8 @@ type ParentRef struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace *string `json:"namespace,omitempty"`
+	Namespace *Namespace `json:"namespace,omitempty"`
 
 	// Scope represents if this refers to a cluster or namespace scoped
 	// resource. This may be set to "Cluster" or "Namespace".
@@ -98,10 +92,8 @@ type ParentRef struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	SectionName *string `json:"sectionName,omitempty"`
+	SectionName SectionName `json:"sectionName,omitempty"`
 }
 
 // CommonRouteSpec defines the common attributes that all Routes should include
@@ -195,10 +187,7 @@ type RouteParentStatus struct {
 	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Controller string `json:"controller"`
+	Controller GatewayController `json:"controller"`
 
 	// Conditions describes the status of the route with respect to the
 	// Gateway. The "Admitted" condition must always be specified by controllers
@@ -249,4 +238,99 @@ type RouteStatus struct {
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 type Hostname string
+
+// Group refers to a Kubernetes Group. It must either be an empty string or a
+// RFC 1123 subdomain.
+//
+// This validation is based off of the corresponding Kubernetes validation:
+// https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/util/validation/validation.go#L208
+//
+// Valid values include:
+//
+// * "" - empty string implies core Kubernetes API group
+// * "networking.k8s.io"
+// * "foo.example.com"
+//
+// Invalid values include:
+//
+// * "example.com/bar" - "/" is an invalid character
+//
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+type Group string
+
+// Kind refers to a Kubernetes Kind.
+//
+// Valid values include:
+//
+// * "Service"
+// * "HTTPRoute"
+//
+// Invalid values include:
+//
+// * "invalid/kind" - "/" is an invalid character
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=63
+// +kubebuilder:validation:Pattern=`^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$`
+type Kind string
+
+// Namespace refers to a Kubernetes namespace. It must be a RFC 1123 label.
+//
+// This validation is based off of the corresponding Kubernetes validation:
+// https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/util/validation/validation.go#L187
+//
+// This is used for Namespace name validation here:
+// https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/api/validation/generic.go#L63
+//
+// Valid values include:
+//
+// * "example"
+//
+// Invalid values include:
+//
+// * "example.com" - "." is an invalid character
+//
+// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?$`
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=63
+type Namespace string
+
+// SectionName is the name of a section in a Kubernetes resource. It must be a
+// RFC 1123 subdomain.
+//
+// This validation is based off of the corresponding Kubernetes validation:
+// https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/util/validation/validation.go#L208
+//
+// Valid values include:
+//
+// * "example.com"
+// * "foo.example.com"
+//
+// Invalid values include:
+//
+// * "example.com/bar" - "/" is an invalid character
+//
+// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+type SectionName string
+
+// GatewayController is the name of a Gateway API controller. It must be a
+// domain prefixed path.
+//
+// Valid values include:
+//
+// * "example.com/bar"
+//
+// Invalid values include:
+//
+// * "example.com" - must include path
+// * "foo.example.com" - must include path
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
+type GatewayController string
