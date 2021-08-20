@@ -1,14 +1,18 @@
 # Deploying a simple Gateway
 
+!!! danger
+    This page has not been updated for v1alpha2 yet.
+
+
 The simplest possible deployment is a Gateway and Route resource which are
 deployed together by the same owner. This represents a similar kind of model
 used for Ingress. In this guide, a Gateway and HTTPRoute are deployed which
 match all HTTP traffic and directs it to a single Service named `foo-svc`. 
 
-![Simple Gateway](/images/single-service-gateway.png)
+![Simple Gateway](/v1alpha2/images/single-service-gateway.png)
 
 ```yaml  
-{% include 'simple-gateway/gateway.yaml' %} 
+{% include 'v1alpha2/simple-gateway/gateway.yaml' %}
 ```
 
 The Gateway represents the instantation of a logical load balancer. It's
@@ -17,12 +21,10 @@ HTTP traffic on port 80. This particular GatewayClass automatically assigns an
 IP address which will be shown in the `Gateway.status` after it has been
 deployed. 
 
-Gateways bind Routes to themselves via label selection (similar to how Services
-label select across Pod labels). In this example, the `prod-web` Gateway will
-bind any HTTPRoute resources which have the `gateway: prod-web-gw` label. The
-label can be any arbitrary label, but using one that identifies the name or
-capabilities of the Gateway is useful to Route owners and makes the relationship
-more explicit. More complex bi-directional matching and permissions are possible
+An `HTTPRoute` resource must be configured with `ParentRefs` which reference the parent
+[Gateway]gateway(s) that it should be attached to. Through this configuration, it can receive
+traffic from the gateway. And the BackendRefs defines the backend service where the traffic
+will be sent to. More complex binding, or bi-directional communication are possible
 and explained in other guides.
 
 The following HTTPRoute defines how traffic from the Gateway listener is routed
@@ -31,7 +33,7 @@ will match all HTTP traffic that arrives at port 80 of the load balancer and
 send it to the `foo-svc` Pods. 
 
 ```yaml  
-{% include 'simple-gateway/httproute.yaml' %} 
+{% include 'v1alpha2/simple-gateway/httproute.yaml' %}
 ```
 
 While Route resources are often used to filter traffic to many different
