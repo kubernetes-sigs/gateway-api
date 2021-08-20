@@ -55,14 +55,14 @@ spec:
                   `*.example.com`). The wildcard character `*` must appear by itself
                   as the first DNS label and matches only a single label. You cannot
                   have a wildcard label by itself (e.g. Host == `*`). \n Requests
-                  will be matched against the Host field in the following order: \n
-                  1. If SNI is precise, the request matches this rule if the SNI in
-                  \   ClientHello is equal to one of the defined SNIs. 2. If SNI is
-                  a wildcard, then the request matches this rule if the    SNI is
-                  to equal to the suffix (removing the first label) of the    wildcard
-                  rule. 3. If SNIs is unspecified, all requests associated with the
-                  gateway TLS    listener will match. This can be used to define a
-                  default backend    for a TLS listener. \n Support: Core"
+                  will be matched against the SNI attribute in the following order:
+                  \n 1. If SNI is precise, the request matches this Route if the SNI
+                  in    ClientHello is equal to one of the defined SNIs. 2. If SNI
+                  is a wildcard, then the request matches this Route if the    SNI
+                  is to equal to the suffix (removing the first label) of the    wildcard.
+                  3. If SNIs are unspecified, all requests associated with the gateway
+                  TLS    listener will match. This can be used to define a default
+                  backend    for a TLS listener. \n Support: Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host, as defined by RFC 3986. Note the following deviations from
@@ -71,12 +71,10 @@ spec:
                     ports are not allowed. \n Hostname can be \"precise\" which is
                     a domain name without the terminating dot of a network host (e.g.
                     \"foo.example.com\") or \"wildcard\", which is a domain name prefixed
-                    with a single wildcard label (e.g. `*.example.com`). The wildcard
-                    character `*` must appear by itself as the first DNS label and
-                    matches only a single label. \n Note that as per RFC1035 and RFC1123,
-                    a *label* must consist of lower case alphanumeric characters or
-                    '-', and must start and end with an alphanumeric character. No
-                    other punctuation is allowed."
+                    with a single wildcard label (e.g. `*.example.com`). \n Note that
+                    as per RFC1035 and RFC1123, a *label* must consist of lower case
+                    alphanumeric characters or '-', and must start and end with an
+                    alphanumeric character. No other punctuation is allowed."
                   maxLength: 253
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -243,19 +241,19 @@ spec:
                             type: integer
                           weight:
                             default: 1
-                            description: "Weight specifies the proportion of HTTP
-                              requests forwarded to the referenced backend. This is
-                              computed as weight/(sum of all weights in this ForwardTo
-                              list). For non-zero values, there may be some epsilon
-                              from the exact proportion defined here depending on
-                              the precision an implementation supports. Weight is
-                              not a percentage and the sum of weights does not need
-                              to equal 100. \n If only one backend is specified and
-                              it has a weight greater than 0, 100% of the traffic
-                              is forwarded to that backend. If weight is set to 0,
-                              no traffic should be forwarded for this entry. If unspecified,
-                              weight defaults to 1. \n Support for this field varies
-                              based on the context where used."
+                            description: "Weight specifies the proportion of requests
+                              forwarded to the referenced backend. This is computed
+                              as weight/(sum of all weights in this BackendRefs list).
+                              For non-zero values, there may be some epsilon from
+                              the exact proportion defined here depending on the precision
+                              an implementation supports. Weight is not a percentage
+                              and the sum of weights does not need to equal 100. \n
+                              If only one backend is specified and it has a weight
+                              greater than 0, 100% of the traffic is forwarded to
+                              that backend. If weight is set to 0, no traffic should
+                              be forwarded for this entry. If unspecified, weight
+                              defaults to 1. \n Support for this field varies based
+                              on the context where used."
                             format: int32
                             maximum: 1000000
                             minimum: 0
@@ -298,14 +296,12 @@ spec:
                         properties:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
-                              extension to the \"match\" behavior.  For example, resource
-                              \"mytlsroutematcher\" in group \"networking.acme.io\".
+                              extension to the \"match\" behavior. For example, resource
+                              \"mytlsroutematcher\" in group \"networking.example.net\".
                               If the referent cannot be found, the rule is not included
-                              in the route. The controller should raise the \"ResolvedRefs\"
-                              condition on the Gateway with the \"DegradedRoutes\"
-                              reason. The gateway status for this route should be
-                              updated with a condition that describes the error more
-                              specifically. \n Support: Custom"
+                              in the route. The controller must ensure the \"ResolvedRefs\"
+                              condition on the Route status is set to `status: False`.
+                              \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -358,12 +354,20 @@ spec:
                     respect to an associated Parent.
                   properties:
                     conditions:
-                      description: Conditions describes the status of the route with
-                        respect to the Gateway. The "Admitted" condition must always
-                        be specified by controllers to indicate whether the route
-                        has been admitted or rejected by the Gateway, and why. Note
-                        that the route's availability is also subject to the Gateway's
-                        own status conditions and listener status.
+                      description: "Conditions describes the status of the route with
+                        respect to the Gateway. Note that the route's availability
+                        is also subject to the Gateway's own status conditions and
+                        listener status. \n If the Route's ParentRef specifies an
+                        existing Gateway that supports Routes of this kind AND that
+                        Gateway's controller has sufficient access, then that Gateway's
+                        controller MUST set the \"Admitted\" condition on the Route,
+                        to indicate whether the route has been admitted or rejected
+                        by the Gateway, and why. \n There are a number of cases where
+                        the \"Admitted\" condition may not be set due to lack of controller
+                        visibility, that includes when: \n * The Route refers to a
+                        non-existent parent. * The Route is of a type that the controller
+                        does not support. * The Route is in a namespace the the controller
+                        does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
                           the current state of this API Resource. --- This struct
@@ -444,7 +448,7 @@ spec:
                     controller:
                       description: "Controller is a domain/path string that indicates
                         the controller that wrote this status. This corresponds with
-                        the controller field on GatewayClass. \n Example: \"acme.io/gateway-controller\".
+                        the controller field on GatewayClass. \n Example: \"example.net/gateway-controller\".
                         \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN
                         and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
                       maxLength: 253

@@ -52,35 +52,25 @@ spec:
                   host, as defined by RFC 3986. Note the following deviations from
                   the \"host\" part of the URI as defined in the RFC: \n 1. IPs are
                   not allowed. 2. The `:` delimiter is not respected because ports
-                  are not allowed. \n Incoming requests are matched against the hostnames
-                  before the HTTPRoute rules. If no hostname is specified, traffic
-                  is routed based on the HTTPRouteRules. \n Requests will be matched
-                  against the Host field in the following order: \n 1. If Hostname
-                  is precise, the request matches this rule if    the HTTP Host header
-                  is equal to the Hostname. 2. If Hostname is a wildcard, then the
-                  request matches this rule if    the HTTP Host header is to equal
-                  to the suffix    (removing the first label) of the wildcard rule.
-                  3. If Hostname is unspecified, empty, or `*`, then any request will
-                  match    this route. \n If a hostname is specified by the Listener
-                  that the HTTPRoute is bound to, at least one hostname specified
-                  here must match the Listener specified hostname as per the rules
-                  above. Other hostnames will not affect processing of the route in
-                  that case. \n If no hostname is specified by the Listener, then
-                  that value will be treated as '*', match any hostname, and so any
-                  hostname on this Route will match. \n If all hostnames do not match,
-                  then the HTTPRoute is not admitted, and the implementation must
-                  raise an 'Admitted' Condition with a status of `false` for that
-                  Listener. \n Examples: - A Listener with unspecified, empty, or
-                  `*` values for Hostname matches   any HTTPRoute hostname. - A HTTPRoute
-                  with unspecified, empty, or `*` values for Hostname matches   any
-                  Listener hostname. - A Listener with `test.foo.com` as the hostname
-                  matches *only*   `test.foo.com` or `*.foo.com`. Any other hostnames
-                  present must be ignored. - A Listener with `*.foo.com` as hostname,
-                  all hostnames in the HTTPRoute   must have any single label where
-                  the star is, and the rest of the hostname   must match exactly.
-                  So, `test.foo.com`, `*.foo.com` or `blog.foo.com` match.   `test.blog.foo.com`,
-                  `test.bar.com`, or `bar.com` do not. Hostnames that do   not match
-                  will be ignored. \n Support: Core"
+                  are not allowed. \n If a hostname is specified by both the Listener
+                  and HTTPRoute, their must be at least one intersecting hostname
+                  for the HTTPRoute to be attached to the Listener. For example: \n
+                  * A Listener with `test.example.com` as the hostname matches HTTPRoutes
+                  \  that have either not specified any hostnames, or have specified
+                  at   least one of `test.example.com` or `*.example.com`. * A Listener
+                  with `*.example.com` as as the hostname matches HTTPRoutes   that
+                  have either not specified any hostnames or have specified at least
+                  \  one hostname that matches the Listener hostname. For example,
+                  \  `test.example.com` and `*.example.com` would both match. On the
+                  other   hand, `a.b.example.com`, `example.com`, and `test.example.net`
+                  would   not match. \n If both the Listener and HTTPRoute have specified
+                  hostnames, any HTTPRoute hostnames that do not match the Listener
+                  hostname MUST be ignored. For example, if a Listener specified `*.example.com`,
+                  and the HTTPRoute specified `test.example.com` and `test.example.net`,
+                  `test.example.net` would be ignored. \n If hostnames do not match
+                  with the criteria above, then the HTTPRoute is not admitted, and
+                  the implementation must raise an 'Admitted' Condition with a status
+                  of `False` for the target Listener(s). \n Support: Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host, as defined by RFC 3986. Note the following deviations from
@@ -89,12 +79,10 @@ spec:
                     ports are not allowed. \n Hostname can be \"precise\" which is
                     a domain name without the terminating dot of a network host (e.g.
                     \"foo.example.com\") or \"wildcard\", which is a domain name prefixed
-                    with a single wildcard label (e.g. `*.example.com`). The wildcard
-                    character `*` must appear by itself as the first DNS label and
-                    matches only a single label. \n Note that as per RFC1035 and RFC1123,
-                    a *label* must consist of lower case alphanumeric characters or
-                    '-', and must start and end with an alphanumeric character. No
-                    other punctuation is allowed."
+                    with a single wildcard label (e.g. `*.example.com`). \n Note that
+                    as per RFC1035 and RFC1123, a *label* must consist of lower case
+                    alphanumeric characters or '-', and must start and end with an
+                    alphanumeric character. No other punctuation is allowed."
                   maxLength: 253
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -240,7 +228,7 @@ spec:
                                 extensionRef:
                                   description: "ExtensionRef is an optional, implementation-specific
                                     extension to the \"filter\" behavior.  For example,
-                                    resource \"myroutefilter\" in group \"networking.acme.io\").
+                                    resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
                                     filters. \n Support: Implementation-specific"
                                   properties:
@@ -321,7 +309,7 @@ spec:
                                     remove:
                                       description: "Remove the given header(s) from
                                         the HTTP request before the action. The value
-                                        of RemoveHeader is a list of HTTP header names.
+                                        of Remove is a list of HTTP header names.
                                         Note that the header names are case-insensitive
                                         (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
                                         \n Input:   GET /foo HTTP/1.1   my-header1:
@@ -384,24 +372,23 @@ spec:
                                     backendRef:
                                       description: "BackendRef references a resource
                                         where mirrored requests are sent. \n If the
-                                        referent cannot be found, this HTTPBackendRef
+                                        referent cannot be found, this BackendRef
                                         is invalid and must be dropped from the Gateway.
                                         The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Gateway is set to `status:
-                                        true` with the \"DegradedRoutes\" reason,
+                                        condition on the Route status is set to `status:
+                                        False` and not configure this backend in the
+                                        underlying implementation. \n If there is
+                                        a cross-namespace reference to an *existing*
+                                        object that is not allowed by a ReferencePolicy,
+                                        the controller must ensure the \"ResolvedRefs\"
+                                        \ condition on the Route is set to `status:
+                                        False`, with the \"RefNotPermitted\" reason
                                         and not configure this backend in the underlying
-                                        implemenation. \n If there is a cross-namespace
-                                        reference to an *existing* object that is
-                                        not allowed by a ReferencePolicy, the controller
-                                        must ensure the \"ResolvedRefs\"  condition
-                                        on the Gateway is set to `status: true`, with
-                                        the \"RefNotPermitted\" reason and not configure
-                                        this backend in the underlying implementation.
-                                        \n In either error case, the Message of the
-                                        `ResolvedRefs` Condition should be used to
-                                        provide more detail about the problem. \n
-                                        Support: Extended for Kubernetes Service Support:
-                                        Custom for any other resource"
+                                        implementation. \n In either error case, the
+                                        Message of the `ResolvedRefs` Condition should
+                                        be used to provide more detail about the problem.
+                                        \n Support: Extended for Kubernetes Service
+                                        Support: Custom for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -456,7 +443,8 @@ spec:
                                   type: object
                                 requestRedirect:
                                   description: "RequestRedirect defines a schema for
-                                    a filter that redirects request. \n Support: Core"
+                                    a filter that responds to the request with an
+                                    HTTP redirection. \n Support: Core"
                                   properties:
                                     hostname:
                                       description: "Hostname is the hostname to be
@@ -572,19 +560,19 @@ spec:
                             type: integer
                           weight:
                             default: 1
-                            description: "Weight specifies the proportion of HTTP
-                              requests forwarded to the referenced backend. This is
-                              computed as weight/(sum of all weights in this ForwardTo
-                              list). For non-zero values, there may be some epsilon
-                              from the exact proportion defined here depending on
-                              the precision an implementation supports. Weight is
-                              not a percentage and the sum of weights does not need
-                              to equal 100. \n If only one backend is specified and
-                              it has a weight greater than 0, 100% of the traffic
-                              is forwarded to that backend. If weight is set to 0,
-                              no traffic should be forwarded for this entry. If unspecified,
-                              weight defaults to 1. \n Support for this field varies
-                              based on the context where used."
+                            description: "Weight specifies the proportion of requests
+                              forwarded to the referenced backend. This is computed
+                              as weight/(sum of all weights in this BackendRefs list).
+                              For non-zero values, there may be some epsilon from
+                              the exact proportion defined here depending on the precision
+                              an implementation supports. Weight is not a percentage
+                              and the sum of weights does not need to equal 100. \n
+                              If only one backend is specified and it has a weight
+                              greater than 0, 100% of the traffic is forwarded to
+                              that backend. If weight is set to 0, no traffic should
+                              be forwarded for this entry. If unspecified, weight
+                              defaults to 1. \n Support for this field varies based
+                              on the context where used."
                             format: int32
                             maximum: 1000000
                             minimum: 0
@@ -621,7 +609,7 @@ spec:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
                               extension to the \"filter\" behavior.  For example,
-                              resource \"myroutefilter\" in group \"networking.acme.io\").
+                              resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
                               filters. \n Support: Implementation-specific"
                             properties:
@@ -698,7 +686,7 @@ spec:
                                 x-kubernetes-list-type: map
                               remove:
                                 description: "Remove the given header(s) from the
-                                  HTTP request before the action. The value of RemoveHeader
+                                  HTTP request before the action. The value of Remove
                                   is a list of HTTP header names. Note that the header
                                   names are case-insensitive (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
                                   \n Input:   GET /foo HTTP/1.1   my-header1: foo
@@ -757,22 +745,21 @@ spec:
                               backendRef:
                                 description: "BackendRef references a resource where
                                   mirrored requests are sent. \n If the referent cannot
-                                  be found, this HTTPBackendRef is invalid and must
-                                  be dropped from the Gateway. The controller must
-                                  ensure the \"ResolvedRefs\" condition on the Gateway
-                                  is set to `status: true` with the \"DegradedRoutes\"
-                                  reason, and not configure this backend in the underlying
-                                  implemenation. \n If there is a cross-namespace
-                                  reference to an *existing* object that is not allowed
-                                  by a ReferencePolicy, the controller must ensure
-                                  the \"ResolvedRefs\"  condition on the Gateway is
-                                  set to `status: true`, with the \"RefNotPermitted\"
-                                  reason and not configure this backend in the underlying
-                                  implementation. \n In either error case, the Message
-                                  of the `ResolvedRefs` Condition should be used to
-                                  provide more detail about the problem. \n Support:
-                                  Extended for Kubernetes Service Support: Custom
-                                  for any other resource"
+                                  be found, this BackendRef is invalid and must be
+                                  dropped from the Gateway. The controller must ensure
+                                  the \"ResolvedRefs\" condition on the Route status
+                                  is set to `status: False` and not configure this
+                                  backend in the underlying implementation. \n If
+                                  there is a cross-namespace reference to an *existing*
+                                  object that is not allowed by a ReferencePolicy,
+                                  the controller must ensure the \"ResolvedRefs\"
+                                  \ condition on the Route is set to `status: False`,
+                                  with the \"RefNotPermitted\" reason and not configure
+                                  this backend in the underlying implementation. \n
+                                  In either error case, the Message of the `ResolvedRefs`
+                                  Condition should be used to provide more detail
+                                  about the problem. \n Support: Extended for Kubernetes
+                                  Service Support: Custom for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -823,7 +810,8 @@ spec:
                             type: object
                           requestRedirect:
                             description: "RequestRedirect defines a schema for a filter
-                              that redirects request. \n Support: Core"
+                              that responds to the request with an HTTP redirection.
+                              \n Support: Core"
                             properties:
                               hostname:
                                 description: "Hostname is the hostname to be used
@@ -915,16 +903,17 @@ spec:
                         of one route rule. If a request matches multiple rules, matching
                         precedence MUST be determined in order of the following criteria,
                         continuing on ties: \n * The longest matching hostname. *
-                        The longest matching path. * The largest number of header
-                        matches. \n If ties still exist across multiple Routes, matching
-                        precedence MUST be determined in order of the following criteria,
-                        continuing on ties: \n * The oldest Route based on creation
-                        timestamp. For example, a Route with   a creation timestamp
-                        of \"2020-09-08 01:02:03\" is given precedence over   a Route
-                        with a creation timestamp of \"2020-09-08 01:02:04\". * The
-                        Route appearing first in alphabetical order by   \"<namespace>/<name>\".
-                        For example, foo/bar is given precedence over   foo/baz. \n
-                        If ties still exist within the Route that has been given precedence,
+                        The longest matching non-wildcard hostname. * The longest
+                        matching path. * The largest number of header matches. \n
+                        If ties still exist across multiple Routes, matching precedence
+                        MUST be determined in order of the following criteria, continuing
+                        on ties: \n * The oldest Route based on creation timestamp.
+                        For example, a Route with   a creation timestamp of \"2020-09-08
+                        01:02:03\" is given precedence over   a Route with a creation
+                        timestamp of \"2020-09-08 01:02:04\". * The Route appearing
+                        first in alphabetical order by   \"<namespace>/<name>\". For
+                        example, foo/bar is given precedence over   foo/baz. \n If
+                        ties still exist within the Route that has been given precedence,
                         matching precedence MUST be granted to the first matching
                         rule meeting the above criteria."
                       items:
@@ -940,13 +929,11 @@ spec:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
                               extension to the \"match\" behavior. For example, resource
-                              \"myroutematcher\" in group \"networking.acme.io\".
+                              \"myroutematcher\" in group \"networking.example.net\".
                               If the referent cannot be found, the rule is not included
-                              in the route. The controller should raise the \"ResolvedRefs\"
-                              condition on the Gateway with the \"DegradedRoutes\"
-                              reason. The gateway status for this route should be
-                              updated with a condition that describes the error more
-                              specifically. \n Support: Custom"
+                              in the route. The controller must ensure the \"ResolvedRefs\"
+                              condition on the Route status is set to `status: False`.
+                              \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -1146,12 +1133,20 @@ spec:
                     respect to an associated Parent.
                   properties:
                     conditions:
-                      description: Conditions describes the status of the route with
-                        respect to the Gateway. The "Admitted" condition must always
-                        be specified by controllers to indicate whether the route
-                        has been admitted or rejected by the Gateway, and why. Note
-                        that the route's availability is also subject to the Gateway's
-                        own status conditions and listener status.
+                      description: "Conditions describes the status of the route with
+                        respect to the Gateway. Note that the route's availability
+                        is also subject to the Gateway's own status conditions and
+                        listener status. \n If the Route's ParentRef specifies an
+                        existing Gateway that supports Routes of this kind AND that
+                        Gateway's controller has sufficient access, then that Gateway's
+                        controller MUST set the \"Admitted\" condition on the Route,
+                        to indicate whether the route has been admitted or rejected
+                        by the Gateway, and why. \n There are a number of cases where
+                        the \"Admitted\" condition may not be set due to lack of controller
+                        visibility, that includes when: \n * The Route refers to a
+                        non-existent parent. * The Route is of a type that the controller
+                        does not support. * The Route is in a namespace the the controller
+                        does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
                           the current state of this API Resource. --- This struct
@@ -1232,7 +1227,7 @@ spec:
                     controller:
                       description: "Controller is a domain/path string that indicates
                         the controller that wrote this status. This corresponds with
-                        the controller field on GatewayClass. \n Example: \"acme.io/gateway-controller\".
+                        the controller field on GatewayClass. \n Example: \"example.net/gateway-controller\".
                         \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN
                         and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
                       maxLength: 253

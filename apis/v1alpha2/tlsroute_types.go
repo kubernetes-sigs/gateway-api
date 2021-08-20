@@ -58,14 +58,15 @@ type TLSRouteSpec struct {
 	// and matches only a single label. You cannot have a wildcard label by
 	// itself (e.g. Host == `*`).
 	//
-	// Requests will be matched against the Host field in the following order:
+	// Requests will be matched against the SNI attribute in the following
+	// order:
 	//
-	// 1. If SNI is precise, the request matches this rule if the SNI in
+	// 1. If SNI is precise, the request matches this Route if the SNI in
 	//    ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this rule if the
+	// 2. If SNI is a wildcard, then the request matches this Route if the
 	//    SNI is to equal to the suffix (removing the first label) of the
-	//    wildcard rule.
-	// 3. If SNIs is unspecified, all requests associated with the gateway TLS
+	//    wildcard.
+	// 3. If SNIs are unspecified, all requests associated with the gateway TLS
 	//    listener will match. This can be used to define a default backend
 	//    for a TLS listener.
 	//
@@ -147,12 +148,10 @@ type TLSRouteRule struct {
 // given action.
 type TLSRouteMatch struct {
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  For example, resource "mytlsroutematcher" in group
-	// "networking.acme.io". If the referent cannot be found, the rule is not
-	// included in the route. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
-	// status for this route should be updated with a condition that describes
-	// the error more specifically.
+	// "match" behavior. For example, resource "mytlsroutematcher" in group
+	// "networking.example.net". If the referent cannot be found, the rule is
+	// not included in the route. The controller must ensure the "ResolvedRefs"
+	// condition on the Route status is set to `status: False`.
 	//
 	// Support: Custom
 	//

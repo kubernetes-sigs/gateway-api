@@ -199,7 +199,7 @@ policies to requests to external services. To accomplish this, implementations
 can choose to support a refernce to a virtual resource type:
 
 ```yaml
-apiVersion: networking.acme.io/v1alpha1
+apiVersion: networking.example.net/v1alpha1
 kind: RetryPolicy
 metadata:
   name: foo
@@ -207,7 +207,7 @@ spec:
   default:
     maxRetries: 5
   targetRef:
-    group: networking.acme.io
+    group: networking.example.net
     kind: ExternalService
     name: foo.com
 ```

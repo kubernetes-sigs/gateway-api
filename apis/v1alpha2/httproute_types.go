@@ -62,44 +62,29 @@ type HTTPRouteSpec struct {
 	// 1. IPs are not allowed.
 	// 2. The `:` delimiter is not respected because ports are not allowed.
 	//
-	// Incoming requests are matched against the hostnames before the
-	// HTTPRoute rules. If no hostname is specified, traffic is routed
-	// based on the HTTPRouteRules.
+	// If a hostname is specified by both the Listener and HTTPRoute, their
+	// must be at least one intersecting hostname for the HTTPRoute to be
+	// attached to the Listener. For example:
 	//
-	// Requests will be matched against the Host field in the following order:
+	// * A Listener with `test.example.com` as the hostname matches HTTPRoutes
+	//   that have either not specified any hostnames, or have specified at
+	//   least one of `test.example.com` or `*.example.com`.
+	// * A Listener with `*.example.com` as as the hostname matches HTTPRoutes
+	//   that have either not specified any hostnames or have specified at least
+	//   one hostname that matches the Listener hostname. For example,
+	//   `test.example.com` and `*.example.com` would both match. On the other
+	//   hand, `a.b.example.com`, `example.com`, and `test.example.net` would
+	//   not match.
 	//
-	// 1. If Hostname is precise, the request matches this rule if
-	//    the HTTP Host header is equal to the Hostname.
-	// 2. If Hostname is a wildcard, then the request matches this rule if
-	//    the HTTP Host header is to equal to the suffix
-	//    (removing the first label) of the wildcard rule.
-	// 3. If Hostname is unspecified, empty, or `*`, then any request will match
-	//    this route.
+	// If both the Listener and HTTPRoute have specified hostnames, any
+	// HTTPRoute hostnames that do not match the Listener hostname MUST be
+	// ignored. For example, if a Listener specified `*.example.com`, and the
+	// HTTPRoute specified `test.example.com` and `test.example.net`,
+	// `test.example.net` would be ignored.
 	//
-	// If a hostname is specified by the Listener that the HTTPRoute is bound
-	// to, at least one hostname specified here must match the Listener specified
-	// hostname as per the rules above. Other hostnames will not affect processing
-	// of the route in that case.
-	//
-	// If no hostname is specified by the Listener, then that value will be treated
-	// as '*', match any hostname, and so any hostname on this Route will match.
-	//
-	// If all hostnames do not match, then the HTTPRoute is not admitted, and
-	// the implementation must raise an 'Admitted' Condition with a status of
-	// `false` for that Listener.
-	//
-	// Examples:
-	// - A Listener with unspecified, empty, or `*` values for Hostname matches
-	//   any HTTPRoute hostname.
-	// - A HTTPRoute with unspecified, empty, or `*` values for Hostname matches
-	//   any Listener hostname.
-	// - A Listener with `test.foo.com` as the hostname matches *only*
-	//   `test.foo.com` or `*.foo.com`. Any other hostnames present must be ignored.
-	// - A Listener with `*.foo.com` as hostname, all hostnames in the HTTPRoute
-	//   must have any single label where the star is, and the rest of the hostname
-	//   must match exactly. So, `test.foo.com`, `*.foo.com` or `blog.foo.com` match.
-	//   `test.blog.foo.com`, `test.bar.com`, or `bar.com` do not. Hostnames that do
-	//   not match will be ignored.
+	// If hostnames do not match with the criteria above, then the HTTPRoute is
+	// not admitted, and the implementation must raise an 'Admitted' Condition
+	// with a status of `False` for the target Listener(s).
 	//
 	// Support: Core
 	//
@@ -155,6 +140,7 @@ type HTTPRouteRule struct {
 	// of the following criteria, continuing on ties:
 	//
 	// * The longest matching hostname.
+	// * The longest matching non-wildcard hostname.
 	// * The longest matching path.
 	// * The largest number of header matches.
 	//
@@ -466,11 +452,9 @@ type HTTPRouteMatch struct {
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "match" behavior. For example, resource "myroutematcher" in group
-	// "networking.acme.io". If the referent cannot be found, the rule is not
-	// included in the route. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
-	// status for this route should be updated with a condition that describes
-	// the error more specifically.
+	// "networking.example.net". If the referent cannot be found, the rule is
+	// not included in the route. The controller must ensure the "ResolvedRefs"
+	// condition on the Route status is set to `status: False`.
 	//
 	// Support: Custom
 	//
@@ -528,7 +512,8 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
-	// RequestRedirect defines a schema for a filter that redirects request.
+	// RequestRedirect defines a schema for a filter that responds to the
+	// request with an HTTP redirection.
 	//
 	// Support: Core
 	//
@@ -537,7 +522,7 @@ type HTTPRouteFilter struct {
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
-	// "networking.acme.io"). ExtensionRef MUST NOT be used for core and
+	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
 	// extended filters.
 	//
 	// Support: Implementation-specific
@@ -650,10 +635,10 @@ type HTTPRequestHeaderFilter struct {
 	// +kubebuilder:validation:MaxItems=16
 	Add []HTTPHeader `json:"add,omitempty"`
 
-	// Remove the given header(s) from the HTTP request before the
-	// action. The value of RemoveHeader is a list of HTTP header
-	// names. Note that the header names are case-insensitive
-	// (see https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
+	// Remove the given header(s) from the HTTP request before the action. The
+	// value of Remove is a list of HTTP header names. Note that the header
+	// names are case-insensitive (see
+	// https://datatracker.ietf.org/doc/html/rfc2616#section-4.2).
 	//
 	// Input:
 	//   GET /foo HTTP/1.1
@@ -717,15 +702,14 @@ type HTTPRequestRedirect struct {
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
-	// If the referent cannot be found, this HTTPBackendRef is invalid
-	// and must be dropped from the Gateway. The controller must ensure the
-	// "ResolvedRefs" condition on the Gateway is set to `status: true`
-	// with the "DegradedRoutes" reason, and not configure this backend in the
-	// underlying implemenation.
+	// If the referent cannot be found, this BackendRef is invalid and must be
+	// dropped from the Gateway. The controller must ensure the "ResolvedRefs"
+	// condition on the Route status is set to `status: False` and not configure
+	// this backend in the underlying implementation.
 	//
 	// If there is a cross-namespace reference to an *existing* object
 	// that is not allowed by a ReferencePolicy, the controller must ensure the
-	// "ResolvedRefs"  condition on the Gateway is set to `status: true`,
+	// "ResolvedRefs"  condition on the Route is set to `status: False`,
 	// with the "RefNotPermitted" reason and not configure this backend in the
 	// underlying implementation.
 	//
@@ -743,15 +727,14 @@ type HTTPRequestMirrorFilter struct {
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
-	// If the referent cannot be found, this HTTPBackendRef is invalid
-	// and must be dropped from the Gateway. The controller must ensure the
-	// "ResolvedRefs" condition on the Gateway is set to `status: true`
-	// with the "DegradedRoutes" reason, and not configure this backend in the
-	// underlying implemenation.
+	// If the referent cannot be found, this HTTPBackendRef is invalid and must
+	// be dropped from the Gateway. The controller must ensure the
+	// "ResolvedRefs" condition on the Route is set to `status: False` and not
+	// configure this backend in the underlying implementation.
 	//
 	// If there is a cross-namespace reference to an *existing* object
 	// that is not covered by a ReferencePolicy, the controller must ensure the
-	// "ResolvedRefs"  condition on the Gateway is set to `status: true`,
+	// "ResolvedRefs"  condition on the Route is set to `status: true`,
 	// with the "RefNotPermitted" reason and not configure this backend in the
 	// underlying implementation.
 	//

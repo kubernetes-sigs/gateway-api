@@ -35,8 +35,18 @@ spec:
     schema:
       openAPIV3Schema:
         description: "GatewayClass describes a class of Gateways available to the
-          user for creating Gateway resources. \n GatewayClass is a Cluster level
-          resource."
+          user for creating Gateway resources. \n It is recommended that this resource
+          be used as a template for Gateways. This means that a Gateway is based on
+          the state of the GatewayClass at the time it was created and changes to
+          the GatewayClass or associated parameters are not propagated down to existing
+          Gateways. This recommendation is intended to limit the blast radius of changes
+          to GatewayClass or associated parameters. If implementations choose to propagate
+          GatewayClass changes to existing Gateways, that MUST be clearly documented
+          by the implementation. \n Whenever one or more Gateways are using a GatewayClass,
+          implementations MUST add the `gateway-exists-finalizer.gateway.networking.k8s.io`
+          finalizer on the associated GatewayClass. This ensures that a GatewayClass
+          associated with a Gateway is not deleted while in use. \n GatewayClass is
+          a Cluster level resource."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -56,9 +66,9 @@ spec:
               controller:
                 description: "Controller is a domain/path string that indicates the
                   controller that is managing Gateways of this class. \n Example:
-                  \"acme.io/gateway-controller\". \n This field is not mutable and
-                  cannot be empty. \n The format of this field is DOMAIN \"/\" PATH,
-                  where DOMAIN is a valid Kubernetes name (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
+                  \"example.net/gateway-controller\". \n This field is not mutable
+                  and cannot be empty. \n The format of this field is DOMAIN \"/\"
+                  PATH, where DOMAIN is a valid Kubernetes name (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
                   and PATH is a valid HTTP path as defined by RFC 3986. \n Support:
                   Core"
                 maxLength: 253

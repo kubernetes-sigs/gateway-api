@@ -141,14 +141,12 @@ spec:
                       description: "BackendRefs defines the backend(s) where matching
                         requests should be sent. If unspecified or invalid (refers
                         to a non-existent resource or a Service with no endpoints),
-                        the rule performs no forwarding; if no filters are specified
-                        that would result in a response being sent, the underlying
-                        implementation must actively reject connection attempts to
-                        this backend. Connection rejections must respect weight; if
-                        an invalid backend is requested to have 80% of connections,
-                        then 80% of connections must be rejected instead. \n Support:
-                        Core for Kubernetes Service Support: Custom for any other
-                        resource \n Support for weight: Extended"
+                        the underlying implementation MUST actively reject connection
+                        attempts to this backend. Connection rejections must respect
+                        weight; if an invalid backend is requested to have 80% of
+                        connections, then 80% of connections must be rejected instead.
+                        \n Support: Core for Kubernetes Service Support: Custom for
+                        any other resource \n Support for weight: Extended"
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a
@@ -202,19 +200,19 @@ spec:
                             type: integer
                           weight:
                             default: 1
-                            description: "Weight specifies the proportion of HTTP
-                              requests forwarded to the referenced backend. This is
-                              computed as weight/(sum of all weights in this ForwardTo
-                              list). For non-zero values, there may be some epsilon
-                              from the exact proportion defined here depending on
-                              the precision an implementation supports. Weight is
-                              not a percentage and the sum of weights does not need
-                              to equal 100. \n If only one backend is specified and
-                              it has a weight greater than 0, 100% of the traffic
-                              is forwarded to that backend. If weight is set to 0,
-                              no traffic should be forwarded for this entry. If unspecified,
-                              weight defaults to 1. \n Support for this field varies
-                              based on the context where used."
+                            description: "Weight specifies the proportion of requests
+                              forwarded to the referenced backend. This is computed
+                              as weight/(sum of all weights in this BackendRefs list).
+                              For non-zero values, there may be some epsilon from
+                              the exact proportion defined here depending on the precision
+                              an implementation supports. Weight is not a percentage
+                              and the sum of weights does not need to equal 100. \n
+                              If only one backend is specified and it has a weight
+                              greater than 0, 100% of the traffic is forwarded to
+                              that backend. If weight is set to 0, no traffic should
+                              be forwarded for this entry. If unspecified, weight
+                              defaults to 1. \n Support for this field varies based
+                              on the context where used."
                             format: int32
                             maximum: 1000000
                             minimum: 0
@@ -254,14 +252,12 @@ spec:
                         properties:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
-                              extension to the \"match\" behavior.  For example, resource
-                              \"myudproutematcher\" in group \"networking.acme.io\".
+                              extension to the \"match\" behavior. For example, resource
+                              \"myudproutematcher\" in group \"networking.example.net\".
                               If the referent cannot be found, the rule is not included
-                              in the route. The controller should raise the \"ResolvedRefs\"
-                              condition on the Gateway with the \"DegradedRoutes\"
-                              reason. The gateway status for this route should be
-                              updated with a condition that describes the error more
-                              specifically. \n Support: Custom"
+                              in the route. The controller must ensure the \"ResolvedRefs\"
+                              condition on the Route status is set to `status: False`.
+                              \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -314,12 +310,20 @@ spec:
                     respect to an associated Parent.
                   properties:
                     conditions:
-                      description: Conditions describes the status of the route with
-                        respect to the Gateway. The "Admitted" condition must always
-                        be specified by controllers to indicate whether the route
-                        has been admitted or rejected by the Gateway, and why. Note
-                        that the route's availability is also subject to the Gateway's
-                        own status conditions and listener status.
+                      description: "Conditions describes the status of the route with
+                        respect to the Gateway. Note that the route's availability
+                        is also subject to the Gateway's own status conditions and
+                        listener status. \n If the Route's ParentRef specifies an
+                        existing Gateway that supports Routes of this kind AND that
+                        Gateway's controller has sufficient access, then that Gateway's
+                        controller MUST set the \"Admitted\" condition on the Route,
+                        to indicate whether the route has been admitted or rejected
+                        by the Gateway, and why. \n There are a number of cases where
+                        the \"Admitted\" condition may not be set due to lack of controller
+                        visibility, that includes when: \n * The Route refers to a
+                        non-existent parent. * The Route is of a type that the controller
+                        does not support. * The Route is in a namespace the the controller
+                        does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
                           the current state of this API Resource. --- This struct
@@ -400,7 +404,7 @@ spec:
                     controller:
                       description: "Controller is a domain/path string that indicates
                         the controller that wrote this status. This corresponds with
-                        the controller field on GatewayClass. \n Example: \"acme.io/gateway-controller\".
+                        the controller field on GatewayClass. \n Example: \"example.net/gateway-controller\".
                         \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN
                         and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
                       maxLength: 253
