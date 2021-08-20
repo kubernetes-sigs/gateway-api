@@ -1,14 +1,8 @@
 resources:
-- bases/networking.x-k8s.io_gatewayclasses.yaml
-- bases/networking.x-k8s.io_gateways.yaml
-- bases/networking.x-k8s.io_httproutes.yaml
-- bases/networking.x-k8s.io_tcproutes.yaml
-- bases/networking.x-k8s.io_tlsroutes.yaml
-- bases/networking.x-k8s.io_udproutes.yaml
-- bases/networking.x-k8s.io_backendpolicies.yaml
-- bases/gateway.networking.k8s.io_gatewayclasses.yaml
-- bases/gateway.networking.k8s.io_gateways.yaml
-- bases/gateway.networking.k8s.io_httproutes.yaml
-- bases/gateway.networking.k8s.io_tcproutes.yaml
-- bases/gateway.networking.k8s.io_tlsroutes.yaml
-- bases/gateway.networking.k8s.io_udproutes.yaml
+- v1alpha2/gateway.networking.k8s.io_gatewayclasses.yaml
+- v1alpha2/gateway.networking.k8s.io_gateways.yaml
+- v1alpha2/gateway.networking.k8s.io_httproutes.yaml
+- v1alpha2/gateway.networking.k8s.io_referencepolicies.yaml
+- v1alpha2/gateway.networking.k8s.io_tcproutes.yaml
+- v1alpha2/gateway.networking.k8s.io_tlsroutes.yaml
+- v1alpha2/gateway.networking.k8s.io_udproutes.yaml

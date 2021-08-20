@@ -2,7 +2,7 @@ kind: GatewayClass
 apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: filter-lb
-spec: 
+spec:
   controller: acme.io/gateway-controller
   parametersRef:
     name: acme-lb
@@ -22,41 +22,26 @@ metadata:
 spec:
   gatewayClassName: filter-lb
   listeners:
-    - protocol: HTTP
+    - name: http
+      protocol: HTTP
       port: 80
-      routes:
-        kind: HTTPRoute
-        selector:
-          matchLabels:
-            protocol: http
-        namespaces:
-          from: "Same"
-    - protocol: HTTPS
+    - name: https
+      protocol: HTTPS
       port: 443
-      routes:
-        kind: HTTPRoute
-        selector:
-          matchLabels:
-            app: filter
-        namespaces:
-          from: "All"
 ---
 kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
   name: http-filter-1
   namespace: gateway-api-example-ns1
-  labels:
-    protocol: http
 spec:
+  parentRefs:
+  - name: my-filter-gateway
+    sectionName: http
   hostnames:
     - my-filter.example.com
   rules:
-    - matches:
-      - path:
-          type: Prefix
-          value: /
-      filters:
+    - filters:
       - type: RequestRedirect
         requestRedirect:
           protocol: HTTPS
@@ -64,10 +49,12 @@ spec:
 kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha2
 metadata:
-  name: http-filter-1
-  labels:
-    app: filter
+  name: http-filter-2
+  namespace: gateway-api-example-ns1
 spec:
+  parentRefs:
+  - name: my-filter-gateway
+    sectionName: https
   hostnames:
     - my-filter.example.com
   rules:

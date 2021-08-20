@@ -41,17 +41,13 @@ type TCPRoute struct {
 
 // TCPRouteSpec defines the desired state of TCPRoute
 type TCPRouteSpec struct {
+	CommonRouteSpec `json:",inline"`
+
 	// Rules are a list of TCP matchers and actions.
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	Rules []TCPRouteRule `json:"rules"`
-
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
 }
 
 // TCPRouteStatus defines the observed state of TCPRoute
@@ -93,7 +89,13 @@ type TCPRouteRule struct {
 	Matches []TCPRouteMatch `json:"matches,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent.
+	// sent. If unspecified or invalid (refers to a non-existent resource or
+	// a Service with no endpoints), the rule performs no forwarding; if no
+	// filters are specified that would result in a response being sent, the
+	// underlying implementation must actively reject connection attempts to
+	// this backend. Connection rejections must respect weight; if an invalid
+	// backend is requested to have 80% of connections, then 80% of connections
+	// must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource

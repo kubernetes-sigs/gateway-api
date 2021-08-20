@@ -19,16 +19,12 @@ package v1alpha2
 // LocalObjectReference identifies an API object within the namespace of the
 // referrer.
 type LocalObjectReference struct {
-	// Group is the group of the referent.
-	//
-	// +kubebuilder:validation:MaxLength=253
-	Group string `json:"group"`
+	// Group is the group of the referent. For example, "networking.k8s.io".
+	// When unspecified (empty string), core API group is inferred.
+	Group Group `json:"group"`
 
-	// Kind is kind of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind string `json:"kind"`
+	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
+	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
 	//
@@ -39,21 +35,18 @@ type LocalObjectReference struct {
 
 // ObjectReference identifies an API object including its namespace.
 type ObjectReference struct {
-	// Group is the group of the referent.
+	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.
 	//
 	// +optional
 	// +kubebuilder:default=""
-	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group"`
+	Group *Group `json:"group"`
 
-	// Kind is kind of the referent.
+	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
 	//
 	// +optional
 	// +kubebuilder:default=Service
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind *string `json:"kind"`
+	Kind *Kind `json:"kind"`
 
 	// Name is the name of the referent.
 	//
@@ -71,10 +64,8 @@ type ObjectReference struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace *string `json:"namespace,omitempty"`
+	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
 // BackendObjectReference defines how an ObjectReference that is
@@ -86,21 +77,18 @@ type ObjectReference struct {
 // owner to accept the reference. See the ReferencePolicy documentation
 // for details.
 type BackendObjectReference struct {
-	// Group is the group of the referent.
+	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.
 	//
 	// +optional
 	// +kubebuilder:default=""
-	// +kubebuilder:validation:MaxLength=253
-	Group *string `json:"group,omitempty"`
+	Group *Group `json:"group,omitempty"`
 
-	// Kind is kind of the referent.
+	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
 	//
 	// +optional
 	// +kubebuilder:default=Service
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Kind *string `json:"kind,omitempty"`
+	Kind *Kind `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
 	//
@@ -118,10 +106,8 @@ type BackendObjectReference struct {
 	//
 	// Support: Core
 	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
 	// +optional
-	Namespace *string `json:"namespace,omitempty"`
+	Namespace *Namespace `json:"namespace,omitempty"`
 
 	// Port specifies the destination port number to use for this resource.
 	// Port is required when the referent is a Kubernetes Service.

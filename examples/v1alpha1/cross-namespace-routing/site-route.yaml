@@ -1,0 +1,38 @@
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: home
+  namespace: site-ns
+spec:
+  gateways:
+    allow: FromList
+    gatewayRefs:
+    - name: shared-gateway
+      namespace: infra
+  rules:
+  - forwardTo:
+    - serviceName: home
+      port: 8080
+---
+kind: HTTPRoute
+apiVersion: networking.x-k8s.io/v1alpha1
+metadata:
+  name: login
+  namespace: site-ns
+spec:
+  gateways:
+    allow: FromList
+    gatewayRefs:
+    - name: shared-gateway
+      namespace: infra
+  rules:
+  - matches:
+    - path:
+        value: /login
+    forwardTo:
+    - serviceName: login-v1
+      port: 8080
+      weight: 90
+    - serviceName: login-v2
+      port: 8080
+      weight: 10

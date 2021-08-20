@@ -1,0 +1,10 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: invalid-backend-group
+spec:
+  rules:
+  - backendRefs:
+    - group: "*"
+      name: foo
+      port: 80

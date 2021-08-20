@@ -1,0 +1,6 @@
+kind: GatewayClass
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: invalid-controller
+spec:
+  controller: example
