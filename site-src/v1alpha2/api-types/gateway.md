@@ -12,7 +12,7 @@ The `Gateway` spec defines the following:
 *   `GatewayClassName`- Defines the name of a `GatewayClass` object used by
     this Gateway.
 *   `Listeners`-  Define the hostnames, ports, protocol, termination, TLS
-    settings and which routes should be associated to a listener.
+    settings and which routes can be attached to a listener.
 *   `Addresses`- Define the network addresses requested for this gateway.
 
 If the desired configuration specified in Gateway spec cannot be achieved, the
@@ -39,8 +39,8 @@ desired state represented in `spec`. `GatewayStatus` consists of the following:
 
 - `Addresses`- Lists the IP addresses that have actually been bound to the
   Gateway.
-- `Listeners`- Provide status for each unique listener port defined in `spec`.
-- `Conditions`- Describe the current status conditions of the Gateway.  
+- `Listeners`- Provide status for each unique listener defined in `spec`.
+- `Conditions`- Describe the current status conditions of the Gateway.
 
 Both `Conditions` and `Listeners.conditions` follow the conditions pattern used
 elsewhere in Kubernetes. This is a list that includes a type of condition, the

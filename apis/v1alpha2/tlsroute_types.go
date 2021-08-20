@@ -46,11 +46,7 @@ type TLSRoute struct {
 
 // TLSRouteSpec defines the desired state of a TLSRoute resource.
 type TLSRouteSpec struct {
-	// Gateways defines which Gateways can use this Route.
-	//
-	// +optional
-	// +kubebuilder:default={allow: "SameNamespace"}
-	Gateways *RouteGateways `json:"gateways,omitempty"`
+	CommonRouteSpec `json:",inline"`
 
 	// Hostnames defines a set of SNI names that should match against the
 	// SNI attribute of TLS ClientHello message in TLS handshake.
@@ -128,7 +124,14 @@ type TLSRouteRule struct {
 	Matches []TLSRouteMatch `json:"matches,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent.
+	// sent. If unspecified or invalid (refers to a non-existent resource or
+	// a Service with no endpoints), the rule performs no forwarding; if no
+	// filters are specified that would result in a response being sent, the
+	// underlying implementation must actively reject request attempts to this
+	// backend, by rejecting the connection or returning a 503 status code.
+	// Request rejections must respect weight; if an invalid backend is
+	// requested to have 80% of requests, then 80% of requests must be rejected
+	// instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource

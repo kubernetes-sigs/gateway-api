@@ -45,16 +45,22 @@ fi
 
 readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
 
-echo "Generating CRDs and deepcopy"
+echo "Generating v1alpha1 CRDs and deepcopy"
 go run sigs.k8s.io/controller-tools/cmd/controller-gen \
         object:headerFile=./hack/boilerplate/boilerplate.generatego.txt \
         crd:crdVersions=v1 \
-        output:crd:artifacts:config=config/crd/bases \
-        paths=./...
+        output:crd:artifacts:config=config/crd/v1alpha1 \
+        paths=./apis/v1alpha1
+
+echo "Generating v1alpha2 CRDs and deepcopy"
+go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+        object:headerFile=./hack/boilerplate/boilerplate.generatego.txt \
+        crd:crdVersions=v1 \
+        output:crd:artifacts:config=config/crd/v1alpha2 \
+        paths=./apis/v1alpha2
 
 # TODO(robscott): Change this once v1alpha2 has received formal API approval.
-sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.5\.0/api\-approved\.kubernetes\.io\:\ unapproved/g' config/crd/bases/gateway.networking.k8s.io*
-
+sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.5\.0/api\-approved\.kubernetes\.io\:\ unapproved/g' config/crd/v1alpha2/gateway.networking.k8s.io*
 
 for VERSION in v1alpha1 v1alpha2
 do

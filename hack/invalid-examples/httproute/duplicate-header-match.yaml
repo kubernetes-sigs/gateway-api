@@ -1,0 +1,12 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: duplicate-header-match
+spec:
+  rules:
+  - matches:
+    - headers:
+      - name: foo
+        value: bar
+      - name: foo
+        value: bar

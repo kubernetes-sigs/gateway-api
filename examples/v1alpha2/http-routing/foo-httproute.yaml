@@ -1,0 +1,17 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: foo-route
+spec:
+  parentRefs:
+  - name: example-gateway
+  hostnames:
+  - "foo.example.com"
+  rules:
+  - matches:
+    - path:
+        type: Prefix
+        value: /login
+    backendRefs:
+    - name: foo-svc
+      port: 8080

@@ -1,0 +1,10 @@
+kind: Gateway
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: invalid-listener-port
+spec:
+  gatewayClassName: acme-lb
+  listeners:
+  - name: foo
+    protocol: HTTP
+    port: 123456789

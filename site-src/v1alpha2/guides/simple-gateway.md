@@ -1,5 +1,6 @@
 # Deploying a simple Gateway
 
+
 The simplest possible deployment is a Gateway and Route resource which are
 deployed together by the same owner. This represents a similar kind of model
 used for Ingress. In this guide, a Gateway and HTTPRoute are deployed which
