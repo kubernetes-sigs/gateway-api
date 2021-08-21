@@ -24,7 +24,7 @@ metadata:
   namespace: gateway-api-example-ns2
 spec:
   from:
-  - group: networking.gateway.k8s.io
+  - group: gateway.networking.k8s.io
     kind: Gateway
     namespace: gateway-api-example-ns1
   to:
