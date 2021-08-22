@@ -19,9 +19,9 @@ interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
-- [User guides](/guides/getting-started)
-- [Gateway controller implementations](/references/implementations)
-- [API reference spec](/references/spec)
+- [User guides](/v1alpha1/guides/getting-started)
+- [Gateway controller implementations](/implementations)
+- [API reference spec](/v1alpha1/references/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 
@@ -76,8 +76,8 @@ used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators. The following example shows how this
 works in practice.
 
-A cluster operator creates a [Gateway](/api-types/gateway) resource derived from a
-[GatewayClass](/api-types/gatewayclass). This Gateway deploys or configures the
+A cluster operator creates a [Gateway](/v1alpha1/api-types/gateway) resource derived from a
+[GatewayClass](/v1alpha1/api-types/gatewayclass). This Gateway deploys or configures the
 underlying network resources that it represents. Through [Route binding
 policy](/concepts/api-overview#route-binding) set on the Gateway, the operator
 permits (or denies) specific teams to bind to this Gateway and expose their
