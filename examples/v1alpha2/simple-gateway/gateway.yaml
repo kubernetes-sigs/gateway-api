@@ -9,8 +9,4 @@ spec:
     port: 80
     routes:
       namespaces:
-      - selector:
-          matchLabels:
-            gateway: prod-web-gw
-      kinds:
-      - kind: HTTPRoute
+        from: Same
