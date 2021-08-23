@@ -1,5 +1,5 @@
-kind: GatewayClass
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: GatewayClass
 metadata:
   name: acme-lb
 spec:
@@ -9,8 +9,8 @@ spec:
     group: acme.io
     kind: Parameters
 ---
-kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: Gateway
 metadata:
   name: my-tcp-gateway
 spec:
@@ -31,8 +31,8 @@ spec:
         matchLabels:
           "app": "bar"
 ---
-kind: TCPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: TCPRoute
 metadata:
   name: tcp-app-1
   labels:
@@ -43,8 +43,8 @@ spec:
     - serviceName: my-foo-service
       port: 6000
 ---
-kind: TCPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: TCPRoute
 metadata:
   name: tcp-app-2
   namespace: default

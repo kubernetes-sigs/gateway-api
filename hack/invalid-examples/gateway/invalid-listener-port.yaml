@@ -1,5 +1,5 @@
-kind: Gateway
 apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: Gateway
 metadata:
   name: invalid-listener-port
 spec:

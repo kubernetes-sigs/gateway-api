@@ -1,11 +1,11 @@
 # These namespaces can be used for examples without recreating them each time.
 ---
-kind: Namespace
 apiVersion: v1
+kind: Namespace
 metadata:
   name: gateway-api-example-ns1
 ---
-kind: Namespace
 apiVersion: v1
+kind: Namespace
 metadata:
   name: gateway-api-example-ns2

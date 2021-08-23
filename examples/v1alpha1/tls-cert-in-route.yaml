@@ -1,5 +1,5 @@
-kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: Gateway
 metadata:
   name: cert-in-route-gateway
 spec:
@@ -22,8 +22,8 @@ spec:
     routes:
       kind: HTTPRoute
 ---
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: http-app-1
 spec:
@@ -43,8 +43,8 @@ spec:
     - serviceName: my-service
       port: 8080
 ---
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: http-app-2
 spec:
