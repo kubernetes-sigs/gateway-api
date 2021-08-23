@@ -1,0 +1,11 @@
+kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+metadata:
+  name: foo
+spec:
+  parentRefs:
+  - name: prod-web-gw
+  rules:
+  - backendRefs:
+    - name: foo-svc
+      port: 8080
