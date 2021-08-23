@@ -1,5 +1,5 @@
-kind: TLSRoute
 apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
 metadata:
   name: invalid-hostname
 spec:

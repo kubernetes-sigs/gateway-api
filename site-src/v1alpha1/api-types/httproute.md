@@ -28,8 +28,8 @@ namespace.
 
 The following example allows Gateways from namespace "httproute-ns-example":
 ```yaml
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: httproute-example
   namespace: httproute-ns-example
@@ -66,8 +66,8 @@ rules and filters (optional).
 The following example defines hostname "my.example.com" and allows Gateways
 from the same namespace as HTTPRoute "httproute-example":
 ```yaml
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: httproute-example
 spec:
@@ -113,8 +113,8 @@ independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
 ```yaml
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 ...
 matches:
   - path:
@@ -209,8 +209,8 @@ update the entry as appropriate when the route is modified.
 The following example indicates HTTPRoute "http-example" has been admitted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: http-example
 ...

@@ -56,8 +56,8 @@ spec:
     kind: Config
     name: internet-gateway-config
 ---
-kind: Config
 apiVersion: acme.io/v1alpha1
+kind: Config
 metadata:
   name: internet-gateway-config
 spec:

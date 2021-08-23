@@ -1,5 +1,5 @@
-kind: GatewayClass
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: GatewayClass
 metadata:
   name: trafficsplit-lb
 spec: 
@@ -9,8 +9,8 @@ spec:
     group: acme.io
     kind: Parameters
 ---
-kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: Gateway
 metadata:
   name: my-trafficsplit-gateway
 spec:
@@ -27,8 +27,8 @@ spec:
           from: "Selector"
           selector: {}
 ---
-kind: HTTPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: http-trafficsplit-1
   labels:

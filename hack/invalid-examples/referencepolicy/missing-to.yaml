@@ -1,5 +1,5 @@
-kind: ReferencePolicy
 apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: ReferencePolicy
 metadata:
   name: missing-to
 spec:

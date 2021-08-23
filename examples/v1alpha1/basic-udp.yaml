@@ -1,5 +1,5 @@
-kind: GatewayClass
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: GatewayClass
 metadata:
   name: acme-lb
 spec:
@@ -9,8 +9,8 @@ spec:
     group: acme.io
     kind: Parameters
 ---
-kind: Gateway
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: Gateway
 metadata:
   name: my-gateway
 spec:
@@ -26,8 +26,8 @@ spec:
       namespaces:
         from: "All"
 ---
-kind: UDPRoute
 apiVersion: networking.x-k8s.io/v1alpha1
+kind: UDPRoute
 metadata:
   name: udp-app-1
   labels:
