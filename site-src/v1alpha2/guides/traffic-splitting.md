@@ -3,7 +3,7 @@
 The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify weights to shift
 traffic between different backends. This is useful for splitting traffic during
 rollouts, canarying changes, or for emergencies. The HTTPRoute
-`spec.rules.forwardTo` accepts a list of backends that a route rule will send
+`spec.rules.backendRefs` accepts a list of backends that a route rule will send
 traffic to. The relative weights of these backends define the split of traffic
 between them. The following YAML snippet shows how two Services are listed as
 backends for a single route rule. This route rule will split traffic 90% to
