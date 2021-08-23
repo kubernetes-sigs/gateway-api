@@ -20,9 +20,9 @@ deployed.
 
 Route resources specify the Gateways they want to attach to using `ParentRefs`. As long as 
 the Gateway allows this attachment (by default Routes from the same namespace are trusted),
-this will allow the Route to receive traffic from the parent Gateway. `BackendRefs` define the backends
-that traffic will be sent to. More complex bi-directional matching and permissions
-are possible and explained in other guides.
+this will allow the Route to receive traffic from the parent Gateway. 
+`BackendRefs` define the backends that traffic will be sent to. More complex 
+bi-directional matching and permissions are possible and explained in other guides.
 
 The following HTTPRoute defines how traffic from the Gateway listener is routed
 to backends. Because there are no host routes or paths specified, this HTTPRoute
