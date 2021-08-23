@@ -1,0 +1,4 @@
+contact_links:
+- name: "Issue regarding a specific implementation of the API"
+  url: https://gateway-api.sigs.k8s.io/implementations/
+  about: "Please file any issues related to a specific implementation to their corresponding issue tracker. Only API related issues should be filed here."
