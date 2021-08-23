@@ -1,13 +1,13 @@
 # HTTP traffic splitting
 
-The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify weights to shift
-traffic between different backends. This is useful for splitting traffic during
-rollouts, canarying changes, or for emergencies. The HTTPRoute
-`spec.rules.backendRefs` accepts a list of backends that a route rule will send
-traffic to. The relative weights of these backends define the split of traffic
-between them. The following YAML snippet shows how two Services are listed as
-backends for a single route rule. This route rule will split traffic 90% to
-`foo-v1` and 10% to `foo-v2`.
+The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify 
+weights to shift traffic between different backends. This is useful for 
+splitting traffic during rollouts, canarying changes, or for emergencies. 
+The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route 
+rule will send traffic to. The relative weights of these backends define 
+the split of traffic between them. The following YAML snippet shows how two 
+Services are listed as backends for a single route rule. This route rule 
+will split traffic 90% to `foo-v1` and 10% to `foo-v2`.
 
 ![Traffic splitting](/v1alpha2/images/simple-split.png)
 
@@ -40,10 +40,11 @@ production user traffic for `foo.example.com`. The following HTTPRoute has no
 `weight` specified for `foo-v1`  or `foo-v2` so they will implicitly
 recieve 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
-traffic before splitting any production user traffic to `foo-v2`. [Routing
-precedence](/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule) ensures that
-all traffic with the matching host and header (the most specific match) will
-be sent to `foo-v2`.
+traffic before splitting any production user traffic to `foo-v2`. 
+[Routing precedence]
+(/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+ensures that all traffic with the matching host and header 
+(the most specific match) will be sent to `foo-v2`.
 
 ![Traffic splitting](/v1alpha2/images/traffic-splitting-1.png)
 
