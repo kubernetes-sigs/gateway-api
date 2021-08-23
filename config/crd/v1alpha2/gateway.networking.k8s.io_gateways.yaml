@@ -344,7 +344,7 @@ spec:
                               pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                               type: string
                             kind:
-                              default: Service
+                              default: Secret
                               description: Kind is kind of the referent. For example
                                 "HTTPRoute" or "Service".
                               maxLength: 63
