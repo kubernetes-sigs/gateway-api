@@ -8,7 +8,9 @@ spec:
   - protocol: HTTP
     port: 80
     routes:
-      kind: HTTPRoute
-      selector:
-        matchLabels:
-          gateway: prod-web-gw
+      namespaces:
+      - selector:
+          matchLabels:
+            gateway: prod-web-gw
+      kinds:
+      - kind: HTTPRoute
