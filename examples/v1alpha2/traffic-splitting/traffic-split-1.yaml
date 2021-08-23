@@ -11,11 +11,8 @@ spec:
   - backendRefs:
     - name: foo-v1
       port: 8080
-  - matches:
-    - headers:
-        type: Exact
-        values:
-          traffic: test
-    forwardTo:
-    - serviceName: foo-v2
+    - name: foo-v2
       port: 8080
+  - matches:
+    - path:
+        value: test
