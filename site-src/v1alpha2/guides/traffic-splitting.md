@@ -1,9 +1,5 @@
 # HTTP traffic splitting
 
-!!! danger
-    This page has not been updated for v1alpha2 yet.
-
-
 The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify weights to shift
 traffic between different backends. This is useful for splitting traffic during
 rollouts, canarying changes, or for emergencies. The HTTPRoute
@@ -16,7 +12,7 @@ backends for a single route rule. This route rule will split traffic 90% to
 ![Traffic splitting](/v1alpha2/images/simple-split.png)
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/simple-split.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/simple-split.yaml' %}  
 ```
 
 `weight` indicates a proportional split of traffic (rather than percentage)
@@ -34,7 +30,7 @@ is used to manage the gradual splitting of traffic from v1 to v2.
 This example assumes that the following Gateway is deployed:
 
 ```yaml 
-{% include 'v1alpha1/simple-gateway/gateway.yaml' %}   
+{% include 'v1alpha2/simple-gateway/gateway.yaml' %}   
 ```
 
 ## Canary traffic rollout
@@ -69,7 +65,7 @@ as a backend along with weights. The weights add up to a total of 100 so
 
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/traffic-split-2.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/traffic-split-2.yaml' %}  
 ```
 
 ## Completing the rollout
@@ -82,7 +78,7 @@ Finally, if all signals are positive, it is time to fully shift traffic to
 
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/traffic-split-3.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/traffic-split-3.yaml' %}  
 ```
 
 At this point 100% of the traffic is being routed to `foo-v2` and the
