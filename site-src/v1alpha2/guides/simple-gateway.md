@@ -18,7 +18,7 @@ HTTP traffic on port 80. This particular GatewayClass automatically assigns an
 IP address which will be shown in the `Gateway.status` after it has been
 deployed. 
 
-An `HTTPRoute` resource must specify the Gateways it is attached to using
+An `HTTPRoute` resource must specify the Gateways it attaches to use
 `ParentRefs`. Referencing the `Gateway` will allow the `HTTPRoute` to
 receive traffic from the parent `Gateway`. `BackendRefs` define the backends
 that traffic will be sent to. More complex bi-directional matching and permissions
