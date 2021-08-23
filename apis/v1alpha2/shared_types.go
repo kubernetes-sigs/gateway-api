@@ -203,6 +203,9 @@ type RouteParentStatus struct {
 	// Route, to indicate whether the route has been admitted or rejected by the
 	// Gateway, and why.
 	//
+	// A Route MUST be considered "Admitted" if at least one of the Route's
+	// rules is implemented by the Gateway.
+	//
 	// There are a number of cases where the "Admitted" condition may not be set
 	// due to lack of controller visibility, that includes when:
 	//

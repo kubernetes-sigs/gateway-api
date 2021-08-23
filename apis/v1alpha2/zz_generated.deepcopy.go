@@ -1120,7 +1120,7 @@ func (in *RouteNamespaces) DeepCopyInto(out *RouteNamespaces) {
 	*out = *in
 	if in.From != nil {
 		in, out := &in.From, &out.From
-		*out = new(NamespacesFrom)
+		*out = new(FromNamespaces)
 		**out = **in
 	}
 	if in.Selector != nil {

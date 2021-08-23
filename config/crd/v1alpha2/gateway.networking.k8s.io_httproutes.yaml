@@ -53,7 +53,7 @@ spec:
                   the \"host\" part of the URI as defined in the RFC: \n 1. IPs are
                   not allowed. 2. The `:` delimiter is not respected because ports
                   are not allowed. \n If a hostname is specified by both the Listener
-                  and HTTPRoute, their must be at least one intersecting hostname
+                  and HTTPRoute, there must be at least one intersecting hostname
                   for the HTTPRoute to be attached to the Listener. For example: \n
                   * A Listener with `test.example.com` as the hostname matches HTTPRoutes
                   \  that have either not specified any hostnames, or have specified
@@ -67,10 +67,11 @@ spec:
                   hostnames, any HTTPRoute hostnames that do not match the Listener
                   hostname MUST be ignored. For example, if a Listener specified `*.example.com`,
                   and the HTTPRoute specified `test.example.com` and `test.example.net`,
-                  `test.example.net` would be ignored. \n If hostnames do not match
-                  with the criteria above, then the HTTPRoute is not admitted, and
-                  the implementation must raise an 'Admitted' Condition with a status
-                  of `False` for the target Listener(s). \n Support: Core"
+                  `test.example.net` must not be considered for a match. \n If hostnames
+                  do not match with the criteria above, then the HTTPRoute is not
+                  admitted, and the implementation must raise an 'Admitted' Condition
+                  with a status of `False` for the target Listener(s). \n Support:
+                  Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host, as defined by RFC 3986. Note the following deviations from
@@ -191,12 +192,11 @@ spec:
                     steps, and forwarding the request to an API object.
                   properties:
                     backendRefs:
-                      description: "BackendRefs defines the backend(s) where matching
-                        requests should be sent. If unspecified or invalid (refers
-                        to a non-existent resource or a Service with no endpoints),
-                        the rule performs no forwarding; if no filters are specified
-                        that would result in a response being sent, a HTTP 503 status
-                        code is returned. 503 responses must be sent so that the overall
+                      description: "If unspecified or invalid (refers to a non-existent
+                        resource or a Service with no endpoints), the rule performs
+                        no forwarding. If that are also no filters specified that
+                        would result in a response being sent, a HTTP 503 status code
+                        is returned. 503 responses must be sent so that the overall
                         weight is respected; if an invalid backend is requested to
                         have 80% of requests, then 80% of requests must get a 503
                         instead. \n Support: Core for Kubernetes Service Support:
@@ -206,7 +206,7 @@ spec:
                           forward an HTTP request.
                         properties:
                           filters:
-                            description: "Filters defined at this-level should be
+                            description: "Filters defined at this level should be
                               executed if and only if the request is being forwarded
                               to the backend defined here. \n Support: Custom (For
                               broader support of filters, use the Filters field in
@@ -904,18 +904,19 @@ spec:
                         precedence MUST be determined in order of the following criteria,
                         continuing on ties: \n * The longest matching hostname. *
                         The longest matching non-wildcard hostname. * The longest
-                        matching path. * The largest number of header matches. \n
-                        If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        For example, a Route with   a creation timestamp of \"2020-09-08
-                        01:02:03\" is given precedence over   a Route with a creation
-                        timestamp of \"2020-09-08 01:02:04\". * The Route appearing
-                        first in alphabetical order by   \"<namespace>/<name>\". For
-                        example, foo/bar is given precedence over   foo/baz. \n If
-                        ties still exist within the Route that has been given precedence,
-                        matching precedence MUST be granted to the first matching
-                        rule meeting the above criteria."
+                        matching path. * The largest number of header matches. * The
+                        largest number of query param matches. \n If ties still exist
+                        across multiple Routes, matching precedence MUST be determined
+                        in order of the following criteria, continuing on ties: \n
+                        * The oldest Route based on creation timestamp. For example,
+                        a Route with   a creation timestamp of \"2020-09-08 01:02:03\"
+                        is given precedence over   a Route with a creation timestamp
+                        of \"2020-09-08 01:02:04\". * The Route appearing first in
+                        alphabetical order by   \"<namespace>/<name>\". For example,
+                        foo/bar is given precedence over   foo/baz. \n If ties still
+                        exist within the Route that has been given precedence, matching
+                        precedence MUST be granted to the first matching rule meeting
+                        the above criteria."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -1141,11 +1142,13 @@ spec:
                         Gateway's controller has sufficient access, then that Gateway's
                         controller MUST set the \"Admitted\" condition on the Route,
                         to indicate whether the route has been admitted or rejected
-                        by the Gateway, and why. \n There are a number of cases where
-                        the \"Admitted\" condition may not be set due to lack of controller
-                        visibility, that includes when: \n * The Route refers to a
-                        non-existent parent. * The Route is of a type that the controller
-                        does not support. * The Route is in a namespace the the controller
+                        by the Gateway, and why. \n A Route MUST be considered \"Admitted\"
+                        if at least one of the Route's rules is implemented by the
+                        Gateway. \n There are a number of cases where the \"Admitted\"
+                        condition may not be set due to lack of controller visibility,
+                        that includes when: \n * The Route refers to a non-existent
+                        parent. * The Route is of a type that the controller does
+                        not support. * The Route is in a namespace the the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of

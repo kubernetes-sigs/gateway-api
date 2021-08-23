@@ -118,12 +118,22 @@ type GatewaySpec struct {
 	// requested address is invalid or unavailable, the implementation MUST
 	// indicate this in the associated entry in GatewayStatus.Addresses.
 	//
+	// The Addresses field represents a request for the address(es) on the
+	// "outside of the Gateway", that traffic bound for this Gateway will use.
+	// This could be the IP address or hostname of an external load balancer or
+	// other networking infrastructure, or some other address that traffic will
+	// be sent to.
+	//
+	// The .listener.hostname field is used to route traffic that has already
+	// arrived at the Gateway to the correct in-cluster destination.
+	//
 	// If no Addresses are specified, the implementation MAY schedule the
 	// Gateway in an implementation-specific manner, assigning an appropriate
 	// set of Addresses.
 	//
 	// The implementation MUST bind all Listeners to every GatewayAddress that
-	// it assigns to the Gateway.
+	// it assigns to the Gateway and add a corresponding entry in
+	// GatewayStatus.Addresses.
 	//
 	// Support: Core
 	//
@@ -182,8 +192,8 @@ type Listener struct {
 	Protocol ProtocolType `json:"protocol"`
 
 	// TLS is the TLS configuration for the Listener. This field is required if
-	// the Protocol field is "HTTPS" or "TLS". It MUST be ignored when the
-	// Protocol field is "HTTP", "TCP", or "UDP".
+	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
+	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
 	// The association of SNIs to Certificate defined in GatewayTLSConfig is
 	// defined based on the Hostname field for this listener.
@@ -196,15 +206,15 @@ type Listener struct {
 	// +optional
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
-	// AllowedRoutes specifies which Routes may be attached to this Listener.
+	// AllowedRoutes defines the types of routes that MAY be attached to a
+	// Listener and the trusted namespaces where those Route resources MAY be
+	// present.
 	//
 	// Although a client request may match multiple route rules, only one rule
 	// may ultimately receive the request. Matching precedence MUST be
 	// determined in order of the following criteria:
 	//
-	// * The most specific match as defined by the Route type. For example, the
-	//   most specific HTTPRoute match is determined by the longest matching
-	//   combination of hostname and path.
+	// * The most specific match as defined by the Route type.
 	// * The oldest Route based on creation timestamp. For example, a Route with
 	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
@@ -213,7 +223,7 @@ type Listener struct {
 	//   example, foo/bar is given precedence over foo/baz.
 	//
 	// All valid rules within a Route attached to this Listener should be
-	// supported. Invalid Route rules can be ignored (sometimes that will mean
+	// implemented. Invalid Route rules can be ignored (sometimes that will mean
 	// the full Route). If a Route rule transitions from valid to invalid,
 	// support for that Route rule should be dropped to ensure consistency. For
 	// example, even if a filter specified by a Route rule is invalid, the rest
@@ -357,21 +367,21 @@ type AllowedRoutes struct {
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
-// NamespacesFrom specifies namespace from which Routes may be attached to a
+// FromNamespaces specifies namespace from which Routes may be attached to a
 // Gateway.
 //
 // +kubebuilder:validation:Enum=All;Selector;Same
-type NamespacesFrom string
+type FromNamespaces string
 
 const (
 	// Routes in all namespaces may be attached to this Gateway.
-	NamespacesFromAll NamespacesFrom = "All"
+	NamespacesFromAll FromNamespaces = "All"
 	// Only Routes in namespaces selected by the selector may be attached to
 	// this Gateway.
-	NamespacesFromSelector NamespacesFrom = "Selector"
+	NamespacesFromSelector FromNamespaces = "Selector"
 	// Only Routes in the same namespace as the Gateway may be attached to this
 	// Gateway.
-	NamespacesFromSame NamespacesFrom = "Same"
+	NamespacesFromSame FromNamespaces = "Same"
 )
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.
@@ -387,7 +397,7 @@ type RouteNamespaces struct {
 	//
 	// +optional
 	// +kubebuilder:default=Same
-	From *NamespacesFrom `json:"from,omitempty"`
+	From *FromNamespaces `json:"from,omitempty"`
 
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only Routes in Namespaces matching this Selector will be selected by this
@@ -472,8 +482,6 @@ type GatewayStatus struct {
 	// addresses in the Spec, e.g. if the Gateway automatically
 	// assigns an address from a reserved pool.
 	//
-	// These addresses should all be of type "IPAddress".
-	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
@@ -538,8 +546,8 @@ const (
 	// true.
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
-	// This reason is used with the "Scheduled" condition when
-	// been recently created and no controller has reconciled it yet.
+	// This reason is used with the "Scheduled" condition when no controller has
+	// reconciled the Gateway.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
 	// This reason is used with the "Scheduled" condition when the
@@ -607,6 +615,12 @@ type ListenerStatus struct {
 	// there are kinds specified on the Listener, this MUST represent the
 	// intersection of those kinds and the kinds supported by the implementation
 	// for the specified protocol.
+	//
+	// If kinds are specified in Spec that are not supported, an implementation
+	// MUST set the "ResolvedRefs" condition to "False" with the
+	// "InvalidRouteKinds" reason. If both valid and invalid Route kinds are
+	// specified, the implementation should support the valid Route kinds that
+	// have been specified.
 	//
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
@@ -758,7 +772,7 @@ const (
 
 	// This reason is used with the "ResolvedRefs" condition when an invalid or
 	// unsupported Route kind is specified by the Listener.
-	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRouteKinds"
+	ListenerReasonInvalidRouteKinds ListenerConditionReason = "InvalidRouteKinds"
 
 	// This reason is used with the "ResolvedRefs" condition when
 	// one of the Listener's Routes has a BackendRef to an object in

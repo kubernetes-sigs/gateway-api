@@ -62,7 +62,7 @@ type HTTPRouteSpec struct {
 	// 1. IPs are not allowed.
 	// 2. The `:` delimiter is not respected because ports are not allowed.
 	//
-	// If a hostname is specified by both the Listener and HTTPRoute, their
+	// If a hostname is specified by both the Listener and HTTPRoute, there
 	// must be at least one intersecting hostname for the HTTPRoute to be
 	// attached to the Listener. For example:
 	//
@@ -80,7 +80,7 @@ type HTTPRouteSpec struct {
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be
 	// ignored. For example, if a Listener specified `*.example.com`, and the
 	// HTTPRoute specified `test.example.com` and `test.example.net`,
-	// `test.example.net` would be ignored.
+	// `test.example.net` must not be considered for a match.
 	//
 	// If hostnames do not match with the criteria above, then the HTTPRoute is
 	// not admitted, and the implementation must raise an 'Admitted' Condition
@@ -143,6 +143,7 @@ type HTTPRouteRule struct {
 	// * The longest matching non-wildcard hostname.
 	// * The longest matching path.
 	// * The largest number of header matches.
+	// * The largest number of query param matches.
 	//
 	// If ties still exist across multiple Routes, matching precedence MUST be
 	// determined in order of the following criteria, continuing on ties:
@@ -185,11 +186,14 @@ type HTTPRouteRule struct {
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent. If unspecified or invalid (refers to a non-existent resource or a Service with no endpoints),
-	// the rule performs no forwarding; if no filters are specified that would result in a
-	// response being sent, a HTTP 503 status code is returned. 503 responses must be sent so that the overall
-	// weight is respected; if an invalid backend is requested to have 80% of requests, then 80% of requests
-	// must get a 503 instead.
+	// sent.
+
+	// If unspecified or invalid (refers to a non-existent resource or a Service
+	// with no endpoints), the rule performs no forwarding. If that are also no
+	// filters specified that would result in a response being sent, a HTTP 503
+	// status code is returned. 503 responses must be sent so that the overall
+	// weight is respected; if an invalid backend is requested to have 80% of
+	// requests, then 80% of requests must get a 503 instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource
@@ -746,7 +750,7 @@ type HTTPBackendRef struct {
 	// +optional
 	BackendRef `json:",inline"`
 
-	// Filters defined at this-level should be executed if and only if the
+	// Filters defined at this level should be executed if and only if the
 	// request is being forwarded to the backend defined here.
 	//
 	// Support: Custom (For broader support of filters, use the Filters field

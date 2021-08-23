@@ -253,11 +253,11 @@ spec:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
                               extension to the \"match\" behavior. For example, resource
-                              \"myudproutematcher\" in group \"networking.example.net\".
-                              If the referent cannot be found, the rule is not included
-                              in the route. The controller must ensure the \"ResolvedRefs\"
-                              condition on the Route status is set to `status: False`.
-                              \n Support: Custom"
+                              \"mytcproutematcher\" in group \"networking.example.net\".
+                              If the referent cannot be found, the rule MUST not be
+                              included in the route. The controller must ensure the
+                              \"ResolvedRefs\" condition on the Route status is set
+                              to `status: False`. \n Support: Custom"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -318,11 +318,13 @@ spec:
                         Gateway's controller has sufficient access, then that Gateway's
                         controller MUST set the \"Admitted\" condition on the Route,
                         to indicate whether the route has been admitted or rejected
-                        by the Gateway, and why. \n There are a number of cases where
-                        the \"Admitted\" condition may not be set due to lack of controller
-                        visibility, that includes when: \n * The Route refers to a
-                        non-existent parent. * The Route is of a type that the controller
-                        does not support. * The Route is in a namespace the the controller
+                        by the Gateway, and why. \n A Route MUST be considered \"Admitted\"
+                        if at least one of the Route's rules is implemented by the
+                        Gateway. \n There are a number of cases where the \"Admitted\"
+                        condition may not be set due to lack of controller visibility,
+                        that includes when: \n * The Route refers to a non-existent
+                        parent. * The Route is of a type that the controller does
+                        not support. * The Route is in a namespace the the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
