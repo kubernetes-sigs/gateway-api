@@ -1,0 +1,17 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: Gateway
+metadata:
+  name: shared-gateway
+  namespace: infra-ns
+spec:
+  gatewayClassName: shared-gateway-class
+  listeners:
+  - name: http
+    hostname: "foo.example.com"
+    protocol: HTTP
+    port: 80
+    routes:
+      namespaces:
+        selector:
+          matchLabels:
+            environment: development

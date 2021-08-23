@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: infra-ns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: site-ns
+  labels:
+    environment: development
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: store-ns
+  labels:
+    environment: development
