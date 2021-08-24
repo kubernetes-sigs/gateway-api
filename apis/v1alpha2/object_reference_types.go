@@ -33,8 +33,8 @@ type LocalObjectReference struct {
 	Name string `json:"name"`
 }
 
-// ObjectReference identifies an API object including its namespace.
-type ObjectReference struct {
+// SecretObjectReference identifies an API object including its namespace, defaulting to Secret.
+type SecretObjectReference struct {
 	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.
 	//
@@ -45,7 +45,7 @@ type ObjectReference struct {
 	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
 	//
 	// +optional
-	// +kubebuilder:default=Service
+	// +kubebuilder:default=Secret
 	Kind *Kind `json:"kind"`
 
 	// Name is the name of the referent.

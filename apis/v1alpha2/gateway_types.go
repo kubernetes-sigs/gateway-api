@@ -307,7 +307,7 @@ type GatewayTLSConfig struct {
 	// Support: Implementation-specific (Other resource types)
 	//
 	// +optional
-	CertificateRef *ObjectReference `json:"certificateRef,omitempty"`
+	CertificateRef *SecretObjectReference `json:"certificateRef,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
