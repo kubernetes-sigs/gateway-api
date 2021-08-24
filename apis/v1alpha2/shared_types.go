@@ -93,7 +93,7 @@ type ParentRef struct {
 	// Support: Core
 	//
 	// +optional
-	SectionName SectionName `json:"sectionName,omitempty"`
+	SectionName *SectionName `json:"sectionName,omitempty"`
 }
 
 // CommonRouteSpec defines the common attributes that all Routes should include
