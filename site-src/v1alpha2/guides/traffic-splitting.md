@@ -1,22 +1,18 @@
 # HTTP traffic splitting
 
-!!! danger
-    This page has not been updated for v1alpha2 yet.
-
-
-The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify weights to shift
-traffic between different backends. This is useful for splitting traffic during
-rollouts, canarying changes, or for emergencies. The HTTPRoute
-`spec.rules.forwardTo` accepts a list of backends that a route rule will send
-traffic to. The relative weights of these backends define the split of traffic
-between them. The following YAML snippet shows how two Services are listed as
-backends for a single route rule. This route rule will split traffic 90% to
-`foo-v1` and 10% to `foo-v2`.
+The [HTTPRoute resource](/v1alpha2/api-types/httproute) allows you to specify 
+weights to shift traffic between different backends. This is useful for 
+splitting traffic during rollouts, canarying changes, or for emergencies. 
+The HTTPRoute`spec.rules.backendRefs` accepts a list of backends that a route 
+rule will send traffic to. The relative weights of these backends define 
+the split of traffic between them. The following YAML snippet shows how two 
+Services are listed as backends for a single route rule. This route rule 
+will split traffic 90% to `foo-v1` and 10% to `foo-v2`.
 
 ![Traffic splitting](/v1alpha2/images/simple-split.png)
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/simple-split.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/simple-split.yaml' %}  
 ```
 
 `weight` indicates a proportional split of traffic (rather than percentage)
@@ -34,7 +30,7 @@ is used to manage the gradual splitting of traffic from v1 to v2.
 This example assumes that the following Gateway is deployed:
 
 ```yaml 
-{% include 'v1alpha1/simple-gateway/gateway.yaml' %}   
+{% include 'v1alpha2/simple-gateway/gateway.yaml' %}   
 ```
 
 ## Canary traffic rollout
@@ -44,16 +40,16 @@ production user traffic for `foo.example.com`. The following HTTPRoute has no
 `weight` specified for `foo-v1`  or `foo-v2` so they will implicitly
 recieve 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
-traffic before splitting any production user traffic to `foo-v2`. [Routing
-precedence](/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule) ensures that
-all traffic with the matching host and header (the most specific match) will
-be sent to `foo-v2`.
+traffic before splitting any production user traffic to `foo-v2`.
+[Routing precedence](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+ensures that all traffic with the matching host and header 
+(the most specific match) will be sent to `foo-v2`.
 
 ![Traffic splitting](/v1alpha2/images/traffic-splitting-1.png)
 
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/traffic-split-1.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/traffic-split-1.yaml' %}
 ```
 
 ## Blue-green traffic rollout
@@ -69,7 +65,7 @@ as a backend along with weights. The weights add up to a total of 100 so
 
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/traffic-split-2.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/traffic-split-2.yaml' %}  
 ```
 
 ## Completing the rollout
@@ -82,7 +78,7 @@ Finally, if all signals are positive, it is time to fully shift traffic to
 
 
 ```yaml
-{% include 'v1alpha1/traffic-splitting/traffic-split-3.yaml' %}  
+{% include 'v1alpha2/traffic-splitting/traffic-split-3.yaml' %}  
 ```
 
 At this point 100% of the traffic is being routed to `foo-v2` and the
