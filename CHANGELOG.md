@@ -14,70 +14,130 @@
 
 API version: v1alpha2
 
-This release is intended to be last alpha release, so there are a lot of breaking API changes. Please read these release notes carefully.
+This release is intended to be last alpha release, so there are a lot of breaking
+API changes. Please read these release notes carefully.
 
 ### Major Changes
 
-* The Gateway API APIGroup has moved from `networking.x-k8s.io` to `gateway.networking.k8s.io`. This means that, as far as the apiserver is concerned, this version is wholly distinct from v1alpha1, and automatic conversion is not possible. As part of this process, Gateway API is now subject to Kubernetes API review, the same as changes made to core API resources. More details in [#780](https://github.com/kubernetes-sigs/gateway-api/pull/780) and [#716](https://github.com/kubernetes-sigs/gateway-api/issues/716).
+* The Gateway API APIGroup has moved from `networking.x-k8s.io` to
+`gateway.networking.k8s.io`. This means that, as far as the apiserver is
+concerned, this version is wholly distinct from v1alpha1, and automatic conversion
+is not possible. As part of this process, Gateway API is now subject to Kubernetes
+API review, the same as changes made to core API resources. More details in
+[#780](https://github.com/kubernetes-sigs/gateway-api/pull/780) and [#716](https://github.com/kubernetes-sigs/gateway-api/issues/716).
 
-* Gateway-Route binding changes, [GEP-724](https://gateway-api.sigs.k8s.io/geps/gep-724/). Currently, Gateways choose which Routes are attached using a combination of object and namespace selectors, with the option of also specifying object names. This has made a very complex config, that's easy to misinterpret. As part of v1alpha2, we're changing to:
-  * Gateways *may* specify what kind of Routes they support (defaults to same protocol if not specified), and where those Routes can be (defaults to same namespace).
-  * Routes *must* directly reference the Gateways the want to attach to, this is a list, so a Route can attach to more than one Gateway.
+* Gateway-Route binding changes,
+[GEP-724](https://gateway-api.sigs.k8s.io/geps/gep-724/). Currently, Gateways
+choose which Routes are attached using a combination of object and namespace
+selectors, with the option of also specifying object names. This has made a very
+complex config, that's easy to misinterpret. As part of v1alpha2, we're changing to:
+  * Gateways *may* specify what kind of Routes they support (defaults to same
+  protocol if not specified), and where those Routes can be (defaults to same
+  namespace).
+  * Routes *must* directly reference the Gateways the want to attach to, this is
+  a list, so a Route can attach to more than one Gateway.
   * The Route becomes attached only when the specifications intersect.
   
-  We believe this is quite a bit easier to understand, and still gives good flexibility for most use cases.
+  We believe this is quite a bit easier to understand, and still gives good
+  flexibility for most use cases.
   GEP added in [#725](https://github.com/kubernetes-sigs/gateway-api/pull/725).
   Implemented in [#754](https://github.com/kubernetes-sigs/gateway-api/pull/754).
   Further documentation was added in [#762](https://github.com/kubernetes-sigs/gateway-api/pull/762).
 
 
-* Safer cross-namespace references ([GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/)): This one concerns (currently), references from Routes to Backends, and Gateways to Secrets. The new behavior is:
-  * By default, references across namespaces are not permitted; creating a reference across a namespace (like a Route referencing a Service in another namespace) must be rejected by implementations.
-  * These references can be accepted by creating a ReferencePolicy in the referent (target) namespace, that specifies what Kind is allowed to accept incoming references, and from what namespace and Kind the references may be.
+* Safer cross-namespace references
+([GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/)): This one concerns
+(currently), references from Routes to Backends, and Gateways to Secrets. The
+new behavior is:
+  * By default, references across namespaces are not permitted; creating a
+  reference across a namespace (like a Route referencing a Service in another
+  namespace) must be rejected by implementations.
+  * These references can be accepted by creating a ReferencePolicy in the
+  referent (target) namespace, that specifies what Kind is allowed to accept
+  incoming references, and from what namespace and Kind the references may be.
 
-  The intent here is that the owner of the referent namespace must explicitly accept incoming references, otherwise we can run into all sorts of bad things from breaking the namespace security model.
+  The intent here is that the owner of the referent namespace must explicitly
+  accept incoming references, otherwise we can run into all sorts of bad things
+  from breaking the namespace security model.
   Implemented in [#741](https://github.com/kubernetes-sigs/gateway-api/pull/741).
 
-* Attaching Policy to objects, [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/): This one has been added so that we have an extensible mechanism for adding a cascading set of policy to Gateway API objects.
+* Attaching Policy to objects,
+[GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/): This one has been added
+so that we have an extensible mechanism for adding a cascading set of policy to
+Gateway API objects.
 
-  What policy? Well, it's kind of up to the implementations, but the best example to begin with is timeout policy.
+  What policy? Well, it's kind of up to the implementations, but the best example
+  to begin with is timeout policy.
   
-  Timeout policy for HTTP connections is highly depedent on how the underlying implementation handles policy - it's very difficult to extract commonalities.
-  This is intended to allow things like:
-  * Attach a policy that specifies the default connection timeout for backends to a GatewayClass. All Gateways that are part of that Class will have Routes get that default connection timeout unless they specify differently.
-  * If a Gateway that's a member of the GatewayClass has a different default attached, then that will beat the GatewayClass (for defaults, more specific object beats less specific object).
-  * Alternatively, a Policy that mandates that you can't set the client timeout to "no timeout" can be attached to a GatewayClass as an override. An override will always take effect, with less specific beating more specific.
+  Timeout policy for HTTP connections is highly depedent on how the underlying
+  implementation handles policy - it's very difficult to extract commonalities.
 
-  This one is a bit complex, but will allow implementations to solve some things that currently require tools like admission control.
+  This is intended to allow things like:
+  * Attach a policy that specifies the default connection timeout for backends
+  to a GatewayClass. All Gateways that are part of that Class will have Routes
+  get that default connection timeout unless they specify differently.
+  * If a Gateway that's a member of the GatewayClass has a different default
+  attached, then that will beat the GatewayClass (for defaults, more specific
+  object beats less specific object).
+  * Alternatively, a Policy that mandates that you can't set the client timeout
+  to "no timeout" can be attached to a GatewayClass as an override. An override
+  will always take effect, with less specific beating more specific.
+
+  This one is a bit complex, but will allow implementations to solve some things
+  that currently require tools like admission control.
   Implemented in [#736](https://github.com/kubernetes-sigs/gateway-api/pull/736).
   
-* As part of GEP-713, `BackendPolicy` has been removed, as its functionality is now better handled using that mechanism. [#732](https://github.com/kubernetes-sigs/gateway-api/pull/732). 
+* As part of GEP-713, `BackendPolicy` has been removed, as its functionality is
+now better handled using that mechanism. [#732](https://github.com/kubernetes-sigs/gateway-api/pull/732). 
 
-* Removal of certificate references from HTTPRoutes, [GEP-746](https://gateway-api.sigs.k8s.io/geps/gep-746/):
-  In v1alpha1, HTTPRoute objects have a stanza that allows referencing a TLS keypair, intended to allow people to have a more self-service model, where an app owner can provision a TLS keypair inside their own namespace, attach it to a HTTPRoute they control, and then have that used to secure their app.
-  When implementing this, however, there are a large number of edge cases that are complex, hard to handle, and poorly defined - about checking SNI, hostname, and overrides, that made even writing a spec on how to implement this very difficult, let alone actually implementing it.
-  In removing certificate references from HTTPRoute, we're using the ReferencePolicy from GEP-709 to allow Gateways to securely create a cross-namespace reference to TLS keypairs in app namespaces.
-  We're hopeful that this will hit most of the self-service use case, and even if not, provide a basis to build from to meet it eventually.
+* Removal of certificate references from HTTPRoutes,
+[GEP-746](https://gateway-api.sigs.k8s.io/geps/gep-746/):
+  In v1alpha1, HTTPRoute objects have a stanza that allows referencing a TLS
+  keypair, intended to allow people to have a more self-service model, where an
+  app owner can provision a TLS keypair inside their own namespace, attach it to
+  a HTTPRoute they control, and then have that used to secure their app.
+  When implementing this, however, there are a large number of edge cases that
+  are complex, hard to handle, and poorly defined - about checking SNI, hostname,
+  and overrides, that made even writing a spec on how to implement this very
+  difficult, let alone actually implementing it.
+
+  In removing certificate references from HTTPRoute, we're using the
+  ReferencePolicy from GEP-709 to allow Gateways to securely create a
+  cross-namespace reference to TLS keypairs in app namespaces.
+  We're hopeful that this will hit most of the self-service use case, and even
+  if not, provide a basis to build from to meet it eventually.
   GEP added in [#749](https://github.com/kubernetes-sigs/gateway-api/pull/749).
   Implemented in [#768](https://github.com/kubernetes-sigs/gateway-api/pull/768).
 
-* The `RouteForwardTo` (YAML: `routeForwardTo`) struct/stanza has been reworked into the `BackendRef` (YAML: `backendRef`) struct/stanza, [GEP-718](https://gateway-api.sigs.k8s.io/geps/gep-718/). As part of this change, the `ServiceName` (YAML: `serviceName`) field has been removed, and Service references must instead now use the `BackendRef`/`backendRef` struct/stanza.
+* The `RouteForwardTo` (YAML: `routeForwardTo`) struct/stanza has been reworked
+into the `BackendRef` (YAML: `backendRef`) struct/stanza,
+[GEP-718](https://gateway-api.sigs.k8s.io/geps/gep-718/). As part of this change,
+the `ServiceName` (YAML: `serviceName`) field has been removed, and Service
+references must instead now use the `BackendRef`/`backendRef` struct/stanza.
 
 ### Other changes
-* HTTP Method matching is now added into HTTPRoute, with Extended support: [#733](https://github.com/kubernetes-sigs/gateway-api/pull/733).
+* HTTP Method matching is now added into HTTPRoute, with Extended support:
+[#733](https://github.com/kubernetes-sigs/gateway-api/pull/733).
 
-* GatewayClass now has a 'Description' field that is printed as a column in `kubectl get` output. You can now end up with output that looks like this:
+* GatewayClass now has a 'Description' field that is printed as a column in
+`kubectl get` output. You can now end up with output that looks like this:
   ```shell
   $> kubectl get gatewayclass
   NAME       CONTROLLER                            DESCRIPTION
   internal   gateway-controller-internal   For non-internet-facing Gateways.
   external   gateway-controller-external   For internet-facing Gateways.
   ```
-  See [#610](https://github.com/kubernetes-sigs/gateway-api/issues/610) and [#653](https://github.com/kubernetes-sigs/gateway-api/pull/653) for the details.
+  See [#610](https://github.com/kubernetes-sigs/gateway-api/issues/610) and
+  [#653](https://github.com/kubernetes-sigs/gateway-api/pull/653) for the details.
   
-*  [#671](https://github.com/kubernetes-sigs/gateway-api/pull/671) Controller is now a required field in Gateway references from Route status. Fixes [#669](https://github.com/kubernetes-sigs/gateway-api/pull/671).
+*  [#671](https://github.com/kubernetes-sigs/gateway-api/pull/671) Controller is
+now a required field in Gateway references from Route status. Fixes
+[#669](https://github.com/kubernetes-sigs/gateway-api/pull/671).
 
-*  [#657](https://github.com/kubernetes-sigs/gateway-api/pull/657) and [#681](https://github.com/kubernetes-sigs/gateway-api/pull/681) Header Matching, Query Param Matching, and HTTPRequestHeaderFilter now use named subobjects instead of maps. 
+*  [#657](https://github.com/kubernetes-sigs/gateway-api/pull/657) and
+[#681](https://github.com/kubernetes-sigs/gateway-api/pull/681) Header Matching,
+Query Param Matching, and HTTPRequestHeaderFilter now use named subobjects
+instead of maps. 
 
 
 ### Documentation Updates
