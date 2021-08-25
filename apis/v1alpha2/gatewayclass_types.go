@@ -30,8 +30,21 @@ import (
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 // +kubebuilder:printcolumn:name="Description",type=string,JSONPath=`.spec.description`,priority=1
 
-// GatewayClass describes a class of Gateways available to the user
-// for creating Gateway resources.
+// GatewayClass describes a class of Gateways available to the user for creating
+// Gateway resources.
+//
+// It is recommended that this resource be used as a template for Gateways. This
+// means that a Gateway is based on the state of the GatewayClass at the time it
+// was created and changes to the GatewayClass or associated parameters are not
+// propagated down to existing Gateways. This recommendation is intended to
+// limit the blast radius of changes to GatewayClass or associated parameters.
+// If implementations choose to propagate GatewayClass changes to existing
+// Gateways, that MUST be clearly documented by the implementation.
+//
+// Whenever one or more Gateways are using a GatewayClass, implementations MUST
+// add the `gateway-exists-finalizer.gateway.networking.k8s.io` finalizer on the
+// associated GatewayClass. This ensures that a GatewayClass associated with a
+// Gateway is not deleted while in use.
 //
 // GatewayClass is a Cluster level resource.
 type GatewayClass struct {
@@ -47,12 +60,19 @@ type GatewayClass struct {
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
 
+const (
+	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
+	// GatewayClass whenever there are provisioned Gateways using a
+	// GatewayClass.
+	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.gateway.networking.k8s.io"
+)
+
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 type GatewayClassSpec struct {
 	// Controller is a domain/path string that indicates the
 	// controller that is managing Gateways of this class.
 	//
-	// Example: "acme.io/gateway-controller".
+	// Example: "example.net/gateway-controller".
 	//
 	// This field is not mutable and cannot be empty.
 	//
@@ -133,15 +153,15 @@ const (
 	// This condition defaults to False, and MUST be set by a controller when it
 	// sees a GatewayClass using its controller string. The status of this
 	// condition MUST be set to true if the controller will support provisioning
-	// Gateways using this class. Otherwise, this status MUST be set to false.
-	// If the status is set to false, the controller SHOULD set a Message and
+	// Gateways using this class. Otherwise, this status MUST be set to False.
+	// If the status is set to False, the controller SHOULD set a Message and
 	// Reason as an explanation.
 	//
 	// Possible reasons for this condition to be true are:
 	//
 	// * "Admitted"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "InvalidParameters"
 	// * "Waiting"
@@ -162,12 +182,8 @@ const (
 	// This reason is used with the "Admitted" condition when the
 	// requested controller has not yet made a decision about whether
 	// to admit the GatewayClass. It is the default Reason on a new
-	// GatewayClass. It indicates
+	// GatewayClass.
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
-
-	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
-	// GatewayClass whenever there are provisioned Gateways using a GatewayClass.
-	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.gateway.networking.k8s.io"
 )
 
 // GatewayClassStatus is the current status for the GatewayClass.

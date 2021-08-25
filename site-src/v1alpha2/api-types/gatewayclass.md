@@ -12,7 +12,7 @@ kind: GatewayClass
 metadata:
   name: cluster-gateway
 spec:
-  controller: "acme.io/gateway-controller"
+  controller: "example.net/gateway-controller"
 ```
 
 We expect that one or more `GatewayClasses` will be created by the
@@ -50,13 +50,13 @@ kind: GatewayClass
 metadata:
   name: internet
 spec:
-  controller: "acme.io/gateway-controller"
+  controller: "example.net/gateway-controller"
   parametersRef:
-    group: acme.io/v1alpha1
+    group: example.net/v1alpha1
     kind: Config
     name: internet-gateway-config
 ---
-apiVersion: acme.io/v1alpha1
+apiVersion: example.net/v1alpha1
 kind: Config
 metadata:
   name: internet-gateway-config
@@ -123,16 +123,16 @@ this field.
 
 It is RECOMMENDED that controller authors/deployments make their selection
 unique by using a domain / path combination under their administrative control
-(e.g. controller managing of all `controller`s starting with `acme.io` is the
-owner of the `acme.io` domain) to avoid conflicts.
+(e.g. controller managing of all `controller`s starting with `example.net` is the
+owner of the `example.net` domain) to avoid conflicts.
 
 Controller versioning can be done by encoding the version of a controller into
 the path portion. An example scheme could be (similar to container URIs):
 
 ```text
-acme.io/gateway/v1   // Use version 1
-acme.io/gateway/v2.1 // Use version 2.1
-acme.io/gateway      // Use the default version
+example.net/gateway/v1   // Use version 1
+example.net/gateway/v2.1 // Use version 2.1
+example.net/gateway      // Use the default version
 ```
 
 [gatewayclass]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.GatewayClass

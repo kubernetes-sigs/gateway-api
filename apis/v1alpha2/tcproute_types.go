@@ -89,13 +89,11 @@ type TCPRouteRule struct {
 	Matches []TCPRouteMatch `json:"matches,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
-	// sent. If unspecified or invalid (refers to a non-existent resource or
-	// a Service with no endpoints), the rule performs no forwarding; if no
-	// filters are specified that would result in a response being sent, the
-	// underlying implementation must actively reject connection attempts to
-	// this backend. Connection rejections must respect weight; if an invalid
-	// backend is requested to have 80% of connections, then 80% of connections
-	// must be rejected instead.
+	// sent. If unspecified or invalid (refers to a non-existent resource or a
+	// Service with no endpoints), the underlying implementation MUST actively
+	// reject connection attempts to this backend. Connection rejections must
+	// respect weight; if an invalid backend is requested to have 80% of
+	// connections, then 80% of connections must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource
@@ -111,12 +109,10 @@ type TCPRouteRule struct {
 // given action.
 type TCPRouteMatch struct {
 	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  For example, resource "mytcproutematcher" in group
-	// "networking.acme.io". If the referent cannot be found, the rule is not
-	// included in the route. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
-	// status for this route should be updated with a condition that describes
-	// the error more specifically.
+	// "match" behavior. For example, resource "mytcproutematcher" in group
+	// "networking.example.net". If the referent cannot be found, the rule MUST
+	// not be included in the route. The controller must ensure the
+	// "ResolvedRefs" condition on the Route status is set to `status: False`.
 	//
 	// Support: Custom
 	//

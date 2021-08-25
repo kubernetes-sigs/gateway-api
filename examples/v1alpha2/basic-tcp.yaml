@@ -8,13 +8,13 @@ spec:
   - name: foo
     protocol: TCP
     port: 8080
-    routes:
+    allowedRoutes:
       kinds:
       - kind: TCPRoute
   - name: bar
     protocol: TCP
     port: 8090
-    routes:
+    allowedRoutes:
       kinds:
       - kind: TCPRoute
 ---

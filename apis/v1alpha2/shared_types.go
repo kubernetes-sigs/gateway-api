@@ -141,12 +141,12 @@ type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
 	BackendObjectReference `json:",inline"`
 
-	// Weight specifies the proportion of HTTP requests forwarded to the
-	// referenced backend. This is computed as
-	// weight/(sum of all weights in this ForwardTo list). For non-zero values,
-	// there may be some epsilon from the exact proportion defined here
-	// depending on the precision an implementation supports. Weight is not a
-	// percentage and the sum of weights does not need to equal 100.
+	// Weight specifies the proportion of requests forwarded to the referenced
+	// backend. This is computed as weight/(sum of all weights in this
+	// BackendRefs list). For non-zero values, there may be some epsilon from
+	// the exact proportion defined here depending on the precision an
+	// implementation supports. Weight is not a percentage and the sum of
+	// weights does not need to equal 100.
 	//
 	// If only one backend is specified and it has a weight greater than 0, 100%
 	// of the traffic is forwarded to that backend. If weight is set to 0, no
@@ -166,9 +166,13 @@ type BackendRef struct {
 type RouteConditionType string
 
 const (
-	// This condition indicates whether the route has been admitted
-	// or rejected by a Gateway, and why.
+	// This condition indicates whether the route has been admitted or rejected
+	// by a Gateway, and why.
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
+
+	// This condition indicates whether the controller was able to resolve all
+	// the object references for the Route.
+	ConditionRouteResolvedRefs RouteConditionType = "ResolvedRefs"
 )
 
 // RouteParentStatus describes the status of a route with respect to an
@@ -182,18 +186,32 @@ type RouteParentStatus struct {
 	// wrote this status. This corresponds with the controller field on
 	// GatewayClass.
 	//
-	// Example: "acme.io/gateway-controller".
+	// Example: "example.net/gateway-controller".
 	//
 	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
 	Controller GatewayController `json:"controller"`
 
-	// Conditions describes the status of the route with respect to the
-	// Gateway. The "Admitted" condition must always be specified by controllers
-	// to indicate whether the route has been admitted or rejected by the Gateway,
-	// and why. Note that the route's availability is also subject to the Gateway's
-	// own status conditions and listener status.
+	// Conditions describes the status of the route with respect to the Gateway.
+	// Note that the route's availability is also subject to the Gateway's own
+	// status conditions and listener status.
+	//
+	// If the Route's ParentRef specifies an existing Gateway that supports
+	// Routes of this kind AND that Gateway's controller has sufficient access,
+	// then that Gateway's controller MUST set the "Admitted" condition on the
+	// Route, to indicate whether the route has been admitted or rejected by the
+	// Gateway, and why.
+	//
+	// A Route MUST be considered "Admitted" if at least one of the Route's
+	// rules is implemented by the Gateway.
+	//
+	// There are a number of cases where the "Admitted" condition may not be set
+	// due to lack of controller visibility, that includes when:
+	//
+	// * The Route refers to a non-existent parent.
+	// * The Route is of a type that the controller does not support.
+	// * The Route is in a namespace the the controller does not have access to.
 	//
 	// +listType=map
 	// +listMapKey=type
@@ -229,8 +247,6 @@ type RouteStatus struct {
 // Hostname can be "precise" which is a domain name without the terminating
 // dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
 // domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-// The wildcard character `*` must appear by itself as the first DNS label
-// and matches only a single label.
 //
 // Note that as per RFC1035 and RFC1123, a *label* must consist of lower case
 // alphanumeric characters or '-', and must start and end with an alphanumeric

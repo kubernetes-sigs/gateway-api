@@ -30,13 +30,8 @@ import (
 // +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// Gateway represents an instantiation of a service-traffic handling
-// infrastructure by binding Listeners to a set of IP addresses.
-//
-// Implementations should add the `gateway-exists-finalizer.gateway.networking.k8s.io`
-// finalizer on the associated GatewayClass whenever Gateway(s) is running.
-// This ensures that a GatewayClass associated with a Gateway(s) is not
-// deleted while in use.
+// Gateway represents an instance of a service-traffic handling infrastructure
+// by binding Listeners to a set of IP addresses.
 type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -52,7 +47,7 @@ type Gateway struct {
 
 // +kubebuilder:object:root=true
 
-// GatewayList contains a list of Gateway.
+// GatewayList contains a list of Gateways.
 type GatewayList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -118,18 +113,27 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []Listener `json:"listeners"`
 
-	// Addresses requested for this gateway. This is optional and
-	// behavior can depend on the GatewayClass. If a value is set
-	// in the spec and the requested address is invalid, the
-	// GatewayClass MUST indicate this in the associated entry in
+	// Addresses requested for this Gateway. This is optional and behavior can
+	// depend on the implementation. If a value is set in the spec and the
+	// requested address is invalid or unavailable, the implementation MUST
+	// indicate this in the associated entry in GatewayStatus.Addresses.
+	//
+	// The Addresses field represents a request for the address(es) on the
+	// "outside of the Gateway", that traffic bound for this Gateway will use.
+	// This could be the IP address or hostname of an external load balancer or
+	// other networking infrastructure, or some other address that traffic will
+	// be sent to.
+	//
+	// The .listener.hostname field is used to route traffic that has already
+	// arrived at the Gateway to the correct in-cluster destination.
+	//
+	// If no Addresses are specified, the implementation MAY schedule the
+	// Gateway in an implementation-specific manner, assigning an appropriate
+	// set of Addresses.
+	//
+	// The implementation MUST bind all Listeners to every GatewayAddress that
+	// it assigns to the Gateway and add a corresponding entry in
 	// GatewayStatus.Addresses.
-	//
-	// If no Addresses are specified, the GatewayClass may
-	// schedule the Gateway in an implementation-defined manner,
-	// assigning an appropriate set of Addresses.
-	//
-	// The GatewayClass MUST bind all Listeners to every
-	// GatewayAddress that it assigns to the Gateway.
 	//
 	// Support: Core
 	//
@@ -143,26 +147,21 @@ type GatewaySpec struct {
 // combination of Hostname, Port, and Protocol. This will be enforced by a
 // validating webhook.
 type Listener struct {
-	// Name is the name of the Listener. If more than one Listener is present
-	// each Listener MUST specify a name. The names of Listeners MUST be unique
-	// within a Gateway.
+	// Name is the name of the Listener.
 	//
 	// Support: Core
 	Name SectionName `json:"name"`
 
 	// Hostname specifies the virtual hostname to match for protocol types that
-	// define this concept. When unspecified, "", or `*`, all hostnames are
-	// matched. This field can be omitted for protocols that don't require
-	// hostname based matching.
+	// define this concept. When unspecified, all hostnames are matched. This
+	// field is ignored for protocols that don't require hostname based
+	// matching.
 	//
-	// For HTTPRoute objects, there is an interaction with the
+	// For HTTPRoute and TLSRoute resources, there is an interaction with the
 	// `spec.hostnames` array. When both listener and route specify hostnames,
-	// there must be an intersection between the values for a Route to be admitted.
-	// For example, a Gateway with `*.example.com` would admit a Route that included
-	// `foo.example.com` as a hostname, but not a Route that *only* included
-	// `foo.acme.io` as a hostname. A Route that included both `foo.example.com`
-	// and `foo.acme.io` would be admitted, but the `foo.acme.io` hostname would
-	// be silently ignored.
+	// there must be an intersection between the values for a Route to be
+	// admitted. For more information, refer to the Route specific Hostnames
+	// documentation.
 	//
 	// Support: Core
 	//
@@ -192,9 +191,9 @@ type Listener struct {
 	// Support: Core
 	Protocol ProtocolType `json:"protocol"`
 
-	// TLS is the TLS configuration for the Listener. This field
-	// is required if the Protocol field is "HTTPS" or "TLS" and
-	// ignored otherwise.
+	// TLS is the TLS configuration for the Listener. This field is required if
+	// the Protocol field is "HTTPS" or "TLS". It is invalid to set this field
+	// if the Protocol field is "HTTP", "TCP", or "UDP".
 	//
 	// The association of SNIs to Certificate defined in GatewayTLSConfig is
 	// defined based on the Hostname field for this listener.
@@ -207,14 +206,15 @@ type Listener struct {
 	// +optional
 	TLS *GatewayTLSConfig `json:"tls,omitempty"`
 
-	// Routes specifies which Routes may be attached to this Listener.
+	// AllowedRoutes defines the types of routes that MAY be attached to a
+	// Listener and the trusted namespaces where those Route resources MAY be
+	// present.
 	//
-	// Although a client request may technically match multiple route rules,
-	// only one rule may ultimately receive the request. Matching precedence
-	// MUST be determined in order of the following criteria:
+	// Although a client request may match multiple route rules, only one rule
+	// may ultimately receive the request. Matching precedence MUST be
+	// determined in order of the following criteria:
 	//
-	// * The most specific match. For example, the most specific HTTPRoute match
-	//   is determined by the longest matching combination of hostname and path.
+	// * The most specific match as defined by the Route type.
 	// * The oldest Route based on creation timestamp. For example, a Route with
 	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
@@ -222,17 +222,17 @@ type Listener struct {
 	//   alphabetical order (namespace/name) should be given precedence. For
 	//   example, foo/bar is given precedence over foo/baz.
 	//
-	// All valid portions of a Route selected by this field should be supported.
-	// Invalid portions of a Route can be ignored (sometimes that will mean the
-	// full Route). If a portion of a Route transitions from valid to invalid,
-	// support for that portion of the Route should be dropped to ensure
-	// consistency. For example, even if a filter specified by a Route is
-	// invalid, the rest of the Route should still be supported.
+	// All valid rules within a Route attached to this Listener should be
+	// implemented. Invalid Route rules can be ignored (sometimes that will mean
+	// the full Route). If a Route rule transitions from valid to invalid,
+	// support for that Route rule should be dropped to ensure consistency. For
+	// example, even if a filter specified by a Route rule is invalid, the rest
+	// of the rules within that Route should still be supported.
 	//
 	// Support: Core
 	// +kubebuilder:default={namespaces:{from: Same}}
 	// +optional
-	Routes *ListenerRoutes `json:"routes,omitempty"`
+	AllowedRoutes *AllowedRoutes `json:"allowedRoutes,omitempty"`
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
@@ -293,7 +293,7 @@ type GatewayTLSConfig struct {
 	// References to a resource in different namespace are invalid UNLESS there
 	// is a ReferencePolicy in the target namespace that allows the certificate
 	// to be attached. If a ReferencePolicy does not allow this reference, the
-	// "ResolvedRefs" condition MUST be set to false for this listener with the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "InvalidCertificateRef" reason.
 	//
 	// This field is required when mode is set to "Terminate" (default) and
@@ -339,11 +339,10 @@ const (
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
-// ListenerRoutes defines which Routes may be attached to this Listener.
-type ListenerRoutes struct {
-	// Namespaces indicates which namespaces Routes may be attached to this
-	// Listener from. This is restricted to the namespace of this Gateway by
-	// default.
+// AllowedRoutes defines which Routes may be attached to this Listener.
+type AllowedRoutes struct {
+	// Namespaces indicates namespaces from which Routes may be attached to this
+	// Listener. This is restricted to the namespace of this Gateway by default.
 	//
 	// Support: Core
 	//
@@ -358,7 +357,7 @@ type ListenerRoutes struct {
 	// A RouteGroupKind MUST correspond to kinds of Routes that are compatible
 	// with the application protocol specified in the Listener's Protocol field.
 	// If an implementation does not support or recognize this resource type, it
-	// MUST set the "ResolvedRefs" condition to false for this Listener with the
+	// MUST set the "ResolvedRefs" condition to False for this Listener with the
 	// "InvalidRoutesRef" reason.
 	//
 	// Support: Core
@@ -368,18 +367,21 @@ type ListenerRoutes struct {
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
-// RouteSelectType specifies where Routes should be selected by a Gateway.
+// FromNamespaces specifies namespace from which Routes may be attached to a
+// Gateway.
 //
 // +kubebuilder:validation:Enum=All;Selector;Same
-type RouteSelectType string
+type FromNamespaces string
 
 const (
-	// Routes in all namespaces may be used by this Gateway.
-	RouteSelectAll RouteSelectType = "All"
-	// Only Routes in namespaces selected by the selector may be used by this Gateway.
-	RouteSelectSelector RouteSelectType = "Selector"
-	// Only Routes in the same namespace as the Gateway may be used by this Gateway.
-	RouteSelectSame RouteSelectType = "Same"
+	// Routes in all namespaces may be attached to this Gateway.
+	NamespacesFromAll FromNamespaces = "All"
+	// Only Routes in namespaces selected by the selector may be attached to
+	// this Gateway.
+	NamespacesFromSelector FromNamespaces = "Selector"
+	// Only Routes in the same namespace as the Gateway may be attached to this
+	// Gateway.
+	NamespacesFromSame FromNamespaces = "Same"
 )
 
 // RouteNamespaces indicate which namespaces Routes should be selected from.
@@ -395,7 +397,7 @@ type RouteNamespaces struct {
 	//
 	// +optional
 	// +kubebuilder:default=Same
-	From *RouteSelectType `json:"from,omitempty"`
+	From *FromNamespaces `json:"from,omitempty"`
 
 	// Selector must be specified when From is set to "Selector". In that case,
 	// only Routes in Namespaces matching this Selector will be selected by this
@@ -480,8 +482,6 @@ type GatewayStatus struct {
 	// addresses in the Spec, e.g. if the Gateway automatically
 	// assigns an address from a reserved pool.
 	//
-	// These addresses should all be of type "IPAddress".
-	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
@@ -532,10 +532,9 @@ const (
 	//
 	// * "Scheduled"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "NotReconciled"
-	// * "NoSuchGatewayClass"
 	// * "NoResources"
 	//
 	// Controllers may raise this condition with other reasons,
@@ -547,16 +546,9 @@ const (
 	// true.
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
-	// This reason is used with the "Scheduled" condition when
-	// been recently created and no controller has reconciled it yet.
+	// This reason is used with the "Scheduled" condition when no controller has
+	// reconciled the Gateway.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
-
-	// This reason is used with the "Scheduled" condition when the Gateway is
-	// not scheduled because there is no controller that recognizes the
-	// GatewayClassName. This reason has been deprecated and will be removed in
-	// a future release.
-	// +deprecated
-	GatewayReasonNoSuchGatewayClass GatewayConditionReason = "NoSuchGatewayClass"
 
 	// This reason is used with the "Scheduled" condition when the
 	// Gateway is not scheduled because insufficient infrastructure
@@ -579,7 +571,7 @@ const (
 	//
 	// * "Ready"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "ListenersNotValid"
 	// * "ListenersNotReady"
@@ -614,9 +606,7 @@ const (
 
 // ListenerStatus is the status associated with a Listener.
 type ListenerStatus struct {
-	// Name is the name of the Listener. If the Gateway has more than one
-	// Listener present, each ListenerStatus MUST specify a name. The names of
-	// ListenerStatus objects MUST be unique within a Gateway.
+	// Name is the name of the Listener that this status corresponds to.
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
@@ -625,6 +615,12 @@ type ListenerStatus struct {
 	// there are kinds specified on the Listener, this MUST represent the
 	// intersection of those kinds and the kinds supported by the implementation
 	// for the specified protocol.
+	//
+	// If kinds are specified in Spec that are not supported, an implementation
+	// MUST set the "ResolvedRefs" condition to "False" with the
+	// "InvalidRouteKinds" reason. If both valid and invalid Route kinds are
+	// specified, the implementation should support the valid Route kinds that
+	// have been specified.
 	//
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
@@ -662,7 +658,7 @@ const (
 	// * "ProtocolConflict"
 	// * "RouteConflict"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "NoConflicts"
 	//
@@ -674,7 +670,7 @@ const (
 	// This reason is used with the "Conflicted" condition when
 	// the Listener conflicts with hostnames in other Listeners. For
 	// example, this reason would be used when multiple Listeners on
-	// the same port use `*` in the hostname field.
+	// the same port use `example.com` in the hostname field.
 	ListenerReasonHostnameConflict ListenerConditionReason = "HostnameConflict"
 
 	// This reason is used with the "Conflicted" condition when
@@ -690,7 +686,7 @@ const (
 	ListenerReasonRouteConflict ListenerConditionReason = "RouteConflict"
 
 	// This reason is used with the "Conflicted" condition when the condition
-	// is false.
+	// is False.
 	ListenerReasonNoConflicts ListenerConditionReason = "NoConflicts"
 )
 
@@ -712,7 +708,7 @@ const (
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "Attached"
 	//
@@ -742,7 +738,7 @@ const (
 	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
 
 	// This reason is used with the "Detached" condition when the condition is
-	// false.
+	// False.
 	ListenerReasonAttached ListenerConditionReason = "Attached"
 )
 
@@ -754,11 +750,10 @@ const (
 	//
 	// * "ResolvedRefs"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
-	// * "DegradedRoutes"
 	// * "InvalidCertificateRef"
-	// * "InvalidRoutesRef"
+	// * "InvalidRouteKinds"
 	// * "RefNotPermitted"
 	//
 	// Controllers may raise this condition with other reasons,
@@ -770,23 +765,14 @@ const (
 	// is true.
 	ListenerReasonResolvedRefs ListenerConditionReason = "ResolvedRefs"
 
-	// This reason is used with the "ResolvedRefs" condition
-	// when not all of the routes selected by this Listener could be
-	// configured. The specific reason for the degraded route should
-	// be indicated in the route's .Status.Conditions field.
-	ListenerReasonDegradedRoutes ListenerConditionReason = "DegradedRoutes"
-
 	// This reason is used with the "ResolvedRefs" condition when the
 	// Listener has a TLS configuration with a TLS CertificateRef
 	// that is invalid or cannot be resolved.
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 
-	// This reason is used with the "ResolvedRefs" condition when
-	// the Listener's Routes selector or kind is invalid or cannot
-	// be resolved. Note that it is not an error for this selector to
-	// not resolve any Routes, and the "ResolvedRefs" status condition
-	// should not be raised in that case.
-	ListenerReasonInvalidRoutesRef ListenerConditionReason = "InvalidRoutesRef"
+	// This reason is used with the "ResolvedRefs" condition when an invalid or
+	// unsupported Route kind is specified by the Listener.
+	ListenerReasonInvalidRouteKinds ListenerConditionReason = "InvalidRouteKinds"
 
 	// This reason is used with the "ResolvedRefs" condition when
 	// one of the Listener's Routes has a BackendRef to an object in
@@ -803,7 +789,7 @@ const (
 	//
 	// * "Ready"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "Invalid"
 	// * "Pending"
