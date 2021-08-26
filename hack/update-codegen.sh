@@ -60,7 +60,7 @@ go run sigs.k8s.io/controller-tools/cmd/controller-gen \
         paths=./apis/v1alpha2
 
 # TODO(robscott): Change this once v1alpha2 has received formal API approval.
-sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.5\.0/api\-approved\.kubernetes\.io\:\ unapproved/g' config/crd/v1alpha2/gateway.networking.k8s.io*
+sed -i -e 's/controller\-gen\.kubebuilder\.io\/version\:\ v0\.6\.2/api\-approved\.kubernetes\.io\:\ unapproved/g' config/crd/v1alpha2/gateway.networking.k8s.io*
 
 for VERSION in v1alpha1 v1alpha2
 do
