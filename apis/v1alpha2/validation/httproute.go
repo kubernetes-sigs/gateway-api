@@ -55,7 +55,7 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 		}
 		// custom filters don't have any validation
 		for _, key := range repeatableHTTPRouteFilters {
-			counts[key] = 0
+			delete(counts, key)
 		}
 
 		for filterType, count := range counts {

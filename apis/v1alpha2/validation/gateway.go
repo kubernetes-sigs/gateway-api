@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"fmt"
 	"net"
 	"strings"
 
@@ -36,8 +37,39 @@ func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
 // validateGatewaySpec validates whether required fields of spec are set according to the
 // Gateway API specification.
 func validateGatewaySpec(spec *gatewayv1a2.GatewaySpec, path *field.Path) field.ErrorList {
-	// TODO [danehans]: Add additional validation of spec fields.
-	return validateGatewayListeners(spec.Listeners, path.Child("listeners"))
+
+	errList := validateGatewayListeners(spec.Listeners, path.Child("listeners"))
+	if len(errList) > 0 {
+		fmt.Printf("Failed validating gateway listeners.")
+		return errList
+	}
+
+	if errList := validateGatewayClassName(spec.GatewayClassName, path.Child("gatewayClassName")); len(errList) > 0 {
+		return errList
+
+	}
+
+	if errList := validateGatewayAddresses(spec.Addresses, path.Child("addresses")); len(errList) > 0 {
+		return errList
+	}
+
+	return nil
+}
+
+func validateGatewayClassName(gwclsName string, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if len(gwclsName) == 0 || len(gwclsName) > 253 {
+		errs = append(errs, field.Invalid(path, gwclsName, "must greater than 1 and less than 253"))
+	}
+	return errs
+}
+
+func validateGatewayAddresses(addresses []gatewayv1a2.GatewayAddress, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if len(addresses) > 16 {
+		errs = append(errs, field.Invalid(path, "addresses length", " maximum is 16 items."))
+	}
+	return errs
 }
 
 // validateGatewayListeners validates whether required fields of listeners are set according

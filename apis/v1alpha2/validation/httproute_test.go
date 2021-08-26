@@ -312,9 +312,8 @@ func TestValidateHTTPRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		// copy variable to avoid scope problems with ranges
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
-			errs := ValidateHTTPRoute(&tt.hRoute)
+			errs := validateHTTPRouteUniqueFilters(&tt.hRoute.)
 			if len(errs) != tt.errCount {
 				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
 			}
