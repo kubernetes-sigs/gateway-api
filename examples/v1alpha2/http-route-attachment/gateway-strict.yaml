@@ -1,0 +1,16 @@
+kind: Gateway
+metadata:
+  name: foo-gateway
+  namespace: foo-namespace
+spec:
+  listeners:
+  - name: prod-web
+    routes:
+      kind: HTTPRoute
+      namespaces:
+      - from: Selector
+        selector:
+          matchLabels:
+            # This label is added automatically as of K8s 1.22
+            # to all namespaces
+            kubernetes.io/metadata.name: bar-namespace 

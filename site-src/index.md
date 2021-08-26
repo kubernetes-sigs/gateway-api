@@ -55,7 +55,7 @@ implementations. These classes make it easy and explicit for users to
 understand what kind of capabilities are available via the Kubernetes resource 
 model.
 - **Shared Gateways and cross-Namespace support** - They allow the sharing of
-load balancers and VIPs by permitting independent Route resources to bind to
+load balancers and VIPs by permitting independent Route resources to attach to
 the same Gateway. This allows teams (even across Namespaces) to share
 infrastructure safely without direct coordination.
 - **Typed Routes and typed backends** - The Gateway API supports typed Route 
@@ -82,16 +82,17 @@ works in practice.
 
 A cluster operator creates a [Gateway](/v1alpha2/api-types/gateway) resource derived from a
 [GatewayClass](/v1alpha2/api-types/gatewayclass). This Gateway deploys or configures the
-underlying network resources that it represents. Through the [Route binding
-handshake](/concepts/api-overview#route-binding) between the Gateway and Routes,
-the operator permits (or denies) specific teams to bind to this Gateway and expose their
-applications through it. Centralized policies [such as
-TLS](/v1alpha2/guides/tls#downstream-tls) can be enforced on the Gateway by the cluster
-operator. Meanwhile, the store and site teams run [in their own
-Namespaces](/v1alpha2/guides/multiple-ns), but bind their Routes against the same shared
-Gateway, allowing them to independently control their [routing
-logic](/v1alpha2/guides/http-routing). This separation of concerns allows the store team to
-manage their own [traffic splitting rollout](/v1alpha2/guides/traffic-splitting) while
+underlying network resources that it represents. Through the
+[Route Attachment Process](/concepts/api-overview#attaching-routes-to-gateways)
+between the Gateway and Routes, the cluster operator and specific teams must
+agree on what can attach to this Gateway and expose their applications through
+it. Centralized policies [such as TLS](/v1alpha2/guides/tls#downstream-tls) can
+be enforced on the Gateway by the cluster operator. Meanwhile, the store and site
+teams run [in their own Namespaces](/v1alpha2/guides/multiple-ns), but attach their
+Routes to the same shared Gateway, allowing them to independently control
+their [routing logic](/v1alpha2/guides/http-routing). This separation of concerns
+allows the store team to manage their own
+[traffic splitting rollout](/v1alpha2/guides/traffic-splitting) while
 leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)

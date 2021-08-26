@@ -1,0 +1,14 @@
+kind: Gateway
+metadata:
+  name: prod-gateway
+  namespace: foo-namespace
+spec:
+  listeners:
+  - name: prod-web
+    routes:
+      kind: HTTPRoute
+      namespaces:
+      - from: Selector
+        selector:
+          matchLabels:
+            expose-apps: "true"

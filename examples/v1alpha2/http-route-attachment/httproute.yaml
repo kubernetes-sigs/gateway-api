@@ -1,0 +1,13 @@
+kind: HTTPRoute
+metadata:
+  name: my-route
+  namespace: bar-namespace
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: foo-gateway
+    namespace: foo-namespace
+  rules:
+  - backendRefs:
+    - name: foo-svc
+      port: 8080
