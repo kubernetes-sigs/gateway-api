@@ -73,7 +73,7 @@ managing the GatewayClass to provide these settings for the user, resulting in a
 more portable spec. This behaviour will be made clear using the GatewayClass
 Status object.
 
-A Gateway MAY contain one or more *Route references* which serve to direct
+A Gateway MAY be attached to one or more *Route references* which serve to direct
 traffic for a subset of traffic *to a specific service.*
 
 ### Route Resources
@@ -119,6 +119,10 @@ to allow multiple Routes to share ports on the Listener.
 
 
 ### Attaching Routes to Gateways
+
+!!! note
+    This section has changed significantly between v1alpha1 and v1alpha2. This
+    section describes the v1alpha2 approach.
 
 When a Route attaches to a Gateway, it represents configuration that is applied
 on the Gateway that configures the underlying load balancer or proxy. How and

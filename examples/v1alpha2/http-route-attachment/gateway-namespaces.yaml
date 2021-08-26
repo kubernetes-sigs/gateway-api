@@ -1,14 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: Gateway
 metadata:
   name: prod-gateway
-  namespace: foo-namespace
+  namespace: gateway-api-example-ns1
 spec:
+  gatewayClassName: foo-lb
   listeners:
   - name: prod-web
-    routes:
-      kind: HTTPRoute
+    port: 80
+    protocol: HTTP    
+    allowedRoutes:
+      kinds: 
+        - kind: HTTPRoute
       namespaces:
-      - from: Selector
+        from: Selector
         selector:
           matchLabels:
             expose-apps: "true"
