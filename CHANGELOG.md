@@ -14,8 +14,13 @@
 
 API version: v1alpha2
 
-This release is intended to be last alpha release, so there are a lot of breaking
-API changes. Please read these release notes carefully.
+The working group expects that this release candidate is quite close to the final
+v1alpha2 API and does not plan to make major API changes. However, breaking API
+changes are still possible.
+
+This release candidate is suitable for implementors, but the working group does
+not recommend shipping products based on a release candidate API due to the
+possibility of incompatible changes prior to the final release.
 
 ### Major Changes
 
