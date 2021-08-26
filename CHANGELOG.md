@@ -15,8 +15,7 @@
 API version: v1alpha2
 
 The working group expects that this release candidate is quite close to the final
-v1alpha2 API and does not plan to make major API changes. However, breaking API
-changes are still possible.
+v1alpha2 API. However, breaking API changes are still possible.
 
 This release candidate is suitable for implementors, but the working group does
 not recommend shipping products based on a release candidate API due to the
@@ -31,7 +30,7 @@ is not possible. As part of this process, Gateway API is now subject to Kubernet
 API review, the same as changes made to core API resources. More details in
 [#780](https://github.com/kubernetes-sigs/gateway-api/pull/780) and [#716](https://github.com/kubernetes-sigs/gateway-api/issues/716).
 
-* Gateway-Route binding changes,
+* Gateway-Route binding changes:
 [GEP-724](https://gateway-api.sigs.k8s.io/geps/gep-724/). Currently, Gateways
 choose which Routes are attached using a combination of object and namespace
 selectors, with the option of also specifying object names. This has made a very
@@ -50,8 +49,8 @@ complex config, that's easy to misinterpret. As part of v1alpha2, we're changing
   Further documentation was added in [#762](https://github.com/kubernetes-sigs/gateway-api/pull/762).
 
 
-* Safer cross-namespace references
-([GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/)): This one concerns
+* Safer cross-namespace references:
+([GEP-709](https://gateway-api.sigs.k8s.io/geps/gep-709/)): This concerns
 (currently), references from Routes to Backends, and Gateways to Secrets. The
 new behavior is:
   * By default, references across namespaces are not permitted; creating a
@@ -66,8 +65,8 @@ new behavior is:
   from breaking the namespace security model.
   Implemented in [#741](https://github.com/kubernetes-sigs/gateway-api/pull/741).
 
-* Attaching Policy to objects,
-[GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/): This one has been added
+* Attaching Policy to objects:
+[GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/): This has been added
 so that we have an extensible mechanism for adding a cascading set of policy to
 Gateway API objects.
 
@@ -95,7 +94,7 @@ Gateway API objects.
 * As part of GEP-713, `BackendPolicy` has been removed, as its functionality is
 now better handled using that mechanism. [#732](https://github.com/kubernetes-sigs/gateway-api/pull/732). 
 
-* Removal of certificate references from HTTPRoutes,
+* Removal of certificate references from HTTPRoutes:
 [GEP-746](https://gateway-api.sigs.k8s.io/geps/gep-746/):
   In v1alpha1, HTTPRoute objects have a stanza that allows referencing a TLS
   keypair, intended to allow people to have a more self-service model, where an
@@ -135,11 +134,11 @@ references must instead now use the `BackendRef`/`backendRef` struct/stanza.
   See [#610](https://github.com/kubernetes-sigs/gateway-api/issues/610) and
   [#653](https://github.com/kubernetes-sigs/gateway-api/pull/653) for the details.
   
-*  [#671](https://github.com/kubernetes-sigs/gateway-api/pull/671) Controller is
+*  [#671](https://github.com/kubernetes-sigs/gateway-api/pull/671): Controller is
 now a required field in Gateway references from Route status. Fixes
 [#669](https://github.com/kubernetes-sigs/gateway-api/pull/671).
 
-*  [#657](https://github.com/kubernetes-sigs/gateway-api/pull/657) and
+*  [#657](https://github.com/kubernetes-sigs/gateway-api/pull/657): and
 [#681](https://github.com/kubernetes-sigs/gateway-api/pull/681) Header Matching,
 Query Param Matching, and HTTPRequestHeaderFilter now use named subobjects
 instead of maps. 
