@@ -12,6 +12,10 @@ many vendors and have broad industry support.
 
 ![Gateway API Model](./images/api-model.png)
 
+
+!!! warning
+    Gateway API is preparing to release v1alpha2, which is a large change, and
+    some documents on this site are out of date. Please pardon our dust for now.
 ## Getting started
 
 Whether you are a user interested in using the Gateway API or an implementer 
@@ -19,9 +23,9 @@ interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
-- [User guides](/v1alpha1/guides/getting-started)
+- [User guides](/v1alpha2/guides/getting-started)
 - [Gateway controller implementations](/implementations)
-- [API reference spec](/v1alpha1/references/spec)
+- [API reference spec](/v1alpha2/references/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 
@@ -51,7 +55,7 @@ implementations. These classes make it easy and explicit for users to
 understand what kind of capabilities are available via the Kubernetes resource 
 model.
 - **Shared Gateways and cross-Namespace support** - They allow the sharing of
-load balancers and VIPs by permitting independent Route resources to bind to
+load balancers and VIPs by permitting independent Route resources to attach to
 the same Gateway. This allows teams (even across Namespaces) to share
 infrastructure safely without direct coordination.
 - **Typed Routes and typed backends** - The Gateway API supports typed Route 
@@ -76,18 +80,19 @@ used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators. The following example shows how this
 works in practice.
 
-A cluster operator creates a [Gateway](/v1alpha1/api-types/gateway) resource derived from a
-[GatewayClass](/v1alpha1/api-types/gatewayclass). This Gateway deploys or configures the
-underlying network resources that it represents. Through [Route binding
-policy](/concepts/api-overview#route-binding) set on the Gateway, the operator
-permits (or denies) specific teams to bind to this Gateway and expose their
-applications through it. Centralized policies [such as
-TLS](/guides/tls#downstream-tls) can be enforced on the Gateway by the cluster
-operator. Meanwhile, the store and site teams run [in their own
-Namespaces](/guides/multiple-ns), but bind their Routes against the same shared
-Gateway, allowing them to independently control their [routing
-logic](/guides/http-routing). This separation of concerns allows the store team to
-manage their own [traffic splitting rollout](/guides/traffic-splitting) while
+A cluster operator creates a [Gateway](/v1alpha2/api-types/gateway) resource derived from a
+[GatewayClass](/v1alpha2/api-types/gatewayclass). This Gateway deploys or configures the
+underlying network resources that it represents. Through the
+[Route Attachment Process](/concepts/api-overview#attaching-routes-to-gateways)
+between the Gateway and Routes, the cluster operator and specific teams must
+agree on what can attach to this Gateway and expose their applications through
+it. Centralized policies [such as TLS](/v1alpha2/guides/tls#downstream-tls) can
+be enforced on the Gateway by the cluster operator. Meanwhile, the store and site
+teams run [in their own Namespaces](/v1alpha2/guides/multiple-ns), but attach their
+Routes to the same shared Gateway, allowing them to independently control
+their [routing logic](/v1alpha2/guides/http-routing). This separation of concerns
+allows the store team to manage their own
+[traffic splitting rollout](/v1alpha2/guides/traffic-splitting) while
 leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)
