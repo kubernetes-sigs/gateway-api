@@ -30,8 +30,8 @@ func ValidateGatewayClassUpdate(oldClass, newClass *gatewayv1a2.GatewayClass) fi
 		return nil
 	}
 	var errs field.ErrorList
-	if oldClass.Spec.Controller != newClass.Spec.Controller {
-		errs = append(errs, field.Invalid(field.NewPath("spec.controller"), newClass.Spec.Controller,
+	if oldClass.Spec.ControllerName != newClass.Spec.ControllerName {
+		errs = append(errs, field.Invalid(field.NewPath("spec.controllerName"), newClass.Spec.ControllerName,
 			"cannot update an immutable field"))
 	}
 	return errs

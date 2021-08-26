@@ -3,7 +3,7 @@ kind: GatewayClass
 metadata:
   name: filter-lb
 spec:
-  controller: acme.io/gateway-controller
+  controllerName: acme.io/gateway-controller
   parametersRef:
     name: acme-lb
     group: acme.io

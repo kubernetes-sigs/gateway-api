@@ -166,9 +166,9 @@ type BackendRef struct {
 type RouteConditionType string
 
 const (
-	// This condition indicates whether the route has been admitted or rejected
+	// This condition indicates whether the route has been accepted or rejected
 	// by a Gateway, and why.
-	ConditionRouteAdmitted RouteConditionType = "Admitted"
+	ConditionRouteAccepted RouteConditionType = "Accepted"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
@@ -182,16 +182,16 @@ type RouteParentStatus struct {
 	// RouteParentStatus struct describes the status of.
 	ParentRef ParentRef `json:"parentRef"`
 
-	// Controller is a domain/path string that indicates the controller that
-	// wrote this status. This corresponds with the controller field on
-	// GatewayClass.
+	// ControllerName is a domain/path string that indicates the name of the
+	// controller that wrote this status. This corresponds with the
+	// controllerName field on GatewayClass.
 	//
 	// Example: "example.net/gateway-controller".
 	//
 	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
 	// valid Kubernetes names
 	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
-	Controller GatewayController `json:"controller"`
+	ControllerName GatewayController `json:"controllerName"`
 
 	// Conditions describes the status of the route with respect to the Gateway.
 	// Note that the route's availability is also subject to the Gateway's own
@@ -199,14 +199,14 @@ type RouteParentStatus struct {
 	//
 	// If the Route's ParentRef specifies an existing Gateway that supports
 	// Routes of this kind AND that Gateway's controller has sufficient access,
-	// then that Gateway's controller MUST set the "Admitted" condition on the
-	// Route, to indicate whether the route has been admitted or rejected by the
+	// then that Gateway's controller MUST set the "Accepted" condition on the
+	// Route, to indicate whether the route has been accepted or rejected by the
 	// Gateway, and why.
 	//
-	// A Route MUST be considered "Admitted" if at least one of the Route's
+	// A Route MUST be considered "Accepted" if at least one of the Route's
 	// rules is implemented by the Gateway.
 	//
-	// There are a number of cases where the "Admitted" condition may not be set
+	// There are a number of cases where the "Accepted" condition may not be set
 	// due to lack of controller visibility, that includes when:
 	//
 	// * The Route refers to a non-existent parent.
@@ -230,6 +230,11 @@ type RouteStatus struct {
 	// first sees the route and should update the entry as appropriate when the
 	// route or gateway is modified.
 	//
+	// Note that parent references that cannot be resolved by an implementation
+	// of this API will not be added to this list. Implementations of this API
+	// can only populate Route status for the Gateways/parent resources they are
+	// responsible for.
+	//
 	// A maximum of 32 Gateways will be represented in this list. An empty list
 	// means the route has not been attached to any Gateway.
 	//
@@ -237,12 +242,12 @@ type RouteStatus struct {
 	Parents []RouteParentStatus `json:"parents"`
 }
 
-// Hostname is the fully qualified domain name of a network host, as defined
-// by RFC 3986. Note the following deviations from the "host" part of the
-// URI as defined in the RFC:
+// Hostname is the fully qualified domain name of a network host. This matches
+// the RFC 1123 definition of a hostname with 2 notable exceptions:
 //
-// 1. IP literals are not allowed.
-// 2. The `:` delimiter is not respected because ports are not allowed.
+// 1. IPs are not allowed.
+// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+//    label must appear by itself as the first label.
 //
 // Hostname can be "precise" which is a domain name without the terminating
 // dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
@@ -314,8 +319,7 @@ type Kind string
 // +kubebuilder:validation:MaxLength=63
 type Namespace string
 
-// SectionName is the name of a section in a Kubernetes resource. It must be a
-// RFC 1123 subdomain.
+// SectionName is the name of a section in a Kubernetes resource.
 //
 // This validation is based off of the corresponding Kubernetes validation:
 // https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/util/validation/validation.go#L208

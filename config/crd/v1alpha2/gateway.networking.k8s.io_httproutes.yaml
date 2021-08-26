@@ -28,7 +28,10 @@ spec:
     name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: HTTPRoute is the Schema for the HTTPRoute resource.
+        description: HTTPRoute provides a way to route HTTP requests. This includes
+          the capability to match requests by hostname, path, header, or query param.
+          Filters can be used to specify additional processing steps. Backends specify
+          where matching requests should be routed.
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -48,42 +51,41 @@ spec:
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
                   against the HTTP Host header to select a HTTPRoute to process the
-                  request. Hostname is the fully qualified domain name of a network
-                  host, as defined by RFC 3986. Note the following deviations from
-                  the \"host\" part of the URI as defined in the RFC: \n 1. IPs are
-                  not allowed. 2. The `:` delimiter is not respected because ports
-                  are not allowed. \n If a hostname is specified by both the Listener
-                  and HTTPRoute, there must be at least one intersecting hostname
-                  for the HTTPRoute to be attached to the Listener. For example: \n
-                  * A Listener with `test.example.com` as the hostname matches HTTPRoutes
-                  \  that have either not specified any hostnames, or have specified
-                  at   least one of `test.example.com` or `*.example.com`. * A Listener
-                  with `*.example.com` as as the hostname matches HTTPRoutes   that
-                  have either not specified any hostnames or have specified at least
-                  \  one hostname that matches the Listener hostname. For example,
-                  \  `test.example.com` and `*.example.com` would both match. On the
-                  other   hand, `a.b.example.com`, `example.com`, and `test.example.net`
-                  would   not match. \n If both the Listener and HTTPRoute have specified
+                  request. This matches the RFC 1123 definition of a hostname with
+                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
+                  be prefixed with a wildcard label (`*.`). The wildcard    label
+                  must appear by itself as the first label. \n If a hostname is specified
+                  by both the Listener and HTTPRoute, there must be at least one intersecting
+                  hostname for the HTTPRoute to be attached to the Listener. For example:
+                  \n * A Listener with `test.example.com` as the hostname matches
+                  HTTPRoutes   that have either not specified any hostnames, or have
+                  specified at   least one of `test.example.com` or `*.example.com`.
+                  * A Listener with `*.example.com` as the hostname matches HTTPRoutes
+                  \  that have either not specified any hostnames or have specified
+                  at least   one hostname that matches the Listener hostname. For
+                  example,   `test.example.com` and `*.example.com` would both match.
+                  On the other   hand, `example.com` and `test.example.net` would
+                  not match. \n If both the Listener and HTTPRoute have specified
                   hostnames, any HTTPRoute hostnames that do not match the Listener
                   hostname MUST be ignored. For example, if a Listener specified `*.example.com`,
                   and the HTTPRoute specified `test.example.com` and `test.example.net`,
                   `test.example.net` must not be considered for a match. \n If hostnames
                   do not match with the criteria above, then the HTTPRoute is not
-                  admitted, and the implementation must raise an 'Admitted' Condition
+                  accepted, and the implementation must raise an 'Accepted' Condition
                   with a status of `False` for the target Listener(s). \n Support:
                   Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
-                    host, as defined by RFC 3986. Note the following deviations from
-                    the \"host\" part of the URI as defined in the RFC: \n 1. IP literals
-                    are not allowed. 2. The `:` delimiter is not respected because
-                    ports are not allowed. \n Hostname can be \"precise\" which is
-                    a domain name without the terminating dot of a network host (e.g.
-                    \"foo.example.com\") or \"wildcard\", which is a domain name prefixed
-                    with a single wildcard label (e.g. `*.example.com`). \n Note that
-                    as per RFC1035 and RFC1123, a *label* must consist of lower case
-                    alphanumeric characters or '-', and must start and end with an
-                    alphanumeric character. No other punctuation is allowed."
+                    host. This matches the RFC 1123 definition of a hostname with
+                    2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
+                    may be prefixed with a wildcard label (`*.`). The wildcard    label
+                    must appear by itself as the first label. \n Hostname can be \"precise\"
+                    which is a domain name without the terminating dot of a network
+                    host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain
+                    name prefixed with a single wildcard label (e.g. `*.example.com`).
+                    \n Note that as per RFC1035 and RFC1123, a *label* must consist
+                    of lower case alphanumeric characters or '-', and must start and
+                    end with an alphanumeric character. No other punctuation is allowed."
                   maxLength: 253
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -188,8 +190,8 @@ spec:
                 description: Rules are a list of HTTP matchers, filters and actions.
                 items:
                   description: HTTPRouteRule defines semantics for matching an HTTP
-                    request based on conditions, optionally executing additional processing
-                    steps, and forwarding the request to an API object.
+                    request based on conditions (matches), processing it (filters),
+                    and forwarding the request to an API object (backendRefs).
                   properties:
                     backendRefs:
                       description: "If unspecified or invalid (refers to a non-existent
@@ -212,18 +214,15 @@ spec:
                               broader support of filters, use the Filters field in
                               HTTPRouteRule.)"
                             items:
-                              description: 'HTTPRouteFilter defines additional processing
-                                steps that must be completed during the request or
-                                response lifecycle. HTTPRouteFilters are meant as
-                                an extension point to express additional processing
-                                that may be done in Gateway implementations. Some
-                                examples include request or response modification,
-                                implementing authentication strategies, rate-limiting,
-                                and traffic shaping. API guarantee/conformance is
-                                defined based on the type of the filter. TODO(hbagdi):
-                                re-render CRDs once controller-tools supports union
-                                tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298
-                                - https://github.com/kubernetes-sigs/controller-tools/issues/461'
+                              description: HTTPRouteFilter defines processing steps
+                                that must be completed during the request or response
+                                lifecycle. HTTPRouteFilters are meant as an extension
+                                point to express processing that may be done in Gateway
+                                implementations. Some examples include request or
+                                response modification, implementing authentication
+                                strategies, rate-limiting, and traffic shaping. API
+                                guarantee/conformance is defined based on the type
+                                of the filter.
                               properties:
                                 extensionRef:
                                   description: "ExtensionRef is an optional, implementation-specific
@@ -367,7 +366,9 @@ spec:
                                   type: object
                                 requestMirror:
                                   description: "RequestMirror defines a schema for
-                                    a filter that mirrors requests. \n Support: Extended"
+                                    a filter that mirrors requests. Requests are sent
+                                    to the specified destination, but responses from
+                                    that destination are ignored. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
@@ -505,7 +506,11 @@ spec:
                                     field. `Type` should be set to   \"ExtensionRef\"
                                     for custom filters. \n Implementers are encouraged
                                     to define custom implementation types to extend
-                                    the core API with implementation-specific behavior."
+                                    the core API with implementation-specific behavior.
+                                    \n If a reference to a custom filter type cannot
+                                    be resolved, the filter MUST NOT be skipped. Instead,
+                                    requests that would have been processed by that
+                                    filter MUST receive a HTTP error response."
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -597,16 +602,14 @@ spec:
                         a core filter multiple times has unspecified or custom conformance.
                         \n Support: Core"
                       items:
-                        description: 'HTTPRouteFilter defines additional processing
-                          steps that must be completed during the request or response
-                          lifecycle. HTTPRouteFilters are meant as an extension point
-                          to express additional processing that may be done in Gateway
-                          implementations. Some examples include request or response
-                          modification, implementing authentication strategies, rate-limiting,
-                          and traffic shaping. API guarantee/conformance is defined
-                          based on the type of the filter. TODO(hbagdi): re-render
-                          CRDs once controller-tools supports union tags: - https://github.com/kubernetes-sigs/controller-tools/pull/298
-                          - https://github.com/kubernetes-sigs/controller-tools/issues/461'
+                        description: HTTPRouteFilter defines processing steps that
+                          must be completed during the request or response lifecycle.
+                          HTTPRouteFilters are meant as an extension point to express
+                          processing that may be done in Gateway implementations.
+                          Some examples include request or response modification,
+                          implementing authentication strategies, rate-limiting, and
+                          traffic shaping. API guarantee/conformance is defined based
+                          on the type of the filter.
                         properties:
                           extensionRef:
                             description: "ExtensionRef is an optional, implementation-specific
@@ -742,7 +745,9 @@ spec:
                             type: object
                           requestMirror:
                             description: "RequestMirror defines a schema for a filter
-                              that mirrors requests. \n Support: Extended"
+                              that mirrors requests. Requests are sent to the specified
+                              destination, but responses from that destination are
+                              ignored. \n Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
@@ -873,7 +878,10 @@ spec:
                               be set to   \"ExtensionRef\" for custom filters. \n
                               Implementers are encouraged to define custom implementation
                               types to extend the core API with implementation-specific
-                              behavior."
+                              behavior. \n If a reference to a custom filter type
+                              cannot be resolved, the filter MUST NOT be skipped.
+                              Instead, requests that would have been processed by
+                              that filter MUST receive a HTTP error response."
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
@@ -903,24 +911,19 @@ spec:
                         how to specify multiple match conditions that should be ANDed
                         together. \n If no matches are specified, the default is a
                         prefix path match on \"/\", which has the effect of matching
-                        every HTTP request. \n Each client request MUST map to a maximum
-                        of one route rule. If a request matches multiple rules, matching
-                        precedence MUST be determined in order of the following criteria,
-                        continuing on ties: \n * The longest matching hostname. *
-                        The longest matching non-wildcard hostname. * The longest
-                        matching path. * The largest number of header matches. * The
-                        largest number of query param matches. \n If ties still exist
-                        across multiple Routes, matching precedence MUST be determined
-                        in order of the following criteria, continuing on ties: \n
-                        * The oldest Route based on creation timestamp. For example,
-                        a Route with   a creation timestamp of \"2020-09-08 01:02:03\"
-                        is given precedence over   a Route with a creation timestamp
-                        of \"2020-09-08 01:02:04\". * The Route appearing first in
-                        alphabetical order by   \"<namespace>/<name>\". For example,
-                        foo/bar is given precedence over   foo/baz. \n If ties still
-                        exist within the Route that has been given precedence, matching
-                        precedence MUST be granted to the first matching rule meeting
-                        the above criteria."
+                        every HTTP request. \n Proxy or Load Balancer routing configuration
+                        generated from HTTPRoutes MUST prioritize rules based on the
+                        following criteria, continuing on ties: \n * The longest hostname.
+                        * The longest non-wildcard hostname. * The longest path. *
+                        The largest number of header matches. * The largest number
+                        of query param matches. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by   \"<namespace>/<name>\". \n If ties
+                        still exist within the Route that has been given precedence,
+                        matching precedence MUST be granted to the first matching
+                        rule meeting the above criteria."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -1095,8 +1098,12 @@ spec:
                   the controller that manages the parent must add an entry to this
                   list when the controller first sees the route and should update
                   the entry as appropriate when the route or gateway is modified.
-                  \n A maximum of 32 Gateways will be represented in this list. An
-                  empty list means the route has not been attached to any Gateway."
+                  \n Note that parent references that cannot be resolved by an implementation
+                  of this API will not be added to this list. Implementations of this
+                  API can only populate Route status for the Gateways/parent resources
+                  they are responsible for. \n A maximum of 32 Gateways will be represented
+                  in this list. An empty list means the route has not been attached
+                  to any Gateway."
                 items:
                   description: RouteParentStatus describes the status of a route with
                     respect to an associated Parent.
@@ -1108,11 +1115,11 @@ spec:
                         listener status. \n If the Route's ParentRef specifies an
                         existing Gateway that supports Routes of this kind AND that
                         Gateway's controller has sufficient access, then that Gateway's
-                        controller MUST set the \"Admitted\" condition on the Route,
-                        to indicate whether the route has been admitted or rejected
-                        by the Gateway, and why. \n A Route MUST be considered \"Admitted\"
+                        controller MUST set the \"Accepted\" condition on the Route,
+                        to indicate whether the route has been accepted or rejected
+                        by the Gateway, and why. \n A Route MUST be considered \"Accepted\"
                         if at least one of the Route's rules is implemented by the
-                        Gateway. \n There are a number of cases where the \"Admitted\"
+                        Gateway. \n There are a number of cases where the \"Accepted\"
                         condition may not be set due to lack of controller visibility,
                         that includes when: \n * The Route refers to a non-existent
                         parent. * The Route is of a type that the controller does
@@ -1195,12 +1202,13 @@ spec:
                       x-kubernetes-list-map-keys:
                       - type
                       x-kubernetes-list-type: map
-                    controller:
-                      description: "Controller is a domain/path string that indicates
-                        the controller that wrote this status. This corresponds with
-                        the controller field on GatewayClass. \n Example: \"example.net/gateway-controller\".
-                        \n The format of this field is DOMAIN \"/\" PATH, where DOMAIN
-                        and PATH are valid Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
+                    controllerName:
+                      description: "ControllerName is a domain/path string that indicates
+                        the name of the controller that wrote this status. This corresponds
+                        with the controllerName field on GatewayClass. \n Example:
+                        \"example.net/gateway-controller\". \n The format of this
+                        field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid
+                        Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
@@ -1275,7 +1283,7 @@ spec:
                       - name
                       type: object
                   required:
-                  - controller
+                  - controllerName
                   - parentRef
                   type: object
                 maxItems: 32

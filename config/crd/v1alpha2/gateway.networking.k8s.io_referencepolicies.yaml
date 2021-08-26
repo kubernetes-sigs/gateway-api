@@ -63,7 +63,7 @@ spec:
                   properties:
                     group:
                       description: "Group is the group of the referent. When empty,
-                        the \"core\" API group is inferred. \n Support: Core"
+                        the Kubernetes core API group is inferred. \n Support: Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
@@ -102,7 +102,7 @@ spec:
                   properties:
                     group:
                       description: "Group is the group of the referent. When empty,
-                        the \"core\" API group is inferred. \n Support: Core"
+                        the Kubernetes core API group is inferred. \n Support: Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string

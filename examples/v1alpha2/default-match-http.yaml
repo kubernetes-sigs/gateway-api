@@ -3,7 +3,7 @@ kind: GatewayClass
 metadata:
   name: default-match-example
 spec:
-  controller: acme.io/gateway-controller
+  controllerName: acme.io/gateway-controller
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: Gateway

@@ -3,4 +3,4 @@ kind: GatewayClass
 metadata:
   name: invalid-controller
 spec:
-  controller: example
+  controllerName: example
