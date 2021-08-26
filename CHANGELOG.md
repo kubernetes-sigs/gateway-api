@@ -139,6 +139,10 @@ now a required field in Gateway references from Route status. Fixes
 Query Param Matching, and HTTPRequestHeaderFilter now use named subobjects
 instead of maps. 
 
+* [#796](https://github.com/kubernetes-sigs/gateway-api/pull/796) API Review suggestions:
+  * listener.routes has been renamed to listener.allowedRoutes
+  * The `NoSuchGatewayClass` has been removed after it was deprecated in v1alpha1
+  * `*` is no longer a valid hostname. Instead, leaving hostname unspecified is interpreted as `*`. 
 
 ### Documentation Updates
 * [#782](https://github.com/kubernetes-sigs/gateway-api/pull/782) : Restructure docs and split into versioned and unversioned
