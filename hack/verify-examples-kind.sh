@@ -61,11 +61,8 @@ sleep 8
 # Install all example gateway-api resources.
 kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha1 || res=$?
 
-sleep 3
-
 # Uninstall CRDs
 kubectl delete --kubeconfig "${KUBECONFIG}" -f config/crd/v1alpha1 || res=$?
-
 
 ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
 # Install CRDs
@@ -83,7 +80,7 @@ kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha2 || r
 # Firstly, apply the examples, remembering that errors are on stdout
 kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f hack/invalid-examples 2>&1 | \
       # First, we grep out the expected responses.
-      # After this, if everything is as expoected, the output should be empty.
+      # After this, if everything is as expected, the output should be empty.
       grep -v 'is invalid' | \
       grep -v 'missing required field' | \
       # Then, we grep for anything else.
