@@ -17,6 +17,8 @@ limitations under the License.
 package validation
 
 import (
+	"regexp"
+
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -30,6 +32,14 @@ var (
 	}
 )
 
+const qnameCharFmt string = "[A-Za-z]"
+const qnameExtCharFmt string = "[-A-Za-z]"
+const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
+const qualifiedNameErrMsg string = "header name must be case senstive and match http header"
+const qualifiedNameMaxLength int = 63
+
+var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
+
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
 // For additional details of the HTTPRoute spec, refer to:
 // https://gateway-api.sigs.k8s.io/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
@@ -40,7 +50,11 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // validateHTTPRouteSpec validates that required fields of spec are set according to the
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
+	if errList := validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules")); len(errList) > 0 {
+		return errList
+	}
+
+	return nil
 }
 
 // validateHTTPRouteUniqueFilters validates whether each core and extended filter
@@ -64,6 +78,48 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 			}
 		}
 
+		if errList := validateHttpRouteMatches(rule.Matches, path, i); len(errList) > 0 {
+			errs = append(errs, errList...)
+		}
+
+		if errList := validateHttpRouteBackendRefs(rule.BackendRefs, path, i); len(errList) > 0 {
+			errs = append(errs, errList...)
+		}
+	}
+
+	return errs
+}
+
+func validateHttpRouteBackendRefs(ref []gatewayv1a2.HTTPBackendRef, path *field.Path, i int) field.ErrorList {
+	var errs field.ErrorList
+
+	for _, bkr := range ref {
+		counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
+		for _, filter := range bkr.Filters {
+			counts[filter.Type]++
+		}
+
+		for _, key := range repeatableHTTPRouteFilters {
+			delete(counts, key)
+		}
+
+		for filterType, count := range counts {
+			if count > 1 {
+				errs = append(errs, field.Invalid(path.Index(i).Child("BackendRefs"), filterType, "cannot be used multiple times in the same rule"))
+			}
+		}
+	}
+	return errs
+}
+
+func validateHttpRouteMatches(matches []gatewayv1a2.HTTPRouteMatch, path *field.Path, i int) field.ErrorList {
+	var errs field.ErrorList
+	for _, match := range matches {
+		for _, header := range match.Headers {
+			if !qualifiedNameRegexp.MatchString(string(header.Name)) {
+				errs = append(errs, field.Invalid(path.Index(i).Child("matches"), header.Name, "match header name is not valid."))
+			}
+		}
 	}
 
 	return errs
