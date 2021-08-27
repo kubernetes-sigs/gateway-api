@@ -19,7 +19,7 @@ Please note the following:
   Gateway listener. Implementations can support such use-cases by adding a custom
   resource to specify advanced routing properties and then referencing it in
   `spec.rules[].matches[].extensionRef`. Conflicts due to routing colisions should
-  be resolved as per the [conflict resolution](/v1alpha1/concepts/guidelines#conflicts) guidelines.
+  be resolved as per the [conflict resolution](/concepts/guidelines#conflicts) guidelines.
 
 ```
 {% include 'v1alpha1/basic-tcp.yaml' %}

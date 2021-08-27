@@ -4,6 +4,8 @@
 infrastructure provider. This resource represents a class of Gateways that can
 be instantiated.
 
+[gatewayclass]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.GatewayClass
+
 > Note: GatewayClass serves the same function as the
 > [`networking.IngressClass` resource][ingress-class-api].
 
@@ -135,5 +137,4 @@ acme.io/gateway/v2   // Use version 2
 acme.io/gateway      // Use the default version
 ```
 
-[gatewayclass]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.GatewayClass
 [ingress-class-api]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class
