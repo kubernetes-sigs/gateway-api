@@ -440,6 +440,8 @@ spec:
                                       required:
                                       - name
                                       type: object
+                                  required:
+                                  - backendRef
                                   type: object
                                 requestRedirect:
                                   description: "RequestRedirect defines a schema for
@@ -807,6 +809,8 @@ spec:
                                 required:
                                 - name
                                 type: object
+                            required:
+                            - backendRef
                             type: object
                           requestRedirect:
                             description: "RequestRedirect defines a schema for a filter

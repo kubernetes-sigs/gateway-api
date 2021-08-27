@@ -722,9 +722,7 @@ type HTTPRequestMirrorFilter struct {
 	//
 	// Support: Extended for Kubernetes Service
 	// Support: Custom for any other resource
-	//
-	// +optional
-	BackendRef *BackendObjectReference `json:"backendRef,omitempty"`
+	BackendRef BackendObjectReference `json:"backendRef"`
 }
 
 // HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.
