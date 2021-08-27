@@ -453,17 +453,6 @@ type HTTPRouteMatch struct {
 	//
 	// +optional
 	Method *HTTPMethod `json:"method,omitempty"`
-
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior. For example, resource "myroutematcher" in group
-	// "networking.example.net". If the referent cannot be found, the rule is
-	// not included in the route. The controller must ensure the "ResolvedRefs"
-	// condition on the Route status is set to `status: False`.
-	//
-	// Support: Custom
-	//
-	// +optional
-	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // HTTPRouteFilter defines additional processing steps that must be completed

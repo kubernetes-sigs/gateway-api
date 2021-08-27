@@ -927,39 +927,6 @@ spec:
                           \n ``` match:   path:     value: \"/foo\"   headers:     values:
                           \      version: \"1\" ```"
                         properties:
-                          extensionRef:
-                            description: "ExtensionRef is an optional, implementation-specific
-                              extension to the \"match\" behavior. For example, resource
-                              \"myroutematcher\" in group \"networking.example.net\".
-                              If the referent cannot be found, the rule is not included
-                              in the route. The controller must ensure the \"ResolvedRefs\"
-                              condition on the Route status is set to `status: False`.
-                              \n Support: Custom"
-                            properties:
-                              group:
-                                description: Group is the group of the referent. For
-                                  example, "networking.k8s.io". When unspecified (empty
-                                  string), core API group is inferred.
-                                maxLength: 253
-                                pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                                type: string
-                              kind:
-                                description: Kind is kind of the referent. For example
-                                  "HTTPRoute" or "Service".
-                                maxLength: 63
-                                minLength: 1
-                                pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                                type: string
-                              name:
-                                description: Name is the name of the referent.
-                                maxLength: 253
-                                minLength: 1
-                                type: string
-                            required:
-                            - group
-                            - kind
-                            - name
-                            type: object
                           headers:
                             description: Headers specifies HTTP request header matchers.
                               Multiple match values are ANDed together, meaning, a
