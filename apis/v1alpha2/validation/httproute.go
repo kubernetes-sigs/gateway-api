@@ -17,8 +17,6 @@ limitations under the License.
 package validation
 
 import (
-	"regexp"
-
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -31,14 +29,6 @@ var (
 		gatewayv1a2.HTTPRouteFilterExtensionRef,
 	}
 )
-
-const qnameCharFmt string = "[A-Za-z]"
-const qnameExtCharFmt string = "[-A-Za-z]"
-const qualifiedNameFmt string = "(" + qnameCharFmt + qnameExtCharFmt + "*)?" + qnameCharFmt
-const qualifiedNameErrMsg string = "header name must be case senstive and match http header"
-const qualifiedNameMaxLength int = 63
-
-var qualifiedNameRegexp = regexp.MustCompile("^" + qualifiedNameFmt + "$")
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
 // For additional details of the HTTPRoute spec, refer to:
@@ -78,10 +68,6 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 			}
 		}
 
-		if errList := validateHttpRouteMatches(rule.Matches, path, i); len(errList) > 0 {
-			errs = append(errs, errList...)
-		}
-
 		if errList := validateHttpRouteBackendRefs(rule.BackendRefs, path, i); len(errList) > 0 {
 			errs = append(errs, errList...)
 		}
@@ -109,18 +95,5 @@ func validateHttpRouteBackendRefs(ref []gatewayv1a2.HTTPBackendRef, path *field.
 			}
 		}
 	}
-	return errs
-}
-
-func validateHttpRouteMatches(matches []gatewayv1a2.HTTPRouteMatch, path *field.Path, i int) field.ErrorList {
-	var errs field.ErrorList
-	for _, match := range matches {
-		for _, header := range match.Headers {
-			if !qualifiedNameRegexp.MatchString(string(header.Name)) {
-				errs = append(errs, field.Invalid(path.Index(i).Child("matches"), header.Name, "match header name is not valid."))
-			}
-		}
-	}
-
 	return errs
 }

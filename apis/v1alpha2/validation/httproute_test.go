@@ -19,6 +19,7 @@ package validation
 import (
 	"testing"
 
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilpointer "k8s.io/utils/pointer"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -313,7 +314,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 	for _, tt := range tests {
 		// copy variable to avoid scope problems with ranges
 		t.Run(tt.name, func(t *testing.T) {
-			errs := validateHTTPRouteUniqueFilters(&tt.hRoute.)
+			errs := validateHTTPRouteUniqueFilters(tt.hRoute.Spec.Rules, field.NewPath("spec").Child("rules"))
 			if len(errs) != tt.errCount {
 				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
 			}
