@@ -9,7 +9,6 @@ import (
 func Test_Utils(t *testing.T) {
 
 	var exportedPort1 gatewayv1a2.PortNumber = 65535
-	var exportedPort2 gatewayv1a2.PortNumber = 65536
 	var exportedPort3 gatewayv1a2.PortNumber = 1
 
 	table := []struct {
@@ -34,7 +33,7 @@ func Test_Utils(t *testing.T) {
 			pathType:     "Exact",
 			expectedPath: gatewayv1a2.PathMatchExact,
 			port:         65536,
-			expectedPort: &exportedPort2,
+			expectedPort: nil,
 		},
 		{
 			pathType:     "Prefix",
