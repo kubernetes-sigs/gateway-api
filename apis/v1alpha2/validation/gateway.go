@@ -17,7 +17,6 @@ limitations under the License.
 package validation
 
 import (
-	"fmt"
 	"net"
 	"strings"
 
@@ -37,12 +36,8 @@ func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
 // validateGatewaySpec validates whether required fields of spec are set according to the
 // Gateway API specification.
 func validateGatewaySpec(spec *gatewayv1a2.GatewaySpec, path *field.Path) field.ErrorList {
-	if errList := validateGatewayListeners(spec.Listeners, path.Child("listeners")); len(errList) > 0 {
-		fmt.Printf("Failed validating gateway listeners.")
-		return errList
-	}
-
-	return nil
+	// TODO [danehans]: Add additional validation of spec fields.
+	return validateGatewayListeners(spec.Listeners, path.Child("listeners"))
 }
 
 // validateGatewayListeners validates whether required fields of listeners are set according
