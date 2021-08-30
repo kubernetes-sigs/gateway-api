@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"testing"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -11,57 +12,85 @@ func Test_Utils(t *testing.T) {
 	var exportedPort1 gatewayv1a2.PortNumber = 65535
 	var exportedPort3 gatewayv1a2.PortNumber = 1
 
+	var expectedPathMatch1 = gatewayv1a2.PathMatchExact
+	var expectedPathMatch2 = gatewayv1a2.PathMatchPrefix
+	var expectedPathMatch3 = gatewayv1a2.PathMatchRegularExpression
+	var expectedPathMatch4 = gatewayv1a2.PathMatchImplementationSpecific
+
 	table := []struct {
 		pathType     string
-		expectedPath gatewayv1a2.PathMatchType
+		expectedPath *gatewayv1a2.PathMatchType
 		port         int
 		expectedPort *gatewayv1a2.PortNumber
 	}{
 		{
 			pathType:     "Exact",
-			expectedPath: gatewayv1a2.PathMatchExact,
+			expectedPath: &expectedPathMatch1,
 			port:         0,
 			expectedPort: nil,
 		},
 		{
 			pathType:     "Exact",
-			expectedPath: gatewayv1a2.PathMatchExact,
+			expectedPath: &expectedPathMatch1,
 			port:         65535,
 			expectedPort: &exportedPort1,
 		},
 		{
 			pathType:     "Exact",
-			expectedPath: gatewayv1a2.PathMatchExact,
+			expectedPath: &expectedPathMatch1,
 			port:         65536,
 			expectedPort: nil,
 		},
 		{
 			pathType:     "Prefix",
-			expectedPath: gatewayv1a2.PathMatchPrefix,
+			expectedPath: &expectedPathMatch2,
 			port:         0,
 			expectedPort: nil,
 		},
 		{
 			pathType:     "RegularExpression",
-			expectedPath: gatewayv1a2.PathMatchRegularExpression,
+			expectedPath: &expectedPathMatch3,
 			port:         65536,
 			expectedPort: nil,
 		},
 		{
 			pathType:     "ImplementationSpecific",
-			expectedPath: gatewayv1a2.PathMatchImplementationSpecific,
+			expectedPath: &expectedPathMatch4,
+			port:         1,
+			expectedPort: &exportedPort3,
+		},
+		{
+			pathType:     "APrefix",
+			expectedPath: nil,
 			port:         1,
 			expectedPort: &exportedPort3,
 		},
 	}
 
 	for _, entry := range table {
-		if path := PathMatchTypePtr(entry.pathType); *path != entry.expectedPath {
-			t.Error("failed in path match type pointer.")
+		path := PathMatchTypePtr(entry.pathType)
+		if path == nil && entry.expectedPath != nil {
+			t.Error("failed in path match type pointer. not expecting nil, but get nil.")
 		}
-		if port := PortNumberPtr(entry.port); port != entry.expectedPort {
-			t.Error("failed in port number pointer.")
+
+		if path != nil && entry.expectedPath == nil {
+			t.Error("failed in path match type pointer. expecting nil but get non-nil")
 		}
+
+		if path != nil && entry.expectedPath != nil && *path != *entry.expectedPath {
+			t.Error("failed in path match type pointer. go unexpected.")
+		}
+
+		port := PortNumberPtr(entry.port)
+		if port == nil && entry.expectedPort != nil {
+			t.Error("failed in port number pointer. not expected nil, but got nil.")
+		}
+		if port != nil && entry.expectedPort == nil {
+			t.Error("failed in port number port. expecting nil, but got non-nil.")
+		}
+		if port != nil && entry.expectedPort != nil && *port != *entry.expectedPort {
+			fmt.Printf("failed in port number expecting  %d got port %d", entry.expectedPort, *port)
+		}
+
 	}
 }
-g

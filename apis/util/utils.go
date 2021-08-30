@@ -20,12 +20,21 @@ import (
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
+// PathMatchTypePtr generate path match type
 func PathMatchTypePtr(s string) *gatewayv1a2.PathMatchType {
+	if s != string(gatewayv1a2.PathMatchExact) && s != string(gatewayv1a2.PathMatchPrefix) && s != string(gatewayv1a2.PathMatchRegularExpression) &&
+		s != string(gatewayv1a2.PathMatchImplementationSpecific) {
+		return nil
+	}
 	result := gatewayv1a2.PathMatchType(s)
 	return &result
 }
 
+// PortNumberPtr generate port number
 func PortNumberPtr(p int) *gatewayv1a2.PortNumber {
+	if p < 1 || p > 65535 {
+		return nil
+	}
 	result := gatewayv1a2.PortNumber(p)
 	return &result
 }
