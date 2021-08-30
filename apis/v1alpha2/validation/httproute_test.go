@@ -314,11 +314,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		// copy variable to avoid scope problems with ranges
-		t.Run(tt.name, func(t *testing.T) {
-			errs := validateHTTPRouteUniqueFilters(tt.hRoute.Spec.Rules, field.NewPath("spec").Child("rules"))
-			if len(errs) != tt.errCount {
-				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
-			}
-		})
+		t.Logf("running test case [%s]", tt.name)
+		errs := validateHTTPRouteUniqueFilters(tt.hRoute.Spec.Rules, field.NewPath("spec").Child("rules"))
+		if len(errs) != tt.errCount {
+			t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
+		}
 	}
 }
