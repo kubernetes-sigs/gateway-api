@@ -56,7 +56,7 @@ func Test_Utils(t *testing.T) {
 	}
 
 	for _, entry := range table {
-		if path := PathMatchTypePtr(entry.pathType); path != &entry.expectedPath {
+		if path := PathMatchTypePtr(entry.pathType); *path != entry.expectedPath {
 			t.Error("failed in path match type pointer.")
 		}
 		if port := PortNumberPtr(entry.port); port != entry.expectedPort {
