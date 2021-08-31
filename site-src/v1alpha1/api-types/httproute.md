@@ -233,13 +233,12 @@ Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification](httprouterule).
 
-
-[httproute]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
-[gateways]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.RouteGateways
-[httprouterule]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule
-[hostname]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.Hostname
-[tls-config]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig
+[httproute]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
+[gateways]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.RouteGateways
+[httprouterule]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule
+[hostname]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.Hostname
+[tls-config]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.RouteTLSConfig
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch
-[filters]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter
-[forwardto]: https://gateway-api.sigs.k8s.io/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo
+[matches]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteMatch
+[filters]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteFilter
+[forwardto]: /v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteForwardTo
