@@ -271,6 +271,7 @@ const (
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
+	//
 	// - Terminate: The TLS session between the downstream client
 	//   and the Gateway is terminated at the Gateway. This mode requires
 	//   certificateRef to be set.
