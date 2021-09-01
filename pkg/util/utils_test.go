@@ -22,40 +22,39 @@ import (
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-func Test_Utils(t *testing.T) {
-
-	var exportedPort1 gatewayv1a2.PortNumber = 65535
-	var exportedPort3 gatewayv1a2.PortNumber = 1
+func Test_PortNumberPtr(t *testing.T) {
+	var exportedPort65535 gatewayv1a2.PortNumber = 65535
+	var exportedPort1 gatewayv1a2.PortNumber = 1
 
 	portNumberPtrTests := []struct {
-		Name         string
+		name         string
 		port         int
 		expectedPort *gatewayv1a2.PortNumber
 	}{
 		{
-			Name:         "invalid port number",
+			name:         "invalid port number",
 			port:         0,
 			expectedPort: nil,
 		},
 		{
-			Name:         "valid port number",
+			name:         "valid port number",
 			port:         65535,
-			expectedPort: &exportedPort1,
+			expectedPort: &exportedPort65535,
 		},
 		{
-			Name:         "invalid port number",
+			name:         "invalid port number",
 			port:         65536,
 			expectedPort: nil,
 		},
 		{
-			Name:         "valid port number",
+			name:         "valid port number",
 			port:         1,
-			expectedPort: &exportedPort3,
+			expectedPort: &exportedPort1,
 		},
 	}
 
 	for _, tt := range portNumberPtrTests {
-		t.Run(tt.Name, func(t *testing.T) {
+		t.Run(tt.name, func(t *testing.T) {
 			port := PortNumberPtr(tt.port)
 			if port == nil || tt.expectedPort == nil {
 				if port != tt.expectedPort {
@@ -66,37 +65,40 @@ func Test_Utils(t *testing.T) {
 			}
 		})
 	}
+}
 
-	pathmatchtypePtrTests := []struct {
-		Name         string
+func Test_PathMatchTypePtr(t *testing.T) {
+
+	pathMatchTypePtrTests := []struct {
+		name         string
 		pathType     string
 		expectedPath gatewayv1a2.PathMatchType
 	}{
 		{
-			Name:         "valid path exact match",
+			name:         "valid path exact match",
 			pathType:     "Exact",
 			expectedPath: gatewayv1a2.PathMatchExact,
 		},
 
 		{
-			Name:         "valid path prefix match",
+			name:         "valid path prefix match",
 			pathType:     "Prefix",
 			expectedPath: gatewayv1a2.PathMatchPrefix,
 		},
 		{
-			Name:         "valid path regular expression match",
+			name:         "valid path regular expression match",
 			pathType:     "RegularExpression",
 			expectedPath: gatewayv1a2.PathMatchRegularExpression,
 		},
 		{
-			Name:         "valid path regular implementation specific match",
+			name:         "valid path regular implementation specific match",
 			pathType:     "ImplementationSpecific",
 			expectedPath: gatewayv1a2.PathMatchImplementationSpecific,
 		},
 	}
 
-	for _, tt := range pathmatchtypePtrTests {
-		t.Run(tt.Name, func(t *testing.T) {
+	for _, tt := range pathMatchTypePtrTests {
+		t.Run(tt.name, func(t *testing.T) {
 			path := PathMatchTypePtr(tt.pathType)
 			if *path != tt.expectedPath {
 				t.Errorf("Expected path %s, got %s", tt.expectedPath, *path)
