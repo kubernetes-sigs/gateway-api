@@ -83,7 +83,7 @@ advanced routing, multi-cluster load balancing and more. See the docs to deploy
 HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specification. See the [controller's Gateway API documentation][h2] to get informed about conformance and roadmap.
 
 [h1]:https://haproxy-ingress.github.io/
-[h2]:https://haproxy-ingress.github.io/v0.13/docs/configuration/gateway-api/
+[h2]:https://haproxy-ingress.github.io/docs/configuration/gateway-api/
 
 ### Istio
 

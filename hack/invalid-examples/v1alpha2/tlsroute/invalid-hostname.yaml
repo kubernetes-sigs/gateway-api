@@ -1,9 +1,10 @@
-kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TLSRoute
 metadata:
-  name: invalid-backend-port
+  name: invalid-hostname
 spec:
+  hostnames:
+  - http://a<
   rules:
   - backendRefs:
-    - name: my-service1
-      port: 800080
+    - name: foo

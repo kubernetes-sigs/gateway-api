@@ -27,8 +27,8 @@ here for implementations to support other types of parent resources.
 
 The following example shows how a Route would attach to the `acme-lb` Gateway:
 ```yaml
-kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: httproute-example
 spec:
@@ -56,8 +56,8 @@ rules and filters (optional).
 
 The following example defines hostname "my.example.com":
 ```yaml
-kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: httproute-example
 spec:
@@ -78,8 +78,8 @@ independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
 ```yaml
-kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: HTTPRoute
 ...
 matches:
   - path:
@@ -170,8 +170,8 @@ appropriate when the route is modified.
 The following example indicates HTTPRoute "http-example" has been admitted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
-kind: HTTPRoute
 apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: HTTPRoute
 metadata:
   name: http-example
 ...
