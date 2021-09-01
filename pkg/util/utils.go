@@ -22,19 +22,12 @@ import (
 
 // PathMatchTypePtr translates a string to *PathMatchType
 func PathMatchTypePtr(s string) *gatewayv1a2.PathMatchType {
-	if s != string(gatewayv1a2.PathMatchExact) && s != string(gatewayv1a2.PathMatchPrefix) && s != string(gatewayv1a2.PathMatchRegularExpression) &&
-		s != string(gatewayv1a2.PathMatchImplementationSpecific) {
-		return nil
-	}
 	result := gatewayv1a2.PathMatchType(s)
 	return &result
 }
 
 // PortNumberPtr translates an int to a *PortNumber
 func PortNumberPtr(p int) *gatewayv1a2.PortNumber {
-	if p < 1 || p > 65535 {
-		return nil
-	}
 	result := gatewayv1a2.PortNumber(p)
 	return &result
 }

@@ -25,6 +25,8 @@ import (
 func Test_PortNumberPtr(t *testing.T) {
 	var exportedPort65535 gatewayv1a2.PortNumber = 65535
 	var exportedPort1 gatewayv1a2.PortNumber = 1
+	var exportedPort0 gatewayv1a2.PortNumber = 0
+	var exportedPort65536 gatewayv1a2.PortNumber = 65536
 
 	portNumberPtrTests := []struct {
 		name         string
@@ -34,7 +36,7 @@ func Test_PortNumberPtr(t *testing.T) {
 		{
 			name:         "invalid port number",
 			port:         0,
-			expectedPort: nil,
+			expectedPort: &exportedPort0,
 		},
 		{
 			name:         "valid port number",
@@ -44,7 +46,7 @@ func Test_PortNumberPtr(t *testing.T) {
 		{
 			name:         "invalid port number",
 			port:         65536,
-			expectedPort: nil,
+			expectedPort: &exportedPort65536,
 		},
 		{
 			name:         "valid port number",
@@ -54,6 +56,9 @@ func Test_PortNumberPtr(t *testing.T) {
 	}
 
 	for _, tt := range portNumberPtrTests {
+		// workaround of : Using the variable on range scope `tt` in function literal (scopelint)
+		// https://github.com/kyoh86/scopelint/issues/4#issuecomment-471661062
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			port := PortNumberPtr(tt.port)
 			if port == nil || tt.expectedPort == nil {
@@ -98,6 +103,7 @@ func Test_PathMatchTypePtr(t *testing.T) {
 	}
 
 	for _, tt := range pathMatchTypePtrTests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			path := PathMatchTypePtr(tt.pathType)
 			if *path != tt.expectedPath {
