@@ -58,14 +58,15 @@ type TLSRouteSpec struct {
 	// and matches only a single label. You cannot have a wildcard label by
 	// itself (e.g. Host == `*`).
 	//
-	// Requests will be matched against the Host field in the following order:
+	// Requests will be matched against the SNI attribute in the following
+	// order:
 	//
-	// 1. If SNI is precise, the request matches this rule if the SNI in
+	// 1. If SNI is precise, the request matches this Route if the SNI in
 	//    ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this rule if the
+	// 2. If SNI is a wildcard, then the request matches this Route if the
 	//    SNI is to equal to the suffix (removing the first label) of the
-	//    wildcard rule.
-	// 3. If SNIs is unspecified, all requests associated with the gateway TLS
+	//    wildcard.
+	// 3. If SNIs are unspecified, all requests associated with the gateway TLS
 	//    listener will match. This can be used to define a default backend
 	//    for a TLS listener.
 	//
@@ -89,40 +90,6 @@ type TLSRouteStatus struct {
 
 // TLSRouteRule is the configuration for a given rule.
 type TLSRouteRule struct {
-	// Matches define conditions used for matching the rule against incoming TLS
-	// connections. Each match is independent, i.e. this rule will be matched if
-	// **any** one of the matches is satisfied. If unspecified (i.e. empty),
-	// this Rule will match all requests for the associated Listener.
-	//
-	// Each client request MUST map to a maximum of one route rule. If a request
-	// matches multiple rules, matching precedence MUST be determined in order
-	// of the following criteria, continuing on ties:
-	//
-	// * The longest matching SNI.
-	// * The longest matching precise SNI (without a wildcard). This means that
-	//   "b.example.com" should be given precedence over "*.example.com".
-	// * The most specific match specified by ExtensionRef. Each implementation
-	//   that supports ExtensionRef may have different ways of determining the
-	//   specificity of the referenced extension.
-	//
-	// If ties still exist across multiple Routes, matching precedence MUST be
-	// determined in order of the following criteria, continuing on ties:
-	//
-	// * The oldest Route based on creation timestamp. For example, a Route with
-	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
-	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
-	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>". For example, foo/bar is given precedence over
-	//   foo/baz.
-	//
-	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the first matching rule meeting
-	// the above criteria.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	Matches []TLSRouteMatch `json:"matches,omitempty"`
-
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a non-existent resource or
 	// a Service with no endpoints), the rule performs no forwarding; if no
@@ -141,23 +108,6 @@ type TLSRouteRule struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
-}
-
-// TLSRouteMatch defines the predicate used to match connections to a
-// given action.
-type TLSRouteMatch struct {
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior.  For example, resource "mytlsroutematcher" in group
-	// "networking.acme.io". If the referent cannot be found, the rule is not
-	// included in the route. The controller should raise the "ResolvedRefs"
-	// condition on the Gateway with the "DegradedRoutes" reason. The gateway
-	// status for this route should be updated with a condition that describes
-	// the error more specifically.
-	//
-	// Support: Custom
-	//
-	// +optional
-	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true

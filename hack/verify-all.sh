@@ -69,7 +69,12 @@ do
       ret=1
     fi
   else
-    bash "$t" || ret=1
+    if bash "$t"; then
+      echo -e "${color_green}SUCCESS: $t ${color_norm}"
+    else
+      echo -e "${color_red}Test FAILED: $t ${color_norm}"
+      ret=1
+    fi
   fi
 done
 

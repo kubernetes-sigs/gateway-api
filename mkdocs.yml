@@ -7,6 +7,8 @@ theme:
   name: material
   icon:
     repo: fontawesome/brands/git-alt
+  logo: images/k8s-favicon.png
+  favicon: images/k8s-favicon.png
   features:
     - search.highlight
     - navigation.tabs
