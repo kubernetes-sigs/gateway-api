@@ -290,6 +290,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 	}
 	for _, tt := range tests {
 		// copy variable to avoid scope problems with ranges
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			errs := validateHTTPRouteUniqueFilters(tt.hRouteRules, field.NewPath("spec").Child("rules"))
 			if len(errs) != tt.errCount {
@@ -380,6 +381,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 	}
 
 	for _, tt := range tests {
+		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			for index, rule := range tt.hRoute.Spec.Rules {
 				errs := validateHTTPBackendUniqueFilters(rule.BackendRefs, field.NewPath("spec").Child("rules"), index)

@@ -78,7 +78,7 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 
 func validateHTTPBackendUniqueFilters(ref []gatewayv1a2.HTTPBackendRef, path *field.Path, i int) field.ErrorList {
 	var errs field.ErrorList
-	
+
 	for _, bkr := range ref {
 		counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
 		for _, filter := range bkr.Filters {
