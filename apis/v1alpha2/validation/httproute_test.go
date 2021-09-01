@@ -322,3 +322,97 @@ func TestValidateHTTPRoute(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
+	var testService = "testService"
+	var specialService = "specialService"
+	tests := []struct {
+		name     string
+		hRoute   gatewayv1a2.HTTPRoute
+		errCount int
+	}{
+		{
+			name: "valid httpRoute Rules backendref filters",
+			hRoute: gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{
+						{
+							BackendRefs: []gatewayv1a2.HTTPBackendRef{
+								{
+									BackendRef: gatewayv1a2.BackendRef{
+										BackendObjectReference: gatewayv1a2.BackendObjectReference{
+											Name: testService,
+											Port: pkgutils.PortNumberPtr(8080),
+										},
+										Weight: utilpointer.Int32(100),
+									},
+									Filters: []gatewayv1a2.HTTPRouteFilter{
+										{
+											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
+											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+												BackendRef: &gatewayv1a2.BackendObjectReference{
+													Name: testService,
+													Port: pkgutils.PortNumberPtr(8081),
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			errCount: 0,
+		},
+
+		{
+			name: "invalid httpRoute Rules backendref filters",
+			hRoute: gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{
+						{
+							BackendRefs: []gatewayv1a2.HTTPBackendRef{
+								{
+									Filters: []gatewayv1a2.HTTPRouteFilter{
+										{
+											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
+											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+												BackendRef: &gatewayv1a2.BackendObjectReference{
+													Name: testService,
+													Port: pkgutils.PortNumberPtr(8080),
+												},
+											},
+										},
+										{
+											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
+											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+												BackendRef: &gatewayv1a2.BackendObjectReference{
+													Name: specialService,
+													Port: pkgutils.PortNumberPtr(8080),
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			errCount: 1,
+		},
+	}
+
+	for _, tt := range tests {
+
+		t.Run(tt.name, func(t *testing.T) {
+			for index, rule := range tt.hRoute.Spec.Rules {
+				errs := validateHTTPBackendUniqueFilters(rule.BackendRefs, field.NewPath("spec").Child("rules"), index)
+				if len(errs) != tt.errCount {
+					t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
+				}
+			}
+		})
+	}
+}
