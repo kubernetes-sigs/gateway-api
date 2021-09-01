@@ -68,7 +68,7 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 			}
 		}
 
-		if errList := validateHttpRouteBackendRefs(rule.BackendRefs, path, i); len(errList) > 0 {
+		if errList := validateHTTPBackendUniqueFilters(rule.BackendRefs, path, i); len(errList) > 0 {
 			errs = append(errs, errList...)
 		}
 	}
@@ -76,7 +76,7 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 	return errs
 }
 
-func validateHttpRouteBackendRefs(ref []gatewayv1a2.HTTPBackendRef, path *field.Path, i int) field.ErrorList {
+func validateHTTPBackendUniqueFilters(ref []gatewayv1a2.HTTPBackendRef, path *field.Path, i int) field.ErrorList {
 	var errs field.ErrorList
 
 	for _, bkr := range ref {
@@ -91,7 +91,7 @@ func validateHttpRouteBackendRefs(ref []gatewayv1a2.HTTPBackendRef, path *field.
 
 		for filterType, count := range counts {
 			if count > 1 {
-				errs = append(errs, field.Invalid(path.Index(i).Child("BackendRefs"), filterType, "cannot be used multiple times in the same rule"))
+				errs = append(errs, field.Invalid(path.Index(i).Child("BackendRefs"), filterType, "cannot be used multiple times in the same backend"))
 			}
 		}
 	}
