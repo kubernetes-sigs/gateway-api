@@ -77,7 +77,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8081),
 								},
@@ -104,7 +104,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -113,7 +113,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: specialService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -151,7 +151,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -189,7 +189,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -209,7 +209,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -229,7 +229,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: specialService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -267,7 +267,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						{
 							Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-								BackendRef: &gatewayv1a2.BackendObjectReference{
+								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
 									Port: pkgutils.PortNumberPtr(8080),
 								},
@@ -302,15 +302,6 @@ func TestValidateHTTPRoute(t *testing.T) {
 func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 	var testService = "testService"
 	var specialService = "specialService"
-	// workaround of : cannot use &(gatewayv1a2.BackendObjectReference literal) (value of type *v1alpha2.BackendObjectReference) as v1alpha2.BackendObjectReference value in struct literal (typecheck)
-	var var1 gatewayv1a2.BackendObjectReference = gatewayv1a2.BackendObjectReference{
-		Name: testService,
-		Port: pkgutils.PortNumberPtr(8080),
-	}
-	var var2 gatewayv1a2.BackendObjectReference = gatewayv1a2.BackendObjectReference{
-		Name: specialService,
-		Port: pkgutils.PortNumberPtr(8080),
-	}
 	tests := []struct {
 		name     string
 		hRoute   gatewayv1a2.HTTPRoute
@@ -335,7 +326,10 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 										{
 											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-												BackendRef: var1,
+												BackendRef: gatewayv1a2.BackendObjectReference{
+													Name: testService,
+													Port: pkgutils.PortNumberPtr(8080),
+												},
 											},
 										},
 									},
@@ -359,13 +353,19 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 										{
 											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-												BackendRef: var1,
+												BackendRef: gatewayv1a2.BackendObjectReference{
+													Name: testService,
+													Port: pkgutils.PortNumberPtr(8080),
+												},
 											},
 										},
 										{
 											Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 											RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-												BackendRef: var2,
+												BackendRef: gatewayv1a2.BackendObjectReference{
+													Name: specialService,
+													Port: pkgutils.PortNumberPtr(8080),
+												},
 											},
 										},
 									},
