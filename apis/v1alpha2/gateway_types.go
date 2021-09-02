@@ -339,8 +339,7 @@ const (
 	// implies that the Gateway can't decipher the TLS stream except for
 	// the ClientHello message of the TLS protocol.
 	//
-	// Note that SSL passthrough is not supported for HTTPRoute. If you're
-	// looking to implement that kind of functionality use TLSRoute.
+	// Note that SSL passthrough is only supported by TLSRoute.
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 

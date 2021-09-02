@@ -69,9 +69,7 @@
 * **Q: Is SSL Passthrough supported?**
   A: SSL Passthrough (wherein a Gateway routes traffic with the [Transport
   Layer Security (TLS)][tls] encryption _intact_ to a backend service instead of
-  terminating it) is supported by the [TLSRoute][tlsroute] API. Note that SSL
-  Passthrough is _not_ supported by the [HTTPRoute][routes] API as it is not
-  possible to route based on HTTP metadata without terminating TLS. See the
+  terminating it) is supported by [TLSRoutes][tlsroute]. See the
   [TLS Guide][tlsguide] for more details about passthrough and other TLS
   configurations.
 
@@ -79,5 +77,5 @@
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
 [tls]:https://en.wikipedia.org/wiki/Transport_Layer_Security
 [tlsroute]:/concepts/api-overview.md#tlsroute
-[routes]:/concepts/api-overview.md#routes
+[httproute]:/concepts/api-overview.md#httproute
 [tlsguide]:/guides/tls.md
