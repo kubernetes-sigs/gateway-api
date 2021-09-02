@@ -334,9 +334,12 @@ const (
 	// In this mode, TLS session between the downstream client
 	// and the Gateway is terminated at the Gateway.
 	TLSModeTerminate TLSModeType = "Terminate"
+
 	// In this mode, the TLS session is NOT terminated by the Gateway. This
 	// implies that the Gateway can't decipher the TLS stream except for
 	// the ClientHello message of the TLS protocol.
+	//
+	// Note that SSL passthrough is only supported by TLSRoute.
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 

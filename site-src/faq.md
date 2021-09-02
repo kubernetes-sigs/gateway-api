@@ -66,5 +66,15 @@
   AppProtocol depend on Kubernetes 1.18 (opt-in) or 1.19 (on by default). 
   There are not any other exceptions to the 1.16+ guideline right now.
 
+* **Q: Is SSL Passthrough supported?**
+  A: SSL Passthrough (wherein a Gateway routes traffic with the [Transport
+  Layer Security (TLS)][tls] encryption _intact_ to a backend service instead of
+  terminating it) is supported by [TLSRoutes][tlsroute]. See the
+  [TLS Guide][tlsguide] for more details about passthrough and other TLS
+  configurations.
+
 [1]: https://github.com/kubernetes-sigs/gateway-api
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
+[tls]:https://en.wikipedia.org/wiki/Transport_Layer_Security
+[tlsroute]:/concepts/api-overview.md#tlsroute
+[tlsguide]:/guides/tls.md
