@@ -6,27 +6,38 @@ Implementors of Gateway API are encouraged to update this document with status i
 
 ## Implementation Status
 
-- [Contour][1] (alpha)
-- [Emissary-Ingress (Ambassador API Gateway)][2] (alpha)
-- [Gloo Edge 2.0][3] (work in progress)
-- [Google Kubernetes Engine][4] (public preview)
-- [HAProxy Ingress][5] (alpha)
-- [Istio][6] (alpha)
-- [Kong][7] (work in progress)
-- [Traefik][8] (alpha)
+- [Apache APISIX][1] (work in progress)
+- [Contour][2] (alpha)
+- [Emissary-Ingress (Ambassador API Gateway)][3] (alpha)
+- [Gloo Edge 2.0][4] (work in progress)
+- [Google Kubernetes Engine][5] (public preview)
+- [HAProxy Ingress][6] (alpha)
+- [Istio][7] (alpha)
+- [Kong][8] (work in progress)
+- [Traefik][9] (alpha)
 
-[1]:#contour
-[2]:#emissary-ingress-ambassador-api-gateway
-[3]:#gloo-edge
-[4]:#google-kubernetes-engine
-[5]:#haproxy-ingress
-[6]:#istio
-[7]:#kong
-[8]:#traefik
+[1]:#apisix
+[2]:#contour
+[3]:#emissary-ingress-ambassador-api-gateway
+[4]:#gloo-edge
+[5]:#google-kubernetes-engine
+[6]:#haproxy-ingress
+[7]:#istio
+[8]:#kong
+[9]:#traefik
 
 ## Project References
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
+
+### APISIX
+
+[Apache APISIX][apisix] is a dynamic, real-time, high-performance API Gateway. APISIX provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
+
+APISIX is moving forward to implement the Gateway API `v1alpha2` version of the specification for its [Apache APISIX Ingress Controller][apisix-1], and status updates and documentation will be provided here as the work progresses.
+
+[apisix]:https://apisix.apache.org/
+[apisix-1]:https://github.com/apache/apisix-ingress-controller
 
 ### Contour
 
