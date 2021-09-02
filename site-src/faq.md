@@ -77,5 +77,4 @@
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
 [tls]:https://en.wikipedia.org/wiki/Transport_Layer_Security
 [tlsroute]:/concepts/api-overview.md#tlsroute
-[httproute]:/concepts/api-overview.md#httproute
 [tlsguide]:/guides/tls.md
