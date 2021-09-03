@@ -55,18 +55,16 @@ func Test_PortNumberPtr(t *testing.T) {
 		},
 	}
 
-	for _, tt := range portNumberPtrTests {
-		// workaround of : Using the variable on range scope `tt` in function literal (scopelint)
-		// https://github.com/kyoh86/scopelint/issues/4#issuecomment-471661062
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			port := PortNumberPtr(tt.port)
-			if port == nil || tt.expectedPort == nil {
-				if port != tt.expectedPort {
-					t.Errorf("Expected port %d, got %d", tt.expectedPort, port)
+	for _, tc := range portNumberPtrTests {
+
+		t.Run(tc.name, func(t *testing.T) {
+			port := PortNumberPtr(tc.port)
+			if port == nil || tc.expectedPort == nil {
+				if port != tc.expectedPort {
+					t.Errorf("Expected port %d, got %d", tc.expectedPort, port)
 				}
-			} else if *port != *tt.expectedPort {
-				t.Errorf("Expected port %d, got %d", *tt.expectedPort, *port)
+			} else if *port != *tc.expectedPort {
+				t.Errorf("Expected port %d, got %d", *tc.expectedPort, *port)
 			}
 		})
 	}
@@ -102,12 +100,11 @@ func Test_PathMatchTypePtr(t *testing.T) {
 		},
 	}
 
-	for _, tt := range pathMatchTypePtrTests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			path := PathMatchTypePtr(tt.pathType)
-			if *path != tt.expectedPath {
-				t.Errorf("Expected path %s, got %s", tt.expectedPath, *path)
+	for _, tc := range pathMatchTypePtrTests {
+		t.Run(tc.name, func(t *testing.T) {
+			path := PathMatchTypePtr(tc.pathType)
+			if *path != tc.expectedPath {
+				t.Errorf("Expected path %s, got %s", tc.expectedPath, *path)
 			}
 		})
 	}

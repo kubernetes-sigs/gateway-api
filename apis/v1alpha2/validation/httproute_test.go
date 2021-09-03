@@ -385,7 +385,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 			for index, rule := range tc.hRoute.Spec.Rules {
 				errs := validateHTTPBackendUniqueFilters(rule.BackendRefs, field.NewPath("spec").Child("rules"), index)
 				if len(errs) != tc.errCount {
-					t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tc.errCount)
+					t.Errorf("ValidateHTTPRoute() got %d errors, want %d errors", len(errs), tc.errCount)
 				}
 			}
 		})
