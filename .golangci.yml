@@ -43,3 +43,4 @@ issues:
         - gocyclo
         - errcheck
         - dupl
+    - Using the variable on range scope `tc` in function literal

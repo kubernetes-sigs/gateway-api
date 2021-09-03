@@ -30,13 +30,13 @@ func TestValidateHTTPRoute(t *testing.T) {
 	testService := "test-service"
 	specialService := "special-service"
 	tests := []struct {
-		name        string
-		hRouteRules []gatewayv1a2.HTTPRouteRule
-		errCount    int
+		name     string
+		rules    []gatewayv1a2.HTTPRouteRule
+		errCount int
 	}{
 		{
 			name: "valid httpRoute with no filters",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -63,7 +63,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 		{
 			name: "valid httpRoute with 1 filter",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -90,7 +90,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 		{
 			name: "invalid httpRoute with 2 extended filters",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -126,7 +126,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 		{
 			name: "invalid httpRoute with mix of filters and one duplicate",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -175,7 +175,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 		{
 			name: "invalid httpRoute with multiple duplicate filters",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -242,7 +242,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 		{
 			name: "valid httpRoute with duplicate ExtensionRef filters",
-			hRouteRules: []gatewayv1a2.HTTPRouteRule{
+			rules: []gatewayv1a2.HTTPRouteRule{
 				{
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
@@ -288,13 +288,13 @@ func TestValidateHTTPRoute(t *testing.T) {
 			errCount: 0,
 		},
 	}
-	for _, tt := range tests {
+	for _, tc := range tests {
 		// copy variable to avoid scope problems with ranges
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			errs := validateHTTPRouteUniqueFilters(tt.hRouteRules, field.NewPath("spec").Child("rules"))
-			if len(errs) != tt.errCount {
-				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
+
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateHTTPRouteUniqueFilters(tc.rules, field.NewPath("spec").Child("rules"))
+			if len(errs) != tc.errCount {
+				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tc.errCount)
 			}
 		})
 	}
@@ -380,13 +380,12 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 		},
 	}
 
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			for index, rule := range tt.hRoute.Spec.Rules {
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			for index, rule := range tc.hRoute.Spec.Rules {
 				errs := validateHTTPBackendUniqueFilters(rule.BackendRefs, field.NewPath("spec").Child("rules"), index)
-				if len(errs) != tt.errCount {
-					t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
+				if len(errs) != tc.errCount {
+					t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tc.errCount)
 				}
 			}
 		})
