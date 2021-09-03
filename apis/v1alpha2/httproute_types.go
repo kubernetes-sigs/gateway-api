@@ -211,7 +211,6 @@ type HTTPRouteRule struct {
 // * "Exact"
 // * "Prefix"
 // * "RegularExpression"
-// * "ImplementationSpecific"
 //
 // Prefix and Exact paths must be syntactically valid:
 //
@@ -220,15 +219,14 @@ type HTTPRouteRule struct {
 // - For prefix paths, a trailing '/' character in the Path is ignored,
 // e.g. /abc and /abc/ specify the same match.
 //
-// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression;ImplementationSpecific
+// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression
 type PathMatchType string
 
 // PathMatchType constants.
 const (
-	PathMatchExact                  PathMatchType = "Exact"
-	PathMatchPrefix                 PathMatchType = "Prefix"
-	PathMatchRegularExpression      PathMatchType = "RegularExpression"
-	PathMatchImplementationSpecific PathMatchType = "ImplementationSpecific"
+	PathMatchExact             PathMatchType = "Exact"
+	PathMatchPrefix            PathMatchType = "Prefix"
+	PathMatchRegularExpression PathMatchType = "RegularExpression"
 )
 
 // HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
@@ -237,7 +235,7 @@ type HTTPPathMatch struct {
 	//
 	// Support: Core (Exact, Prefix)
 	//
-	// Support: Custom (RegularExpression, ImplementationSpecific)
+	// Support: Custom (RegularExpression)
 	//
 	// Since RegularExpression PathType has custom conformance, implementations
 	// can support POSIX, PCRE or any other dialects of regular expressions.
@@ -261,16 +259,14 @@ type HTTPPathMatch struct {
 //
 // * "Exact"
 // * "RegularExpression"
-// * "ImplementationSpecific"
 //
-// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
+// +kubebuilder:validation:Enum=Exact;RegularExpression
 type HeaderMatchType string
 
 // HeaderMatchType constants.
 const (
-	HeaderMatchExact                  HeaderMatchType = "Exact"
-	HeaderMatchRegularExpression      HeaderMatchType = "RegularExpression"
-	HeaderMatchImplementationSpecific HeaderMatchType = "ImplementationSpecific"
+	HeaderMatchExact             HeaderMatchType = "Exact"
+	HeaderMatchRegularExpression HeaderMatchType = "RegularExpression"
 )
 
 // HTTPHeaderName is the name of an HTTP header.
@@ -298,7 +294,7 @@ type HTTPHeaderMatch struct {
 	//
 	// Support: Core (Exact)
 	//
-	// Support: Custom (RegularExpression, ImplementationSpecific)
+	// Support: Custom (RegularExpression)
 	//
 	// Since RegularExpression PathType has custom conformance, implementations
 	// can support POSIX, PCRE or any other dialects of regular expressions.
@@ -337,16 +333,14 @@ type HTTPHeaderMatch struct {
 //
 // * "Exact"
 // * "RegularExpression"
-// * "ImplementationSpecific"
 //
-// +kubebuilder:validation:Enum=Exact;RegularExpression;ImplementationSpecific
+// +kubebuilder:validation:Enum=Exact;RegularExpression
 type QueryParamMatchType string
 
 // QueryParamMatchType constants.
 const (
-	QueryParamMatchExact                  QueryParamMatchType = "Exact"
-	QueryParamMatchRegularExpression      QueryParamMatchType = "RegularExpression"
-	QueryParamMatchImplementationSpecific QueryParamMatchType = "ImplementationSpecific"
+	QueryParamMatchExact             QueryParamMatchType = "Exact"
+	QueryParamMatchRegularExpression QueryParamMatchType = "RegularExpression"
 )
 
 // HTTPQueryParamMatch describes how to select a HTTP route by matching HTTP
@@ -356,7 +350,7 @@ type HTTPQueryParamMatch struct {
 	//
 	// Support: Extended (Exact)
 	//
-	// Support: Custom (RegularExpression, ImplementationSpecific)
+	// Support: Custom (RegularExpression)
 	//
 	// Since RegularExpression QueryParamMatchType has custom conformance,
 	// implementations can support POSIX, PCRE or any other dialects of regular
