@@ -964,16 +964,15 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the header. \n Support: Core (Exact)
-                                    \n Support: Custom (RegularExpression, ImplementationSpecific)
-                                    \n Since RegularExpression PathType has custom
-                                    conformance, implementations can support POSIX,
-                                    PCRE or any other dialects of regular expressions.
-                                    Please read the implementation's documentation
-                                    to determine the supported dialect."
+                                    \n Support: Custom (RegularExpression) \n Since
+                                    RegularExpression PathType has custom conformance,
+                                    implementations can support POSIX, PCRE or any
+                                    other dialects of regular expressions. Please
+                                    read the implementation's documentation to determine
+                                    the supported dialect."
                                   enum:
                                   - Exact
                                   - RegularExpression
-                                  - ImplementationSpecific
                                   type: string
                                 value:
                                   description: Value is the value of HTTP Header to
@@ -1017,8 +1016,8 @@ spec:
                                 default: Prefix
                                 description: "Type specifies how to match against
                                   the path Value. \n Support: Core (Exact, Prefix)
-                                  \n Support: Custom (RegularExpression, ImplementationSpecific)
-                                  \n Since RegularExpression PathType has custom conformance,
+                                  \n Support: Custom (RegularExpression) \n Since
+                                  RegularExpression PathType has custom conformance,
                                   implementations can support POSIX, PCRE or any other
                                   dialects of regular expressions. Please read the
                                   implementation's documentation to determine the
@@ -1027,7 +1026,6 @@ spec:
                                 - Exact
                                 - Prefix
                                 - RegularExpression
-                                - ImplementationSpecific
                                 type: string
                               value:
                                 default: /
@@ -1055,16 +1053,15 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the query parameter. \n Support:
-                                    Extended (Exact) \n Support: Custom (RegularExpression,
-                                    ImplementationSpecific) \n Since RegularExpression
-                                    QueryParamMatchType has custom conformance, implementations
-                                    can support POSIX, PCRE or any other dialects
-                                    of regular expressions. Please read the implementation's
-                                    documentation to determine the supported dialect."
+                                    Extended (Exact) \n Support: Custom (RegularExpression)
+                                    \n Since RegularExpression QueryParamMatchType
+                                    has custom conformance, implementations can support
+                                    POSIX, PCRE or any other dialects of regular expressions.
+                                    Please read the implementation's documentation
+                                    to determine the supported dialect."
                                   enum:
                                   - Exact
                                   - RegularExpression
-                                  - ImplementationSpecific
                                   type: string
                                 value:
                                   description: Value is the value of HTTP query param
