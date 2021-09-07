@@ -749,7 +749,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-   								   "controller": "example.com/foo"
+   								   "controllerName": "example.com/foo"
    								}
 							},
 						"operation": "CREATE"
@@ -782,7 +782,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-   								   "controller": "example.com/foo"
+   								   "controllerName": "example.com/foo"
    								}
 							},
 							"oldObject": {
@@ -792,7 +792,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-									"controller": "example.com/foo",
+									"controllerName": "example.com/foo",
 									"parametersRef": {
 										"name": "foo",
 										"namespace": "bar",
@@ -813,7 +813,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "update to v1alpha2 GatewayClass controller field" +
+				name: "update to v1alpha2 GatewayClass controllerName field" +
 					" results in an error ",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -832,7 +832,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-   								   "controller": "example.com/foo"
+   								   "controllerName": "example.com/foo"
    								}
 							},
 							"oldObject": {
@@ -842,7 +842,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-   								   "controller": "example.com/bar"
+   								   "controllerName": "example.com/bar"
    								}
 							},
 						"operation": "UPDATE"
@@ -854,7 +854,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 					Allowed: false,
 					Result: &metav1.Status{
 						Code:    400,
-						Message: `spec.controller: Invalid value: "example.com/foo": cannot update an immutable field`,
+						Message: `spec.controllerName: Invalid value: "example.com/foo": cannot update an immutable field`,
 					},
 				},
 			},

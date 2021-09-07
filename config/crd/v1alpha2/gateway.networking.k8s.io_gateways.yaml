@@ -77,7 +77,7 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the address. \n Support: Extended"
+                      description: Type of the address.
                       enum:
                       - IPAddress
                       - Hostname
@@ -104,33 +104,32 @@ spec:
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
-                  least one Listener MUST be specified. \n An implementation MAY group
-                  Listeners by Port and then collapse each group of Listeners into
-                  a single Listener if the implementation determines that the Listeners
-                  in the group are \"compatible\". An implementation MAY also group
-                  together and collapse compatible Listeners belonging to different
-                  Gateways. \n For example, an implementation might consider Listeners
-                  to be compatible with each other if all of the following conditions
-                  are met: \n 1. Either each Listener within the group specifies the
-                  \"HTTP\"    Protocol or each Listener within the group specifies
-                  either    the \"HTTPS\" or \"TLS\" Protocol. \n 2. Each Listener
-                  within the group specifies a Hostname that is unique    within the
-                  group. \n 3. As a special case, one Listener within a group may
-                  omit Hostname,    in which case this Listener matches when no other
-                  Listener    matches. \n If the implementation does collapse compatible
-                  Listeners, the hostname provided in the incoming client request
-                  MUST be matched to a Listener to find the correct set of Routes.
-                  The incoming hostname MUST be matched using the Hostname field for
-                  each Listener in order of most to least specific. That is, exact
-                  matches must be processed before wildcard matches. \n If this field
-                  specifies multiple Listeners that have the same Port value but are
-                  not compatible, the implementation must raise a \"Conflicted\" condition
-                  in the Listener status. \n Support: Core"
+                  least one Listener MUST be specified. \n Each listener in a Gateway
+                  must have a unique combination of Hostname, Port, and Protocol.
+                  \n An implementation MAY group Listeners by Port and then collapse
+                  each group of Listeners into a single Listener if the implementation
+                  determines that the Listeners in the group are \"compatible\". An
+                  implementation MAY also group together and collapse compatible Listeners
+                  belonging to different Gateways. \n For example, an implementation
+                  might consider Listeners to be compatible with each other if all
+                  of the following conditions are met: \n 1. Either each Listener
+                  within the group specifies the \"HTTP\"    Protocol or each Listener
+                  within the group specifies either    the \"HTTPS\" or \"TLS\" Protocol.
+                  \n 2. Each Listener within the group specifies a Hostname that is
+                  unique    within the group. \n 3. As a special case, one Listener
+                  within a group may omit Hostname,    in which case this Listener
+                  matches when no other Listener    matches. \n If the implementation
+                  does collapse compatible Listeners, the hostname provided in the
+                  incoming client request MUST be matched to a Listener to find the
+                  correct set of Routes. The incoming hostname MUST be matched using
+                  the Hostname field for each Listener in order of most to least specific.
+                  That is, exact matches must be processed before wildcard matches.
+                  \n If this field specifies multiple Listeners that have the same
+                  Port value but are not compatible, the implementation must raise
+                  a \"Conflicted\" condition in the Listener status. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
-                    where a Gateway can accept network connections. Each listener
-                    in a Gateway must have a unique combination of Hostname, Port,
-                    and Protocol. This will be enforced by a validating webhook.
+                    where a Gateway accepts network connections.
                   properties:
                     allowedRoutes:
                       default:
@@ -268,11 +267,19 @@ spec:
                       description: "Hostname specifies the virtual hostname to match
                         for protocol types that define this concept. When unspecified,
                         all hostnames are matched. This field is ignored for protocols
-                        that don't require hostname based matching. \n For HTTPRoute
-                        and TLSRoute resources, there is an interaction with the `spec.hostnames`
+                        that don't require hostname based matching. \n Implementations
+                        MUST apply Hostname matching appropriately for each of the
+                        following protocols: \n * TLS: The Listener Hostname MUST
+                        match the SNI. * HTTP: The Listener Hostname MUST match the
+                        Host header of the request. * HTTPS: The Listener Hostname
+                        SHOULD match at both the TLS and HTTP   protocol layers as
+                        described above. If an implementation does not   ensure that
+                        both the SNI and Host header match the Listener hostname,
+                        \  it MUST clearly document that. \n For HTTPRoute and TLSRoute
+                        resources, there is an interaction with the `spec.hostnames`
                         array. When both listener and route specify hostnames, there
-                        must be an intersection between the values for a Route to
-                        be admitted. For more information, refer to the Route specific
+                        MUST be an intersection between the values for a Route to
+                        be accepted. For more information, refer to the Route specific
                         Hostnames documentation. \n Support: Core"
                       maxLength: 253
                       minLength: 1
@@ -295,15 +302,7 @@ spec:
                       type: integer
                     protocol:
                       description: "Protocol specifies the network protocol this listener
-                        expects to receive. The GatewayClass MUST apply the Hostname
-                        match appropriately for each protocol: \n * For the \"TLS\"
-                        protocol, the Hostname match MUST be   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)
-                        \  server name offered by the client. * For the \"HTTP\" protocol,
-                        the Hostname match MUST be   applied to the host portion of
-                        the   [effective request URI](https://tools.ietf.org/html/rfc7230#section-5.5)
-                        \  or the [:authority pseudo-header](https://tools.ietf.org/html/rfc7540#section-8.1.2.3)
-                        * For the \"HTTPS\" protocol, the Hostname match MUST be   applied
-                        at both the TLS and HTTP protocol layers. \n Support: Core"
+                        expects to receive. \n Support: Core"
                       type: string
                     tls:
                       description: "TLS is the TLS configuration for the Listener.
@@ -418,7 +417,7 @@ spec:
               - lastTransitionTime: "1970-01-01T00:00:00Z"
                 message: Waiting for controller
                 reason: NotReconciled
-                status: "False"
+                status: Unknown
                 type: Scheduled
             description: Status defines the current state of Gateway.
             properties:
@@ -433,7 +432,7 @@ spec:
                   properties:
                     type:
                       default: IPAddress
-                      description: "Type of the address. \n Support: Extended"
+                      description: Type of the address.
                       enum:
                       - IPAddress
                       - Hostname
@@ -456,7 +455,7 @@ spec:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
                   message: Waiting for controller
                   reason: NotReconciled
-                  status: "False"
+                  status: Unknown
                   type: Scheduled
                 description: "Conditions describe the current conditions of the Gateway.
                   \n Implementations should prefer to express Gateway conditions using
@@ -635,16 +634,14 @@ spec:
                       type: string
                     supportedKinds:
                       description: "SupportedKinds is the list indicating the Kinds
-                        supported by this listener. When this is not specified on
-                        the Listener, this MUST represent the kinds an implementation
-                        supports for the specified protocol. When there are kinds
-                        specified on the Listener, this MUST represent the intersection
-                        of those kinds and the kinds supported by the implementation
-                        for the specified protocol. \n If kinds are specified in Spec
-                        that are not supported, an implementation MUST set the \"ResolvedRefs\"
-                        condition to \"False\" with the \"InvalidRouteKinds\" reason.
-                        If both valid and invalid Route kinds are specified, the implementation
-                        should support the valid Route kinds that have been specified."
+                        supported by this listener. This MUST represent the kinds
+                        an implementation supports for that Listener configuration.
+                        \n If kinds are specified in Spec that are not supported,
+                        they MUST NOT appear in this list and an implementation MUST
+                        set the \"ResolvedRefs\" condition to \"False\" with the \"InvalidRouteKinds\"
+                        reason. If both valid and invalid Route kinds are specified,
+                        the implementation MUST reference the valid Route kinds that
+                        have been specified."
                       items:
                         description: RouteGroupKind indicates the group and kind of
                           a Route resource.

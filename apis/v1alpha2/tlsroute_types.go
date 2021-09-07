@@ -49,26 +49,35 @@ type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
 	// Hostnames defines a set of SNI names that should match against the
-	// SNI attribute of TLS ClientHello message in TLS handshake.
+	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
+	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
-	// SNI can be "precise" which is a domain name without the terminating
-	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-	// The wildcard character `*` must appear by itself as the first DNS label
-	// and matches only a single label. You cannot have a wildcard label by
-	// itself (e.g. Host == `*`).
+	// 1. IPs are not allowed in SNI names per RFC 6066.
+	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+	//    label must appear by itself as the first label.
 	//
-	// Requests will be matched against the SNI attribute in the following
-	// order:
+	// If a hostname is specified by both the Listener and TLSRoute, there
+	// must be at least one intersecting hostname for the TLSRoute to be
+	// attached to the Listener. For example:
 	//
-	// 1. If SNI is precise, the request matches this Route if the SNI in
-	//    ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this Route if the
-	//    SNI is to equal to the suffix (removing the first label) of the
-	//    wildcard.
-	// 3. If SNIs are unspecified, all requests associated with the gateway TLS
-	//    listener will match. This can be used to define a default backend
-	//    for a TLS listener.
+	// * A Listener with `test.example.com` as the hostname matches TLSRoutes
+	//   that have either not specified any hostnames, or have specified at
+	//   least one of `test.example.com` or `*.example.com`.
+	// * A Listener with `*.example.com` as the hostname matches TLSRoutes
+	//   that have either not specified any hostnames or have specified at least
+	//   one hostname that matches the Listener hostname. For example,
+	//   `test.example.com` and `*.example.com` would both match. On the other
+	//   hand, `example.com` and `test.example.net` would not match.
+	//
+	// If both the Listener and TLSRoute have specified hostnames, any
+	// TLSRoute hostnames that do not match the Listener hostname MUST be
+	// ignored. For example, if a Listener specified `*.example.com`, and the
+	// TLSRoute specified `test.example.com` and `test.example.net`,
+	// `test.example.net` must not be considered for a match.
+	//
+	// If all hostnames do not match with the criteria above, then the TLSRoute
+	// is not accepted, and the implementation must raise an 'Accepted'
+	// Condition with a status of `False` for the target Listener(s).
 	//
 	// Support: Core
 	//

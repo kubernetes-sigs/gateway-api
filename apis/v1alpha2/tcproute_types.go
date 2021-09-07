@@ -27,7 +27,9 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// TCPRoute is the Schema for the TCPRoute resource.
+// TCPRoute provides a way to route TCP requests. When combined with a Gateway
+// listener, it can be used to forward connections on the port specified by the
+// listener to a set of backends specified by the TCPRoute.
 type TCPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

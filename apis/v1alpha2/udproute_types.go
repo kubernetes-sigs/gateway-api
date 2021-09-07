@@ -27,7 +27,9 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// UDPRoute is a resource that specifies how a Gateway should forward UDP traffic.
+// UDPRoute provides a way to route UDP traffic. When combined with a Gateway
+// listener, it can be used to forward traffic on the port specified by the
+// listener to a set of backends specified by the UDPRoute.
 type UDPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

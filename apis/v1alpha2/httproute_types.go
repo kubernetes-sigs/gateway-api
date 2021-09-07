@@ -28,7 +28,10 @@ import (
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// HTTPRoute is the Schema for the HTTPRoute resource.
+// HTTPRoute provides a way to route HTTP requests. This includes the capability
+// to match requests by hostname, path, header, or query param. Filters can be
+// used to specify additional processing steps. Backends specify where matching
+// requests should be routed.
 type HTTPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -53,14 +56,13 @@ type HTTPRouteList struct {
 type HTTPRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname that should match against
-	// the HTTP Host header to select a HTTPRoute to process the request.
-	// Hostname is the fully qualified domain name of a network host,
-	// as defined by RFC 3986. Note the following deviations from the
-	// "host" part of the URI as defined in the RFC:
+	// Hostnames defines a set of hostname that should match against the HTTP
+	// Host header to select a HTTPRoute to process the request. This matches
+	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
 	// 1. IPs are not allowed.
-	// 2. The `:` delimiter is not respected because ports are not allowed.
+	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+	//    label must appear by itself as the first label.
 	//
 	// If a hostname is specified by both the Listener and HTTPRoute, there
 	// must be at least one intersecting hostname for the HTTPRoute to be
@@ -69,12 +71,11 @@ type HTTPRouteSpec struct {
 	// * A Listener with `test.example.com` as the hostname matches HTTPRoutes
 	//   that have either not specified any hostnames, or have specified at
 	//   least one of `test.example.com` or `*.example.com`.
-	// * A Listener with `*.example.com` as as the hostname matches HTTPRoutes
+	// * A Listener with `*.example.com` as the hostname matches HTTPRoutes
 	//   that have either not specified any hostnames or have specified at least
 	//   one hostname that matches the Listener hostname. For example,
 	//   `test.example.com` and `*.example.com` would both match. On the other
-	//   hand, `a.b.example.com`, `example.com`, and `test.example.net` would
-	//   not match.
+	//   hand, `example.com` and `test.example.net` would not match.
 	//
 	// If both the Listener and HTTPRoute have specified hostnames, any
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be
@@ -83,7 +84,7 @@ type HTTPRouteSpec struct {
 	// `test.example.net` must not be considered for a match.
 	//
 	// If hostnames do not match with the criteria above, then the HTTPRoute is
-	// not admitted, and the implementation must raise an 'Admitted' Condition
+	// not accepted, and the implementation must raise an 'Accepted' Condition
 	// with a status of `False` for the target Listener(s).
 	//
 	// Support: Core
@@ -101,8 +102,8 @@ type HTTPRouteSpec struct {
 }
 
 // HTTPRouteRule defines semantics for matching an HTTP request based on
-// conditions, optionally executing additional processing steps, and forwarding
-// the request to an API object.
+// conditions (matches), processing it (filters), and forwarding the request to
+// an API object (backendRefs).
 type HTTPRouteRule struct {
 	// Matches define conditions used for matching the rule against incoming
 	// HTTP requests. Each match is independent, i.e. this rule will be matched
@@ -134,26 +135,22 @@ type HTTPRouteRule struct {
 	// path match on "/", which has the effect of matching every
 	// HTTP request.
 	//
+	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
+	// MUST prioritize rules based on the following criteria, continuing on
+	// ties:
 	//
-	// Each client request MUST map to a maximum of one route rule. If a request
-	// matches multiple rules, matching precedence MUST be determined in order
-	// of the following criteria, continuing on ties:
-	//
-	// * The longest matching hostname.
-	// * The longest matching non-wildcard hostname.
-	// * The longest matching path.
+	// * The longest hostname.
+	// * The longest non-wildcard hostname.
+	// * The longest path.
 	// * The largest number of header matches.
 	// * The largest number of query param matches.
 	//
 	// If ties still exist across multiple Routes, matching precedence MUST be
 	// determined in order of the following criteria, continuing on ties:
 	//
-	// * The oldest Route based on creation timestamp. For example, a Route with
-	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
-	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
+	// * The oldest Route based on creation timestamp.
 	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>". For example, foo/bar is given precedence over
-	//   foo/baz.
+	//   "<namespace>/<name>".
 	//
 	// If ties still exist within the Route that has been given precedence,
 	// matching precedence MUST be granted to the first matching rule meeting
@@ -177,7 +174,8 @@ type HTTPRouteRule struct {
 	// - Implementation-specific custom filters have no API guarantees across
 	//   implementations.
 	//
-	// Specifying a core filter multiple times has unspecified or custom conformance.
+	// Specifying a core filter multiple times has unspecified or custom
+	// conformance.
 	//
 	// Support: Core
 	//
@@ -449,16 +447,12 @@ type HTTPRouteMatch struct {
 	Method *HTTPMethod `json:"method,omitempty"`
 }
 
-// HTTPRouteFilter defines additional processing steps that must be completed
-// during the request or response lifecycle. HTTPRouteFilters are meant as an
-// extension point to express additional processing that may be done in Gateway
-// implementations. Some examples include request or response modification,
-// implementing authentication strategies, rate-limiting, and traffic shaping.
-// API guarantee/conformance is defined based on the type of the filter.
-// TODO(hbagdi): re-render CRDs once controller-tools supports union tags:
-// - https://github.com/kubernetes-sigs/controller-tools/pull/298
-// - https://github.com/kubernetes-sigs/controller-tools/issues/461
-// +union
+// HTTPRouteFilter defines processing steps that must be completed during the
+// request or response lifecycle. HTTPRouteFilters are meant as an extension
+// point to express processing that may be done in Gateway implementations. Some
+// examples include request or response modification, implementing
+// authentication strategies, rate-limiting, and traffic shaping. API
+// guarantee/conformance is defined based on the type of the filter.
 type HTTPRouteFilter struct {
 	// Type identifies the type of filter to apply. As with other API fields,
 	// types are classified into three conformance levels:
@@ -481,6 +475,10 @@ type HTTPRouteFilter struct {
 	// Implementers are encouraged to define custom implementation types to
 	// extend the core API with implementation-specific behavior.
 	//
+	// If a reference to a custom filter type cannot be resolved, the filter
+	// MUST NOT be skipped. Instead, requests that would have been processed by
+	// that filter MUST receive a HTTP error response.
+	//
 	// +unionDiscriminator
 	Type HTTPRouteFilterType `json:"type"`
 
@@ -493,6 +491,8 @@ type HTTPRouteFilter struct {
 	RequestHeaderModifier *HTTPRequestHeaderFilter `json:"requestHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
+	// Requests are sent to the specified destination, but responses from
+	// that destination are ignored.
 	//
 	// Support: Extended
 	//
