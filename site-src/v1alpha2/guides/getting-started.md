@@ -36,7 +36,7 @@ these resources. Installing the CRDs will just allow you to see and apply the
 resources, though they won't do anything.
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.3.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0-rc1" \
 | kubectl apply -f -
 ```
 
@@ -50,7 +50,7 @@ these resources.
 
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.3.0" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0-rc1" \
 | kubectl delete -f -
 ```
 
