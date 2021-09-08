@@ -6,12 +6,16 @@ metadata:
 spec:
   gatewayClassName: shared-gateway-class
   listeners:
-  - name: http
+  - name: https
     hostname: "foo.example.com"
-    protocol: HTTP
-    port: 80
-    routes:
+    protocol: HTTPS
+    port: 443
+    allowedRoutes:
       namespaces:
+        from: Selector
         selector:
           matchLabels:
-            environment: development
+            shared-gateway-access: "true"
+    tls:
+      certificateRef:
+        name: foo-example-com

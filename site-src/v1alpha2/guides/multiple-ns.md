@@ -5,31 +5,31 @@ when more than one user or team is sharing the underlying networking
 infrastructure, yet control and configuration must be segmented to minimize
 access and fault domains.
 
-Gateways and Routes can be deployed into different Namespaces and Routes 
-attached to Gateways across Namespace boundaries. This allows differing user access and
-roles (RBAC) to be applied to separate Namespaces, effectively controlling who
-has access to different parts of the cluster-wide routing configuration. The
-ability for Routes to attach to Gateways across Namespace boundaries is governed
-by [_Route Attaching_](#cross-namespace-route-attachment), which
-is explored in this guide which will demonstrate how two independent teams can
-safely share the same Gateway from different Namespaces.
+Gateways and Routes can be deployed into different Namespaces and Routes  can
+attach to Gateways across Namespace boundaries. This allows user access 
+control to be applied differently across Namespaces for Routes and Gateways, 
+effectively segmenting access and control to different parts of the
+cluster-wide  routing configuration. The ability for Routes to attach to
+Gateways across Namespace boundaries are governed by [_Route Attachment_](cross-namespace-route-attachment). Route attachment is explored
+in this guide and demonstrates how independent teams can safely share the same
+Gateway.
 
 In this guide there are two independent teams, _store_ and _site_, operating
 in the same Kubernetes cluster in the `store-ns` and `site-ns` Namespaces. These
-are their requirements:
+are their goals and how they use Gateway API resources to accomplish them:
 
-- The site team has two applications, _home_ and _login_, that are running
-behind `foo.example.com`. They want to isolate access and configuration across
-their apps as much as possible to minimize access and failure domains.
-They use separate HTTPRoutes for each app, to isolate app routing configurations
-such as canary rollouts, but share the same load balancer
-IP, port, domain, and TLS certificate.
+- The site team has two applications, _home_ and _login_. The team wants to to
+isolate access and  configuration across their apps as much as possible to
+minimize access and failure domains. They use separate HTTPRoutes attached to
+the same Gateway to isolate routing configurations, such as canary rollouts,
+and still share the same but share the same IP address, port, DNS domain, and
+TLS certificate.
 - The store team has a single Service called _store_ that they have deployed
-in the `store-ns` Namespace.
-- The Foobar Corporation operates behind the `foo.example.com` domain so they
-would like to host all applications on the same Gateway resource. This is
-controlled by a central infrastructure team, operating in the `infra-ns`
-Namespace.
+in the `store-ns` Namespace which also needs to be exposed behind the same IP
+address and domain.
+- The Foobar Corporation operates behind the `foo.example.com` domain for all
+apps. This is controlled by a central infrastructure team, operating in the
+`infra-ns` Namespace.
 - Lastly, the security team controls the certificate for `foo.example.com`.
 By managing this certificate through the single shared Gateway they are able
 to centrally control security without directly involving application teams.
@@ -40,29 +40,33 @@ The logical relationship between the Gateway API resources looks like this:
 
 ## Cross-namespace Route Attachment
 
-[Route attachment][attaching] is an important concept that dictates how Routes
-and Gateways select each other to apply routing configuration to a Gateway. It
-is especially relevant when there are multiple Gateways and multiple Namespaces
-in a cluster. Gateway and Route attachment is bidirectional - attachment can
-only succeed if the Gateway owner and Route owner owner both agree to the
-relationship. This bi-directional relationship exists for two reasons:
+[Route attachment][attachment] is an important concept that dictates how Routes
+attach to Gateways and program their routing rules. It is especially relevant
+when there are Routes across Namespaces that share one or more Gateways.
+Gateway and Route attachment is bidirectional - attachment can only succeed if
+the Gateway owner and Route owner owner both agree to the relationship. This
+bi-directional relationship exists for two reasons:
 
-- Route owners don't want to overexpose their applications and don't want
-their apps to be accessible through paths they are not aware of.
-- Gateway owners don't want apps using certain Gateways they should not be
-using. An internal application shouldn't be exposed through a public Gateway
-for example.
+- Route owners don't want to overexpose their applications through paths they 
+are not aware of.
+- Gateway owners don't want certain apps or teams using Gateways without 
+permission. For example, an internal service shouldn't be accessible 
+through an internet Gateway.
 
-As a result, Gateways and Routes have independent control to determine which
-resources will succeed in attaching. It is a handshake between the infra owners
-and the application owners that allows them to be independent actors. Routes
-can only attach to specified gateways and Gateways provide a similar level of
-selection control over which Routes they allow to attach to by trusting
-specific namespaces in which those Routes live and operate. This allows a
-cluster to be more self-governed, which requires less central administration
-to ensure that Routes are not over-exposed.
+Gateways support _attachment constraints_ which are fields on Gateway
+listeners that restrict which Routes can be attached. Gateways support
+Namespaces and Route types as attachment constraints. Any Routes that do not
+meet the attachment constraints are not able to attach to that Gateway. 
+Similarly, Routes explicitly reference Gateways that they want to attach to
+through the Route's `parentRef` field. Together these create a handshake
+between the infra owners and application owners that enables them to
+independently define how applications are exposed through Gateways. This is
+effectively a policy that reduces administrative overhead. App owners can
+specify which Gateways their apps should use and infra owners can constrain
+the Namespaces and types of Routes that a Gateway accepts.
 
-## Multi-Namespace Gateways Example
+
+## Shared Gateway
 
 The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
 Namespace:
@@ -71,34 +75,56 @@ Namespace:
 {% include 'v1alpha2/cross-namespace-routing/gateway.yaml' %}
 ```
 
-The `http` listener in the above `Gateway` matches traffic for the
-`foo.example.com` domain specifically, this frees `HTTPRoute` resources which
-attach to it from needing to do any matching on the `hostname` which can reduce
-the amount of templating needed for deployment of the underlying application,
-since the `HTTPRoutes` developed for it can be domain agnostic (helpful for
-situations where the domain hosting the application is not static).
+The `https` listener in the above Gateway matches traffic for the
+`foo.example.com` domain. This allows the infrastructure team to manage all 
+aspects of the domain. The HTTPRoutes below do not need to specify domains
+and will match all traffic by default if `hostname` is not set. This makes
+it easier to manage HTTPRoutes because they can be domain agnostic, which is
+helpful when application domains are not static.
 
+This Gateway also configures HTTPS using the `foo-example-com` Secret
+in the `infra-ns` Namespace. This allows the infrastructure team to centrally
+manage TLS on behalf of app owners. The `foo-example-com` certificate will
+terminate all traffic going to its attached Routes, without any TLS 
+configuration on the HTTPRoutes themselves.
 
-The `routes` section of this `Gateway` is particularly important because it is
-the crux of how multiple namespace support is configured in this example:
+This Gateway uses a Namespace selector to define which HTTPRoutes are allowed 
+to attach. This allows the infrastructure team to constrain who
+or which apps can use this Gateway by allowlisting a set of Namespaces.
+
 
 ```yaml
-   routes:
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: Gateway
+spec:
+  listeners:
+  - allowedRoutes:
       namespaces:
+        from: Selector
         selector:
           matchLabels:
-            environment: development
+            shared-gateway-access: "true"
+...
 ```
 
-In the above _only_ namespaces labeled as `development` will be able to attach
-their routes to the `Gateway`. The namespaces themselves must be decorated with
-the corresponding labels:
+_Only_ Namespaces which are labelled `shared-gateway-access: "true"` will be
+able to attach their Routes to `shared-gateway`. In the following set of
+Namespaces, if an HTTPRoute existed in the `no-external-access` Namespace with
+a `parentRef`  for `infra-ns/shared-gateway`, it would be ignored by the
+Gateway because the  attachment constraint (Namespace label) was not met.
 
 ```yaml
 {% include 'v1alpha2/cross-namespace-routing/0-namespaces.yaml' %}
 ```
 
-## Route Attachment Examples
+Note that attachment constraints on the Gateway are not required, but they are
+a best-practice if operating a cluster with many different teams and
+Namespaces. In environments where all apps in a cluster have permission to
+attach to a Gateway then the `listeners[].routes` field does not have to be
+configured and all Routes can freely use the Gateway.
+
+
+## Route Attachment 
 
 The store team deploys their route for the `store` Service in the `store-ns`
 Namespace:
@@ -128,11 +154,10 @@ Gateway that these Routes want to attach to.
 {% include 'v1alpha2/cross-namespace-routing/site-route.yaml' %}
 ```
 
-After these three Routes are deployed, they will all be bound to the
-`shared-gateway` Gateway. The Gateway merges its bound Routes into a single flat
-list of routing rules. [Routing
-precedence](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
-between the flat list of routing rules is determined by most specific match and
+After these three Routes are deployed, they will all be attached to the
+`shared-gateway` Gateway. The Gateway merges these Routes into a single flat
+list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](/concepts/guidelines#conflicts). This provides predictable and
 deterministic merging of routing rules between independent users.
@@ -142,4 +167,4 @@ ownership of their infrastructure more evenly, while still retaining centralized
 control. This gives them the best of both worlds, all delivered through
 declarative and open source APIs.
 
-[attaching]:/concepts/api-overview/#attaching-routes-to-gateways
+[attachment]:/concepts/api-overview/#attaching-routes-to-gateways
