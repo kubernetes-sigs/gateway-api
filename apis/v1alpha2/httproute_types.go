@@ -319,6 +319,10 @@ type HTTPHeaderMatch struct {
 	// Generally, proxies should follow the guidance from the RFC:
 	// https://www.rfc-editor.org/rfc/rfc7230.html#section-3.2.2 regarding
 	// processing a repeated header, with special handling for "Set-Cookie".
+	//
+	// Note implementations must allow the use of HTTP/2 pseudo headers
+	// (See https://datatracker.ietf.org/doc/html/rfc7540#section-8.1.2.1)
+	// like ":method", ":path".
 	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP Header to be matched.
