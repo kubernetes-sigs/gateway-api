@@ -34,7 +34,7 @@ we need to enforce a handshake mechanism that requires resources in both
 namespaces to agree to this reference. To accomplish that, a ReferencePolicy
 resource has been introduced.
 
-![Reference Policy](images/referencepolicy.png)
+![Reference Policy](/v1alpha2/references/images/referencepolicy.png)
 
 With this model, Routes are able to directly reference Services in other namespaces.
 These references are only considered valid if a ReferencePolicy in the target
