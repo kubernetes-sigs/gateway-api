@@ -56,7 +56,7 @@ type GatewayClass struct {
 
 	// Status defines the current state of GatewayClass.
 	//
-	// +kubebuilder:default={conditions: {{type: "Admitted", status: "False", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
 
@@ -69,19 +69,15 @@ const (
 
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 type GatewayClassSpec struct {
-	// Controller is a domain/path string that indicates the
-	// controller that is managing Gateways of this class.
+	// ControllerName is the name of the controller that is managing Gateways of
+	// this class. The value of this field MUST be a domain prefixed path.
 	//
 	// Example: "example.net/gateway-controller".
 	//
 	// This field is not mutable and cannot be empty.
 	//
-	// The format of this field is DOMAIN "/" PATH, where DOMAIN is a valid
-	// Kubernetes name (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)
-	// and PATH is a valid HTTP path as defined by RFC 3986.
-	//
 	// Support: Core
-	Controller GatewayController `json:"controller"`
+	ControllerName GatewayController `json:"controllerName"`
 
 	// ParametersRef is a reference to a resource that contains the configuration
 	// parameters corresponding to the GatewayClass. This is optional if the
@@ -130,8 +126,8 @@ type ParametersReference struct {
 	Scope *string `json:"scope,omitempty"`
 
 	// Namespace is the namespace of the referent.
-	// This field is required when scope is set to "Namespace" and ignored when
-	// scope is set to "Cluster".
+	// This field is required when scope is set to "Namespace" and must be unset
+	// when scope is set to "Cluster".
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`
@@ -147,19 +143,19 @@ type GatewayClassConditionType string
 type GatewayClassConditionReason string
 
 const (
-	// This condition indicates whether the GatewayClass has been admitted by
+	// This condition indicates whether the GatewayClass has been accepted by
 	// the controller requested in the `spec.controller` field.
 	//
-	// This condition defaults to False, and MUST be set by a controller when it
-	// sees a GatewayClass using its controller string. The status of this
-	// condition MUST be set to true if the controller will support provisioning
+	// This condition defaults to Unknown, and MUST be set by a controller when
+	// it sees a GatewayClass using its controller string. The status of this
+	// condition MUST be set to True if the controller will support provisioning
 	// Gateways using this class. Otherwise, this status MUST be set to False.
 	// If the status is set to False, the controller SHOULD set a Message and
 	// Reason as an explanation.
 	//
 	// Possible reasons for this condition to be true are:
 	//
-	// * "Admitted"
+	// * "Accepted"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -168,18 +164,18 @@ const (
 	//
 	// Controllers should prefer to use the values of GatewayClassConditionReason
 	// for the corresponding Reason, where appropriate.
-	GatewayClassConditionStatusAdmitted GatewayClassConditionType = "Admitted"
+	GatewayClassConditionStatusAccepted GatewayClassConditionType = "Accepted"
 
-	// This reason is used with the "Admitted" condition when the condition is
+	// This reason is used with the "Accepted" condition when the condition is
 	// true.
-	GatewayClassReasonAdmitted GatewayClassConditionReason = "Admitted"
+	GatewayClassReasonAccepted GatewayClassConditionReason = "Accepted"
 
-	// This reason is used with the "Admitted" condition when the
-	// GatewayClass was not admitted because the parametersRef field
+	// This reason is used with the "Accepted" condition when the
+	// GatewayClass was not accepted because the parametersRef field
 	// was invalid, with more detail in the message.
 	GatewayClassReasonInvalidParameters GatewayClassConditionReason = "InvalidParameters"
 
-	// This reason is used with the "Admitted" condition when the
+	// This reason is used with the "Accepted" condition when the
 	// requested controller has not yet made a decision about whether
 	// to admit the GatewayClass. It is the default Reason on a new
 	// GatewayClass.
@@ -198,7 +194,7 @@ type GatewayClassStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Admitted", status: "False", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 

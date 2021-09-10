@@ -40,12 +40,12 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			args: args{
 				oldClass: &gatewayv1a2.GatewayClass{
 					Spec: gatewayv1a2.GatewayClassSpec{
-						Controller: "foo",
+						ControllerName: "foo",
 					},
 				},
 				newClass: &gatewayv1a2.GatewayClass{
 					Spec: gatewayv1a2.GatewayClassSpec{
-						Controller: "foo",
+						ControllerName: "foo",
 						ParametersRef: &gatewayv1a2.ParametersReference{
 							Group: "example.com",
 							Kind:  "GatewayClassConfig",
@@ -61,19 +61,19 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			args: args{
 				oldClass: &gatewayv1a2.GatewayClass{
 					Spec: gatewayv1a2.GatewayClassSpec{
-						Controller: "example.com/gateway",
+						ControllerName: "example.com/gateway",
 					},
 				},
 				newClass: &gatewayv1a2.GatewayClass{
 					Spec: gatewayv1a2.GatewayClassSpec{
-						Controller: "example.org/gateway",
+						ControllerName: "example.org/gateway",
 					},
 				},
 			},
 			want: field.ErrorList{
 				{
 					Type:     field.ErrorTypeInvalid,
-					Field:    "spec.controller",
+					Field:    "spec.controllerName",
 					Detail:   "cannot update an immutable field",
 					BadValue: gatewayv1a2.GatewayController("example.org/gateway"),
 				},
