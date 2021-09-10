@@ -1,153 +1,163 @@
 # Cross-Namespace routing
 
 The Gateway API has core support for cross Namespace routing. This is useful
-when more than one user or team is sharing the underlying networking infrastructure,
-yet control and configuration must be segmented to minimize access and fault
-domains. Gateways and Routes can be deployed into different Namespaces and bind
-with each other across Namespace boundaries. This allows differing user access
-and roles (RBAC) to be applied to separate Namespaces, effectively controlling
-who has access to different parts of the cluster-wide routing configuration. The
-ability for Routes to bind with Gateways across Namespace boundaries is goverend
-by [_Route binding_](#cross-namespace-route-binding), which
-is explored in this guide. The guide shows how two independent teams can safely
-share the same Gateway from different Namespaces.
+when more than one user or team is sharing the underlying networking
+infrastructure, yet control and configuration must be segmented to minimize
+access and fault domains.
+
+Gateways and Routes can be deployed into different Namespaces and Routes  can
+attach to Gateways across Namespace boundaries. This allows user access 
+control to be applied differently across Namespaces for Routes and Gateways, 
+effectively segmenting access and control to different parts of the
+cluster-wide  routing configuration. The ability for Routes to attach to
+Gateways across Namespace boundaries are governed by [_Route Attachment_](cross-namespace-route-attachment). Route attachment is explored
+in this guide and demonstrates how independent teams can safely share the same
+Gateway.
 
 In this guide there are two independent teams, _store_ and _site_, operating
-in the same Kubernetes cluster in the `store-ns` and `site-ns` Namespaces. These are
-their requirements:
+in the same Kubernetes cluster in the `store-ns` and `site-ns` Namespaces. These
+are their goals and how they use Gateway API resources to accomplish them:
 
-- The site team has two applications, _home_ and _login_, that are running 
-behind `foo.example.com`. They want to isolate access and configuration across
-their apps as much as possible to minimize access and failure domains. 
-They use separate HTTPRoutes for each app, to isolate app routing configurations 
-such as canary rollouts. but share the same load balancer 
-IP, port, domain, and TLS certificate.
-- The store team has a single Service called _store_ that they have deployed 
-in the `store-ns` Namespace. 
-- The Foobar Corporation operates behind the `foo.example.com` domain so they 
-would like to host all applications on the same Gateway resource. This is 
-controlled by a central infrastructure team, operating in the `infra-ns` Namespace.
-- Lastly, the security team controls the certificate for `foo.example.com`. 
-By managing this certificate through the single shared Gateway they are able 
+- The site team has two applications, _home_ and _login_. The team wants to to
+isolate access and  configuration across their apps as much as possible to
+minimize access and failure domains. They use separate HTTPRoutes attached to
+the same Gateway to isolate routing configurations, such as canary rollouts,
+and still share the same but share the same IP address, port, DNS domain, and
+TLS certificate.
+- The store team has a single Service called _store_ that they have deployed
+in the `store-ns` Namespace which also needs to be exposed behind the same IP
+address and domain.
+- The Foobar Corporation operates behind the `foo.example.com` domain for all
+apps. This is controlled by a central infrastructure team, operating in the
+`infra-ns` Namespace.
+- Lastly, the security team controls the certificate for `foo.example.com`.
+By managing this certificate through the single shared Gateway they are able
 to centrally control security without directly involving application teams.
 
 The logical relationship between the Gateway API resources looks like this:
 
 ![Cross-Namespace routing](../images/cross-namespace-routing.svg)
 
-## Cross-namespace Route binding
+## Cross-namespace Route Attachment
 
-[Route binding](/concepts/api-overview/#route-binding) is an important concept 
-that dictates how Routes and Gateways select each other to apply routing
-configuration to a Gateway. It is especially relevant when there are multiple
-Gateways and multiple Namespaces in a cluster. Gateway and Route binding is
-bidirectional - a binding can only exist if the Gateway owner and Route owner
-owner both agree to the relationship. This bi-directional relationship exists
-for two reasons:
+[Route attachment][attachment] is an important concept that dictates how Routes
+attach to Gateways and program their routing rules. It is especially relevant
+when there are Routes across Namespaces that share one or more Gateways.
+Gateway and Route attachment is bidirectional - attachment can only succeed if
+the Gateway owner and Route owner owner both agree to the relationship. This
+bi-directional relationship exists for two reasons:
 
-- Route owners don't want to overexpose their applications and don't want 
-their apps to be accessible through paths they are not aware of.
-- Gateway owners don't want apps using certain Gateways they should not be 
-using. An internal application shouldn't be exposed through a public Gateway 
-for example.
+- Route owners don't want to overexpose their applications through paths they 
+are not aware of.
+- Gateway owners don't want certain apps or teams using Gateways without 
+permission. For example, an internal service shouldn't be accessible 
+through an internet Gateway.
+
+Gateways support _attachment constraints_ which are fields on Gateway
+listeners that restrict which Routes can be attached. Gateways support
+Namespaces and Route types as attachment constraints. Any Routes that do not
+meet the attachment constraints are not able to attach to that Gateway. 
+Similarly, Routes explicitly reference Gateways that they want to attach to
+through the Route's `parentRef` field. Together these create a handshake
+between the infra owners and application owners that enables them to
+independently define how applications are exposed through Gateways. This is
+effectively a policy that reduces administrative overhead. App owners can
+specify which Gateways their apps should use and infra owners can constrain
+the Namespaces and types of Routes that a Gateway accepts.
 
 
-As a result, Gateways and Routes have independent control to determine which
-resources they permit binding with. It is a handshake between the infra owners
-and the application owners that allows them to be independent actors.
-Route-owners can specify that they will bind with all Gateways in the cluster,
-or only Gateways from a specific Namespace, with a specific label selector, or
-an individual Gateway. Similarly, Gateways provide the same level of control.
-This allows a cluster to be more self-governed, which requires less central
-administration to ensure that Routes are not over-exposed.
+## Shared Gateway
 
-## Resource Deployment
-
-The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns` 
-Namespace. 
+The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
+Namespace:
 
 ```yaml
-{% include 'v1alpha1/cross-namespace-routing/gateway.yaml' %}
+{% include 'v1alpha2/cross-namespace-routing/gateway.yaml' %}
 ```
 
-A few notes about this Gateway:
+The `https` listener in the above Gateway matches traffic for the
+`foo.example.com` domain. This allows the infrastructure team to manage all 
+aspects of the domain. The HTTPRoutes below do not need to specify domains
+and will match all traffic by default if `hostname` is not set. This makes
+it easier to manage HTTPRoutes because they can be domain agnostic, which is
+helpful when application domains are not static.
 
-- It is matching for the `foo.example.com` domain. This is configured on the 
-Gateway so that each HTTPRoute does not also have to configure hostname matching, 
-since they are all using the same domain. This also allows these HTTPRoute 
-manifests to be reused across production and dev environments where the dev 
-environment might be hosted at `foo.dev.corp.example.com`.
-- The Gateway is configured for HTTPS and references the `foo-example-com` Secret. 
-This allows the certificate to be managed centrally for all applications which 
-are using this Gateway.
-- It allows any Route in the cluster to use this Gateway because `namespaces.from = All`. 
-This is a permissive method of Route selection since the Routes are given 
-full control to select this Gateway. There are more restrictive forms of Route 
-selection that allow selection on a per-Namespace basis, detailed 
-in [Route binding](/concepts/api-overview/#route-binding). The following block
-specifies how this Gateway allows HTTPRoutes from all Namespaces in the 
-cluster to bind to it:
+This Gateway also configures HTTPS using the `foo-example-com` Secret
+in the `infra-ns` Namespace. This allows the infrastructure team to centrally
+manage TLS on behalf of app owners. The `foo-example-com` certificate will
+terminate all traffic going to its attached Routes, without any TLS 
+configuration on the HTTPRoutes themselves.
+
+This Gateway uses a Namespace selector to define which HTTPRoutes are allowed 
+to attach. This allows the infrastructure team to constrain who
+or which apps can use this Gateway by allowlisting a set of Namespaces.
+
 
 ```yaml
-    routes:
-      kind: HTTPRoute
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: Gateway
+spec:
+  listeners:
+  - allowedRoutes:
       namespaces:
-        from: "All"
+        from: Selector
+        selector:
+          matchLabels:
+            shared-gateway-access: "true"
+...
 ```
 
-Meanwhile, the store team deploys their route for the `store` Service in the 
-`store-ns` Namespace:
+_Only_ Namespaces which are labelled `shared-gateway-access: "true"` will be
+able to attach their Routes to `shared-gateway`. In the following set of
+Namespaces, if an HTTPRoute existed in the `no-external-access` Namespace with
+a `parentRef`  for `infra-ns/shared-gateway`, it would be ignored by the
+Gateway because the  attachment constraint (Namespace label) was not met.
 
 ```yaml
-{% include 'v1alpha1/cross-namespace-routing/store-route.yaml' %}
+{% include 'v1alpha2/cross-namespace-routing/0-namespaces.yaml' %}
 ```
 
-This Route has straightforward routing logic as it just matches for 
-`/store` traffic which it sends to the `store` Service. The following snippet 
-of the [`gateways` field](/v1alpha2/references/spec/#networking.x-k8s.io/v1alpha1.RouteGateways) 
-controls which Gateways this Route can bind to:
+Note that attachment constraints on the Gateway are not required, but they are
+a best-practice if operating a cluster with many different teams and
+Namespaces. In environments where all apps in a cluster have permission to
+attach to a Gateway then the `listeners[].routes` field does not have to be
+configured and all Routes can freely use the Gateway.
+
+
+## Route Attachment 
+
+The store team deploys their route for the `store` Service in the `store-ns`
+Namespace:
 
 ```yaml
-  gateways:
-    allow: FromList
-    gatewayRefs:
-    - name: shared-gateway
-      namespace: infra
+{% include 'v1alpha2/cross-namespace-routing/store-route.yaml' %}
 ```
 
-`gateways.allow` can be configured for Gateways in the same Namespace as the
-Route (the default), all Gateways, or a list of specific Gateways. In this
-example the store and site teams decide to reference a specific Gateway. This is
-the least permissive choice which ensures that other Gateways in the cluster
-(perhaps created in the future at some point) will not bind with these Routes.
-If cluster administrators have full control over how Gateways are deployed in a
-cluster then a more permissive binding option could be configured on Routes. The
-less permissive the Gateway selection is, the less that application owners need
-to know about which Gateways are deployed. 
+This Route has straightforward routing logic as it just matches for
+`/store` traffic which it sends to the `store` Service.
 
 The site team now deploys Routes for their applications. They deploy two
 HTTPRoutes into the `site-ns` Namespace:
 
-- The `home` HTTPRoute acts as a default routing rule, matching for all traffic 
-to `foo.example.com/*` not matched by an existing routing rule and sending it to 
+- The `home` HTTPRoute acts as a default routing rule, matching for all traffic
+to `foo.example.com/*` not matched by an existing routing rule and sending it to
 the `home` Service.
-- The `login` HTTPRoute  routes traffic for `foo.example.com/login` to 
-`service/login-v1` and `service/login-v2`. It uses weights to granularly 
-control traffic distribution between them. 
+- The `login` HTTPRoute  routes traffic for `foo.example.com/login` to
+`service/login-v1` and `service/login-v2`. It uses weights to granularly
+control traffic distribution between them.
 
-Both of these Routes use the same Gateway binding configuration which specifies
-`gateway/shared-gateway` in the `infra-ns` Namespace as the only Gateway that these
-Routes can bind with.
+Both of these Routes use the same Gateway attachment configuration which
+specifies `gateway/shared-gateway` in the `infra-ns` Namespace as the only
+Gateway that these Routes want to attach to.
 
 ```yaml
-{% include 'v1alpha1/cross-namespace-routing/site-route.yaml' %}
+{% include 'v1alpha2/cross-namespace-routing/site-route.yaml' %}
 ```
 
-After these three Routes are deployed, they will all be bound to the 
-`shared-gateway` Gateway. The Gateway merges its bound Routes into a single flat
-list of routing rules. [Routing
-precedence](/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule)
-between the flat list of routing rules is determined by most specific match and
+After these three Routes are deployed, they will all be attached to the
+`shared-gateway` Gateway. The Gateway merges these Routes into a single flat
+list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](/concepts/guidelines#conflicts). This provides predictable and
 deterministic merging of routing rules between independent users.
@@ -156,3 +166,5 @@ Thanks to cross-Namespace routing, the Foobar Corporation can distribute
 ownership of their infrastructure more evenly, while still retaining centralized
 control. This gives them the best of both worlds, all delivered through
 declarative and open source APIs.
+
+[attachment]:/concepts/api-overview/#attaching-routes-to-gateways
