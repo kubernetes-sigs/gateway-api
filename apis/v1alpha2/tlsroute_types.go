@@ -75,9 +75,10 @@ type TLSRouteSpec struct {
 	// TLSRoute specified `test.example.com` and `test.example.net`,
 	// `test.example.net` must not be considered for a match.
 	//
-	// If all hostnames do not match with the criteria above, then the TLSRoute
-	// is not accepted, and the implementation must raise an 'Accepted'
-	// Condition with a status of `False` for the target Listener(s).
+	// If both the Listener and TLSRoute have specified hostnames, and none
+	// match with the criteria above, then the TLSRoute is not accepted. The
+	// implementation must raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus.
 	//
 	// Support: Core
 	//

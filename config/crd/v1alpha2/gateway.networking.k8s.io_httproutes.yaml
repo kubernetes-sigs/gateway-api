@@ -69,11 +69,11 @@ spec:
                   hostnames, any HTTPRoute hostnames that do not match the Listener
                   hostname MUST be ignored. For example, if a Listener specified `*.example.com`,
                   and the HTTPRoute specified `test.example.com` and `test.example.net`,
-                  `test.example.net` must not be considered for a match. \n If hostnames
-                  do not match with the criteria above, then the HTTPRoute is not
-                  accepted, and the implementation must raise an 'Accepted' Condition
-                  with a status of `False` for the target Listener(s). \n Support:
-                  Core"
+                  `test.example.net` must not be considered for a match. \n If both
+                  the Listener and HTTPRoute have specified hostnames, and none match
+                  with the criteria above, then the HTTPRoute is not accepted. The
+                  implementation must raise an 'Accepted' Condition with a status
+                  of `False` in the corresponding RouteParentStatus. \n Support: Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with

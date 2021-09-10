@@ -83,9 +83,10 @@ type HTTPRouteSpec struct {
 	// HTTPRoute specified `test.example.com` and `test.example.net`,
 	// `test.example.net` must not be considered for a match.
 	//
-	// If hostnames do not match with the criteria above, then the HTTPRoute is
-	// not accepted, and the implementation must raise an 'Accepted' Condition
-	// with a status of `False` for the target Listener(s).
+	// If both the Listener and HTTPRoute have specified hostnames, and none
+	// match with the criteria above, then the HTTPRoute is not accepted. The
+	// implementation must raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus.
 	//
 	// Support: Core
 	//
