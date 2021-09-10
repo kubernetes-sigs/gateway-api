@@ -27,7 +27,9 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// TCPRoute is the Schema for the TCPRoute resource.
+// TCPRoute provides a way to route TCP requests. When combined with a Gateway
+// listener, it can be used to forward connections on the port specified by the
+// listener to a set of backends specified by the TCPRoute.
 type TCPRoute struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -57,37 +59,6 @@ type TCPRouteStatus struct {
 
 // TCPRouteRule is the configuration for a given rule.
 type TCPRouteRule struct {
-	// Matches define conditions used for matching the rule against incoming TCP
-	// connections. Each match is independent, i.e. this rule will be matched if
-	// **any** one of the matches is satisfied. If unspecified (i.e. empty),
-	// this Rule will match all requests for the associated Listener.
-	//
-	// Each client request MUST map to a maximum of one route rule. If a request
-	// matches multiple rules, matching precedence MUST be determined in order
-	// of the following criteria, continuing on ties:
-	//
-	// * The most specific match specified by ExtensionRef. Each implementation
-	//   that supports ExtensionRef may have different ways of determining the
-	//   specificity of the referenced extension.
-	//
-	// If ties still exist across multiple Routes, matching precedence MUST be
-	// determined in order of the following criteria, continuing on ties:
-	//
-	// * The oldest Route based on creation timestamp. For example, a Route with
-	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
-	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
-	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>". For example, foo/bar is given precedence over
-	//   foo/baz.
-	//
-	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the first matching rule meeting
-	// the above criteria.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	Matches []TCPRouteMatch `json:"matches,omitempty"`
-
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a non-existent resource or a
 	// Service with no endpoints), the underlying implementation MUST actively
@@ -103,21 +74,6 @@ type TCPRouteRule struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
-}
-
-// TCPRouteMatch defines the predicate used to match connections to a
-// given action.
-type TCPRouteMatch struct {
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior. For example, resource "mytcproutematcher" in group
-	// "networking.example.net". If the referent cannot be found, the rule MUST
-	// not be included in the route. The controller must ensure the
-	// "ResolvedRefs" condition on the Route status is set to `status: False`.
-	//
-	// Support: Custom
-	//
-	// +optional
-	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true

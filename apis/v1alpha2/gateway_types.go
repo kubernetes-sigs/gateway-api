@@ -41,7 +41,7 @@ type Gateway struct {
 
 	// Status defines the current state of Gateway.
 	//
-	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
@@ -71,6 +71,9 @@ type GatewaySpec struct {
 	// Listeners associated with this Gateway. Listeners define
 	// logical endpoints that are bound on this Gateway's addresses.
 	// At least one Listener MUST be specified.
+	//
+	// Each listener in a Gateway must have a unique combination of Hostname,
+	// Port, and Protocol.
 	//
 	// An implementation MAY group Listeners by Port and then collapse each
 	// group of Listeners into a single Listener if the implementation
@@ -142,10 +145,8 @@ type GatewaySpec struct {
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
 }
 
-// Listener embodies the concept of a logical endpoint where a Gateway can
-// accept network connections. Each listener in a Gateway must have a unique
-// combination of Hostname, Port, and Protocol. This will be enforced by a
-// validating webhook.
+// Listener embodies the concept of a logical endpoint where a Gateway accepts
+// network connections.
 type Listener struct {
 	// Name is the name of the Listener.
 	//
@@ -157,10 +158,20 @@ type Listener struct {
 	// field is ignored for protocols that don't require hostname based
 	// matching.
 	//
+	// Implementations MUST apply Hostname matching appropriately for each of
+	// the following protocols:
+	//
+	// * TLS: The Listener Hostname MUST match the SNI.
+	// * HTTP: The Listener Hostname MUST match the Host header of the request.
+	// * HTTPS: The Listener Hostname SHOULD match at both the TLS and HTTP
+	//   protocol layers as described above. If an implementation does not
+	//   ensure that both the SNI and Host header match the Listener hostname,
+	//   it MUST clearly document that.
+	//
 	// For HTTPRoute and TLSRoute resources, there is an interaction with the
 	// `spec.hostnames` array. When both listener and route specify hostnames,
-	// there must be an intersection between the values for a Route to be
-	// admitted. For more information, refer to the Route specific Hostnames
+	// there MUST be an intersection between the values for a Route to be
+	// accepted. For more information, refer to the Route specific Hostnames
 	// documentation.
 	//
 	// Support: Core
@@ -175,18 +186,6 @@ type Listener struct {
 	Port PortNumber `json:"port"`
 
 	// Protocol specifies the network protocol this listener expects to receive.
-	// The GatewayClass MUST apply the Hostname match appropriately for each
-	// protocol:
-	//
-	// * For the "TLS" protocol, the Hostname match MUST be
-	//   applied to the [SNI](https://tools.ietf.org/html/rfc6066#section-3)
-	//   server name offered by the client.
-	// * For the "HTTP" protocol, the Hostname match MUST be
-	//   applied to the host portion of the
-	//   [effective request URI](https://tools.ietf.org/html/rfc7230#section-5.5)
-	//   or the [:authority pseudo-header](https://tools.ietf.org/html/rfc7540#section-8.1.2.3)
-	// * For the "HTTPS" protocol, the Hostname match MUST be
-	//   applied at both the TLS and HTTP protocol layers.
 	//
 	// Support: Core
 	Protocol ProtocolType `json:"protocol"`
@@ -251,7 +250,10 @@ type Listener struct {
 type ProtocolType string
 
 const (
-	// Accepts cleartext HTTP/1.1 sessions over TCP.
+	// Accepts cleartext HTTP/1.1 sessions over TCP. Implementations MAY also
+	// support HTTP/2 over cleartext. If implementations support HTTP/2 over
+	// cleartext on "HTTP" listeners, that MUST be clearly documented by the
+	// implementation.
 	HTTPProtocolType ProtocolType = "HTTP"
 
 	// Accepts HTTP/1.1 or HTTP/2 sessions over TLS.
@@ -271,13 +273,14 @@ const (
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
+	//
 	// - Terminate: The TLS session between the downstream client
 	//   and the Gateway is terminated at the Gateway. This mode requires
-	//   certificateRef to be set.
+	//   certificateRefs to be set and contain at least one element.
 	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
 	//   implies that the Gateway can't decipher the TLS stream except for
 	//   the ClientHello message of the TLS protocol.
-	//   CertificateRef field is ignored in this mode.
+	//   CertificateRefs field is ignored in this mode.
 	//
 	// Support: Core
 	//
@@ -285,10 +288,14 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:default=Terminate
 	Mode *TLSModeType `json:"mode,omitempty"`
 
-	// CertificateRef is a reference to a Kubernetes object that contains a TLS
-	// certificate and private key. This certificate is used to establish a TLS
-	// handshake for requests that match the hostname of the associated
-	// listener.
+	// CertificateRefs contains a series of references to Kubernetes objects that
+	// contains TLS certificates and private keys. These certificates are used to
+	// establish a TLS handshake for requests that match the hostname of the
+	// associated listener.
+	//
+	// A single CertificateRef to a Kubernetes Secret has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a Listener, but this behavior is implementation-specific.
 	//
 	// References to a resource in different namespace are invalid UNLESS there
 	// is a ReferencePolicy in the target namespace that allows the certificate
@@ -296,18 +303,19 @@ type GatewayTLSConfig struct {
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "InvalidCertificateRef" reason.
 	//
-	// This field is required when mode is set to "Terminate" (default) and
-	// optional otherwise.
+	// This field is required to have at least one element when the mode is set
+	// to "Terminate" (default) and is optional otherwise.
 	//
-	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
-	// or an implementation-specific custom resource.
+	// CertificateRefs can reference to standard Kubernetes resources, i.e.
+	// Secret, or implementation-specific custom resources.
 	//
-	// Support: Core (Kubernetes Secrets)
+	// Support: Core - A single reference to a Kubernetes Secret
 	//
-	// Support: Implementation-specific (Other resource types)
+	// Support: Implementation-specific (More than one reference or other resource types)
 	//
 	// +optional
-	CertificateRef *SecretObjectReference `json:"certificateRef,omitempty"`
+	// +kubebuilder:validation:MaxItems=64
+	CertificateRefs []*SecretObjectReference `json:"certificateRefs,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
@@ -333,9 +341,12 @@ const (
 	// In this mode, TLS session between the downstream client
 	// and the Gateway is terminated at the Gateway.
 	TLSModeTerminate TLSModeType = "Terminate"
+
 	// In this mode, the TLS session is NOT terminated by the Gateway. This
 	// implies that the Gateway can't decipher the TLS stream except for
 	// the ClientHello message of the TLS protocol.
+	//
+	// Note that SSL passthrough is only supported by TLSRoute.
 	TLSModePassthrough TLSModeType = "Passthrough"
 )
 
@@ -425,8 +436,6 @@ type RouteGroupKind struct {
 type GatewayAddress struct {
 	// Type of the address.
 	//
-	// Support: Extended
-	//
 	// +optional
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
@@ -502,7 +511,7 @@ type GatewayStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Scheduled", status: "False", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Scheduled", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
@@ -595,12 +604,11 @@ const (
 	// more Listeners are not ready to serve traffic.
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
 
-	// This reason is used with the "Ready" condition when the requested
-	// address has not been assigned to the Gateway. This reason
-	// can be used to express a range of circumstances, including
-	// (but not limited to) IPAM address exhaustion, invalid
-	// or unsupported address requests, or a named address not
-	// being found.
+	// This reason is used with the "Ready" condition when none of the requested
+	// addresses have been assigned to the Gateway. This reason can be used to
+	// express a range of circumstances, including (but not limited to) IPAM
+	// address exhaustion, invalid or unsupported address requests, or a named
+	// address not being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
@@ -610,17 +618,14 @@ type ListenerStatus struct {
 	Name SectionName `json:"name"`
 
 	// SupportedKinds is the list indicating the Kinds supported by this
-	// listener. When this is not specified on the Listener, this MUST represent
-	// the kinds an implementation supports for the specified protocol. When
-	// there are kinds specified on the Listener, this MUST represent the
-	// intersection of those kinds and the kinds supported by the implementation
-	// for the specified protocol.
+	// listener. This MUST represent the kinds an implementation supports for
+	// that Listener configuration.
 	//
-	// If kinds are specified in Spec that are not supported, an implementation
-	// MUST set the "ResolvedRefs" condition to "False" with the
-	// "InvalidRouteKinds" reason. If both valid and invalid Route kinds are
-	// specified, the implementation should support the valid Route kinds that
-	// have been specified.
+	// If kinds are specified in Spec that are not supported, they MUST NOT
+	// appear in this list and an implementation MUST set the "ResolvedRefs"
+	// condition to "False" with the "InvalidRouteKinds" reason. If both valid
+	// and invalid Route kinds are specified, the implementation MUST
+	// reference the valid Route kinds that have been specified.
 	//
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
@@ -717,8 +722,12 @@ const (
 	// interoperability.
 	ListenerConditionDetached ListenerConditionType = "Detached"
 
-	// This reason is used with the "Detached" condition when the
-	// Listener requests a port that cannot be used on the Gateway.
+	// This reason is used with the "Detached" condition when the Listener
+	// requests a port that cannot be used on the Gateway. This reason could be
+	// used in a number of instances, including:
+	//
+	// * The port is already in use.
+	// * The port is not supported by the implementation.
 	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
 
 	// This reason is used with the "Detached" condition when the
@@ -732,9 +741,12 @@ const (
 	// protocol type is not supported.
 	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
 
-	// This reason is used with the "Detached" condition when
-	// the Listener could not be attached to the Gateway because the
-	// requested address is not supported.
+	// This reason is used with the "Detached" condition when the Listener could
+	// not be attached to the Gateway because the requested address is not
+	// supported. This reason could be used in a number of instances, including:
+	//
+	// * The address is already in use.
+	// * The type of address is not supported by the implementation.
 	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
 
 	// This reason is used with the "Detached" condition when the condition is
@@ -766,7 +778,7 @@ const (
 	ListenerReasonResolvedRefs ListenerConditionReason = "ResolvedRefs"
 
 	// This reason is used with the "ResolvedRefs" condition when the
-	// Listener has a TLS configuration with a TLS CertificateRef
+	// Listener has a TLS configuration with at least one TLS CertificateRef
 	// that is invalid or cannot be resolved.
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 

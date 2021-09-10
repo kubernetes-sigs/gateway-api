@@ -49,26 +49,36 @@ type TLSRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
 	// Hostnames defines a set of SNI names that should match against the
-	// SNI attribute of TLS ClientHello message in TLS handshake.
+	// SNI attribute of TLS ClientHello message in TLS handshake. This matches
+	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
-	// SNI can be "precise" which is a domain name without the terminating
-	// dot of a network host (e.g. "foo.example.com") or "wildcard", which is
-	// a domain name prefixed with a single wildcard label (e.g. `*.example.com`).
-	// The wildcard character `*` must appear by itself as the first DNS label
-	// and matches only a single label. You cannot have a wildcard label by
-	// itself (e.g. Host == `*`).
+	// 1. IPs are not allowed in SNI names per RFC 6066.
+	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+	//    label must appear by itself as the first label.
 	//
-	// Requests will be matched against the SNI attribute in the following
-	// order:
+	// If a hostname is specified by both the Listener and TLSRoute, there
+	// must be at least one intersecting hostname for the TLSRoute to be
+	// attached to the Listener. For example:
 	//
-	// 1. If SNI is precise, the request matches this Route if the SNI in
-	//    ClientHello is equal to one of the defined SNIs.
-	// 2. If SNI is a wildcard, then the request matches this Route if the
-	//    SNI is to equal to the suffix (removing the first label) of the
-	//    wildcard.
-	// 3. If SNIs are unspecified, all requests associated with the gateway TLS
-	//    listener will match. This can be used to define a default backend
-	//    for a TLS listener.
+	// * A Listener with `test.example.com` as the hostname matches TLSRoutes
+	//   that have either not specified any hostnames, or have specified at
+	//   least one of `test.example.com` or `*.example.com`.
+	// * A Listener with `*.example.com` as the hostname matches TLSRoutes
+	//   that have either not specified any hostnames or have specified at least
+	//   one hostname that matches the Listener hostname. For example,
+	//   `test.example.com` and `*.example.com` would both match. On the other
+	//   hand, `example.com` and `test.example.net` would not match.
+	//
+	// If both the Listener and TLSRoute have specified hostnames, any
+	// TLSRoute hostnames that do not match the Listener hostname MUST be
+	// ignored. For example, if a Listener specified `*.example.com`, and the
+	// TLSRoute specified `test.example.com` and `test.example.net`,
+	// `test.example.net` must not be considered for a match.
+	//
+	// If both the Listener and TLSRoute have specified hostnames, and none
+	// match with the criteria above, then the TLSRoute is not accepted. The
+	// implementation must raise an 'Accepted' Condition with a status of
+	// `False` in the corresponding RouteParentStatus.
 	//
 	// Support: Core
 	//
@@ -90,40 +100,6 @@ type TLSRouteStatus struct {
 
 // TLSRouteRule is the configuration for a given rule.
 type TLSRouteRule struct {
-	// Matches define conditions used for matching the rule against incoming TLS
-	// connections. Each match is independent, i.e. this rule will be matched if
-	// **any** one of the matches is satisfied. If unspecified (i.e. empty),
-	// this Rule will match all requests for the associated Listener.
-	//
-	// Each client request MUST map to a maximum of one route rule. If a request
-	// matches multiple rules, matching precedence MUST be determined in order
-	// of the following criteria, continuing on ties:
-	//
-	// * The longest matching SNI.
-	// * The longest matching precise SNI (without a wildcard). This means that
-	//   "b.example.com" should be given precedence over "*.example.com".
-	// * The most specific match specified by ExtensionRef. Each implementation
-	//   that supports ExtensionRef may have different ways of determining the
-	//   specificity of the referenced extension.
-	//
-	// If ties still exist across multiple Routes, matching precedence MUST be
-	// determined in order of the following criteria, continuing on ties:
-	//
-	// * The oldest Route based on creation timestamp. For example, a Route with
-	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
-	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
-	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>". For example, foo/bar is given precedence over
-	//   foo/baz.
-	//
-	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the first matching rule meeting
-	// the above criteria.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	Matches []TLSRouteMatch `json:"matches,omitempty"`
-
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a non-existent resource or
 	// a Service with no endpoints), the rule performs no forwarding; if no
@@ -142,21 +118,6 @@ type TLSRouteRule struct {
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []BackendRef `json:"backendRefs,omitempty"`
-}
-
-// TLSRouteMatch defines the predicate used to match connections to a
-// given action.
-type TLSRouteMatch struct {
-	// ExtensionRef is an optional, implementation-specific extension to the
-	// "match" behavior. For example, resource "mytcproutematcher" in group
-	// "networking.example.net". If the referent cannot be found, the rule MUST
-	// not be included in the route. The controller must ensure the
-	// "ResolvedRefs" condition on the Route status is set to `status: False`.
-	//
-	// Support: Custom
-	//
-	// +optional
-	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
 }
 
 // +kubebuilder:object:root=true
