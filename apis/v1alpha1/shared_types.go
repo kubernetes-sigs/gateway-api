@@ -169,10 +169,21 @@ type RouteForwardTo struct {
 // RouteConditionType is a type of condition for a route.
 type RouteConditionType string
 
+// RouteConditionReason is a reason for a route condition.
+type RouteConditionReason string
+
 const (
 	// This condition indicates whether the route has been admitted
-	// or rejected by a Gateway, and why.
+	// or refused by a Gateway.
 	ConditionRouteAdmitted RouteConditionType = "Admitted"
+
+	// This reason is used with the "Admitted" condition when the Route has been
+	// admitted by the Gateway.
+	RouteReasonAdmitted RouteConditionReason = "Admitted"
+
+	// This reason is used with the "Admitted" condition when the Route has been
+	// refused by the Gateway.
+	RouteReasonRefused RouteConditionReason = "Refused"
 )
 
 // RouteGatewayStatus describes the status of a route with respect to an

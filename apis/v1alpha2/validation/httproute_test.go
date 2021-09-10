@@ -81,7 +81,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8081),
 										},
@@ -112,7 +112,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8080),
 										},
@@ -121,7 +121,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: specialService,
 											Port: portNumberPtr(8080),
 										},
@@ -163,7 +163,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8080),
 										},
@@ -205,7 +205,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8080),
 										},
@@ -225,7 +225,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8080),
 										},
@@ -245,7 +245,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: specialService,
 											Port: portNumberPtr(8080),
 										},
@@ -287,7 +287,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								{
 									Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
 									RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-										BackendRef: &gatewayv1a2.BackendObjectReference{
+										BackendRef: gatewayv1a2.BackendObjectReference{
 											Name: testService,
 											Port: portNumberPtr(8080),
 										},
