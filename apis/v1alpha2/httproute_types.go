@@ -117,16 +117,16 @@ type HTTPRouteRule struct {
 	// - path:
 	//     value: "/foo"
 	//   headers:
-	//     values:
-	//       version: "2"
+	//   - name: "version"
+	//     value: "v2"
 	// - path:
 	//     value: "/v2/foo"
 	// ```
 	//
-	// For a request to match against this rule, a request should satisfy
+	// For a request to match against this rule, a request must satisfy
 	// EITHER of the two conditions:
 	//
-	// - path prefixed with `/foo` AND contains the header `version: "2"`
+	// - path prefixed with `/foo` AND contains the header `version: v2`
 	// - path prefix of `/v2/foo`
 	//
 	// See the documentation for HTTPRouteMatch on how to specify multiple
@@ -138,13 +138,14 @@ type HTTPRouteRule struct {
 	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize rules based on the following criteria, continuing on
-	// ties:
+	// ties. Precedence must be given to the the Rule with the largest number
+	// of:
 	//
-	// * The longest hostname.
-	// * The longest non-wildcard hostname.
-	// * The longest path.
-	// * The largest number of header matches.
-	// * The largest number of query param matches.
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	// * Characters in a matching path.
+	// * Header matches.
+	// * Query param matches.
 	//
 	// If ties still exist across multiple Routes, matching precedence MUST be
 	// determined in order of the following criteria, continuing on ties:
@@ -400,15 +401,15 @@ const (
 // evaluate to true only if all conditions are satisfied.
 //
 // For example, the match below will match a HTTP request only if its path
-// starts with `/foo` AND it contains the `version: "1"` header:
+// starts with `/foo` AND it contains the `version: v1` header:
 //
 // ```
 // match:
 //   path:
 //     value: "/foo"
 //   headers:
-//     values:
-//       version: "1"
+//   - name: "version"
+//     value "v1"
 // ```
 type HTTPRouteMatch struct {
 	// Path specifies a HTTP request path matcher. If this field is not
@@ -564,9 +565,9 @@ type HTTPHeader struct {
 	// Name is the name of the HTTP Header to be matched. Name matching MUST be
 	// case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
 	//
-	// If multiple entries specify equivalent header names, only the first entry
-	// with an equivalent name MUST be considered for a match. Subsequent
-	// entries with an equivalent header name MUST be ignored. Due to the
+	// If multiple entries specify equivalent header names, the first entry with
+	// an equivalent name MUST be considered for a match. Subsequent entries
+	// with an equivalent header name MUST be ignored. Due to the
 	// case-insensitivity of header names, "foo" and "Foo" are considered
 	// equivalent.
 	Name HTTPHeaderName `json:"name"`
@@ -589,7 +590,9 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: foo
 	//
 	// Config:
-	//   set: {"my-header": "bar"}
+	//   set:
+	//   - name: "my-header"
+	//     value: "bar"
 	//
 	// Output:
 	//   GET /foo HTTP/1.1
@@ -610,7 +613,9 @@ type HTTPRequestHeaderFilter struct {
 	//   my-header: foo
 	//
 	// Config:
-	//   add: {"my-header": "bar"}
+	//   add:
+	//   - name: "my-header"
+	//     value: "bar"
 	//
 	// Output:
 	//   GET /foo HTTP/1.1

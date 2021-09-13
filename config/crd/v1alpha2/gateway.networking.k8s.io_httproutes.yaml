@@ -266,9 +266,9 @@ spec:
                                         appends to any existing values associated
                                         with the header name. \n Input:   GET /foo
                                         HTTP/1.1   my-header: foo \n Config:   add:
-                                        {\"my-header\": \"bar\"} \n Output:   GET
-                                        /foo HTTP/1.1   my-header: foo   my-header:
-                                        bar"
+                                        \  - name: \"my-header\"     value: \"bar\"
+                                        \n Output:   GET /foo HTTP/1.1   my-header:
+                                        foo   my-header: bar"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
@@ -279,10 +279,10 @@ spec:
                                               HTTP Header to be matched. Name matching
                                               MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
                                               \n If multiple entries specify equivalent
-                                              header names, only the first entry with
-                                              an equivalent name MUST be considered
-                                              for a match. Subsequent entries with
-                                              an equivalent header name MUST be ignored.
+                                              header names, the first entry with an
+                                              equivalent name MUST be considered for
+                                              a match. Subsequent entries with an
+                                              equivalent header name MUST be ignored.
                                               Due to the case-insensitivity of header
                                               names, \"foo\" and \"Foo\" are considered
                                               equivalent."
@@ -324,9 +324,9 @@ spec:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
                                         action. \n Input:   GET /foo HTTP/1.1   my-header:
-                                        foo \n Config:   set: {\"my-header\": \"bar\"}
-                                        \n Output:   GET /foo HTTP/1.1   my-header:
-                                        bar"
+                                        foo \n Config:   set:   - name: \"my-header\"
+                                        \    value: \"bar\" \n Output:   GET /foo
+                                        HTTP/1.1   my-header: bar"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
@@ -337,10 +337,10 @@ spec:
                                               HTTP Header to be matched. Name matching
                                               MUST be case insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
                                               \n If multiple entries specify equivalent
-                                              header names, only the first entry with
-                                              an equivalent name MUST be considered
-                                              for a match. Subsequent entries with
-                                              an equivalent header name MUST be ignored.
+                                              header names, the first entry with an
+                                              equivalent name MUST be considered for
+                                              a match. Subsequent entries with an
+                                              equivalent header name MUST be ignored.
                                               Due to the case-insensitivity of header
                                               names, \"foo\" and \"Foo\" are considered
                                               equivalent."
@@ -432,8 +432,8 @@ spec:
                                             port number to use for this resource.
                                             Port is required when the referent is
                                             a Kubernetes Service. For other resources,
-                                            destination port can be derived from the
-                                            referent resource or this field.
+                                            destination port might be derived from
+                                            the referent resource or this field.
                                           format: int32
                                           maximum: 65535
                                           minimum: 1
@@ -559,8 +559,8 @@ spec:
                             description: Port specifies the destination port number
                               to use for this resource. Port is required when the
                               referent is a Kubernetes Service. For other resources,
-                              destination port can be derived from the referent resource
-                              or this field.
+                              destination port might be derived from the referent
+                              resource or this field.
                             format: int32
                             maximum: 65535
                             minimum: 1
@@ -652,9 +652,9 @@ spec:
                                   value) to the request before the action. It appends
                                   to any existing values associated with the header
                                   name. \n Input:   GET /foo HTTP/1.1   my-header:
-                                  foo \n Config:   add: {\"my-header\": \"bar\"} \n
-                                  Output:   GET /foo HTTP/1.1   my-header: foo   my-header:
-                                  bar"
+                                  foo \n Config:   add:   - name: \"my-header\"     value:
+                                  \"bar\" \n Output:   GET /foo HTTP/1.1   my-header:
+                                  foo   my-header: bar"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.
@@ -664,10 +664,10 @@ spec:
                                         to be matched. Name matching MUST be case
                                         insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
                                         \n If multiple entries specify equivalent
-                                        header names, only the first entry with an
-                                        equivalent name MUST be considered for a match.
-                                        Subsequent entries with an equivalent header
-                                        name MUST be ignored. Due to the case-insensitivity
+                                        header names, the first entry with an equivalent
+                                        name MUST be considered for a match. Subsequent
+                                        entries with an equivalent header name MUST
+                                        be ignored. Due to the case-insensitivity
                                         of header names, \"foo\" and \"Foo\" are considered
                                         equivalent."
                                       maxLength: 256
@@ -706,8 +706,8 @@ spec:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
                                   Input:   GET /foo HTTP/1.1   my-header: foo \n Config:
-                                  \  set: {\"my-header\": \"bar\"} \n Output:   GET
-                                  /foo HTTP/1.1   my-header: bar"
+                                  \  set:   - name: \"my-header\"     value: \"bar\"
+                                  \n Output:   GET /foo HTTP/1.1   my-header: bar"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.
@@ -717,10 +717,10 @@ spec:
                                         to be matched. Name matching MUST be case
                                         insensitive. (See https://tools.ietf.org/html/rfc7230#section-3.2).
                                         \n If multiple entries specify equivalent
-                                        header names, only the first entry with an
-                                        equivalent name MUST be considered for a match.
-                                        Subsequent entries with an equivalent header
-                                        name MUST be ignored. Due to the case-insensitivity
+                                        header names, the first entry with an equivalent
+                                        name MUST be considered for a match. Subsequent
+                                        entries with an equivalent header name MUST
+                                        be ignored. Due to the case-insensitivity
                                         of header names, \"foo\" and \"Foo\" are considered
                                         equivalent."
                                       maxLength: 256
@@ -805,7 +805,7 @@ spec:
                                     description: Port specifies the destination port
                                       number to use for this resource. Port is required
                                       when the referent is a Kubernetes Service. For
-                                      other resources, destination port can be derived
+                                      other resources, destination port might be derived
                                       from the referent resource or this field.
                                     format: int32
                                     maximum: 65535
@@ -902,21 +902,22 @@ spec:
                         rule against incoming HTTP requests. Each match is independent,
                         i.e. this rule will be matched if **any** one of the matches
                         is satisfied. \n For example, take the following matches configuration:
-                        \n ``` matches: - path:     value: \"/foo\"   headers:     values:
-                        \      version: \"2\" - path:     value: \"/v2/foo\" ``` \n
-                        For a request to match against this rule, a request should
-                        satisfy EITHER of the two conditions: \n - path prefixed with
-                        `/foo` AND contains the header `version: \"2\"` - path prefix
+                        \n ``` matches: - path:     value: \"/foo\"   headers:   -
+                        name: \"version\"     value: \"v2\" - path:     value: \"/v2/foo\"
+                        ``` \n For a request to match against this rule, a request
+                        must satisfy EITHER of the two conditions: \n - path prefixed
+                        with `/foo` AND contains the header `version: v2` - path prefix
                         of `/v2/foo` \n See the documentation for HTTPRouteMatch on
                         how to specify multiple match conditions that should be ANDed
                         together. \n If no matches are specified, the default is a
                         prefix path match on \"/\", which has the effect of matching
                         every HTTP request. \n Proxy or Load Balancer routing configuration
                         generated from HTTPRoutes MUST prioritize rules based on the
-                        following criteria, continuing on ties: \n * The longest hostname.
-                        * The longest non-wildcard hostname. * The longest path. *
-                        The largest number of header matches. * The largest number
-                        of query param matches. \n If ties still exist across multiple
+                        following criteria, continuing on ties. Precedence must be
+                        given to the the Rule with the largest number of: \n * Characters
+                        in a matching non-wildcard hostname. * Characters in a matching
+                        hostname. * Characters in a matching path. * Header matches.
+                        * Query param matches. \n If ties still exist across multiple
                         Routes, matching precedence MUST be determined in order of
                         the following criteria, continuing on ties: \n * The oldest
                         Route based on creation timestamp. * The Route appearing first
@@ -930,9 +931,9 @@ spec:
                           ANDed together, i.e. the match will evaluate to true only
                           if all conditions are satisfied. \n For example, the match
                           below will match a HTTP request only if its path starts
-                          with `/foo` AND it contains the `version: \"1\"` header:
-                          \n ``` match:   path:     value: \"/foo\"   headers:     values:
-                          \      version: \"1\" ```"
+                          with `/foo` AND it contains the `version: v1` header: \n
+                          ``` match:   path:     value: \"/foo\"   headers:   - name:
+                          \"version\"     value \"v1\" ```"
                         properties:
                           headers:
                             description: Headers specifies HTTP request header matchers.
