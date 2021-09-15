@@ -77,6 +77,22 @@ universal support will not be a blocker towards developing portable
 feature sets. Standardizing on spec will make it easier to eventually
 graduate to CORE when support is widespread.
 
+### Overlapping Support Levels
+It is possible for support levels to overlap. When this occurs, the minimum
+expressed support level should be interpreted. For example, an identical struct
+may be embedded in two different places. In one of those places, the struct is
+considered to have CORE support while the other place only includes EXTENDED
+support. Fields within this struct may express separate CORE and EXTENDED
+support levels, but those levels may never be interpreted as exceeding the
+support level of the parent struct they are embedded in.
+
+For a more concrete example, HTTPRoute includes CORE support for filters defined
+within a Rule and EXTENDED support when defined within ForwardTo. Those filters
+may separately define support levels for each field. When interpreting
+overlapping support levels, the minimum value should be interpreted. That means
+if a field has a CORE support level but is in a filter attached in a place with
+EXTENDED support, the interpreted support level should be EXTENDED.
+
 ### Conformance expectations
 
 We expect there will be varying levels of conformance among the

@@ -1,7 +1,5 @@
 # Security Model
 
-!!! danger
-    This page is very of date and needs to be updated.
 ## Introduction
 The Gateway API have been designed to enable granular authorization for each
 role in a typical organization.
@@ -98,14 +96,11 @@ configuration](https://github.com/open-policy-agent/gatekeeper-library/pull/24)
 that could be used for this.
 
 ## Route Namespaces
-Gateway API allow Gateways to select Routes across multiple Namespaces.
+Gateway API enables Routes to be attached to Gateways from different Namespaces.
 Although this can be remarkably powerful, this capability needs to be used
-carefully. Gateways include a `RouteNamespaces` field that allows selecting
-multiple namespaces with a label selector. By default, this is limited to Routes
-in the same namespace as the Gateway. Additionally, Routes include a `Gateways`
-field that allows them to restrict which Gateways use them. If the Gateways
-field is not specified (i.e. its empty), then the Route will default to allowing
-selection by Gateways in the same namespace.
+carefully. Gateway Listeners include a `namespaces` field that can allow Routes
+to be attached from additional namespaces. By default, this is limited to Routes
+in the same namespace as the Gateway.
 
 ## Controller Requirements
 To be considered conformant with the Gateway API spec, controllers need to:
