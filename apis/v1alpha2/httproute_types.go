@@ -507,7 +507,7 @@ type HTTPRouteFilter struct {
 	// Support: Core
 	//
 	// +optional
-	RequestRedirect *HTTPRequestRedirect `json:"requestRedirect,omitempty"`
+	RequestRedirect *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
@@ -651,17 +651,17 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPRequestRedirect defines configuration for the RequestRedirect filter.
-type HTTPRequestRedirect struct {
-	// Protocol is the protocol to be used in the value of the `Location`
+// HTTPRequestRedirectFilter defines configuration for the RequestRedirect filter.
+type HTTPRequestRedirectFilter struct {
+	// Scheme is the scheme to be used in the value of the `Location`
 	// header in the response.
-	// When empty, the protocol of the request is used.
+	// When empty, the scheme of the request is used.
 	//
 	// Support: Extended
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=HTTP;HTTPS
-	Protocol *string `json:"protocol,omitempty"`
+	// +kubebuilder:validation:Enum=http;https
+	Scheme *string `json:"scheme,omitempty"`
 
 	// Hostname is the hostname to be used in the value of the `Location`
 	// header in the response.
