@@ -111,7 +111,7 @@ type BackendObjectReference struct {
 
 	// Port specifies the destination port number to use for this resource.
 	// Port is required when the referent is a Kubernetes Service.
-	// For other resources, destination port can be derived from the referent
+	// For other resources, destination port might be derived from the referent
 	// resource or this field.
 	//
 	// +optional
