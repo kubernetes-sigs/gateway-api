@@ -214,18 +214,33 @@ type HTTPRouteRule struct {
 //
 // Prefix and Exact paths must be syntactically valid:
 //
-// - Must begin with the '/' character
-// - Must not contain consecutive '/' characters (e.g. /foo///, //).
-// - For prefix paths, a trailing '/' character in the Path is ignored,
-// e.g. /abc and /abc/ specify the same match.
+// - Must begin with the `/` character
+// - Must not contain consecutive `/` characters (e.g. `/foo///`, `//`).
 //
 // +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression
 type PathMatchType string
 
-// PathMatchType constants.
 const (
-	PathMatchExact             PathMatchType = "Exact"
-	PathMatchPrefix            PathMatchType = "Prefix"
+	// Matches based on a URL path prefix split by `/`. Matching is
+	// case sensitive and done on a path element by element basis. A
+	// path element refers to the list of labels in the path split by
+	// the `/` separator. A request is a match for path _p_ if every
+	// _p_ is an element-wise prefix of the request path.
+	//
+	// For example, `/abc`, `/abc/` and `/abc/def` match the prefix
+	// `/abc`, but `/abcd` does not.
+	PathMatchExact PathMatchType = "Exact"
+
+	// Matches the URL path exactly and with case sensitivity.
+	PathMatchPrefix PathMatchType = "Prefix"
+
+	// Matches if the URL path matches the given regular expression with
+	// case sensitivity.
+	//
+	// Since `"RegularExpression"` has custom conformance, implementations
+	// can support POSIX, PCRE, RE2 or any other regular expression dialect.
+	// Please read the implementation's documentation to determine the supported
+	// dialect.
 	PathMatchRegularExpression PathMatchType = "RegularExpression"
 )
 
@@ -236,11 +251,6 @@ type HTTPPathMatch struct {
 	// Support: Core (Exact, Prefix)
 	//
 	// Support: Custom (RegularExpression)
-	//
-	// Since RegularExpression PathType has custom conformance, implementations
-	// can support POSIX, PCRE or any other dialects of regular expressions.
-	// Please read the implementation's documentation to determine the supported
-	// dialect.
 	//
 	// +optional
 	// +kubebuilder:default=Prefix

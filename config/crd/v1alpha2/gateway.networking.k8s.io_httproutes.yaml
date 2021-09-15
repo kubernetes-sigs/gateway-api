@@ -1020,12 +1020,7 @@ spec:
                                 default: Prefix
                                 description: "Type specifies how to match against
                                   the path Value. \n Support: Core (Exact, Prefix)
-                                  \n Support: Custom (RegularExpression) \n Since
-                                  RegularExpression PathType has custom conformance,
-                                  implementations can support POSIX, PCRE or any other
-                                  dialects of regular expressions. Please read the
-                                  implementation's documentation to determine the
-                                  supported dialect."
+                                  \n Support: Custom (RegularExpression)"
                                 enum:
                                 - Exact
                                 - Prefix
