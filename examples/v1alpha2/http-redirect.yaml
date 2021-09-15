@@ -44,7 +44,7 @@ spec:
     - filters:
       - type: RequestRedirect
         requestRedirect:
-          protocol: HTTPS
+          scheme: https
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: HTTPRoute

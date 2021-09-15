@@ -467,14 +467,14 @@ spec:
                                       maximum: 65535
                                       minimum: 1
                                       type: integer
-                                    protocol:
-                                      description: "Protocol is the protocol to be
-                                        used in the value of the `Location` header
-                                        in the response. When empty, the protocol
-                                        of the request is used. \n Support: Extended"
+                                    scheme:
+                                      description: "Scheme is the scheme to be used
+                                        in the value of the `Location` header in the
+                                        response. When empty, the scheme of the request
+                                        is used. \n Support: Extended"
                                       enum:
-                                      - HTTP
-                                      - HTTPS
+                                      - http
+                                      - https
                                       type: string
                                     statusCode:
                                       default: 302
@@ -840,14 +840,14 @@ spec:
                                 maximum: 65535
                                 minimum: 1
                                 type: integer
-                              protocol:
-                                description: "Protocol is the protocol to be used
-                                  in the value of the `Location` header in the response.
-                                  When empty, the protocol of the request is used.
-                                  \n Support: Extended"
+                              scheme:
+                                description: "Scheme is the scheme to be used in the
+                                  value of the `Location` header in the response.
+                                  When empty, the scheme of the request is used. \n
+                                  Support: Extended"
                                 enum:
-                                - HTTP
-                                - HTTPS
+                                - http
+                                - https
                                 type: string
                               statusCode:
                                 default: 302
