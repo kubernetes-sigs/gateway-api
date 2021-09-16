@@ -118,6 +118,16 @@ The "implementation-specific" designation allows a CORE or EXTENDED feature to
 be well-defined taking into account the realities of some features that are
 mostly but not entirely portable.
 
+## Kind vs. Resource
+
+Similar to other Kubernetes APIs, Gateway API uses "Kind" instead of "Resource"
+in object references throughout the API. This pattern should be familiar to
+most Kubernetes users.
+
+Per the [Kubernetes API conventions][1], this means that all implementations of
+this API should have a predefined mapping between kinds and resources. Relying
+on dynamic resource mapping is not safe.
+
 ## API Conventions
 
 Gateway API follows Kubernetes API [conventions][1]. These conventions
