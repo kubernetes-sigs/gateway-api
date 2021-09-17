@@ -27,8 +27,8 @@ import (
 )
 
 func TestValidateHTTPRoute(t *testing.T) {
-	testService := "test-service"
-	specialService := "special-service"
+	testService := gatewayv1a2.ObjectName("test-service")
+	specialService := gatewayv1a2.ObjectName("special-service")
 	tests := []struct {
 		name     string
 		rules    []gatewayv1a2.HTTPRouteRule

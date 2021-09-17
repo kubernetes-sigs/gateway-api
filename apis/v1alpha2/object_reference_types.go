@@ -27,10 +27,7 @@ type LocalObjectReference struct {
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
+	Name ObjectName `json:"name"`
 }
 
 // SecretObjectReference identifies an API object including its namespace, defaulting to Secret.
@@ -49,10 +46,7 @@ type SecretObjectReference struct {
 	Kind *Kind `json:"kind"`
 
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
+	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.
@@ -91,10 +85,7 @@ type BackendObjectReference struct {
 	Kind *Kind `json:"kind,omitempty"`
 
 	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
+	Name ObjectName `json:"name"`
 
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.

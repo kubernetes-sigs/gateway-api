@@ -87,6 +87,7 @@ spec:
                         Core"
                       maxLength: 253
                       minLength: 1
+                      pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
@@ -165,6 +166,7 @@ spec:
                             description: Name is the name of the referent.
                             maxLength: 253
                             minLength: 1
+                            pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
                           namespace:
                             description: "Namespace is the namespace of the backend.
@@ -369,6 +371,7 @@ spec:
                             Core"
                           maxLength: 253
                           minLength: 1
+                          pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.
