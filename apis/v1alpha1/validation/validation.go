@@ -33,6 +33,11 @@ var (
 // ValidateGateway validates gw according to the Gateway API specification.
 // For additional details of the Gateway spec, refer to:
 //  https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.Gateway
+//
+// This function is currently empty as the validations have been moved to CRD field validations.
+// It's expected that further validation will be added back here in the future.
+// Here is the related PR for the reference:
+//  https://github.com/kubernetes-sigs/gateway-api/pull/872
 func ValidateGateway(_ *gatewayv1a1.Gateway) field.ErrorList {
 	return nil
 }
