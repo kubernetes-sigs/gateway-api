@@ -221,6 +221,9 @@ type HTTPRouteRule struct {
 type PathMatchType string
 
 const (
+	// Matches the URL path exactly and with case sensitivity.
+	PathMatchExact PathMatchType = "Exact"
+
 	// Matches based on a URL path prefix split by `/`. Matching is
 	// case sensitive and done on a path element by element basis. A
 	// path element refers to the list of labels in the path split by
@@ -229,9 +232,6 @@ const (
 	//
 	// For example, `/abc`, `/abc/` and `/abc/def` match the prefix
 	// `/abc`, but `/abcd` does not.
-	PathMatchExact PathMatchType = "Exact"
-
-	// Matches the URL path exactly and with case sensitivity.
 	PathMatchPrefix PathMatchType = "Prefix"
 
 	// Matches if the URL path matches the given regular expression with
