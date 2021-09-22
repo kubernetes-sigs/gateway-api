@@ -185,12 +185,14 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 		if err != nil {
 			return nil, err
 		}
+		fieldErr = v1a1Validation.ValidateGateway(&gateway)
 	case v1a2GatewayGVR:
 		var gateway v1alpha2.Gateway
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
 		if err != nil {
 			return nil, err
 		}
+		fieldErr = v1a2Validation.ValidateGateway(&gateway)
 	case v1a1GatewayClassGVR:
 		// runs only for updates
 		if request.Operation != admission.Update {

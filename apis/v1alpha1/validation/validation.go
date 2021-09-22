@@ -30,6 +30,13 @@ var (
 	}
 )
 
+// ValidateGateway validates gw according to the Gateway API specification.
+// For additional details of the Gateway spec, refer to:
+//  https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.Gateway
+func ValidateGateway(_ *gatewayv1a1.Gateway) field.ErrorList {
+	return nil
+}
+
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
 // For additional details of the HTTPRoute spec, refer to:
 // https://gateway-api.sigs.k8s.io/spec/#networking.x-k8s.io/v1alpha1.HTTPRoute
