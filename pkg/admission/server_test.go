@@ -59,10 +59,6 @@ func TestServeHTTPInvalidMethod(t *testing.T) {
 }
 
 func TestServeHTTPSubmissions(t *testing.T) {
-
-	const invalidHostname = "!@!.foo.com"
-	const lowercaseRFC1123ErrorMessage = "a lowercase RFC 1123 subdomain must consist of lower case alphanumeric characters, '-' or '.', and must start and end with an alphanumeric character (e.g. 'example.com', regex used for validation is '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*')"
-
 	for _, apiVersion := range []string{
 		"admission.k8s.io/v1",
 		"admission.k8s.io/v1",
