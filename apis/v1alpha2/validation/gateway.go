@@ -22,6 +22,10 @@ import (
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
+// ValidateGateway validates gw according to the Gateway API specification.
+// For additional details of the Gateway spec, refer to:
+//  https://gateway-api.sigs.k8s.io/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+//
 // Validation that is not possible with CRD annotations may be added here in the future.
 // See https://github.com/kubernetes-sigs/gateway-api/issues/868 for more information.
 func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
