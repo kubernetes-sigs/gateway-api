@@ -11,8 +11,8 @@ spec:
     port: 443
     hostname: "*.example.com"
     tls:
-      certificateRef:
-        kind: Secret
+      certificateRefs:
+      - kind: Secret
         group: ""
         name: wildcard-example-com-cert
         namespace: gateway-api-example-ns1
