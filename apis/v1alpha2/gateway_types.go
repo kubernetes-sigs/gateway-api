@@ -250,7 +250,10 @@ type Listener struct {
 type ProtocolType string
 
 const (
-	// Accepts cleartext HTTP/1.1 sessions over TCP.
+	// Accepts cleartext HTTP/1.1 sessions over TCP. Implementations MAY also
+	// support HTTP/2 over cleartext. If implementations support HTTP/2 over
+	// cleartext on "HTTP" listeners, that MUST be clearly documented by the
+	// implementation.
 	HTTPProtocolType ProtocolType = "HTTP"
 
 	// Accepts HTTP/1.1 or HTTP/2 sessions over TLS.
