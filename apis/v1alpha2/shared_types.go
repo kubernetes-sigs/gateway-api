@@ -96,7 +96,7 @@ type ParentRef struct {
 	SectionName *SectionName `json:"sectionName,omitempty"`
 }
 
-// CommonRouteSpec defines the common attributes that all Routes should include
+// CommonRouteSpec defines the common attributes that all Routes MUST include
 // within their spec.
 type CommonRouteSpec struct {
 	// ParentRefs references the resources (usually Gateways) that a Route wants
@@ -220,8 +220,8 @@ type RouteParentStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-// RouteStatus defines the observed state that is required across
-// all route types.
+// RouteStatus defines the common attributes that all Routes MUST include within
+// their status.
 type RouteStatus struct {
 	// Parents is a list of parent resources (usually Gateways) that are
 	// associated with the route, and the status of the route with respect to

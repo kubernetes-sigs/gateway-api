@@ -260,7 +260,9 @@ Here is a summary of extension points in the API:
 the request/response lifecycle of an HTTP request.
 - **Custom Routes**: If none of the above extensions points suffice for a use
   case, Implementers can chose to create custom Route resources for protocols
-  that are not currently supported in the API.
+  that are not currently supported in the API. Custom Route types need to share
+  the same fields that core Route types do. These are contained within
+  CommonRouteSpec and RouteStatus.
 
 Whenever you are using an extension point without any prior art, please let
 the community know. As we learn more about usage of extension points, we would
