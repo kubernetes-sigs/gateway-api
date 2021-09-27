@@ -56,7 +56,6 @@ func Test_PortNumberPtr(t *testing.T) {
 	}
 
 	for _, tc := range portNumberPtrTests {
-
 		t.Run(tc.name, func(t *testing.T) {
 			port := PortNumberPtr(tc.port)
 			if port == nil || tc.expectedPort == nil {
@@ -71,7 +70,6 @@ func Test_PortNumberPtr(t *testing.T) {
 }
 
 func Test_PathMatchTypePtr(t *testing.T) {
-
 	pathMatchTypePtrTests := []struct {
 		name         string
 		pathType     string

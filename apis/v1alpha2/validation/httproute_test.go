@@ -289,8 +289,6 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 	}
 	for _, tc := range tests {
-		// copy variable to avoid scope problems with ranges
-
 		t.Run(tc.name, func(t *testing.T) {
 			errs := validateHTTPRouteUniqueFilters(tc.rules, field.NewPath("spec").Child("rules"))
 			if len(errs) != tc.errCount {
