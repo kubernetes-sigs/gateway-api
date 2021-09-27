@@ -34,13 +34,7 @@ var (
 // For additional details of the HTTPRoute spec, refer to:
 // https://gateway-api.sigs.k8s.io/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
 func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
-	return validateHTTPRouteSpec(&route.Spec, field.NewPath("spec"))
-}
-
-// validateHTTPRouteSpec validates that required fields of spec are set according to the
-// HTTPRoute specification.
-func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
+	return validateHTTPRouteUniqueFilters(route.Spec.Rules, field.NewPath("spec").Child("rules"))
 }
 
 // validateHTTPRouteUniqueFilters validates whether each core and extended filter
