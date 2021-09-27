@@ -40,11 +40,7 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // validateHTTPRouteSpec validates that required fields of spec are set according to the
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	if errList := validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules")); len(errList) > 0 {
-		return errList
-	}
-
-	return nil
+	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
 }
 
 // validateHTTPRouteUniqueFilters validates whether each core and extended filter
