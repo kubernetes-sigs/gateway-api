@@ -10,8 +10,8 @@ spec:
     port: 443
     hostname: foo.example.com
     tls:
-      certificateRef:
-        kind: Secret
+      certificateRefs:
+      - kind: Secret
         group: ""
         name: foo-example-com-cert
   - name: wildcard-https
@@ -19,7 +19,7 @@ spec:
     port: 443
     hostname: "*.example.com"
     tls:
-      certificateRef:
-        kind: Secret
+      certificateRefs:
+      - kind: Secret
         group: ""
         name: wildcard-example-com-cert

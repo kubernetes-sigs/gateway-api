@@ -17,5 +17,5 @@ spec:
           matchLabels:
             shared-gateway-access: "true"
     tls:
-      certificateRef:
-        name: foo-example-com
+      certificateRefs:
+      - name: foo-example-com

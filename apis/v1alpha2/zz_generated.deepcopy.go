@@ -389,10 +389,16 @@ func (in *GatewayTLSConfig) DeepCopyInto(out *GatewayTLSConfig) {
 		*out = new(TLSModeType)
 		**out = **in
 	}
-	if in.CertificateRef != nil {
-		in, out := &in.CertificateRef, &out.CertificateRef
-		*out = new(SecretObjectReference)
-		(*in).DeepCopyInto(*out)
+	if in.CertificateRefs != nil {
+		in, out := &in.CertificateRefs, &out.CertificateRefs
+		*out = make([]*SecretObjectReference, len(*in))
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(SecretObjectReference)
+				(*in).DeepCopyInto(*out)
+			}
+		}
 	}
 	if in.Options != nil {
 		in, out := &in.Options, &out.Options

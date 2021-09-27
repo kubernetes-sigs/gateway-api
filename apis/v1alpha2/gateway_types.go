@@ -276,11 +276,11 @@ type GatewayTLSConfig struct {
 	//
 	// - Terminate: The TLS session between the downstream client
 	//   and the Gateway is terminated at the Gateway. This mode requires
-	//   certificateRef to be set.
+	//   certificateRefs to be set and contain at least one element.
 	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
 	//   implies that the Gateway can't decipher the TLS stream except for
 	//   the ClientHello message of the TLS protocol.
-	//   CertificateRef field is ignored in this mode.
+	//   CertificateRefs field is ignored in this mode.
 	//
 	// Support: Core
 	//
@@ -288,10 +288,14 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:default=Terminate
 	Mode *TLSModeType `json:"mode,omitempty"`
 
-	// CertificateRef is a reference to a Kubernetes object that contains a TLS
-	// certificate and private key. This certificate is used to establish a TLS
-	// handshake for requests that match the hostname of the associated
-	// listener.
+	// CertificateRefs contains a series of references to Kubernetes objects that
+	// contains TLS certificates and private keys. These certificates are used to
+	// establish a TLS handshake for requests that match the hostname of the
+	// associated listener.
+	//
+	// A single CertificateRef to a Kubernetes Secret has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a Listener, but this behavior is implementation-specific.
 	//
 	// References to a resource in different namespace are invalid UNLESS there
 	// is a ReferencePolicy in the target namespace that allows the certificate
@@ -299,18 +303,19 @@ type GatewayTLSConfig struct {
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "InvalidCertificateRef" reason.
 	//
-	// This field is required when mode is set to "Terminate" (default) and
-	// optional otherwise.
+	// This field is required to have at least one element when the mode is set
+	// to "Terminate" (default) and is optional otherwise.
 	//
-	// CertificateRef can reference a standard Kubernetes resource, i.e. Secret,
-	// or an implementation-specific custom resource.
+	// CertificateRefs can reference to standard Kubernetes resources, i.e.
+	// Secret, or implementation-specific custom resources.
 	//
-	// Support: Core (Kubernetes Secrets)
+	// Support: Core - A single reference to a Kubernetes Secret
 	//
-	// Support: Implementation-specific (Other resource types)
+	// Support: Implementation-specific (More than one reference or other resource types)
 	//
 	// +optional
-	CertificateRef *SecretObjectReference `json:"certificateRef,omitempty"`
+	// +kubebuilder:validation:MaxItems=64
+	CertificateRefs []*SecretObjectReference `json:"certificateRefs,omitempty"`
 
 	// Options are a list of key/value pairs to give extended options
 	// to the provider.
@@ -773,7 +778,7 @@ const (
 	ListenerReasonResolvedRefs ListenerConditionReason = "ResolvedRefs"
 
 	// This reason is used with the "ResolvedRefs" condition when the
-	// Listener has a TLS configuration with a TLS CertificateRef
+	// Listener has a TLS configuration with at least one TLS CertificateRef
 	// that is invalid or cannot be resolved.
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 
