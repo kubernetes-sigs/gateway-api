@@ -138,22 +138,11 @@ spec:
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
-                        unspecified (or empty string), this will either be: \n * local
-                        namespace of the route when scope is set to Namespace. * no
-                        namespace when scope is set to Cluster. \n Support: Core"
+                        unspecified (or empty string), this refers to the local namespace
+                        of the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                      type: string
-                    scope:
-                      default: Namespace
-                      description: "Scope represents if this refers to a cluster or
-                        namespace scoped resource. This may be set to \"Cluster\"
-                        or \"Namespace\". \n Support: Core (Namespace) Support: Custom
-                        (Cluster)"
-                      enum:
-                      - Cluster
-                      - Namespace
                       type: string
                     sectionName:
                       description: "SectionName is the name of a section within the
@@ -1236,23 +1225,11 @@ spec:
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.
-                            When unspecified (or empty string), this will either be:
-                            \n * local namespace of the route when scope is set to
-                            Namespace. * no namespace when scope is set to Cluster.
-                            \n Support: Core"
+                            When unspecified (or empty string), this refers to the
+                            local namespace of the Route. \n Support: Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                          type: string
-                        scope:
-                          default: Namespace
-                          description: "Scope represents if this refers to a cluster
-                            or namespace scoped resource. This may be set to \"Cluster\"
-                            or \"Namespace\". \n Support: Core (Namespace) Support:
-                            Custom (Cluster)"
-                          enum:
-                          - Cluster
-                          - Namespace
                           type: string
                         sectionName:
                           description: "SectionName is the name of a section within

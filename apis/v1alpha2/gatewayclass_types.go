@@ -117,17 +117,9 @@ type ParametersReference struct {
 	// +kubebuilder:validation:MaxLength=253
 	Name string `json:"name"`
 
-	// Scope represents if the referent is a Cluster or Namespace scoped resource.
-	// This may be set to "Cluster" or "Namespace".
-	//
-	// +kubebuilder:validation:Enum=Cluster;Namespace
-	// +kubebuilder:default=Cluster
-	// +optional
-	Scope *string `json:"scope,omitempty"`
-
 	// Namespace is the namespace of the referent.
-	// This field is required when scope is set to "Namespace" and must be unset
-	// when scope is set to "Cluster".
+	// This field is required when referring to a Namespace-scoped resource and
+	// MUST be unset when referring to a Cluster-scoped resource.
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`

@@ -43,26 +43,12 @@ type ParentRef struct {
 	Kind *Kind `json:"kind,omitempty"`
 
 	// Namespace is the namespace of the referent. When unspecified (or empty
-	// string), this will either be:
-	//
-	// * local namespace of the route when scope is set to Namespace.
-	// * no namespace when scope is set to Cluster.
+	// string), this refers to the local namespace of the Route.
 	//
 	// Support: Core
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`
-
-	// Scope represents if this refers to a cluster or namespace scoped
-	// resource. This may be set to "Cluster" or "Namespace".
-	//
-	// Support: Core (Namespace)
-	// Support: Custom (Cluster)
-	//
-	// +kubebuilder:validation:Enum=Cluster;Namespace
-	// +kubebuilder:default=Namespace
-	// +optional
-	Scope *string `json:"scope,omitempty"`
 
 	// Name is the name of the referent.
 	//
