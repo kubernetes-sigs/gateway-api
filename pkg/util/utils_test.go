@@ -91,11 +91,6 @@ func Test_PathMatchTypePtr(t *testing.T) {
 			pathType:     "RegularExpression",
 			expectedPath: gatewayv1a2.PathMatchRegularExpression,
 		},
-		{
-			name:         "valid path regular implementation specific match",
-			pathType:     "ImplementationSpecific",
-			expectedPath: gatewayv1a2.PathMatchRegularExpression,
-		},
 	}
 
 	for _, tc := range pathMatchTypePtrTests {
