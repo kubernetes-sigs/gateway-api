@@ -22,13 +22,14 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilpointer "k8s.io/utils/pointer"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	pkgutils "sigs.k8s.io/gateway-api/pkg/util"
 )
 
 func TestValidateHTTPRoute(t *testing.T) {
-	testService := "test-service"
-	specialService := "special-service"
+	testService := gatewayv1a2.ObjectName("test-service")
+	specialService := gatewayv1a2.ObjectName("special-service")
 	tests := []struct {
 		name     string
 		rules    []gatewayv1a2.HTTPRouteRule
@@ -299,8 +300,8 @@ func TestValidateHTTPRoute(t *testing.T) {
 }
 
 func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
-	var testService = "testService"
-	var specialService = "specialService"
+	var testService v1alpha2.ObjectName = "testService"
+	var specialService v1alpha2.ObjectName = "specialService"
 	tests := []struct {
 		name     string
 		hRoute   gatewayv1a2.HTTPRoute

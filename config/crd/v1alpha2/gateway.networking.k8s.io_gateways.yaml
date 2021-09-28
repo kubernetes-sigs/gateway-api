@@ -303,6 +303,9 @@ spec:
                     protocol:
                       description: "Protocol specifies the network protocol this listener
                         expects to receive. \n Support: Core"
+                      maxLength: 255
+                      minLength: 1
+                      pattern: ^[a-zA-Z0-9]([-a-zSA-Z0-9]*[a-zA-Z0-9])?$|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9]+$
                       type: string
                     tls:
                       description: "TLS is the TLS configuration for the Listener.
@@ -337,8 +340,14 @@ spec:
                             to a Kubernetes Secret \n Support: Implementation-specific
                             (More than one reference or other resource types)"
                           items:
-                            description: SecretObjectReference identifies an API object
-                              including its namespace, defaulting to Secret.
+                            description: "SecretObjectReference identifies an API
+                              object including its namespace, defaulting to Secret.
+                              \n The API object must be valid in the cluster; the
+                              Group and Kind must be registered in the cluster for
+                              this reference to be valid. \n References to objects
+                              with invalid Group and Kind are not valid, and must
+                              be rejected by the implementation, with appropriate
+                              Conditions set on the containing object."
                             properties:
                               group:
                                 default: ""

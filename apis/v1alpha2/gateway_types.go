@@ -63,10 +63,7 @@ type GatewayList struct {
 type GatewaySpec struct {
 	// GatewayClassName used for this Gateway. This is the name of a
 	// GatewayClass resource.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	GatewayClassName string `json:"gatewayClassName"`
+	GatewayClassName ObjectName `json:"gatewayClassName"`
 
 	// Listeners associated with this Gateway. Listeners define
 	// logical endpoints that are bound on this Gateway's addresses.
@@ -247,6 +244,20 @@ type Listener struct {
 // `mycompany.com/my-custom-protocol`. Un-prefixed names are reserved for core
 // protocols. Any protocol defined by implementations will fall under custom
 // conformance.
+//
+// Valid values include:
+//
+// * "HTTP" - Core support
+// * "example.com/bar" - Implementation-specific support
+//
+// Invalid values include:
+//
+// * "example.com" - must include path if domain is used
+// * "foo.example.com" - must include path if domain is used
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=255
+// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9]([-a-zSA-Z0-9]*[a-zA-Z0-9])?$|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9]+$`
 type ProtocolType string
 
 const (
