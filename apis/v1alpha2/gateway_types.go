@@ -340,7 +340,7 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxProperties=16
-	Options map[string]string `json:"options,omitempty"`
+	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 
 // TLSModeType type defines how a Gateway handles TLS sessions.

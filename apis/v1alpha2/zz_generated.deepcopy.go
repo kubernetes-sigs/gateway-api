@@ -402,7 +402,7 @@ func (in *GatewayTLSConfig) DeepCopyInto(out *GatewayTLSConfig) {
 	}
 	if in.Options != nil {
 		in, out := &in.Options, &out.Options
-		*out = make(map[string]string, len(*in))
+		*out = make(map[AnnotationKey]AnnotationValue, len(*in))
 		for key, val := range *in {
 			(*out)[key] = val
 		}
