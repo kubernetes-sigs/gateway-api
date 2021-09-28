@@ -18,6 +18,12 @@ package v1alpha2
 
 // LocalObjectReference identifies an API object within the namespace of the
 // referrer.
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
 type LocalObjectReference struct {
 	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.
@@ -30,7 +36,15 @@ type LocalObjectReference struct {
 	Name ObjectName `json:"name"`
 }
 
-// SecretObjectReference identifies an API object including its namespace, defaulting to Secret.
+// SecretObjectReference identifies an API object including its namespace,
+// defaulting to Secret.
+//
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
 type SecretObjectReference struct {
 	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.
@@ -70,6 +84,13 @@ type SecretObjectReference struct {
 // is required in the referent namespace to allow that namespace's
 // owner to accept the reference. See the ReferencePolicy documentation
 // for details.
+//
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
 type BackendObjectReference struct {
 	// Group is the group of the referent. For example, "networking.k8s.io".
 	// When unspecified (empty string), core API group is inferred.

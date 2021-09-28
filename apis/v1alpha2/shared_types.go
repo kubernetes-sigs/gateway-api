@@ -24,6 +24,13 @@ import (
 // a parent of this resource (usually a route). The only kind of parent resource
 // with "Core" support is Gateway. This API may be extended in the future to
 // support additional kinds of parent resources, such as HTTPRoute.
+//
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
 type ParentRef struct {
 	// Group is the group of the referent.
 	//
@@ -281,15 +288,12 @@ type Group string
 // +kubebuilder:validation:Pattern=`^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$`
 type Kind string
 
-// ObjectName refers to a Kubernetes object name.
+// ObjectName refers to the name of a Kubernetes object.
 // Object names can have a variety of forms, including RFC1123 subdomains,
 // RFC 1123 labels, or RFC 1035 labels.
-// Therefore the validation for this type is set to the least restritive out of
-// those options, the RFC1123 subdomain.
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 type ObjectName string
 
 // Namespace refers to a Kubernetes namespace. It must be a RFC 1123 label.

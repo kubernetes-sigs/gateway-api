@@ -61,11 +61,16 @@ spec:
                   is the case, the list of routes attached to those resources should
                   also be merged."
                 items:
-                  description: ParentRef identifies an API object (usually a Gateway)
+                  description: "ParentRef identifies an API object (usually a Gateway)
                     that can be considered a parent of this resource (usually a route).
-                    The only kind of parent resource with "Core" support is Gateway.
+                    The only kind of parent resource with \"Core\" support is Gateway.
                     This API may be extended in the future to support additional kinds
-                    of parent resources, such as HTTPRoute.
+                    of parent resources, such as HTTPRoute. \n The API object must
+                    be valid in the cluster; the Group and Kind must be registered
+                    in the cluster for this reference to be valid. \n References to
+                    objects with invalid Group and Kind are not valid, and must be
+                    rejected by the implementation, with appropriate Conditions set
+                    on the containing object."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -87,7 +92,6 @@ spec:
                         Core"
                       maxLength: 253
                       minLength: 1
-                      pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
@@ -166,7 +170,6 @@ spec:
                             description: Name is the name of the referent.
                             maxLength: 253
                             minLength: 1
-                            pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
                           namespace:
                             description: "Namespace is the namespace of the backend.
@@ -371,7 +374,6 @@ spec:
                             Core"
                           maxLength: 253
                           minLength: 1
-                          pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.

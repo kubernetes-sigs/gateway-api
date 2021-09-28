@@ -245,9 +245,19 @@ type Listener struct {
 // protocols. Any protocol defined by implementations will fall under custom
 // conformance.
 //
-// +kubebuilder:validation:MinLength:=1
-// +kubebuilder:validation:MinLength:=255
-// +kubebuilder:validation:Pattern:=`^[a-zA-Z0-9]([A-Z-a-z0-9\/]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Z-a-z0-9\/]*[A-Za-z0-9])?)*$`
+// Valid values include:
+//
+// * "HTTP" - Core support
+// * "example.com/bar" - Implementation-specific support
+//
+// Invalid values include:
+//
+// * "example.com" - must include path if domain is used
+// * "foo.example.com" - must include path if domain is used
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=255
+// +kubebuilder:validation:Pattern=`^[a-zA-Z0-9]([-a-zSA-Z0-9]*[a-zA-Z0-9])?$|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9]+$`
 type ProtocolType string
 
 const (
