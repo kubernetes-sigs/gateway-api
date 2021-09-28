@@ -258,32 +258,43 @@ Although these concerns are not unsolvable, they lead to the conclusion that
 a Kubectl plugin should be our primary approach to providing visibility here,
 with a possibility of adding policies to status at a later point.
 
-### Interaction with Custom Filters and other extension points
-There are multiple methods of custom extension in the Gateway API. Policy
-attachment and custom Route filters are two of these. Policy attachment is
-designed to provide arbitrary configuration fields that decorate Gateway API
-resources. Route filters provide custom request/response filters embedded inside
-Route resources. Both are extension methods for fields that cannot easily be
-standardized as core or extended fields of the Gateway API. The following
-guidance should be considered when introducing a custom field into any Gateway
-controller implementation:
+### Interaction with Custom Route Filters
+Both Policy attachment and custom Route filters provide ways to extend Gateway
+API. Although similar in nature, they have slightly different purposes.
 
-1. For any given field that a Gateway controller implementation needs, the
-   possibility of using core or extended should always be considered before
-   using custom policy resources. This is encouraged to promote standardization
-   and, over time, to absorb capabilities into the API as first class fields,
-   which offer a more streamlined UX than custom policy attachment.
+Custom Route filters provide a way to configure request/response modifiers or
+middleware embedded inside Route rules or backend references.
 
-2. Although it's possible that arbitrary fields could be supported by custom
-   policy, custom route filters, and core/extended fields concurrently, it is
-   strongly recommended that implementations not use multiple mechanisms for
-   representing the same fields. A given field should only be supported through
-   a single extension method. An example of potential conflict is policy
-   precedence and structured hierarchy, which only applies to custom policies.
-   Allowing a field to exist in custom policies and also other areas of the API,
-   which are not part of the structured hierarchy, breaks the precedence model.
-   Note that this guidance may change in the future as we gain a better
-   understanding for extension mechanisms of the Gateway API can interoperate.
+Policy attachment is more broad in scope. In contrast with filters, policies can
+be attached to a wide variety of Gateway API resources, and include a concept of
+hierarchical defaulting and overrides. Although Policy attachment can be used to
+target an entire Route or Backend, it cannot currently be used to target
+specific Route rules or backend references. If there are sufficient use cases
+for this, policy attachment may be expanded in the future to support this fine
+grained targeting.
+
+The following guidance should be considered when introducing a custom field into
+any Gateway controller implementation:
+
+#### 1. Use core or extended fields if available
+For any given field that a Gateway controller implementation needs, the
+possibility of using core or extended fields should always be considered
+before using custom policy resources. This is encouraged to promote
+standardization and, over time, to absorb capabilities into the API as first
+class fields, which offer a more streamlined UX than custom policy
+attachment.
+
+#### 2. Custom filters and policies should not overlap
+Although it's possible that arbitrary fields could be supported by custom
+policy, custom route filters, and core/extended fields concurrently, it is
+strongly recommended that implementations not use multiple mechanisms for
+representing the same fields. A given field should only be supported through a
+single extension method. An example of potential conflict is policy precedence
+and structured hierarchy, which only applies to custom policies. Allowing a
+field to exist in custom policies and also other areas of the API, which are not
+part of the structured hierarchy, breaks the precedence model. Note that this
+guidance may change in the future as we gain a better understanding of how
+extension mechanisms of the Gateway API can interoperate.
 
 ### Conformance Level
 This policy attachment pattern is associated with an "EXTENDED" conformance
