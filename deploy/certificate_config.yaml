@@ -11,7 +11,6 @@ metadata:
   name: gateway-api-admission
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -20,7 +19,6 @@ metadata:
   name: gateway-api-admission
   labels:
     name: gateway-api
-    version: 0.0.1
 rules:
   - apiGroups:
       - admissionregistration.k8s.io
@@ -37,7 +35,6 @@ metadata:
   annotations:
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -55,7 +52,6 @@ metadata:
   annotations:
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 rules:
   - apiGroups:
@@ -73,7 +69,6 @@ metadata:
   annotations:
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -91,7 +86,6 @@ metadata:
   annotations:
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 spec:
   template:
@@ -99,7 +93,6 @@ spec:
       name: gateway-api-admission-create
       labels:
         name: gateway-api-webhook
-        version: 0.0.1
     spec:
       containers:
         - name: create
@@ -127,7 +120,6 @@ metadata:
   name: gateway-api-admission-patch
   labels:
     name: gateway-api-webhook
-    version: 0.0.1
   namespace: gateway-api
 spec:
   template:
@@ -135,7 +127,6 @@ spec:
       name: gateway-api-admission-patch
       labels:
         name: gateway-api-webhook
-        version: 0.0.1
     spec:
       containers:
         - name: patch
