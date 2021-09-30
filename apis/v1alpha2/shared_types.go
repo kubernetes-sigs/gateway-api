@@ -352,3 +352,34 @@ type SectionName string
 // +kubebuilder:validation:MaxLength=253
 // +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
 type GatewayController string
+
+// AnnotationKey is the key of an annotation in Gateway API. This is used for
+// validation of maps such as TLS options. This matches the Kubernetes
+// "qualified name" validation that is used for annotations and other common
+// values.
+//
+// Valid values include:
+//
+// * example
+// * example.com
+// * example.com/path
+// * example.com/path.html
+//
+// Invalid values include:
+//
+// * example~ - "~" is an invalid character
+// * example.com. - can not start or end with "."
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]/?)*$`
+type AnnotationKey string
+
+// AnnotationValue is the value of an annotation in Gateway API. This is used
+// for validation of maps such as TLS options. This roughly matches Kubernetes
+// annotation validation, although the length validation in that case is based
+// on the entire size of the annotations struct.
+//
+// +kubebuilder:validation:MinLength=0
+// +kubebuilder:validation:MaxLength=4096
+type AnnotationValue string
