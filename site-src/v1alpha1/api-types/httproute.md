@@ -18,7 +18,7 @@ The specification of an HTTPRoute consists of:
   (optional) fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
-![httproute-basic-example](/images/httproute-basic-example.svg)
+![httproute-basic-example](/v1alpha1/images/httproute-basic-example.svg)
 
 ### Gateways
 
