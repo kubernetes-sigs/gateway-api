@@ -17,7 +17,7 @@ The specification of an HTTPRoute consists of:
   fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
-![httproute-basic-example](/images/httproute-basic-example.svg)
+![httproute-basic-example](/v1alpha2/images/httproute-basic-example.svg)
 
 ### Attaching to Gateways
 
@@ -111,7 +111,7 @@ strategies, rate-limiting, and traffic shaping.
 The following example adds header "my-header: foo" to HTTP requests with Host
 header "my.filter.com".
 ```yaml
-{% include 'v1alpha1/http-filter.yaml' %}
+{% include 'v1alpha2/http-filter.yaml' %}
 ```
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -137,18 +137,18 @@ The following example forwards HTTP requests for prefiex `/bar` to service
 "my-service1" on port `8080` and HTTP requests for prefex `/some/thing` with
 header `magic: foo` to service "my-service2" on port `8080`:
 ```yaml
-{% include 'v1alpha1/basic-http.yaml' %}
+{% include 'v1alpha2/basic-http.yaml' %}
 ```
 
-The following example uses the `weight` field to forward HTTP requests for
-prefix `/bar` equally across service "my-trafficsplit-svc1" and service
-"my-trafficsplit-svc2", i.e. traffic splitting:
+The following example uses the `weight` field to forward 90% of HTTP requests to
+`foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
+Service:
 ```yaml
-{% include 'v1alpha1/http-trafficsplit.yaml' %}
+{% include 'v1alpha2/traffic-splitting/traffic-split-2.yaml' %}
 ```
 
 Reference the [backendRef][backendRef] API documentation for additional details
-of `weight` and other fields.
+on `weight` and other fields.
 
 ## Status
 
