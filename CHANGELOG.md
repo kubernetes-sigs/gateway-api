@@ -2,12 +2,99 @@
 
 ## Table of Contents
 
+- [v0.4.0-rc2](#v040-rc2)
 - [v0.4.0-rc1](#v040-rc1)
 - [v0.3.0](#v030)
 - [v0.2.0](#v020)
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+
+## v0.4.0-rc2
+
+API version: v1alpha2
+
+The group expects that this release candidate has no changes before we release
+v1alpha2 final, but are cutting here to allow implementations a chance to check
+before we go to the final release.
+
+In general, most of the changes below have been made to reduce the complexity of
+the API for v1alpha2, on the assumption that we can add functionality in later
+in the API's lifecycle, but cannot remove it.
+
+The following changes have been made since v1alpha2-rc1:
+
+### GEP implementations
+* Use `CertificateRefs` field to instead the `CertificateRef` in `GatewayTLSConfig`.
+[#852](https://github.com/kubernetes-sigs/gateway-api/pull/852). This implements
+[GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md),
+Allow Multiple Certificate Refs per Gateway Listener.
+* Extension points within match blocks from all Routes have been removed
+[#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
+[GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-820.md).
+These extension points have been removed because they are currently not used,
+are poorly understood, and we don't have good use cases for them. We may consider re-adding them in the future.
+
+### Field changes
+* Make `MirrorFilter.BackendRef` a required field when the mirror filter is used
+[#837](https://github.com/kubernetes-sigs/gateway-api/pull/837).
+* ImplementationSpecific match types in HTTPRoute's path, query, and header
+matches have been removed.
+[#850](https://github.com/kubernetes-sigs/gateway-api/pull/850)
+
+### Field Renames
+* "Controller" has been renamed to "ControllerName"
+* "Admitted" condition has been renamed to "Accepted" and now defaults to an
+"Unknown" state instead of "False" [#839](https://github.com/kubernetes-sigs/gateway-api/pull/839)
+* HTTPRequestRedirectFilter's Protocol field has been renamed to Scheme.
+[#863](https://github.com/kubernetes-sigs/gateway-api/pull/863)
+
+### Validation changes
+*  Validation: Ensure TLSConfig is empty when the protocol is HTTP, TCP, or UDP
+[#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
+*  Validation: Ensure Hostname is empty when the protocol is TCP or UDP.
+[#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
+* Validation: Listener ProtocolType now has validation.
+[#871](https://github.com/kubernetes-sigs/gateway-api/pull/871)
+
+### Documentation and specification updates
+* Updated guidance on how HTTP and TLS Route status should be populated when
+hostnames do not match.
+[#859](https://github.com/kubernetes-sigs/gateway-api/pull/859)
+* Aligned path prefix matching with Ingress by clarifying that it is a prefix of
+path elements. [#869](https://github.com/kubernetes-sigs/gateway-api/pull/869)
+* HTTP listeners may now be used for Cleartext HTTP/2.
+[#879](https://github.com/kubernetes-sigs/gateway-api/pull/879)
+* The `scope` field has been removed from all object references.
+* ParentRefs can no longer refer to cluster-scoped resources.
+[#882](https://github.com/kubernetes-sigs/gateway-api/pull/882)
+* TLS options keys are now subject to the same validation as Kubernetes
+annotations. [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
+* TLS options values now have a max length of 1024 characters.
+[#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
+
+### Other changes
+* [#890](https://github.com/kubernetes-sigs/gateway-api/pull/890) : Updating HTTPRoute docs for v1alpha2
+* [#889](https://github.com/kubernetes-sigs/gateway-api/pull/889) : remove outdated version label
+* [#888](https://github.com/kubernetes-sigs/gateway-api/pull/888) : Corrected broken getting started
+* [#885](https://github.com/kubernetes-sigs/gateway-api/pull/885) : Fix incorrect urls
+* [#883](https://github.com/kubernetes-sigs/gateway-api/pull/883) : v1alpha2 validation fix/update
+* [#880](https://github.com/kubernetes-sigs/gateway-api/pull/880) : Reworking Policy vs. Filter Documentation
+* [#878](https://github.com/kubernetes-sigs/gateway-api/pull/878) : Clarifying the fields that all Route types must include
+* [#875](https://github.com/kubernetes-sigs/gateway-api/pull/875) : Fix HTTP path match documentation.
+* [#872](https://github.com/kubernetes-sigs/gateway-api/pull/872) : Remove duplicate validation from CRD & Webhook
+* [#870](https://github.com/kubernetes-sigs/gateway-api/pull/870) : Adding guidance on Kind vs. Resource in implementation guidelines
+* [#865](https://github.com/kubernetes-sigs/gateway-api/pull/865) : Route cleanup for v1alpha2 sig-network review
+* [#864](https://github.com/kubernetes-sigs/gateway-api/pull/864) : Merging v1alpha2 concepts docs into unversioned docs
+* [#858](https://github.com/kubernetes-sigs/gateway-api/pull/858) : Fixing broken link to spec page
+* [#857](https://github.com/kubernetes-sigs/gateway-api/pull/857) : Adding missing references pages to docs navigation
+* [#853](https://github.com/kubernetes-sigs/gateway-api/pull/853) : docs: Use v0.4.0-rc1 in "Getting started with Gateway APIs" for v1alpha2
+* [#845](https://github.com/kubernetes-sigs/gateway-api/pull/845) : Fix markdown list formatting.
+* [#844](https://github.com/kubernetes-sigs/gateway-api/pull/844) : docs: add ssl passthrough note in FAQ
+* [#843](https://github.com/kubernetes-sigs/gateway-api/pull/843) : Add APISIX implementation
+* [#834](https://github.com/kubernetes-sigs/gateway-api/pull/834) : Fixes some broken links
+* [#807](https://github.com/kubernetes-sigs/gateway-api/pull/807) : docs: update multiple-ns guide for v1alpha2
 
 
 ## v0.4.0-rc1
