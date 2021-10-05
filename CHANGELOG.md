@@ -26,7 +26,7 @@ in the API's lifecycle, but cannot remove it.
 The following changes have been made since v1alpha2-rc1:
 
 ### GEP implementations
-* Use `CertificateRefs` field to instead the `CertificateRef` in `GatewayTLSConfig`.
+* Replace `CertificateRef` field with `CertificateRefs` in `GatewayTLSConfig`.
 [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852). This implements
 [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md),
 Allow Multiple Certificate Refs per Gateway Listener.
@@ -34,7 +34,8 @@ Allow Multiple Certificate Refs per Gateway Listener.
 [#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
 [GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-820.md).
 These extension points have been removed because they are currently not used,
-are poorly understood, and we don't have good use cases for them. We may consider re-adding them in the future.
+are poorly understood, and we don't have good use cases for them. We may
+consider re-adding them in the future.
 
 ### Field changes
 * Make `MirrorFilter.BackendRef` a required field when the mirror filter is used
