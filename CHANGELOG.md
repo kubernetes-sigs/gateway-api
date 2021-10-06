@@ -58,6 +58,8 @@ matches have been removed.
 [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
 * Validation: Listener ProtocolType now has validation.
 [#871](https://github.com/kubernetes-sigs/gateway-api/pull/871)
+* Validation: TTP Path match values are now validated for PathMatchExact and
+PathMatchPrefix match types. [#894](https://github.com/kubernetes-sigs/gateway-api/pull/894)
 
 ### Documentation and specification updates
 * Updated guidance on how HTTP and TLS Route status should be populated when
