@@ -390,3 +390,44 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateHTTPPathMatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		path     *gatewayv1a2.HTTPPathMatch
+		errCount int
+	}{
+		{
+			name: "invalid httpRoute prefix",
+			path: &gatewayv1a2.HTTPPathMatch{
+				Type:  pkgutils.PathMatchTypePtr("Prefix"),
+				Value: utilpointer.String("/."),
+			},
+			errCount: 1,
+		},
+		{
+			name: "invalid httpRoute Exact",
+			path: &gatewayv1a2.HTTPPathMatch{
+				Type:  pkgutils.PathMatchTypePtr("Exact"),
+				Value: utilpointer.String("/foo/./bar"),
+			},
+			errCount: 1,
+		},
+		{
+			name: "invalid httpRoute prefix",
+			path: &gatewayv1a2.HTTPPathMatch{
+				Type:  pkgutils.PathMatchTypePtr("Prefix"),
+				Value: utilpointer.String("/"),
+			},
+			errCount: 0,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateHTTPPathMatch(tc.path, field.NewPath("spec").Child("rules").Child("matches").Child("path"))
+			if len(errs) != tc.errCount {
+				t.Errorf("TestValidateHTTPPathMatch() got %v errors, want %v errors", len(errs), tc.errCount)
+			}
+		})
+	}
+}
