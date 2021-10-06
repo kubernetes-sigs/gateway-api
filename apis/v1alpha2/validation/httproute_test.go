@@ -405,7 +405,7 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name: "valid httpRoute Exact",
+			name: "invalid httpRoute Exact",
 			path: &gatewayv1a2.HTTPPathMatch{
 				Type:  pkgutils.PathMatchTypePtr("Exact"),
 				Value: utilpointer.String("/foo/./bar"),
