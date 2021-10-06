@@ -32,7 +32,7 @@ var (
 		gatewayv1a2.HTTPRouteFilterExtensionRef,
 	}
 
-	invalidPathSequences = []string{"//", "/./", "/../", "%2f", "%2F"}
+	invalidPathSequences = []string{"//", "/./", "/../", "%2f", "%2F", "#"}
 	invalidPathSuffixes  = []string{"/..", "/."}
 )
 
@@ -106,6 +106,10 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 
 	if path.Type == nil {
 		return append(allErrs, field.Required(fldPath.Child("pathType"), "pathType must be specified"))
+	}
+
+	if path.Value == nil {
+		return append(allErrs, field.Required(fldPath.Child("pathValue"), "pathValue must not be nil."))
 	}
 
 	switch *path.Type {
