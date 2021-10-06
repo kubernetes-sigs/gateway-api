@@ -130,6 +130,7 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 				}
 			}
 		}
+	case gatewayv1a2.PathMatchRegularExpression:
 	default:
 		pathTypes := []string{string(gatewayv1a2.PathMatchExact), string(gatewayv1a2.PathMatchPrefix), string(gatewayv1a2.PathMatchRegularExpression)}
 		allErrs = append(allErrs, field.NotSupported(fldPath.Child("pathType"), *path.Type, pathTypes))
