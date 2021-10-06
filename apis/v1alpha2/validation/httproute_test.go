@@ -414,7 +414,7 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name: "valid httpRoute prefix",
+			name: "invalid httpRoute prefix",
 			path: &gatewayv1a2.HTTPPathMatch{
 				Type:  pkgutils.PathMatchTypePtr("Prefix"),
 				Value: utilpointer.String("/"),
