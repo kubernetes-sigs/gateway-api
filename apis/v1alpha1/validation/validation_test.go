@@ -147,7 +147,6 @@ func TestValidateGateway(t *testing.T) {
 	}
 
 	for name, tc := range testCases {
-		tc := tc
 		t.Run(name, func(t *testing.T) {
 			gw := baseGateway.DeepCopy()
 			tc.mutate(gw)
@@ -405,13 +404,11 @@ func TestValidateHTTPRoute(t *testing.T) {
 			errCount: 0,
 		},
 	}
-	for _, tt := range tests {
-		// copy variable to avoid scope problems with ranges
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			errs := ValidateHTTPRoute(&tt.hRoute)
-			if len(errs) != tt.errCount {
-				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tt.errCount)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := ValidateHTTPRoute(&tc.hRoute)
+			if len(errs) != tc.errCount {
+				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tc.errCount)
 			}
 		})
 	}
@@ -490,11 +487,10 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			want: nil,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ValidateGatewayClassUpdate(tt.args.oldClass, tt.args.newClass); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ValidateGatewayClassUpdate() = %v, want %v", got, tt.want)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := ValidateGatewayClassUpdate(tc.args.oldClass, tc.args.newClass); !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("ValidateGatewayClassUpdate() = %v, want %v", got, tc.want)
 			}
 		})
 	}

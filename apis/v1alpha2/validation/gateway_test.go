@@ -40,104 +40,39 @@ func TestValidateGateway(t *testing.T) {
 			Listeners:        listeners,
 		},
 	}
+	tlsConfig := gatewayv1a2.GatewayTLSConfig{}
 
 	testCases := map[string]struct {
 		mutate             func(gw *gatewayv1a2.Gateway)
 		expectErrsOnFields []string
 	}{
-		"nil hostname": {
-			mutate:             func(gw *gatewayv1a2.Gateway) {},
-			expectErrsOnFields: []string{},
-		},
-		"empty string hostname": {
+		"tls config present with http protocol": {
 			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("")
-				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].Protocol = gatewayv1a2.HTTPProtocolType
+				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
-			expectErrsOnFields: []string{},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
-		"wildcard hostname": {
+		"tls config present with tcp protocol": {
 			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("*")
-				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
+				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
-			expectErrsOnFields: []string{},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
-		"wildcard-prefixed hostname": {
+		"hostname present with tcp protocol": {
 			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("*.example.com")
+				hostname := gatewayv1a2.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{},
-		},
-		"valid dns subdomain": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("foo.example.com")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{},
-		},
-		// Invalid use cases
-		"IPv4 address hostname": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("1.2.3.4")
-				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},
-		"Invalid IPv4 address hostname": {
+		"hostname present with udp protocol": {
 			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("1.2.3..4")
+				hostname := gatewayv1a2.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"IPv4 address with port hostname": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("1.2.3.4:8080")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"IPv6 address hostname": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("2001:db8::68")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname", "spec.listeners[0].hostname"},
-		},
-		"IPv6 link-local address hostname": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("fe80::/10")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"dns subdomain with port": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("foo.example.com:8080")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"dns subdomain with invalid wildcard label": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("*.*.com")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"dns subdomain with multiple wildcards": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("*.foo.*.com")
-				gw.Spec.Listeners[0].Hostname = &hostname
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
-		},
-		"dns subdomain with wildcard root label": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("*.foo.*.com")
-				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].Protocol = gatewayv1a2.UDPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},

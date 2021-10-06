@@ -88,11 +88,10 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 			want: nil,
 		},
 	}
-	for _, tt := range tests {
-		tt := tt
-		t.Run(tt.name, func(t *testing.T) {
-			if got := ValidateGatewayClassUpdate(tt.args.oldClass, tt.args.newClass); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("ValidateGatewayClassUpdate() = %v, want %v", got, tt.want)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := ValidateGatewayClassUpdate(tc.args.oldClass, tc.args.newClass); !reflect.DeepEqual(got, tc.want) {
+				t.Errorf("ValidateGatewayClassUpdate() = %v, want %v", got, tc.want)
 			}
 		})
 	}
