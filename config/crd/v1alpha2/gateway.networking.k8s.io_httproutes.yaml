@@ -109,11 +109,16 @@ spec:
                   is the case, the list of routes attached to those resources should
                   also be merged."
                 items:
-                  description: ParentRef identifies an API object (usually a Gateway)
+                  description: "ParentRef identifies an API object (usually a Gateway)
                     that can be considered a parent of this resource (usually a route).
-                    The only kind of parent resource with "Core" support is Gateway.
+                    The only kind of parent resource with \"Core\" support is Gateway.
                     This API may be extended in the future to support additional kinds
-                    of parent resources, such as HTTPRoute.
+                    of parent resources, such as HTTPRoute. \n The API object must
+                    be valid in the cluster; the Group and Kind must be registered
+                    in the cluster for this reference to be valid. \n References to
+                    objects with invalid Group and Kind are not valid, and must be
+                    rejected by the implementation, with appropriate Conditions set
+                    on the containing object."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -138,22 +143,11 @@ spec:
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
-                        unspecified (or empty string), this will either be: \n * local
-                        namespace of the route when scope is set to Namespace. * no
-                        namespace when scope is set to Cluster. \n Support: Core"
+                        unspecified (or empty string), this refers to the local namespace
+                        of the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                      type: string
-                    scope:
-                      default: Namespace
-                      description: "Scope represents if this refers to a cluster or
-                        namespace scoped resource. This may be set to \"Cluster\"
-                        or \"Namespace\". \n Support: Core (Namespace) Support: Custom
-                        (Cluster)"
-                      enum:
-                      - Cluster
-                      - Namespace
                       type: string
                     sectionName:
                       description: "SectionName is the name of a section within the
@@ -1236,23 +1230,11 @@ spec:
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.
-                            When unspecified (or empty string), this will either be:
-                            \n * local namespace of the route when scope is set to
-                            Namespace. * no namespace when scope is set to Cluster.
-                            \n Support: Core"
+                            When unspecified (or empty string), this refers to the
+                            local namespace of the Route. \n Support: Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
-                          type: string
-                        scope:
-                          default: Namespace
-                          description: "Scope represents if this refers to a cluster
-                            or namespace scoped resource. This may be set to \"Cluster\"
-                            or \"Namespace\". \n Support: Core (Namespace) Support:
-                            Custom (Cluster)"
-                          enum:
-                          - Cluster
-                          - Namespace
                           type: string
                         sectionName:
                           description: "SectionName is the name of a section within
