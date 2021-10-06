@@ -72,7 +72,7 @@ path elements. [#869](https://github.com/kubernetes-sigs/gateway-api/pull/869)
 [#882](https://github.com/kubernetes-sigs/gateway-api/pull/882)
 * TLS options keys are now subject to the same validation as Kubernetes
 annotations. [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
-* TLS options values now have a max length of 1024 characters.
+* TLS options values now have a max length of 4096 characters.
 [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
 
 ### Other changes
