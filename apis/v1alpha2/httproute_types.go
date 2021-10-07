@@ -189,7 +189,7 @@ type HTTPRouteRule struct {
 	// sent.
 
 	// If unspecified or invalid (refers to a non-existent resource or a Service
-	// with no endpoints), the rule performs no forwarding. If that are also no
+	// with no endpoints), the rule performs no forwarding. If there are also no
 	// filters specified that would result in a response being sent, a HTTP 503
 	// status code is returned. 503 responses must be sent so that the overall
 	// weight is respected; if an invalid backend is requested to have 80% of
@@ -288,8 +288,8 @@ const (
 //
 // Invalid values include:
 //
-// * ":method" - ":" is an invalid character. This means that pseudo headers are
-//   not currently supported by this type.
+// * ":method" - ":" is an invalid character. This means that HTTP/2 pseudo
+//   headers are not currently supported by this type.
 // * "/invalid" - "/" is an invalid character
 //
 // +kubebuilder:validation:MinLength=1
@@ -306,10 +306,10 @@ type HTTPHeaderMatch struct {
 	//
 	// Support: Custom (RegularExpression)
 	//
-	// Since RegularExpression PathType has custom conformance, implementations
-	// can support POSIX, PCRE or any other dialects of regular expressions.
-	// Please read the implementation's documentation to determine the supported
-	// dialect.
+	// Since RegularExpression HeaderMatchType has custom conformance,
+	// implementations can support POSIX, PCRE or any other dialects of regular
+	// expressions. Please read the implementation's documentation to determine
+	// the supported dialect.
 	//
 	// +optional
 	// +kubebuilder:default=Exact

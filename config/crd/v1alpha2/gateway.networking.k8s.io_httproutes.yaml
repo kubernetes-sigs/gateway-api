@@ -190,7 +190,7 @@ spec:
                     backendRefs:
                       description: "If unspecified or invalid (refers to a non-existent
                         resource or a Service with no endpoints), the rule performs
-                        no forwarding. If that are also no filters specified that
+                        no forwarding. If there are also no filters specified that
                         would result in a response being sent, a HTTP 503 status code
                         is returned. 503 responses must be sent so that the overall
                         weight is respected; if an invalid backend is requested to
@@ -963,7 +963,7 @@ spec:
                                   description: "Type specifies how to match against
                                     the value of the header. \n Support: Core (Exact)
                                     \n Support: Custom (RegularExpression) \n Since
-                                    RegularExpression PathType has custom conformance,
+                                    RegularExpression HeaderMatchType has custom conformance,
                                     implementations can support POSIX, PCRE or any
                                     other dialects of regular expressions. Please
                                     read the implementation's documentation to determine
