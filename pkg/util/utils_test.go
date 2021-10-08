@@ -83,8 +83,8 @@ func Test_PathMatchTypePtr(t *testing.T) {
 
 		{
 			name:         "valid path prefix match",
-			pathType:     "Prefix",
-			expectedPath: gatewayv1a2.PathMatchPrefix,
+			pathType:     "PathPrefix",
+			expectedPath: gatewayv1a2.PathMatchPathPrefix,
 		},
 		{
 			name:         "valid path regular expression match",

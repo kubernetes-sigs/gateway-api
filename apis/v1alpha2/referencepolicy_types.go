@@ -122,4 +122,11 @@ type ReferencePolicyTo struct {
 	//
 	// * Service
 	Kind Kind `json:"kind"`
+
+	// Name is the name of the referent. When unspecified or empty, this policy
+	// refers to all resources of the specified Group and Kind in the local
+	// namespace.
+	//
+	// +optional
+	Name *ObjectName `json:"name,omitempty"`
 }

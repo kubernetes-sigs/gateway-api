@@ -10,7 +10,7 @@ spec:
   rules:
   - matches:
     - path:
-        type: Prefix
+        type: PathPrefix
         value: /login
     backendRefs:
     - name: foo-svc

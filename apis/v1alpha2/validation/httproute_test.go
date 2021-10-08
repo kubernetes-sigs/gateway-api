@@ -42,7 +42,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -69,7 +69,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -96,7 +96,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -132,7 +132,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -181,7 +181,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -248,7 +248,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					Matches: []gatewayv1a2.HTTPRouteMatch{
 						{
 							Path: &gatewayv1a2.HTTPPathMatch{
-								Type:  pkgutils.PathMatchTypePtr("Prefix"),
+								Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 								Value: utilpointer.String("/"),
 							},
 						},
@@ -400,7 +400,7 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 		{
 			name: "invalid httpRoute prefix",
 			path: &gatewayv1a2.HTTPPathMatch{
-				Type:  pkgutils.PathMatchTypePtr("Prefix"),
+				Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 				Value: utilpointer.String("/."),
 			},
 			errCount: 1,
@@ -416,7 +416,7 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 		{
 			name: "invalid httpRoute prefix",
 			path: &gatewayv1a2.HTTPPathMatch{
-				Type:  pkgutils.PathMatchTypePtr("Prefix"),
+				Type:  pkgutils.PathMatchTypePtr("PathPrefix"),
 				Value: utilpointer.String("/"),
 			},
 			errCount: 0,

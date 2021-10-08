@@ -32,7 +32,7 @@ spec:
   rules:
   - matches:
     - path:
-        type: Prefix
+        type: PathPrefix
         value: /bar
     backendRefs:
     - name: my-service1
@@ -47,7 +47,7 @@ spec:
         name: great
         value: example
       path:
-        type: Prefix
+        type: PathPrefix
         value: /some/thing
       method: GET
     backendRefs:

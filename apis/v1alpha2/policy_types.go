@@ -38,12 +38,4 @@ type PolicyTargetReference struct {
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`
-
-	// ClassName is the name of the class this policy should apply to. When
-	// unspecified, the policy will apply to all classes that support it.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	// +optional
-	ClassName *string `json:"className,omitempty"`
 }
