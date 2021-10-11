@@ -60,7 +60,7 @@ spec:
   rules:
     - matches:
       - path:
-          type: Prefix
+          type: PathPrefix
           value: /
       backendRefs:
       - name: my-filter-svc1

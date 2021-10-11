@@ -98,7 +98,7 @@ type HTTPRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:default={{matches: {{path: {type: "Prefix", value: "/"}}}}}
+	// +kubebuilder:default={{matches: {{path: {type: "PathPrefix", value: "/"}}}}}
 	Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
 
@@ -160,7 +160,7 @@ type HTTPRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{path:{ type: "Prefix", value: "/"}}}
+	// +kubebuilder:default={{path:{ type: "PathPrefix", value: "/"}}}
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
@@ -209,15 +209,15 @@ type HTTPRouteRule struct {
 // Valid PathMatchType values are:
 //
 // * "Exact"
-// * "Prefix"
+// * "PathPrefix"
 // * "RegularExpression"
 //
-// Prefix and Exact paths must be syntactically valid:
+// PathPrefix and Exact paths must be syntactically valid:
 //
 // - Must begin with the `/` character
 // - Must not contain consecutive `/` characters (e.g. `/foo///`, `//`).
 //
-// +kubebuilder:validation:Enum=Exact;Prefix;RegularExpression
+// +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 type PathMatchType string
 
 const (
@@ -232,7 +232,10 @@ const (
 	//
 	// For example, `/abc`, `/abc/` and `/abc/def` match the prefix
 	// `/abc`, but `/abcd` does not.
-	PathMatchPrefix PathMatchType = "Prefix"
+	//
+	// "PathPrefix" is semantically equivalent to the "Prefix" path type in the
+	// Kubernetes Ingress API.
+	PathMatchPathPrefix PathMatchType = "PathPrefix"
 
 	// Matches if the URL path matches the given regular expression with
 	// case sensitivity.
@@ -248,12 +251,12 @@ const (
 type HTTPPathMatch struct {
 	// Type specifies how to match against the path Value.
 	//
-	// Support: Core (Exact, Prefix)
+	// Support: Core (Exact, PathPrefix)
 	//
 	// Support: Custom (RegularExpression)
 	//
 	// +optional
-	// +kubebuilder:default=Prefix
+	// +kubebuilder:default=PathPrefix
 	Type *PathMatchType `json:"type,omitempty"`
 
 	// Value of the HTTP path to match against.
@@ -426,7 +429,7 @@ type HTTPRouteMatch struct {
 	// specified, a default prefix match on the "/" path is provided.
 	//
 	// +optional
-	// +kubebuilder:default={type: "Prefix", value: "/"}
+	// +kubebuilder:default={type: "PathPrefix", value: "/"}
 	Path *HTTPPathMatch `json:"path,omitempty"`
 
 	// Headers specifies HTTP request header matchers. Multiple match values are

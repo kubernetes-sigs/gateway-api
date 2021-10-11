@@ -113,7 +113,7 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 	}
 
 	switch *path.Type {
-	case gatewayv1a2.PathMatchExact, gatewayv1a2.PathMatchPrefix:
+	case gatewayv1a2.PathMatchExact, gatewayv1a2.PathMatchPathPrefix:
 		if !strings.HasPrefix(*path.Value, "/") {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("path"), path, "must be an absolute path"))
 		}
@@ -132,7 +132,7 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 		}
 	case gatewayv1a2.PathMatchRegularExpression:
 	default:
-		pathTypes := []string{string(gatewayv1a2.PathMatchExact), string(gatewayv1a2.PathMatchPrefix), string(gatewayv1a2.PathMatchRegularExpression)}
+		pathTypes := []string{string(gatewayv1a2.PathMatchExact), string(gatewayv1a2.PathMatchPathPrefix), string(gatewayv1a2.PathMatchRegularExpression)}
 		allErrs = append(allErrs, field.NotSupported(fldPath.Child("pathType"), *path.Type, pathTypes))
 	}
 	return allErrs

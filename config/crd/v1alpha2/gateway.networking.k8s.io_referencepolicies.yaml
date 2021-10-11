@@ -114,6 +114,13 @@ spec:
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                       type: string
+                    name:
+                      description: Name is the name of the referent. When unspecified
+                        or empty, this policy refers to all resources of the specified
+                        Group and Kind in the local namespace.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
                   required:
                   - group
                   - kind

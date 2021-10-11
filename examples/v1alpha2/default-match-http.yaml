@@ -17,7 +17,7 @@ spec:
     port: 80
 ---
 # This HTTPRoute demonstrates patch match defaulting. If no path match is
-# specified, CRD defaults adds a default prefix match on the path "/". This
+# specified, CRD defaults adds a default PathPrefix match on the path "/". This
 # matches every HTTP request and ensures that route rules always have at
 # least one valid match.
 apiVersion: gateway.networking.k8s.io/v1alpha2

@@ -179,7 +179,7 @@ spec:
                 default:
                 - matches:
                   - path:
-                      type: Prefix
+                      type: PathPrefix
                       value: /
                 description: Rules are a list of HTTP matchers, filters and actions.
                 items:
@@ -890,7 +890,7 @@ spec:
                     matches:
                       default:
                       - path:
-                          type: Prefix
+                          type: PathPrefix
                           value: /
                       description: "Matches define conditions used for matching the
                         rule against incoming HTTP requests. Each match is independent,
@@ -1004,20 +1004,20 @@ spec:
                             type: string
                           path:
                             default:
-                              type: Prefix
+                              type: PathPrefix
                               value: /
                             description: Path specifies a HTTP request path matcher.
                               If this field is not specified, a default prefix match
                               on the "/" path is provided.
                             properties:
                               type:
-                                default: Prefix
+                                default: PathPrefix
                                 description: "Type specifies how to match against
-                                  the path Value. \n Support: Core (Exact, Prefix)
+                                  the path Value. \n Support: Core (Exact, PathPrefix)
                                   \n Support: Custom (RegularExpression)"
                                 enum:
                                 - Exact
-                                - Prefix
+                                - PathPrefix
                                 - RegularExpression
                                 type: string
                               value:
