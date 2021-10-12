@@ -227,11 +227,10 @@ const (
 	// Matches based on a URL path prefix split by `/`. Matching is
 	// case sensitive and done on a path element by element basis. A
 	// path element refers to the list of labels in the path split by
-	// the `/` separator. A request is a match for path _p_ if every
-	// _p_ is an element-wise prefix of the request path.
+	// the `/` separator. When specified, a trailing `/` is ignored.
 	//
-	// For example, `/abc`, `/abc/` and `/abc/def` match the prefix
-	// `/abc`, but `/abcd` does not.
+	// For example. the paths `/abc`, `/abc/`, and `/abc/def` would all match
+	// the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// "PathPrefix" is semantically equivalent to the "Prefix" path type in the
 	// Kubernetes Ingress API.
