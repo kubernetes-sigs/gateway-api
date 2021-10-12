@@ -328,13 +328,14 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []*SecretObjectReference `json:"certificateRefs,omitempty"`
 
-	// Options are a list of key/value pairs to give extended options
-	// to the provider.
+	// Options are a list of key/value pairs to enable extended TLS
+	// configuration for each implementation. For example, configuring the
+	// minimum TLS version or supported cipher suites.
 	//
-	// There variation among providers as to how ciphersuites are
-	// expressed. If there is a common subset for expressing ciphers
-	// then it will make sense to loft that as a core API
-	// construct.
+	// A set of common keys MAY be defined by the API in the future. To avoid
+	// any ambiguity, implementation-specific definitions MUST use
+	// domain-prefixed names, such as `example.com/my-custom-option`.
+	// Un-prefixed names are reserved for key names defined by Gateway API.
 	//
 	// Support: Implementation-specific
 	//

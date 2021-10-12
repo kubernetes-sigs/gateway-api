@@ -414,12 +414,14 @@ spec:
                             maxLength: 4096
                             minLength: 0
                             type: string
-                          description: "Options are a list of key/value pairs to give
-                            extended options to the provider. \n There variation among
-                            providers as to how ciphersuites are expressed. If there
-                            is a common subset for expressing ciphers then it will
-                            make sense to loft that as a core API construct. \n Support:
-                            Implementation-specific"
+                          description: "Options are a list of key/value pairs to enable
+                            extended TLS configuration for each implementation. For
+                            example, configuring the minimum TLS version or supported
+                            cipher suites. \n A set of common keys MAY be defined
+                            by the API in the future. To avoid any ambiguity, implementation-specific
+                            definitions MUST use domain-prefixed names, such as `example.com/my-custom-option`.
+                            Un-prefixed names are reserved for key names defined by
+                            Gateway API. \n Support: Implementation-specific"
                           maxProperties: 16
                           type: object
                       type: object
