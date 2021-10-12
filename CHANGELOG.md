@@ -43,6 +43,10 @@ consider re-adding them in the future.
 * ImplementationSpecific match types in HTTPRoute's path, query, and header
 matches have been removed.
 [#850](https://github.com/kubernetes-sigs/gateway-api/pull/850)
+* The "Prefix" path match type has been renamed "PathPrefix". 
+* The "ClassName" field in PolicyTargetReference has been removed.
+* A new optional "Name" field has been added to ReferencePolicyTo.
+[#898](https://github.com/kubernetes-sigs/gateway-api/pull/898)
 
 ### Field Renames
 * "Controller" has been renamed to "ControllerName"
@@ -51,6 +55,7 @@ matches have been removed.
 * HTTPRequestRedirectFilter's Protocol field has been renamed to Scheme.
 [#863](https://github.com/kubernetes-sigs/gateway-api/pull/863)
 
+
 ### Validation changes
 *  Validation: Ensure TLSConfig is empty when the protocol is HTTP, TCP, or UDP
 [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
@@ -58,7 +63,7 @@ matches have been removed.
 [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
 * Validation: Listener ProtocolType now has validation.
 [#871](https://github.com/kubernetes-sigs/gateway-api/pull/871)
-* Validation: TTP Path match values are now validated for PathMatchExact and
+* Validation: HTTP Path match values are now validated for PathMatchExact and
 PathMatchPrefix match types. [#894](https://github.com/kubernetes-sigs/gateway-api/pull/894)
 
 ### Documentation and specification updates
@@ -76,6 +81,8 @@ path elements. [#869](https://github.com/kubernetes-sigs/gateway-api/pull/869)
 annotations. [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
 * TLS options values now have a max length of 4096 characters.
 [#886](https://github.com/kubernetes-sigs/gateway-api/pull/886)
+* Added clarification that implementation-specific TLS options MUST be domain-prefixed.
+[#899](https://github.com/kubernetes-sigs/gateway-api/pull/899)
 
 ### Other changes
 * [#890](https://github.com/kubernetes-sigs/gateway-api/pull/890) : Updating HTTPRoute docs for v1alpha2
