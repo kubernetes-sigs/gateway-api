@@ -1,8 +1,5 @@
 # Getting started with Gateway APIs
 
-!!! danger
-    This page and some of its sub-pages are not fully updated for v1alpha2 yet.
-
 **1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
  _OR_  **[install the Gateway API CRDs manually](#installing-gateway-api-crds-manually)**
 
@@ -36,7 +33,7 @@ these resources. Installing the CRDs will just allow you to see and apply the
 resources, though they won't do anything.
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0-rc1" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0" \
 | kubectl apply -f -
 ```
 
@@ -50,7 +47,7 @@ these resources.
 
 
 ```
-kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0-rc1" \
+kubectl kustomize "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.0" \
 | kubectl delete -f -
 ```
 

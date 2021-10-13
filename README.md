@@ -3,15 +3,12 @@
 The Gateway API is a part of the [SIG Network][sn], and this repository contains
 the specification and Custom Resource Definitions (CRDs).
 
-*Note: This project was previously named "Service APIs" until being renamed to
-"Gateway API" in February 2021.*
-
 ## Status
 
-The latest supported version is v1alpha1 as released by the [v0.3.0
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.3.0) of
-this project. A second alpha API version, v1alpha2, is under active development,
-but this is considered unstable and has not been released yet.
+The latest supported version is v1alpha2 as released by the [v0.4.0
+release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0) of
+this project. This version of the API is expected to graduate to beta in the
+future with relatively minimal changes.
 
 ## Documentation
 
