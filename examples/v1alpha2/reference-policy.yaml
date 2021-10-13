@@ -1,0 +1,12 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: ReferencePolicy
+metadata:
+  name: allow-prod-traffic
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: prod
+  to:
+  - group: ""
+    kind: Service
