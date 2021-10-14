@@ -12,10 +12,6 @@ many vendors and have broad industry support.
 
 ![Gateway API Model](./images/api-model.png)
 
-
-!!! warning
-    Gateway API is preparing to release v1alpha2, which is a large change, and
-    some documents on this site are out of date. Please pardon our dust for now.
 ## Getting started
 
 Whether you are a user interested in using the Gateway API or an implementer 
