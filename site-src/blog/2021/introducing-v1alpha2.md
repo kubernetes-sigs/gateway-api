@@ -83,9 +83,10 @@ Timeout policy for HTTP connections is highly dependent on how the underlying
 implementation handles policy - it's very difficult to extract commonalities.
 
 This is intended to allow things like:
-* Attach a policy that specifies the default connection timeout for backends to
-  a GatewayClass. All Gateways that are part of that Class will have Routes get
-  that default connection timeout unless they specify differently.
+
+* Attaching a policy that specifies the default connection timeout for backends
+  to a GatewayClass. All Gateways that are part of that Class will have Routes
+  get that default connection timeout unless they specify differently.
 * If a Gateway that's a member of the GatewayClass has a different default
   attached, then that will beat the GatewayClass (for defaults, more specific
   object beats less specific object).
