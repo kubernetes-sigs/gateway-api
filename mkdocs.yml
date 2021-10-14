@@ -23,6 +23,14 @@ plugins:
       include_dir: examples
 markdown_extensions:
   - admonition
+  - meta
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
   - toc:
       permalink: true
 nav:
@@ -33,6 +41,7 @@ nav:
         Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
     - Implementations: implementations.md
+    - FAQ: faq.md
   - Guides:
     - v1alpha2:
       - Getting started: v1alpha2/guides/getting-started.md
@@ -65,12 +74,15 @@ nav:
           Gateway: v1alpha1/api-types/gateway.md
           HTTPRoute: v1alpha1/api-types/httproute.md
       - API specification: v1alpha1/references/spec.md
+    - Enhancement Proposals:
+      - Overview: contributing/gep.md
+      - ... | geps/gep-*.md
     - Release policy: references/releases.md
   - Contributing:
     - Developer guide: contributing/devguide.md
     - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
     - Community: contributing/community.md
-  - FAQ: faq.md
-  - Enhancement Proposals:
-    - Overview: contributing/gep.md
-    - ... | geps/gep-*.md    
+  - Blog: 
+    - Index: blog/index.md
+    - 2021:
+      - blog/2021/introducing-v1alpha2.md
