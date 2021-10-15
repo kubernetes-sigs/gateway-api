@@ -112,7 +112,7 @@ The following changes have been made since v0.3.0:
   GEP added in [#749](https://github.com/kubernetes-sigs/gateway-api/pull/749).
   Implemented in [#768](https://github.com/kubernetes-sigs/gateway-api/pull/768).
 
-  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md),
+  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md)
   was a follow up on this change that allowed multiple Certificate Refs per
   Gateway Listener. This was implemented in
   [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852).
