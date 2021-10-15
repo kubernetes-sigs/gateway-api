@@ -106,9 +106,9 @@ There are a lot of changes in v1alpha2 that we haven't covered here. For the
 full changelog, refer to our [v0.4.0 release
 notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0). 
 
-Many of our [implementations]((/implementations)) are planning to release
-support for the v1alpha2 API in the coming weeks. We'll update our documentation
-as v1alpha2 implementations become available.
+Many of our [implementations](/implementations) are planning to release support
+for the v1alpha2 API in the coming weeks. We'll update our documentation as
+v1alpha2 implementations become available.
 
 We still have lots more to work on. Some of our next items to discuss include:
 
