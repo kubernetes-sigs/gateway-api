@@ -7,24 +7,26 @@ Implementors of Gateway API are encouraged to update this document with status i
 ## Implementation Status
 
 - [Apache APISIX][1] (work in progress)
-- [Contour][2] (alpha)
-- [Emissary-Ingress (Ambassador API Gateway)][3] (alpha)
-- [Gloo Edge 2.0][4] (work in progress)
-- [Google Kubernetes Engine][5] (public preview)
-- [HAProxy Ingress][6] (alpha)
-- [Istio][7] (alpha)
-- [Kong][8] (work in progress)
-- [Traefik][9] (alpha)
+- [Consul][2] (work in progress)
+- [Contour][3] (alpha)
+- [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
+- [Gloo Edge 2.0][5] (work in progress)
+- [Google Kubernetes Engine][6] (public preview)
+- [HAProxy Ingress][7] (alpha)
+- [Istio][8] (alpha)
+- [Kong][9] (work in progress)
+- [Traefik][10] (alpha)
 
 [1]:#apisix
-[2]:#contour
-[3]:#emissary-ingress-ambassador-api-gateway
-[4]:#gloo-edge
-[5]:#google-kubernetes-engine
-[6]:#haproxy-ingress
-[7]:#istio
-[8]:#kong
-[9]:#traefik
+[2]:#consul
+[3]:#contour
+[4]:#emissary-ingress-ambassador-api-gateway
+[5]:#gloo-edge
+[6]:#google-kubernetes-engine
+[7]:#haproxy-ingress
+[8]:#istio
+[9]:#kong
+[10]:#traefik
 
 ## Project References
 
@@ -38,6 +40,17 @@ APISIX is moving forward to implement the Gateway API `v1alpha2` version of the 
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
+
+### Consul
+
+[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deploymeent can span bare memtal, VM and container environemnts.  
+
+Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and supports mutiple types of gateways. Consul CRDs provide a self-service, Kubernetes native workflow to manage traffic patterns and permissions in the mesh.
+
+[HashiCorp][hashicorp] is actively working towards an implementation of the Gateway API.
+
+[consul]:https://consul.io
+[hashicorp]:https://www.hashicorp.com
 
 ### Contour
 
