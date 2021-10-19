@@ -21,7 +21,7 @@ spec:
   scope: Cluster
   versions:
   - additionalPrinterColumns:
-    - jsonPath: .spec.controller
+    - jsonPath: .spec.controllerName
       name: Controller
       type: string
     - jsonPath: .metadata.creationTimestamp
