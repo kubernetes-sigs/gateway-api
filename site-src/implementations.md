@@ -43,7 +43,7 @@ APISIX is moving forward to implement the Gateway API `v1alpha2` version of the 
 
 ### Consul
 
-[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deploymeent can span bare memtal, VM and container environemnts.  
+[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deploymeent can span bare metal, VM and container environemnts.  
 
 Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and supports mutiple types of gateways. Consul CRDs provide a self-service, Kubernetes native workflow to manage traffic patterns and permissions in the mesh.
 
