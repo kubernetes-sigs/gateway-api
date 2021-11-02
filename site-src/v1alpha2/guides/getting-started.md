@@ -16,7 +16,7 @@ _THEN_
 
 ## Installing a Gateway controller
 
-There are [multiple projects](/references/implementations) that support the
+There are [multiple projects](/implementations) that support the
 Gateway API. By installing a Gateway controller in your Kubernetes cluster,
 you can try out the guides above. This will demonstrate that the desired routing
 configuration is actually being implemented by your Gateway resources (and the
