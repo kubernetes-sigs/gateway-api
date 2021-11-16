@@ -20,7 +20,7 @@ set -o pipefail
 
 # Delete all CR and CRDs installed by gateway-api.
 
-RESOURCES=$(kubectl api-resources --api-group=networking.x-k8s.io -o name)
+RESOURCES=$(kubectl api-resources --api-group=gateway.networking.k8s.io -o name)
 
 for TYPE in ${RESOURCES}; do
   kubectl delete ${TYPE} --all
