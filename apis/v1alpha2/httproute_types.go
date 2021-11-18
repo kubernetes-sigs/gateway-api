@@ -521,6 +521,15 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestRedirect *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
 
+	// URLRewrite defines a schema for a filter that responds to the
+	// request with an HTTP redirection.
+	//
+	// Support: Core
+	//
+	// +optional
+	// +gateway:extended
+	URLRewrite *HTTPURLRewriteFilter `json:"urlRewrite,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
@@ -533,7 +542,7 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
+// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
 type HTTPRouteFilterType string
 
 const (
@@ -547,12 +556,25 @@ const (
 
 	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
 	// another location. This filter can also be used for HTTP to HTTPS
-	// redirects.
+	// redirects. This may not be used on the same Route rule or BackendRef as a
+	// URLRewrite filter.
 	//
 	// Support in HTTPRouteRule: Core
 	//
 	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestRedirect HTTPRouteFilterType = "RequestRedirect"
+
+	// HTTPRouteFilterURLRewrite can be used to modify a request during
+	// forwarding. At most one of these filters may be used on a Route rule.
+	// This may not be used on the same Route rule or BackendRef as a
+	// RequestRedirect filter.
+	//
+	// Support in HTTPRouteRule: Extended
+	//
+	// Support in HTTPBackendRef: Extended
+	//
+	// +gateway:experimental
+	HTTPRouteFilterURLRewrite HTTPRouteFilterType = "URLRewrite"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 	// different backend. The responses from this backend MUST be ignored by
@@ -663,7 +685,40 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPRequestRedirectFilter defines configuration for the RequestRedirect filter.
+// HTTPPathModifierType defines the type of path redirect.
+type HTTPPathModifierType string
+
+const (
+	// This type of modifier indicates that the complete path will be replaced
+	// by the path redirect value.
+	AbsoluteHTTPPathModifier HTTPPathModifierType = "Absolute"
+
+	// This type of modifier indicates that any prefix path matches will be
+	// replaced by the substitution value. For example, a path with a prefix
+	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
+	// the "/foo" prefix replaced with "/bar" in matching requests.
+	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
+)
+
+// HTTPPathModifier defines configuration for path modifiers.
+type HTTPPathModifier struct {
+	// Type defines the type of path modifier.
+	//
+	// +kubebuilder:validation:Enum=Absolute;ReplacePrefixMatch
+	Type HTTPPathModifierType `json:"type"`
+
+	// Substitution defines the HTTP path value to substitute. An empty value
+	// ("") indicates that the portion of the path to be changed should be
+	// removed from the resulting path. For example, a request to "/foo/bar"
+	// with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// +kubebuilder:validation:MaxLength=1024
+	Substitution string `json:"substitution"`
+}
+
+// HTTPRequestRedirect defines a filter that redirects a request. At most one of
+// these filters may be used on a Route rule. This may not be used on the same
+// Route rule as a HTTPURLRewrite filter.
 type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location`
 	// header in the response.
@@ -684,6 +739,14 @@ type HTTPRequestRedirectFilter struct {
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
 
+	// Path defines a path redirect.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// +gateway:extended
+	Path *HTTPPathModifier `json:"path,omitempty"`
+
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	// When empty, port (if specified) of the request is used.
@@ -701,6 +764,28 @@ type HTTPRequestRedirectFilter struct {
 	// +kubebuilder:default=302
 	// +kubebuilder:validation:Enum=301;302
 	StatusCode *int `json:"statusCode,omitempty"`
+}
+
+// HTTPURLRewriteFilter defines a filter that modifies a request during
+// forwarding. At most one of these filters may be used on a Route rule. This
+// may not be used on the same Route rule as a HTTPRequestRedirect filter.
+//
+// Support: Extended
+type HTTPURLRewriteFilter struct {
+	// Hostname is the value to be used to replace the Host header value during
+	// forwarding.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Hostname *Hostname `json:"hostname,omitempty"`
+
+	// Path defines a path rewrite.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Path *HTTPPathModifier `json:"path,omitempty"`
 }
 
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
