@@ -14,10 +14,6 @@ webhooks:
     matchPolicy: Equivalent
     rules:
       - operations: [ "CREATE" , "UPDATE" ]
-        apiGroups: [ "networking.x-k8s.io" ]
-        apiVersions: [ "v1alpha1" ]
-        resources: [ "gateways", "gatewayclasses", "httproutes" ]
-      - operations: [ "CREATE" , "UPDATE" ]
         apiGroups: [ "gateway.networking.k8s.io" ]
         apiVersions: [ "v1alpha2" ]
         resources: [ "gateways", "gatewayclasses", "httproutes" ]

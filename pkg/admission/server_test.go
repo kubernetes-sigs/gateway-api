@@ -106,12 +106,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
+								"group": "gateway.networking.k8s.io",
+								"version": "v1alpha2",
 								"resource": "httproutes"
 							},
 							"object": {
-								"apiVersion": "networking.x-k8s.io/v1alpha1",
+								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
 								"kind": "HTTPRoute"
 							},
 						"operation": "CREATE"
@@ -119,55 +119,6 @@ func TestServeHTTPSubmissions(t *testing.T) {
 					}`),
 				wantRespCode:       http.StatusBadRequest,
 				wantFailureMessage: "submitted object is not of kind AdmissionReview\n",
-			},
-			{
-				name: "valid v1alpha1 Gateway resource",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "gateways"
-							},
-							"object": {
-   								"kind": "Gateway",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-1",
-   								   "labels": {
-   								      "app": "foo"
-   								   }
-   								},
-   								"spec": {
-									"gatewayClassName": "contour-class",
-									"listeners": [
-										{
-											"port": 80,
-											"protocol": "HTTP",
-											"hostname": "foo.com",
-											"routes": {
-												"group": "networking.x-k8s.io",
-												"kind": "HTTPRoute",
-												"namespaces": {
-													"from": "All"
-												}
-											}
-										}
-									]
-   								}
-							},
-						"operation": "CREATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: true,
-					Result:  &metav1.Status{},
-				},
 			},
 			{
 				name: "valid v1alpha2 Gateway resource",
@@ -206,70 +157,6 @@ func TestServeHTTPSubmissions(t *testing.T) {
 											}
 										}
 									]
-   								}
-							},
-						"operation": "CREATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: true,
-					Result:  &metav1.Status{},
-				},
-			},
-			{
-				name: "valid HTTPRoute resource",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "httproutes"
-							},
-							"object": {
-   								"kind": "HTTPRoute",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "http-app-1",
-   								   "labels": {
-   								      "app": "foo"
-   								   }
-   								},
-   								"spec": {
-   								   "hostnames": [
-   								      "foo.com"
-   								   ],
-   								   "rules": [
-   								      {
-   								         "matches": [
-   								            {
-   								               "path": {
-   								                  "type": "Prefix",
-   								                  "value": "/bar"
-   								               }
-   								            }
-   								         ],
-   								         "filters": [
-   								            {
-   								               "type": "RequestMirror",
-   								               "requestMirror": {
-   								                  "serviceName": "my-service1-staging",
-   								                  "port": 8080
-   								               }
-   								            }
-   								         ],
-   								         "forwardTo": [
-   								            {
-   								               "serviceName": "my-service1",
-   								               "port": 8080
-   								            }
-   								         ]
-   								      }
-   								   ]
    								}
 							},
 						"operation": "CREATE"
@@ -347,80 +234,6 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "invalid HTTPRoute resource with two request mirror filters",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "httproutes"
-							},
-							"object": {
-   								"kind": "HTTPRoute",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "http-app-1",
-   								   "labels": {
-   								      "app": "foo"
-   								   }
-   								},
-   								"spec": {
-   								   "hostnames": [
-   								      "foo.com"
-   								   ],
-   								   "rules": [
-   								      {
-   								         "matches": [
-   								            {
-   								               "path": {
-   								                  "type": "Prefix",
-   								                  "value": "/bar"
-   								               }
-   								            }
-   								         ],
-   								         "filters": [
-   								            {
-   								               "type": "RequestMirror",
-   								               "requestMirror": {
-   								                  "serviceName": "my-service1-staging",
-   								                  "port": 8080
-   								               }
-   								            },
-   								            {
-   								               "type": "RequestMirror",
-   								               "requestMirror": {
-   								                  "serviceName": "my-service2-staging",
-   								                  "port": 8080
-   								               }
-   								            }
-   								         ],
-   								         "forwardTo": [
-   								            {
-   								               "serviceName": "my-service1",
-   								               "port": 8080
-   								            }
-   								         ]
-   								      }
-   								   ]
-   								}
-							},
-						"operation": "CREATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: false,
-					Result: &metav1.Status{
-						Code:    400,
-						Message: "spec.rules[0].filters: Invalid value: \"RequestMirror\": cannot be used multiple times in the same rule",
-					},
-				},
-			},
-			{
 				name: "invalid v1alpha2 HTTPRoute resource with two request mirror filters",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -495,134 +308,6 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "v1a1 GatewayClass create events do not result in an error",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "gatewayclasses"
-							},
-							"object": {
-   								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-class-1"
-   								},
-   								"spec": {
-   								   "controller": "example.com/foo"
-   								}
-							},
-						"operation": "CREATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: true,
-					Result:  &metav1.Status{},
-				},
-			},
-			{
-				name: "update to v1alpha1 GatewayClass parameters field does" +
-					" not result in an error",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "gatewayclasses"
-							},
-							"object": {
-   								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-class-1"
-   								},
-   								"spec": {
-   								   "controller": "example.com/foo"
-   								}
-							},
-							"oldObject": {
-   								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-class-1"
-   								},
-   								"spec": {
-									"controller": "example.com/foo",
-									"parametersRef": {
-										"name": "foo",
-										"namespace": "bar",
-										"scope": "Namespace",
-										"group": "example.com",
-										"kind": "ExampleConfig"
-									}
-   								}
-							},
-						"operation": "UPDATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: true,
-					Result:  &metav1.Status{},
-				},
-			},
-			{
-				name: "update to v1alpha1 GatewayClass controller field" +
-					" results in an error ",
-				reqBody: dedent.Dedent(`{
-						"kind": "AdmissionReview",
-						"apiVersion": "` + apiVersion + `",
-						"request": {
-							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
-								"resource": "gatewayclasses"
-							},
-							"object": {
-   								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-class-1"
-   								},
-   								"spec": {
-   								   "controller": "example.com/foo"
-   								}
-							},
-							"oldObject": {
-   								"kind": "GatewayClass",
-   								"apiVersion": "networking.x-k8s.io/v1alpha1",
-   								"metadata": {
-   								   "name": "gateway-class-1"
-   								},
-   								"spec": {
-   								   "controller": "example.com/bar"
-   								}
-							},
-						"operation": "UPDATE"
-						}
-					}`),
-				wantRespCode: http.StatusOK,
-				wantSuccessResponse: admission.AdmissionResponse{
-					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: false,
-					Result: &metav1.Status{
-						Code:    400,
-						Message: `spec.controller: Invalid value: "example.com/foo": cannot update an immutable field`,
-					},
-				},
-			},
-			{
 				name: "v1a2 GatewayClass create events do not result in an error",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -641,7 +326,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								   "name": "gateway-class-1"
    								},
    								"spec": {
-   								   "controllerName": "example.com/foo"
+   								   "controller": "example.com/foo"
    								}
 							},
 						"operation": "CREATE"
@@ -758,12 +443,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 						"request": {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
-								"group": "networking.x-k8s.io",
-								"version": "v1alpha1",
+								"group": "gateway.networking.k8s.io",
+								"version": "v1alpha2",
 								"resource": "brokenroutes"
 							},
 							"object": {
-								"apiVersion": "networking.x-k8s.io/v1alpha1",
+								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
 								"kind": "HTTPRoute"
 							},
 						"operation": "CREATE"

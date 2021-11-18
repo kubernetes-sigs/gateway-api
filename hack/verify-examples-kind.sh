@@ -51,19 +51,6 @@ res=0
 KIND_CREATE_ATTEMPTED=true
 kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res=$?
 
-##### Test v1alpha1 CRD apply
-# Install CRDs
-kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/v1alpha1 || res=$?
-
-# Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
-sleep 8
-
-# Install all example gateway-api resources.
-kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha1 || res=$?
-
-# Uninstall CRDs
-kubectl delete --kubeconfig "${KUBECONFIG}" -f config/crd/v1alpha1 || res=$?
-
 ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
 # Install CRDs
 kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/v1alpha2 || res=$?

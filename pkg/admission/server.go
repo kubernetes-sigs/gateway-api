@@ -29,8 +29,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/klog/v2"
 
-	v1alpha1 "sigs.k8s.io/gateway-api/apis/v1alpha1"
-	v1a1Validation "sigs.k8s.io/gateway-api/apis/v1alpha1/validation"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	v1a2Validation "sigs.k8s.io/gateway-api/apis/v1alpha2/validation"
 )
@@ -41,30 +39,15 @@ var (
 )
 
 var (
-	v1a1HTTPRouteGVR = meta.GroupVersionResource{
-		Group:    v1alpha1.SchemeGroupVersion.Group,
-		Version:  v1alpha1.SchemeGroupVersion.Version,
-		Resource: "httproutes",
-	}
 	v1a2HTTPRouteGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
 		Version:  v1alpha2.SchemeGroupVersion.Version,
 		Resource: "httproutes",
 	}
-	v1a1GatewayGVR = meta.GroupVersionResource{
-		Group:    v1alpha1.SchemeGroupVersion.Group,
-		Version:  v1alpha1.SchemeGroupVersion.Version,
-		Resource: "gateways",
-	}
 	v1a2GatewayGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
 		Version:  v1alpha2.SchemeGroupVersion.Version,
 		Resource: "gateways",
-	}
-	v1a1GatewayClassGVR = meta.GroupVersionResource{
-		Group:    v1alpha1.SchemeGroupVersion.Group,
-		Version:  v1alpha1.SchemeGroupVersion.Version,
-		Resource: "gatewayclasses",
 	}
 	v1a2GatewayClassGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
@@ -163,14 +146,6 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 	}
 
 	switch request.Resource {
-	case v1a1HTTPRouteGVR:
-		var hRoute v1alpha1.HTTPRoute
-		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
-		if err != nil {
-			return nil, err
-		}
-
-		fieldErr = v1a1Validation.ValidateHTTPRoute(&hRoute)
 	case v1a2HTTPRouteGVR:
 		var hRoute v1alpha2.HTTPRoute
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
@@ -179,13 +154,6 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 		}
 
 		fieldErr = v1a2Validation.ValidateHTTPRoute(&hRoute)
-	case v1a1GatewayGVR:
-		var gateway v1alpha1.Gateway
-		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
-		if err != nil {
-			return nil, err
-		}
-		fieldErr = v1a1Validation.ValidateGateway(&gateway)
 	case v1a2GatewayGVR:
 		var gateway v1alpha2.Gateway
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
@@ -193,24 +161,6 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 			return nil, err
 		}
 		fieldErr = v1a2Validation.ValidateGateway(&gateway)
-	case v1a1GatewayClassGVR:
-		// runs only for updates
-		if request.Operation != admission.Update {
-			break
-		}
-		var gatewayClass v1alpha1.GatewayClass
-		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gatewayClass)
-		if err != nil {
-			return nil, err
-		}
-
-		var gatewayClassOld v1alpha1.GatewayClass
-		_, _, err = deserializer.Decode(request.OldObject.Raw, nil, &gatewayClassOld)
-		if err != nil {
-			return nil, err
-		}
-
-		fieldErr = v1a1Validation.ValidateGatewayClassUpdate(&gatewayClassOld, &gatewayClass)
 	case v1a2GatewayClassGVR:
 		// runs only for updates
 		if request.Operation != admission.Update {
