@@ -51,31 +51,34 @@ res=0
 KIND_CREATE_ATTEMPTED=true
 kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res=$?
 
-##### Test v1alpha2 CRD apply and that invalid examples are invalid.
-# Install CRDs
-kubectl apply --kubeconfig "${KUBECONFIG}" -f config/crd/v1alpha2 || res=$?
+for CHANNEL in experimental stable; do
+  ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
+  # Install CRDs
+  kubectl apply --kubeconfig "${KUBECONFIG}" -f "config/crd/${CHANNEL}" || res=$?
 
-# Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
-sleep 8
+  # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
+  sleep 8
 
-# Install all example gateway-api resources.
-kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha2 || res=$?
+  # Install all example gateway-api resources.
+  kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha2 || res=$?
 
-# Install invalid gateway-api resources.
-# None of these examples should be successfully configured
-# This is very hacky, sorry.
-# Firstly, apply the examples, remembering that errors are on stdout
-kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f hack/invalid-examples 2>&1 | \
-      # First, we grep out the expected responses.
-      # After this, if everything is as expected, the output should be empty.
-      grep -v 'is invalid' | \
-      grep -v 'missing required field' | \
-      # Then, we grep for anything else.
-      # If anything else is found, this will return 0
-      # which is *not* what we want.
-      grep -e '.' && \
-      res=2 || \
-      echo Examples failed as expected
+  # Install invalid gateway-api resources.
+  # None of these examples should be successfully configured
+  # This is very hacky, sorry.
+  # Firstly, apply the examples, remembering that errors are on stdout
+  kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f hack/invalid-examples 2>&1 | \
+        # First, we grep out the expected responses.
+        # After this, if everything is as expected, the output should be empty.
+        grep -v 'is invalid' | \
+        grep -v 'missing required field' | \
+        # Then, we grep for anything else.
+        # If anything else is found, this will return 0
+        # which is *not* what we want.
+        grep -e '.' && \
+        res=2 || \
+        echo Examples failed as expected
+done
+
 # Clean up and exit
 cleanup || res=$?
 exit $res

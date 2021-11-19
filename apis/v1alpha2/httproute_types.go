@@ -494,6 +494,8 @@ type HTTPRouteFilter struct {
 	// that filter MUST receive a HTTP error response.
 	//
 	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
 	Type HTTPRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -524,10 +526,10 @@ type HTTPRouteFilter struct {
 	// URLRewrite defines a schema for a filter that responds to the
 	// request with an HTTP redirection.
 	//
-	// Support: Core
+	// Support: Extended
 	//
+	// <gateway:experimental>
 	// +optional
-	// +gateway:extended
 	URLRewrite *HTTPURLRewriteFilter `json:"urlRewrite,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
@@ -542,7 +544,6 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
 type HTTPRouteFilterType string
 
 const (
@@ -573,7 +574,7 @@ const (
 	//
 	// Support in HTTPBackendRef: Extended
 	//
-	// +gateway:experimental
+	// <gateway:experimental>
 	HTTPRouteFilterURLRewrite HTTPRouteFilterType = "URLRewrite"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
@@ -701,9 +702,11 @@ const (
 )
 
 // HTTPPathModifier defines configuration for path modifiers.
+// <gateway:experimental>
 type HTTPPathModifier struct {
 	// Type defines the type of path modifier.
 	//
+	// <gateway:experimental>
 	// +kubebuilder:validation:Enum=Absolute;ReplacePrefixMatch
 	Type HTTPPathModifierType `json:"type"`
 
@@ -712,13 +715,13 @@ type HTTPPathModifier struct {
 	// removed from the resulting path. For example, a request to "/foo/bar"
 	// with a prefix match of "/foo" would be modified to "/bar".
 	//
+	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024
 	Substitution string `json:"substitution"`
 }
 
-// HTTPRequestRedirect defines a filter that redirects a request. At most one of
-// these filters may be used on a Route rule. This may not be used on the same
-// Route rule as a HTTPURLRewrite filter.
+// HTTPRequestRedirect defines a filter that redirects a request. This filter
+// MUST not be used on the same Route rule as a HTTPURLRewrite filter.
 type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location`
 	// header in the response.
@@ -739,12 +742,14 @@ type HTTPRequestRedirectFilter struct {
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
 
-	// Path defines a path redirect.
+	// Path defines parameters used to modify the path of the incoming request.
+	// The modified path is then used to construct the `Location` header. When
+	// empty, the request path is used as-is.
 	//
 	// Support: Extended
 	//
+	// <gateway:experimental>
 	// +optional
-	// +gateway:extended
 	Path *HTTPPathModifier `json:"path,omitempty"`
 
 	// Port is the port to be used in the value of the `Location`
@@ -770,6 +775,7 @@ type HTTPRequestRedirectFilter struct {
 // forwarding. At most one of these filters may be used on a Route rule. This
 // may not be used on the same Route rule as a HTTPRequestRedirect filter.
 //
+// <gateway:experimental>
 // Support: Extended
 type HTTPURLRewriteFilter struct {
 	// Hostname is the value to be used to replace the Host header value during
@@ -777,6 +783,7 @@ type HTTPURLRewriteFilter struct {
 	//
 	// Support: Extended
 	//
+	// <gateway:experimental>
 	// +optional
 	Hostname *Hostname `json:"hostname,omitempty"`
 
@@ -784,6 +791,7 @@ type HTTPURLRewriteFilter struct {
 	//
 	// Support: Extended
 	//
+	// <gateway:experimental>
 	// +optional
 	Path *HTTPPathModifier `json:"path,omitempty"`
 }

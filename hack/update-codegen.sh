@@ -45,43 +45,37 @@ fi
 
 readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt"
 
-echo "Generating v1alpha2 CRDs and deepcopy"
-go run sigs.k8s.io/controller-tools/cmd/controller-gen \
-        object:headerFile=./hack/boilerplate/boilerplate.generatego.txt \
-        crd:crdVersions=v1 \
-        output:crd:artifacts:config=config/crd/v1alpha2 \
-        paths=./apis/v1alpha2
-
-sed -i -e 's|controller-gen.kubebuilder.io/version: v0.6.2|api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/891|g' config/crd/v1alpha2/gateway.networking.k8s.io*
+echo "Generating CRDs"
+go run ./pkg/generator
 
 for VERSION in v1alpha2
 do
-        echo "Generating ${VERSION} clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
-        go run k8s.io/code-generator/cmd/client-gen \
-                --clientset-name "${CLIENTSET_NAME}" \
-                --input-base "" \
-                --input "${APIS_PKG}/apis/${VERSION}" \
-                --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
-                ${COMMON_FLAGS}
+  echo "Generating ${VERSION} clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
+  go run k8s.io/code-generator/cmd/client-gen \
+    --clientset-name "${CLIENTSET_NAME}" \
+    --input-base "" \
+    --input "${APIS_PKG}/apis/${VERSION}" \
+    --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
+    ${COMMON_FLAGS}
 
-        echo "Generating ${VERSION} listers at ${OUTPUT_PKG}/listers"
-        go run k8s.io/code-generator/cmd/lister-gen \
-                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
-                --output-package "${OUTPUT_PKG}/listers" \
-                ${COMMON_FLAGS}
+  echo "Generating ${VERSION} listers at ${OUTPUT_PKG}/listers"
+  go run k8s.io/code-generator/cmd/lister-gen \
+    --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+    --output-package "${OUTPUT_PKG}/listers" \
+    ${COMMON_FLAGS}
 
-        echo "Generating ${VERSION} informers at ${OUTPUT_PKG}/informers"
-        go run k8s.io/code-generator/cmd/informer-gen \
-                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
-                --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
-                --listers-package "${OUTPUT_PKG}/listers" \
-                --output-package "${OUTPUT_PKG}/informers" \
-                ${COMMON_FLAGS}
+  echo "Generating ${VERSION} informers at ${OUTPUT_PKG}/informers"
+  go run k8s.io/code-generator/cmd/informer-gen \
+    --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+    --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
+    --listers-package "${OUTPUT_PKG}/listers" \
+    --output-package "${OUTPUT_PKG}/informers" \
+    ${COMMON_FLAGS}
 
-        echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
-        go run k8s.io/code-generator/cmd/register-gen \
-                --input-dirs "${APIS_PKG}/apis/${VERSION}" \
-                --output-package "${APIS_PKG}/apis/${VERSION}" \
-                ${COMMON_FLAGS}
+  echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
+  go run k8s.io/code-generator/cmd/register-gen \
+    --input-dirs "${APIS_PKG}/apis/${VERSION}" \
+    --output-package "${APIS_PKG}/apis/${VERSION}" \
+    ${COMMON_FLAGS}
 
 done
