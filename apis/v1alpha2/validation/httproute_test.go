@@ -431,3 +431,125 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateServicePort(t *testing.T) {
+	portPtr := func(n int) *gatewayv1a2.PortNumber {
+		p := gatewayv1a2.PortNumber(n)
+		return &p
+	}
+
+	groupPtr := func(g string) *gatewayv1a2.Group {
+		p := gatewayv1a2.Group(g)
+		return &p
+	}
+
+	kindPtr := func(k string) *gatewayv1a2.Kind {
+		p := gatewayv1a2.Kind(k)
+		return &p
+	}
+
+	tests := []struct {
+		name     string
+		route    *gatewayv1a2.HTTPRoute
+		errCount int
+	}{
+		{
+			name:     "default groupkind with port",
+			errCount: 0,
+			route: &gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{{
+						BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+							BackendRef: gatewayv1a2.BackendRef{
+								BackendObjectReference: gatewayv1a2.BackendObjectReference{
+									Name: "backend",
+									Port: portPtr(99),
+								},
+							},
+						}},
+					}},
+				},
+			},
+		}, {
+			name:     "default groupkind with no port",
+			errCount: 1,
+			route: &gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{{
+						BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+							BackendRef: gatewayv1a2.BackendRef{
+								BackendObjectReference: gatewayv1a2.BackendObjectReference{
+									Name: "backend",
+								},
+							},
+						}},
+					}},
+				},
+			},
+		}, {
+			name:     "explicit service with port",
+			errCount: 0,
+			route: &gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{{
+						BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+							BackendRef: gatewayv1a2.BackendRef{
+								BackendObjectReference: gatewayv1a2.BackendObjectReference{
+									Group: groupPtr(""),
+									Kind:  kindPtr("Service"),
+									Name:  "backend",
+									Port:  portPtr(99),
+								},
+							},
+						}},
+					}},
+				},
+			},
+		}, {
+			name:     "explicit service with no port",
+			errCount: 1,
+			route: &gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{{
+						BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+							BackendRef: gatewayv1a2.BackendRef{
+								BackendObjectReference: gatewayv1a2.BackendObjectReference{
+									Group: groupPtr(""),
+									Kind:  kindPtr("Service"),
+									Name:  "backend",
+								},
+							},
+						}},
+					}},
+				},
+			},
+		}, {
+			name:     "explicit ref with no port",
+			errCount: 0,
+			route: &gatewayv1a2.HTTPRoute{
+				Spec: gatewayv1a2.HTTPRouteSpec{
+					Rules: []gatewayv1a2.HTTPRouteRule{{
+						BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+							BackendRef: gatewayv1a2.BackendRef{
+								BackendObjectReference: gatewayv1a2.BackendObjectReference{
+									Group: groupPtr("foo.example.com"),
+									Kind:  kindPtr("Foo"),
+									Name:  "backend",
+								},
+							},
+						}},
+					}},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateHTTPRouteBackendServicePorts(tc.route.Spec.Rules, field.NewPath("spec").Child("rules"))
+			if len(errs) != tc.errCount {
+				t.Errorf("got %v errors, want %v errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}

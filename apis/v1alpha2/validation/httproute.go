@@ -46,7 +46,38 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // validateHTTPRouteSpec validates that required fields of spec are set according to the
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
+	var errs field.ErrorList
+
+	errs = append(errs, validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
+
+	return errs
+}
+
+// validateHTTPRouteBackendServicePorts validates that v1.Service backends always have a port.
+func validateHTTPRouteBackendServicePorts(rules []gatewayv1a2.HTTPRouteRule, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+
+	for i, rule := range rules {
+		path = path.Index(i).Child("backendRefs")
+		for i, ref := range rule.BackendRefs {
+			if ref.BackendObjectReference.Group != nil &&
+				*ref.BackendObjectReference.Group != "" {
+				continue
+			}
+
+			if ref.BackendObjectReference.Kind != nil &&
+				*ref.BackendObjectReference.Kind != "Service" {
+				continue
+			}
+
+			if ref.BackendObjectReference.Port == nil {
+				errs = append(errs, field.Required(path.Index(i).Child("port"), "missing port for Service reference"))
+			}
+		}
+	}
+
+	return errs
 }
 
 // validateHTTPRouteUniqueFilters validates whether each core and extended filter
@@ -70,9 +101,7 @@ func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *fie
 			}
 		}
 
-		if errList := validateHTTPBackendUniqueFilters(rule.BackendRefs, path, i); len(errList) > 0 {
-			errs = append(errs, errList...)
-		}
+		errs = append(errs, validateHTTPBackendUniqueFilters(rule.BackendRefs, path, i)...)
 	}
 
 	return errs
