@@ -42,7 +42,7 @@ vet:
 
 # Run go test against code
 test:
-	go test ./...
+	go test -race -cover ./...
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
