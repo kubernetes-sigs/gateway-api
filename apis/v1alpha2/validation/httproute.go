@@ -46,7 +46,33 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // validateHTTPRouteSpec validates that required fields of spec are set according to the
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
-	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))
+	return validateHTTPRouteUniqueFilters(spec.Rules, path.Child("filters"))
+}
+
+// validateHTTPRouteFilterTypeMatchesValues validates that the filter type matches the filter value.
+func validateHTTPRouteFilterTypeMatchesValues(filter *gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+
+	switch filter.Type {
+	case gatewayv1a2.HTTPRouteFilterExtensionRef:
+		if filter.ExtensionRef == nil || filter.RequestHeaderModifier != nil || filter.RequestMirror != nil || filter.RequestRedirect != nil {
+			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		}
+	case gatewayv1a2.HTTPRouteFilterRequestHeaderModifier:
+		if filter.RequestHeaderModifier == nil || filter.ExtensionRef != nil || filter.RequestMirror != nil || filter.RequestRedirect != nil {
+			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		}
+	case gatewayv1a2.HTTPRouteFilterRequestMirror:
+		if filter.RequestMirror == nil || filter.RequestHeaderModifier != nil || filter.ExtensionRef != nil || filter.RequestRedirect != nil {
+			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		}
+	case gatewayv1a2.HTTPRouteFilterRequestRedirect:
+		if filter.RequestRedirect == nil || filter.ExtensionRef != nil || filter.RequestHeaderModifier != nil || filter.RequestMirror != nil {
+			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		}
+	}
+
+	return errs
 }
 
 // validateHTTPRouteUniqueFilters validates whether each core and extended filter

@@ -431,3 +431,108 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateHTTPRouteMatchingField(t *testing.T) {
+	tests := []struct {
+		name        string
+		routeFilter *gatewayv1a2.HTTPRouteFilter
+		errCount    int
+	}{
+		{
+			name: "valid HTTPRouteFilterRequestHeaderModifier filter with matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
+				RequestMirror:         nil,
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 0,
+		},
+		{
+			name: "invalid HTTPRouteFilterRequestHeaderModifier filter with non-matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: nil,
+				RequestMirror:         &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterRequestMirror filter with matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestMirror,
+				RequestHeaderModifier: nil,
+				RequestMirror:         &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 0,
+		},
+		{
+			name: "invalid HTTPRouteFilterRequestMirror filter with non-matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestMirror,
+				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
+				RequestMirror:         nil,
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterRequestRedirect filter with matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestRedirect,
+				RequestHeaderModifier: nil,
+				RequestMirror:         nil,
+				RequestRedirect:       &gatewayv1a2.HTTPRequestRedirectFilter{},
+				ExtensionRef:          nil,
+			},
+			errCount: 0,
+		},
+		{
+			name: "invalid HTTPRouteFilterRequestRedirect filter with non-matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterRequestRedirect,
+				RequestHeaderModifier: nil,
+				RequestMirror:         &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterExtensionRef filter with matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterExtensionRef,
+				RequestHeaderModifier: nil,
+				RequestMirror:         nil,
+				RequestRedirect:       nil,
+				ExtensionRef:          &gatewayv1a2.LocalObjectReference{},
+			},
+			errCount: 0,
+		},
+		{
+			name: "invalid HTTPRouteFilterExtensionRef filter with non-matching field",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+				Type:                  gatewayv1a2.HTTPRouteFilterExtensionRef,
+				RequestHeaderModifier: nil,
+				RequestMirror:         &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestRedirect:       nil,
+				ExtensionRef:          nil,
+			},
+			errCount: 1,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateHTTPRouteFilterTypeMatchesValues(tc.routeFilter, field.NewPath("spec").Child("rules").Child("filters"))
+			if len(errs) != tc.errCount {
+				t.Errorf("got %v errors, want %v errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
