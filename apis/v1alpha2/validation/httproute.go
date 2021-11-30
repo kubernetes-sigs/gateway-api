@@ -188,6 +188,8 @@ func validateHTTPRouteFilterTypeMatchesValues(filter *gatewayv1a2.HTTPRouteFilte
 		if filter.RequestRedirect == nil {
 			return append(errs, field.Invalid(path.Child("filters"), path, "type of filter must match type of value"))
 		}
+	default:
+		return append(errs, field.Invalid(path.Child("filters"), path, "unknown type of filter"))
 	}
 
 	return errs

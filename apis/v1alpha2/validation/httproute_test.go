@@ -624,6 +624,11 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			},
 			errCount: 1,
 		},
+		{
+			name:        "invalid nil type filter",
+			routeFilter: &gatewayv1a2.HTTPRouteFilter{},
+			errCount:    1,
+		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
