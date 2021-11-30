@@ -173,20 +173,20 @@ func validateHTTPRouteFilterTypeMatchesValues(filter *gatewayv1a2.HTTPRouteFilte
 
 	switch filter.Type {
 	case gatewayv1a2.HTTPRouteFilterExtensionRef:
-		if filter.ExtensionRef == nil || filter.RequestHeaderModifier != nil || filter.RequestMirror != nil || filter.RequestRedirect != nil {
-			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		if filter.ExtensionRef == nil {
+			return append(errs, field.Invalid(path.Child("filters"), path, "type of filter must match type of value"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestHeaderModifier:
-		if filter.RequestHeaderModifier == nil || filter.ExtensionRef != nil || filter.RequestMirror != nil || filter.RequestRedirect != nil {
-			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		if filter.RequestHeaderModifier == nil {
+			return append(errs, field.Invalid(path.Child("filters"), path, "type of filter must match type of value"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestMirror:
-		if filter.RequestMirror == nil || filter.RequestHeaderModifier != nil || filter.ExtensionRef != nil || filter.RequestRedirect != nil {
-			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		if filter.RequestMirror == nil {
+			return append(errs, field.Invalid(path.Child("filters"), path, "type of filter must match type of value"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestRedirect:
-		if filter.RequestRedirect == nil || filter.ExtensionRef != nil || filter.RequestHeaderModifier != nil || filter.RequestMirror != nil {
-			return append(errs, field.Invalid(path.Child("rules"), path, "type of filter must match type of value"))
+		if filter.RequestRedirect == nil {
+			return append(errs, field.Invalid(path.Child("filters"), path, "type of filter must match type of value"))
 		}
 	}
 
