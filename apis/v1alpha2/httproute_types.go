@@ -737,7 +737,7 @@ type HTTPBackendRef struct {
 	//
 	// If there is a cross-namespace reference to an *existing* object
 	// that is not covered by a ReferencePolicy, the controller must ensure the
-	// "ResolvedRefs"  condition on the Route is set to `status: true`,
+	// "ResolvedRefs"  condition on the Route is set to `status: False`,
 	// with the "RefNotPermitted" reason and not configure this backend in the
 	// underlying implementation.
 	//
