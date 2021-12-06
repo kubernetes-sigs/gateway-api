@@ -10,7 +10,7 @@ attach to Gateways across Namespace boundaries. This allows user access
 control to be applied differently across Namespaces for Routes and Gateways, 
 effectively segmenting access and control to different parts of the
 cluster-wide  routing configuration. The ability for Routes to attach to
-Gateways across Namespace boundaries are governed by [_Route Attachment_](cross-namespace-route-attachment). Route attachment is explored
+Gateways across Namespace boundaries are governed by [_Route Attachment_](#cross-namespace-route-attachment). Route attachment is explored
 in this guide and demonstrates how independent teams can safely share the same
 Gateway.
 
@@ -156,7 +156,7 @@ Gateway that these Routes want to attach to.
 
 After these three Routes are deployed, they will all be attached to the
 `shared-gateway` Gateway. The Gateway merges these Routes into a single flat
-list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+list of routing rules. [Routing precedence](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
 between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](/concepts/guidelines#conflicts). This provides predictable and
