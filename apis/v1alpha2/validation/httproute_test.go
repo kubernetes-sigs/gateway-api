@@ -291,7 +291,10 @@ func TestValidateHTTPRoute(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := validateHTTPRouteUniqueFilters(tc.rules, field.NewPath("spec").Child("rules"))
+			var errs field.ErrorList
+			for _, rules := range tc.rules {
+				errs = validateHTTPRouteUniqueFilters(rules.Filters, field.NewPath("spec").Child("rules"))
+			}
 			if len(errs) != tc.errCount {
 				t.Errorf("ValidateHTTPRoute() got %v errors, want %v errors", len(errs), tc.errCount)
 			}
@@ -381,10 +384,12 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			for index, rule := range tc.hRoute.Spec.Rules {
-				errs := validateHTTPBackendUniqueFilters(rule.BackendRefs, field.NewPath("spec").Child("rules"), index)
-				if len(errs) != tc.errCount {
-					t.Errorf("ValidateHTTPRoute() got %d errors, want %d errors", len(errs), tc.errCount)
+			for _, rule := range tc.hRoute.Spec.Rules {
+				for _, backendRef := range rule.BackendRefs {
+					errs := validateHTTPRouteUniqueFilters(backendRef.Filters, field.NewPath("spec").Child("rules"))
+					if len(errs) != tc.errCount {
+						t.Errorf("ValidateHTTPRoute() got %d errors, want %d errors", len(errs), tc.errCount)
+					}
 				}
 			}
 		})
@@ -557,82 +562,82 @@ func TestValidateServicePort(t *testing.T) {
 func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 	tests := []struct {
 		name        string
-		routeFilter *gatewayv1a2.HTTPRouteFilter
+		routeFilter []gatewayv1a2.HTTPRouteFilter
 		errCount    int
 	}{
 		{
 			name: "valid HTTPRouteFilterRequestHeaderModifier type filter with matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:                  gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
-			},
+			}},
 			errCount: 0,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with non-matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
-			},
+			}},
 			errCount: 1,
 		},
 		{
 			name: "valid HTTPRouteFilterRequestMirror type filter with matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterRequestMirror,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
-			},
+			}},
 			errCount: 0,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestMirror type filter with non-matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:                  gatewayv1a2.HTTPRouteFilterRequestMirror,
 				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
-			},
+			}},
 			errCount: 1,
 		},
 		{
 			name: "valid HTTPRouteFilterRequestRedirect type filter with matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:            gatewayv1a2.HTTPRouteFilterRequestRedirect,
 				RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{},
-			},
+			}},
 			errCount: 0,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestRedirect type filter with non-matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterRequestRedirect,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
-			},
+			}},
 			errCount: 1,
 		},
 		{
 			name: "valid HTTPRouteFilterExtensionRef type filter with matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:         gatewayv1a2.HTTPRouteFilterExtensionRef,
 				ExtensionRef: &gatewayv1a2.LocalObjectReference{},
-			},
+			}},
 			errCount: 0,
 		},
 		{
 			name: "invalid HTTPRouteFilterExtensionRef type filter with non-matching field",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterExtensionRef,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
-			},
+			}},
 			errCount: 1,
 		},
 		{
 			name:        "invalid nil type filter",
-			routeFilter: &gatewayv1a2.HTTPRouteFilter{},
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{}},
 			errCount:    1,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := validateHTTPRouteFilterTypeMatchesValues(tc.routeFilter, field.NewPath("spec").Child("rules"))
+			errs := validateHTTPRouteFilterTypeMatchesValue(tc.routeFilter, field.NewPath(""))
 			if len(errs) != tc.errCount {
 				t.Errorf("got %v errors, want %v errors: %s", len(errs), tc.errCount, errs)
 			}
