@@ -683,7 +683,7 @@ type HTTPRequestRedirectFilter struct {
 	// Support: Core
 	//
 	// +optional
-	Hostname *Hostname `json:"hostname,omitempty"`
+	Hostname *PreciseHostname `json:"hostname,omitempty"`
 
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
