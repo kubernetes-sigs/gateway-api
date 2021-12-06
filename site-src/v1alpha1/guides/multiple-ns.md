@@ -146,7 +146,7 @@ Routes can bind with.
 After these three Routes are deployed, they will all be bound to the 
 `shared-gateway` Gateway. The Gateway merges its bound Routes into a single flat
 list of routing rules. [Routing
-precedence](/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule)
+precedence](/v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.HTTPRouteRule)
 between the flat list of routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](/concepts/guidelines#conflicts). This provides predictable and

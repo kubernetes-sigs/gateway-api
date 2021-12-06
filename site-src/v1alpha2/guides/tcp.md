@@ -52,8 +52,8 @@ possible to use metadata to route traffic from the `Gateway` to the underlying
 See the [spec][tcproute] for more details on how to configure alternative logic
 for routing TCP traffic beyond just using ports and selecting `listener` names.
 
-[tcproute]:/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
+[tcproute]:/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
-[httproute]:/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[gateway]:/v1alpha2/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+[httproute]:/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
+[gateway]:/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/

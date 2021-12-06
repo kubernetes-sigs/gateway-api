@@ -188,7 +188,7 @@ status:
 ### Merging
 Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
-resolution applies to merging, refer to the [API specification](httprouterule).
+resolution applies to merging, refer to the [API specification][httprouterule].
 
 
 [httproute]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
