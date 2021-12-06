@@ -450,7 +450,7 @@ spec:
                                         of the request is used. \n Support: Core"
                                       maxLength: 253
                                       minLength: 1
-                                      pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
                                     port:
                                       description: "Port is the port to be used in
@@ -823,7 +823,7 @@ spec:
                                   \n Support: Core"
                                 maxLength: 253
                                 minLength: 1
-                                pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               port:
                                 description: "Port is the port to be used in the value

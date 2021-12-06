@@ -252,6 +252,24 @@ type RouteStatus struct {
 // +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 type Hostname string
 
+// PreciseHostname is the fully qualified domain name of a network host. This matches
+// the RFC 1123 definition of a hostname with 2 notable exceptions:
+//
+// 1. IPs are not allowed.
+// 2. A hostname may not be prefixed with a wildcard label (`*.`).
+//
+// Hostname can be "precise" which is a domain name without the terminating
+// dot of a network host (e.g. "foo.example.com").
+//
+// Note that as per RFC1035 and RFC1123, a *label* must consist of lower case
+// alphanumeric characters or '-', and must start and end with an alphanumeric
+// character. No other punctuation is allowed.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+type PreciseHostname string
+
 // Group refers to a Kubernetes Group. It must either be an empty string or a
 // RFC 1123 subdomain.
 //
