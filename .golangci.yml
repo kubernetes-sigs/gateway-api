@@ -11,9 +11,12 @@ linters:
   enable:
   - gofmt
   - goimports
-  - golint
+  - revive
   - govet
   - misspell
+  - exportloopref
+  disable:
+  - scopelint
   disable-all: false
   presets:
   - bugs
