@@ -78,4 +78,9 @@ do
     --output-package "${APIS_PKG}/apis/${VERSION}" \
     ${COMMON_FLAGS}
 
+  echo "Generating ${VERSION} deepcopy at ${APIS_PKG}/apis/${VERSION}"
+  go run sigs.k8s.io/controller-tools/cmd/controller-gen \
+    object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
+    paths="${APIS_PKG}/apis/${VERSION}" 
+
 done
