@@ -47,13 +47,13 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	for _, rule := range spec.Rules {
-		errs = append(errs, validateHTTPRouteUniqueFilters(rule.Filters, path.Child("rules"))...)
-		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(rule.Filters, path.Child("rules"))...)
+	for i, rule := range spec.Rules {
+		errs = append(errs, validateHTTPRouteUniqueFilters(rule.Filters, path.Child("rules").Index(i))...)
+		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(rule.Filters, path.Child("rules").Index(i))...)
 
-		for _, backendRef := range rule.BackendRefs {
-			errs = append(errs, validateHTTPRouteUniqueFilters(backendRef.Filters, path.Child("rules"))...)
-			errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(backendRef.Filters, path.Child("rules"))...)
+		for j, backendRef := range rule.BackendRefs {
+			errs = append(errs, validateHTTPRouteUniqueFilters(backendRef.Filters, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
+			errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(backendRef.Filters, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
 
 		}
 	}
