@@ -169,6 +169,10 @@ func validateHTTPRouteFilterTypeMatchesValue(filters []gatewayv1a2.HTTPRouteFilt
 			if filter.RequestRedirect == nil {
 				errs = append(errs, field.Invalid(path.Child("filters"), path, "requestRedirect must be specified for RequestRedirect filter"))
 			}
+		case gatewayv1a2.HTTPRouteFilterURLRewrite:
+			if filter.URLRewrite == nil {
+				errs = append(errs, field.Invalid(path.Child("filters"), path, "urlRewrite must be specified for URLRewrite filter"))
+			}
 		default:
 			errs = append(errs, field.Invalid(path.Child("filters"), path, "unknown type of filter"))
 		}
