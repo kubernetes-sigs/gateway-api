@@ -25,7 +25,7 @@ import (
 func Test_PortNumberPtr(t *testing.T) {
 	var exportedPort65535 gatewayv1a2.PortNumber = 65535
 	var exportedPort1 gatewayv1a2.PortNumber = 1
-	var exportedPort0 gatewayv1a2.PortNumber = 0
+	var exportedPort0 gatewayv1a2.PortNumber
 	var exportedPort65536 gatewayv1a2.PortNumber = 65536
 
 	portNumberPtrTests := []struct {

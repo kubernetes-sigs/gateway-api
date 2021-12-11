@@ -87,7 +87,7 @@ While the API is simplistic in nature, it comes with a few notable decisions:
    Although a selector would be more powerful, it encourages unnecessarily
    insecure configuration.
 
-Please see the [API Specification](https://gateway-api.sigs.k8s.io/references/spec/)
+Please see the [API Specification](/v1alpha2/references/spec#gateway.networking.k8s.io/v1alpha2.ReferencePolicy)
 for the details of the object's behavior.
 
 ### Exceptions
