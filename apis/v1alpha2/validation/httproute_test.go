@@ -566,10 +566,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		errCount    int
 	}{
 		{
-			name: "valid HTTPRouteFilterRequestHeaderModifier type filter with matching field",
+			name: "valid HTTPRouteFilterRequestHeaderModifier route filter",
 			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
-				Type:                  gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
+				Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+					Set:    []gatewayv1a2.HTTPHeader{},
+					Add:    []gatewayv1a2.HTTPHeader{},
+					Remove: []string{},
+				},
 			}},
 			errCount: 0,
 		},
@@ -582,10 +586,17 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name: "valid HTTPRouteFilterRequestMirror type filter with matching field",
+			name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with empty value field",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
+			}},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterRequestMirror route filter",
 			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterRequestMirror,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{BackendRef: gatewayv1a2.BackendObjectReference{}},
 			}},
 			errCount: 0,
 		},
@@ -598,10 +609,23 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name: "valid HTTPRouteFilterRequestRedirect type filter with matching field",
+			name: "invalid HTTPRouteFilterRequestMirror type filter with empty value field",
 			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
-				Type:            gatewayv1a2.HTTPRouteFilterRequestRedirect,
-				RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{},
+				Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
+			}},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterRequestRedirect route filter",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
+				RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{
+					Scheme:     new(string),
+					Hostname:   new(gatewayv1a2.Hostname),
+					Path:       &gatewayv1a2.HTTPPathModifier{},
+					Port:       new(gatewayv1a2.PortNumber),
+					StatusCode: new(int),
+				},
 			}},
 			errCount: 0,
 		},
@@ -614,10 +638,21 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name: "valid HTTPRouteFilterExtensionRef type filter with matching field",
+			name: "invalid HTTPRouteFilterRequestRedirect type filter with empty value field",
 			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
-				Type:         gatewayv1a2.HTTPRouteFilterExtensionRef,
-				ExtensionRef: &gatewayv1a2.LocalObjectReference{},
+				Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
+			}},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterExtensionRef filter",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterExtensionRef,
+				ExtensionRef: &gatewayv1a2.LocalObjectReference{
+					Group: "group",
+					Kind:  "kind",
+					Name:  "name",
+				},
 			}},
 			errCount: 0,
 		},
@@ -626,6 +661,39 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
 				Type:          gatewayv1a2.HTTPRouteFilterExtensionRef,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+			}},
+			errCount: 1,
+		},
+		{
+			name: "invalid HTTPRouteFilterExtensionRef type filter with empty value field",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterExtensionRef,
+			}},
+			errCount: 1,
+		},
+		{
+			name: "valid HTTPRouteFilterURLRewrite route filter",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Hostname: new(gatewayv1a2.Hostname),
+					Path:     &gatewayv1a2.HTTPPathModifier{},
+				},
+			}},
+			errCount: 0,
+		},
+		{
+			name: "invalid HTTPRouteFilterURLRewrite type filter with non-matching field",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type:          gatewayv1a2.HTTPRouteFilterURLRewrite,
+				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+			}},
+			errCount: 1,
+		},
+		{
+			name: "invalid HTTPRouteFilterURLRewrite type filter with empty value field",
+			routeFilter: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
 			}},
 			errCount: 1,
 		},
