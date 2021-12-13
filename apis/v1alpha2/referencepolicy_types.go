@@ -104,7 +104,7 @@ type ReferencePolicyFrom struct {
 	// Namespace is the namespace of the referent.
 	//
 	// Support: Core
-	Namespace Namespace `json:"namespace,omitempty"`
+	Namespace Namespace `json:"namespace"`
 }
 
 // ReferencePolicyTo describes what Kinds are allowed as targets of the

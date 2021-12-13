@@ -86,6 +86,7 @@ spec:
                   required:
                   - group
                   - kind
+                  - namespace
                   type: object
                 maxItems: 16
                 minItems: 1
