@@ -1,30 +1,12 @@
-# GEP-922: Gateway API Versioning
+# Versioning
 
-* Issue: [#922](https://github.com/kubernetes-sigs/gateway-api/issues/922)
-* Status: Implemented
-
-## TLDR
-Each Gateway API release will be represented by a bundle version that represents
+## Summary
+Each Gateway API release is represented by a bundle version that represents
 that specific combination of CRDs, API versions, and validating webhook. To
 enable experimental fields, future releases of the API will include stable and
 experimental CRD tracks. Users will be able to access experimental features by
 installing the experimental CRDs. A cluster can contain either an experimental
 or stable CRD for any resource at a given time. 
-
-
-## Goals
-Provide a path for implementations to support:
-
-* Users should have a predictable experience when interacting with Gateway API. 
-* The API should be able to continue to safely evolve, including:
-    * Loosening validation
-    * Transitioning required fields to optional
-    * Adding new fields at an experimental stability level
-
-## Introduction
-This GEP details how we should approach future releases of Gateway API. This is
-intended as another step towards building consensus. Once merged, it will be
-considered implemented once this content is fully documented.
 
 ## Version Terminology
 Gateway API has two related but different versioning schemes:
@@ -132,47 +114,3 @@ and channel:
 gateway.networking.k8s.io/bundle-version: v0.4.0
 gateway.networking.k8s.io/channel: stable|experimental
 ```
-
-## Alternatives Considered
-### 1. Use Webhook to Implement Feature Gates
-This option would involve using the webhook to prevent experimental fields from
-being set unless the corresponding feature gate was enabled. This would make use
-of the existing Kubernetes feature gate tooling.
-
-This approach would be familiar to Kubernetes users, but would put a lot of
-emphasis on the webhook. It would require webhook versioning to be precisely in
-line with the CRDs, and edge cases during the upgrade process could get rather
-messy.
-
-### 2: Reuse Alpha API versions
-With this approach, we would only allow the use of these fields when using the
-alpha API. 
-
-To simplify conversion, new fields will be added to all versions of the API,
-with some key exceptions:
-
-* New fields will be added with an `alpha` prefix to beta and GA API versions.
-* Webhook validation would ensure that new fields will only be writable when
-  using alpha API versions.
-* New fields may be removed without replacement while they are still considered
-  alpha.
-
-An alpha API field could graduate to beta in the subsequent minor release of the
-API. That process would involve:
-
-* Loosening webhook validation to allow writes to the field with beta API
-  versions.
-* Removing the alpha prefix from the field name in the beta API Changing the
-  alpha prefix to a beta prefix in the GA API.
-
-A beta API field could graduate to GA in the subsequent minor release of the
-API. That process would involve:
-
-* Loosening webhook validation to allow writes to the field with GA API
-  versions.
-* Removing the beta prefix from the field name in the GA API.
-
-This is potentially the most complex of all the options presented. It would
-effectively require us to consistently maintain an alpha API version. Of all the
-options presented, this is probably the most likely to confuse users and
-implementers of the API.
