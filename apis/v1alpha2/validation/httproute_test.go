@@ -570,9 +570,9 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			routeFilter: gatewayv1a2.HTTPRouteFilter{
 				Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
-					Set:    []gatewayv1a2.HTTPHeader{},
-					Add:    []gatewayv1a2.HTTPHeader{},
-					Remove: []string{},
+					Set:    []gatewayv1a2.HTTPHeader{{Name: "name"}},
+					Add:    []gatewayv1a2.HTTPHeader{{Name: "add"}},
+					Remove: []string{"remove"},
 				},
 			},
 			errCount: 0,
@@ -595,8 +595,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		{
 			name: "valid HTTPRouteFilterRequestMirror route filter",
 			routeFilter: gatewayv1a2.HTTPRouteFilter{
-				Type:          gatewayv1a2.HTTPRouteFilterRequestMirror,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{BackendRef: gatewayv1a2.BackendObjectReference{}},
+				Type: gatewayv1a2.HTTPRouteFilterRequestMirror,
+				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{BackendRef: gatewayv1a2.BackendObjectReference{
+					Group:     new(gatewayv1a2.Group),
+					Kind:      new(gatewayv1a2.Kind),
+					Name:      "name",
+					Namespace: new(gatewayv1a2.Namespace),
+					Port:      pkgutils.PortNumberPtr(22),
+				}},
 			},
 			errCount: 0,
 		},

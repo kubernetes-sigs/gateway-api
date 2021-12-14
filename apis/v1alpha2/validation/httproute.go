@@ -18,7 +18,6 @@ package validation
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -155,15 +154,16 @@ func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter,
 			errs = append(errs, field.Invalid(path.Child("filters"), path, "extensionRef must be specified for ExtensionRef filter"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestHeaderModifier:
-		if filter.RequestHeaderModifier == nil || reflect.DeepEqual(gatewayv1a2.HTTPRequestHeaderFilter{}, *filter.RequestHeaderModifier) {
+		//Request header modifier contains slice whi
+		if filter.RequestHeaderModifier == nil || filter.RequestHeaderModifier.Add == nil || filter.RequestHeaderModifier.Set == nil || filter.RequestHeaderModifier.Remove == nil {
 			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestHeaderModifier must be specified for RequestHeaderModifier filter"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestMirror:
-		if filter.RequestMirror == nil || reflect.DeepEqual(gatewayv1a2.HTTPRequestMirrorFilter{}, filter.RequestMirror) {
+		if filter.RequestMirror == nil || (gatewayv1a2.HTTPRequestMirrorFilter{}) == *filter.RequestMirror {
 			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestMirror must be specified for RequestMirror filter"))
 		}
 	case gatewayv1a2.HTTPRouteFilterRequestRedirect:
-		if filter.RequestRedirect == nil || reflect.DeepEqual(gatewayv1a2.HTTPRequestRedirectFilter{}, *filter.RequestRedirect) {
+		if filter.RequestRedirect == nil || (gatewayv1a2.HTTPRequestRedirectFilter{}) == *filter.RequestRedirect {
 			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestRedirect must be specified for RequestRedirect filter"))
 		}
 	case gatewayv1a2.HTTPRouteFilterURLRewrite:
