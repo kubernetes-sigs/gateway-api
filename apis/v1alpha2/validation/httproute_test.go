@@ -704,9 +704,9 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name:        "invalid empty type filter",
+			name:        "empty type filter is valid(caught by CRD validation)",
 			routeFilter: gatewayv1a2.HTTPRouteFilter{},
-			errCount:    1,
+			errCount:    0,
 		},
 	}
 	for _, tc := range tests {
