@@ -583,7 +583,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Type:          gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
 			},
-			errCount: 1,
+			errCount: 2,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with empty value field",
@@ -612,7 +612,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Type:                  gatewayv1a2.HTTPRouteFilterRequestMirror,
 				RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
 			},
-			errCount: 1,
+			errCount: 2,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestMirror type filter with empty value field",
@@ -641,7 +641,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Type:          gatewayv1a2.HTTPRouteFilterRequestRedirect,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
 			},
-			errCount: 1,
+			errCount: 2,
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestRedirect type filter with empty value field",
@@ -668,7 +668,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Type:          gatewayv1a2.HTTPRouteFilterExtensionRef,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
 			},
-			errCount: 1,
+			errCount: 2,
 		},
 		{
 			name: "invalid HTTPRouteFilterExtensionRef type filter with empty value field",
@@ -694,7 +694,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Type:          gatewayv1a2.HTTPRouteFilterURLRewrite,
 				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
 			},
-			errCount: 1,
+			errCount: 2,
 		},
 		{
 			name: "invalid HTTPRouteFilterURLRewrite type filter with empty value field",
@@ -704,14 +704,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			errCount: 1,
 		},
 		{
-			name:        "invalid nil type filter",
+			name:        "invalid empty type filter",
 			routeFilter: gatewayv1a2.HTTPRouteFilter{},
 			errCount:    1,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			errs := validateHTTPRouteFilterTypeMatchesValue(tc.routeFilter, field.NewPath(""))
+			errs := validateHTTPRouteFilterTypeMatchesValue(tc.routeFilter, field.NewPath("spec").Child("rules").Index(0).Child("filters").Index(0))
 			if len(errs) != tc.errCount {
 				t.Errorf("got %v errors, want %v errors: %s", len(errs), tc.errCount, errs)
 			}

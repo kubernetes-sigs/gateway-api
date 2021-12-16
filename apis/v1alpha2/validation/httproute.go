@@ -148,30 +148,38 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 //the filter value and that values are not empty.
 func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	switch filter.Type {
-	case gatewayv1a2.HTTPRouteFilterExtensionRef:
-		if filter.ExtensionRef == nil || (gatewayv1a2.LocalObjectReference{}) == *filter.ExtensionRef {
-			errs = append(errs, field.Invalid(path.Child("filters"), path, "extensionRef must be specified for ExtensionRef filter"))
-		}
-	case gatewayv1a2.HTTPRouteFilterRequestHeaderModifier:
-		//Request header modifier contains slice whi
-		if filter.RequestHeaderModifier == nil || filter.RequestHeaderModifier.Add == nil || filter.RequestHeaderModifier.Set == nil || filter.RequestHeaderModifier.Remove == nil {
-			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestHeaderModifier must be specified for RequestHeaderModifier filter"))
-		}
-	case gatewayv1a2.HTTPRouteFilterRequestMirror:
-		if filter.RequestMirror == nil || (gatewayv1a2.HTTPRequestMirrorFilter{}) == *filter.RequestMirror {
-			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestMirror must be specified for RequestMirror filter"))
-		}
-	case gatewayv1a2.HTTPRouteFilterRequestRedirect:
-		if filter.RequestRedirect == nil || (gatewayv1a2.HTTPRequestRedirectFilter{}) == *filter.RequestRedirect {
-			errs = append(errs, field.Invalid(path.Child("filters"), path, "requestRedirect must be specified for RequestRedirect filter"))
-		}
-	case gatewayv1a2.HTTPRouteFilterURLRewrite:
-		if filter.URLRewrite == nil || (gatewayv1a2.HTTPURLRewriteFilter{}) == *filter.URLRewrite {
-			errs = append(errs, field.Invalid(path.Child("filters"), path, "urlRewrite must be specified for URLRewrite filter"))
-		}
-	default:
-		errs = append(errs, field.Invalid(path.Child("filters"), path, "unknown type of filter"))
+	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.HTTPRouteFilterExtensionRef {
+		errs = append(errs, field.Invalid(path, filter.ExtensionRef, "must be nil if the HTTPRouteFilter.Type is not ExtensionRef"))
+	}
+	if filter.ExtensionRef == nil && filter.Type == gatewayv1a2.HTTPRouteFilterExtensionRef {
+		errs = append(errs, field.Required(path, "filter.ExtensionRef must be specified for ExtensionRef HTTPRouteFilter.Type"))
+	}
+	if filter.RequestHeaderModifier != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Invalid(path, filter.RequestHeaderModifier, "must be nil if the HTTPRouteFilter.Type is not RequestHeaderModifier"))
+	}
+	if filter.RequestHeaderModifier == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Required(path, "filter.RequestHeaderModifier must be specified for RequestHeaderModifier HTTPRouteFilter.Type"))
+	}
+	if filter.RequestMirror != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestMirror {
+		errs = append(errs, field.Invalid(path, filter.RequestMirror, "must be nil if the HTTPRouteFilter.Type is not RequestMirror"))
+	}
+	if filter.RequestMirror == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestMirror {
+		errs = append(errs, field.Required(path, "filter.RequestMirror must be specified for RequestMirror HTTPRouteFilter.Type"))
+	}
+	if filter.RequestRedirect != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestRedirect {
+		errs = append(errs, field.Invalid(path, filter.RequestRedirect, "must be nil if the HTTPRouteFilter.Type is not RequestRedirect"))
+	}
+	if filter.RequestRedirect == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestRedirect {
+		errs = append(errs, field.Required(path, "filter.RequestRedirect must be specified for RequestRedirect HTTPRouteFilter.Type"))
+	}
+	if filter.URLRewrite != nil && filter.Type != gatewayv1a2.HTTPRouteFilterURLRewrite {
+		errs = append(errs, field.Invalid(path, filter.URLRewrite, "must be nil if the HTTPRouteFilter.Type is not URLRewrite"))
+	}
+	if filter.URLRewrite == nil && filter.Type == gatewayv1a2.HTTPRouteFilterURLRewrite {
+		errs = append(errs, field.Required(path, "filter.URLRewrite must be specified for URLRewrite HTTPRouteFilter.Type"))
+	}
+	if filter.Type == "" {
+		errs = append(errs, field.Required(path, "filter.Type cannot be empty"))
 	}
 	return errs
 }
