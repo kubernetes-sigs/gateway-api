@@ -144,8 +144,8 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 	return allErrs
 }
 
-// validateHTTPRouteFilterTypeMatchesValue validates that each filter type matches
-//the filter value and that values are not empty.
+// validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are
+//// set for the specified filter type.
 func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.HTTPRouteFilterExtensionRef {
@@ -177,9 +177,6 @@ func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter,
 	}
 	if filter.URLRewrite == nil && filter.Type == gatewayv1a2.HTTPRouteFilterURLRewrite {
 		errs = append(errs, field.Required(path, "filter.URLRewrite must be specified for URLRewrite HTTPRouteFilter.Type"))
-	}
-	if filter.Type == "" {
-		errs = append(errs, field.Required(path, "filter.Type cannot be empty"))
 	}
 	return errs
 }
