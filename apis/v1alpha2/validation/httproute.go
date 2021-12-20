@@ -47,10 +47,13 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 // HTTPRoute specification.
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-
-	errs = append(errs, validateHTTPRouteUniqueFilters(spec.Rules, path.Child("rules"))...)
+	for i, rule := range spec.Rules {
+		errs = append(errs, validateHTTPRouteFilters(rule.Filters, path.Child("rules").Index(i))...)
+		for j, backendRef := range rule.BackendRefs {
+			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
+		}
+	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
-
 	return errs
 }
 
@@ -80,50 +83,24 @@ func validateHTTPRouteBackendServicePorts(rules []gatewayv1a2.HTTPRouteRule, pat
 	return errs
 }
 
-// validateHTTPRouteUniqueFilters validates whether each core and extended filter
-// is used at most once in each rule.
-func validateHTTPRouteUniqueFilters(rules []gatewayv1a2.HTTPRouteRule, path *field.Path) field.ErrorList {
+// validateHTTPRouteFilters validates that a list of core and extended filters
+// is used at most once and that the filter type matches its value
+func validateHTTPRouteFilters(filters []gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
+	counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
 
-	for i, rule := range rules {
-		counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
-		for _, filter := range rule.Filters {
-			counts[filter.Type]++
-		}
-		// custom filters don't have any validation
-		for _, key := range repeatableHTTPRouteFilters {
-			delete(counts, key)
-		}
-
-		for filterType, count := range counts {
-			if count > 1 {
-				errs = append(errs, field.Invalid(path.Index(i).Child("filters"), filterType, "cannot be used multiple times in the same rule"))
-			}
-		}
-
-		errs = append(errs, validateHTTPBackendUniqueFilters(rule.BackendRefs, path, i)...)
+	for i, filter := range filters {
+		counts[filter.Type]++
+		validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))
+	}
+	// custom filters don't have any validation
+	for _, key := range repeatableHTTPRouteFilters {
+		delete(counts, key)
 	}
 
-	return errs
-}
-
-func validateHTTPBackendUniqueFilters(ref []gatewayv1a2.HTTPBackendRef, path *field.Path, i int) field.ErrorList {
-	var errs field.ErrorList
-
-	for _, bkr := range ref {
-		counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
-		for _, filter := range bkr.Filters {
-			counts[filter.Type]++
-		}
-
-		for _, key := range repeatableHTTPRouteFilters {
-			delete(counts, key)
-		}
-
-		for filterType, count := range counts {
-			if count > 1 {
-				errs = append(errs, field.Invalid(path.Index(i).Child("BackendRefs"), filterType, "cannot be used multiple times in the same backend"))
-			}
+	for filterType, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path.Child("filters"), filterType, "cannot be used multiple times in the same rule"))
 		}
 	}
 	return errs
@@ -165,4 +142,41 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 		allErrs = append(allErrs, field.NotSupported(fldPath.Child("pathType"), *path.Type, pathTypes))
 	}
 	return allErrs
+}
+
+// validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are
+//// set for the specified filter type.
+func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.HTTPRouteFilterExtensionRef {
+		errs = append(errs, field.Invalid(path, filter.ExtensionRef, "must be nil if the HTTPRouteFilter.Type is not ExtensionRef"))
+	}
+	if filter.ExtensionRef == nil && filter.Type == gatewayv1a2.HTTPRouteFilterExtensionRef {
+		errs = append(errs, field.Required(path, "filter.ExtensionRef must be specified for ExtensionRef HTTPRouteFilter.Type"))
+	}
+	if filter.RequestHeaderModifier != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Invalid(path, filter.RequestHeaderModifier, "must be nil if the HTTPRouteFilter.Type is not RequestHeaderModifier"))
+	}
+	if filter.RequestHeaderModifier == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Required(path, "filter.RequestHeaderModifier must be specified for RequestHeaderModifier HTTPRouteFilter.Type"))
+	}
+	if filter.RequestMirror != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestMirror {
+		errs = append(errs, field.Invalid(path, filter.RequestMirror, "must be nil if the HTTPRouteFilter.Type is not RequestMirror"))
+	}
+	if filter.RequestMirror == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestMirror {
+		errs = append(errs, field.Required(path, "filter.RequestMirror must be specified for RequestMirror HTTPRouteFilter.Type"))
+	}
+	if filter.RequestRedirect != nil && filter.Type != gatewayv1a2.HTTPRouteFilterRequestRedirect {
+		errs = append(errs, field.Invalid(path, filter.RequestRedirect, "must be nil if the HTTPRouteFilter.Type is not RequestRedirect"))
+	}
+	if filter.RequestRedirect == nil && filter.Type == gatewayv1a2.HTTPRouteFilterRequestRedirect {
+		errs = append(errs, field.Required(path, "filter.RequestRedirect must be specified for RequestRedirect HTTPRouteFilter.Type"))
+	}
+	if filter.URLRewrite != nil && filter.Type != gatewayv1a2.HTTPRouteFilterURLRewrite {
+		errs = append(errs, field.Invalid(path, filter.URLRewrite, "must be nil if the HTTPRouteFilter.Type is not URLRewrite"))
+	}
+	if filter.URLRewrite == nil && filter.Type == gatewayv1a2.HTTPRouteFilterURLRewrite {
+		errs = append(errs, field.Required(path, "filter.URLRewrite must be specified for URLRewrite HTTPRouteFilter.Type"))
+	}
+	return errs
 }
