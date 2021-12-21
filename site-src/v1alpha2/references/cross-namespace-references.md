@@ -7,7 +7,7 @@ in a another namespace, or possibly Secrets may be referred to by Gateways or
 Routes in another namespace.
 
 In the past, we've seen that forwarding traffic across namespace boundaries is a
-desired feature, but a safeguard like ReferencePolicy,
+desired feature, but without a safeguard like ReferencePolicy,
 [vulnerabilities](https://github.com/kubernetes/kubernetes/issues/103675) can emerge.
 
 !!! note
