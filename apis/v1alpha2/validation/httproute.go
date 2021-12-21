@@ -52,6 +52,11 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 		for j, backendRef := range rule.BackendRefs {
 			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
 		}
+		for j, m := range rule.Matches {
+			if m.Path != nil {
+				errs = append(errs, validateHTTPPathMatch(m.Path, path.Child("matches").Index(j).Child("path"))...)
+			}
+		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
 	return errs
@@ -91,7 +96,7 @@ func validateHTTPRouteFilters(filters []gatewayv1a2.HTTPRouteFilter, path *field
 
 	for i, filter := range filters {
 		counts[filter.Type]++
-		validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))
+		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
 	// custom filters don't have any validation
 	for _, key := range repeatableHTTPRouteFilters {
@@ -111,35 +116,35 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 	allErrs := field.ErrorList{}
 
 	if path.Type == nil {
-		return append(allErrs, field.Required(fldPath.Child("pathType"), "pathType must be specified"))
+		return append(allErrs, field.Required(fldPath.Child("type"), "must be specified"))
 	}
 
 	if path.Value == nil {
-		return append(allErrs, field.Required(fldPath.Child("pathValue"), "pathValue must not be nil."))
+		return append(allErrs, field.Required(fldPath.Child("value"), "must be specified"))
 	}
 
 	switch *path.Type {
 	case gatewayv1a2.PathMatchExact, gatewayv1a2.PathMatchPathPrefix:
 		if !strings.HasPrefix(*path.Value, "/") {
-			allErrs = append(allErrs, field.Invalid(fldPath.Child("path"), path, "must be an absolute path"))
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("value"), *path.Value, "must be an absolute path"))
 		}
 		if len(*path.Value) > 0 {
 			for _, invalidSeq := range invalidPathSequences {
 				if strings.Contains(*path.Value, invalidSeq) {
-					allErrs = append(allErrs, field.Invalid(fldPath.Child("path"), path, fmt.Sprintf("must not contain '%s'", invalidSeq)))
+					allErrs = append(allErrs, field.Invalid(fldPath.Child("value"), *path.Value, fmt.Sprintf("must not contain %q", invalidSeq)))
 				}
 			}
 
 			for _, invalidSuff := range invalidPathSuffixes {
 				if strings.HasSuffix(*path.Value, invalidSuff) {
-					allErrs = append(allErrs, field.Invalid(fldPath.Child("path"), path, fmt.Sprintf("cannot end with '%s'", invalidSuff)))
+					allErrs = append(allErrs, field.Invalid(fldPath.Child("value"), *path.Value, fmt.Sprintf("cannot end with '%s'", invalidSuff)))
 				}
 			}
 		}
 	case gatewayv1a2.PathMatchRegularExpression:
 	default:
 		pathTypes := []string{string(gatewayv1a2.PathMatchExact), string(gatewayv1a2.PathMatchPathPrefix), string(gatewayv1a2.PathMatchRegularExpression)}
-		allErrs = append(allErrs, field.NotSupported(fldPath.Child("pathType"), *path.Type, pathTypes))
+		allErrs = append(allErrs, field.NotSupported(fldPath.Child("type"), *path.Type, pathTypes))
 	}
 	return allErrs
 }

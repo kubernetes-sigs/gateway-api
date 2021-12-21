@@ -26,6 +26,7 @@ import (
 
 	"github.com/lithammer/dedent"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	admission "k8s.io/api/admission/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -199,7 +200,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								         "matches": [
    								            {
    								               "path": {
-   								                  "type": "Prefix",
+   								                  "type": "PathPrefix",
    								                  "value": "/bar"
    								               }
    								            }
@@ -263,7 +264,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								         "matches": [
    								            {
    								               "path": {
-   								                  "type": "Prefix",
+   								                  "type": "PathPrefix",
    								                  "value": "/bar"
    								               }
    								            }
@@ -467,7 +468,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				// send request
 				req, err := http.NewRequest("POST", "", bytes.NewBuffer([]byte(tt.reqBody)))
 				req = req.WithContext(context.Background())
-				assert.Nil(err)
+				require.NoError(t, err)
 				handler.ServeHTTP(res, req)
 
 				// check response assertions
@@ -475,7 +476,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				if tt.wantRespCode == http.StatusOK {
 					var review admission.AdmissionReview
 					_, _, err = decoder.Decode(res.Body.Bytes(), nil, &review)
-					assert.Nil(err)
+					require.NoError(t, err)
 					assert.EqualValues(&tt.wantSuccessResponse, review.Response)
 				} else {
 					assert.Equal(res.Body.String(), tt.wantFailureMessage)
