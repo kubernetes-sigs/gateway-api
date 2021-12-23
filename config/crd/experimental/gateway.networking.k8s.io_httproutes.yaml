@@ -144,7 +144,11 @@ spec:
                     namespace:
                       description: "Namespace is the namespace of the referent. When
                         unspecified (or empty string), this refers to the local namespace
-                        of the Route. \n Support: Core"
+                        of the Route. \n Note that when a namespace is specified,
+                        a ReferencePolicy object is required in the referent namespace
+                        to allow that namespace's owner to accept the reference. See
+                        the ReferencePolicy documentation for details. \n Support:
+                        Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1370,7 +1374,11 @@ spec:
                         namespace:
                           description: "Namespace is the namespace of the referent.
                             When unspecified (or empty string), this refers to the
-                            local namespace of the Route. \n Support: Core"
+                            local namespace of the Route. \n Note that when a namespace
+                            is specified, a ReferencePolicy object is required in
+                            the referent namespace to allow that namespace's owner
+                            to accept the reference. See the ReferencePolicy documentation
+                            for details. \n Support: Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$

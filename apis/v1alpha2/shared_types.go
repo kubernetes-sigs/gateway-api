@@ -52,6 +52,11 @@ type ParentRef struct {
 	// Namespace is the namespace of the referent. When unspecified (or empty
 	// string), this refers to the local namespace of the Route.
 	//
+	// Note that when a namespace is specified, a ReferencePolicy object
+	// is required in the referent namespace to allow that namespace's
+	// owner to accept the reference. See the ReferencePolicy documentation
+	// for details.
+	//
 	// Support: Core
 	//
 	// +optional
