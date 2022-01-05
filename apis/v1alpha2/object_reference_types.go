@@ -16,6 +16,22 @@ limitations under the License.
 
 package v1alpha2
 
+import "k8s.io/apimachinery/pkg/runtime/schema"
+
+func makeGroupKind(g *Group, k *Kind) schema.GroupKind {
+	var gk schema.GroupKind
+
+	if g != nil {
+		gk.Group = string(*g)
+	}
+
+	if k != nil {
+		gk.Kind = string(*k)
+	}
+
+	return gk
+}
+
 // LocalObjectReference identifies an API object within the namespace of the
 // referrer.
 // The API object must be valid in the cluster; the Group and Kind must
@@ -34,6 +50,11 @@ type LocalObjectReference struct {
 
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
+}
+
+// HasKind tests whether the reference refers to a resource of the given GroupKind.
+func (l *LocalObjectReference) HasKind(gk schema.GroupKind) bool {
+	return gk == makeGroupKind(&l.Group, &l.Kind)
 }
 
 // SecretObjectReference identifies an API object including its namespace,
@@ -74,6 +95,11 @@ type SecretObjectReference struct {
 	//
 	// +optional
 	Namespace *Namespace `json:"namespace,omitempty"`
+}
+
+// HasKind tests whether the reference refers to a resource of the given GroupKind.
+func (s *SecretObjectReference) HasKind(gk schema.GroupKind) bool {
+	return gk == makeGroupKind(s.Group, s.Kind)
 }
 
 // BackendObjectReference defines how an ObjectReference that is
@@ -128,4 +154,9 @@ type BackendObjectReference struct {
 	//
 	// +optional
 	Port *PortNumber `json:"port,omitempty"`
+}
+
+// HasKind tests whether the reference refers to a resource of the given GroupKind.
+func (r *BackendObjectReference) HasKind(gk schema.GroupKind) bool {
+	return gk == makeGroupKind(r.Group, r.Kind)
 }
