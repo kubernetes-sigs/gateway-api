@@ -222,7 +222,7 @@ ties:
 * The oldest Policy based on creation timestamp. For example, a Policy with a
   creation timestamp of "2021-07-15 01:02:03" is given precedence over a Policy
   with a creation timestamp of "2021-07-15 01:02:04".
-* The Policy appearing first in alphabetical order by "<namespace>/<name>". For
+* The Policy appearing first in alphabetical order by "{namespace}/{name}". For
   example, foo/bar is given precedence over foo/baz.
 
 ### Kubectl Plugin

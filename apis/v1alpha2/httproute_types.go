@@ -152,7 +152,7 @@ type HTTPRouteRule struct {
 	//
 	// * The oldest Route based on creation timestamp.
 	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>".
+	//   "{namespace}/{name}".
 	//
 	// If ties still exist within the Route that has been given precedence,
 	// matching precedence MUST be granted to the first matching rule meeting

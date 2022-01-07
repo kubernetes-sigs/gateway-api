@@ -1054,7 +1054,7 @@ spec:
                         Routes, matching precedence MUST be determined in order of
                         the following criteria, continuing on ties: \n * The oldest
                         Route based on creation timestamp. * The Route appearing first
-                        in alphabetical order by   \"<namespace>/<name>\". \n If ties
+                        in alphabetical order by   \"{namespace}/{name}\". \n If ties
                         still exist within the Route that has been given precedence,
                         matching precedence MUST be granted to the first matching
                         rule meeting the above criteria."
