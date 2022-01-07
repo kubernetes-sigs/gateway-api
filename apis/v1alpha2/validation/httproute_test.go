@@ -605,7 +605,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
 			RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{
 				Scheme:     new(string),
-				Hostname:   new(gatewayv1a2.Hostname),
+				Hostname:   new(gatewayv1a2.PreciseHostname),
 				Path:       &gatewayv1a2.HTTPPathModifier{},
 				Port:       new(gatewayv1a2.PortNumber),
 				StatusCode: new(int),

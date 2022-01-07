@@ -740,7 +740,7 @@ type HTTPRequestRedirectFilter struct {
 	// Support: Core
 	//
 	// +optional
-	Hostname *Hostname `json:"hostname,omitempty"`
+	Hostname *PreciseHostname `json:"hostname,omitempty"`
 
 	// Path defines parameters used to modify the path of the incoming request.
 	// The modified path is then used to construct the `Location` header. When
