@@ -88,7 +88,7 @@ type TLSRouteRule struct {
 	//   a creation timestamp of "2020-09-08 01:02:03" is given precedence over
 	//   a Route with a creation timestamp of "2020-09-08 01:02:04".
 	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>". For example, foo/bar is given precedence over
+	//   "{namespace}/{name}". For example, foo/bar is given precedence over
 	//   foo/baz.
 	//
 	// If ties still exist within the Route that has been given precedence,
