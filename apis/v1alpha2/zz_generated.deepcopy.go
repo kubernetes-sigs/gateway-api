@@ -578,7 +578,7 @@ func (in *HTTPRequestRedirectFilter) DeepCopyInto(out *HTTPRequestRedirectFilter
 	}
 	if in.Hostname != nil {
 		in, out := &in.Hostname, &out.Hostname
-		*out = new(Hostname)
+		*out = new(PreciseHostname)
 		**out = **in
 	}
 	if in.Port != nil {
