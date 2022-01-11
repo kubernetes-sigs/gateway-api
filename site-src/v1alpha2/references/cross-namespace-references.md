@@ -113,6 +113,7 @@ effective safeguards are in place.
 
 ReferencePolicy support is a "CORE" conformance level requirement for
 cross-namespace references that originate from the following objects:
+
 - HTTPRoute
 - TLSRoute
 - TCPRoute
