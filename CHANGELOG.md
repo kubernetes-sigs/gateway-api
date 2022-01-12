@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.4.0-rc2](#v040-rc2)
 - [v0.4.0-rc1](#v040-rc1)
@@ -10,6 +11,21 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.4.1
+
+API version: v1alpha2
+
+This release contains minor bug fixes for v1alpha2.
+
+### Bug Fixes
+
+* ControllerName now prints correctly in kubectl output for GatewayClass
+  [#909](https://github.com/kubernetes-sigs/gateway-api/pull/909)
+* Namespace can no longer be left unspecified in ReferencePolicy
+  [#964](https://github.com/kubernetes-sigs/gateway-api/pull/964)
+* Wildcard characters can no longer be used in redirect Hostname values
+  [#956](https://github.com/kubernetes-sigs/gateway-api/pull/956)
 
 ## v0.4.0
 
