@@ -106,6 +106,14 @@ type HTTPRouteSpec struct {
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
 type HTTPRouteRule struct {
+	// The name assigned to the route for debugging purposes. The
+	// route's name will be concatenated with the match's name and may
+	// be logged in the access logs for requests matching this
+	// route/match depends on the implementor.
+	//
+	// +optional
+	Name *string `json:"name,omitempty"`
+
 	// Matches define conditions used for matching the rule against incoming
 	// HTTP requests. Each match is independent, i.e. this rule will be matched
 	// if **any** one of the matches is satisfied.
@@ -424,6 +432,13 @@ const (
 //     value "v1"
 // ```
 type HTTPRouteMatch struct {
+	// Name specifies the HTTP route match name. The match's name will be
+	// concatenated with the parent route's name and may be logged in
+	// the access logs for requests matching this route depends on the implementor.
+	//
+	// +optional
+	Name *string `json:"name,omitempty"`
+
 	// Path specifies a HTTP request path matcher. If this field is not
 	// specified, a default prefix match on the "/" path is provided.
 	//
