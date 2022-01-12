@@ -20,7 +20,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// ParentRef identifies an API object (usually a Gateway) that can be considered
+// ParentReference identifies an API object (usually a Gateway) that can be considered
 // a parent of this resource (usually a route). The only kind of parent resource
 // with "Core" support is Gateway. This API may be extended in the future to
 // support additional kinds of parent resources, such as HTTPRoute.
@@ -31,7 +31,7 @@ import (
 // References to objects with invalid Group and Kind are not valid, and must
 // be rejected by the implementation, with appropriate Conditions set
 // on the containing object.
-type ParentRef struct {
+type ParentReference struct {
 	// Group is the group of the referent.
 	//
 	// Support: Core
@@ -111,7 +111,7 @@ type CommonRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=32
-	ParentRefs []ParentRef `json:"parentRefs,omitempty"`
+	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
 }
 
 // PortNumber defines a network port.
@@ -170,7 +170,7 @@ const (
 type RouteParentStatus struct {
 	// ParentRef corresponds with a ParentRef in the spec that this
 	// RouteParentStatus struct describes the status of.
-	ParentRef ParentRef `json:"parentRef"`
+	ParentRef ParentReference `json:"parentRef"`
 
 	// ControllerName is a domain/path string that indicates the name of the
 	// controller that wrote this status. This corresponds with the
