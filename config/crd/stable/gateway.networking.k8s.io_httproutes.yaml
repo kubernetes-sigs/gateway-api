@@ -1002,6 +1002,12 @@ spec:
                             - TRACE
                             - PATCH
                             type: string
+                          name:
+                            description: Name specifies the HTTP route match name.
+                              The match's name will be concatenated with the parent
+                              route's name and may be logged in the access logs for
+                              requests matching this route depends on the implementor.
+                            type: string
                           path:
                             default:
                               type: PathPrefix
@@ -1074,6 +1080,12 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    name:
+                      description: The name assigned to the route for debugging purposes.
+                        The route's name will be concatenated with the match's name
+                        and may be logged in the access logs for requests matching
+                        this route/match depends on the implementor.
+                      type: string
                   type: object
                 maxItems: 16
                 type: array
