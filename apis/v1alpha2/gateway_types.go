@@ -381,7 +381,7 @@ type AllowedRoutes struct {
 	// with the application protocol specified in the Listener's Protocol field.
 	// If an implementation does not support or recognize this resource type, it
 	// MUST set the "ResolvedRefs" condition to False for this Listener with the
-	// "InvalidRoutesRef" reason.
+	// "InvalidRouteKinds" reason.
 	//
 	// Support: Core
 	//

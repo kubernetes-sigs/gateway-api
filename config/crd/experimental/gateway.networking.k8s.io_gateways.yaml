@@ -166,7 +166,7 @@ spec:
                             with the application protocol specified in the Listener's
                             Protocol field. If an implementation does not support
                             or recognize this resource type, it MUST set the \"ResolvedRefs\"
-                            condition to False for this Listener with the \"InvalidRoutesRef\"
+                            condition to False for this Listener with the \"InvalidRouteKinds\"
                             reason. \n Support: Core"
                           items:
                             description: RouteGroupKind indicates the group and kind
