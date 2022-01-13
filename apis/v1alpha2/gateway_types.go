@@ -145,7 +145,8 @@ type GatewaySpec struct {
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
 type Listener struct {
-	// Name is the name of the Listener.
+	// Name is the name of the Listener. This name MUST be unique within a
+	// Gateway.
 	//
 	// Support: Core
 	Name SectionName `json:"name"`
