@@ -449,6 +449,7 @@ type GatewayAddress struct {
 	// Type of the address.
 	//
 	// +optional
+	// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 
@@ -461,40 +462,6 @@ type GatewayAddress struct {
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value"`
 }
-
-// AddressType defines how a network address is represented as a text string.
-//
-// If the requested address is unsupported, the controller
-// should raise the "Detached" listener status condition on
-// the Gateway with the "UnsupportedAddress" reason.
-//
-// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
-type AddressType string
-
-const (
-	// A textual representation of a numeric IP address. IPv4
-	// addresses must be in dotted-decimal form. IPv6 addresses
-	// must be in a standard IPv6 text representation
-	// (see [RFC 5952](https://tools.ietf.org/html/rfc5952)).
-	//
-	// Support: Extended
-	IPAddressType AddressType = "IPAddress"
-
-	// A Hostname represents a DNS based ingress point. This is similar to the
-	// corresponding hostname field in Kubernetes load balancer status. For
-	// example, this concept may be used for cloud load balancers where a DNS
-	// name is used to expose a load balancer.
-	//
-	// Support: Extended
-	HostnameAddressType AddressType = "Hostname"
-
-	// A NamedAddress provides a way to reference a specific IP address by name.
-	// For example, this may be a name or other unique identifier that refers
-	// to a resource on a cloud provider such as a static IP.
-	//
-	// Support: Implementation-Specific
-	NamedAddressType AddressType = "NamedAddress"
-)
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {

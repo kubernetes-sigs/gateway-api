@@ -399,3 +399,86 @@ type AnnotationKey string
 // +kubebuilder:validation:MinLength=0
 // +kubebuilder:validation:MaxLength=4096
 type AnnotationValue string
+
+// AddressRouteMatches defines AddressMatch rules for inbound traffic according to
+// source and/or destination address of a packet or connection.
+type AddressRouteMatches struct {
+	// SourceAddresses indicates the originating (source) network
+	// addresses which are valid for routing traffic.
+	//
+	// Support: Extended
+	SourceAddresses []AddressMatch `json:"sourceAddresses"`
+
+	// DestinationAddresses indicates the destination network addresses
+	// which are valid for routing traffic.
+	//
+	// Support: Extended
+	DestinationAddresses []AddressMatch `json:"destinationAddresses"`
+}
+
+// AddressMatch defines matching rules for network addresses by type.
+type AddressMatch struct {
+	// Type of the address, either IPAddress or NamedAddress.
+	//
+	// If NamedAddress is used this is a custom and specific value for each
+	// implementation to handle (and add validation for) according to their
+	// own needs.
+	//
+	// For IPAddress the implementor may expect either IPv4 or IPv6.
+	//
+	// Support: Core (IPAddress)
+	// Support: Custom (NamedAddress)
+	//
+	// +optional
+	// +kubebuilder:validation:Enum=IPAddress;NamedAddress
+	// +kubebuilder:default=IPAddress
+	Type *AddressType `json:"type,omitempty"`
+
+	// Value of the address. The validity of the values will depend
+	// on the type and support by the controller.
+	//
+	// If implementations support proxy-protocol (see:
+	// https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt) they
+	// must respect the connection metadata from proxy-protocol
+	// in the match logic implemented for these address values.
+	//
+	// Examples: `1.2.3.4`, `128::1`, `my-named-address`.
+	//
+	// Support: Core
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Value string `json:"value"`
+}
+
+// AddressType defines how a network address is represented as a text string.
+type AddressType string
+
+const (
+	// A textual representation of a numeric IP address. IPv4
+	// addresses must be in dotted-decimal form. IPv6 addresses
+	// must be in a standard IPv6 text representation
+	// (see [RFC 5952](https://tools.ietf.org/html/rfc5952)).
+	//
+	// This type is intended for specific addresses. Address ranges are not
+	// supported (e.g. you can not use a CIDR range like 127.0.0.0/24 as an
+	// IPAddress).
+	//
+	// Support: Extended
+	IPAddressType AddressType = "IPAddress"
+
+	// A Hostname represents a DNS based ingress point. This is similar to the
+	// corresponding hostname field in Kubernetes load balancer status. For
+	// example, this concept may be used for cloud load balancers where a DNS
+	// name is used to expose a load balancer.
+	//
+	// Support: Extended
+	HostnameAddressType AddressType = "Hostname"
+
+	// A NamedAddress provides a way to reference a specific IP address by name.
+	// For example, this may be a name or other unique identifier that refers
+	// to a resource on a cloud provider such as a static IP.
+	//
+	// Support: Implementation-Specific
+	NamedAddressType AddressType = "NamedAddress"
+)
