@@ -62,6 +62,12 @@ for CHANNEL in experimental stable; do
   # Install all example gateway-api resources.
   kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha2 || res=$?
 
+  # Install all experimental example gateway-api resources when experimental mode is enabled
+  if [[ "${CHANNEL}" == "experimental" ]] ; then
+      echo "Experimental mode enabled: deploying experimental examples"
+      kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/experimental/v1alpha2 || res=$?
+  fi
+
   # Install invalid gateway-api resources.
   # None of these examples should be successfully configured
   # This is very hacky, sorry.
