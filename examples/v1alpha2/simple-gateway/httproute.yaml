@@ -4,7 +4,7 @@ metadata:
   name: foo
 spec:
   parentRefs:
-  - name: prod-web-gw
+  - name: prod-web
   rules:
   - backendRefs:
     - name: foo-svc
