@@ -16,5 +16,6 @@ spec:
     backendRefs:
     - name: bar-svc-canary
       port: 8080
+  - backendRefs:
     - name: bar-svc
       port: 8080
