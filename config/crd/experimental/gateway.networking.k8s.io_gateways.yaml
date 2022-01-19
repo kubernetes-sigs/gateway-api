@@ -286,8 +286,8 @@ spec:
                       pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
                     name:
-                      description: "Name is the name of the Listener. \n Support:
-                        Core"
+                      description: "Name is the name of the Listener. This name MUST
+                        be unique within a Gateway. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
