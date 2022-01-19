@@ -42,7 +42,12 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./...
+	go test -race -cover ./pkg/...
+
+# Run conformance tests against controller implementation
+.PHONY: conformance
+conformance:
+	go test -v ./conformance/...
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

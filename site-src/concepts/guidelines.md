@@ -148,3 +148,33 @@ So for example, in HTTPRoute, `hostnames` uses a plural, but `forwardTo` is sing
 although they are both lists.
 
 [1]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md
+
+### Conformance Tests
+
+Conformance tests are actively being developed to ensure that implementations of
+this API are conformant with the spec. Use `make conformance` to run these tests
+with the Kubernetes cluster you are currently connected to. 
+
+By default, conformance tests will expect a `gateway-conformance` GatewayClass
+to be installed in the cluster and tests will be run against that. A different
+class can be specified with the `--gateway-class` flag along with the
+corresponding test command. For example:
+
+```shell
+go test ./conformance --gateway-class my-class
+```
+
+Most conformance tests rely on a shared set of base manifests defined in
+`conformance/base/manifests.yaml`. These include a set of Namespaces, Services,
+and Deployments that can be used for routing.
+
+Conformance tests are defined with in `conformance/tests`. Each test definition
+includes:
+
+* A unique `shortName`
+* A description
+* A set of manifests to apply before running tests
+* A test function that implements the test
+
+These tests are currently in an alpha state. Please file a GitHub issue or ask
+in Slack if these are not working as expected.
