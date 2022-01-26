@@ -65,7 +65,9 @@ type ParentReference struct {
 	// SectionName is the name of a section within the target resource. In the
 	// following resources, SectionName is interpreted as the following:
 	//
-	// * Gateway: Listener Name
+	// * Gateway: Listener Name. When both Port (experimental) and SectionName
+	// are specified, the name and port of the selected listener must match
+	// both specified values.
 	//
 	// Implementations MAY choose to support attaching Routes to other resources.
 	// If that is the case, they MUST clearly document how SectionName is
@@ -84,6 +86,35 @@ type ParentReference struct {
 	//
 	// +optional
 	SectionName *SectionName `json:"sectionName,omitempty"`
+
+	// Port is the network port this Route targets. It can be interpreted
+	// differently based on the type of parent resource:
+	//
+	// * Gateway: All listeners listening on the specified port that also
+	// support this kind of Route(and select this Route). It's not
+	// recommended to set `Port` unless the networking behaviors specified
+	// in a Route must apply to a specific port as opposed to a listener(s)
+	// whose port(s) may be changed. When both Port and SectionName are
+	// specified, the name and port of the selected listener must match both
+	// specified values.
+	//
+	// Implementations MAY choose to support other parent resources.
+	// Implementations supporting other types of parent resources MUST clearly
+	// document how/if Port is interpreted.
+	//
+	// For the purpose of status, an attachment is considered successful as
+	// long as the parent resource accepts it partially. For example, Gateway
+	// listeners can restrict which Routes can attach to them by Route kind,
+	// namespace, or hostname. If 1 of 2 Gateway listeners accept attachment
+	// from the referencing Route, the Route MUST be considered successfully
+	// attached. If no Gateway listeners accept attachment from this Route,
+	// the Route MUST be considered detached from the Gateway.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Port *PortNumber `json:"port,omitempty"`
 }
 
 // CommonRouteSpec defines the common attributes that all Routes MUST include
