@@ -59,20 +59,20 @@ spec:
   rules:
   - matches:
       method:
-        grpcService: helloworld.Greeter
-        grpcMethod:  SayHello
+        service: helloworld.Greeter
+        method:  SayHello
       headers:
       - type: Exact
         name: magic
         value: foo
 
     filters:
-    - type: GRPCRequestHeaderModifierFilter
+    - type: RequestHeaderModifierFilter
       add:
         - name: my-header
           value: foo
 
-    - type: GRPCRequestMirrorPolicyFilter
+    - type: RequestMirrorPolicyFilter
       destination:
         backendRef:
           name: mirror-svc
