@@ -77,18 +77,172 @@ spec:
         backendRef:
           name: mirror-svc
 
-    - type: GRPCTimeoutPolicyFilter
-      timeout: "30s"
-
-    - type: GRPCRouteRetryPolicyFilter
-      numRetries: 3
-      retryConditions:
-      - "refused-stream"
-      - "cancelled"
-
     backendRefs:
     - name: foo-v1
       weight: 90
     - name: foo-v2
       weight: 10
+```
+
+### Structs
+
+```go
+type GRPCRouteSpec struct {
+	CommonRouteSpec `json:",inline"`
+
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Hostnames []Hostname `json:"hostnames,omitempty"`
+
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:default={{matches: {{method: {type: "RegularExpression", service: ".*", method: ".*"}}}}}
+	Rules []GRPCRouteRule `json:"rules,omitempty"`
+}
+
+type GRPCRouteRule struct {
+	// +optional
+	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:default={{method: {type: "RegularExpression", service: ".*", method: ".*"}}}
+	Matches []GRPCRouteMatch `json:"matches,omitempty"`
+
+	// Support: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Filters []GRPCRouteFilter `json:"filters,omitempty"`
+
+	// Support: Core for Kubernetes Service
+	// Support: Custom for any other resource
+	//
+	// Support for weight: Core
+	//
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	BackendRefs []GRPCBackendRef `json:"backendRefs,omitempty"`
+}
+
+type GRPCRouteMatch struct {
+	// +optional
+	// +kubebuilder:default={type: "RegularExpression", service: ".*", method: ".*"}
+	Method *GRPCMethodMatch `json:"path,omitempty"`
+
+	// +listType=map
+	// +listMapKey=name
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Headers []GRPCHeaderMatch `json:"headers,omitempty"`
+}
+
+type GRPCMethodMatch struct {
+	// Support: Core (Exact)
+	//
+	// Support: Custom (RegularExpression)
+	//
+	// +optional
+	// +kubebuilder:default=Exact
+	Type *GRPCMethodMatchType `json:"type,omitempty"`
+
+	// +optional
+	// +kubebuilder:default=""
+	// +kubebuilder:validation:MaxLength=1024
+	Service *string `json:"value,omitempty"`
+
+	// +optional
+	// +kubebuilder:default=""
+	// +kubebuilder:validation:MaxLength=1024
+	Method *string `json:"value,omitempty"`
+
+	// +optional
+	// +kubebuilder:default=true
+	CaseSensitive *bool `json:"value,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Exact;RegularExpression
+type GRPCMethodMatchType string
+
+type GRPCHeaderMatch struct {
+	// +optional
+	// +kubebuilder:default=Exact
+	Type *HeaderMatchType `json:"type,omitempty"`
+
+	Name GRPCHeaderName `json:"name"`
+
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+
+// +kubebuilder:validation:Enum=Exact;RegularExpression
+type HeaderMatchType string
+
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=256
+// +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
+type GRPCHeaderName string
+
+type GRPCBackendRef struct {
+	// +optional
+	BackendRef `json:",inline"`
+
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Filters []GRPCRouteFilter `json:"filters,omitempty"`
+}
+
+type GRPCRouteFilter struct {
+	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef>
+	Type GRPCRouteFilterType `json:"type"`
+
+	// Support: Core
+	//
+	// +optional
+	RequestHeaderModifier *GRPCRequestHeaderFilter `json:"requestHeaderModifier,omitempty"`
+
+	// Support: Extended
+	//
+	// +optional
+	RequestMirror *GRPCRequestMirrorFilter `json:"requestMirror,omitempty"`
+
+	// Support: Implementation-specific
+	//
+	// +optional
+	ExtensionRef *LocalObjectReference `json:"extensionRef,omitempty"`
+}
+
+type GRPCRequestHeaderFilter struct {
+	// +optional
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MaxItems=16
+	Set []GRPCHeader `json:"set,omitempty"`
+
+	// +optional
+	// +listType=map
+	// +listMapKey=name
+	// +kubebuilder:validation:MaxItems=16
+	Add []GRPCHeader `json:"add,omitempty"`
+
+	// +optional
+	// +kubebuilder:validation:MaxItems=16
+	Remove []string `json:"remove,omitempty"`
+}
+
+type GRPCHeader struct {
+	Name GRPCHeaderName `json:"name"`
+
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=4096
+	Value string `json:"value"`
+}
+
+type GRPCRequestMirrorFilter struct {
+	// Support: Extended for Kubernetes Service
+	// Support: Custom for any other resource
+	BackendRef BackendObjectReference `json:"backendRef"`
+}
 ```
