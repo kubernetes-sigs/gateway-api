@@ -46,12 +46,11 @@ Meeting agendas and notes are maintained in the [meeting notes
 doc][meeting-notes]. Feel free to add topics for discussion at an upcoming
 meeting.
 
-All meetings are recorded and automatically uploaded to the [Kubernetes
-SIG-NETWORK playlist on YouTube][sig-net-yt-playlist].
+All meetings are recorded and automatically uploaded to the [Gateway API meetings Youtube playlist][gateway-api-yt-playlist].
 
 #### Early Meetings
 Some early community meetings were uploaded to a [separate YouTube
-playlist][early-yt-playlist].
+playlist][early-yt-playlist], and then to the [SIG Network Youtube playlist][sig-net-yt-playlist].
 
 #### Initial Design Discussions
 
@@ -59,6 +58,7 @@ playlist][early-yt-playlist].
 * [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync]
 * [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion]
 
+[gateway-api-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP1GgO7k02ipPGZUFpSzGaHH
 [sig-net-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb
 [early-yt-playlist]: https://www.youtube.com/playlist?list=PL7KjrPTDcs4Xe6SZj-51WvBfufKf-la1O
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
