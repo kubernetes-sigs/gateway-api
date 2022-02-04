@@ -43,10 +43,10 @@
 
     * Use implementation-specific annotations. For some kinds of
       configuration, implementations may choose to support custom
-      annotations on Servce API objects. This approach continues
+      annotations on Gateway API objects. This approach continues
       a proud tradition of extending Ingress objects.
 
-    * Use API-defined extension points. Some Service
+    * Use API-defined extension points. Some Gateway
       API objects have explicit [extension points](/concepts/api-overview#extension-points)
       for implementations to use.
 
