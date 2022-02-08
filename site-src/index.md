@@ -93,7 +93,7 @@ leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)
 
-This flexibility allows the API to adapt to different vastly different
+This flexibility allows the API to adapt to vastly different
 organizational models and implementations while remaining a portable and
 standard API.
 
