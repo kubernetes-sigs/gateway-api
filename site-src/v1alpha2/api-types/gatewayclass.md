@@ -79,12 +79,12 @@ kind: GatewayClass
 ...
 status:
   conditions:
-  - type: Admitted
+  - type: Accepted
     status: False
     ...
 ```
 
-A new `GatewayClass` will start with the `Admitted` condition set to
+A new `GatewayClass` will start with the `Accepted` condition set to
 `False`. At this point the controller has not seen the configuration. Once the
 controller has processed the configuration, the condition will be set to
 `True`:
@@ -94,7 +94,7 @@ kind: GatewayClass
 ...
 status:
   conditions:
-  - type: Admitted
+  - type: Accepted
     status: True
     ...
 ```
@@ -107,7 +107,7 @@ kind: GatewayClass
 ...
 status:
   conditions:
-  - type: Admitted
+  - type: Accepted
     status: False
     Reason: BadFooBar
     Message: "foobar" is an FooBar.

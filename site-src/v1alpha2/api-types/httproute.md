@@ -167,7 +167,7 @@ parentRefs, the controller that manages the Gateway should add an entry to this
 list when the controller first sees the route and should update the entry as
 appropriate when the route is modified.
 
-The following example indicates HTTPRoute "http-example" has been admitted by
+The following example indicates HTTPRoute "http-example" has been accepted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1alpha1
@@ -181,7 +181,7 @@ status:
       name: gw-example
       namespace: gw-example-ns
     conditions:
-    - type: Admitted
+    - type: Accepted
       status: "True"
 ```
 
