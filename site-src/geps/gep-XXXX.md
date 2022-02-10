@@ -321,3 +321,15 @@ type GRPCRequestMirrorFilter struct {
 	BackendRef BackendObjectReference `json:"backendRef"`
 }
 ```
+
+## Future Enhancements
+
+Many more ideas have been discussed for the `GRPCRoute` resource, but in the
+interest of keeping this particular proposal tractable, they have been deferred
+for future proposals.
+
+Some of these ideas are:
+- Better UX for enabling reflection support
+- gRPC Web support
+- HTTP/JSON transcoding at the gateway
+- Protobuf payload-based routing
