@@ -12,11 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# We need all the Make variables exported as env vars.
+# Note that the ?= operator works regardless.
+.EXPORT_ALL_VARIABLES:
+
 # Enable Go modules.
-export GO111MODULE=on
+GO111MODULE=on
 
 REGISTRY ?= gcr.io/k8s-staging-gateway-api
-TAG ?= dev
+
+# These are overridden by cloudbuild.yaml when run by Prow.
+GIT_TAG ?= dev
+BASE_REF ?= master
+
 COMMIT=$(shell git rev-parse --short HEAD)
 
 DOCKER ?= docker
@@ -78,16 +86,9 @@ verify:
 docs:
 	hack/make-docs.sh
 
-.PHONY: build
-build:
-	docker build --build-arg COMMIT=$(COMMIT) --build-arg TAG=$(TAG) \
-			-t $(REGISTRY)/admission-server:$(TAG) .
-
 .PHONY: release-staging
-release-staging: build
-	docker push $(REGISTRY)/admission-server:$(TAG)
-	docker tag $(REGISTRY)/admission-server:$(TAG) $(REGISTRY)/admission-server:latest
-	docker push $(REGISTRY)/admission-server:latest
+release-staging: 
+	hack/build-and-push.sh
 
 # Generate a virtualenv install, which is useful for hacking on the
 # docs since it installs mkdocs and all the right dependencies.
