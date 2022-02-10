@@ -38,6 +38,81 @@ Given gRPC's importance in the application-layer networking space and to
 the Kubernetes project in particular, we must ensure that the gRPC control plane
 configuration landscape does not Balkanize.
 
+### Encapsulated Network Protocols
+
+At the time of writing, the only kind of route officially defined by the Gateway
+APIs is `HttpRoute`. This GEP is novel not only in that it introduces a second
+protocol to route, but also in that it introduces the first protocol
+encapsulated in a protocol already supported by the API.
+
+That is, it _is_ theoretically possible to route gRPC traffic using only `HTTPRoute`
+resources, but there are several serious problems with forcing gRPC users to route traffic at
+the level of HTTP. This is why we propose a new resource.
+
+In setting this precendent, we must also introduce a coherent policy for _when_
+to introduce a custom `Route` resource for an encapsulated protocol for which a
+lower layer protocol already exists. We propose the following criteria for such
+an addition.
+
+- Users of the encapsulated protocol would miss out on significant conventional features from their ecosystem if forced to route at a lower layer.
+- Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
+- The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
+
+gRPC meets _all_ of these criteria and is therefore, we contend, a strong
+candidate for inclusion in the Gateway APIs.
+
+#### HTTP/2 Cleartext
+
+gRPC allows HTTP/2 cleartext communication (H2C). This is conventionally deployed for
+testing. Many control plane implementations do not support this by default and
+would require special configuration to work properly.
+
+#### Content-Based Routing
+
+While not included in the scope of this initial GEP, a common use case cited for
+routing gRPC is payload-aware routing. That is, routing rules which determine a
+backend based on the contents of the protocol buffer payload.
+
+#### User Experience
+
+The user experience would also degrade significantly if forced to route at the level of HTTP.
+
+- Encoding services and methods as URIs (an implementation detail of gRPC)
+- The [Transfer Encoding header](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Transfer-Encoding) for trailers
+- Many features supported by HTTP/2 but not by gRPC, such as
+  - Query parameters
+  - Methods besides `POST`
+  - CORS
+
+### Cross Serving
+
+A new route type (and especially one encapsulated in an already supported
+protocol) raises questions about precedence of routing rules. Today, there is
+already a complicated algorithm dictating which routing rule to apply to a
+particular HTTP request when two `HTTPRoutes` both apply to the request's
+hostname. What semantics should apply when a `GRPCRoute` and an `HTTPRoute` both apply to
+a request?
+
+We propose that, in this case, all rules defined in the `HTTPRoute` should be
+applied. Only then will the `GRPCRoute` rules be evaluated. This supports the
+common use case of routing gRPC traffic at a particular URI prefix to gRPC
+backends while routing all other HTTP traffic to a default HTTP backend.
+
+More generally, we propose that when a new protocol encapsulated in an already
+supported one is added, if traffic applies to both a Route resource of the lower
+layer and a Route resource of the higher layer, the rules of the lower layer
+will be applied before the rules of the higher layer.
+
+#### Proxyless Service Mesh
+
+The gRPC library supports proxyless service mesh, a system by which routing
+configuration is received not by an in-line proxy or sidecar proxy but by the client
+itself. Eventually, `GRPCRoute` in the Gateway APIs should support this feature.
+However, to date, there are no HTTP client libraries capable of participating
+in a proxyless service mesh.
+
+---
+
 ## API
 
 The API deviates from `HTTPRoute` where it results in a better UX for gRPC
