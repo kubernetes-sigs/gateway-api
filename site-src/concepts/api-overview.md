@@ -179,9 +179,8 @@ following mechanisms:
     * `All` will allow Routes from all Namespaces to be attached.
     * `Selector` means that Routes from a subset of Namespaces selected by a
       Namespace label selector may be attached to this Gateway. When `Selector`
-      is used, the `listeners.routes.namespaces.selector` field must be used to
-      specify label selectors. This field is not supported with `All` or
-      `SameNamespace`.
+      is used, the `namespaces.selector` field must be used to specify label
+      selectors. This field is not supported with `All` or `SameNamespace`.
 3. **Kinds:** The `kinds` field on a listener can be used to restrict the kinds
    of Routes that may be attached.
 
