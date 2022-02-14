@@ -190,9 +190,9 @@ attached from the same namespace that support the listener protocol.
 #### Further Gateway - Route attachment examples
 
 The following `my-route` Route wants to attach to the `foo-gateway` in the
-`foo-namespace` and will not attach to any other Gateways. Note that
+`gateway-api-example-ns1` and will not attach to any other Gateways. Note that
 `foo-gateway` is in a different Namespace. The `foo-gateway` must allow
-attachment from HTTPRoutes in the namespace `bar-namespace`.
+attachment from HTTPRoutes in the namespace `gateway-api-example-ns2`.
 
 ```yaml
 {% include 'v1alpha2/http-route-attachment/httproute.yaml' %}
