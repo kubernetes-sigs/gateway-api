@@ -171,19 +171,18 @@ following mechanisms:
 
 1. **Hostname:** When the `hostname` field on a listener is set, attached Routes
    that specify a `hostnames` field must have at least one overlapping value.
-2. **Namespaces:** The `namespaces` field on a listener can be used to restrict
-   where Routes may be attached from. The `namespaces.from` field supports the
-   following values:
+2. **Namespaces:** The `allowedRoutes.namespaces` field on a listener can be
+   used to restrict where Routes may be attached from. The `namespaces.from`
+   field supports the following values:
     * `SameNamespace` is the default option. Only Routes in the same namespace
       as this Gateway may be attached.
     * `All` will allow Routes from all Namespaces to be attached.
     * `Selector` means that Routes from a subset of Namespaces selected by a
       Namespace label selector may be attached to this Gateway. When `Selector`
-      is used, the `listeners.routes.namespaces.selector` field must be used to
-      specify label selectors. This field is not supported with `All` or
-      `SameNamespace`.
-3. **Kinds:** The `kinds` field on a listener can be used to restrict the kinds
-   of Routes that may be attached.
+      is used, the `namespaces.selector` field must be used to specify label
+      selectors. This field is not supported with `All` or `SameNamespace`.
+3. **Kinds:** The `allowedRoutes.kinds` field on a listener can be used to
+   restrict the kinds of Routes that may be attached.
 
 If none of the above are specified, a Gateway listener will trust Routes
 attached from the same namespace that support the listener protocol.
@@ -191,9 +190,9 @@ attached from the same namespace that support the listener protocol.
 #### Further Gateway - Route attachment examples
 
 The following `my-route` Route wants to attach to the `foo-gateway` in the
-`foo-namespace` and will not attach to any other Gateways. Note that
+`gateway-api-example-ns1` and will not attach to any other Gateways. Note that
 `foo-gateway` is in a different Namespace. The `foo-gateway` must allow
-attachment from HTTPRoutes in the namespace `bar-namespace`.
+attachment from HTTPRoutes in the namespace `gateway-api-example-ns2`.
 
 ```yaml
 {% include 'v1alpha2/http-route-attachment/httproute.yaml' %}
