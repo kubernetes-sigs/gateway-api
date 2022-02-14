@@ -171,9 +171,9 @@ following mechanisms:
 
 1. **Hostname:** When the `hostname` field on a listener is set, attached Routes
    that specify a `hostnames` field must have at least one overlapping value.
-2. **Namespaces:** The `namespaces` field on a listener can be used to restrict
-   where Routes may be attached from. The `namespaces.from` field supports the
-   following values:
+2. **Namespaces:** The `allowedRoutes.namespaces` field on a listener can be
+   used to restrict where Routes may be attached from. The `namespaces.from`
+   field supports the following values:
     * `SameNamespace` is the default option. Only Routes in the same namespace
       as this Gateway may be attached.
     * `All` will allow Routes from all Namespaces to be attached.
@@ -181,8 +181,8 @@ following mechanisms:
       Namespace label selector may be attached to this Gateway. When `Selector`
       is used, the `namespaces.selector` field must be used to specify label
       selectors. This field is not supported with `All` or `SameNamespace`.
-3. **Kinds:** The `kinds` field on a listener can be used to restrict the kinds
-   of Routes that may be attached.
+3. **Kinds:** The `allowedRoutes.kinds` field on a listener can be used to
+   restrict the kinds of Routes that may be attached.
 
 If none of the above are specified, a Gateway listener will trust Routes
 attached from the same namespace that support the listener protocol.
