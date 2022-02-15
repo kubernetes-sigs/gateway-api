@@ -71,20 +71,20 @@ fi
 
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
-echo docker build --build-arg COMMIT=${BINARY_VERSION} --build-arg TAG=${VERSION_TAG} \
+docker build --build-arg COMMIT=${BINARY_VERSION} --build-arg TAG=${VERSION_TAG} \
   			-t ${REGISTRY}/admission-server:${GIT_TAG} .
 
-echo docker push ${REGISTRY}/admission-server:${GIT_TAG}
+docker push ${REGISTRY}/admission-server:${GIT_TAG}
 
 # Then, we add extra tags if required.
 if [[ $VERSION_TAG != $GIT_TAG ]]
 then
-	echo docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
-	echo docker push ${REGISTRY}/admission-server:${VERSION_TAG}
+    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
+    docker push ${REGISTRY}/admission-server:${VERSION_TAG}
 fi
 
 if [[ $LATEST == true ]]
 then
-	echo docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:latest
-	echo docker push ${REGISTRY}/admission-server:latest
+    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:latest
+    docker push ${REGISTRY}/admission-server:latest
 fi

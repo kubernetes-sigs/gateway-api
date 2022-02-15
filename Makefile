@@ -14,18 +14,31 @@
 
 # We need all the Make variables exported as env vars.
 # Note that the ?= operator works regardless.
-.EXPORT_ALL_VARIABLES:
 
 # Enable Go modules.
 GO111MODULE=on
 
-REGISTRY ?= gcr.io/k8s-staging-gateway-api
+# The registry to push container images to.
+export REGISTRY ?= gcr.io/k8s-staging-gateway-api
 
 # These are overridden by cloudbuild.yaml when run by Prow.
-GIT_TAG ?= dev
-BASE_REF ?= master
 
-COMMIT=$(shell git rev-parse --short HEAD)
+# Prow gives this a value of the form vYYYYMMDD-hash.
+# (It's similar to `git describe` output, and for non-tag
+# builds will give vYYYYMMDD-COMMITS-HASH where COMMITS is the
+# number of commits since the last tag.)
+export GIT_TAG ?= dev
+
+# Prow gives this the reference it's called on.
+# The test-infra config job only allows our cloudbuild to
+# be called on `master` and semver tags, so this will be
+# set to one of those things.
+export BASE_REF ?= master
+
+# The commit hash of the current checkout
+# Used to pass a binary version for master,
+# overridden to semver for tagged versions.
+export COMMIT=$(shell git rev-parse --short HEAD)
 
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
