@@ -14,7 +14,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Google Kubernetes Engine][6] (public preview)
 - [HAProxy Ingress][7] (alpha)
 - [Istio][8] (alpha)
-- [Kong][9] (work in progress)
+- [Kong][9] (alpha)
 - [Traefik][10] (alpha)
 
 [1]:#apisix
@@ -123,14 +123,11 @@ Istio is actively working towards an implementation of the Gateway API and you c
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
-Kong is actively working towards an implementation of the Gateway API `v0.2.x` specification for it's [Kubernetes Ingress Controller][kic] and status updates and documentation will be provided here as the work progresses.
-
-You can subscribe to [kong/kubernetes-ingress-controller/issues/692][kong-1] to track the implementation progress and [contribute][kong-2]!
+Kong is actively working on an implementation of the Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic] and you can use the [Gateway API Guide][kong-gw-guide] to try it in its current state.
 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
-[kong-1]:https://github.com/kong/kubernetes-ingress-controller/issues/692
-[kong-2]:https://github.com/Kong/kubernetes-ingress-controller/blob/main/CONTRIBUTING.md
+[kong-gw-guide]:https://github.com/Kong/kubernetes-ingress-controller/blob/main/FEATURE_PREVIEW_DOCUMENTATION.md#feature-preview-gateway-apis
 
 ### Traefik
 
