@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: destination-port-matching-example
+spec:
+  parentRefs:
+  - name: my-mesh
+    group: example.io
+    kind: Mesh
+    port: 8000
+  rules:
+  - backendRefs:
+    - name: my-service
+      port: 8080
