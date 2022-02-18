@@ -20,8 +20,11 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -36,18 +39,18 @@ import (
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
 // provided YAML file and registers a cleanup function for resources it created.
 // Note that this does not remove resources that already existed in the cluster.
-func MustApplyWithCleanup(t *testing.T, c client.Client, path string, gcName string, cleanup bool) {
-	b, err := ioutil.ReadFile(path)
-	require.NoErrorf(t, err, "error reading %s file", path)
+func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName string, cleanup bool) {
+	data, err := getContentsFromPathOrURL(location)
+	require.NoError(t, err)
 
-	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(b), 4096)
+	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
 	for {
 		uObj := unstructured.Unstructured{}
 		if decodeErr := decoder.Decode(&uObj); decodeErr != nil {
 			if errors.Is(decodeErr, io.EOF) {
 				break
 			}
-			t.Logf("manifest: %s", string(b))
+			t.Logf("manifest: %s", data.String())
 			require.NoErrorf(t, decodeErr, "error parsing manifest")
 		}
 		if len(uObj.Object) == 0 {
@@ -94,4 +97,52 @@ func MustApplyWithCleanup(t *testing.T, c client.Client, path string, gcName str
 		}
 		require.NoErrorf(t, err, "error updating resource")
 	}
+}
+
+// getContentsFromPathOrURL takes a string that can either be a local file
+// path or an https:// URL to YAML manifests and provides the contents.
+func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
+	manifests := new(bytes.Buffer)
+	if strings.HasPrefix(location, "http://") {
+		return nil, fmt.Errorf("data can't be retrieved from %s: http is not supported, use https", location)
+	} else if strings.HasPrefix(location, "https://") {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		defer cancel()
+
+		req, err := http.NewRequestWithContext(ctx, http.MethodGet, location, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+
+		count, err := manifests.ReadFrom(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+
+		if resp.ContentLength != -1 && count != resp.ContentLength {
+			return nil, fmt.Errorf("received %d bytes from %s, expected %d", count, location, resp.ContentLength)
+		}
+	} else {
+		b, err := ioutil.ReadFile(location)
+		if err != nil {
+			return nil, err
+		}
+
+		count, err := manifests.Read(b)
+		if err != nil {
+			return nil, err
+		}
+
+		if count != len(b) {
+			return nil, fmt.Errorf("expected to write %d bytes to memory, only wrote %d", len(b), count)
+		}
+	}
+
+	return manifests, nil
 }

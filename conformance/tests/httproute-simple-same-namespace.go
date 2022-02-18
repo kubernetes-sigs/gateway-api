@@ -37,7 +37,7 @@ func init() {
 var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 	ShortName:   "HTTPRouteSimpleSameNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
-	Manifests:   []string{"httproute-simple-same-namespace.yaml"},
+	Manifests:   []string{"tests/httproute-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := v1alpha2.Namespace("gateway-conformance-infra")
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: string(ns)}

@@ -34,6 +34,7 @@ type ConformanceTestSuite struct {
 	ControllerName   string
 	Debug            bool
 	Cleanup          bool
+	BaseManifests    string
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -43,6 +44,7 @@ type Options struct {
 	Debug            bool
 	Cleanup          bool
 	RoundTripper     roundtripper.RoundTripper
+	BaseManifests    string
 }
 
 // New returns a new ConformanceTestSuite.
@@ -51,13 +53,22 @@ func New(s Options) *ConformanceTestSuite {
 	if roundTripper == nil {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug}
 	}
-	return &ConformanceTestSuite{
+
+	suite := &ConformanceTestSuite{
 		Client:           s.Client,
 		RoundTripper:     roundTripper,
 		GatewayClassName: s.GatewayClassName,
 		Debug:            s.Debug,
 		Cleanup:          s.Cleanup,
+		BaseManifests:    s.BaseManifests,
 	}
+
+	// apply defaults
+	if suite.BaseManifests == "" {
+		suite.BaseManifests = "base/manifests.yaml"
+	}
+
+	return suite
 }
 
 // Setup ensures the base resources required for conformance tests are installed
@@ -67,7 +78,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.GatewayClassName, 180)
 
 	t.Logf("Test Setup: Applying base manifests")
-	kubernetes.MustApplyWithCleanup(t, suite.Client, "base/manifests.yaml", suite.GatewayClassName, suite.Cleanup)
+	kubernetes.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
 
 	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 	namespaces := []string{
@@ -103,9 +114,9 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	if test.Parallel {
 		t.Parallel()
 	}
-	for _, path := range test.Manifests {
-		t.Logf("Applying tests/%s", path)
-		kubernetes.MustApplyWithCleanup(t, suite.Client, "tests/"+path, suite.GatewayClassName, true)
+	for _, manifestLocation := range test.Manifests {
+		t.Logf("Applying %s", manifestLocation)
+		kubernetes.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
 	}
 
 	test.Test(t, suite)
