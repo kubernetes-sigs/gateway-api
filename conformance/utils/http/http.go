@@ -17,10 +17,12 @@ limitations under the License.
 package http
 
 import (
+	"net/url"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -40,6 +42,40 @@ type ExpectedRequest struct {
 	Method  string
 	Path    string
 	Headers map[string]string
+}
+
+// MakeRequestAndExpectResponse makes a request with the given parameters and
+// verifies the response matches the provided ExpectedResponse.
+func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
+	t.Helper()
+
+	if expected.Request.Method == "" {
+		expected.Request.Method = "GET"
+	}
+
+	if expected.StatusCode == 0 {
+		expected.StatusCode = 200
+	}
+
+	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
+
+	req := roundtripper.Request{
+		Method:   expected.Request.Method,
+		Host:     expected.Request.Host,
+		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: expected.Request.Path},
+		Protocol: "HTTP",
+	}
+
+	if expected.Request.Headers != nil {
+		req.Headers = map[string][]string{}
+		for name, value := range expected.Request.Headers {
+			req.Headers[name] = []string{value}
+		}
+	}
+	cReq, cRes, err := r.CaptureRoundTrip(req)
+	require.NoErrorf(t, err, "error making request")
+
+	ExpectResponse(t, cReq, cRes, expected)
 }
 
 // ExpectResponse verifies that a captured request and response match the
