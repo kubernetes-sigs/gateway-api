@@ -127,7 +127,7 @@ Kong is actively working on an implementation of the Gateway API in the [Kong Ku
 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
-[kong-gw-guide]:https://github.com/Kong/kubernetes-ingress-controller/blob/main/FEATURE_PREVIEW_DOCUMENTATION.md#feature-preview-gateway-apis
+[kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
 
 ### Traefik
 
