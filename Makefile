@@ -12,12 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# We need all the Make variables exported as env vars.
+# Note that the ?= operator works regardless.
+
 # Enable Go modules.
 export GO111MODULE=on
 
-REGISTRY ?= gcr.io/k8s-staging-gateway-api
-TAG ?= dev
-COMMIT=$(shell git rev-parse --short HEAD)
+# The registry to push container images to.
+export REGISTRY ?= gcr.io/k8s-staging-gateway-api
+
+# These are overridden by cloudbuild.yaml when run by Prow.
+
+# Prow gives this a value of the form vYYYYMMDD-hash.
+# (It's similar to `git describe` output, and for non-tag
+# builds will give vYYYYMMDD-COMMITS-HASH where COMMITS is the
+# number of commits since the last tag.)
+export GIT_TAG ?= dev
+
+# Prow gives this the reference it's called on.
+# The test-infra config job only allows our cloudbuild to
+# be called on `master` and semver tags, so this will be
+# set to one of those things.
+export BASE_REF ?= master
+
+# The commit hash of the current checkout
+# Used to pass a binary version for master,
+# overridden to semver for tagged versions.
+export COMMIT=$(shell git rev-parse --short HEAD)
 
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
@@ -78,16 +99,9 @@ verify:
 docs:
 	hack/make-docs.sh
 
-.PHONY: build
-build:
-	docker build --build-arg COMMIT=$(COMMIT) --build-arg TAG=$(TAG) \
-			-t $(REGISTRY)/admission-server:$(TAG) .
-
 .PHONY: release-staging
-release-staging: build
-	docker push $(REGISTRY)/admission-server:$(TAG)
-	docker tag $(REGISTRY)/admission-server:$(TAG) $(REGISTRY)/admission-server:latest
-	docker push $(REGISTRY)/admission-server:latest
+release-staging: 
+	hack/build-and-push.sh
 
 # Generate a virtualenv install, which is useful for hacking on the
 # docs since it installs mkdocs and all the right dependencies.

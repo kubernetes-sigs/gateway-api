@@ -11,7 +11,8 @@ steps:
     entrypoint: make
     env:
     - DOCKER_CLI_EXPERIMENTAL=enabled
-    - TAG=$_GIT_TAG
+    - GIT_TAG=$_GIT_TAG
+    - BASE_REF=$_PULL_BASE_REF
     args:
     - release-staging
 substitutions:
