@@ -33,7 +33,7 @@ func init() {
 var HTTPRouteMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteMatching",
 	Description: "A single HTTPRoute with path and header matching for different backends",
-	Manifests:   []string{"matching.yaml"},
+	Manifests:   []string{"tests/httproute-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "matching", Namespace: ns}
