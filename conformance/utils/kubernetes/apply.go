@@ -134,7 +134,7 @@ func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
 			return nil, err
 		}
 
-		count, err := manifests.Read(b)
+		count, err := manifests.Write(b)
 		if err != nil {
 			return nil, err
 		}
