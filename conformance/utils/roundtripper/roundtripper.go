@@ -43,7 +43,7 @@ type Request struct {
 	Headers  map[string][]string
 }
 
-// CapturedResponse contains request metadata captured from an echoserver
+// CapturedRequest contains request metadata captured from an echoserver
 // response.
 type CapturedRequest struct {
 	Path     string              `json:"path"`
@@ -100,24 +100,26 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	}
 
 	if d.Debug {
-		dump, dumpErr := httputil.DumpRequestOut(req, true)
-		if dumpErr != nil {
-			return nil, nil, dumpErr
+		var dump []byte
+		dump, err = httputil.DumpRequestOut(req, true)
+		if err != nil {
+			return nil, nil, err
 		}
 
 		fmt.Printf("Sending Request:\n%s\n\n", formatDump(dump, "< "))
 	}
 
-	resp, reqErr := client.Do(req)
-	if reqErr != nil {
-		return nil, nil, reqErr
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, nil, err
 	}
 	defer resp.Body.Close()
 
 	if d.Debug {
-		dump, dumpErr := httputil.DumpResponse(resp, true)
+		var dump []byte
+		dump, err = httputil.DumpResponse(resp, true)
 		if err != nil {
-			return nil, nil, dumpErr
+			return nil, nil, err
 		}
 
 		fmt.Printf("Received Response:\n%s\n\n", formatDump(dump, "< "))
