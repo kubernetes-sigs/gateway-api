@@ -28,7 +28,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   hostnames:
-  - "*.com"
+  - example.com
   parentRefs:
   - name: same-namespace
   rules:

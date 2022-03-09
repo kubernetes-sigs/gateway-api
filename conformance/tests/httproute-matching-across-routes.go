@@ -80,7 +80,7 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			Namespace: ns,
 		}, {
 			Request: http.ExpectedRequest{
-				// v2 matches are limited to *.com
+				// v2 matches are limited to example.com
 				Host: "example.net",
 				Path: "/v2",
 			},
@@ -103,7 +103,10 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			Namespace: ns,
 		}}
 
-		for i, tc := range testCases {
+		for i := range testCases {
+			// Declare tc here to avoid loop variable
+			// reuse issues across parallel tests.
+			tc := testCases[i]
 			t.Run(testName(tc, i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectResponse(t, suite.RoundTripper, gwAddr, tc)
