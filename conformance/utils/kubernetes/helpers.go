@@ -91,7 +91,8 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, namespaces []string, s
 				t.Errorf("Error listing Pods: %v", err)
 			}
 			for _, pod := range podList.Items {
-				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") {
+				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
+					pod.Status.Phase != v1.PodSucceeded {
 					t.Logf("%s/%s Pod not ready yet", ns, pod.Name)
 					return false, nil
 				}
