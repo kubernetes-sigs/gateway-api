@@ -80,7 +80,7 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			Namespace: ns,
 		}, {
 			Request: http.ExpectedRequest{
-				// v2 matches are limited to *.com
+				// v2 matches are limited to example.com
 				Host: "example.net",
 				Path: "/v2",
 			},
