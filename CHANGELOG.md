@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.4.2](#v042)
 - [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.4.0-rc2](#v040-rc2)
@@ -11,6 +12,17 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.4.2
+
+API version: v1alpha2
+
+This release is intended to verify our webhook image tagging process.
+
+### Bug Fixes
+
+* Update image generation process with more consistent naming
+  [#1034](https://github.com/kubernetes-sigs/gateway-api/pull/1034)
 
 ## v0.4.1
 
