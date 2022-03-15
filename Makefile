@@ -38,7 +38,10 @@ export BASE_REF ?= master
 # The commit hash of the current checkout
 # Used to pass a binary version for master,
 # overridden to semver for tagged versions.
-export COMMIT=$(shell git rev-parse --short HEAD)
+# Cloudbuild will set this in the environment to the
+# commit SHA, since the Prow does not seem to check out
+# a git repo.
+export COMMIT ?= $(shell git rev-parse --short HEAD)
 
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
