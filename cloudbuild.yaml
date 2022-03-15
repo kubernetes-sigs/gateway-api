@@ -13,6 +13,7 @@ steps:
     - DOCKER_CLI_EXPERIMENTAL=enabled
     - GIT_TAG=$_GIT_TAG
     - BASE_REF=$_PULL_BASE_REF
+    - COMMIT=$_PULL_BASE_SHA
     args:
     - release-staging
 substitutions:
@@ -22,3 +23,5 @@ substitutions:
   # _PULL_BASE_REF will contain the ref that was pushed to to trigger this build -
   # a branch like 'master' or 'release-0.2', or a tag like 'v0.2'.
   _PULL_BASE_REF: 'master'
+  # _PULL_BASE_SHA will contain the Git SHA of the commit that was pushed to trigger this build.
+  _PULL_BASE_SHA: 'abcdef'
