@@ -572,8 +572,8 @@ spec:
                                   type: string
                                 urlRewrite:
                                   description: "URLRewrite defines a schema for a
-                                    filter that responds to the request with an HTTP
-                                    redirection. \n Support: Extended \n <gateway:experimental>"
+                                    filter that modifies a request during forwarding.
+                                    Support: Extended \n <gateway:experimental>"
                                   properties:
                                     hostname:
                                       description: "Hostname is the value to be used
@@ -1012,8 +1012,8 @@ spec:
                             type: string
                           urlRewrite:
                             description: "URLRewrite defines a schema for a filter
-                              that responds to the request with an HTTP redirection.
-                              \n Support: Extended \n <gateway:experimental>"
+                              that modifies a request during forwarding. Support:
+                              Extended \n <gateway:experimental>"
                             properties:
                               hostname:
                                 description: "Hostname is the value to be used to

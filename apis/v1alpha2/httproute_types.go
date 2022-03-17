@@ -523,9 +523,7 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestRedirect *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
 
-	// URLRewrite defines a schema for a filter that responds to the
-	// request with an HTTP redirection.
-	//
+	// URLRewrite defines a schema for a filter that modifies a request during forwarding.
 	// Support: Extended
 	//
 	// <gateway:experimental>
