@@ -22,8 +22,8 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly CLUSTER_NAME="verify-gateway-api"
-readonly KUBECONFIG="${GOPATH}/.kubeconfig"
 
+export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
 export PATH="${PATH}:${GOPATH}/bin"
 
@@ -34,7 +34,7 @@ cleanup() {
     return
   fi
   if [ "${KIND_CREATE_ATTEMPTED:-}" = true ]; then
-    kind delete cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || true
+    kind delete cluster --name "${CLUSTER_NAME}" || true
   fi
   CLEANED_UP=true
 }
@@ -49,34 +49,53 @@ res=0
 
 # Create cluster
 KIND_CREATE_ATTEMPTED=true
-kind create cluster --name "${CLUSTER_NAME}" --kubeconfig "${KUBECONFIG}" || res=$?
+kind create cluster --name "${CLUSTER_NAME}" || res=$?
+
+# Install webhook
+docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
+kubectl apply -f deploy/
+
+# Wait for webhook to be ready
+for check in {1..10}; do 
+  sleep 5
+  NUM_COMPLETED=$(kubectl get po -n gateway-system | grep Completed | wc -l || echo Failed to get completed Pods)
+  if [ "${NUM_COMPLETED}" = "2" ]; then
+    echo "Webhook successfully configured"
+    break
+  elif [ "${check}" = "10" ]; then
+    echo "Timed out waiting for webhook setup to complete"
+    exit 1
+  fi
+  echo "Webhook not ready yet, will check again in 5 seconds"
+done
 
 for CHANNEL in experimental stable; do
   ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
   # Install CRDs
-  kubectl apply --kubeconfig "${KUBECONFIG}" -f "config/crd/${CHANNEL}" || res=$?
+  kubectl apply -f "config/crd/${CHANNEL}" || res=$?
 
   # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
   sleep 8
 
   # Install all example gateway-api resources.
-  kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/v1alpha2 || res=$?
+  kubectl apply --recursive -f examples/v1alpha2 || res=$?
 
   # Install all experimental example gateway-api resources when experimental mode is enabled
   if [[ "${CHANNEL}" == "experimental" ]] ; then
       echo "Experimental mode enabled: deploying experimental examples"
-      kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f examples/experimental/v1alpha2 || res=$?
+      kubectl apply --recursive -f examples/experimental/v1alpha2 || res=$?
   fi
 
   # Install invalid gateway-api resources.
   # None of these examples should be successfully configured
   # This is very hacky, sorry.
   # Firstly, apply the examples, remembering that errors are on stdout
-  kubectl apply --kubeconfig "${KUBECONFIG}" --recursive -f hack/invalid-examples 2>&1 | \
+  kubectl apply --recursive -f hack/invalid-examples 2>&1 | \
         # First, we grep out the expected responses.
         # After this, if everything is as expected, the output should be empty.
         grep -v 'is invalid' | \
         grep -v 'missing required field' | \
+        grep -v 'denied the request' | \
         # Then, we grep for anything else.
         # If anything else is found, this will return 0
         # which is *not* what we want.
