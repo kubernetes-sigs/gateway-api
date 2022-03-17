@@ -66,8 +66,8 @@ nav:
           GatewayClass: v1alpha2/api-types/gatewayclass.md
           Gateway: v1alpha2/api-types/gateway.md
           HTTPRoute: v1alpha2/api-types/httproute.md
+          ReferencePolicy: v1alpha2/api-types/referencepolicy.md
       - API specification: v1alpha2/references/spec.md
-      - Cross Namespace References: v1alpha2/references/cross-namespace-references.md
       - Policy Attachment: v1alpha2/references/policy-attachment.md
     - v1alpha1:
       - API Types:
