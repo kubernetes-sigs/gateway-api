@@ -77,10 +77,16 @@ docker build --build-arg COMMIT=${BINARY_VERSION} --build-arg TAG=${VERSION_TAG}
 docker push ${REGISTRY}/admission-server:${GIT_TAG}
 
 # Then, we add extra tags if required.
+# If the version tag and the git tag aren't the same, we're on a release branch, so
+# we need to push the release tag.
 if [[ $VERSION_TAG != $GIT_TAG ]]
 then
     docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
     docker push ${REGISTRY}/admission-server:${VERSION_TAG}
+else
+# Otherwise, we're on master and we should update the master image here too.
+    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:master
+    docker push ${REGISTRY}/admission-server:master
 fi
 
 if [[ $LATEST == true ]]
