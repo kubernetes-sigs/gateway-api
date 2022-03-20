@@ -1,11 +1,11 @@
 # Security Model
 
 ## Introduction
-The Gateway API have been designed to enable granular authorization for each
-role in a typical organization.
+Gateway API has been designed to enable granular authorization for each role in
+a typical organization.
 
 ## Resources
-The Gateway API have 3 primary API resources:
+Gateway API has 3 primary API resources:
 
 * **GatewayClass** defines a set of gateways with a common configuration and
   behavior.
@@ -13,29 +13,20 @@ The Gateway API have 3 primary API resources:
   within the cluster.
 * **Routes** describe how traffic coming via the Gateway maps to the Services.
 
-### Additional Configuration
-There are two additional pieces of configuration that are important in this
-security model:
-
-* Which namespaces can contain Gateways of the specified GatewayClass.
-* Which namespaces Routes can be targeted in by Gateways of the specified
-  GatewayClass.
-
 ## Roles and personas
 
-In the original design of Kubernetes, Ingress and Service resources were
-based on a self-service model of usage; developers who create Services and
-Ingresses control all aspects of defining and exposing their applications to
-their users.
+In the original design of Kubernetes, Ingress and Service resources were based
+on a self-service model of usage; developers who create Services and Ingresses
+control all aspects of defining and exposing their applications to their users.
 
 We have found that the self-service model does not fully capture some of the
-more complex deployment and team structures that our users are seeing. The
-Gateway API are designed to target the following personas:
+more complex deployment and team structures that our users are seeing. Gateway
+API is designed to target the following personas:
 
 * **Infrastructure provider**: The infrastructure provider (infra) is
   responsible for the overall environment that the cluster(s) are operating in.
-  Examples include: the cloud provider (AWS, Azure, GCP, ...), the PaaS provider
-  in a company.
+  Examples include: the cloud provider (AWS, Azure, GCP, ...) or the PaaS
+  provider in a company.
 * **Cluster operator**: The cluster operator (ops) is responsible for
   administration of entire clusters. They manage policies, network access,
   application permissions.
@@ -54,29 +45,24 @@ We expect that each persona will map approximately to a `Role` in the Kubernetes
 Role-Based Authentication (RBAC) system and will define resource model
 responsibility and separation.
 
-Depending on the environment, multiple roles can map to the same user.
-For example, giving the user all the above roles replicates the self-service
-model.
+Depending on the environment, multiple roles can map to the same user. For
+example, giving the user all the above roles replicates the self-service model.
 
-## The Security Model
-There are two primary components to the Gateway API security model: RBAC and
-namespace restrictions.
-
-## RBAC
+### RBAC
 RBAC (role-based access control) is the standard used for Kubernetes
 authorization. This allows users to configure who can perform actions on
 resources in specific scopes. RBAC can be used to enable each of the roles
 defined above. In most cases, it will be desirable to have all resources be
 readable by most roles, so instead we'll focus on write access for this model.
 
-### Write Permissions for Simple 3 Tier Model
+#### Write Permissions for Simple 3 Tier Model
 | | GatewayClass | Gateway | Route |
 |-|-|-|-|
 | Infrastructure Provider | Yes | Yes | Yes |
 | Cluster Operators | No | Yes | Yes |
 | Application Developers | No | No | Yes |
 
-### Write Permissions for Advanced 4 Tier Model
+#### Write Permissions for Advanced 4 Tier Model
 | | GatewayClass | Gateway | Route |
 |-|-|-|-|
 | Infrastructure Provider | Yes | Yes | Yes |
@@ -84,83 +70,66 @@ readable by most roles, so instead we'll focus on write access for this model.
 | Application Admins | No | In Specified Namespaces | In Specified Namespaces |
 | Application Developers | No | No | In Specified Namespaces |
 
-## Limiting Namespaces Where a GatewayClass Can Be Used
+## Crossing Namespace Boundaries
+Gateway API provides new ways to cross namespace boundaries. These
+cross-namespace capabilities are quire powerful but need to be used carefully to
+avoid accidental exposure. As a rule, every time we allow a namespace boundary
+to be crossed, we require a handshake between namespaces. There are 2 different
+ways that can occur:
+
+### 1. Route Binding
+Routes can be connected to Gateways in different namespaces. To accomplish this,
+The Gateway owner must explicitly allow Routes to bind from additional
+namespaces. This is accomplished by configuring allowedRoutes within a Gateway
+listener to look something like this:
+
+```yaml
+namespaces:
+  from: Selector
+  selector:
+    matchExpressions:
+    - key: kubernetes.io/metadata.name
+      operator: In
+      values:
+      - foo
+      - bar
+```
+
+This will allow routes from the "foo" and "bar" namespaces to attach to this
+Gateway listener.
+
+#### Risks of Other Labels
+Although it's possible to use other labels with this selector, it is not quite
+as safe. While the `kubernetes.io/metadata.name` label is consistently set on
+namespaces to the name of the namespace, other labels do not have the same
+guarantee. If you used a custom label such as `env`, anyone that is able to
+label namespaces within your cluster would effectively be able to change the set
+of namespaces your Gateway supported.
+
+### 2. ReferencePolicy
+There are some cases where we allow other object references to cross namespace
+boundaries. This includes Gateways referencing Secrets and Routes referencing
+Backends (usually Services). In these cases, the required handshake is
+accomplished with a ReferencePolicy resource. This resource exists within a
+target namespace and can be used to allow references from other namespaces.
+
+For example, the following ReferencePolicy allows references from Gateways in
+the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
+the ReferencePolicy.
+
+```yaml
+{% include 'examples/v1alpha2/reference-policy.yaml' %}
+```
+
+For more information on ReferencePolicy, refer to our [detailed documentation
+for this resource](/v1alpha2/api-types/referencepolicy.md).
+
+## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
 Some infrastructure providers or cluster operators may wish to limit the
 namespaces where a GatewayClass can be used. At this point, we do not have a
-solution for this built into the API. We continue to [explore
-options](https://github.com/kubernetes-sigs/gateway-api/issues/375) to improve
-support for this. Until then, we recommend using a policy agent such as Open
-Policy Agent and [Gatekeeper](https://github.com/open-policy-agent/gatekeeper)
-to enforce these kinds of policies. For reference, we've created an [example of
+solution for this built into the API. In lieu of that, we recommend using a
+policy agent such as Open Policy Agent and
+[Gatekeeper](https://github.com/open-policy-agent/gatekeeper) to enforce these
+kinds of policies. For reference, we've created an [example of
 configuration](https://github.com/open-policy-agent/gatekeeper-library/pull/24)
 that could be used for this.
-
-## Route Namespaces
-Gateway API enables Routes to be attached to Gateways from different Namespaces.
-Although this can be remarkably powerful, this capability needs to be used
-carefully. Gateway Listeners include a `namespaces` field that can allow Routes
-to be attached from additional namespaces. By default, this is limited to Routes
-in the same namespace as the Gateway.
-
-## Controller Requirements
-To be considered conformant with the Gateway API spec, controllers need to:
-
-* Populate status fields on Gateways and Resources to indicate if they are
-  compatible with the corresponding GatewayClass configuration.
-* Ensure that all Routes added to a Gateway:
-    * Have been selected by the Gateway.
-    * Have a Gateways field that allows the Gateway use of the route.
-
-## Alternative Approaches Considered
-### New API Resources
-We considered introducing new API resources to cover these use cases. These
-resources might be look something like:
-
-* **ClusterGateway**: A ClusterGateway could reference routes in any namespace.
-* **ClusterRoute**: A ClusterRoute could be referenced by any Gateway or
-  ClusterGateway.
-
-**Benefits**
-
-* Easy to model with RBAC.
-* API validation tied directly to each resource.
-
-**Downsides**
-
-* New resources to deal with - more informers, clients, documentation, etc.
-* Harder to expand with additional options in the future - may just end up with
-  tons of API resources to cover all use cases.
-
-### Boolean Multi Namespace Route Indicator on GatewayClass
-Instead of having the `routeNamespaceSelector` field on GatewayClass, we would
-use a boolean `multiNamespaceRoutes` field to indicate if Gateways of this class
-can target routes in multiple namespaces. This would default to false. A false
-value here would indicate that routes could only be targeted in the current
-namespace.
-
-**Benefits**
-
-* Helpful for multi-tenant use cases with many isolated Gateways.
-* Simple configuration with an easy to understand default value.
-
-**Downsides**
-
-* GatewayClass admins are unable to partially limit namespaces that can be
-  targeted by Gateways. Admins would have to choose between allowing access to
-  Routes in all namespaces or only the local one.
-
-### Validating Webhook
-A validating webhook could potentially handle some of the cross-resource
-validation necessary for this security model and provide more immediate feedback
-to end users.
-
-**Benefits**
-
-* Immediate validation feedback.
-* More validation logic stays in core Gateway API codebase.
-
-**Downsides**
-
-* Imperfect solution for cross-resource validation. For example, a change to a
-  GatewayClass could affect the validity of corresponding Gateway.
-* Additional complexity involved in installing Gateway API in a cluster.
