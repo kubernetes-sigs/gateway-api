@@ -44,7 +44,7 @@ var HTTPRouteInvalidCrossNamespace = suite.ConformanceTest{
 		// preferable to have status set with some kind of warning/error message
 		// but that is also unlikely to be universally achievable.
 		t.Run("Route should not have Parents set in status", func(t *testing.T) {
-			parents := []v1alpha2.RouteParentStatus{}
+			parents := []v1alpha2.RouteParentStatusWithHostnames{}
 			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeName, parents, true, 60)
 		})
 

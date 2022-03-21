@@ -95,7 +95,7 @@ type TLSRouteSpec struct {
 
 // TLSRouteStatus defines the observed state of TLSRoute
 type TLSRouteStatus struct {
-	RouteStatus `json:",inline"`
+	RouteStatusWithHostnames `json:",inline"`
 }
 
 // TLSRouteRule is the configuration for a given rule.

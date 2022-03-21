@@ -315,12 +315,13 @@ spec:
                   \n Note that parent references that cannot be resolved by an implementation
                   of this API will not be added to this list. Implementations of this
                   API can only populate Route status for the Gateways/parent resources
-                  they are responsible for. \n A maximum of 32 Gateways will be represented
-                  in this list. An empty list means the route has not been attached
-                  to any Gateway."
+                  they are responsible for. \n A maximum of 32 parent resources will
+                  be represented in this list. An empty list means the route has not
+                  been attached to any parent resource."
                 items:
-                  description: RouteParentStatus describes the status of a route with
-                    respect to an associated Parent.
+                  description: RouteParentStatusWithHostnames describes the status
+                    of a route with respect to an associated Parent. In the experimental
+                    channel, this includes hostnames used as part of the Parent binding.
                   properties:
                     conditions:
                       description: "Conditions describes the status of the route with
@@ -427,6 +428,44 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
                       type: string
+                    hostnames:
+                      description: "Hostnames describes the hostnames used when binding
+                        to this Parent. \n When attaching to a Gateway, this represents
+                        the intersection between Hostnames defined on the Route and
+                        Hostnames defined on the attached Gateway listeners. This
+                        indicates the set of hostnames for which requests may be routed
+                        to this Route via this Parent. There are two possible reasons
+                        for this list to be empty: \n 1. This Route has not been accepted.
+                        Refer to the \"Accepted\" condition    within this RouteParentStatus
+                        for more information. For example, a    Route will not be
+                        accepted if both the Route and Parent specify    hostnames
+                        and none of them intersect. 2. Both the Route and Parent have
+                        not specified hostnames and therefore    there is at least
+                        one path from this Parent to this Route with no    restrictions
+                        on the hostnames that may be used to reach this Route.    For
+                        example, if a Route does not specify any hostnames and has
+                        a    ParentRef that matches at least one Gateway listener
+                        that does not    specify a hostname. \n <gateway:experimental>"
+                      items:
+                        description: "Hostname is the fully qualified domain name
+                          of a network host. This matches the RFC 1123 definition
+                          of a hostname with 2 notable exceptions: \n 1. IPs are not
+                          allowed. 2. A hostname may be prefixed with a wildcard label
+                          (`*.`). The wildcard    label must appear by itself as the
+                          first label. \n Hostname can be \"precise\" which is a domain
+                          name without the terminating dot of a network host (e.g.
+                          \"foo.example.com\") or \"wildcard\", which is a domain
+                          name prefixed with a single wildcard label (e.g. `*.example.com`).
+                          \n Note that as per RFC1035 and RFC1123, a *label* must
+                          consist of lower case alphanumeric characters or '-', and
+                          must start and end with an alphanumeric character. No other
+                          punctuation is allowed."
+                        maxLength: 253
+                        minLength: 1
+                        pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                        type: string
+                      maxItems: 64
+                      type: array
                     parentRef:
                       description: ParentRef corresponds with a ParentRef in the spec
                         that this RouteParentStatus struct describes the status of.

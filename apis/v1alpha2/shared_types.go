@@ -256,11 +256,63 @@ type RouteStatus struct {
 	// can only populate Route status for the Gateways/parent resources they are
 	// responsible for.
 	//
-	// A maximum of 32 Gateways will be represented in this list. An empty list
-	// means the route has not been attached to any Gateway.
+	// A maximum of 32 parent resources will be represented in this list. An
+	// empty list means the route has not been attached to any parent resource.
 	//
 	// +kubebuilder:validation:MaxItems=32
 	Parents []RouteParentStatus `json:"parents"`
+}
+
+// RouteParentStatusWithHostnames describes the status of a route with respect
+// to an associated Parent. In the experimental channel, this includes hostnames
+// used as part of the Parent binding.
+type RouteParentStatusWithHostnames struct {
+	RouteParentStatus `json:",inline"`
+
+	// Hostnames describes the hostnames used when binding to this Parent.
+	//
+	// When attaching to a Gateway, this represents the intersection between
+	// Hostnames defined on the Route and Hostnames defined on the attached
+	// Gateway listeners. This indicates the set of hostnames for which requests
+	// may be routed to this Route via this Parent. There are two possible
+	// reasons for this list to be empty:
+	//
+	// 1. This Route has not been accepted. Refer to the "Accepted" condition
+	//    within this RouteParentStatus for more information. For example, a
+	//    Route will not be accepted if both the Route and Parent specify
+	//    hostnames and none of them intersect.
+	// 2. Both the Route and Parent have not specified hostnames and therefore
+	//    there is at least one path from this Parent to this Route with no
+	//    restrictions on the hostnames that may be used to reach this Route.
+	//    For example, if a Route does not specify any hostnames and has a
+	//    ParentRef that matches at least one Gateway listener that does not
+	//    specify a hostname.
+	//
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxItems=64
+	Hostnames []Hostname `json:"hostnames,omitempty"`
+}
+
+// RouteStatusWithHostnames defines the common attributes that all Routes which
+// specify Hostnames MUST include within their status.
+type RouteStatusWithHostnames struct {
+	// Parents is a list of parent resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each parent. When this route attaches to a parent, the controller that
+	// manages the parent must add an entry to this list when the controller
+	// first sees the route and should update the entry as appropriate when the
+	// route or gateway is modified.
+	//
+	// Note that parent references that cannot be resolved by an implementation
+	// of this API will not be added to this list. Implementations of this API
+	// can only populate Route status for the Gateways/parent resources they are
+	// responsible for.
+	//
+	// A maximum of 32 parent resources will be represented in this list. An
+	// empty list means the route has not been attached to any parent resource.
+	//
+	// +kubebuilder:validation:MaxItems=32
+	Parents []RouteParentStatusWithHostnames `json:"parents"`
 }
 
 // Hostname is the fully qualified domain name of a network host. This matches

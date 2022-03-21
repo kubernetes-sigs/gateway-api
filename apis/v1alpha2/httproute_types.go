@@ -853,5 +853,5 @@ type HTTPBackendRef struct {
 
 // HTTPRouteStatus defines the observed state of HTTPRoute.
 type HTTPRouteStatus struct {
-	RouteStatus `json:",inline"`
+	RouteStatusWithHostnames `json:",inline"`
 }

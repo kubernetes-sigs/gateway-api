@@ -122,18 +122,20 @@ func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerNa
 		if routeNN.Namespace == gwNN.Namespace {
 			namespaceRequired = false
 		}
-		parents := []v1alpha2.RouteParentStatus{{
-			ParentRef: v1alpha2.ParentReference{
-				Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-				Kind:      &kind,
-				Name:      v1alpha2.ObjectName(gwNN.Name),
-				Namespace: &ns,
+		parents := []v1alpha2.RouteParentStatusWithHostnames{{
+			RouteParentStatus: v1alpha2.RouteParentStatus{
+				ParentRef: v1alpha2.ParentReference{
+					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+					Kind:      &kind,
+					Name:      v1alpha2.ObjectName(gwNN.Name),
+					Namespace: &ns,
+				},
+				ControllerName: v1alpha2.GatewayController(controllerName),
+				Conditions: []metav1.Condition{{
+					Type:   string(v1alpha2.ConditionRouteAccepted),
+					Status: metav1.ConditionTrue,
+				}},
 			},
-			ControllerName: v1alpha2.GatewayController(controllerName),
-			Conditions: []metav1.Condition{{
-				Type:   string(v1alpha2.ConditionRouteAccepted),
-				Status: metav1.ConditionTrue,
-			}},
 		}}
 		HTTPRouteMustHaveParents(t, c, routeNN, parents, namespaceRequired, 60)
 	}
@@ -176,10 +178,10 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, gwName types.Name
 // HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
-func HTTPRouteMustHaveParents(t *testing.T, client client.Client, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool, seconds int) {
+func HTTPRouteMustHaveParents(t *testing.T, client client.Client, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatusWithHostnames, namespaceRequired bool, seconds int) {
 	t.Helper()
 
-	var actual []v1alpha2.RouteParentStatus
+	var actual []v1alpha2.RouteParentStatusWithHostnames
 	waitFor := time.Duration(seconds) * time.Second
 	waitErr := wait.PollImmediate(1*time.Second, waitFor, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -198,7 +200,7 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, routeName type
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have parents matching expectations")
 }
 
-func parentsMatch(t *testing.T, expected, actual []v1alpha2.RouteParentStatus, namespaceRequired bool) bool {
+func parentsMatch(t *testing.T, expected, actual []v1alpha2.RouteParentStatusWithHostnames, namespaceRequired bool) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
