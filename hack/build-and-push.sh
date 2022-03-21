@@ -45,7 +45,8 @@ then
 fi
 
 
-LATEST=false
+# We tag the image with :latest for the most recent PR merge.
+LATEST=true
 
 VERSION_TAG=$GIT_TAG
 
@@ -58,15 +59,12 @@ if [[ "${BASE_REF}" != "master" ]]
 then
     # Since we know this is built from a tag or release branch, we can set the VERSION_TAG
     VERSION_TAG="${BASE_REF}"
+
     # We want the binary version to show up correctly too.
     BINARY_VERSION="${BASE_REF}"
-    # Use some bash magic to check if the semver does not end with -sometext, that
-    # would indicate a prerelease version. If this is not a prerelease, then we want to set
-    # the `latest` tag too.
-    if [[ ! "${BASE_REF}" =~ -(.+)$ ]];
-    then
-    LATEST=true
-    fi
+
+    # If we're on a semver baseref, then we don't want to tag the image with :latest
+    LATEST=false
 fi
 
 # First, build the image, with the version info passed in.
@@ -83,10 +81,6 @@ if [[ $VERSION_TAG != $GIT_TAG ]]
 then
     docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
     docker push ${REGISTRY}/admission-server:${VERSION_TAG}
-else
-# Otherwise, we're on master and we should update the master image here too.
-    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:master
-    docker push ${REGISTRY}/admission-server:master
 fi
 
 if [[ $LATEST == true ]]
