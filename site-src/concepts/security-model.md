@@ -118,7 +118,7 @@ the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
 the ReferencePolicy.
 
 ```yaml
-{% include 'examples/v1alpha2/reference-policy.yaml' %}
+{% include 'v1alpha2/reference-policy.yaml' %}
 ```
 
 For more information on ReferencePolicy, refer to our [detailed documentation
