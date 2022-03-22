@@ -45,8 +45,8 @@ then
 fi
 
 
-# We tag the image with :latest for the most recent PR merge.
-LATEST=true
+# We tag the image with :latest for the most recent PR merge to master.
+LATEST=false
 
 VERSION_TAG=$GIT_TAG
 
@@ -62,10 +62,12 @@ then
 
     # We want the binary version to show up correctly too.
     BINARY_VERSION="${BASE_REF}"
-
-    # If we're on a semver baseref, then we don't want to tag the image with :latest
-    LATEST=false
+else
+    # If our base ref == "master" then we will tag :latest.
+    LATEST=true
 fi
+
+
 
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
