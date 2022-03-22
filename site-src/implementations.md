@@ -12,7 +12,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [Gloo Edge 2.0][4] (work in progress)
 - [Google Kubernetes Engine][5] (public preview)
 - [HAProxy Ingress][6] (alpha)
-- [HshiCorp Consul][7]
+- [HashiCorp Consul][7]
 - [Istio][8] (alpha)
 - [Kong][9] (alpha)
 - [Traefik][10] (alpha)
