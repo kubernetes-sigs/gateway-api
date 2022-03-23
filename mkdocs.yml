@@ -78,7 +78,6 @@ nav:
     - Enhancement Proposals:
       - Overview: contributing/gep.md
       - ... | geps/gep-*.md
-    - Release policy: references/releases.md
   - Contributing:
     - Developer guide: contributing/devguide.md
     - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
