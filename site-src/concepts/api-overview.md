@@ -112,11 +112,16 @@ to allow multiple Routes to share ports on the Listener.
 
 |Object|OSI Layer|Routing Discriminator|TLS Support|Purpose|
 |------|---------|---------------------|-----------|-------|
-|HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only, can be reencrypted| HTTP and HTTPS Routing|
-|TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or terminated, can be reencrypted if terminated. | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
+|HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only | HTTP and HTTPS Routing|
+|TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
 |TCPRoute| Layer 4| destination port | Passthrough or Terminated | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| destination port | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
+Note that traffic routed via HTTPRoute and TCPRoute can be encrypted between the
+Gateway and backend (commonly referred to as reencryption). It is not possible
+to configure that with existing Gateway API resources, but implementations may
+provide custom configuration for this until there is a standardized approach
+defined by Gateway API.
 
 ### Attaching Routes to Gateways
 
