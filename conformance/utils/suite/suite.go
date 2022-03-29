@@ -116,7 +116,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 	for _, manifestLocation := range test.Manifests {
 		t.Logf("Applying %s", manifestLocation)
-		kubernetes.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
+		kubernetes.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, suite.Cleanup)
 	}
 
 	test.Test(t, suite)
