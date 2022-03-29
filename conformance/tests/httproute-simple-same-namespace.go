@@ -17,16 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"net/url"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
-	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
 
@@ -45,19 +42,8 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN)
 
 		t.Run("Simple HTTP request should reach infra-backend", func(t *testing.T) {
-			t.Logf("Making request to http://%s", gwAddr)
-			cReq, cRes, err := suite.RoundTripper.CaptureRoundTrip(roundtripper.Request{
-				URL:      url.URL{Scheme: "http", Host: gwAddr},
-				Protocol: "HTTP",
-			})
-
-			require.NoErrorf(t, err, "error making request")
-
-			http.ExpectResponse(t, cReq, cRes, http.ExpectedResponse{
-				Request: http.ExpectedRequest{
-					Method: "GET",
-					Path:   "/",
-				},
+			http.MakeRequestAndExpectResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+				Request:    http.ExpectedRequest{Path: "/"},
 				StatusCode: 200,
 				Backend:    "infra-backend-v1",
 				Namespace:  "gateway-conformance-infra",
