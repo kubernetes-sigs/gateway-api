@@ -42,7 +42,7 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN)
 
 		t.Run("Simple HTTP request should reach infra-backend", func(t *testing.T) {
-			http.MakeRequestAndExpectResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request:    http.ExpectedRequest{Path: "/"},
 				StatusCode: 200,
 				Backend:    "infra-backend-v1",

@@ -17,6 +17,7 @@ limitations under the License.
 package http
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"testing"
@@ -45,9 +46,15 @@ type ExpectedRequest struct {
 	Headers map[string]string
 }
 
-// MakeRequestAndExpectResponse makes a request with the given parameters and
-// verifies the response matches the provided ExpectedResponse.
-func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
+const maxConsistencyPeriodPerRequest = 60 * time.Second
+const numConsistencyChecksPerRequest = 3
+
+// MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
+// understanding that the request may fail for some amount of time.
+//
+// Once the request succeeds and the response has the expected status code, assert that
+// a response matching the provided ExpectedResponse is returned consistently.
+func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	if expected.Request.Method == "" {
@@ -74,16 +81,13 @@ func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwA
 		}
 	}
 
-	var cReq *roundtripper.CapturedRequest
-	var cRes *roundtripper.CapturedResponse
-
 	// We expect eventual consistency once the resources are ready, so wait until
 	// we've made a successful request and gotten a response with desired status
 	// before making assertions on the response body.
 	require.Eventually(t, func() bool {
 		var err error
 
-		cReq, cRes, err = r.CaptureRoundTrip(req)
+		_, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
@@ -95,9 +99,18 @@ func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwA
 		}
 
 		return true
-	}, 60*time.Second, 1*time.Second, "error making request, never got expected status")
+	}, maxConsistencyPeriodPerRequest, 1*time.Second, "error making request, never got expected status")
 
-	ExpectResponse(t, cReq, cRes, expected)
+	// Once we've made a successful request and gotten a response with the
+	// desired status, assert that we get the expected response consistently.
+	for i := 1; i <= numConsistencyChecksPerRequest; i++ {
+		t.Run(fmt.Sprintf("consistency_check_%d", i), func(t *testing.T) {
+			cReq, cRes, err := r.CaptureRoundTrip(req)
+			require.NoError(t, err, "error making request after previous success")
+
+			ExpectResponse(t, cReq, cRes, expected)
+		})
+	}
 }
 
 // ExpectResponse verifies that a captured request and response match the
