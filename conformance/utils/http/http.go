@@ -85,12 +85,12 @@ func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwA
 
 		cReq, cRes, err = r.CaptureRoundTrip(req)
 		if err != nil {
-			t.Log("request failed, not ready yet")
+			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
 		}
 
 		if cRes.StatusCode != expected.StatusCode {
-			t.Log("response missing expected status, not ready yet")
+			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
 			return false
 		}
 
