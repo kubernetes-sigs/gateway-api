@@ -20,6 +20,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,8 +73,29 @@ func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwA
 			req.Headers[name] = []string{value}
 		}
 	}
-	cReq, cRes, err := r.CaptureRoundTrip(req)
-	require.NoErrorf(t, err, "error making request")
+
+	var cReq *roundtripper.CapturedRequest
+	var cRes *roundtripper.CapturedResponse
+
+	// We expect eventual consistency once the resources are ready, so wait until
+	// we've made a successful request and gotten a response with desired status
+	// before making assertions on the response body.
+	require.Eventually(t, func() bool {
+		var err error
+
+		cReq, cRes, err = r.CaptureRoundTrip(req)
+		if err != nil {
+			t.Log("request failed, not ready yet")
+			return false
+		}
+
+		if cRes.StatusCode != expected.StatusCode {
+			t.Log("response missing expected status, not ready yet")
+			return false
+		}
+
+		return true
+	}, 60*time.Second, 1*time.Second, "error making request, never got expected status")
 
 	ExpectResponse(t, cReq, cRes, expected)
 }
