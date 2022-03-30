@@ -248,6 +248,8 @@ def main():
         if not file_passes(filename, refs, regexs):
             print(filename, file=sys.stdout)
 
+    print("Verified %d file headers match boilerplate" % (len(filenames),), file=sys.stderr)
+
     return 0
 
 
