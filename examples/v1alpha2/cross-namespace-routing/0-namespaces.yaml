@@ -1,3 +1,6 @@
+# Used in
+# - service-apis/site-src/v1alpha2/guides/multiple-ns.md
+
 apiVersion: v1
 kind: Namespace
 metadata:

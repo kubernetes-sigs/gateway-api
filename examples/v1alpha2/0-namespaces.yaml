@@ -1,4 +1,6 @@
 # These namespaces can be used for examples without recreating them each time.
+# Used in
+# - site-src/v1alpha2/guides/multiple-ns.md
 ---
 apiVersion: v1
 kind: Namespace
