@@ -115,6 +115,7 @@ func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtrip
 			return false
 		}
 
+		t.Logf("Request has passed %d times in a row of the desired %d, ready!", numSuccesses, threshold)
 		return true
 	}, maxConsistencyPeriodPerRequest, 1*time.Second, "error making request, never got expected status")
 
