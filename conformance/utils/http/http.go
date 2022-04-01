@@ -17,7 +17,6 @@ limitations under the License.
 package http
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 	"testing"
@@ -52,8 +51,8 @@ const numConsistencyChecksPerRequest = 3
 // MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
 // understanding that the request may fail for some amount of time.
 //
-// Once the request succeeds and the response has the expected status code, assert that
-// a response matching the provided ExpectedResponse is returned consistently.
+// Once the request succeeds consistently with the response having the expected status code, make
+// additional assertions on the response body using the provided ExpectedResponse.
 func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
@@ -81,36 +80,45 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	// We expect eventual consistency once the resources are ready, so wait until
-	// we've made a successful request and gotten a response with desired status
-	// before making assertions on the response body.
-	require.Eventually(t, func() bool {
-		var err error
+	cReq, cRes := WaitForConsistency(t, r, req, expected, numConsistencyChecksPerRequest)
+	ExpectResponse(t, cReq, cRes, expected)
+}
 
-		_, cRes, err := r.CaptureRoundTrip(req)
+// WaitForConsistency repeats the provided request until it completes with a response having
+// the expected status code consistently. The provided threshold determines how many times in
+// a row this must occur to be considered "consistent".
+func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) (*roundtripper.CapturedRequest, *roundtripper.CapturedResponse) {
+	var (
+		cReq         *roundtripper.CapturedRequest
+		cRes         *roundtripper.CapturedResponse
+		err          error
+		numSuccesses int
+	)
+
+	require.Eventually(t, func() bool {
+		cReq, cRes, err = r.CaptureRoundTrip(req)
 		if err != nil {
+			numSuccesses = 0
 			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
 		}
 
 		if cRes.StatusCode != expected.StatusCode {
+			numSuccesses = 0
 			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
+			return false
+		}
+
+		numSuccesses++
+		if numSuccesses < threshold {
+			t.Logf("Request has passed %d times in a row of the desired %d, not ready yet", numSuccesses, threshold)
 			return false
 		}
 
 		return true
 	}, maxConsistencyPeriodPerRequest, 1*time.Second, "error making request, never got expected status")
 
-	// Once we've made a successful request and gotten a response with the
-	// desired status, assert that we get the expected response consistently.
-	for i := 1; i <= numConsistencyChecksPerRequest; i++ {
-		t.Run(fmt.Sprintf("consistency_check_%d", i), func(t *testing.T) {
-			cReq, cRes, err := r.CaptureRoundTrip(req)
-			require.NoError(t, err, "error making request after previous success")
-
-			ExpectResponse(t, cReq, cRes, expected)
-		})
-	}
+	return cReq, cRes
 }
 
 // ExpectResponse verifies that a captured request and response match the
