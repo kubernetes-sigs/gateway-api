@@ -74,8 +74,13 @@ type HTTPRouteSpec struct {
 	// * A Listener with `*.example.com` as the hostname matches HTTPRoutes
 	//   that have either not specified any hostnames or have specified at least
 	//   one hostname that matches the Listener hostname. For example,
-	//   `test.example.com` and `*.example.com` would both match. On the other
-	//   hand, `example.com` and `test.example.net` would not match.
+	//   `*.example.com`, `test.example.com`, and `foo.test.example.com` would
+	//   all match. On the other hand, `example.com` and `test.example.net` would
+	//   not match.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
 	// If both the Listener and HTTPRoute have specified hostnames, any
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be
@@ -152,11 +157,14 @@ type HTTPRouteRule struct {
 	//
 	// * The oldest Route based on creation timestamp.
 	// * The Route appearing first in alphabetical order by
-	//   "<namespace>/<name>".
+	//   "{namespace}/{name}".
 	//
 	// If ties still exist within the Route that has been given precedence,
 	// matching precedence MUST be granted to the first matching rule meeting
 	// the above criteria.
+	//
+	// When no rules matching a request have been successfully attached to the
+	// parent a request is coming from, a HTTP 404 status code MUST be returned.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
@@ -179,6 +187,12 @@ type HTTPRouteRule struct {
 	// Specifying a core filter multiple times has unspecified or custom
 	// conformance.
 	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined. If an
+	// implementation can not support other combinations of filters, they must clearly
+	// document that limitation. In all cases where incompatible or unsupported
+	// filters are specified, implementations MUST add a warning condition to status.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -187,13 +201,25 @@ type HTTPRouteRule struct {
 
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
-
-	// If unspecified or invalid (refers to a non-existent resource or a Service
-	// with no endpoints), the rule performs no forwarding. If there are also no
-	// filters specified that would result in a response being sent, a HTTP 503
-	// status code is returned. 503 responses must be sent so that the overall
-	// weight is respected; if an invalid backend is requested to have 80% of
-	// requests, then 80% of requests must get a 503 instead.
+	//
+	// A 404 status code MUST be returned if there are no BackendRefs or filters
+	// specified that would result in a response being sent.
+	//
+	// A BackendRef is considered invalid when it refers to:
+	//
+	// * an unknown or unsupported kind of resource
+	// * a resource that does not exist
+	// * a resource in another namespace when the reference has not been
+	//   explicitly allowed by a ReferenceGrant (or equivalent concept).
+	//
+	// When a BackendRef is invalid, 404 status codes MUST be returned for
+	// requests that would have otherwise been routed to an invalid backend. If
+	// multiple backends are specified, and some are invalid, the proportion of
+	// requests that would otherwise have been routed to an invalid backend
+	// MUST receive a 404 status code.
+	//
+	// When a BackendRef refers to a Service that has no ready endpoints, it is
+	// recommended to return a 503 status code.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource
@@ -227,11 +253,10 @@ const (
 	// Matches based on a URL path prefix split by `/`. Matching is
 	// case sensitive and done on a path element by element basis. A
 	// path element refers to the list of labels in the path split by
-	// the `/` separator. A request is a match for path _p_ if every
-	// _p_ is an element-wise prefix of the request path.
+	// the `/` separator. When specified, a trailing `/` is ignored.
 	//
-	// For example, `/abc`, `/abc/` and `/abc/def` match the prefix
-	// `/abc`, but `/abcd` does not.
+	// For example, the paths `/abc`, `/abc/`, and `/abc/def` would all match
+	// the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// "PathPrefix" is semantically equivalent to the "Prefix" path type in the
 	// Kubernetes Ingress API.
@@ -495,6 +520,8 @@ type HTTPRouteFilter struct {
 	// that filter MUST receive a HTTP error response.
 	//
 	// +unionDiscriminator
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
 	Type HTTPRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -522,6 +549,13 @@ type HTTPRouteFilter struct {
 	// +optional
 	RequestRedirect *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
 
+	// URLRewrite defines a schema for a filter that modifies a request during forwarding.
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	URLRewrite *HTTPURLRewriteFilter `json:"urlRewrite,omitempty"`
+
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
@@ -534,7 +568,6 @@ type HTTPRouteFilter struct {
 }
 
 // HTTPRouteFilterType identifies a type of HTTPRoute filter.
-// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
 type HTTPRouteFilterType string
 
 const (
@@ -548,12 +581,25 @@ const (
 
 	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
 	// another location. This filter can also be used for HTTP to HTTPS
-	// redirects.
+	// redirects. This may not be used on the same Route rule or BackendRef as a
+	// URLRewrite filter.
 	//
 	// Support in HTTPRouteRule: Core
 	//
 	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestRedirect HTTPRouteFilterType = "RequestRedirect"
+
+	// HTTPRouteFilterURLRewrite can be used to modify a request during
+	// forwarding. At most one of these filters may be used on a Route rule.
+	// This may not be used on the same Route rule or BackendRef as a
+	// RequestRedirect filter.
+	//
+	// Support in HTTPRouteRule: Extended
+	//
+	// Support in HTTPBackendRef: Extended
+	//
+	// <gateway:experimental>
+	HTTPRouteFilterURLRewrite HTTPRouteFilterType = "URLRewrite"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
 	// different backend. The responses from this backend MUST be ignored by
@@ -664,7 +710,63 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPRequestRedirectFilter defines configuration for the RequestRedirect filter.
+// HTTPPathModifierType defines the type of path redirect or rewrite.
+type HTTPPathModifierType string
+
+const (
+	// This type of modifier indicates that the full path will be replaced
+	// by the specified value.
+	FullPathHTTPPathModifier HTTPPathModifierType = "ReplaceFullPath"
+
+	// This type of modifier indicates that any prefix path matches will be
+	// replaced by the substitution value. For example, a path with a prefix
+	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
+	// the "/foo" prefix replaced with "/bar" in matching requests.
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
+	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
+)
+
+// HTTPPathModifier defines configuration for path modifiers.
+// <gateway:experimental>
+type HTTPPathModifier struct {
+	// Type defines the type of path modifier. Additional types may be
+	// added in a future release of the API.
+	//
+	// <gateway:experimental>
+	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
+	Type HTTPPathModifierType `json:"type"`
+
+	// ReplaceFullPath specifies the value with which to replace the full path
+	// of a request during a rewrite or redirect.
+	//
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	ReplaceFullPath *string `json:"replaceFullPath,omitempty"`
+
+	// ReplacePrefixMatch specifies the value with which to replace the prefix
+	// match of a request during a rewrite or redirect. For example, a request
+	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
+	//
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
+}
+
+// HTTPRequestRedirect defines a filter that redirects a request. This filter
+// MUST NOT be used on the same Route rule as a HTTPURLRewrite filter.
 type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location`
 	// header in the response.
@@ -685,6 +787,16 @@ type HTTPRequestRedirectFilter struct {
 	// +optional
 	Hostname *PreciseHostname `json:"hostname,omitempty"`
 
+	// Path defines parameters used to modify the path of the incoming request.
+	// The modified path is then used to construct the `Location` header. When
+	// empty, the request path is used as-is.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	Path *HTTPPathModifier `json:"path,omitempty"`
+
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	// When empty, port (if specified) of the request is used.
@@ -704,6 +816,31 @@ type HTTPRequestRedirectFilter struct {
 	StatusCode *int `json:"statusCode,omitempty"`
 }
 
+// HTTPURLRewriteFilter defines a filter that modifies a request during
+// forwarding. At most one of these filters may be used on a Route rule. This
+// MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.
+//
+// <gateway:experimental>
+// Support: Extended
+type HTTPURLRewriteFilter struct {
+	// Hostname is the value to be used to replace the Host header value during
+	// forwarding.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	Hostname *PreciseHostname `json:"hostname,omitempty"`
+
+	// Path defines a path rewrite.
+	//
+	// Support: Extended
+	//
+	// <gateway:experimental>
+	// +optional
+	Path *HTTPPathModifier `json:"path,omitempty"`
+}
+
 // HTTPRequestMirrorFilter defines configuration for the RequestMirror filter.
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
@@ -714,7 +851,7 @@ type HTTPRequestMirrorFilter struct {
 	// this backend in the underlying implementation.
 	//
 	// If there is a cross-namespace reference to an *existing* object
-	// that is not allowed by a ReferencePolicy, the controller must ensure the
+	// that is not allowed by a ReferenceGrant, the controller must ensure the
 	// "ResolvedRefs"  condition on the Route is set to `status: False`,
 	// with the "RefNotPermitted" reason and not configure this backend in the
 	// underlying implementation.
@@ -737,8 +874,8 @@ type HTTPBackendRef struct {
 	// configure this backend in the underlying implementation.
 	//
 	// If there is a cross-namespace reference to an *existing* object
-	// that is not covered by a ReferencePolicy, the controller must ensure the
-	// "ResolvedRefs"  condition on the Route is set to `status: true`,
+	// that is not covered by a ReferenceGrant, the controller must ensure the
+	// "ResolvedRefs"  condition on the Route is set to `status: False`,
 	// with the "RefNotPermitted" reason and not configure this backend in the
 	// underlying implementation.
 	//
