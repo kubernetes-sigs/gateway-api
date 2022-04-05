@@ -6,33 +6,43 @@ Implementors of Gateway API are encouraged to update this document with status i
 
 ## Implementation Status
 
-- [Apache APISIX][1] (work in progress)
-- [Contour][2] (alpha)
-- [Emissary-Ingress (Ambassador API Gateway)][3] (alpha)
-- [Gloo Edge 2.0][4] (work in progress)
-- [Google Kubernetes Engine][5] (public preview)
-- [HAProxy Ingress][6] (alpha)
-- [HashiCorp Consul][7]
-- [Istio][8] (alpha)
-- [Kong][9] (alpha)
-- [NGINX Kubernetes Gateway][10] (pre-alpha)
-- [Traefik][11] (alpha)
 
-[1]:#apisix
-[2]:#contour
-[3]:#emissary-ingress-ambassador-api-gateway
-[4]:#gloo-edge
-[5]:#google-kubernetes-engine
-[6]:#haproxy-ingress
-[7]:#hashicorp-consul
-[8]:#istio
-[9]:#kong
+- [Acnodal EPIC][1] (public preview)
+- [Apache APISIX][2] (work in progress)
+- [Contour][3] (alpha)
+- [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
+- [Gloo Edge 2.0][5] (work in progress)
+- [Google Kubernetes Engine][6] (public preview)
+- [HAProxy Ingress][7] (alpha)
+- [HashiCorp Consul][8]
+- [Istio][9] (alpha)
+- [Kong][10] (alpha)
+- [NGINX Kubernetes Gateway][11] (pre-alpha)
+- [Traefik][12] (alpha)
+
+[1]:#epic
+[2]:#apisix
+[3]:#contour
+[4]:#emissary-ingress-ambassador-api-gateway
+[5]:#gloo-edge
+[6]:#google-kubernetes-engine
+[7]:#haproxy-ingress
+[8]:#hashicorp-consul
+[9]:#istio
+[10]:#kong
 [10]:#nginx-kubernetes-gateway
-[11]:#traefik
+[12]:#traefik
 
 ## Project References
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
+
+### Acnodal EPIC
+[EPIC][epic] is a Managed Application & API Gateway Service.  The epic-controller installed in the cluster implements v1alpha2 and currently supports HTTPRoute.  Defining Gateways and Routes creates a Gateway in the EPIC Service consisting of Envoy instances allocating public IP addresses and DNS for clients, and configures transport that sends request directly upstream to application endpoints in the cluster.  EPIC is in public preview.
+ 
+Documentation can be found at [EPIC Application & API Gateway Service][epic]
+ 
+[epic]:https://www.epick8sgw.io
 
 ### APISIX
 
