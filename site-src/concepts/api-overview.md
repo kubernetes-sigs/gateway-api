@@ -112,11 +112,16 @@ to allow multiple Routes to share ports on the Listener.
 
 |Object|OSI Layer|Routing Discriminator|TLS Support|Purpose|
 |------|---------|---------------------|-----------|-------|
-|HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only, can be reencrypted| HTTP and HTTPS Routing|
-|TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or terminated, can be reencrypted if terminated. | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
+|HTTPRoute| Layer 7 | Anything in the HTTP Protocol | Terminated only | HTTP and HTTPS Routing|
+|TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
 |TCPRoute| Layer 4| destination port | Passthrough or Terminated | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| destination port | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
 
+Note that traffic routed via HTTPRoute and TCPRoute can be encrypted between the
+Gateway and backend (commonly referred to as reencryption). It is not possible
+to configure that with existing Gateway API resources, but implementations may
+provide custom configuration for this until there is a standardized approach
+defined by Gateway API.
 
 ### Attaching Routes to Gateways
 
@@ -165,6 +170,31 @@ The following is required for a Route to be attached to a Gateway:
 
 1. The Route needs an entry in its `parentRefs` field referencing the Gateway.
 2. At least one listener on the Gateway needs to allow this attachment.
+
+#### Referencing Gateways
+
+!!! info "Experimental Channel"
+
+    The `Port` field described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/#adding-experimental-fields).
+
+A Route can reference a Gateway by specifying the namespace (optional if the
+Route and the Gateway are in the same namespace) and name of the Gateway in
+a `parentRef`. A Route can further select a subset of listeners under the
+Gateway using the following fields in `parentRef`:
+
+1. **SectionName** When `sectionName` is set, the Route selects the listener
+   with the specified name.
+2. **Port** When `port` is set, the Route selects all listeners listening on
+   the specified port and with protocol compatible with this kind of Route.
+
+When multiple fields in `parentRef` are set, the Route selects listeners that
+satisfy all conditions specified in those fields. For example, when both
+`sectionName` and `port` are set, the Route selects listeners with the specified
+name AND listening on the specified port.
+
+#### Restricting Route Attachment
 
 Each Gateway listener can restrict which Routes can be attached with the
 following mechanisms:

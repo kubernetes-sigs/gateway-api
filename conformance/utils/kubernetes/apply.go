@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -34,6 +33,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"sigs.k8s.io/gateway-api/conformance"
 )
 
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
@@ -106,7 +107,6 @@ func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName
 // getContentsFromPathOrURL takes a string that can either be a local file
 // path or an https:// URL to YAML manifests and provides the contents.
 func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
-	manifests := new(bytes.Buffer)
 	if strings.HasPrefix(location, "http://") {
 		return nil, fmt.Errorf("data can't be retrieved from %s: http is not supported, use https", location)
 	} else if strings.HasPrefix(location, "https://") {
@@ -124,6 +124,7 @@ func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
 		}
 		defer resp.Body.Close()
 
+		manifests := new(bytes.Buffer)
 		count, err := manifests.ReadFrom(resp.Body)
 		if err != nil {
 			return nil, err
@@ -132,21 +133,11 @@ func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
 		if resp.ContentLength != -1 && count != resp.ContentLength {
 			return nil, fmt.Errorf("received %d bytes from %s, expected %d", count, location, resp.ContentLength)
 		}
-	} else {
-		b, err := ioutil.ReadFile(location)
-		if err != nil {
-			return nil, err
-		}
-
-		count, err := manifests.Write(b)
-		if err != nil {
-			return nil, err
-		}
-
-		if count != len(b) {
-			return nil, fmt.Errorf("expected to write %d bytes to memory, only wrote %d", len(b), count)
-		}
+		return manifests, nil
 	}
-
-	return manifests, nil
+	b, err := conformance.Manifests.ReadFile(location)
+	if err != nil {
+		return nil, err
+	}
+	return bytes.NewBuffer(b), nil
 }

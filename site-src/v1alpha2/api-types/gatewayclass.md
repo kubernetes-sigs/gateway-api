@@ -12,7 +12,7 @@ kind: GatewayClass
 metadata:
   name: cluster-gateway
 spec:
-  controller: "example.net/gateway-controller"
+  controllerName: "example.net/gateway-controller"
 ```
 
 We expect that one or more `GatewayClasses` will be created by the
@@ -50,7 +50,7 @@ kind: GatewayClass
 metadata:
   name: internet
 spec:
-  controller: "example.net/gateway-controller"
+  controllerName: "example.net/gateway-controller"
   parametersRef:
     group: example.net/v1alpha1
     kind: Config

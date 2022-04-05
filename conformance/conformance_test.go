@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package conformance
+// conformance_test contains code to run the conformance tests. This is in its own package to avoid circular imports.
+package conformance_test
 
 import (
 	"flag"

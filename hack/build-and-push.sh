@@ -44,12 +44,11 @@ then
     exit 1
 fi
 
+# If our base ref == "master" then we will tag :latest.
+VERSION_TAG=latest
 
-LATEST=false
-
-VERSION_TAG=$GIT_TAG
-
-BINARY_VERSION=$COMMIT
+# We tag the go binary with the git-based tag by default
+BINARY_TAG=$GIT_TAG
 
 # $BASE_REF has only two things that it can be set to by cloudbuild and Prow,
 # `master`, or a semver tag.
@@ -58,33 +57,17 @@ if [[ "${BASE_REF}" != "master" ]]
 then
     # Since we know this is built from a tag or release branch, we can set the VERSION_TAG
     VERSION_TAG="${BASE_REF}"
-    # We want the binary version to show up correctly too.
-    BINARY_VERSION="${BASE_REF}"
-    # Use some bash magic to check if the semver does not end with -sometext, that
-    # would indicate a prerelease version. If this is not a prerelease, then we want to set
-    # the `latest` tag too.
-    if [[ ! "${BASE_REF}" =~ -(.+)$ ]];
-    then
-    LATEST=true
-    fi
+
+    # Include the semver tag in the binary instead of the git-based tag
+    BINARY_TAG="${BASE_REF}"
 fi
 
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
-docker build --build-arg COMMIT=${BINARY_VERSION} --build-arg TAG=${VERSION_TAG} \
+docker build --build-arg COMMIT=${COMMIT} --build-arg TAG=${BINARY_TAG} \
   			-t ${REGISTRY}/admission-server:${GIT_TAG} .
-
 docker push ${REGISTRY}/admission-server:${GIT_TAG}
 
-# Then, we add extra tags if required.
-if [[ $VERSION_TAG != $GIT_TAG ]]
-then
-    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
-    docker push ${REGISTRY}/admission-server:${VERSION_TAG}
-fi
-
-if [[ $LATEST == true ]]
-then
-    docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:latest
-    docker push ${REGISTRY}/admission-server:latest
-fi
+# Then, we add an extra version tag - either :latest or semver.
+docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
+docker push ${REGISTRY}/admission-server:${VERSION_TAG}

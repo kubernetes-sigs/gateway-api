@@ -15,7 +15,8 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [HashiCorp Consul][7]
 - [Istio][8] (alpha)
 - [Kong][9] (alpha)
-- [Traefik][10] (alpha)
+- [NGINX Kubernetes Gateway][10] (pre-alpha)
+- [Traefik][11] (alpha)
 
 [1]:#apisix
 [2]:#contour
@@ -26,7 +27,8 @@ Implementors of Gateway API are encouraged to update this document with status i
 [7]:#hashicorp-consul
 [8]:#istio
 [9]:#kong
-[10]:#traefik
+[10]:#nginx-kubernetes-gateway
+[11]:#traefik
 
 ## Project References
 
@@ -129,6 +131,13 @@ Kong is actively working on an implementation of the Gateway API in the [Kong Ku
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
+
+### NGINX Kubernetes Gateway
+
+[NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway APIs -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
+
+[nginx-kubernetes-gateway]:https://github.com/nginxinc/nginx-kubernetes-gateway
+[nginx]:https://nginx.org/
 
 ### Traefik
 
