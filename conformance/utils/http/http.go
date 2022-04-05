@@ -45,8 +45,15 @@ type ExpectedRequest struct {
 	Headers map[string]string
 }
 
-const maxConsistencyPeriodPerRequest = 60 * time.Second
-const numConsistencyChecksPerRequest = 3
+// maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
+// requiredConsecutiveSuccesses requests to succeed in a row before failing the test.
+const maxTimeToConsistency = 30 * time.Second
+
+// requiredConsecutiveSuccesses is the number of requests that must succeed in a row
+// for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
+// before making additional assertions on the response body. If this number is not reached within
+// maxTimeToConsistency, the test will fail.
+const requiredConsecutiveSuccesses = 3
 
 // MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
 // understanding that the request may fail for some amount of time.
@@ -80,7 +87,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	cReq, cRes := WaitForConsistency(t, r, req, expected, numConsistencyChecksPerRequest)
+	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
 	ExpectResponse(t, cReq, cRes, expected)
 }
 
@@ -117,7 +124,7 @@ func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtrip
 
 		t.Logf("Request has passed %d times in a row of the desired %d, ready!", numSuccesses, threshold)
 		return true
-	}, maxConsistencyPeriodPerRequest, 1*time.Second, "error making request, never got expected status")
+	}, maxTimeToConsistency, 1*time.Second, "error making request, never got expected status")
 
 	return cReq, cRes
 }
