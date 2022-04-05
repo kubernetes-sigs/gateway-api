@@ -321,7 +321,7 @@ type GatewayTLSConfig struct {
 	// CertificateRefs can reference to standard Kubernetes resources, i.e.
 	// Secret, or implementation-specific custom resources.
 	//
-	// Support: Core - A single reference to a Kubernetes Secret
+	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
 	//
 	// Support: Implementation-specific (More than one reference or other resource types)
 	//
