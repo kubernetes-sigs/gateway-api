@@ -109,7 +109,7 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			tc := testCases[i]
 			t.Run(testName(tc, i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectResponse(t, suite.RoundTripper, gwAddr, tc)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, tc)
 			})
 		}
 	},

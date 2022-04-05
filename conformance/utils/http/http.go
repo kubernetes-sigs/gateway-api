@@ -20,6 +20,7 @@ import (
 	"net/url"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -44,9 +45,22 @@ type ExpectedRequest struct {
 	Headers map[string]string
 }
 
-// MakeRequestAndExpectResponse makes a request with the given parameters and
-// verifies the response matches the provided ExpectedResponse.
-func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
+// maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
+// requiredConsecutiveSuccesses requests to succeed in a row before failing the test.
+const maxTimeToConsistency = 30 * time.Second
+
+// requiredConsecutiveSuccesses is the number of requests that must succeed in a row
+// for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
+// before making additional assertions on the response body. If this number is not reached within
+// maxTimeToConsistency, the test will fail.
+const requiredConsecutiveSuccesses = 3
+
+// MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
+// understanding that the request may fail for some amount of time.
+//
+// Once the request succeeds consistently with the response having the expected status code, make
+// additional assertions on the response body using the provided ExpectedResponse.
+func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	if expected.Request.Method == "" {
@@ -72,10 +86,47 @@ func MakeRequestAndExpectResponse(t *testing.T, r roundtripper.RoundTripper, gwA
 			req.Headers[name] = []string{value}
 		}
 	}
-	cReq, cRes, err := r.CaptureRoundTrip(req)
-	require.NoErrorf(t, err, "error making request")
 
+	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
 	ExpectResponse(t, cReq, cRes, expected)
+}
+
+// WaitForConsistency repeats the provided request until it completes with a response having
+// the expected status code consistently. The provided threshold determines how many times in
+// a row this must occur to be considered "consistent".
+func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) (*roundtripper.CapturedRequest, *roundtripper.CapturedResponse) {
+	var (
+		cReq         *roundtripper.CapturedRequest
+		cRes         *roundtripper.CapturedResponse
+		err          error
+		numSuccesses int
+	)
+
+	require.Eventually(t, func() bool {
+		cReq, cRes, err = r.CaptureRoundTrip(req)
+		if err != nil {
+			numSuccesses = 0
+			t.Logf("Request failed, not ready yet: %v", err.Error())
+			return false
+		}
+
+		if cRes.StatusCode != expected.StatusCode {
+			numSuccesses = 0
+			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
+			return false
+		}
+
+		numSuccesses++
+		if numSuccesses < threshold {
+			t.Logf("Request has passed %d times in a row of the desired %d, not ready yet", numSuccesses, threshold)
+			return false
+		}
+
+		t.Logf("Request has passed %d times in a row of the desired %d, ready!", numSuccesses, threshold)
+		return true
+	}, maxTimeToConsistency, 1*time.Second, "error making request, never got expected status")
+
+	return cReq, cRes
 }
 
 // ExpectResponse verifies that a captured request and response match the
