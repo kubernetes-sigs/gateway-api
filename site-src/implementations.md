@@ -30,7 +30,7 @@ Implementors of Gateway API are encouraged to update this document with status i
 [8]:#hashicorp-consul
 [9]:#istio
 [10]:#kong
-[10]:#nginx-kubernetes-gateway
+[11]:#nginx-kubernetes-gateway
 [12]:#traefik
 
 ## Project References
