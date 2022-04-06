@@ -30,7 +30,7 @@ kind: Service
 metadata:
   labels:
     name: gateway-api-webhook-server
-    version: 0.0.1
+    version: dev
   name: gateway-api-admission-server
   namespace: gateway-system
 spec:
@@ -49,6 +49,7 @@ metadata:
   namespace: gateway-system
   labels:
     name: gateway-api-admission-server
+    version: dev
 spec:
   replicas: 1
   selector:
