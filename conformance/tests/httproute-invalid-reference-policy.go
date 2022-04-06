@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -37,20 +38,33 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferencePolicy exists but does not grant permission to route to that specific Service",
 	Manifests:   []string{"tests/httproute-invalid-reference-policy.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		routeName := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
-		gwName := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
-		// TODO: Determine if this is actually what we want. It is likely
-		// preferable to have status set with some kind of warning/error message
-		// but that is also unlikely to be universally achievable.
-		t.Run("Route should not have Parents set in status", func(t *testing.T) {
-			parents := []v1alpha2.RouteParentStatus{}
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeName, parents, true, 60)
+		ns := v1alpha2.Namespace(gwNN.Namespace)
+		kind := v1alpha2.Kind("Gateway")
+
+		t.Run("Route status should have a route parent status with an Accepted condition set to False", func(t *testing.T) {
+			parents := []v1alpha2.RouteParentStatus{{
+				ParentRef: v1alpha2.ParentReference{
+					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+					Kind:      &kind,
+					Name:      v1alpha2.ObjectName(gwNN.Name),
+					Namespace: &ns,
+				},
+				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
+				Conditions: []metav1.Condition{{
+					Type:   string(v1alpha2.ConditionRouteAccepted),
+					Status: metav1.ConditionFalse,
+				}},
+			}}
+
+			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, true, 60)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
 			gw := &v1alpha2.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwName, gw)
+			err := suite.Client.Get(context.TODO(), gwNN, gw)
 			require.NoError(t, err, "error fetching Gateway")
 			// There are two valid ways to represent this:
 			// 1. No listeners in status
