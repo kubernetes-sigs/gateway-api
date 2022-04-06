@@ -25,7 +25,7 @@ readonly CLUSTER_NAME="verify-gateway-api"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
-export PATH="${PATH}:${GOPATH}/bin"
+export PATH="${GOPATH}/bin:${PATH}"
 
 # Cleanup logic for cleanup on exit
 CLEANED_UP=false
