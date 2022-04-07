@@ -21,8 +21,10 @@ documentation].
   Approval of the PR indicates community consensus for a new release.
 
 The following steps must be done by one of the [Gateway API maintainers][gateway-api-team]:
-- If you are making a new major or minor release, cut a `release-major.minor` branch that we
-  can tag things in as needed.
+
+For a major or minor release:
+- Cut a `release-major.minor` branch that we can tag things in as needed.
+For all releases:
 - Check out the `release-major.minor` branch locally
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
 - Run the following commnand `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
