@@ -19,7 +19,9 @@ package kubernetes
 import (
 	"context"
 	"fmt"
+	"net"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -146,7 +148,7 @@ func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerNa
 func WaitForGatewayAddress(t *testing.T, client client.Client, gwName types.NamespacedName, seconds int) (string, error) {
 	t.Helper()
 
-	var ipAddr string
+	var ipAddr, port string
 	waitFor := time.Duration(seconds) * time.Second
 	waitErr := wait.PollImmediate(1*time.Second, waitFor, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -159,6 +161,8 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, gwName types.Name
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
 
+		port = strconv.FormatInt(int64(gw.Spec.Listeners[0].Port), 10)
+
 		// TODO: Support more than IPAddress
 		for _, address := range gw.Status.Addresses {
 			if address.Type != nil && *address.Type == v1alpha2.IPAddressType {
@@ -170,7 +174,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, gwName types.Name
 		return false, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway to have at least one IP address in status")
-	return ipAddr, waitErr
+	return net.JoinHostPort(ipAddr, port), waitErr
 }
 
 // HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
