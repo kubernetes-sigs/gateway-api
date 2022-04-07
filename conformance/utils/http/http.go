@@ -17,6 +17,7 @@ limitations under the License.
 package http
 
 import (
+	"net"
 	"net/url"
 	"strings"
 	"testing"
@@ -71,7 +72,17 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		expected.StatusCode = 200
 	}
 
-	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
+	// Parse gwAddr so we can tell which family it belongs to.
+	ip := net.ParseIP(gwAddr)
+	if ip == nil {
+		t.Errorf("Gateway address %s could not be parsed", gwAddr)
+		return
+	}
+
+	// If gwAddr is an IPV6 then wrap it in [].
+	if ip.To4() == nil {
+		gwAddr = "[" + gwAddr + "]"
+	}
 
 	req := roundtripper.Request{
 		Method:   expected.Request.Method,
@@ -86,6 +97,8 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 			req.Headers[name] = []string{value}
 		}
 	}
+
+	t.Logf("Making %s request to %s", req.Method, req.URL.String())
 
 	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
 	ExpectResponse(t, cReq, cRes, expected)
