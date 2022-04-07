@@ -17,9 +17,9 @@ limitations under the License.
 package tests
 
 import (
-	"slice"
 	"testing"
 
+	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -36,7 +36,7 @@ var HTTPRouteReferencePolicy = suite.ConformanceTest{
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
 	Manifests:   []string{"tests/httproute-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		if !slice.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
+		if !slices.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
 			t.Skip("Skipping ReferencePolicy conformance test")
 		}
 

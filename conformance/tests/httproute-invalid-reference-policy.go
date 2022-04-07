@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/slices"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -37,7 +38,11 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidReferencePolicy",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferencePolicy exists but does not grant permission to route to that specific Service",
 	Manifests:   []string{"tests/httproute-invalid-reference-policy.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		if !slices.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
+			t.Skip("Skipping ReferencePolicy conformance test")
+		}
+
 		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
@@ -52,19 +57,19 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 					Name:      v1alpha2.ObjectName(gwNN.Name),
 					Namespace: &ns,
 				},
-				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
+				ControllerName: v1alpha2.GatewayController(s.ControllerName),
 				Conditions: []metav1.Condition{{
 					Type:   string(v1alpha2.ConditionRouteAccepted),
 					Status: metav1.ConditionFalse,
 				}},
 			}}
 
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, true, 60)
+			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, true, 60)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
 			gw := &v1alpha2.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwNN, gw)
+			err := s.Client.Get(context.TODO(), gwNN, gw)
 			require.NoError(t, err, "error fetching Gateway")
 			// There are two valid ways to represent this:
 			// 1. No listeners in status
