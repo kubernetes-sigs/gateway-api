@@ -22,6 +22,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"strings"
 	"testing"
@@ -134,6 +135,15 @@ func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
 			return nil, fmt.Errorf("received %d bytes from %s, expected %d", count, location, resp.ContentLength)
 		}
 		return manifests, nil
+	} else if strings.HasPrefix(location, "file://") {
+		fn := strings.TrimPrefix(location, "file://")
+
+		b, err := ioutil.ReadFile(fn)
+		if err != nil {
+			return nil, fmt.Errorf("error reading manifests from file: %w", err)
+		}
+
+		return bytes.NewBuffer(b), nil
 	}
 	b, err := conformance.Manifests.ReadFile(location)
 	if err != nil {
