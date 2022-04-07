@@ -26,6 +26,15 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
+// ConformanceTestSupport is a specific subset of extended support for opting in to
+// additional conformance tests.
+type ConformanceTestSupport string
+
+const (
+	// This conformance test option indicates support for the ReferencePolicy object.
+	SupportReferencePolicy ConformanceTestSupport = "ReferencePolicy"
+)
+
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
 type ConformanceTestSuite struct {
@@ -37,6 +46,7 @@ type ConformanceTestSuite struct {
 	Cleanup          bool
 	BaseManifests    string
 	Applier          kubernetes.Applier
+	ExtendedSupport  []ConformanceTestSupport
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -58,6 +68,7 @@ type Options struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources bool
+	ExtendedSupport      []ConformanceTestSupport
 }
 
 // New returns a new ConformanceTestSuite.
@@ -78,6 +89,7 @@ func New(s Options) *ConformanceTestSuite {
 			NamespaceLabels:          s.NamespaceLabels,
 			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
 		},
+		ExtendedSupport: s.ExtendedSupport,
 	}
 
 	// apply defaults

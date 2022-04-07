@@ -17,6 +17,7 @@ limitations under the License.
 package tests
 
 import (
+	"slice"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -34,13 +35,17 @@ var HTTPRouteReferencePolicy = suite.ConformanceTest{
 	ShortName:   "HTTPRouteReferencePolicy",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
 	Manifests:   []string{"tests/httproute-reference-policy.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		if !slice.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
+			t.Skip("Skipping ReferencePolicy conformance test")
+		}
+
 		routeNN := types.NamespacedName{Name: "reference-policy", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
 
 		t.Run("Simple HTTP request should reach web-backend", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.ExpectedRequest{
 					Method: "GET",
 					Path:   "/",

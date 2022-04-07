@@ -18,6 +18,7 @@ package tests
 
 import (
 	"context"
+	"slice"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -36,7 +37,11 @@ var HTTPRouteInvalidCrossNamespace = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidCrossNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should fail to attach to a Gateway in another namespace that it is not allowed to",
 	Manifests:   []string{"tests/httproute-invalid-cross-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		if !slice.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
+			t.Skip("Skipping ReferencePolicy conformance test")
+		}
+
 		routeName := types.NamespacedName{Name: "invalid-cross-namespace", Namespace: "gateway-conformance-web-backend"}
 		gwName := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
@@ -45,12 +50,12 @@ var HTTPRouteInvalidCrossNamespace = suite.ConformanceTest{
 		// but that is also unlikely to be universally achievable.
 		t.Run("Route should not have Parents set in status", func(t *testing.T) {
 			parents := []v1alpha2.RouteParentStatus{}
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeName, parents, true, 60)
+			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeName, parents, true, 60)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
 			gw := &v1alpha2.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwName, gw)
+			err := s.Client.Get(context.TODO(), gwName, gw)
 			require.NoError(t, err, "error fetching Gateway")
 			// There are two valid ways to represent this:
 			// 1. No listeners in status
