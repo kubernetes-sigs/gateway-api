@@ -57,3 +57,4 @@ do
     cat $file >> release/stable-install.yaml
 done
 
+echo "Generated:" release/*-install.yaml
