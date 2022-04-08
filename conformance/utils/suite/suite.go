@@ -35,16 +35,18 @@ type ConformanceTestSuite struct {
 	Debug            bool
 	Cleanup          bool
 	BaseManifests    string
+	Applier          kubernetes.Applier
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
-	Client           client.Client
-	GatewayClassName string
-	Debug            bool
-	Cleanup          bool
-	RoundTripper     roundtripper.RoundTripper
-	BaseManifests    string
+	Client               client.Client
+	GatewayClassName     string
+	Debug                bool
+	Cleanup              bool
+	RoundTripper         roundtripper.RoundTripper
+	BaseManifests        string
+	NamespaceAnnotations map[string]string
 }
 
 // New returns a new ConformanceTestSuite.
@@ -61,6 +63,9 @@ func New(s Options) *ConformanceTestSuite {
 		Debug:            s.Debug,
 		Cleanup:          s.Cleanup,
 		BaseManifests:    s.BaseManifests,
+		Applier: kubernetes.Applier{
+			NamespaceAnnotations: s.NamespaceAnnotations,
+		},
 	}
 
 	// apply defaults
@@ -78,7 +83,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.GatewayClassName, 180)
 
 	t.Logf("Test Setup: Applying base manifests")
-	kubernetes.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
+	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
 
 	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 	namespaces := []string{
@@ -116,7 +121,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 	for _, manifestLocation := range test.Manifests {
 		t.Logf("Applying %s", manifestLocation)
-		kubernetes.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
+		suite.Applier.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
 	}
 
 	test.Test(t, suite)
