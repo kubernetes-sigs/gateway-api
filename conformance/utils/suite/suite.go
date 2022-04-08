@@ -21,6 +21,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -47,6 +48,9 @@ type Options struct {
 	RoundTripper     roundtripper.RoundTripper
 	BaseManifests    string
 	NamespaceLabels  map[string]string
+	// ValidListenerPorts holds a list of ports assignable to Gateway listeners.
+	// If empty, every listener port will be left as is.
+	ValidListenerPorts []v1alpha2.PortNumber
 }
 
 // New returns a new ConformanceTestSuite.
@@ -64,7 +68,8 @@ func New(s Options) *ConformanceTestSuite {
 		Cleanup:          s.Cleanup,
 		BaseManifests:    s.BaseManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels: s.NamespaceLabels,
+			NamespaceLabels:    s.NamespaceLabels,
+			ValidListenerPorts: s.ValidListenerPorts,
 		},
 	}
 

@@ -34,11 +34,63 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance"
 )
 
+// Applier prepares manifests depending on the available options and applies
+// them to the Kubernetes cluster.
 type Applier struct {
-	NamespaceLabels map[string]string
+	NamespaceLabels    map[string]string
+	ValidListenerPorts []v1alpha2.PortNumber
+}
+
+// prepareGateway adjusts both listener ports and the gatewayClassName. It
+// returns an index pointing to the next valid listener port.
+func prepareGateway(t *testing.T, uObj *unstructured.Unstructured, gatewayClassName string, validListenerPorts []v1alpha2.PortNumber, portIndex int) int {
+	err := unstructured.SetNestedField(uObj.Object, gatewayClassName, "spec", "gatewayClassName")
+	require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
+
+	if len(validListenerPorts) > 0 {
+		listeners, _, err := unstructured.NestedSlice(uObj.Object, "spec", "listeners")
+		require.NoErrorf(t, err, "error getting `spec.listeners` on %s Gateway resource", uObj.GetName())
+
+		for i, uListener := range listeners {
+			require.Less(t, portIndex, len(validListenerPorts), "not enough unassigned valid ports for `spec.listeners[%d]` on %s Gateway resource", i, uObj.GetName())
+
+			listener, ok := uListener.(map[string]interface{})
+			require.Truef(t, ok, "unexpected type at `spec.listeners[%d]` on %s Gateway resource", i, uObj.GetName())
+
+			nextPort := validListenerPorts[portIndex]
+			err = unstructured.SetNestedField(listener, int64(nextPort), "port")
+			require.NoErrorf(t, err, "error setting `spec.listeners[%d].port` on %s Gateway resource", i, uObj.GetName())
+
+			portIndex++
+			listeners[i] = listener
+		}
+
+		err = unstructured.SetNestedSlice(uObj.Object, listeners, "spec", "listeners")
+		require.NoErrorf(t, err, "error setting `spec.listeners` on %s Gateway resource", uObj.GetName())
+	}
+
+	return portIndex
+}
+
+// prepareNamespace adjusts the Namespace labels.
+func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLabels map[string]string) {
+	labels, _, err := unstructured.NestedMap(uObj.Object, "metadata", "labels")
+	require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
+
+	if labels == nil {
+		labels = map[string]interface{}{}
+	}
+
+	for k, v := range namespaceLabels {
+		labels[k] = v
+	}
+
+	err = unstructured.SetNestedMap(uObj.Object, labels, "metadata", "labels")
+	require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
 }
 
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
@@ -49,6 +101,8 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 	require.NoError(t, err)
 
 	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
+
+	portIndex := 0
 	for {
 		uObj := unstructured.Unstructured{}
 		if decodeErr := decoder.Decode(&uObj); decodeErr != nil {
@@ -63,24 +117,11 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 		}
 
 		if uObj.GetKind() == "Gateway" {
-			err = unstructured.SetNestedField(uObj.Object, gcName, "spec", "gatewayClassName")
-			require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
+			portIndex = prepareGateway(t, &uObj, gcName, a.ValidListenerPorts, portIndex)
 		}
 
 		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
-			labels, _, err := unstructured.NestedMap(uObj.Object, "metadata", "labels")
-			require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
-
-			if labels == nil {
-				labels = map[string]interface{}{}
-			}
-
-			for k, v := range a.NamespaceLabels {
-				labels[k] = v
-			}
-
-			err = unstructured.SetNestedMap(uObj.Object, labels, "metadata", "labels")
-			require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
+			prepareNamespace(t, &uObj, a.NamespaceLabels)
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
