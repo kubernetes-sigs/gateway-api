@@ -37,10 +37,14 @@ import (
 	"sigs.k8s.io/gateway-api/conformance"
 )
 
+type Applier struct {
+	NamespaceLabels map[string]string
+}
+
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
 // provided YAML file and registers a cleanup function for resources it created.
 // Note that this does not remove resources that already existed in the cluster.
-func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName string, cleanup bool) {
+func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName string, cleanup bool) {
 	data, err := getContentsFromPathOrURL(location)
 	require.NoError(t, err)
 
@@ -61,6 +65,22 @@ func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName
 		if uObj.GetKind() == "Gateway" {
 			err = unstructured.SetNestedField(uObj.Object, gcName, "spec", "gatewayClassName")
 			require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
+		}
+
+		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
+			labels, _, err := unstructured.NestedMap(uObj.Object, "metadata", "labels")
+			require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
+
+			if labels == nil {
+				labels = map[string]interface{}{}
+			}
+
+			for k, v := range a.NamespaceLabels {
+				labels[k] = v
+			}
+
+			err = unstructured.SetNestedMap(uObj.Object, labels, "metadata", "labels")
+			require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
 		}
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
