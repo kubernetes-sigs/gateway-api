@@ -20,20 +20,20 @@ set -o pipefail
 
 thisyear=`date +"%Y"`
 
-mkdir -p install
+mkdir -p release/
 
 # Make clean files with boilerplate
-cat hack/boilerplate/boilerplate.sh.txt > install/experimental.yaml
-sed -i "s/YEAR/$thisyear/g" install/experimental.yaml
-cat << EOF >> install/experimental.yaml
+cat hack/boilerplate/boilerplate.sh.txt > release/experimental-install.yaml
+sed -i "s/YEAR/$thisyear/g" release/experimental-install.yaml
+cat << EOF >> release/experimental-install.yaml
 #
 # Gateway API Experimental channel install
 #
 EOF
 
-cat hack/boilerplate/boilerplate.sh.txt > install/stable.yaml
-sed -i "s/YEAR/$thisyear/g" install/stable.yaml
-cat << EOF >> install/stable.yaml
+cat hack/boilerplate/boilerplate.sh.txt > release/stable-install.yaml
+sed -i "s/YEAR/$thisyear/g" release/stable-install.yaml
+cat << EOF >> release/stable-install.yaml
 #
 # Gateway API Stable channel install
 #
@@ -41,19 +41,19 @@ EOF
 
 for file in `ls config/webhook/*.yaml config/crd/experimental/*.yaml`
 do
-    echo "---" >> install/experimental.yaml
-    echo "#" >> install/experimental.yaml
-    echo "# $file" >> install/experimental.yaml
-    echo "#" >> install/experimental.yaml
-    cat $file >> install/experimental.yaml
+    echo "---" >> release/experimental-install.yaml
+    echo "#" >> release/experimental-install.yaml
+    echo "# $file" >> release/experimental-install.yaml
+    echo "#" >> release/experimental-install.yaml
+    cat $file >> release/experimental-install.yaml
 done
 
 for file in `ls config/webhook/*.yaml config/crd/stable/*.yaml`
 do
-    echo "---" >> install/stable.yaml
-    echo "#" >> install/stable.yaml
-    echo "# $file" >> install/stable.yaml
-    echo "#" >> install/stable.yaml
-    cat $file >> install/stable.yaml
+    echo "---" >> release/stable-install.yaml
+    echo "#" >> release/stable-install.yaml
+    echo "# $file" >> release/stable-install.yaml
+    echo "#" >> release/stable-install.yaml
+    cat $file >> release/stable-install.yaml
 done
 
