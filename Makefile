@@ -53,7 +53,7 @@ all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: update-codegen update-webhook-yaml build-install-yaml
+generate: update-codegen update-webhook-yaml
 
 .PHONY: update-codegen
 update-codegen:

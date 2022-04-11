@@ -32,6 +32,9 @@ For all releases:
   published in the next step.
 - Publish a new Git tag. This can  be done using the `git` CLI or Github's [release][release]
   page.
+- Run the `make build-install-yaml` command which will generate
+  install files in the `release/` directory and attach these files to
+  the Github release.
 
 [release]: https://gateway-api.sigs.k8s.io/references/releases/
 [gateway-api-team]: https://github.com/kubernetes/org/blob/master/config/kubernetes-sigs/sig-network/teams.yaml
