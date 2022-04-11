@@ -35,7 +35,6 @@ then
     echo "Working on semver, need to replace."
     for yaml in `ls config/webhook/*.yaml`
     do
-        sed -i "s/version: dev/version: ${BASE_REF}/g" $yaml
         sed -i "s/:latest/:${BASE_REF}/g" $yaml
     done
 else
