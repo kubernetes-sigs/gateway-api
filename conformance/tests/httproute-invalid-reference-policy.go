@@ -37,12 +37,11 @@ func init() {
 var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidReferencePolicy",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferencePolicy exists but does not grant permission to route to that specific Service",
-	Manifests:   []string{"tests/httproute-invalid-reference-policy.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportReferencePolicy,
+	},
+	Manifests: []string{"tests/httproute-invalid-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		if !slices.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
-			t.Skip("Skipping ReferencePolicy conformance test")
-		}
-
 		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 

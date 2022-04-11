@@ -19,7 +19,6 @@ package tests
 import (
 	"testing"
 
-	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
@@ -34,12 +33,11 @@ func init() {
 var HTTPRouteReferencePolicy = suite.ConformanceTest{
 	ShortName:   "HTTPRouteReferencePolicy",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
-	Manifests:   []string{"tests/httproute-reference-policy.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportReferencePolicy,
+	},
+	Manifests: []string{"tests/httproute-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		if !slices.Contains(s.ExtendedSupport, suite.SupportReferencePolicy) {
-			t.Skip("Skipping ReferencePolicy conformance test")
-		}
-
 		routeNN := types.NamespacedName{Name: "reference-policy", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
