@@ -41,7 +41,7 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-invalid-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-app-backend"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		ns := v1alpha2.Namespace(gwNN.Namespace)
