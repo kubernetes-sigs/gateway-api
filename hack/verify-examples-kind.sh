@@ -53,7 +53,7 @@ kind create cluster --name "${CLUSTER_NAME}" || res=$?
 
 # Install webhook
 docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
-kubectl apply -f deploy/
+kubectl apply -f config/webhook/
 
 # Wait for webhook to be ready
 for check in {1..10}; do 
