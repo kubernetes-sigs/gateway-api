@@ -41,7 +41,7 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-invalid-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-app-backend"}
+		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		ns := v1alpha2.Namespace(gwNN.Namespace)
@@ -62,7 +62,7 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 				}},
 			}}
 
-			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, true, 60)
+			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, false, 60)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {

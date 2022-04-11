@@ -59,7 +59,7 @@ var HTTPRouteMissingReferencePolicy = suite.ConformanceTest{
 				}},
 			}}
 
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, true, 60)
+			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, false, 60)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
