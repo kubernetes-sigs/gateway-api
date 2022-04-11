@@ -78,18 +78,18 @@ func prepareGateway(t *testing.T, uObj *unstructured.Unstructured, gatewayClassN
 
 // prepareNamespace adjusts the Namespace labels.
 func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLabels map[string]string) {
-	labels, _, err := unstructured.NestedMap(uObj.Object, "metadata", "labels")
+	labels, _, err := unstructured.NestedStringMap(uObj.Object, "metadata", "labels")
 	require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
 
 	if labels == nil {
-		labels = map[string]interface{}{}
+		labels = map[string]string{}
 	}
 
 	for k, v := range namespaceLabels {
 		labels[k] = v
 	}
 
-	err = unstructured.SetNestedMap(uObj.Object, labels, "metadata", "labels")
+	err = unstructured.SetNestedStringMap(uObj.Object, labels, "metadata", "labels")
 	require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
 }
 
