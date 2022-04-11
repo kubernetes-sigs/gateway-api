@@ -81,6 +81,7 @@ func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName
 				t.Cleanup(func() {
 					ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 					defer cancel()
+					t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
 					err = c.Delete(ctx, &uObj)
 					require.NoErrorf(t, err, "error deleting resource")
 				})
@@ -96,6 +97,7 @@ func MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName
 			t.Cleanup(func() {
 				ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 				defer cancel()
+				t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
 				err = c.Delete(ctx, &uObj)
 				require.NoErrorf(t, err, "error deleting resource")
 			})
