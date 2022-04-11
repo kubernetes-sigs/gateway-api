@@ -135,7 +135,7 @@ type GatewaySpec struct {
 	// it assigns to the Gateway and add a corresponding entry in
 	// GatewayStatus.Addresses.
 	//
-	// Support: Core
+	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
