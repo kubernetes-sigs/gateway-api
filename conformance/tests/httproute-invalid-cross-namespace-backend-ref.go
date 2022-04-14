@@ -1,4 +1,4 @@
-/*
+/*-v2
 Copyright 2022 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,8 @@ limitations under the License.
 package tests
 
 import (
-	"context"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -30,21 +28,24 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteMissingReferencePolicy)
+	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidCrossNamespaceBackendRef)
 }
 
-var HTTPRouteMissingReferencePolicy = suite.ConformanceTest{
-	ShortName:   "HTTPRouteMissingReferencePolicy",
-	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to route to that Service does not exist",
-	Manifests:   []string{"tests/httproute-missing-reference-policy.yaml"},
+var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
+	ShortName:   "HTTPRouteInvalidCrossNamespaceBackendRef",
+	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set a ResolvedRefs status False with reason RefNotPermitted when attempting to bind to a Gateway in the same namespace if the route has a BackendRef Service in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to route to that Service does not exist",
+	Manifests:   []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "missing-reference-policy", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		ns := v1alpha2.Namespace(gwNN.Namespace)
 		kind := v1alpha2.Kind("Gateway")
 
-		t.Run("Route status should have a route parent status with an Accepted condition set to False", func(t *testing.T) {
+		// TODO(mikemorris): Add check for Accepted condition once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
+		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 			parents := []v1alpha2.RouteParentStatus{{
 				ParentRef: v1alpha2.ParentReference{
 					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
@@ -54,28 +55,18 @@ var HTTPRouteMissingReferencePolicy = suite.ConformanceTest{
 				},
 				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
 				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.ConditionRouteAccepted),
+					Type:   string(v1alpha2.RouteConditionResolvedRefs),
 					Status: metav1.ConditionFalse,
+					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 				}},
 			}}
 
 			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, false, 60)
 		})
 
-		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
-			gw := &v1alpha2.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwNN, gw)
-			require.NoError(t, err, "error fetching Gateway")
-			// There are two valid ways to represent this:
-			// 1. No listeners in status
-			// 2. One listener in status with 0 attached routes
-			if len(gw.Status.Listeners) == 0 {
-				// No listeners in status.
-			} else if len(gw.Status.Listeners) == 1 {
-				require.Equal(t, int32(0), gw.Status.Listeners[0].AttachedRoutes)
-			} else {
-				t.Errorf("Expected no more than 1 listener in status, got %d", len(gw.Status.Listeners))
-			}
-		})
+		// TODO(mikemorris): Add check for Listener attached routes or
+		// ResolvedRefs RefNotPermittedAccepted condition once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
 	},
 }
