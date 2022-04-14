@@ -77,19 +77,29 @@ spec:
                   have specified hostnames, and none match with the criteria above,
                   then the HTTPRoute is not accepted. The implementation must raise
                   an 'Accepted' Condition with a status of `False` in the corresponding
-                  RouteParentStatus. \n Support: Core"
+                  RouteParentStatus. \n If a Route (A) of type HTTPRoute or GRPCRoute
+                  is attached to a Listener and that listener already has another
+                  Route (B) of the other type attached and the intersection of the
+                  hostnames of A and B is non-empty, then the implementation MUST
+                  accept exactly one of these two routes, determined by the following
+                  criteria, in order: \n * The oldest Route based on creation timestamp.
+                  * The Route appearing first in alphabetical order by   \"{namespace}/{name}\".
+                  \n The rejected Route MUST raise an 'Accepted' condition with a
+                  status of 'False' in the corresponding RouteParentStatus. \n Support:
+                  Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
                     2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
-                    may be prefixed with a wildcard label (`*.`). The wildcard    label
-                    must appear by itself as the first label. \n Hostname can be \"precise\"
-                    which is a domain name without the terminating dot of a network
-                    host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain
-                    name prefixed with a single wildcard label (e.g. `*.example.com`).
-                    \n Note that as per RFC1035 and RFC1123, a *label* must consist
-                    of lower case alphanumeric characters or '-', and must start and
-                    end with an alphanumeric character. No other punctuation is allowed."
+                    may be prefixed with a wildcard label (`*.`). The wildcard \n
+                    \tlabel must appear by itself as the first label. \n Hostname
+                    can be \"precise\" which is a domain name without the terminating
+                    dot of a network host (e.g. \"foo.example.com\") or \"wildcard\",
+                    which is a domain name prefixed with a single wildcard label (e.g.
+                    `*.example.com`). \n Note that as per RFC1035 and RFC1123, a *label*
+                    must consist of lower case alphanumeric characters or '-', and
+                    must start and end with an alphanumeric character. No other punctuation
+                    is allowed."
                   maxLength: 253
                   minLength: 1
                   pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
