@@ -191,9 +191,15 @@ const (
 	// by a Gateway, and why.
 	RouteConditionAccepted RouteConditionType = "Accepted"
 
+	// FIXME: alias for backwards compatibility in v1alpha2, remove in next release
+	ConditionRouteAccepted RouteConditionType = RouteConditionAccepted
+
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	RouteConditionResolvedRefs RouteConditionType = "ResolvedRefs"
+
+	// FIXME: alias for backwards compatibility in v1alpha2, remove in next release
+	ConditionRouteResolvedRefs RouteConditionType = RouteConditionResolvedRefs
 )
 
 // RouteParentStatus describes the status of a route with respect to an
