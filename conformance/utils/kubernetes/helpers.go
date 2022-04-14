@@ -235,18 +235,27 @@ func parentsMatch(t *testing.T, expected, actual []v1alpha2.RouteParentStatus, n
 				return false
 			}
 		}
-		if len(aParent.Conditions) < len(eParent.Conditions) {
-			t.Logf("Expected more conditions to be present")
+		if !conditionsMatch(t, aParent.Conditions, eParent.Conditions) {
 			return false
-		}
-		for _, condition := range eParent.Conditions {
-			if !findConditionInList(t, aParent.Conditions, condition.Type, string(condition.Status)) {
-				return false
-			}
 		}
 	}
 
 	t.Logf("Route parents matched expectations")
+	return true
+}
+
+func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
+	if len(actual) < len(expected) {
+		t.Logf("Expected more conditions to be present")
+		return false
+	}
+	for _, condition := range expected {
+		if !findConditionInList(t, actual, condition.Type, string(condition.Status)) {
+			return false
+		}
+	}
+
+	t.Logf("Conditions matched expectations")
 	return true
 }
 
