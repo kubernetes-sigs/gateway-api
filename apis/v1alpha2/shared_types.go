@@ -189,11 +189,11 @@ type RouteConditionType string
 const (
 	// This condition indicates whether the route has been accepted or rejected
 	// by a Gateway, and why.
-	ConditionRouteAccepted RouteConditionType = "Accepted"
+	RouteConditionAccepted RouteConditionType = "Accepted"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
-	ConditionRouteResolvedRefs RouteConditionType = "ResolvedRefs"
+	RouteConditionResolvedRefs RouteConditionType = "ResolvedRefs"
 )
 
 // RouteParentStatus describes the status of a route with respect to an
