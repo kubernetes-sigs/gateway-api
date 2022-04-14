@@ -244,6 +244,64 @@ func parentsMatch(t *testing.T, expected, actual []v1alpha2.RouteParentStatus, n
 	return true
 }
 
+// GatewayStatusMustHaveListeners waits for the specified Gateway to have listeners
+// in status that match the expected listeners. This will cause the test to halt
+// if the specified timeout is exceeded.
+func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, gwNN types.NamespacedName, listeners []v1alpha2.ListenerStatus, seconds int) {
+	t.Helper()
+
+	var actual []v1alpha2.ListenerStatus
+	waitFor := time.Duration(seconds) * time.Second
+	waitErr := wait.PollImmediate(1*time.Second, waitFor, func() (bool, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		gw := &v1alpha2.Gateway{}
+		err := client.Get(ctx, gwNN, gw)
+		if err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		actual = gw.Status.Listeners
+
+		return listenersMatch(t, listeners, actual), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
+}
+
+// TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
+func listenersMatch(t *testing.T, expected, actual []v1alpha2.ListenerStatus) bool {
+	t.Helper()
+
+	if len(expected) != len(actual) {
+		t.Logf("Expected %d Gateway status listeners, got %d", len(expected), len(actual))
+		return false
+	}
+
+	// TODO(mikemorris): Allow for arbitrarily ordered listeners
+	for i, eListener := range expected {
+		aListener := actual[i]
+		if aListener.Name != eListener.Name {
+			t.Logf("Name doesn't match")
+			return false
+		}
+		if !reflect.DeepEqual(aListener.SupportedKinds, eListener.SupportedKinds) {
+			t.Logf("Expected SupportedKinds to be %v, got %v", eListener.SupportedKinds, aListener.SupportedKinds)
+			return false
+		}
+		if aListener.AttachedRoutes != eListener.AttachedRoutes {
+			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
+			return false
+		}
+		if !conditionsMatch(t, aListener.Conditions, eListener.Conditions) {
+			return false
+		}
+	}
+
+	t.Logf("Gateway status listeners matched expectations")
+	return true
+}
+
 func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 	if len(actual) < len(expected) {
 		t.Logf("Expected more conditions to be present")
