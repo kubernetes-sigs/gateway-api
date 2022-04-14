@@ -27,6 +27,15 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
+// ExemptFeature allows opting out of core conformance tests at an
+// individual feature granularity.
+type ExemptFeature string
+
+const (
+	// This option indicates support for the ReferencePolicy object.
+	ExemptReferencePolicy ExemptFeature = "ReferencePolicy"
+)
+
 // SupportedFeature allows opting in to additional conformance tests at an
 // individual feature granularity.
 type SupportedFeature string
@@ -47,6 +56,7 @@ type ConformanceTestSuite struct {
 	Cleanup           bool
 	BaseManifests     string
 	Applier           kubernetes.Applier
+	ExemptFeatures    []ExemptFeature
 	SupportedFeatures []SupportedFeature
 }
 
@@ -69,6 +79,7 @@ type Options struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources bool
+	ExemptFeatures       []ExemptFeature
 	SupportedFeatures    []SupportedFeature
 }
 
@@ -90,6 +101,7 @@ func New(s Options) *ConformanceTestSuite {
 			NamespaceLabels:          s.NamespaceLabels,
 			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
 		},
+		ExemptFeatures:    s.ExemptFeatures,
 		SupportedFeatures: s.SupportedFeatures,
 	}
 
@@ -132,6 +144,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) {
 type ConformanceTest struct {
 	ShortName   string
 	Description string
+	Exemptions  []ExemptFeature
 	Features    []SupportedFeature
 	Manifests   []string
 	Slow        bool
@@ -151,6 +164,14 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	for _, feature := range test.Features {
 		if !slices.Contains(suite.SupportedFeatures, feature) {
 			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
+		}
+	}
+
+	// Check that no features excerised by the test have been opted out of by
+	// the suite.
+	for _, feature := range test.Exemptions {
+		if !slices.Contains(suite.ExemptFeatures, feature) {
+			t.Skip("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
 
