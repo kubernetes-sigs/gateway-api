@@ -23,11 +23,6 @@ spec:
   - name: same-namespace
   rules:
   - backendRefs:
-    - name: app-backend-v1
-      namespace: gateway-conformance-app-backend
-      port: 8080
-      weight: 90
     - name: app-backend-v2
       namespace: gateway-conformance-app-backend
       port: 8080
-      weight: 10

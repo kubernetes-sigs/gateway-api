@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -45,40 +46,61 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		ns := v1alpha2.Namespace(gwNN.Namespace)
-		kind := v1alpha2.Kind("Gateway")
+		gwKind := v1alpha2.Kind("Gateway")
 
-		t.Run("Route status should have a route parent status with an Accepted condition set to False", func(t *testing.T) {
+		// TODO(mikemorris): Add check for Accepted condition once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
+		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 			parents := []v1alpha2.RouteParentStatus{{
 				ParentRef: v1alpha2.ParentReference{
 					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-					Kind:      &kind,
+					Kind:      &gwKind,
 					Name:      v1alpha2.ObjectName(gwNN.Name),
 					Namespace: &ns,
 				},
 				ControllerName: v1alpha2.GatewayController(s.ControllerName),
 				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.ConditionRouteAccepted),
+					Type:   string(v1alpha2.RouteConditionResolvedRefs),
 					Status: metav1.ConditionFalse,
+					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 				}},
 			}}
 
 			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, false, 60)
 		})
 
-		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
-			gw := &v1alpha2.Gateway{}
-			err := s.Client.Get(context.TODO(), gwNN, gw)
-			require.NoError(t, err, "error fetching Gateway")
-			// There are two valid ways to represent this:
-			// 1. No listeners in status
-			// 2. One listener in status with 0 attached routes
-			if len(gw.Status.Listeners) == 0 {
-				// No listeners in status.
-			} else if len(gw.Status.Listeners) == 1 {
-				require.Equal(t, int32(0), gw.Status.Listeners[0].AttachedRoutes)
-			} else {
-				t.Errorf("Expected no more than 1 listener in status, got %d", len(gw.Status.Listeners))
-			}
+		t.Run("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
+			listeners := []v1alpha2.ListenerStatus{{
+				Name: v1alpha2.SectionName("http"),
+				SupportedKinds: []v1alpha2.RouteGroupKind{{
+					Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+					Kind:  v1alpha2.Kind("HTTPRoute"),
+				}},
+				Conditions: []metav1.Condition{{
+					Type:   string(v1alpha2.RouteConditionResolvedRefs),
+					Status: metav1.ConditionFalse,
+					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
+				}},
+			}}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
+		})
+
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
+
+		t.Run("Simple HTTP request should not reach app-backend-v2", func(t *testing.T) {
+			// This requires consecutive successes, so we only configure a single backend
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
+				Request: http.ExpectedRequest{
+					Method: "GET",
+					Path:   "/",
+				},
+				StatusCode: 503,
+				// TODO: should these fields be populated when the BackendRef is invalid?
+				Backend:   "app-backend-v2",
+				Namespace: "gateway-conformance-app-backend",
+			})
 		})
 	},
 }
