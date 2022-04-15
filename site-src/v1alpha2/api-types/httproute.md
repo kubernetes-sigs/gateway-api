@@ -185,7 +185,7 @@ status:
       status: "True"
 ```
 
-### Merging
+## Merging
 Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
