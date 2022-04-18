@@ -293,7 +293,7 @@ func listenersMatch(t *testing.T, expected, actual []v1alpha2.ListenerStatus) bo
 			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
 			return false
 		}
-		if !conditionsMatch(t, aListener.Conditions, eListener.Conditions) {
+		if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
 			return false
 		}
 	}
