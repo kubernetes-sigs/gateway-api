@@ -235,7 +235,7 @@ func parentsMatch(t *testing.T, expected, actual []v1alpha2.RouteParentStatus, n
 				return false
 			}
 		}
-		if !conditionsMatch(t, aParent.Conditions, eParent.Conditions) {
+		if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
 			return false
 		}
 	}
