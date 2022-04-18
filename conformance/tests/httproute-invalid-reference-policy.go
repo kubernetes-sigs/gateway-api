@@ -68,7 +68,12 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, false, 60)
 		})
 
-		t.Run("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
+		// TODO(mikemorris): Un-skip check for Listener ResolvedRefs
+		// RefNotPermitted condition and/or add check for attached
+		// routes and any expected Listener conditions once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
+		t.Skip("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{
 				Name: v1alpha2.SectionName("http"),
 				SupportedKinds: []v1alpha2.RouteGroupKind{{
@@ -87,12 +92,16 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
 
+		// TODO(mikemorris): Add check for HTTP requests successfully reaching
+		// app-backend-v1 at path "/" if it is determined that a Route with at
+		// at least one allowed BackendRef should be accepted by a Gateway
+		// and partially configured.
+
 		t.Run("Simple HTTP request should not reach app-backend-v2", func(t *testing.T) {
-			// This requires consecutive successes, so we only configure a single backend
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.ExpectedRequest{
 					Method: "GET",
-					Path:   "/",
+					Path:   "/v2",
 				},
 				StatusCode: 503,
 				// TODO: should these fields be populated when the BackendRef is invalid?
