@@ -168,8 +168,8 @@ unspecified, the rule performs no forwarding. If unspecified and no filters
 are specified that would result in a response being sent, a 503 error code
 is returned.
 
-The following example forwards HTTP requests for prefiex `/bar` to service
-"my-service1" on port `8080` and HTTP requests for prefex `/some/thing` with
+The following example forwards HTTP requests for prefix `/bar` to service
+"my-service1" on port `8080` and HTTP requests for prefix `/some/thing` with
 header `magic: foo` to service "my-service2" on port `8080`:
 ```yaml
 {% include 'v1alpha1/basic-http.yaml' %}
@@ -228,7 +228,7 @@ A maximum of 100 Gateways can be represented in this list. If this list is full,
 there may be additional Gateways using this Route that are not included in the
 list.
 
-### Merging
+## Merging
 Multiple HTTPRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
