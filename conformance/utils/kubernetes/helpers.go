@@ -361,6 +361,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, condValue string) bool {
 	for _, cond := range conditions {
 		if cond.Type == condName {
+			// TODO(nathancoleman): Compare Reason
 			if cond.Status == metav1.ConditionStatus(condValue) {
 				return true
 			}
