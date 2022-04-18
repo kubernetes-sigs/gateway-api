@@ -1,8 +1,8 @@
 # Implementations
 
-This document tracks downstream implementations of Gateway API and provides status and resource references for them.
+This document tracks downstream implementations and integrations of Gateway API and provides status and resource references for them.
 
-Implementors of Gateway API are encouraged to update this document with status information about their implementations, the versions they cover, and documentation to help users get started.
+Implementors and integrators of Gateway API are encouraged to update this document with status information about their implementations, the versions they cover, and documentation to help users get started.
 
 ## Implementation Status
 
@@ -20,6 +20,10 @@ Implementors of Gateway API are encouraged to update this document with status i
 - [NGINX Kubernetes Gateway][11] (pre-alpha)
 - [Traefik][12] (alpha)
 
+## Integratation Status
+- [Flagger][13] (public preview)
+- [cert-manager][14] (alpha)
+
 [1]:#epic
 [2]:#apisix
 [3]:#contour
@@ -32,8 +36,10 @@ Implementors of Gateway API are encouraged to update this document with status i
 [10]:#kong
 [11]:#nginx-kubernetes-gateway
 [12]:#traefik
+[13]:#flagger
+[14]:#cert-manager
 
-## Project References
+## Implementations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
 
@@ -159,3 +165,25 @@ Traefik is currently working on implementing TCP, status updates and documentati
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+
+## Integratations
+
+In this section you will find specific links to blog posts, documentation and other Gateway API references for specific integrations.
+
+### Flagger
+
+[Flagger][flagger] is a progressive delivery tool that automates the release process for applications running on Kubernetes.
+
+Flagger can be used to automate canary deployments and A/B testing using Gateway API. It currently supports the `v1alpha2` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
+
+[flagger]:https://flagger.app
+[flagger-tutorial]:https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery
+
+### cert-manager
+
+[cert-manager][cert-manager] is a tool to automate certificate management in cloud native environments.
+
+cert-manager can generate TLS certificates for Gateway resources. This is configured by adding annotations to a Gateway. It currently supports the `v1alpha2` spec of Gateway API. You can refer to the [cert-manager docs][cert-manager-docs] to try it out.
+
+[cert-manager]:https://cert-manager.io/
+[cert-manager-docs]:https://cert-manager.io/docs/usage/gateway/
