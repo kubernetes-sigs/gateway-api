@@ -67,10 +67,7 @@ spec:
                     is Gateway. This API may be extended in the future to support
                     additional kinds of parent resources, such as HTTPRoute. \n The
                     API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid. \n
-                    References to objects with invalid Group and Kind are not valid,
-                    and must be rejected by the implementation, with appropriate Conditions
-                    set on the containing object."
+                    be registered in the cluster for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
