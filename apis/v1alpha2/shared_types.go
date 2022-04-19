@@ -202,9 +202,6 @@ const (
 	// interoperability.
 	RouteConditionAccepted RouteConditionType = "Accepted"
 
-	// FIXME: alias for backwards compatibility in v1alpha2, remove in next release
-	ConditionRouteAccepted RouteConditionType = RouteConditionAccepted
-
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	//
@@ -220,9 +217,6 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	RouteConditionResolvedRefs RouteConditionType = "ResolvedRefs"
-
-	// FIXME: alias for backwards compatibility in v1alpha2, remove in next release
-	ConditionRouteResolvedRefs RouteConditionType = RouteConditionResolvedRefs
 
 	// This reason is used with the "Accepted" condition when the Route has been
 	// accepted by the Gateway.
