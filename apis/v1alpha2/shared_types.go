@@ -186,14 +186,51 @@ type BackendRef struct {
 // RouteConditionType is a type of condition for a route.
 type RouteConditionType string
 
+// RouteConditionReason is a reason for a route condition.
+type RouteConditionReason string
+
 const (
 	// This condition indicates whether the route has been accepted or rejected
 	// by a Gateway, and why.
-	ConditionRouteAccepted RouteConditionType = "Accepted"
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "Accepted"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	RouteConditionAccepted RouteConditionType = "Accepted"
+
+	// This reason is used with the "Accepted" condition when the Route has been
+	// accepted by the Gateway.
+	RouteReasonAccepted RouteConditionReason = "Accepted"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
-	ConditionRouteResolvedRefs RouteConditionType = "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "ResolvedRefs"
+	//
+	// Possible reasons for this condition to be false are:
+	//
+	// * "RefNotPermitted"
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
+	RouteConditionResolvedRefs RouteConditionType = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when the condition
+	// is true.
+	RouteReasonResolvedRefs RouteConditionReason = "ResolvedRefs"
+
+	// This reason is used with the "ResolvedRefs" condition when
+	// one of the Listener's Routes has a BackendRef to an object in
+	// another namespace, where the object in the other namespace does
+	// not have a ReferencePolicy explicitly allowing the reference.
+	RouteReasonRefNotPermitted RouteConditionReason = "RefNotPermitted"
 )
 
 // RouteParentStatus describes the status of a route with respect to an
