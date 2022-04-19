@@ -19,6 +19,10 @@ package tests
 import (
 	"testing"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
 
@@ -32,6 +36,28 @@ var GatewaySecretReferencePolicy = suite.ConformanceTest{
 	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
 	Manifests:   []string{"tests/gateway-secret-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		gwNN := types.NamespacedName{Name: "gateway-secret-reference-policy", Namespace: "gateway-conformance-infra"}
 
+		t.Run("Gateway listener should have healthy status", func(t *testing.T) {
+			listeners := []v1alpha2.ListenerStatus{{
+				Name: v1alpha2.SectionName("https"),
+				SupportedKinds: []v1alpha2.RouteGroupKind{{
+					Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+					Kind:  v1alpha2.Kind("HTTPRoute"),
+				}},
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(v1alpha2.ListenerConditionReady),
+						Status: metav1.ConditionTrue,
+					},
+					{
+						Type:   string(v1alpha2.ListenerConditionResolvedRefs),
+						Status: metav1.ConditionTrue,
+					},
+				},
+			}}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
+		})
 	},
 }
