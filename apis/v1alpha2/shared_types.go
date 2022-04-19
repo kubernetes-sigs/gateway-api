@@ -213,7 +213,7 @@ const (
 	//
 	// * "ResolvedRefs"
 	//
-	// Possible reasons for this condition to be False are:
+	// Possible reasons for this condition to be false are:
 	//
 	// * "RefNotPermitted"
 	//
