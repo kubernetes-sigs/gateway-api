@@ -32,7 +32,9 @@ import (
 type ExemptFeature string
 
 const (
-	// This option indicates support for the ReferencePolicy object.
+	// This option indicates the implementation is exempting itself from the
+	// requirement of a ReferencePolicy to allow cross-namesapce references,
+	// and has instead implemented alternative safeguards.
 	ExemptReferencePolicy ExemptFeature = "ReferencePolicy"
 )
 
