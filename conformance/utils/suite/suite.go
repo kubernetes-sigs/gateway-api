@@ -21,6 +21,7 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -35,6 +36,7 @@ type ConformanceTestSuite struct {
 	Debug            bool
 	Cleanup          bool
 	BaseManifests    string
+	Applier          kubernetes.Applier
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -45,6 +47,14 @@ type Options struct {
 	Cleanup          bool
 	RoundTripper     roundtripper.RoundTripper
 	BaseManifests    string
+	NamespaceLabels  map[string]string
+	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
+	// manifests to a valid, unique port. There must be as many
+	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
+	// For example, given two Gateways, each with 2 listeners, there should be
+	// four ValidUniqueListenerPorts.
+	// If empty or nil, ports are not modified.
+	ValidUniqueListenerPorts []v1alpha2.PortNumber
 }
 
 // New returns a new ConformanceTestSuite.
@@ -61,6 +71,10 @@ func New(s Options) *ConformanceTestSuite {
 		Debug:            s.Debug,
 		Cleanup:          s.Cleanup,
 		BaseManifests:    s.BaseManifests,
+		Applier: kubernetes.Applier{
+			NamespaceLabels:          s.NamespaceLabels,
+			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
+		},
 	}
 
 	// apply defaults
@@ -78,7 +92,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.GatewayClassName, 180)
 
 	t.Logf("Test Setup: Applying base manifests")
-	kubernetes.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
+	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
 
 	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 	namespaces := []string{
@@ -116,7 +130,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 	for _, manifestLocation := range test.Manifests {
 		t.Logf("Applying %s", manifestLocation)
-		kubernetes.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
+		suite.Applier.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
 	}
 
 	test.Test(t, suite)
