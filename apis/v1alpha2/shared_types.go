@@ -202,6 +202,10 @@ const (
 	// interoperability.
 	RouteConditionAccepted RouteConditionType = "Accepted"
 
+	// This reason is used with the "Accepted" condition when the Route has been
+	// accepted by the Gateway.
+	RouteReasonAccepted RouteConditionReason = "Accepted"
+
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	//
@@ -217,10 +221,6 @@ const (
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
 	RouteConditionResolvedRefs RouteConditionType = "ResolvedRefs"
-
-	// This reason is used with the "Accepted" condition when the Route has been
-	// accepted by the Gateway.
-	RouteReasonAccepted RouteConditionReason = "Accepted"
 
 	// This reason is used with the "ResolvedRefs" condition when the condition
 	// is true.
