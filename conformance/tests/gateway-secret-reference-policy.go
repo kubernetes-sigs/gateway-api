@@ -32,13 +32,13 @@ func init() {
 
 var GatewaySecretReferencePolicy = suite.ConformanceTest{
 	ShortName:   "GatewaySecretMissingReferencePolicy",
-	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to the Secret does not exist",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the secrets namespace and a ReferencePolicy granting permission to the Secret exists",
 	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
 	Manifests:   []string{"tests/gateway-secret-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-reference-policy", Namespace: "gateway-conformance-infra"}
 
-		t.Run("Gateway listener should have healthy status", func(t *testing.T) {
+		t.Run("Gateway listener should have a true ResolvedRefs condition and a true Ready condition", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{
 				Name: v1alpha2.SectionName("https"),
 				SupportedKinds: []v1alpha2.RouteGroupKind{{
