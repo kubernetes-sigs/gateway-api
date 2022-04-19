@@ -48,9 +48,13 @@ type Options struct {
 	RoundTripper     roundtripper.RoundTripper
 	BaseManifests    string
 	NamespaceLabels  map[string]string
-	// ValidListenerPorts holds a list of ports assignable to Gateway listeners.
-	// If empty, every listener port will be left as is.
-	ValidListenerPorts []v1alpha2.PortNumber
+	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
+	// manifests to a valid, unique port. There must be as many
+	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
+	// For example, given two Gateways, each with 2 listeners, there should be
+	// four ValidUniqueListenerPorts.
+	// If empty or nil, ports are not modified.
+	ValidUniqueListenerPorts []v1alpha2.PortNumber
 }
 
 // New returns a new ConformanceTestSuite.
@@ -68,8 +72,8 @@ func New(s Options) *ConformanceTestSuite {
 		Cleanup:          s.Cleanup,
 		BaseManifests:    s.BaseManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels:    s.NamespaceLabels,
-			ValidListenerPorts: s.ValidListenerPorts,
+			NamespaceLabels:          s.NamespaceLabels,
+			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
 		},
 	}
 

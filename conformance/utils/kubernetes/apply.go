@@ -41,8 +41,14 @@ import (
 // Applier prepares manifests depending on the available options and applies
 // them to the Kubernetes cluster.
 type Applier struct {
-	NamespaceLabels    map[string]string
-	ValidListenerPorts []v1alpha2.PortNumber
+	NamespaceLabels map[string]string
+	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
+	// manifests to a valid, unique port. There must be as many
+	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
+	// For example, given two Gateways, each with 2 listeners, there should be
+	// four ValidUniqueListenerPorts.
+	// If empty or nil, ports are not modified.
+	ValidUniqueListenerPorts []v1alpha2.PortNumber
 }
 
 // prepareGateway adjusts both listener ports and the gatewayClassName. It
@@ -81,16 +87,54 @@ func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLa
 	labels, _, err := unstructured.NestedStringMap(uObj.Object, "metadata", "labels")
 	require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
 
-	if labels == nil {
-		labels = map[string]string{}
-	}
-
 	for k, v := range namespaceLabels {
+		if labels == nil {
+			labels = map[string]string{}
+		}
+
 		labels[k] = v
 	}
 
-	err = unstructured.SetNestedStringMap(uObj.Object, labels, "metadata", "labels")
+	// SetNestedStringMap converts nil to an empty map
+	if labels != nil {
+		err = unstructured.SetNestedStringMap(uObj.Object, labels, "metadata", "labels")
+	}
 	require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
+}
+
+// prepareResources uses the options from an Applier to tweak resources given by
+// a set of manifests.
+func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder, gcName string) ([]unstructured.Unstructured, error) {
+	var resources []unstructured.Unstructured
+
+	// portIndex is incremented for each listener we see. For a manifest file
+	// with 2 gateways, each with 2 listeners, it will be incremented 4 times.
+	portIndex := 0
+
+	for {
+		uObj := unstructured.Unstructured{}
+		if err := decoder.Decode(&uObj); err != nil {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			return nil, err
+		}
+		if len(uObj.Object) == 0 {
+			continue
+		}
+
+		if uObj.GetKind() == "Gateway" {
+			portIndex = prepareGateway(t, &uObj, gcName, a.ValidUniqueListenerPorts, portIndex)
+		}
+
+		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
+			prepareNamespace(t, &uObj, a.NamespaceLabels)
+		}
+
+		resources = append(resources, uObj)
+	}
+
+	return resources, nil
 }
 
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
@@ -102,27 +146,14 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 
 	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
 
-	portIndex := 0
-	for {
-		uObj := unstructured.Unstructured{}
-		if decodeErr := decoder.Decode(&uObj); decodeErr != nil {
-			if errors.Is(decodeErr, io.EOF) {
-				break
-			}
-			t.Logf("manifest: %s", data.String())
-			require.NoErrorf(t, decodeErr, "error parsing manifest")
-		}
-		if len(uObj.Object) == 0 {
-			continue
-		}
+	resources, err := a.prepareResources(t, decoder, gcName)
+	if err != nil {
+		t.Logf("manifest: %s", data.String())
+		require.NoErrorf(t, err, "error parsing manifest")
+	}
 
-		if uObj.GetKind() == "Gateway" {
-			portIndex = prepareGateway(t, &uObj, gcName, a.ValidListenerPorts, portIndex)
-		}
-
-		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
-			prepareNamespace(t, &uObj, a.NamespaceLabels)
-		}
+	for i := range resources {
+		uObj := &resources[i]
 
 		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 		defer cancel()
@@ -135,7 +166,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 				require.NoErrorf(t, err, "error getting resource")
 			}
 			t.Logf("Creating %s %s", uObj.GetName(), uObj.GetKind())
-			err = c.Create(ctx, &uObj)
+			err = c.Create(ctx, uObj)
 			require.NoErrorf(t, err, "error creating resource")
 
 			if cleanup {
@@ -143,7 +174,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 					ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 					defer cancel()
 					t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
-					err = c.Delete(ctx, &uObj)
+					err = c.Delete(ctx, uObj)
 					require.NoErrorf(t, err, "error deleting resource")
 				})
 			}
@@ -152,14 +183,14 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 
 		uObj.SetResourceVersion(fetchedObj.GetResourceVersion())
 		t.Logf("Updating %s %s", uObj.GetName(), uObj.GetKind())
-		err = c.Update(ctx, &uObj)
+		err = c.Update(ctx, uObj)
 
 		if cleanup {
 			t.Cleanup(func() {
 				ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 				defer cancel()
 				t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
-				err = c.Delete(ctx, &uObj)
+				err = c.Delete(ctx, uObj)
 				require.NoErrorf(t, err, "error deleting resource")
 			})
 		}

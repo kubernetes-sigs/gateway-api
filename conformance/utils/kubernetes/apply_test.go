@@ -17,189 +17,257 @@ limitations under the License.
 package kubernetes
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/util/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
-func Test_prepareNamespace_empty(t *testing.T) {
-	ns := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "v1",
-			"kind":       "Namespace",
-			"metadata": map[string]interface{}{
-				"name": "test",
-			},
-		},
-	}
-
-	prepareNamespace(t, ns, nil)
-
-	labels, _, err := unstructured.NestedMap(ns.Object, "metadata", "labels")
-	require.NoError(t, err, "unexpected error getting labels")
-
-	require.EqualValues(
-		t,
-		labels,
-		map[string]interface{}{},
-	)
-}
-
-func Test_prepareNamespace_simple(t *testing.T) {
-	ns := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "v1",
-			"kind":       "Namespace",
-			"metadata": map[string]interface{}{
-				"name": "test",
-			},
-		},
-	}
-
-	prepareNamespace(t, ns, map[string]string{
-		"test": "true",
-	})
-
-	labels, _, err := unstructured.NestedMap(ns.Object, "metadata", "labels")
-	require.NoError(t, err, "unexpected error getting labels")
-
-	require.EqualValues(
-		t,
-		labels,
-		map[string]interface{}{
-			"test": "true",
-		}, "unexpected Namespace labels",
-	)
-}
-
-func Test_prepareNamespace_overwrite(t *testing.T) {
-	ns := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "v1",
-			"kind":       "Namespace",
-			"metadata": map[string]interface{}{
-				"name": "test",
-				"labels": map[string]interface{}{
-					"test": "false",
+func TestPrepareResources(t *testing.T) {
+	tests := []struct {
+		name     string
+		given    string
+		expected []unstructured.Unstructured
+		applier  Applier
+	}{{
+		name:    "empty namespace labels",
+		applier: Applier{},
+		given: `
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "v1",
+				"kind":       "Namespace",
+				"metadata": map[string]interface{}{
+					"name": "test",
 				},
 			},
-		},
-	}
-
-	prepareNamespace(t, ns, map[string]string{
-		"test": "true",
-	})
-
-	labels, _, err := unstructured.NestedMap(ns.Object, "metadata", "labels")
-	require.NoError(t, err, "unexpected error getting labels")
-
-	require.EqualValues(
-		t,
-		labels,
-		map[string]interface{}{
-			"test": "true",
-		}, "unexpected Namespace labels",
-	)
-}
-
-func Test_prepareGateway_noPorts(t *testing.T) {
-	gateway := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "gateway.networking.k8s.io/v1alpha2",
-			"kind":       "Gateway",
-			"metadata": map[string]interface{}{
-				"name": "test",
+		}},
+	}, {
+		name: "simple namespace labels",
+		applier: Applier{
+			NamespaceLabels: map[string]string{
+				"test": "false",
 			},
-			"spec": map[string]interface{}{
-				"gatewayClassName": "{GATEWAY_CLASS_NAME}",
-				"listeners": []interface{}{
-					map[string]interface{}{
-						"name":     "http",
-						"port":     80,
-						"protocol": "HTTP",
-						"allowedRoutes": map[string]interface{}{
-							"namespaces": map[string]interface{}{
-								"from": "Same",
+		},
+		given: `
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "v1",
+				"kind":       "Namespace",
+				"metadata": map[string]interface{}{
+					"name": "test",
+					"labels": map[string]interface{}{
+						"test": "false",
+					},
+				},
+			},
+		}},
+	}, {
+		name: "overwrite namespace labels",
+		applier: Applier{
+			NamespaceLabels: map[string]string{
+				"test": "true",
+			},
+		},
+		given: `
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: test
+  labels:
+    test: 'false'
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "v1",
+				"kind":       "Namespace",
+				"metadata": map[string]interface{}{
+					"name": "test",
+					"labels": map[string]interface{}{
+						"test": "true",
+					},
+				},
+			},
+		}},
+	}, {
+		name:    "no listener ports given",
+		applier: Applier{},
+		given: `
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"kind":       "Gateway",
+				"metadata": map[string]interface{}{
+					"name": "test",
+				},
+				"spec": map[string]interface{}{
+					"gatewayClassName": "test-class",
+					"listeners": []interface{}{
+						map[string]interface{}{
+							"name":     "http",
+							"port":     int64(80),
+							"protocol": "HTTP",
+							"allowedRoutes": map[string]interface{}{
+								"namespaces": map[string]interface{}{
+									"from": "Same",
+								},
 							},
 						},
 					},
 				},
 			},
+		}},
+	}, {
+		name: "multiple gateways each with multiple listeners",
+		applier: Applier{
+			ValidUniqueListenerPorts: []v1alpha2.PortNumber{8000, 8001, 8002, 8003},
 		},
-	}
-	unchanged := *gateway
-
-	nextPort := prepareGateway(t, gateway, "test", nil, 0)
-	require.Equal(t, 0, nextPort, "unexpected next valid port index")
-
-	require.EqualValues(
-		t,
-		gateway,
-		&unchanged,
-		"expected Gateway to be unchanged",
-	)
-}
-
-func Test_prepareGateway_ports(t *testing.T) {
-	gateway := &unstructured.Unstructured{
-		Object: map[string]interface{}{
-			"apiVersion": "gateway.networking.k8s.io/v1alpha2",
-			"kind":       "Gateway",
-			"metadata": map[string]interface{}{
-				"name": "test",
-			},
-			"spec": map[string]interface{}{
-				"gatewayClassName": "{GATEWAY_CLASS_NAME}",
-				"listeners": []interface{}{
-					map[string]interface{}{
-						"name":     "http",
-						"port":     float64(80),
-						"protocol": "HTTP",
-						"allowedRoutes": map[string]interface{}{
-							"namespaces": map[string]interface{}{
-								"from": "Same",
+		given: `
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Same
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind:       Gateway
+metadata:
+  name: test2
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"kind":       "Gateway",
+				"metadata": map[string]interface{}{
+					"name": "test",
+				},
+				"spec": map[string]interface{}{
+					"gatewayClassName": "test-class",
+					"listeners": []interface{}{
+						map[string]interface{}{
+							"name":     "http",
+							"port":     int64(8000),
+							"protocol": "HTTP",
+							"allowedRoutes": map[string]interface{}{
+								"namespaces": map[string]interface{}{
+									"from": "Same",
+								},
 							},
 						},
-					},
-					map[string]interface{}{
-						"name":     "https",
-						"port":     float64(443),
-						"protocol": "HTTPS",
-						"allowedRoutes": map[string]interface{}{
-							"namespaces": map[string]interface{}{
-								"from": "Same",
+						map[string]interface{}{
+							"name":     "https",
+							"port":     int64(8001),
+							"protocol": "HTTPS",
+							"allowedRoutes": map[string]interface{}{
+								"namespaces": map[string]interface{}{
+									"from": "Same",
+								},
 							},
 						},
 					},
 				},
 			},
-		},
+		}, {
+			Object: map[string]interface{}{
+				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"kind":       "Gateway",
+				"metadata": map[string]interface{}{
+					"name": "test2",
+				},
+				"spec": map[string]interface{}{
+					"gatewayClassName": "test-class",
+					"listeners": []interface{}{
+						map[string]interface{}{
+							"name":     "http",
+							"port":     int64(8002),
+							"protocol": "HTTP",
+							"allowedRoutes": map[string]interface{}{
+								"namespaces": map[string]interface{}{
+									"from": "Same",
+								},
+							},
+						},
+						map[string]interface{}{
+							"name":     "https",
+							"port":     int64(8003),
+							"protocol": "HTTPS",
+							"allowedRoutes": map[string]interface{}{
+								"namespaces": map[string]interface{}{
+									"from": "Same",
+								},
+							},
+						},
+					},
+				},
+			},
+		}},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(tc.given), 4096)
+
+			resources, err := tc.applier.prepareResources(t, decoder, "test-class")
+
+			require.NoError(t, err, "unexpected error preparing resources")
+			require.EqualValues(t, tc.expected, resources)
+		})
 	}
-
-	nextPort := prepareGateway(t, gateway, "test", []v1alpha2.PortNumber{30080, 30081}, 0)
-	require.Equal(t, 2, nextPort, "unexpected next valid port index")
-
-	listeners, _, err := unstructured.NestedSlice(gateway.Object, "spec", "listeners")
-	require.NoError(t, err, "unexpected error getting listeners")
-	port, _, err := unstructured.NestedFieldCopy(listeners[0].(map[string]interface{}), "port")
-	require.NoError(t, err, "unexpected error getting first listener port")
-	require.EqualValues(
-		t,
-		30080,
-		port,
-		"unexpected first Gateway listener port",
-	)
-
-	port, _, err = unstructured.NestedFieldCopy(listeners[1].(map[string]interface{}), "port")
-	require.NoError(t, err, "unexpected error getting second listener port")
-	require.EqualValues(
-		t,
-		30081,
-		port,
-		"unexpected second Gateway listener port",
-	)
-
 }
