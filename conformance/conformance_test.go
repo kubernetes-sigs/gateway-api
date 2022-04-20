@@ -32,7 +32,7 @@ import (
 
 var gatewayClassName = flag.String("gateway-class", "gateway-conformance", "Name of GatewayClass to use for tests")
 var showDebug = flag.Bool("debug", false, "Whether to print debug logs")
-var shouldCleanup = flag.Bool("cleanup", true, "Whether to cleanup base resources")
+var cleanupBaseResources = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
 
 func TestConformance(t *testing.T) {
 	cfg, err := config.GetConfig()
@@ -48,10 +48,10 @@ func TestConformance(t *testing.T) {
 	t.Logf("Running conformance tests with %s GatewayClass", *gatewayClassName)
 
 	cSuite := suite.New(suite.Options{
-		Client:           client,
-		GatewayClassName: *gatewayClassName,
-		Debug:            *showDebug,
-		Cleanup:          *shouldCleanup,
+		Client:               client,
+		GatewayClassName:     *gatewayClassName,
+		Debug:                *showDebug,
+		CleanupBaseResources: *cleanupBaseResources,
 	})
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)

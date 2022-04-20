@@ -49,6 +49,10 @@ TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
+# Command-line flags passed to "go test" for the conformance
+# test. These are passed after the "-args" flag.
+CONFORMANCE_FLAGS ?=
+
 all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
@@ -82,7 +86,7 @@ test:
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
-	go test -v ./conformance/...
+	go test -v ./conformance/... -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

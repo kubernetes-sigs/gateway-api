@@ -17,6 +17,7 @@ limitations under the License.
 package kubernetes
 
 import (
+	"flag"
 	"strings"
 	"testing"
 
@@ -25,6 +26,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+)
+
+var (
+	// These aren't used by this test but since this test is run using
+	// the same invocation as the conformance test it needs to parse the
+	// same set of flags.
+	_ = flag.String("gateway-class", "", "unused")
+	_ = flag.Bool("debug", false, "unused")
+	_ = flag.Bool("cleanup-base-resources", true, "unused")
 )
 
 func TestPrepareResources(t *testing.T) {
