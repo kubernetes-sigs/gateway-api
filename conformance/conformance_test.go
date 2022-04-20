@@ -18,21 +18,17 @@ limitations under the License.
 package conformance_test
 
 import (
-	"flag"
 	"testing"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/tests"
+	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
-
-var gatewayClassName = flag.String("gateway-class", "gateway-conformance", "Name of GatewayClass to use for tests")
-var showDebug = flag.Bool("debug", false, "Whether to print debug logs")
-var shouldCleanup = flag.Bool("cleanup", true, "Whether to cleanup base resources")
 
 func TestConformance(t *testing.T) {
 	cfg, err := config.GetConfig()
@@ -45,13 +41,13 @@ func TestConformance(t *testing.T) {
 	}
 	v1alpha2.AddToScheme(client.Scheme())
 
-	t.Logf("Running conformance tests with %s GatewayClass", *gatewayClassName)
+	t.Logf("Running conformance tests with %s GatewayClass", *flags.GatewayClassName)
 
 	cSuite := suite.New(suite.Options{
-		Client:           client,
-		GatewayClassName: *gatewayClassName,
-		Debug:            *showDebug,
-		Cleanup:          *shouldCleanup,
+		Client:               client,
+		GatewayClassName:     *flags.GatewayClassName,
+		Debug:                *flags.ShowDebug,
+		CleanupBaseResources: *flags.CleanupBaseResources,
 	})
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)

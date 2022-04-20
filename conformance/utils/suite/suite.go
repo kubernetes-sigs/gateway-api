@@ -44,7 +44,6 @@ type Options struct {
 	Client           client.Client
 	GatewayClassName string
 	Debug            bool
-	Cleanup          bool
 	RoundTripper     roundtripper.RoundTripper
 	BaseManifests    string
 	NamespaceLabels  map[string]string
@@ -55,6 +54,10 @@ type Options struct {
 	// four ValidUniqueListenerPorts.
 	// If empty or nil, ports are not modified.
 	ValidUniqueListenerPorts []v1alpha2.PortNumber
+
+	// CleanupBaseResources indicates whether or not the base test
+	// resources such as Gateways should be cleaned up after the run.
+	CleanupBaseResources bool
 }
 
 // New returns a new ConformanceTestSuite.
@@ -69,7 +72,7 @@ func New(s Options) *ConformanceTestSuite {
 		RoundTripper:     roundTripper,
 		GatewayClassName: s.GatewayClassName,
 		Debug:            s.Debug,
-		Cleanup:          s.Cleanup,
+		Cleanup:          s.CleanupBaseResources,
 		BaseManifests:    s.BaseManifests,
 		Applier: kubernetes.Applier{
 			NamespaceLabels:          s.NamespaceLabels,

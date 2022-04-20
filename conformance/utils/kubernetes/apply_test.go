@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	_ "sigs.k8s.io/gateway-api/conformance/utils/flags"
 )
 
 func TestPrepareResources(t *testing.T) {
