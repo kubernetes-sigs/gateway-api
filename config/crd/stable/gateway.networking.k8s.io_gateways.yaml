@@ -70,7 +70,7 @@ spec:
                   manner, assigning an appropriate set of Addresses. \n The implementation
                   MUST bind all Listeners to every GatewayAddress that it assigns
                   to the Gateway and add a corresponding entry in GatewayStatus.Addresses.
-                  \n Support: Core"
+                  \n Support: Extended"
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
