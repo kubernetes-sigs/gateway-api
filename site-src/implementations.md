@@ -159,9 +159,9 @@ Kong is actively working on an implementation of the Gateway API in the [Kong Ku
 
 [Traefik][traefik] is an open source cloud-native application proxy.
 
-Traefik currently supports the previous `v0.1.x` Gateway API specification, check the [Kubernetes Gateway Documentation][traefik-1] for information on how to deploy and use Traefik's Gateway implementation.
+Traefik currently supports version `v1alpha2` (`v0.4.x`) of the Gateway API specification, check the [Kubernetes Gateway Documentation][traefik-1] for information on how to deploy and use Traefik's Gateway implementation.
 
-Traefik is currently working on implementing TCP, status updates and documentation will be provided here as the work progresses.
+Traefik is currently working on implementing UDP, and ReferencePolicy. Status updates and documentation will be provided here as the work progresses.
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
