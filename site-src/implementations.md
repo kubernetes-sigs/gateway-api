@@ -20,7 +20,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [NGINX Kubernetes Gateway][11] (pre-alpha)
 - [Traefik][12] (alpha)
 
-## Integratation Status
+## Integration Status
 - [Flagger][13] (public preview)
 - [cert-manager][14] (alpha)
 
@@ -166,7 +166,7 @@ Traefik is currently working on implementing TCP, status updates and documentati
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 
-## Integratations
+## Integrations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific integrations.
 
