@@ -100,6 +100,7 @@ type BackendObjectReference struct {
 	Group *Group `json:"group,omitempty"`
 
 	// Kind is kind of the referent. For example "HTTPRoute" or "Service".
+	// Defaults to "Service" when not specified.
 	//
 	// +optional
 	// +kubebuilder:default=Service
