@@ -24,7 +24,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Flagger][13] (public preview)
 - [cert-manager][14] (alpha)
 
-[1]:#epic
+[1]:#acnodal-epic
 [2]:#apisix
 [3]:#contour
 [4]:#emissary-ingress-ambassador-api-gateway
