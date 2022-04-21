@@ -293,6 +293,88 @@ func TestValidateHTTPRoute(t *testing.T) {
 				},
 			},
 		},
+	}, {
+		name:     "valid redirect path modifier",
+		errCount: 0,
+		rules: []gatewayv1a2.HTTPRouteRule{
+			{
+				Filters: []gatewayv1a2.HTTPRouteFilter{
+					{
+						Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
+						RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{
+							Path: &gatewayv1a2.HTTPPathModifier{
+								Type:            gatewayv1a2.FullPathHTTPPathModifier,
+								ReplaceFullPath: utilpointer.String("foo"),
+							},
+						},
+					},
+				},
+			},
+		},
+	}, {
+		name:     "redirect path modifier with type mismatch",
+		errCount: 2,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
+				RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:            gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplaceFullPath: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "valid rewrite path modifier",
+		errCount: 0,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "redirect path modifier with type mismatch",
+		errCount: 2,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.FullPathHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "rewrite and redirect filters combined (invalid)",
+		errCount: 1,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}, {
+				Type: gatewayv1a2.HTTPRouteFilterRequestRedirect,
+				RequestRedirect: &gatewayv1a2.HTTPRequestRedirectFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
 	}}
 
 	for _, tc := range tests {
@@ -654,7 +736,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		routeFilter: gatewayv1a2.HTTPRouteFilter{
 			Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
 			URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
-				Hostname: new(gatewayv1a2.Hostname),
+				Hostname: new(gatewayv1a2.PreciseHostname),
 				Path:     &gatewayv1a2.HTTPPathModifier{},
 			},
 		},

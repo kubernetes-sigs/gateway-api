@@ -96,11 +96,21 @@ func validateHTTPRouteFilters(filters []gatewayv1a2.HTTPRouteFilter, path *field
 
 	for i, filter := range filters {
 		counts[filter.Type]++
+		if filter.RequestRedirect != nil && filter.RequestRedirect.Path != nil {
+			errs = append(errs, validateHTTPPathModifier(*filter.RequestRedirect.Path, path.Index(i).Child("requestRedirect", "path"))...)
+		}
+		if filter.URLRewrite != nil && filter.URLRewrite.Path != nil {
+			errs = append(errs, validateHTTPPathModifier(*filter.URLRewrite.Path, path.Index(i).Child("urlRewrite", "path"))...)
+		}
 		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
 	// custom filters don't have any validation
 	for _, key := range repeatableHTTPRouteFilters {
 		delete(counts, key)
+	}
+
+	if counts[gatewayv1a2.HTTPRouteFilterRequestRedirect] > 0 && counts[gatewayv1a2.HTTPRouteFilterURLRewrite] > 0 {
+		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1a2.HTTPRouteFilterRequestRedirect, "Redirect and Rewrite filters cannot be defined in the same list of filters"))
 	}
 
 	for filterType, count := range counts {
@@ -182,6 +192,25 @@ func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter,
 	}
 	if filter.URLRewrite == nil && filter.Type == gatewayv1a2.HTTPRouteFilterURLRewrite {
 		errs = append(errs, field.Required(path, "filter.URLRewrite must be specified for URLRewrite HTTPRouteFilter.Type"))
+	}
+	return errs
+}
+
+// validateHTTPPathModifier validates that only the expected fields are set in a
+// path modifier.
+func validateHTTPPathModifier(modifier gatewayv1a2.HTTPPathModifier, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if modifier.ReplaceFullPath != nil && modifier.Type != gatewayv1a2.FullPathHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplaceFullPath, "must be nil if the HTTPRouteFilter.Type is not ReplaceFullPath"))
+	}
+	if modifier.ReplaceFullPath == nil && modifier.Type == gatewayv1a2.FullPathHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplaceFullPath, "must not be nil if the HTTPRouteFilter.Type is ReplaceFullPath"))
+	}
+	if modifier.ReplacePrefixMatch != nil && modifier.Type != gatewayv1a2.PrefixMatchHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "must be nil if the HTTPRouteFilter.Type is not ReplacePrefixMatch"))
+	}
+	if modifier.ReplacePrefixMatch == nil && modifier.Type == gatewayv1a2.PrefixMatchHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "must not be nil if the HTTPRouteFilter.Type is ReplacePrefixMatch"))
 	}
 	return errs
 }

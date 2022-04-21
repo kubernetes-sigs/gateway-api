@@ -486,26 +486,31 @@ spec:
                                         path is used as-is. \n Support: Extended \n
                                         <gateway:experimental>"
                                       properties:
-                                        substitution:
-                                          description: "Substitution defines the HTTP
-                                            path value to substitute. An empty value
-                                            (\"\") indicates that the portion of the
-                                            path to be changed should be removed from
-                                            the resulting path. For example, a request
-                                            to \"/foo/bar\" with a prefix match of
-                                            \"/foo\" would be modified to \"/bar\".
-                                            \n <gateway:experimental>"
+                                        replaceFullPath:
+                                          description: "ReplaceFullPath specifies
+                                            the value with which to replace the full
+                                            path of a request during a rewrite or
+                                            redirect. \n <gateway:experimental>"
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n <gateway:experimental>"
                                           maxLength: 1024
                                           type: string
                                         type:
                                           description: "Type defines the type of path
-                                            modifier. \n <gateway:experimental>"
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n <gateway:experimental>"
                                           enum:
-                                          - Absolute
+                                          - ReplaceFullPath
                                           - ReplacePrefixMatch
                                           type: string
                                       required:
-                                      - substitution
                                       - type
                                       type: object
                                     port:
@@ -579,32 +584,37 @@ spec:
                                         \n Support: Extended \n <gateway:experimental>"
                                       maxLength: 253
                                       minLength: 1
-                                      pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
                                     path:
                                       description: "Path defines a path rewrite. \n
                                         Support: Extended \n <gateway:experimental>"
                                       properties:
-                                        substitution:
-                                          description: "Substitution defines the HTTP
-                                            path value to substitute. An empty value
-                                            (\"\") indicates that the portion of the
-                                            path to be changed should be removed from
-                                            the resulting path. For example, a request
-                                            to \"/foo/bar\" with a prefix match of
-                                            \"/foo\" would be modified to \"/bar\".
-                                            \n <gateway:experimental>"
+                                        replaceFullPath:
+                                          description: "ReplaceFullPath specifies
+                                            the value with which to replace the full
+                                            path of a request during a rewrite or
+                                            redirect. \n <gateway:experimental>"
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n <gateway:experimental>"
                                           maxLength: 1024
                                           type: string
                                         type:
                                           description: "Type defines the type of path
-                                            modifier. \n <gateway:experimental>"
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n <gateway:experimental>"
                                           enum:
-                                          - Absolute
+                                          - ReplaceFullPath
                                           - ReplacePrefixMatch
                                           type: string
                                       required:
-                                      - substitution
                                       - type
                                       type: object
                                   type: object
@@ -931,25 +941,30 @@ spec:
                                   When empty, the request path is used as-is. \n Support:
                                   Extended \n <gateway:experimental>"
                                 properties:
-                                  substitution:
-                                    description: "Substitution defines the HTTP path
-                                      value to substitute. An empty value (\"\") indicates
-                                      that the portion of the path to be changed should
-                                      be removed from the resulting path. For example,
-                                      a request to \"/foo/bar\" with a prefix match
-                                      of \"/foo\" would be modified to \"/bar\". \n
-                                      <gateway:experimental>"
+                                  replaceFullPath:
+                                    description: "ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n <gateway:experimental>"
                                     maxLength: 1024
                                     type: string
                                   type:
                                     description: "Type defines the type of path modifier.
-                                      \n <gateway:experimental>"
+                                      Additional types may be added in a future release
+                                      of the API. \n <gateway:experimental>"
                                     enum:
-                                    - Absolute
+                                    - ReplaceFullPath
                                     - ReplacePrefixMatch
                                     type: string
                                 required:
-                                - substitution
                                 - type
                                 type: object
                               port:
@@ -1021,31 +1036,36 @@ spec:
                                   \n Support: Extended \n <gateway:experimental>"
                                 maxLength: 253
                                 minLength: 1
-                                pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               path:
                                 description: "Path defines a path rewrite. \n Support:
                                   Extended \n <gateway:experimental>"
                                 properties:
-                                  substitution:
-                                    description: "Substitution defines the HTTP path
-                                      value to substitute. An empty value (\"\") indicates
-                                      that the portion of the path to be changed should
-                                      be removed from the resulting path. For example,
-                                      a request to \"/foo/bar\" with a prefix match
-                                      of \"/foo\" would be modified to \"/bar\". \n
-                                      <gateway:experimental>"
+                                  replaceFullPath:
+                                    description: "ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n <gateway:experimental>"
                                     maxLength: 1024
                                     type: string
                                   type:
                                     description: "Type defines the type of path modifier.
-                                      \n <gateway:experimental>"
+                                      Additional types may be added in a future release
+                                      of the API. \n <gateway:experimental>"
                                     enum:
-                                    - Absolute
+                                    - ReplaceFullPath
                                     - ReplacePrefixMatch
                                     type: string
                                 required:
-                                - substitution
                                 - type
                                 type: object
                             type: object
