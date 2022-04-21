@@ -212,7 +212,8 @@ spec:
                           kind:
                             default: Service
                             description: Kind is kind of the referent. For example
-                              "HTTPRoute" or "Service".
+                              "HTTPRoute" or "Service". Defaults to "Service" when
+                              not specified.
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
