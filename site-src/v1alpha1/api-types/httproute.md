@@ -1,5 +1,10 @@
 # HTTPRoute
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 [HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
 

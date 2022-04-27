@@ -1,3 +1,8 @@
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 Gateway API is designed to work with multiple protocols.
 [TCPRoute](/v1alpha1/references/spec/#networking.x-k8s.io/v1alpha1.TCPRoute) is one such route which
 allows for managing TCP traffic.

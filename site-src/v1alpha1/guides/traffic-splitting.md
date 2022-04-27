@@ -1,5 +1,10 @@
 # HTTP traffic splitting
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 The [HTTPRoute resource](/v1alpha1/api-types/httproute) allows you to specify weights to shift
 traffic between different backends. This is useful for splitting traffic during
 rollouts, canarying changes, or for emergencies. The HTTPRoute

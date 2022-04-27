@@ -1,5 +1,9 @@
 # Getting started with Gateway APIs
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
 
 **1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
  _OR_  **[install the Gateway API CRDs manually](#installing-gateway-api-crds-manually)**

@@ -1,5 +1,11 @@
 # Gateway
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
+
 A `Gateway` is 1:1 with the life cycle of the configuration of infrastructure.
 When a user creates a `Gateway`, some load balancing infrastructure is
 provisioned or configured (see below for details) by the `GatewayClass`
