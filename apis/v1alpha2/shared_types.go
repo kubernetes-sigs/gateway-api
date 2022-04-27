@@ -27,10 +27,6 @@ import (
 //
 // The API object must be valid in the cluster; the Group and Kind must
 // be registered in the cluster for this reference to be valid.
-//
-// References to objects with invalid Group and Kind are not valid, and must
-// be rejected by the implementation, with appropriate Conditions set
-// on the containing object.
 type ParentReference struct {
 	// Group is the group of the referent.
 	//
