@@ -54,12 +54,10 @@
    A: Gateway API releases are tags of the [Github repository][1].
    The [Github releases][2] page shows all the releases.
 
-* **Q: How should I think about the alpha release?<br>**
-  A: The `v1alpha1` release will be the first Gateway API release. As
-  various projects begin implementing the API, and operators start using
-  it, the working group will collect feedback and issues, which will
-  guide what revisions are needed for the next release. It is possible
-  that the next release will contain breaking changes.
+* **Q: How should I think about alpha API versions?<br>**
+  A: Similar to upstream Kubernetes, alpha API versions indicate that resources
+  are still experimental in nature and may either be removed or changed in
+  breaking ways in future releases of Gateway API.
 
 * **Q: Which Kubernetes versions are supported?<br>**
   A: Generally, we support Kubernetes 1.16+, but certain features like 

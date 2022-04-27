@@ -1,5 +1,10 @@
 # HTTP routing
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 The [HTTPRoute resource](/v1alpha1/api-types/httproute) allows you to match on HTTP
 traffic and direct it to Kubernetes backends. This guide shows how the HTTPRoute
 matches traffic on host, header, and path fields and forwards it to different
