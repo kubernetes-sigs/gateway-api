@@ -320,12 +320,9 @@ type RouteStatus struct {
 // +kubebuilder:validation:Pattern=`^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 type Hostname string
 
-// PreciseHostname is the fully qualified domain name of a network host. This matches
-// the RFC 1123 definition of a hostname with 1 notable exception that
+// PreciseHostname is the fully qualified domain name of a network host. This
+// matches the RFC 1123 definition of a hostname with 1 notable exception that
 // numeric IP addresses are not allowed.
-//
-// PreciseHostname can be "precise" which is a domain name without the terminating
-// dot of a network host (e.g. "foo.example.com").
 //
 // Note that as per RFC1035 and RFC1123, a *label* must consist of lower case
 // alphanumeric characters or '-', and must start and end with an alphanumeric
