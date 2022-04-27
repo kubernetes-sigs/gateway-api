@@ -17,12 +17,13 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [HashiCorp Consul][8]
 - [Istio][9] (alpha)
 - [Kong][10] (alpha)
-- [NGINX Kubernetes Gateway][11] (pre-alpha)
-- [Traefik][12] (alpha)
+- [Kuma][11] (alpha)
+- [NGINX Kubernetes Gateway][12] (pre-alpha)
+- [Traefik][13] (alpha)
 
 ## Integration Status
-- [Flagger][13] (public preview)
-- [cert-manager][14] (alpha)
+- [Flagger][14] (public preview)
+- [cert-manager][15] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -34,10 +35,11 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [8]:#hashicorp-consul
 [9]:#istio
 [10]:#kong
-[11]:#nginx-kubernetes-gateway
-[12]:#traefik
-[13]:#flagger
-[14]:#cert-manager
+[11]:#kuma
+[12]:#nginx-kubernetes-gateway
+[13]:#traefik
+[14]:#flagger
+[15]:#cert-manager
 
 ## Implementations
 
@@ -147,6 +149,15 @@ Kong is actively working on an implementation of the Gateway API in the [Kong Ku
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
+
+### Kuma
+
+[Kuma][kuma] is an open source service mesh.
+
+Kuma is actively working on an implementation of Gateway API specification for the Kuma builtin Gateway. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma builtin gateway using the Gateway API.
+
+[kuma]:https://kuma.io
+[kuma-1]:https://kuma.io/docs/latest/explore/gateway-api/
 
 ### NGINX Kubernetes Gateway
 
