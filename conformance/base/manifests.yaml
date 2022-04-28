@@ -154,6 +154,52 @@ spec:
             cpu: 10m
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: infra-backend-v3
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: infra-backend-v3
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infra-backend-v3
+  namespace: gateway-conformance-infra
+  labels:
+    app: infra-backend-v3
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: infra-backend-v3
+  template:
+    metadata:
+      labels:
+        app: infra-backend-v3
+    spec:
+      containers:
+      - name: infra-backend-v3
+        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: v1
 kind: Namespace
 metadata:
   name: gateway-conformance-app-backend
