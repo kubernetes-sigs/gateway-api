@@ -1,5 +1,10 @@
 # Cross-Namespace routing
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 The Gateway API has core support for cross Namespace routing. This is useful
 when more than one user or team is sharing the underlying networking infrastructure,
 yet control and configuration must be segmented to minimize access and fault

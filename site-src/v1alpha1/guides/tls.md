@@ -1,5 +1,10 @@
 # TLS details
 
+!!! warning "v1alpha1 has been deprecated"
+
+    Please upgrade to v1alpha2, v1alpha1 will be removed from Gateway API
+    in an upcoming release.
+
 Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.

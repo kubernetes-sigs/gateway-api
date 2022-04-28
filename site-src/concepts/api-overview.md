@@ -18,9 +18,9 @@ section in the Security model for details.
 ## Resource model
 
 !!! note
-    As of v1alpha2, resources are in the `gateway.networking.k8s.io` API group as
-    Custom Resource Definitions (CRDs). Unqualified resource names below will implicitly
-    be in this API group. Prior to v1alpha1, the API group was `networking.x-k8s.io`.
+    Gateway API resources are in the `gateway.networking.k8s.io` API group as
+    Custom Resource Definitions (CRDs). Unqualified resource names below will
+    implicitly be in this API group.
 
 There are three main types of objects in our resource model:
 
