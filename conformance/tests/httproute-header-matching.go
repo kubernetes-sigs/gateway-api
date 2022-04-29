@@ -36,7 +36,7 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 	Manifests:   []string{"tests/httproute-header-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "matching", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "header-matching", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN)
 
@@ -54,6 +54,9 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 			Namespace: ns,
 		}, {
 			Request:    http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "orange"}},
+			StatusCode: 404,
+		}, {
+			Request:    http.ExpectedRequest{Path: "/", Headers: map[string]string{"Some-Other-Header": "one"}},
 			StatusCode: 404,
 		}, {
 			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "blue"}},
