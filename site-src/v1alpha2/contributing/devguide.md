@@ -59,6 +59,18 @@ You can kick off an overall build from the top-level makefile:
 make
 ```
 
+## Adding Experimental Fields
+
+Starting with v0.5.0, all additions to the API must start in the experimental
+release channel. Experimental fields must be marked with the
+`<gateway:experimental>` annotation in Go type definitions. Gateway API CRD
+generation will exclude these fields from stable CRDs.
+
+If experimental fields are removed or renamed, the original field name should be
+removed from the go struct, with a tombstone comment
+([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
+ensuring the field name will not be reused.
+
 ## Install CRDs
 
 To install gateway-api CRDs into a Kubernetes cluster:
@@ -122,7 +134,6 @@ INFO    -  Building documentation...
 ...
 ```
 
- [mkdocs]: https://www.mkdocs.org/
 [mkdocs]: https://www.mkdocs.org/
 [Netlify]: https://netlify.com/
 [gateway-api.sigs.k8s.io]: https://gateway-api.sigs.k8s.io

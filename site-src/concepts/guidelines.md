@@ -38,6 +38,44 @@ prescribed resolution, the following guiding principles should be applied:
   should be given to the resource appearing first in alphabetical order
   (namespace/name). For example, foo/bar would be given precedence over foo/baz.
 
+## Gracefully Handling Future API Versions
+
+An important consideration when implementing this API is how it might change in
+the future. Similar to the Ingress API before it, this API is designed to be
+implemented by a variety of different products within the same cluster. That
+means that the API version your implementation was developed with may be
+different than the API version it is used with. At a minimum, the following
+requirements must be met to ensure future versions of the API do not break your
+implementation:
+
+* Handle fields with loosened validation without crashing
+* Handle fields that have transitioned from required to optional without
+  crashing
+
+## Limitations of CRD and Webhook Validation
+
+CRD and webhook validation is not the final validation i.e. webhook is "nice UX"
+but not schema enforcement. This validation is intended to provide immediate
+feedback to users when they provide an invalid configuration. Write code
+defensively with the assumption that at least some invalid input (Gateway API
+resources) will reach your controller. Both Webhook and CRD validation is not
+fully reliable because it:
+
+* May not be deployed correctly.
+* May be loosened in future API releases. (Fields may contain values with less
+  restrictive validation in newer versions of the API). 
+
+*Note: These limitations are not unique to Gateway API and apply more broadly to
+any Kubernetes CRDs and webhooks.*
+
+Implementers should ensure that, even if unexpected values are encountered in
+the API, their implementations are still as secure as possible and handle this
+input gracefully. The most common response would be to reject the configuration
+as malformed and signal the user via a condition in the status block. To avoid
+duplicating work, Gateway API maintainers are considering adding a shared
+validation package that implementations can use for this purpose. This is
+tracked by [#926](https://github.com/kubernetes-sigs/gateway-api/issues/926).
+
 ## Conformance
 
 As this API aims to cover a wide set of implementations and use cases,
@@ -117,6 +155,7 @@ These cases will be specified as defining delimited parts of the API
 The "implementation-specific" designation allows a CORE or EXTENDED feature to
 be well-defined taking into account the realities of some features that are
 mostly but not entirely portable.
+
 
 ## Kind vs. Resource
 
