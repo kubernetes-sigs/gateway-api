@@ -92,6 +92,46 @@ change across API versions.
 ### Major version (e.g. v0.x to v1.0)
 * There are no API compatibility guarantees when the major version changes.
 
+## Graduation Criteria
+
+### Resources
+
+#### Alpha -> Beta
+A resource to graduate from alpha to beta must meet the following criteria:
+
+* Implemented by several implementations.
+* Conformance test framework is in place, with some coverage of basic
+  functionality.
+* Validation is well thought out.
+* Most of the API surface is being exercised by users.
+* Approval from subproject owners + KEP reviewers.
+
+#### Beta -> GA
+
+A resource to graduate from beta to GA must meet the following criteria:
+
+* Almost all of the fields and behavior have conformance test coverage.
+* Multiple conformant implementations.
+* Widespread implementation and usage.
+* At least 6 months of soak time as a beta API.
+* Approval from subproject owners + KEP reviewers.
+
+### Fields
+
+#### Experimental -> Stable
+As described above, field level stability is layered on top of beta and GA
+resources (no fields in alpha resources can be considered stable). The
+requirements for a field to graduate from experimental to stable depend on the
+API version of the resource it is a part of. For a field to be considered
+stable, it needs to meet the same criteria of the resource it is contained in.
+
+If a resource has graduated to beta, an experimental field must meet all of the
+beta graduation criteria before graduating to stable. Similarly, if a resource
+has graduated to GA, a field must meet all of the beta and GA graduation
+criteria. There is one slight variation here, instead of 6 months of soak time
+as a beta API, a field graduating to stable requires 6 months of soak time as an
+experimental field.
+
 ## Out of Scope
 ### Unreleased APIs
 This project will have frequent updates to the master branch. There are no
