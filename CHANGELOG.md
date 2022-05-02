@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.4.3](#v043)
 - [v0.4.2](#v042)
 - [v0.4.1](#v041)
 - [v0.4.0](#v040)
@@ -12,6 +13,19 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.4.3
+
+API version: v1alpha2
+
+This release includes improvements to our webhook, including:
+
+* Migrating kube-webhook-certgen to k8s.gcr.io/ingress-nginx:v1.1.1.
+  [#1126](https://github.com/kubernetes-sigs/gateway-api/pull/1126)
+* New validation to ensure that a HTTPRouterFilter Type matches its value
+  [#1071](https://github.com/kubernetes-sigs/gateway-api/pull/1071)
+* A fix to ensure that Path match validation actually works
+  [#1071](https://github.com/kubernetes-sigs/gateway-api/pull/1071)
 
 ## v0.4.2
 
