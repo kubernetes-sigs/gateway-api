@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.17 AS build-env
+FROM golang:1.18 AS build-env
 RUN mkdir -p /go/src/sig.k8s.io/gateway-api
 WORKDIR /go/src/sig.k8s.io/gateway-api
 COPY  . .
