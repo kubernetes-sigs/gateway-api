@@ -104,9 +104,6 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 					Path:   "/v2",
 				},
 				StatusCode: 503,
-				// TODO: should these fields be populated when the BackendRef is invalid?
-				Backend:   "app-backend-v2",
-				Namespace: "gateway-conformance-app-backend",
 			})
 		})
 	},
