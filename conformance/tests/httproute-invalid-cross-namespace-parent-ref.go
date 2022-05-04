@@ -29,15 +29,15 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidCrossNamespace)
+	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidCrossNamespaceParentRef)
 }
 
-var HTTPRouteInvalidCrossNamespace = suite.ConformanceTest{
-	ShortName:   "HTTPRouteInvalidCrossNamespace",
+var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
+	ShortName:   "HTTPRouteInvalidCrossNamespaceParentRef",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should fail to attach to a Gateway in another namespace that it is not allowed to",
-	Manifests:   []string{"tests/httproute-invalid-cross-namespace.yaml"},
+	Manifests:   []string{"tests/httproute-invalid-cross-namespace-parent-ref.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		routeName := types.NamespacedName{Name: "invalid-cross-namespace", Namespace: "gateway-conformance-web-backend"}
+		routeName := types.NamespacedName{Name: "invalid-cross-namespace-parent-ref", Namespace: "gateway-conformance-web-backend"}
 		gwName := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		// TODO: Determine if this is actually what we want. It is likely
