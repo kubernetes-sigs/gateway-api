@@ -641,7 +641,6 @@ const (
 	//
 	// * "HostnameConflict"
 	// * "ProtocolConflict"
-	// * "RouteConflict"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -662,13 +661,6 @@ const (
 	// multiple Listeners are specified with the same Listener port
 	// number, but have conflicting protocol specifications.
 	ListenerReasonProtocolConflict ListenerConditionReason = "ProtocolConflict"
-
-	// This reason is used with the "Conflicted" condition when the route
-	// resources selected for this Listener conflict with other
-	// specified properties of the Listener (e.g. Protocol).
-	// For example, a Listener that specifies "UDP" as the protocol
-	// but a route selector that resolves "TCPRoute" objects.
-	ListenerReasonRouteConflict ListenerConditionReason = "RouteConflict"
 
 	// This reason is used with the "Conflicted" condition when the condition
 	// is False.
