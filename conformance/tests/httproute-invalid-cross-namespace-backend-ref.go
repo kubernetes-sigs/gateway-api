@@ -68,7 +68,7 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		})
 
 		// TODO(mikemorris): Add check for Listener attached routes or
-		// ResolvedRefs RefNotPermittedAccepted condition once
+		// Listener ResolvedRefs RefNotPermitted condition once
 		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
 		// has been resolved
 	},
