@@ -68,7 +68,7 @@ spec:
     spec:
       containers:
         - name: webhook
-          image: gcr.io/k8s-staging-gateway-api/admission-server:latest
+          image: gcr.io/k8s-staging-gateway-api/admission-server:v0.4.3
           imagePullPolicy: Always
           args:
             - -logtostderr
