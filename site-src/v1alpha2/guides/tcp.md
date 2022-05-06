@@ -43,28 +43,6 @@ In this way each `TCPRoute` "attaches" itself to a different port on the
 `Gateway` so that the service `my-foo-service` is taking traffic for port `8080`
 from outside the cluster and `my-bar-service` takes the port `8090` traffic.
 
-## Alternatives: Routing Using Traffic Matching
-
-!!! info "Experimental Channel"
-
-    This functionality is currently only included in the "Experimental" channel
-    of Gateway API. For more information on release channels, refer to the
-    [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/#adding-experimental-fields).
-
-In addition to simply matching traffic based on a Gateway's listeners (as seen
-in the above examples) a `TCPRoute` can also match further on the traffic bound
-for that listener:
-
-```
-{% include 'experimental/v1alpha2/traffic-matching-tcp.yaml' %}
-```
-
-In the above example the `matches` option for the `TCPRoute` rules enables the
-route to only serve the traffic that matches specified destination and/or source
-address patterns. In this way separate `TCPRoute` objects can be responsible
-for routing different traffic on the same `Gateway` listener and can enable
-significant flexibility for pure TCP routing.
-
 [tcproute]:/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
 [httproute]:/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute

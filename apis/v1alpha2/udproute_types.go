@@ -59,13 +59,6 @@ type UDPRouteStatus struct {
 
 // UDPRouteRule is the configuration for a given rule.
 type UDPRouteRule struct {
-	// Matches add rules for filtering traffic to backends based on addresses.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=16
-	//  <gateway:experimental>
-	Matches []AddressRouteMatches `json:"matches,omitempty"`
-
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a non-existent resource or a
 	// Service with no endpoints), the underlying implementation MUST actively
