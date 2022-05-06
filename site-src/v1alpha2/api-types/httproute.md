@@ -130,7 +130,7 @@ Specifying a core filter multiple times has unspecified or custom conformance.
 
 BackendRefs defines API objects where matching requests should be sent. If
 unspecified, the rule performs no forwarding. If unspecified and no filters
-are specified that would result in a response being sent, a 503 error code
+are specified that would result in a response being sent, a 404 error code
 is returned.
 
 The following example forwards HTTP requests for prefix `/bar` to service

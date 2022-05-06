@@ -103,7 +103,7 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/v2",
 				},
-				StatusCode: 503,
+				StatusCode: 404,
 			})
 		})
 	},
