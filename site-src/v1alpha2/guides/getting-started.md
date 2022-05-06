@@ -38,7 +38,7 @@ these resources. Installing the CRDs will just allow you to see and apply the
 resources, but they won't do anything without a controller implementing them.
 
 ```
-kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.2"
+kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.3"
 ```
 
 ### Install the Webhook
@@ -50,8 +50,8 @@ Until that point, the webhook can be installed with the following kubectl
 commands:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.2/deploy/admission_webhook.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.2/deploy/certificate_config.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.3/deploy/admission_webhook.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.3/deploy/certificate_config.yaml
 ```
 
 ### Cleanup
