@@ -19,6 +19,7 @@ package tests
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
@@ -49,19 +50,25 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
-			gw := &v1alpha2.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwName, gw)
-			require.NoError(t, err, "error fetching Gateway")
-			// There are two valid ways to represent this:
-			// 1. No listeners in status
-			// 2. One listener in status with 0 attached routes
-			if len(gw.Status.Listeners) == 0 {
-				// No listeners in status.
-			} else if len(gw.Status.Listeners) == 1 {
-				require.Equal(t, int32(0), gw.Status.Listeners[0].AttachedRoutes)
-			} else {
-				t.Errorf("Expected no more than 1 listener in status, got %d", len(gw.Status.Listeners))
-			}
+			require.Eventually(t, func() bool {
+				gw := &v1alpha2.Gateway{}
+				if err := suite.Client.Get(context.TODO(), gwName, gw); err != nil {
+					t.Logf("error fetching gateway: %v", err)
+					return false
+				}
+
+				// There are two valid ways to represent this:
+				// 1. No listeners in status
+				// 2. One listener in status with 0 attached routes
+				if len(gw.Status.Listeners) == 0 {
+					// No listeners in status.
+					return true
+				} else if len(gw.Status.Listeners) == 1 {
+					// Listener with no attached routes
+					return gw.Status.Listeners[0].AttachedRoutes == 0
+				}
+				return false
+			}, time.Second*15, time.Second, "Expected no attached routes")
 		})
 	},
 }
