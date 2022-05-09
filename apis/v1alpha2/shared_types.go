@@ -196,6 +196,7 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "NotAllowedByListeners"
+	// * "NoMatchingListenerHostname"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -210,6 +211,10 @@ const (
 	// been accepted by a Gateway because the Gateway had no Listener whose
 	// allowedRoutes criteria permit the route
 	RouteReasonNotAllowedByListeners RouteConditionReason = "NotAllowedByListeners"
+
+	// This reason is used with the "Accepted" condition when the Gateway has no
+	// compatible Listeners whose Hostname matches the route
+	RouteReasonNoMatchingListenerHostname RouteConditionReason = "NoMatchingListenerHostname"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
