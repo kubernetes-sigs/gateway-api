@@ -208,7 +208,7 @@ const (
 	RouteReasonAccepted RouteConditionReason = "Accepted"
 
 	// This reason is used with the "Accepted" condition when the route has not
-	// been accepted by a Gateway because the Gateway had no Listener whose
+	// been accepted by a Gateway because the Gateway has no Listener whose
 	// allowedRoutes criteria permit the route
 	RouteReasonNotAllowedByListeners RouteConditionReason = "NotAllowedByListeners"
 
