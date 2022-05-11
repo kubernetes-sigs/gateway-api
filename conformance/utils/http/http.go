@@ -147,9 +147,9 @@ func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtrip
 			return false
 		}
 
-		t.Logf("Request passed, ready!")
 		return true
 	})
+	t.Logf("Request passed")
 
 	return cReq, cRes
 }
