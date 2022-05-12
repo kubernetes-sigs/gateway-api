@@ -23,8 +23,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
@@ -91,40 +89,67 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	ExpectResponse(t, cReq, cRes, expected)
 }
 
+// awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
+// Each failed attempt has a 1s delay; succesful attempts have no delay.
+func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
+	successes := 0
+	attempts := 0
+	to := time.After(maxTimeToConsistency)
+	delay := time.Second
+	for {
+		select {
+		case <-to:
+			t.Fatalf("timeout while waiting after %d attempts", attempts)
+		default:
+		}
+
+		completed := fn()
+		attempts++
+		if completed {
+			successes++
+			if successes >= threshold {
+				return
+			}
+			// Skip delay if we have a success
+			continue
+		}
+
+		successes = 0
+		select {
+		// Capture the overall timeout
+		case <-to:
+			t.Fatalf("timeout while waiting after %d attempts, %d/%d sucessess", attempts, successes, threshold)
+			// And the per-try delay
+		case <-time.After(delay):
+		}
+	}
+}
+
 // WaitForConsistency repeats the provided request until it completes with a response having
 // the expected status code consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
 func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) (*roundtripper.CapturedRequest, *roundtripper.CapturedResponse) {
 	var (
-		cReq         *roundtripper.CapturedRequest
-		cRes         *roundtripper.CapturedResponse
-		err          error
-		numSuccesses int
+		cReq *roundtripper.CapturedRequest
+		cRes *roundtripper.CapturedResponse
+		err  error
 	)
 
-	require.Eventually(t, func() bool {
+	awaitConvergence(t, threshold, func() bool {
 		cReq, cRes, err = r.CaptureRoundTrip(req)
 		if err != nil {
-			numSuccesses = 0
 			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
 		}
 
 		if cRes.StatusCode != expected.StatusCode {
-			numSuccesses = 0
 			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
 			return false
 		}
 
-		numSuccesses++
-		if numSuccesses < threshold {
-			t.Logf("Request has passed %d times in a row of the desired %d, not ready yet", numSuccesses, threshold)
-			return false
-		}
-
-		t.Logf("Request has passed %d times in a row of the desired %d, ready!", numSuccesses, threshold)
 		return true
-	}, maxTimeToConsistency, 1*time.Second, "error making request, never got expected status")
+	})
+	t.Logf("Request passed")
 
 	return cReq, cRes
 }
