@@ -158,6 +158,9 @@ type HTTPRouteRule struct {
 	// matching precedence MUST be granted to the first matching rule meeting
 	// the above criteria.
 	//
+	// When no rules matching a request have been successfully attached to the
+	// parent a request is coming from, a HTTP 404 status code MUST be returned.
+	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{path:{ type: "PathPrefix", value: "/"}}}
@@ -187,13 +190,25 @@ type HTTPRouteRule struct {
 
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
-
-	// If unspecified or invalid (refers to a non-existent resource or a Service
-	// with no endpoints), the rule performs no forwarding. If there are also no
-	// filters specified that would result in a response being sent, a HTTP 503
-	// status code is returned. 503 responses must be sent so that the overall
-	// weight is respected; if an invalid backend is requested to have 80% of
-	// requests, then 80% of requests must get a 503 instead.
+	//
+	// A 404 status code MUST be returned if there are no BackendRefs or filters
+	// specified that would result in a response being sent.
+	//
+	// A BackendRef is considered invalid when it refers to:
+	//
+	// * an unknown or unsupported kind of resource
+	// * a resource that does not exist
+	// * a resource in another namespace when the reference has not been
+	//   explicitly allowed by a ReferencePolicy (or equivalent concept).
+	//
+	// When a BackendRef is invalid, 404 status codes MUST be returned for
+	// requests that would have otherwise been routed to an invalid backend. If
+	// multiple backends are specified, and some are invalid, the proportion of
+	// requests that would otherwise have been routed to an invalid backend
+	// MUST receive a 404 status code.
+	//
+	// When a BackendRef refers to a Service that has no ready endpoints, it is
+	// recommended to return a 503 status code.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource

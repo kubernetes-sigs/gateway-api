@@ -187,15 +187,23 @@ spec:
                     and forwarding the request to an API object (backendRefs).
                   properties:
                     backendRefs:
-                      description: "If unspecified or invalid (refers to a non-existent
-                        resource or a Service with no endpoints), the rule performs
-                        no forwarding. If there are also no filters specified that
-                        would result in a response being sent, a HTTP 503 status code
-                        is returned. 503 responses must be sent so that the overall
-                        weight is respected; if an invalid backend is requested to
-                        have 80% of requests, then 80% of requests must get a 503
-                        instead. \n Support: Core for Kubernetes Service Support:
-                        Custom for any other resource \n Support for weight: Core"
+                      description: "BackendRefs defines the backend(s) where matching
+                        requests should be sent. \n A 404 status code MUST be returned
+                        if there are no BackendRefs or filters specified that would
+                        result in a response being sent. \n A BackendRef is considered
+                        invalid when it refers to: \n * an unknown or unsupported
+                        kind of resource * a resource that does not exist * a resource
+                        in another namespace when the reference has not been   explicitly
+                        allowed by a ReferencePolicy (or equivalent concept). \n When
+                        a BackendRef is invalid, 404 status codes MUST be returned
+                        for requests that would have otherwise been routed to an invalid
+                        backend. If multiple backends are specified, and some are
+                        invalid, the proportion of requests that would otherwise have
+                        been routed to an invalid backend MUST receive a 404 status
+                        code. \n When a BackendRef refers to a Service that has no
+                        ready endpoints, it is recommended to return a 503 status
+                        code. \n Support: Core for Kubernetes Service Support: Custom
+                        for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
                           forward an HTTP request.
@@ -920,7 +928,9 @@ spec:
                         in alphabetical order by   \"{namespace}/{name}\". \n If ties
                         still exist within the Route that has been given precedence,
                         matching precedence MUST be granted to the first matching
-                        rule meeting the above criteria."
+                        rule meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
