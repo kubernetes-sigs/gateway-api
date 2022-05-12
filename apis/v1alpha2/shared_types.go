@@ -84,15 +84,15 @@ type ParentReference struct {
 	SectionName *SectionName `json:"sectionName,omitempty"`
 
 	// Port is the network port this Route targets. It can be interpreted
-	// differently based on the type of parent resource:
+	// differently based on the type of parent resource.
 	//
-	// * Gateway: All listeners listening on the specified port that also
-	// support this kind of Route(and select this Route). It's not
-	// recommended to set `Port` unless the networking behaviors specified
-	// in a Route must apply to a specific port as opposed to a listener(s)
-	// whose port(s) may be changed. When both Port and SectionName are
-	// specified, the name and port of the selected listener must match both
-	// specified values.
+	// When the parent resource is a Gateway, this targets all listeners
+	// listening on the specified port that also support this kind of Route(and
+	// select this Route). It's not recommended to set `Port` unless the
+	// networking behaviors specified in a Route must apply to a specific port
+	// as opposed to a listener(s) whose port(s) may be changed. When both Port
+	// and SectionName are specified, the name and port of the selected listener
+	// must match both specified values.
 	//
 	// Implementations MAY choose to support other parent resources.
 	// Implementations supporting other types of parent resources MUST clearly
