@@ -5,8 +5,8 @@ go 1.18
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/lithammer/dedent v1.1.0
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/stretchr/testify v1.7.0
+	golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4
 	k8s.io/api v0.22.4
 	k8s.io/apiextensions-apiserver v0.22.4
 	k8s.io/apimachinery v0.22.4
@@ -47,10 +47,10 @@ require (
 	github.com/modern-go/reflect2 v1.0.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
+	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/spf13/cobra v1.2.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
-	golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20211013180041-c96bc1413d57 // indirect
 	golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f // indirect
 	golang.org/x/oauth2 v0.0.0-20210402161424-2e8d93401602 // indirect

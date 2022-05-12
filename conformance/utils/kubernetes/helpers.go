@@ -32,7 +32,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -175,6 +174,47 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, gwName types.Name
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway to have at least one IP address in status")
 	return net.JoinHostPort(ipAddr, port), waitErr
+}
+
+// HTTPRouteMustHaveNoAcceptedParents waits for the specified HTTPRoute to have either no parents
+// or a single parent that is not accepted. This is used to validate HTTPRoute errors.
+func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, routeName types.NamespacedName, seconds int) {
+	t.Helper()
+
+	var actual []v1alpha2.RouteParentStatus
+	waitFor := time.Duration(seconds) * time.Second
+	emptyChecked := false
+	waitErr := wait.PollImmediate(1*time.Second, waitFor, func() (bool, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		route := &v1alpha2.HTTPRoute{}
+		err := client.Get(ctx, routeName, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
+		}
+
+		actual = route.Status.Parents
+
+		if len(actual) == 0 {
+			// For empty status, we need to distinguish between "correctly did not set" and "hasn't set yet"
+			// Ensure we iterate at least two times (taking advantage of the 1s poll delay) to give it some time.
+			if !emptyChecked {
+				emptyChecked = true
+				return false, nil
+			}
+			return true, nil
+		}
+		if len(actual) > 1 {
+			// Only expect one parent
+			return false, nil
+		}
+		return conditionsMatch(t, []metav1.Condition{{
+			Type:   string(v1alpha2.RouteConditionAccepted),
+			Status: "False",
+		}}, actual[0].Conditions), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have no accepted parents")
 }
 
 // HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
