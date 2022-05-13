@@ -44,7 +44,7 @@ type ConformanceTestSuite struct {
 	Cleanup           bool
 	BaseManifests     string
 	MeshManifests     string
-	Applier           kubernetes.Applier
+	Applier           *kubernetes.Applier
 	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
 	SkipTests         sets.Set[string]
@@ -116,10 +116,10 @@ func New(s Options) *ConformanceTestSuite {
 		Cleanup:          s.CleanupBaseResources,
 		BaseManifests:    s.BaseManifests,
 		MeshManifests:    s.MeshManifests,
-		Applier: kubernetes.Applier{
-			NamespaceLabels:          s.NamespaceLabels,
-			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
-		},
+		Applier: kubernetes.NewApplier(
+			s.NamespaceLabels,
+			s.ValidUniqueListenerPorts,
+		),
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 		SkipTests:         sets.New(s.SkipTests...),

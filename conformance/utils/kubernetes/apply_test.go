@@ -28,63 +28,74 @@ import (
 	_ "sigs.k8s.io/gateway-api/conformance/utils/flags"
 )
 
+type given struct {
+	resources string
+	expected  []unstructured.Unstructured
+}
+
 func TestPrepareResources(t *testing.T) {
 	tests := []struct {
-		name     string
-		given    string
-		expected []unstructured.Unstructured
-		applier  Applier
+		name    string
+		givens  []given
+		applier *Applier
 	}{{
 		name:    "empty namespace labels",
-		applier: Applier{},
-		given: `
+		applier: NewApplier(nil, nil),
+		givens: []given{{
+			resources: `
 apiVersion: v1
 kind: Namespace
 metadata:
   name: test
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "v1",
-				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
-					"name": "test",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
 				},
-			},
+			}},
 		}},
 	}, {
 		name: "simple namespace labels",
-		applier: Applier{
-			NamespaceLabels: map[string]string{
+		applier: NewApplier(
+			map[string]string{
 				"test": "false",
 			},
-		},
-		given: `
+			nil,
+		),
+		givens: []given{{
+			resources: `
 apiVersion: v1
 kind: Namespace
 metadata:
   name: test
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "v1",
-				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
-					"name": "test",
-					"labels": map[string]interface{}{
-						"test": "false",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": "test",
+						"labels": map[string]interface{}{
+							"test": "false",
+						},
 					},
 				},
-			},
+			}},
 		}},
 	}, {
 		name: "overwrite namespace labels",
-		applier: Applier{
-			NamespaceLabels: map[string]string{
+		applier: NewApplier(
+			map[string]string{
 				"test": "true",
 			},
-		},
-		given: `
+			nil,
+		),
+		givens: []given{{
+			resources: `
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -92,22 +103,24 @@ metadata:
   labels:
     test: 'false'
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "v1",
-				"kind":       "Namespace",
-				"metadata": map[string]interface{}{
-					"name": "test",
-					"labels": map[string]interface{}{
-						"test": "true",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "v1",
+					"kind":       "Namespace",
+					"metadata": map[string]interface{}{
+						"name": "test",
+						"labels": map[string]interface{}{
+							"test": "true",
+						},
 					},
 				},
-			},
+			}},
 		}},
 	}, {
 		name:    "no listener ports given",
-		applier: Applier{},
-		given: `
+		applier: NewApplier(nil, nil),
+		givens: []given{{
+			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       Gateway
 metadata:
@@ -122,36 +135,39 @@ spec:
         namespaces:
           from: Same
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
-					"name": "test",
-				},
-				"spec": map[string]interface{}{
-					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
-							"name":     "http",
-							"port":     int64(80),
-							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(80),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
 								},
 							},
 						},
 					},
 				},
-			},
+			}},
 		}},
 	}, {
 		name: "multiple gateways each with multiple listeners",
-		applier: Applier{
-			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001, 8002, 8003},
-		},
-		given: `
+		applier: NewApplier(
+			nil,
+			[]v1beta1.PortNumber{8000, 8001, 8002, 8003},
+		),
+		givens: []given{{
+			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       Gateway
 metadata:
@@ -192,77 +208,315 @@ spec:
         namespaces:
           from: Same
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
-					"name": "test",
-				},
-				"spec": map[string]interface{}{
-					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
-							"name":     "http",
-							"port":     int64(8000),
-							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
 								},
 							},
-						},
-						map[string]interface{}{
-							"name":     "https",
-							"port":     int64(8001),
-							"protocol": "HTTPS",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
+							map[string]interface{}{
+								"name":     "https",
+								"port":     int64(8001),
+								"protocol": "HTTPS",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
 								},
 							},
 						},
 					},
 				},
-			},
+			}, {
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test2",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8002),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+							map[string]interface{}{
+								"name":     "https",
+								"port":     int64(8003),
+								"protocol": "HTTPS",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name:    "gateway with multiple listeners on the same port",
+		applier: NewApplier(nil, []v1beta1.PortNumber{8000}),
+		givens: []given{{
+			resources: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http-a
+      port: 80
+      hostname: a.test.com
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-b
+      port: 80
+      hostname: b.test.com
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http-a",
+								"port":     int64(8000),
+								"hostname": "a.test.com",
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+							map[string]interface{}{
+								"name":     "http-b",
+								"port":     int64(8000),
+								"hostname": "b.test.com",
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name: "multiple calls to apply with gateways",
+		applier: NewApplier(
+			nil, []v1beta1.PortNumber{8000, 8001},
+		),
+		givens: []given{{
+			resources: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
 		}, {
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
-					"name": "test2",
-				},
-				"spec": map[string]interface{}{
-					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
-							"name":     "http",
-							"port":     int64(8002),
-							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
-								},
-							},
-						},
-						map[string]interface{}{
-							"name":     "https",
-							"port":     int64(8003),
-							"protocol": "HTTPS",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
+			resources: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       Gateway
+metadata:
+  name: test2
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test2",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8001),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
 								},
 							},
 						},
 					},
 				},
-			},
+			}},
+		}},
+	}, {
+		name: "multiple calls to apply with gateways, free ports",
+		applier: NewApplier(
+			nil, []v1beta1.PortNumber{8000},
+		),
+		givens: []given{{
+			resources: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
+		}, {
+			resources: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       Gateway
+metadata:
+  name: test
+spec:
+  gatewayClassName: {GATEWAY_CLASS_NAME}
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+`,
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "Gateway",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"gatewayClassName": "test-class",
+						"listeners": []interface{}{
+							map[string]interface{}{
+								"name":     "http",
+								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+						},
+					},
+				},
+			}},
 		}},
 	}, {
 		name:    "setting the controllerName for a GatewayClass",
-		applier: Applier{},
-		given: `
+		applier: &Applier{},
+		givens: []given{{
+			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       GatewayClass
 metadata:
@@ -270,30 +524,33 @@ metadata:
 spec:
   controllerName: {GATEWAY_CONTROLLER_NAME}
 `,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "GatewayClass",
-				"metadata": map[string]interface{}{
-					"name": "test",
+			expected: []unstructured.Unstructured{{
+				Object: map[string]interface{}{
+					"apiVersion": "gateway.networking.k8s.io/v1beta1",
+					"kind":       "GatewayClass",
+					"metadata": map[string]interface{}{
+						"name": "test",
+					},
+					"spec": map[string]interface{}{
+						"controllerName": "test-controller",
+					},
 				},
-				"spec": map[string]interface{}{
-					"controllerName": "test-controller",
-				},
-			},
+			}},
 		}},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(tc.given), 4096)
-
 			tc.applier.GatewayClass = "test-class"
 			tc.applier.ControllerName = "test-controller"
-			resources, err := tc.applier.prepareResources(t, decoder)
+			for i, given := range tc.givens {
+				decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(given.resources), 4096)
 
-			require.NoError(t, err, "unexpected error preparing resources")
-			require.EqualValues(t, tc.expected, resources)
+				resources, err := tc.applier.prepareResources(t, decoder)
+				require.NoError(t, err, "unexpected error preparing resources")
+
+				require.EqualValues(t, given.expected, resources, "values differ for given resources #%d", i)
+			}
 		})
 	}
 }
