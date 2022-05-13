@@ -165,7 +165,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// the suite.
 	for _, feature := range test.Features {
 		if !slices.Contains(suite.SupportedFeatures, feature) {
-			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
+			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
 
@@ -173,7 +173,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// the suite.
 	for _, feature := range test.Exemptions {
 		if !slices.Contains(suite.ExemptFeatures, feature) {
-			t.Skip("Skipping %s: suite exempts %s", test.ShortName, feature)
+			t.Skipf("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
 
