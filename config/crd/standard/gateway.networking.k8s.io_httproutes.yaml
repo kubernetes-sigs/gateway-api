@@ -607,7 +607,13 @@ spec:
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across   implementations. \n Specifying
                         a core filter multiple times has unspecified or custom conformance.
-                        \n Support: Core"
+                        \n All filters are expected to be compatible with each other
+                        except for the URLRewrite and RequestRedirect filters, which
+                        may not be combined. If an implementation can not support
+                        other combinations of filters, they must clearly document
+                        that limitation. In all cases where incompatible or unsupported
+                        filters are specified, implementations MUST add a warning
+                        condition to status. \n Support: Core"
                       items:
                         description: HTTPRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
