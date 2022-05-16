@@ -44,12 +44,18 @@ type ExpectedResponse struct {
 }
 
 // Request can be used as both the request to make and a means to verify
-// that echoserver received the expected request.
+// that echoserver received the expected request. Note that multiple header
+// values can be provided, as a comma-separated value.
 type Request struct {
 	Host    string
 	Method  string
 	Path    string
 	Headers map[string]string
+
+	// AbsentHeaders are names of headers that are expected
+	// *not* to be present on the request. They have no effect
+	// on a request being made.
+	AbsentHeaders []string
 }
 
 // maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
@@ -194,12 +200,28 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 					actualVal, ok := cReq.Headers[strings.ToLower(name)]
 					if !ok {
 						t.Errorf("Expected %s header to be set, actual headers: %v", name, cReq.Headers)
-					} else if actualVal[0] != expectedVal {
-						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, actualVal[0])
+					} else if strings.Join(actualVal, ",") != expectedVal {
+						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 					}
 				}
 			}
 		}
+
+		// Verify that headers expected *not* to be present on the
+		// request are actually not present.
+		if len(expected.Request.AbsentHeaders) > 0 {
+			for name, val := range cReq.Headers {
+				cReq.Headers[strings.ToLower(name)] = val
+			}
+
+			for _, name := range expected.Request.AbsentHeaders {
+				val, ok := cReq.Headers[strings.ToLower(name)]
+				if ok {
+					t.Errorf("Expected %s header to not be set, got %s", name, val)
+				}
+			}
+		}
+
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			t.Errorf("Expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
 		}
