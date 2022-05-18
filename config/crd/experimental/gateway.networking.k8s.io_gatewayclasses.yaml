@@ -24,6 +24,9 @@ spec:
     - jsonPath: .spec.controllerName
       name: Controller
       type: string
+    - jsonPath: .status.conditions[?(@.type=="Accepted")].status
+      name: Accepted
+      type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
