@@ -699,13 +699,13 @@ type HTTPRequestHeaderFilter struct {
 	Remove []string `json:"remove,omitempty"`
 }
 
-// HTTPPathModifierType defines the type of path redirect.
+// HTTPPathModifierType defines the type of path redirect or rewrite.
 type HTTPPathModifierType string
 
 const (
-	// This type of modifier indicates that the complete path will be replaced
-	// by the path redirect value.
-	AbsoluteHTTPPathModifier HTTPPathModifierType = "Absolute"
+	// This type of modifier indicates that the full path will be replaced
+	// by the specified value.
+	FullPathHTTPPathModifier HTTPPathModifierType = "ReplaceFullPath"
 
 	// This type of modifier indicates that any prefix path matches will be
 	// replaced by the substitution value. For example, a path with a prefix
@@ -717,20 +717,29 @@ const (
 // HTTPPathModifier defines configuration for path modifiers.
 // <gateway:experimental>
 type HTTPPathModifier struct {
-	// Type defines the type of path modifier.
+	// Type defines the type of path modifier. Additional types may be
+	// added in a future release of the API.
 	//
 	// <gateway:experimental>
-	// +kubebuilder:validation:Enum=Absolute;ReplacePrefixMatch
+	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
 	Type HTTPPathModifierType `json:"type"`
 
-	// Substitution defines the HTTP path value to substitute. An empty value
-	// ("") indicates that the portion of the path to be changed should be
-	// removed from the resulting path. For example, a request to "/foo/bar"
-	// with a prefix match of "/foo" would be modified to "/bar".
+	// ReplaceFullPath specifies the value with which to replace the full path
+	// of a request during a rewrite or redirect.
 	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024
-	Substitution string `json:"substitution"`
+	// +optional
+	ReplaceFullPath *string `json:"replaceFullPath,omitempty"`
+
+	// ReplacePrefixMatch specifies the value with which to replace the prefix
+	// match of a request during a rewrite or redirect. For example, a request
+	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
 }
 
 // HTTPRequestRedirect defines a filter that redirects a request. This filter
@@ -798,7 +807,7 @@ type HTTPURLRewriteFilter struct {
 	//
 	// <gateway:experimental>
 	// +optional
-	Hostname *Hostname `json:"hostname,omitempty"`
+	Hostname *PreciseHostname `json:"hostname,omitempty"`
 
 	// Path defines a path rewrite.
 	//
