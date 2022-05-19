@@ -681,7 +681,6 @@ const (
 	// Possible reasons for this condition to be true are:
 	//
 	// * "PortUnavailable"
-	// * "UnsupportedExtension"
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
@@ -701,12 +700,6 @@ const (
 	// * The port is already in use.
 	// * The port is not supported by the implementation.
 	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
-
-	// This reason is used with the "Detached" condition when the
-	// controller detects that an implementation-specific Listener
-	// extension is being requested, but is not able to support
-	// the extension.
-	ListenerReasonUnsupportedExtension ListenerConditionReason = "UnsupportedExtension"
 
 	// This reason is used with the "Detached" condition when the
 	// Listener could not be attached to be Gateway because its
