@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
@@ -90,7 +91,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 }
 
 // awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
-// Each failed attempt has a 1s delay; succesful attempts have no delay.
+// Each failed attempt has a 1s delay; successful attempts have no delay.
 func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
 	successes := 0
 	attempts := 0

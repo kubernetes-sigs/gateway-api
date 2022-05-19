@@ -161,19 +161,19 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 		t.Parallel()
 	}
 
-	// Check that all features excerised by the test have been opted into by
+	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
 		if !slices.Contains(suite.SupportedFeatures, feature) {
-			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
+			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
 
-	// Check that no features excerised by the test have been opted out of by
+	// Check that no features exercised by the test have been opted out of by
 	// the suite.
 	for _, feature := range test.Exemptions {
 		if !slices.Contains(suite.ExemptFeatures, feature) {
-			t.Skip("Skipping %s: suite exempts %s", test.ShortName, feature)
+			t.Skipf("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
 

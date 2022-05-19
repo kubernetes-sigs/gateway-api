@@ -73,22 +73,22 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		// routes and any expected Listener conditions once
 		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
 		// has been resolved
-		t.Skip("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
-			listeners := []v1alpha2.ListenerStatus{{
-				Name: v1alpha2.SectionName("http"),
-				SupportedKinds: []v1alpha2.RouteGroupKind{{
-					Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-					Kind:  v1alpha2.Kind("HTTPRoute"),
-				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.RouteConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
-				}},
-			}}
+		// t.Skip("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
+		// 	listeners := []v1alpha2.ListenerStatus{{
+		// 		Name: v1alpha2.SectionName("http"),
+		// 		SupportedKinds: []v1alpha2.RouteGroupKind{{
+		// 			Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+		// 			Kind:  v1alpha2.Kind("HTTPRoute"),
+		// 		}},
+		// 		Conditions: []metav1.Condition{{
+		// 			Type:   string(v1alpha2.RouteConditionResolvedRefs),
+		// 			Status: metav1.ConditionFalse,
+		// 			Reason: string(v1alpha2.RouteReasonRefNotPermitted),
+		// 		}},
+		// 	}}
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
-		})
+		// 	kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
+		// })
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
 
