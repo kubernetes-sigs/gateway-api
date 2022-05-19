@@ -2,6 +2,9 @@
 
 ## Table of Contents
 
+- [v0.4.3](#v043)
+- [v0.4.2](#v042)
+- [v0.4.1](#v041)
 - [v0.4.0](#v040)
 - [v0.4.0-rc2](#v040-rc2)
 - [v0.4.0-rc1](#v040-rc1)
@@ -10,6 +13,45 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.4.3
+
+API version: v1alpha2
+
+This release includes improvements to our webhook, including:
+
+* Migrating kube-webhook-certgen to k8s.gcr.io/ingress-nginx:v1.1.1.
+  [#1126](https://github.com/kubernetes-sigs/gateway-api/pull/1126)
+* New validation to ensure that a HTTPRouterFilter Type matches its value
+  [#1071](https://github.com/kubernetes-sigs/gateway-api/pull/1071)
+* A fix to ensure that Path match validation actually works
+  [#1071](https://github.com/kubernetes-sigs/gateway-api/pull/1071)
+
+## v0.4.2
+
+API version: v1alpha2
+
+This release is intended to verify our webhook image tagging process.
+
+### Bug Fixes
+
+* Update image generation process with more consistent naming
+  [#1034](https://github.com/kubernetes-sigs/gateway-api/pull/1034)
+
+## v0.4.1
+
+API version: v1alpha2
+
+This release contains minor bug fixes for v1alpha2.
+
+### Bug Fixes
+
+* ControllerName now prints correctly in kubectl output for GatewayClass
+  [#909](https://github.com/kubernetes-sigs/gateway-api/pull/909)
+* Namespace can no longer be left unspecified in ReferencePolicy
+  [#964](https://github.com/kubernetes-sigs/gateway-api/pull/964)
+* Wildcard characters can no longer be used in redirect Hostname values
+  [#956](https://github.com/kubernetes-sigs/gateway-api/pull/956)
 
 ## v0.4.0
 
