@@ -46,9 +46,6 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		ns := v1alpha2.Namespace(gwNN.Namespace)
 		gwKind := v1alpha2.Kind("Gateway")
 
-		// TODO(mikemorris): Add check for Accepted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
 		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 			parents := []v1alpha2.RouteParentStatus{{
 				ParentRef: v1alpha2.ParentReference{
@@ -90,6 +87,10 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		// 	kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
 		// })
 
+		// TODO(mikemorris): Add routeNN to the end of the arguments below
+		// to add check for Accepted condition once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN)
 
 		// TODO(mikemorris): Add check for HTTP requests successfully reaching
