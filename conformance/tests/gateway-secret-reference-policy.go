@@ -50,10 +50,6 @@ var GatewaySecretReferencePolicy = suite.ConformanceTest{
 						Type:   string(v1alpha2.ListenerConditionReady),
 						Status: metav1.ConditionTrue,
 					},
-					{
-						Type:   string(v1alpha2.ListenerConditionResolvedRefs),
-						Status: metav1.ConditionTrue,
-					},
 				},
 			}}
 
