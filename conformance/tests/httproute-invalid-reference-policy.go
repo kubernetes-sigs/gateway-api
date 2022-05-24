@@ -46,9 +46,6 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		ns := v1alpha2.Namespace(gwNN.Namespace)
 		gwKind := v1alpha2.Kind("Gateway")
 
-		// TODO(mikemorris): Add check for Accepted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
 		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 			parents := []v1alpha2.RouteParentStatus{{
 				ParentRef: v1alpha2.ParentReference{
@@ -68,12 +65,12 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, false, 60)
 		})
 
-		// TODO(mikemorris): Un-skip check for Listener ResolvedRefs
+		// TODO(mikemorris): Un-comment check for Listener ResolvedRefs
 		// RefNotPermitted condition and/or add check for attached
 		// routes and any expected Listener conditions once
 		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
 		// has been resolved
-		// t.Skip("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
+		// t.Run("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
 		// 	listeners := []v1alpha2.ListenerStatus{{
 		// 		Name: v1alpha2.SectionName("http"),
 		// 		SupportedKinds: []v1alpha2.RouteGroupKind{{
@@ -90,7 +87,11 @@ var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
 		// 	kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
 		// })
 
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
+		// TODO(mikemorris): Add routeNN to the end of the arguments below
+		// to add check for Accepted condition once
+		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
+		// has been resolved
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN)
 
 		// TODO(mikemorris): Add check for HTTP requests successfully reaching
 		// app-backend-v1 at path "/" if it is determined that a Route with at

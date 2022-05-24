@@ -24,7 +24,8 @@ spec:
   rules:
   - matches:
     - path:
-      value: "/v2"
+        type: PathPrefix
+        value: "/v2"
     backendRefs:
     - name: app-backend-v2
       namespace: gateway-conformance-app-backend
