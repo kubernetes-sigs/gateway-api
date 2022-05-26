@@ -32,7 +32,7 @@ func init() {
 
 var GatewaySecretReferencePolicy = suite.ConformanceTest{
 	ShortName:   "GatewaySecretMissingReferencePolicy",
-	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the secrets namespace and a ReferencePolicy granting permission to the Secret exists",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to the Secret exists",
 	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
 	Manifests:   []string{"tests/gateway-secret-reference-policy.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
