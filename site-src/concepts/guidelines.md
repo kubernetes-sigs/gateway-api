@@ -2,6 +2,11 @@
 
 There are some general design guidelines used throughout this API.
 
+!!! note
+    Throughout the Gateway API documentation and specification,
+    keywords such as "MUST", "MAY", and "SHOULD" are used
+    broadly. These should be interpreted as described in RFC 2119.
+
 ## Single resource consistency
 
 The Kubernetes API guarantees consistency only on a single resource level. There
