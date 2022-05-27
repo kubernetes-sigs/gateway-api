@@ -244,7 +244,7 @@ const (
 	// path element refers to the list of labels in the path split by
 	// the `/` separator. When specified, a trailing `/` is ignored.
 	//
-	// For example. the paths `/abc`, `/abc/`, and `/abc/def` would all match
+	// For example, the paths `/abc`, `/abc/`, and `/abc/def` would all match
 	// the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// "PathPrefix" is semantically equivalent to the "Prefix" path type in the
@@ -743,7 +743,7 @@ type HTTPPathModifier struct {
 }
 
 // HTTPRequestRedirect defines a filter that redirects a request. This filter
-// MUST not be used on the same Route rule as a HTTPURLRewrite filter.
+// MUST NOT be used on the same Route rule as a HTTPURLRewrite filter.
 type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location`
 	// header in the response.
@@ -795,7 +795,7 @@ type HTTPRequestRedirectFilter struct {
 
 // HTTPURLRewriteFilter defines a filter that modifies a request during
 // forwarding. At most one of these filters may be used on a Route rule. This
-// may not be used on the same Route rule as a HTTPRequestRedirect filter.
+// MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.
 //
 // <gateway:experimental>
 // Support: Extended
