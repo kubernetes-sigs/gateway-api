@@ -327,7 +327,7 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=64
-	CertificateRefs []*SecretObjectReference `json:"certificateRefs,omitempty"`
+	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
