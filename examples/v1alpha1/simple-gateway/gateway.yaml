@@ -1,3 +1,6 @@
+## Used in:
+## - site-src/v1alpha1/guides/traffic-splitting.md
+## - site-src/v1alpha1/guides/simple-gateway.md
 apiVersion: networking.x-k8s.io/v1alpha1
 kind: Gateway
 metadata:

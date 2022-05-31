@@ -21,6 +21,7 @@ plugins:
   - awesome-pages
   - macros:
       include_dir: examples
+      j2_line_comment_prefix: "##"
 markdown_extensions:
   - admonition
   - meta
