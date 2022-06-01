@@ -450,7 +450,6 @@ type GatewayAddress struct {
 	// Type of the address.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 

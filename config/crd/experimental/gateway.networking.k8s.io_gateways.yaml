@@ -82,6 +82,9 @@ spec:
                       - IPAddress
                       - Hostname
                       - NamedAddress
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^([a-zA-Z0-9])+$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$
                       type: string
                     value:
                       description: "Value of the address. The validity of the values
@@ -467,6 +470,9 @@ spec:
                       - IPAddress
                       - Hostname
                       - NamedAddress
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^([a-zA-Z0-9])+$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$
                       type: string
                     value:
                       description: "Value of the address. The validity of the values
