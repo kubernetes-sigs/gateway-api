@@ -1,0 +1,6 @@
+      - type: RequestRedirect
+        requestRedirect:
+          path:
+            type: ReplacePrefixMatch
+            replacePrefixMatch: /paprika
+          statusCode: 302
