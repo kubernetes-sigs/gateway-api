@@ -21,7 +21,7 @@ example, to issue a permanent redirect (301) from HTTP to HTTPS, configure
 `requestRedirect.statusCode=301` and `requestRedirect.scheme="https"`:
 
 ```yaml
-{% include 'v1alpha2/http-redirect-rewrite/httproute-redirect-https.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-redirect-https.yaml' %}
 ```
 
 Redirects change configured URL components to match the redirect configuration
@@ -43,7 +43,7 @@ prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
 `redirect.example` requests whose path begins with `/cayenne` to `/paprika`:
 
 ```yaml
-{% include 'v1alpha2/http-redirect-rewrite/httproute-redirect-full.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-redirect-full.yaml' %}
 ```
 
 Both requests to
@@ -55,7 +55,7 @@ The other path redirect type, `ReplacePrefixMatch`, replaces only the path
 portion matching `matches.path.value`. Changing the filter in the above to:
 
 ```yaml
-{% include 'v1alpha2/http-redirect-rewrite/httproute-redirect-prefix.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-redirect-prefix.yaml' %}
 ```
 
 will result in redirects with `location:
@@ -74,7 +74,7 @@ following HTTPRoute will accept a request for
 rewrite.example`.
 
 ```yaml
-{% include 'v1alpha2/http-redirect-rewrite/httproute-rewrite.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-rewrite.yaml' %}
 ```
 
 Path rewrites also make use of HTTP Path Modifiers. The HTTPRoute below
@@ -84,5 +84,5 @@ Instead using `type: ReplacePrefixMatch` and `replacePrefixMatch: /fennel` will
 request `https://elsewhere.example/fennel/smidgen` upstream.
 
 ```yaml
-{% include 'v1alpha2/http-redirect-rewrite/httproute-rewrite.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-rewrite.yaml' %}
 ```
