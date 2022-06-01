@@ -36,9 +36,9 @@ the cluster.
 
 GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
-controllers MAY handle more than one GatewayClass.
+controllers may handle more than one GatewayClass.
 
-GatewayClass is a cluster-scoped resource. There MUST be at least one
+GatewayClass is a cluster-scoped resource. There must be at least one
 GatewayClass defined in order to be able to have functional Gateways. A
 controller that implements the Gateway API does so by providing an associated
 GatewayClass resource that the user can reference from their Gateway(s).
@@ -62,8 +62,8 @@ have client traffic originating “outside” the cluster, this is not a
 requirement.
 
 It defines a request for a specific load balancer config that implements the
-GatewayClass’ configuration and behaviour contract. The resource MAY be created
-by an operator directly, or MAY be created by a controller handling a
+GatewayClass’ configuration and behaviour contract. The resource may be created
+by an operator directly, or may be created by a controller handling a
 GatewayClass.
 
 As the Gateway spec captures user intent, it may not contain a complete
@@ -73,7 +73,7 @@ managing the GatewayClass to provide these settings for the user, resulting in a
 more portable spec. This behaviour will be made clear using the GatewayClass
 Status object.
 
-A Gateway MAY be attached to one or more *Route references* which serve to direct
+A Gateway may be attached to one or more *Route references* which serve to direct
 traffic for a subset of traffic *to a specific service.*
 
 ### Route Resources
