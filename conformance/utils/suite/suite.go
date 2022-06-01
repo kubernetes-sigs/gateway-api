@@ -33,9 +33,9 @@ type ExemptFeature string
 
 const (
 	// This option indicates the implementation is exempting itself from the
-	// requirement of a ReferencePolicy to allow cross-namesapce references,
+	// requirement of a ReferenceGrant to allow cross-namesapce references,
 	// and has instead implemented alternative safeguards.
-	ExemptReferencePolicy ExemptFeature = "ReferencePolicy"
+	ExemptReferenceGrant ExemptFeature = "ReferenceGrant"
 )
 
 // SupportedFeature allows opting in to additional conformance tests at an
@@ -43,8 +43,8 @@ const (
 type SupportedFeature string
 
 const (
-	// This option indicates support for the ReferencePolicy object.
-	SupportReferencePolicy SupportedFeature = "ReferencePolicy"
+	// This option indicates support for the ReferenceGrant object.
+	SupportReferenceGrant SupportedFeature = "ReferenceGrant"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API

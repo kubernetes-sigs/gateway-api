@@ -198,7 +198,7 @@ spec:
                         invalid when it refers to: \n * an unknown or unsupported
                         kind of resource * a resource that does not exist * a resource
                         in another namespace when the reference has not been   explicitly
-                        allowed by a ReferencePolicy (or equivalent concept). \n When
+                        allowed by a ReferenceGrant (or equivalent concept). \n When
                         a BackendRef is invalid, 404 status codes MUST be returned
                         for requests that would have otherwise been routed to an invalid
                         backend. If multiple backends are specified, and some are
@@ -385,7 +385,7 @@ spec:
                                         False` and not configure this backend in the
                                         underlying implementation. \n If there is
                                         a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferencePolicy,
+                                        object that is not allowed by a ReferenceGrant,
                                         the controller must ensure the \"ResolvedRefs\"
                                         \ condition on the Route is set to `status:
                                         False`, with the \"RefNotPermitted\" reason
@@ -423,10 +423,10 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferencePolicy
+                                            when a namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
-                                            the reference. See the ReferencePolicy
+                                            the reference. See the ReferenceGrant
                                             documentation for details. \n Support:
                                             Core"
                                           maxLength: 63
@@ -553,10 +553,10 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferencePolicy
+                              Note that when a namespace is specified, a ReferenceGrant
                               object is required in the referent namespace to allow
                               that namespace's owner to accept the reference. See
-                              the ReferencePolicy documentation for details. \n Support:
+                              the ReferenceGrant documentation for details. \n Support:
                               Core"
                             maxLength: 63
                             minLength: 1
@@ -765,7 +765,7 @@ spec:
                                   is set to `status: False` and not configure this
                                   backend in the underlying implementation. \n If
                                   there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferencePolicy,
+                                  object that is not allowed by a ReferenceGrant,
                                   the controller must ensure the \"ResolvedRefs\"
                                   \ condition on the Route is set to `status: False`,
                                   with the \"RefNotPermitted\" reason and not configure
@@ -801,9 +801,9 @@ spec:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
                                       is inferred. \n Note that when a namespace is
-                                      specified, a ReferencePolicy object is required
+                                      specified, a ReferenceGrant object is required
                                       in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferencePolicy
+                                      owner to accept the reference. See the ReferenceGrant
                                       documentation for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1

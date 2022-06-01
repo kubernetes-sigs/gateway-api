@@ -106,23 +106,23 @@ guarantee. If you used a custom label such as `env`, anyone that is able to
 label namespaces within your cluster would effectively be able to change the set
 of namespaces your Gateway supported.
 
-### 2. ReferencePolicy
+### 2. ReferenceGrant
 There are some cases where we allow other object references to cross namespace
 boundaries. This includes Gateways referencing Secrets and Routes referencing
 Backends (usually Services). In these cases, the required handshake is
-accomplished with a ReferencePolicy resource. This resource exists within a
+accomplished with a ReferenceGrant resource. This resource exists within a
 target namespace and can be used to allow references from other namespaces.
 
-For example, the following ReferencePolicy allows references from Gateways in
+For example, the following ReferenceGrant allows references from Gateways in
 the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
-the ReferencePolicy.
+the ReferenceGrant.
 
 ```yaml
-{% include 'v1alpha2/reference-policy.yaml' %}
+{% include 'v1alpha2/reference-grant.yaml' %}
 ```
 
-For more information on ReferencePolicy, refer to our [detailed documentation
-for this resource](/v1alpha2/api-types/referencepolicy.md).
+For more information on ReferenceGrant, refer to our [detailed documentation
+for this resource](/v1alpha2/api-types/referencegrant.md).
 
 ## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
 Some infrastructure providers or cluster operators may wish to limit the

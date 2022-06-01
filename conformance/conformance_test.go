@@ -49,7 +49,7 @@ func TestConformance(t *testing.T) {
 		Debug:                *flags.ShowDebug,
 		CleanupBaseResources: *flags.CleanupBaseResources,
 		SupportedFeatures: []suite.SupportedFeature{
-			suite.SupportReferencePolicy,
+			suite.SupportReferenceGrant,
 		},
 	})
 	cSuite.Setup(t)

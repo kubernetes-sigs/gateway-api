@@ -53,20 +53,20 @@ Gateway API, we had several key feature requests that required this capability.
 Most notably, forwarding traffic to backends in other namespaces and referring
 to TLS certificates in other namespaces.
 
-To accomplish this, we've introduced a new ReferencePolicy resource that
+To accomplish this, we've introduced a new ReferenceGrant resource that
 provides a handshake mechanism. By default, references across namespaces are not
 permitted; creating a reference across a namespace (like a Route referencing a
 Service in another namespace) must be rejected by implementations. These
-references can be accepted by creating a ReferencePolicy in the referent
+references can be accepted by creating a ReferenceGrant in the referent
 (target) namespace, that specifies what Kind is allowed to accept incoming
 references, and from what namespace and Kind the references may be.
 
-For example, the following ReferencePolicy would allow HTTPRoutes in the prod
-namespace to forward traffic to Services wherever this ReferencePolicy was
+For example, the following ReferenceGrant would allow HTTPRoutes in the prod
+namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'v1alpha2/reference-policy.yaml' %}
+{% include 'v1alpha2/reference-grant.yaml' %}
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).

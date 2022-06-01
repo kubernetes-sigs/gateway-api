@@ -24,7 +24,7 @@ type GatewayClassExpansion interface{}
 
 type HTTPRouteExpansion interface{}
 
-type ReferencePolicyExpansion interface{}
+type ReferenceGrantExpansion interface{}
 
 type TCPRouteExpansion interface{}
 

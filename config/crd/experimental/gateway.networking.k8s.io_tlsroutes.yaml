@@ -219,9 +219,9 @@ spec:
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a
-                          namespace is specified, a ReferencePolicy object is required
+                          namespace is specified, a ReferenceGrant object is required
                           in the referent namespace to allow that namespace's owner
-                          to accept the reference. See the ReferencePolicy documentation
+                          to accept the reference. See the ReferenceGrant documentation
                           for details."
                         properties:
                           group:
@@ -249,10 +249,10 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferencePolicy
+                              Note that when a namespace is specified, a ReferenceGrant
                               object is required in the referent namespace to allow
                               that namespace's owner to accept the reference. See
-                              the ReferencePolicy documentation for details. \n Support:
+                              the ReferenceGrant documentation for details. \n Support:
                               Core"
                             maxLength: 63
                             minLength: 1

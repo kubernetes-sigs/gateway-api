@@ -2,7 +2,7 @@ resources:
 - stable/gateway.networking.k8s.io_gatewayclasses.yaml
 - stable/gateway.networking.k8s.io_gateways.yaml
 - stable/gateway.networking.k8s.io_httproutes.yaml
-- stable/gateway.networking.k8s.io_referencepolicies.yaml
+- stable/gateway.networking.k8s.io_referencegrants.yaml
 - stable/gateway.networking.k8s.io_tcproutes.yaml
 - stable/gateway.networking.k8s.io_tlsroutes.yaml
 - stable/gateway.networking.k8s.io_udproutes.yaml

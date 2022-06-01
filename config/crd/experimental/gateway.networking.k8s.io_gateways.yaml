@@ -331,9 +331,9 @@ spec:
                             MAY choose to support attaching multiple certificates
                             to a Listener, but this behavior is implementation-specific.
                             \n References to a resource in different namespace are
-                            invalid UNLESS there is a ReferencePolicy in the target
+                            invalid UNLESS there is a ReferenceGrant in the target
                             namespace that allows the certificate to be attached.
-                            If a ReferencePolicy does not allow this reference, the
+                            If a ReferenceGrant does not allow this reference, the
                             \"ResolvedRefs\" condition MUST be set to False for this
                             listener with the \"InvalidCertificateRef\" reason. \n
                             This field is required to have at least one element when
@@ -378,10 +378,10 @@ spec:
                               namespace:
                                 description: "Namespace is the namespace of the backend.
                                   When unspecified, the local namespace is inferred.
-                                  \n Note that when a namespace is specified, a ReferencePolicy
+                                  \n Note that when a namespace is specified, a ReferenceGrant
                                   object is required in the referent namespace to
                                   allow that namespace's owner to accept the reference.
-                                  See the ReferencePolicy documentation for details.
+                                  See the ReferenceGrant documentation for details.
                                   \n Support: Core"
                                 maxLength: 63
                                 minLength: 1

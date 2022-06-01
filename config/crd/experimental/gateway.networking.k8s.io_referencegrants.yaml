@@ -6,18 +6,18 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v0.5.0-dev
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: referencepolicies.gateway.networking.k8s.io
+  name: referencegrants.gateway.networking.k8s.io
 spec:
   group: gateway.networking.k8s.io
   names:
     categories:
     - gateway-api
-    kind: ReferencePolicy
-    listKind: ReferencePolicyList
-    plural: referencepolicies
+    kind: ReferenceGrant
+    listKind: ReferenceGrantList
+    plural: referencegrants
     shortNames:
     - refpol
-    singular: referencepolicy
+    singular: referencegrant
   scope: Namespaced
   versions:
   - additionalPrinterColumns:
@@ -27,14 +27,14 @@ spec:
     name: v1alpha2
     schema:
       openAPIV3Schema:
-        description: "ReferencePolicy identifies kinds of resources in other namespaces
+        description: "ReferenceGrant identifies kinds of resources in other namespaces
           that are trusted to reference the specified kinds of resources in the same
-          namespace as the policy. \n Each ReferencePolicy can be used to represent
+          namespace as the policy. \n Each ReferenceGrant can be used to represent
           a unique trust relationship. Additional Reference Policies can be used to
           add to the set of trusted sources of inbound references for the namespace
           they are defined within. \n All cross-namespace references in Gateway API
           (with the exception of cross-namespace Gateway-route attachment) require
-          a ReferencePolicy. \n Support: Core"
+          a ReferenceGrant. \n Support: Core"
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -49,7 +49,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: Spec defines the desired state of ReferencePolicy.
+            description: Spec defines the desired state of ReferenceGrant.
             properties:
               from:
                 description: "From describes the trusted namespaces and kinds that
@@ -58,7 +58,7 @@ spec:
                   can be valid from, or to put this another way, entries must be combined
                   using OR. \n Support: Core"
                 items:
-                  description: ReferencePolicyFrom describes trusted namespaces and
+                  description: ReferenceGrantFrom describes trusted namespaces and
                     kinds.
                   properties:
                     group:
@@ -98,8 +98,8 @@ spec:
                   to, or to put this another way, entries must be combined using OR.
                   \n Support: Core"
                 items:
-                  description: ReferencePolicyTo describes what Kinds are allowed
-                    as targets of the references.
+                  description: ReferenceGrantTo describes what Kinds are allowed as
+                    targets of the references.
                   properties:
                     group:
                       description: "Group is the group of the referent. When empty,

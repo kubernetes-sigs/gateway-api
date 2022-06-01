@@ -87,8 +87,8 @@ Since a specific match takes priority, the Gateway will serve
 #### Cross namespace certificate references
 
 In this example, the Gateway is configured to reference a certificate in a
-different namespace. This is allowed by the ReferencePolicy created in the
-target namespace. Without that ReferencePolicy, the cross-namespace reference
+different namespace. This is allowed by the ReferenceGrant created in the
+target namespace. Without that ReferenceGrant, the cross-namespace reference
 would be invalid.
 
 ```yaml

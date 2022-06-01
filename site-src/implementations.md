@@ -172,7 +172,7 @@ Kuma is actively working on an implementation of Gateway API specification for t
 
 Traefik currently supports version `v1alpha2` (`v0.4.x`) of the Gateway API specification, check the [Kubernetes Gateway Documentation][traefik-1] for information on how to deploy and use Traefik's Gateway implementation.
 
-Traefik is currently working on implementing UDP, and ReferencePolicy. Status updates and documentation will be provided here as the work progresses.
+Traefik is currently working on implementing UDP, and ReferenceGrant. Status updates and documentation will be provided here as the work progresses.
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/

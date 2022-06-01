@@ -65,9 +65,9 @@ type SecretObjectReference struct {
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.
 	//
-	// Note that when a namespace is specified, a ReferencePolicy object
+	// Note that when a namespace is specified, a ReferenceGrant object
 	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferencePolicy documentation
+	// owner to accept the reference. See the ReferenceGrant documentation
 	// for details.
 	//
 	// Support: Core
@@ -80,9 +80,9 @@ type SecretObjectReference struct {
 // specific to BackendRef. It includes a few additional fields and features
 // than a regular ObjectReference.
 //
-// Note that when a namespace is specified, a ReferencePolicy object
+// Note that when a namespace is specified, a ReferenceGrant object
 // is required in the referent namespace to allow that namespace's
-// owner to accept the reference. See the ReferencePolicy documentation
+// owner to accept the reference. See the ReferenceGrant documentation
 // for details.
 //
 // The API object must be valid in the cluster; the Group and Kind must
@@ -112,9 +112,9 @@ type BackendObjectReference struct {
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.
 	//
-	// Note that when a namespace is specified, a ReferencePolicy object
+	// Note that when a namespace is specified, a ReferenceGrant object
 	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferencePolicy documentation
+	// owner to accept the reference. See the ReferenceGrant documentation
 	// for details.
 	//
 	// Support: Core

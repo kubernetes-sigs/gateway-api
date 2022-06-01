@@ -27,18 +27,18 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteReferencePolicy)
+	ConformanceTests = append(ConformanceTests, HTTPRouteReferenceGrant)
 }
 
-var HTTPRouteReferencePolicy = suite.ConformanceTest{
-	ShortName:   "HTTPRouteReferencePolicy",
+var HTTPRouteReferenceGrant = suite.ConformanceTest{
+	ShortName:   "HTTPRouteReferenceGrant",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
 	Features: []suite.SupportedFeature{
-		suite.SupportReferencePolicy,
+		suite.SupportReferenceGrant,
 	},
-	Manifests: []string{"tests/httproute-reference-policy.yaml"},
+	Manifests: []string{"tests/httproute-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "reference-policy", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN, routeNN)
 
