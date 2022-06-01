@@ -9,6 +9,7 @@ _THEN_
 
 - [Simple Gateway](/v1alpha2/guides/simple-gateway) (a good one to start out with)
 - [HTTP routing](/v1alpha2/guides/http-routing)
+- [HTTP redirects and rewrites](/v1alpha2/guides/http-redirect-rewrite)
 - [HTTP traffic splitting](/v1alpha2/guides/traffic-splitting)
 - [Routing across Namespaces](/v1alpha2/guides/multiple-ns)
 - [Configuring TLS](/v1alpha2/guides/tls)
