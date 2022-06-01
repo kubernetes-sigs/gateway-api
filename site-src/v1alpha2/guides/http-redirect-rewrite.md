@@ -31,13 +31,10 @@ example, the request `GET http://redirect.example/cinammon` will result in a
 hostname (`redirect.example`), path (`/cinnamon`), and port (implicit) remain
 unchanged.
 
-<!---
-The above raises some questions. Do redirects apply unconditionally? If my
-request is already HTTPS, will the above create a redirect loop? If redirects
-are unconditional (i.e. they _do not_ nothing and proxy upstream if the request
-already uses HTTPS), how should you properly write configuration elsewhere to
-ensure this only applies to HTTP requests?
--->
+Redirect filters do not return redirects if the redirected URL and original URL
+are the same. Although the above configuration applies to both HTTP and HTTPS
+requests, HTTPS requests will proxy upstream, not return a redirect response
+that would result in a loop.
 
 ### Path redirects
 
@@ -64,14 +61,6 @@ portion matching `matches.path.value`. Changing the filter in the above to:
 will result in redirects with `location:
 https://redirect.example/paprika/pinch` and `location:
 https://redirect.example/paprika/teaspoon` response headers.
-
-<!---
-Do these behave at all differently based on matches.path.type? I expect no, and
-that implementations should just always replace only the matching path prefix
-or the entire path. Using ReplacePrefixMatch on Exact is the same as
-ReplaceFullPath. RegularExpression looks a bit ambiguous, since the
-PathMatchType looks unclear on whether they're handled as prefixes or not.
--->
 
 ## Rewrites
 
