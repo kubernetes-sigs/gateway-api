@@ -115,14 +115,15 @@ safeguards are in place.
 ReferenceGrant support is a "CORE" conformance level requirement for
 cross-namespace references that originate from the following objects:
 
+- Gateway
 - HTTPRoute
 - TLSRoute
 - TCPRoute
 - UDPRoute
 
 That is, all implementations MUST use this flow for any cross namespace
-references in any of the core xRoute types, except as noted in the Exceptions
-section above.
+references in the Gateway and any of the core xRoute types, except as noted
+in the Exceptions section above.
 
 Other "ImplementationSpecific" objects and references MUST also use this flow
 for cross-namespace references, except as noted in the Exceptions section above.
