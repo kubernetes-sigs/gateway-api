@@ -70,3 +70,21 @@ spec:
     backendRefs:
     - name: infra-backend-v1
       port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /case-insensitivity
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: X-Header-Set
+          value: header-set
+        add:
+        - name: X-Header-Add
+          value: header-add
+        remove:
+        - X-Header-Remove
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080

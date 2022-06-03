@@ -143,6 +143,28 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
+		}, {
+			Request: http.Request{
+				Path: "/case-insensitivity",
+				// The filter uses canonicalized header names,
+				// the request uses lowercase names.
+				Headers: map[string]string{
+					"x-header-set":    "original-val-set",
+					"x-header-add":    "original-val-add",
+					"x-header-remove": "original-val-remove",
+					"Another-Header":  "another-header-val",
+				},
+			},
+			BackendRequest: &http.Request{
+				Path: "/case-insensitivity",
+				Headers: map[string]string{
+					"X-Header-Set": "header-set",
+					"X-Header-Add": "original-val-add,header-add",
+				},
+				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
+			},
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
 		}}
 
 		for i := range testCases {
