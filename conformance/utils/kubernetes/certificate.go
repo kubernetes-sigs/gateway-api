@@ -1,3 +1,19 @@
+/*
+Copyright 2022 The Kubernetes Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 package kubernetes
 
 import (
@@ -58,7 +74,7 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 func generateRSACert(host string, keyOut, certOut io.Writer) error {
 	priv, err := rsa.GenerateKey(rand.Reader, rsaBits)
 	if err != nil {
-		return fmt.Errorf("failed to generate key: %v", err)
+		return fmt.Errorf("failed to generate key: %w", err)
 	}
 	notBefore := time.Now()
 	notAfter := notBefore.Add(validFor)
@@ -104,7 +120,7 @@ func generateRSACert(host string, keyOut, certOut io.Writer) error {
 	}
 
 	if err := pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}); err != nil {
-		return fmt.Errorf("failed creating key: %v", err)
+		return fmt.Errorf("failed creating key: %w", err)
 	}
 
 	return nil
