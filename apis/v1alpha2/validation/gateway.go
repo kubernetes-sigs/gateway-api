@@ -99,11 +99,15 @@ func validateListenerHostname(listeners []gatewayv1a2.Listener, path *field.Path
 	return errs
 }
 
+// domainPrefixedStringRegex is a regex used in validation to determine whether
+// a provided string is a domain-prefixed string. Domain-prefixed strings are used
+// to indicate custom (implementation-specific) address types.
+var domainPrefixedStringRegex = regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$`)
+
 // validateAddresses validates each listener address
 // if there are addresses set. Otherwise, returns no error.
 func validateAddresses(addresses []gatewayv1a2.GatewayAddress, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	re := regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$`)
 
 	for i, a := range addresses {
 		if a.Type == nil {
@@ -113,7 +117,7 @@ func validateAddresses(addresses []gatewayv1a2.GatewayAddress, path *field.Path)
 		if !ok {
 			// Found something that's not one of the upstream AddressTypes
 			// Next, check for a domain-prefixed string
-			match := re.Match([]byte(*a.Type))
+			match := domainPrefixedStringRegex.Match([]byte(*a.Type))
 			if !match {
 				errs = append(errs, field.Invalid(path.Index(i).Child("type"), a.Type, "should either be a defined constant or a domain-prefixed string (example.com/Type)"))
 			}

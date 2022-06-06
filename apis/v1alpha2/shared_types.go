@@ -488,8 +488,7 @@ type AnnotationValue string
 // Values `IPAddress` and `Hostname` have Extended support.
 //
 // All other values, including domain-prefixed values have Custom support,
-// and are expected to be used by implementations to implement custom behavior
-// in a compatible way.
+// which are used in implementation-specific behaviors.
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
