@@ -27,6 +27,13 @@ spec:
       namespaces:
         from: Same
     hostname: "*.bar.com"
+  - name: listener-4
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      namespaces:
+        from: Same
+    hostname: "*.foo.com"
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: HTTPRoute
@@ -68,6 +75,9 @@ spec:
   - name: httproute-listener-hostname-matching
     namespace: gateway-conformance-infra
     sectionName: listener-3
+  - name: httproute-listener-hostname-matching
+    namespace: gateway-conformance-infra
+    sectionName: listener-4
   rules:
   - backendRefs:
     - name: infra-backend-v3

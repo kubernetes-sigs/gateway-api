@@ -280,7 +280,11 @@ spec:
                         array. When both listener and route specify hostnames, there
                         MUST be an intersection between the values for a Route to
                         be accepted. For more information, refer to the Route specific
-                        Hostnames documentation. \n Support: Core"
+                        Hostnames documentation. \n Hostnames that are prefixed with
+                        a wildcard label (`*.`) are interpreted as a suffix match.
+                        That means that a match for `*.example.com` would match both
+                        `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+                        \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$

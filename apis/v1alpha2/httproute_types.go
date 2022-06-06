@@ -74,8 +74,13 @@ type HTTPRouteSpec struct {
 	// * A Listener with `*.example.com` as the hostname matches HTTPRoutes
 	//   that have either not specified any hostnames or have specified at least
 	//   one hostname that matches the Listener hostname. For example,
-	//   `test.example.com` and `*.example.com` would both match. On the other
-	//   hand, `example.com` and `test.example.net` would not match.
+	//   `*.example.com`, `test.example.com`, and `foo.test.example.com` would
+	//   all match. On the other hand, `example.com` and `test.example.net` would
+	//   not match.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
 	// If both the Listener and HTTPRoute have specified hostnames, any
 	// HTTPRoute hostnames that do not match the Listener hostname MUST be

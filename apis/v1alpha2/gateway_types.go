@@ -172,6 +172,10 @@ type Listener struct {
 	// accepted. For more information, refer to the Route specific Hostnames
 	// documentation.
 	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
+	//
 	// Support: Core
 	//
 	// +optional

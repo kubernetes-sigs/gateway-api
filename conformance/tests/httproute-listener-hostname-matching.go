@@ -66,7 +66,15 @@ var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 			Backend:   "infra-backend-v3",
 			Namespace: ns,
 		}, {
-			Request:    http.ExpectedRequest{Host: "too.many.prefixes.bar.com", Path: "/"},
+			Request:   http.ExpectedRequest{Host: "multiple.prefixes.bar.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
+		}, {
+			Request:   http.ExpectedRequest{Host: "multiple.prefixes.foo.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
+		}, {
+			Request:    http.ExpectedRequest{Host: "foo.com", Path: "/"},
 			StatusCode: 404,
 		}, {
 			Request:    http.ExpectedRequest{Host: "no.matching.host", Path: "/"},
