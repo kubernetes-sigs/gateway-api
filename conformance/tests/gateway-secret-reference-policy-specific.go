@@ -27,14 +27,14 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewaySecretReferencePolicy)
+	ConformanceTests = append(ConformanceTests, GatewaySecretReferencePolicySpecific)
 }
 
-var GatewaySecretReferencePolicy = suite.ConformanceTest{
-	ShortName:   "GatewaySecretMissingReferencePolicy",
-	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to the Secret exists",
+var GatewaySecretReferencePolicySpecific = suite.ConformanceTest{
+	ShortName:   "GatewaySecretReferencePolicySpecific",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to the specific Secret exists",
 	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
-	Manifests:   []string{"tests/gateway-secret-reference-policy.yaml"},
+	Manifests:   []string{"tests/gateway-secret-reference-policy-specific.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-reference-policy", Namespace: "gateway-conformance-infra"}
 
