@@ -482,7 +482,7 @@ type AnnotationValue string
 // AddressType defines how a network address is represented as a text string.
 // This may take two possible forms:
 //
-// * A CamelCase string identifier (like `IPAddress` or `Hostname`)
+// * A predefined CamelCase string identifier (currently limited to `IPAddress` or `Hostname`)
 // * A domain-prefixed string identifier (like `acme.io/CustomAddressType`)
 //
 // Values `IPAddress` and `Hostname` have Extended support.
