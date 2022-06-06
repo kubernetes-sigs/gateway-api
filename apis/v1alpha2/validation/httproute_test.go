@@ -30,6 +30,8 @@ import (
 func TestValidateHTTPRoute(t *testing.T) {
 	testService := gatewayv1a2.ObjectName("test-service")
 	specialService := gatewayv1a2.ObjectName("special-service")
+	pathPrefixMatchType := gatewayv1a2.PathMatchPathPrefix
+
 	tests := []struct {
 		name     string
 		rules    []gatewayv1a2.HTTPRouteRule
@@ -329,6 +331,51 @@ func TestValidateHTTPRoute(t *testing.T) {
 		name:     "valid rewrite path modifier",
 		errCount: 0,
 		rules: []gatewayv1a2.HTTPRouteRule{{
+			Matches: []gatewayv1a2.HTTPRouteMatch{{
+				Path: &gatewayv1a2.HTTPPathMatch{
+					Type:  &pathPrefixMatchType,
+					Value: utilpointer.String("/bar"),
+				},
+			}},
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "rewrite path modifier missing path match",
+		errCount: 1,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Filters: []gatewayv1a2.HTTPRouteFilter{{
+				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
+					Path: &gatewayv1a2.HTTPPathModifier{
+						Type:               gatewayv1a2.PrefixMatchHTTPPathModifier,
+						ReplacePrefixMatch: utilpointer.String("foo"),
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "rewrite path too many matches",
+		errCount: 1,
+		rules: []gatewayv1a2.HTTPRouteRule{{
+			Matches: []gatewayv1a2.HTTPRouteMatch{{
+				Path: &gatewayv1a2.HTTPPathMatch{
+					Type:  &pathPrefixMatchType,
+					Value: utilpointer.String("/foo"),
+				},
+			}, {
+				Path: &gatewayv1a2.HTTPPathMatch{
+					Type:  &pathPrefixMatchType,
+					Value: utilpointer.String("/bar"),
+				},
+			}},
 			Filters: []gatewayv1a2.HTTPRouteFilter{{
 				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
 				URLRewrite: &gatewayv1a2.HTTPURLRewriteFilter{
@@ -355,7 +402,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		}},
 	}, {
 		name:     "rewrite and redirect filters combined (invalid)",
-		errCount: 1,
+		errCount: 3,
 		rules: []gatewayv1a2.HTTPRouteRule{{
 			Filters: []gatewayv1a2.HTTPRouteFilter{{
 				Type: gatewayv1a2.HTTPRouteFilterURLRewrite,
