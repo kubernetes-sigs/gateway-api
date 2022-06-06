@@ -67,7 +67,7 @@ func generateRSACert(host string, keyOut, certOut io.Writer) error {
 	serialNumber, err := rand.Int(rand.Reader, serialNumberLimit)
 
 	if err != nil {
-		return fmt.Errorf("failed to generate serial number: %s", err)
+		return fmt.Errorf("failed to generate serial number: %w", err)
 	}
 
 	template := x509.Certificate{
@@ -96,11 +96,11 @@ func generateRSACert(host string, keyOut, certOut io.Writer) error {
 	derBytes, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
 
 	if err != nil {
-		return fmt.Errorf("failed to create certificate: %s", err)
+		return fmt.Errorf("failed to create certificate: %w", err)
 	}
 
 	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: derBytes}); err != nil {
-		return fmt.Errorf("failed creating cert: %v", err)
+		return fmt.Errorf("failed creating cert: %w", err)
 	}
 
 	if err := pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(priv)}); err != nil {
