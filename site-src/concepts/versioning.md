@@ -20,21 +20,21 @@ documentation](https://kubernetes.io/docs/reference/using-api/#api-versioning).
 ![Lifecycle of New Gateway API Resources](/images/lifecycle-new-resources.png)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
 
-### Release Channels (e.g. Experimental, Stable)
-Gateway API provides 2 release channels: an Experimental one and a Stable one.
+### Release Channels (e.g. Experimental, Standard)
+Gateway API provides 2 release channels: an Experimental one and a Standard one.
 
-The Stable release channel includes:
+The Standard release channel includes:
 
 * Resources that have graduated to beta
-* All fields that have graduated to stable and are no longer considered
+* All fields that have graduated to standard and are no longer considered
   experimental
 
-The Experimental release channel includes everything in the Stable release
+The Experimental release channel includes everything in the Standard release
 channel, plus:
 
 * Alpha API resources
 * New fields that are considered experimental and have not yet graduated to the
-  stable channel
+  standard channel
 
 ![Release Channel Overlap](/images/release-channel-overlap.png)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
@@ -49,7 +49,7 @@ Unfortunately, CRDs do not have a similar concept yet.
 Instead of trying to recreate feature gates in this project, we've introduced
 release channels. Starting in v0.5.0, all new fields and features will start in
 the Experimental release channel. From that point, these may graduate to the
-Stable release channel or be dropped from the API entirely. See
+Standard release channel or be dropped from the API entirely. See
 [GEP-922](/geps/gep-922) for a more detailed discussion of this approach to new
 fields and features.
 
@@ -62,7 +62,7 @@ and channel:
 
 ```
 gateway.networking.k8s.io/bundle-version: v0.4.0
-gateway.networking.k8s.io/channel: stable|experimental
+gateway.networking.k8s.io/channel: standard|experimental
 ```
 
 ## What can Change
@@ -81,7 +81,7 @@ change across API versions.
 * Making required fields optional
 * Removal of experimental fields
 * Removal of experimental resources
-* Graduation of fields or resources from experimental to stable track
+* Graduation of fields or resources from experimental to standard track
 * Introduction of a new **API version**, which may also include:
   * Renamed fields
   * Anything else that is valid in a new Kubernetes API version
@@ -118,18 +118,18 @@ A resource to graduate from beta to GA must meet the following criteria:
 
 ### Fields
 
-#### Experimental -> Stable
+#### Experimental -> Standard
 As described above, field level stability is layered on top of beta and GA
-resources (no fields in alpha resources can be considered stable). The
-requirements for a field to graduate from experimental to stable depend on the
+resources (no fields in alpha resources can be considered standard). The
+requirements for a field to graduate from experimental to standard depend on the
 API version of the resource it is a part of. For a field to be considered
-stable, it needs to meet the same criteria of the resource it is contained in.
+standard, it needs to meet the same criteria of the resource it is contained in.
 
 If a resource has graduated to beta, an experimental field must meet all of the
-beta graduation criteria before graduating to stable. Similarly, if a resource
+beta graduation criteria before graduating to standard. Similarly, if a resource
 has graduated to GA, a field must meet all of the beta and GA graduation
 criteria. There is one slight variation here, instead of 6 months of soak time
-as a beta API, a field graduating to stable requires 6 months of soak time as an
+as a beta API, a field graduating to standard requires 6 months of soak time as an
 experimental field.
 
 ## Out of Scope

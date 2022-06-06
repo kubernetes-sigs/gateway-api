@@ -1,8 +1,8 @@
 resources:
-- stable/gateway.networking.k8s.io_gatewayclasses.yaml
-- stable/gateway.networking.k8s.io_gateways.yaml
-- stable/gateway.networking.k8s.io_httproutes.yaml
-- stable/gateway.networking.k8s.io_referencegrants.yaml
-- stable/gateway.networking.k8s.io_tcproutes.yaml
-- stable/gateway.networking.k8s.io_tlsroutes.yaml
-- stable/gateway.networking.k8s.io_udproutes.yaml
+- standard/gateway.networking.k8s.io_gatewayclasses.yaml
+- standard/gateway.networking.k8s.io_gateways.yaml
+- standard/gateway.networking.k8s.io_httproutes.yaml
+- standard/gateway.networking.k8s.io_referencegrants.yaml
+- standard/gateway.networking.k8s.io_tcproutes.yaml
+- standard/gateway.networking.k8s.io_tlsroutes.yaml
+- standard/gateway.networking.k8s.io_udproutes.yaml

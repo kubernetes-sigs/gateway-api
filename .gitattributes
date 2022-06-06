@@ -9,6 +9,6 @@ apis/generated/** linguist-generated=true
 apis/**/generated.pb.go linguist-generated=true
 apis/**/generated.proto linguist-generated=true
 config/crd/experimental/** linguist-generated=true
-config/crd/stable/** linguist-generated=true
+config/crd/standard/** linguist-generated=true
 pkg/client/** linguist-generated=true
 
