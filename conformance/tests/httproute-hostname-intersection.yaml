@@ -62,9 +62,9 @@ spec:
   hostnames:
   - non.matching.com
   - wildcard.io
-  - foo.bar.wildcard.io
   - foo.wildcard.io # matches listener-2's wildcard host
   - bar.wildcard.io # matches listener-2's wildcard host
+  - foo.bar.wildcard.io # matches listener-2's wildcard host
   rules:
   - matches:
     - path:
@@ -126,7 +126,7 @@ spec:
     namespace: gateway-conformance-infra
   hostnames:
   - specific.but.wrong.com
-  - too.many.prefixes.wildcard.io
+  - wildcard.io
   rules:
   - matches:
     - path:

@@ -93,6 +93,11 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					Namespace: ns,
 				},
 				http.ExpectedResponse{
+					Request:   http.ExpectedRequest{Host: "foo.bar.wildcard.io", Path: "/s2"},
+					Backend:   "infra-backend-v2",
+					Namespace: ns,
+				},
+				http.ExpectedResponse{
 					Request:    http.ExpectedRequest{Host: "non.matching.com", Path: "/s2"},
 					StatusCode: 404,
 				},
@@ -100,10 +105,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					Request:    http.ExpectedRequest{Host: "wildcard.io", Path: "/s2"},
 					StatusCode: 404,
 				},
-				http.ExpectedResponse{
-					Request:    http.ExpectedRequest{Host: "foo.bar.wildcard.io", Path: "/s2"},
-					StatusCode: 404,
-				},
+
 				http.ExpectedResponse{
 					Request:    http.ExpectedRequest{Host: "very.specific.com", Path: "/s2"},
 					StatusCode: 404,
@@ -152,13 +154,15 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					Namespace: ns,
 				},
 				http.ExpectedResponse{
+					Request:   http.ExpectedRequest{Host: "foo.bar.anotherwildcard.io", Path: "/s4"},
+					Backend:   "infra-backend-v1",
+					Namespace: ns,
+				},
+				http.ExpectedResponse{
 					Request:    http.ExpectedRequest{Host: "anotherwildcard.io", Path: "/s4"},
 					StatusCode: 404,
 				},
-				http.ExpectedResponse{
-					Request:    http.ExpectedRequest{Host: "too.many.anotherwildcard.io", Path: "/s4"},
-					StatusCode: 404,
-				},
+
 				http.ExpectedResponse{
 					Request:    http.ExpectedRequest{Host: "foo.wildcard.io", Path: "/s4"},
 					StatusCode: 404,
@@ -207,7 +211,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					StatusCode: 404,
 				},
 				{
-					Request:    http.ExpectedRequest{Host: "too.many.prefixes.wildcard.io", Path: "/s5"},
+					Request:    http.ExpectedRequest{Host: "wildcard.io", Path: "/s5"},
 					StatusCode: 404,
 				},
 			}
