@@ -31,11 +31,6 @@ example, the request `GET http://redirect.example/cinammon` will result in a
 hostname (`redirect.example`), path (`/cinnamon`), and port (implicit) remain
 unchanged.
 
-Redirect filters do not return redirects if the redirected URL and original URL
-are the same. Although the above configuration applies to both HTTP and HTTPS
-requests, HTTPS requests will proxy upstream, not return a redirect response
-that would result in a loop.
-
 ### Path redirects
 
 Path redirects use an HTTP Path Modifier to replace either entire paths or path
