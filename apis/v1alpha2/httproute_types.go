@@ -716,6 +716,12 @@ const (
 	// replaced by the substitution value. For example, a path with a prefix
 	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
 	// the "/foo" prefix replaced with "/bar" in matching requests.
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
 )
 
@@ -740,6 +746,12 @@ type HTTPPathModifier struct {
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
 	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024
