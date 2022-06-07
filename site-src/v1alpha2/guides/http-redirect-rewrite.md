@@ -33,6 +33,12 @@ unchanged.
 
 ### Path redirects
 
+!!! info "Experimental Channel"
+
+    The `Path` field described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 Path redirects use an HTTP Path Modifier to replace either entire paths or path
 prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
 `redirect.example` requests whose path begins with `/cayenne` to `/paprika`:
@@ -58,6 +64,12 @@ https://redirect.example/paprika/pinch` and `location:
 https://redirect.example/paprika/teaspoon` response headers.
 
 ## Rewrites
+
+!!! info "Experimental Channel"
+
+    The `URLRewrite` filter described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
 
 Rewrites modify components of a client request before proxying it upstream. A
 [`URLRewrite`
