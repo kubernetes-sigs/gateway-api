@@ -80,7 +80,7 @@ func main() {
 		log.Fatalf("no objects in the roots")
 	}
 
-	channels := []string{"stable", "experimental"}
+	channels := []string{"standard", "experimental"}
 	for _, channel := range channels {
 		for groupKind := range kubeKinds {
 			log.Printf("generating %s CRD for %v\n", channel, groupKind)
@@ -126,7 +126,7 @@ func main() {
 func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
 	for name := range props {
 		jsonProps, _ := props[name]
-		if channel == "stable" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
+		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
 			delete(props, name)
 			continue
 		}

@@ -64,7 +64,7 @@ make
 Starting with v0.5.0, all additions to the API must start in the experimental
 release channel. Experimental fields must be marked with the
 `<gateway:experimental>` annotation in Go type definitions. Gateway API CRD
-generation will exclude these fields from stable CRDs.
+generation will only include these fields in the experimental set of CRDs.
 
 If experimental fields are removed or renamed, the original field name should be
 removed from the go struct, with a tombstone comment
