@@ -23,6 +23,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -228,6 +229,15 @@ func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
 			return nil, fmt.Errorf("received %d bytes from %s, expected %d", count, location, resp.ContentLength)
 		}
 		return manifests, nil
+	} else if strings.HasPrefix(location, "local://") {
+		_, path, _ := strings.Cut(location, "local://")
+
+		b, err := os.ReadFile(path)
+		if err != nil {
+			return nil, err
+		}
+
+		return bytes.NewBuffer(b), nil
 	}
 	b, err := conformance.Manifests.ReadFile(location)
 	if err != nil {
