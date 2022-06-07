@@ -277,42 +277,44 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 func parentsMatch(t *testing.T, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
 	t.Helper()
 
-	if len(expected) != len(actual) {
-		t.Logf("Expected %d Route parents, got %d", len(expected), len(actual))
+	oneParentMatchClosed := func(t *testing.T, eParent, aParent v1beta1.RouteParentStatus) bool {
+		return oneParentMatch(t, eParent, aParent, namespaceRequired)
+	}
+	if !listMatch(t, expected, actual, oneParentMatchClosed) {
 		return false
 	}
 
-	// TODO(robscott): Allow for arbitrarily ordered parents
-	for i, eParent := range expected {
-		aParent := actual[i]
-		if aParent.ControllerName != eParent.ControllerName {
-			t.Logf("ControllerName doesn't match")
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-			t.Logf("Expected ParentReference.Group to be %v, got %v", eParent.ParentRef.Group, aParent.ParentRef.Group)
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-			t.Logf("Expected ParentReference.Kind to be %v, got %v", eParent.ParentRef.Kind, aParent.ParentRef.Kind)
-			return false
-		}
-		if aParent.ParentRef.Name != eParent.ParentRef.Name {
-			t.Logf("ParentReference.Name doesn't match")
-			return false
-		}
-		if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
-			if namespaceRequired || aParent.ParentRef.Namespace != nil {
-				t.Logf("Expected ParentReference.Namespace to be %v, got %v", eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
-				return false
-			}
-		}
-		if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
+	t.Logf("Route parents matched expectations")
+	return true
+}
+
+func oneParentMatch(t *testing.T, eParent, aParent v1beta1.RouteParentStatus, namespaceRequired bool) bool {
+	if aParent.ControllerName != eParent.ControllerName {
+		t.Logf("ControllerName doesn't match")
+		return false
+	}
+	if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
+		t.Logf("Expected ParentReference.Group to be %v, got %v", eParent.ParentRef.Group, aParent.ParentRef.Group)
+		return false
+	}
+	if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
+		t.Logf("Expected ParentReference.Kind to be %v, got %v", eParent.ParentRef.Kind, aParent.ParentRef.Kind)
+		return false
+	}
+	if aParent.ParentRef.Name != eParent.ParentRef.Name {
+		t.Logf("ParentReference.Name doesn't match")
+		return false
+	}
+	if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
+		if namespaceRequired || aParent.ParentRef.Namespace != nil {
+			t.Logf("Expected ParentReference.Namespace to be %v, got %v", eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
 			return false
 		}
 	}
+	if !conditionsMatch(t, eParent.Conditions, aParent.Conditions) {
+		return false
+	}
 
-	t.Logf("Route parents matched expectations")
 	return true
 }
 
@@ -372,37 +374,53 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
 }
 
-// TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
 func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) bool {
 	t.Helper()
+
+	if !listMatch(t, expected, actual, oneListenerMatch) {
+		return false
+	}
+
+	t.Logf("Gateway status listeners matched expectations")
+	return true
+}
+
+func oneListenerMatch(t *testing.T, eListener, aListener v1beta1.ListenerStatus) bool {
+	if aListener.Name != eListener.Name {
+		t.Logf("Name doesn't match")
+		return false
+	}
+	if !reflect.DeepEqual(aListener.SupportedKinds, eListener.SupportedKinds) {
+		t.Logf("Expected SupportedKinds to be %v, got %v", eListener.SupportedKinds, aListener.SupportedKinds)
+		return false
+	}
+	if aListener.AttachedRoutes != eListener.AttachedRoutes {
+		t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
+		return false
+	}
+	if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
+		t.Logf("Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
+		return false
+	}
+
+	return true
+}
+
+func listMatch[elementType any](t *testing.T, expected, actual []elementType, matcher func(*testing.T, elementType, elementType) bool) bool {
 
 	if len(expected) != len(actual) {
 		t.Logf("Expected %d Gateway status listeners, got %d", len(expected), len(actual))
 		return false
 	}
 
-	// TODO(mikemorris): Allow for arbitrarily ordered listeners
-	for i, eListener := range expected {
-		aListener := actual[i]
-		if aListener.Name != eListener.Name {
-			t.Logf("Name doesn't match")
-			return false
-		}
-		if !reflect.DeepEqual(aListener.SupportedKinds, eListener.SupportedKinds) {
-			t.Logf("Expected SupportedKinds to be %v, got %v", eListener.SupportedKinds, aListener.SupportedKinds)
-			return false
-		}
-		if aListener.AttachedRoutes != eListener.AttachedRoutes {
-			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
-			return false
-		}
-		if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
-			t.Logf("Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
+	// TODO(mikemorris): Allow for arbitrarily ordered elements
+	for i, e := range expected {
+		a := actual[i]
+		if !matcher(t, e, a) {
 			return false
 		}
 	}
 
-	t.Logf("Gateway status listeners matched expectations")
 	return true
 }
 
