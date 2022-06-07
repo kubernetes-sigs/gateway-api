@@ -28,16 +28,16 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewaySecretInvalidReferencePolicy)
+	ConformanceTests = append(ConformanceTests, GatewaySecretMissingReferenceGrant)
 }
 
-var GatewaySecretInvalidReferencePolicy = suite.ConformanceTest{
-	ShortName:   "GatewaySecretInvalidReferencePolicy",
-	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy exists but does not grant permission to that specific Secret",
-	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
-	Manifests:   []string{"tests/gateway-secret-invalid-reference-policy.yaml"},
+var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
+	ShortName:   "GatewaySecretMissingReferenceGrant",
+	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the Secret does not exist",
+	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
+	Manifests:   []string{"tests/gateway-secret-missing-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-secret-invalid-reference-policy", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "gateway-secret-missing-reference-grant", Namespace: "gateway-conformance-infra"}
 
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidCertificateRef", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{

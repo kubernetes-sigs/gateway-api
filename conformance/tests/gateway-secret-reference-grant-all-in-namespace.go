@@ -28,29 +28,30 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewaySecretMissingReferencePolicy)
+	ConformanceTests = append(ConformanceTests, GatewaySecretReferenceGrantAllInNamespace)
 }
 
-var GatewaySecretMissingReferencePolicy = suite.ConformanceTest{
-	ShortName:   "GatewaySecretMissingReferencePolicy",
-	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to the Secret does not exist",
-	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
-	Manifests:   []string{"tests/gateway-secret-missing-reference-policy.yaml"},
+var GatewaySecretReferenceGrantAllInNamespace = suite.ConformanceTest{
+	ShortName:   "GatewaySecretReferenceGrantAllInNamespace",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to all Secrets in the namespace exists",
+	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
+	Manifests:   []string{"tests/gateway-secret-reference-grant-specific.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-secret-missing-reference-policy", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "gateway-secret-reference-grant", Namespace: "gateway-conformance-infra"}
 
-		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidCertificateRef", func(t *testing.T) {
+		t.Run("Gateway listener should have a true ResolvedRefs condition and a true Ready condition", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{
 				Name: v1alpha2.SectionName("https"),
 				SupportedKinds: []v1alpha2.RouteGroupKind{{
 					Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
 					Kind:  v1alpha2.Kind("HTTPRoute"),
 				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.ListenerConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.ListenerReasonInvalidCertificateRef),
-				}},
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(v1alpha2.ListenerConditionReady),
+						Status: metav1.ConditionTrue,
+					},
+				},
 			}}
 
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)

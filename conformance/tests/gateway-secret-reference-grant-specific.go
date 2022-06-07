@@ -28,16 +28,16 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewaySecretReferencePolicyAllInNamespace)
+	ConformanceTests = append(ConformanceTests, GatewaySecretReferenceGrantSpecific)
 }
 
-var GatewaySecretReferencePolicyAllInNamespace = suite.ConformanceTest{
-	ShortName:   "GatewaySecretReferencePolicyAllInNamespace",
-	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferencePolicy granting permission to all Secrets in the namespace exists",
-	Features:    []suite.SupportedFeature{suite.SupportReferencePolicy},
-	Manifests:   []string{"tests/gateway-secret-reference-policy-specific.yaml"},
+var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
+	ShortName:   "GatewaySecretReferenceGrantSpecific",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the specific Secret exists",
+	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
+	Manifests:   []string{"tests/gateway-secret-reference-grant-specific.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwNN := types.NamespacedName{Name: "gateway-secret-reference-policy", Namespace: "gateway-conformance-infra"}
+		gwNN := types.NamespacedName{Name: "gateway-secret-reference-grant", Namespace: "gateway-conformance-infra"}
 
 		t.Run("Gateway listener should have a true ResolvedRefs condition and a true Ready condition", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{
