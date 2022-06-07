@@ -30,6 +30,11 @@ func TestValidateGateway(t *testing.T) {
 			Hostname: nil,
 		},
 	}
+	addresses := []gatewayv1a2.GatewayAddress{
+		{
+			Type: nil,
+		},
+	}
 	baseGateway := gatewayv1a2.Gateway{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
@@ -38,6 +43,7 @@ func TestValidateGateway(t *testing.T) {
 		Spec: gatewayv1a2.GatewaySpec{
 			GatewayClassName: "foo",
 			Listeners:        listeners,
+			Addresses:        addresses,
 		},
 	}
 	tlsConfig := gatewayv1a2.GatewayTLSConfig{}
@@ -75,6 +81,34 @@ func TestValidateGateway(t *testing.T) {
 				gw.Spec.Listeners[0].Protocol = gatewayv1a2.UDPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
+		},
+		"Address present with IPAddress": {
+			mutate: func(gw *gatewayv1a2.Gateway) {
+				ip := gatewayv1a2.IPAddressType
+				gw.Spec.Addresses[0].Type = &ip
+			},
+			expectErrsOnFields: []string{},
+		},
+		"Address present with Hostname": {
+			mutate: func(gw *gatewayv1a2.Gateway) {
+				host := gatewayv1a2.HostnameAddressType
+				gw.Spec.Addresses[0].Type = &host
+			},
+			expectErrsOnFields: []string{},
+		},
+		"Address present with example.com/CustomAddress": {
+			mutate: func(gw *gatewayv1a2.Gateway) {
+				customAddress := gatewayv1a2.AddressType("example.com/CustomAddress")
+				gw.Spec.Addresses[0].Type = &customAddress
+			},
+			expectErrsOnFields: []string{},
+		},
+		"Address present with invalid Type": {
+			mutate: func(gw *gatewayv1a2.Gateway) {
+				customAddress := gatewayv1a2.AddressType("CustomAddress")
+				gw.Spec.Addresses[0].Type = &customAddress
+			},
+			expectErrsOnFields: []string{"spec.addresses[0].type"},
 		},
 	}
 

@@ -480,6 +480,19 @@ type AnnotationKey string
 type AnnotationValue string
 
 // AddressType defines how a network address is represented as a text string.
+// This may take two possible forms:
+//
+// * A predefined CamelCase string identifier (currently limited to `IPAddress` or `Hostname`)
+// * A domain-prefixed string identifier (like `acme.io/CustomAddressType`)
+//
+// Values `IPAddress` and `Hostname` have Extended support.
+//
+// All other values, including domain-prefixed values have Custom support,
+// which are used in implementation-specific behaviors.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^([a-zA-Z0-9])+$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$`
 type AddressType string
 
 const (
@@ -502,11 +515,4 @@ const (
 	//
 	// Support: Extended
 	HostnameAddressType AddressType = "Hostname"
-
-	// A NamedAddress provides a way to reference a specific IP address by name.
-	// For example, this may be a name or other unique identifier that refers
-	// to a resource on a cloud provider such as a static IP.
-	//
-	// Support: Implementation-Specific
-	NamedAddressType AddressType = "NamedAddress"
 )
