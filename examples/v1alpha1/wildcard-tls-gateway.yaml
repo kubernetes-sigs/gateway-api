@@ -1,5 +1,5 @@
-## Used in:
-## - site-src/v1alpha1/guides/tls.md
+#$ Used in:
+#$ - site-src/v1alpha1/guides/tls.md
 apiVersion: networking.x-k8s.io/v1alpha1
 kind: Gateway
 metadata:
