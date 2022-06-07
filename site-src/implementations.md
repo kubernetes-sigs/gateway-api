@@ -144,11 +144,14 @@ Istio is actively working towards an implementation of the Gateway API and you c
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
-Kong is actively working on an implementation of the Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic] and you can use the [Gateway API Guide][kong-gw-guide] to try it in its current state.
+Kong supports Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic], see the [Gateway API Guide][kong-gw-guide] for usage information.
+
+Kong also supports Gateway API in the [Kong Gateway Operator][kgo].
 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
+[kgo]:https://github.com/kong/gateway-operator
 
 ### Kuma
 
