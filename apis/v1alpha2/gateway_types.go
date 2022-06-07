@@ -314,8 +314,8 @@ type GatewayTLSConfig struct {
 	// a Listener, but this behavior is implementation-specific.
 	//
 	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferencePolicy in the target namespace that allows the certificate
-	// to be attached. If a ReferencePolicy does not allow this reference, the
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "InvalidCertificateRef" reason.
 	//
@@ -758,7 +758,7 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when
 	// one of the Listener's Routes has a BackendRef to an object in
 	// another namespace, where the object in the other namespace does
-	// not have a ReferencePolicy explicitly allowing the reference.
+	// not have a ReferenceGrant explicitly allowing the reference.
 	ListenerReasonRefNotPermitted ListenerConditionReason = "RefNotPermitted"
 )
 

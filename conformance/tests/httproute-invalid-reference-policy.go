@@ -29,18 +29,18 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidReferencePolicy)
+	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidReferenceGrant)
 }
 
-var HTTPRouteInvalidReferencePolicy = suite.ConformanceTest{
-	ShortName:   "HTTPRouteInvalidReferencePolicy",
-	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferencePolicy exists but does not grant permission to route to that specific Service",
+var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
+	ShortName:   "HTTPRouteInvalidReferenceGrant",
+	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferenceGrant exists but does not grant permission to route to that specific Service",
 	Features: []suite.SupportedFeature{
-		suite.SupportReferencePolicy,
+		suite.SupportReferenceGrant,
 	},
-	Manifests: []string{"tests/httproute-invalid-reference-policy.yaml"},
+	Manifests: []string{"tests/httproute-invalid-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		routeNN := types.NamespacedName{Name: "invalid-reference-policy", Namespace: "gateway-conformance-infra"}
+		routeNN := types.NamespacedName{Name: "invalid-reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		ns := v1alpha2.Namespace(gwNN.Namespace)

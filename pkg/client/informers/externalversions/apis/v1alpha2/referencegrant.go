@@ -32,59 +32,59 @@ import (
 	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/listers/apis/v1alpha2"
 )
 
-// ReferencePolicyInformer provides access to a shared informer and lister for
-// ReferencePolicies.
-type ReferencePolicyInformer interface {
+// ReferenceGrantInformer provides access to a shared informer and lister for
+// ReferenceGrants.
+type ReferenceGrantInformer interface {
 	Informer() cache.SharedIndexInformer
-	Lister() v1alpha2.ReferencePolicyLister
+	Lister() v1alpha2.ReferenceGrantLister
 }
 
-type referencePolicyInformer struct {
+type referenceGrantInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
 	tweakListOptions internalinterfaces.TweakListOptionsFunc
 	namespace        string
 }
 
-// NewReferencePolicyInformer constructs a new informer for ReferencePolicy type.
+// NewReferenceGrantInformer constructs a new informer for ReferenceGrant type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewReferencePolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
-	return NewFilteredReferencePolicyInformer(client, namespace, resyncPeriod, indexers, nil)
+func NewReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
+	return NewFilteredReferenceGrantInformer(client, namespace, resyncPeriod, indexers, nil)
 }
 
-// NewFilteredReferencePolicyInformer constructs a new informer for ReferencePolicy type.
+// NewFilteredReferenceGrantInformer constructs a new informer for ReferenceGrant type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
-func NewFilteredReferencePolicyInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
+func NewFilteredReferenceGrantInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
 	return cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1alpha2().ReferencePolicies(namespace).List(context.TODO(), options)
+				return client.GatewayV1alpha2().ReferenceGrants(namespace).List(context.TODO(), options)
 			},
 			WatchFunc: func(options v1.ListOptions) (watch.Interface, error) {
 				if tweakListOptions != nil {
 					tweakListOptions(&options)
 				}
-				return client.GatewayV1alpha2().ReferencePolicies(namespace).Watch(context.TODO(), options)
+				return client.GatewayV1alpha2().ReferenceGrants(namespace).Watch(context.TODO(), options)
 			},
 		},
-		&apisv1alpha2.ReferencePolicy{},
+		&apisv1alpha2.ReferenceGrant{},
 		resyncPeriod,
 		indexers,
 	)
 }
 
-func (f *referencePolicyInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewFilteredReferencePolicyInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
+func (f *referenceGrantInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
+	return NewFilteredReferenceGrantInformer(client, f.namespace, resyncPeriod, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, f.tweakListOptions)
 }
 
-func (f *referencePolicyInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisv1alpha2.ReferencePolicy{}, f.defaultInformer)
+func (f *referenceGrantInformer) Informer() cache.SharedIndexInformer {
+	return f.factory.InformerFor(&apisv1alpha2.ReferenceGrant{}, f.defaultInformer)
 }
 
-func (f *referencePolicyInformer) Lister() v1alpha2.ReferencePolicyLister {
-	return v1alpha2.NewReferencePolicyLister(f.Informer().GetIndexer())
+func (f *referenceGrantInformer) Lister() v1alpha2.ReferenceGrantLister {
+	return v1alpha2.NewReferenceGrantLister(f.Informer().GetIndexer())
 }

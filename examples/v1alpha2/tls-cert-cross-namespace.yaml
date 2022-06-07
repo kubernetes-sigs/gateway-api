@@ -20,7 +20,7 @@ spec:
         namespace: gateway-api-example-ns2
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: ReferencePolicy
+kind: ReferenceGrant
 metadata:
   name: allow-ns1-gateways-to-ref-secrets
   namespace: gateway-api-example-ns2

@@ -150,9 +150,9 @@ type PortNumber int32
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.
 //
-// Note that when a namespace is specified, a ReferencePolicy object
+// Note that when a namespace is specified, a ReferenceGrant object
 // is required in the referent namespace to allow that namespace's
-// owner to accept the reference. See the ReferencePolicy documentation
+// owner to accept the reference. See the ReferenceGrant documentation
 // for details.
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
@@ -239,7 +239,7 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when
 	// one of the Listener's Routes has a BackendRef to an object in
 	// another namespace, where the object in the other namespace does
-	// not have a ReferencePolicy explicitly allowing the reference.
+	// not have a ReferenceGrant explicitly allowing the reference.
 	RouteReasonRefNotPermitted RouteConditionReason = "RefNotPermitted"
 )
 

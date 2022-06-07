@@ -24,25 +24,25 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// ReferencePolicy identifies kinds of resources in other namespaces that are
+// ReferenceGrant identifies kinds of resources in other namespaces that are
 // trusted to reference the specified kinds of resources in the same namespace
 // as the policy.
 //
-// Each ReferencePolicy can be used to represent a unique trust relationship.
+// Each ReferenceGrant can be used to represent a unique trust relationship.
 // Additional Reference Policies can be used to add to the set of trusted
 // sources of inbound references for the namespace they are defined within.
 //
 // All cross-namespace references in Gateway API (with the exception of cross-namespace
-// Gateway-route attachment) require a ReferencePolicy.
+// Gateway-route attachment) require a ReferenceGrant.
 //
 // Support: Core
 //
-type ReferencePolicy struct {
+type ReferenceGrant struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec defines the desired state of ReferencePolicy.
-	Spec ReferencePolicySpec `json:"spec,omitempty"`
+	// Spec defines the desired state of ReferenceGrant.
+	Spec ReferenceGrantSpec `json:"spec,omitempty"`
 
 	// Note that `Status` sub-resource has been excluded at the
 	// moment as it was difficult to work out the design.
@@ -50,16 +50,16 @@ type ReferencePolicy struct {
 }
 
 // +kubebuilder:object:root=true
-// ReferencePolicyList contains a list of ReferencePolicy.
-type ReferencePolicyList struct {
+// ReferenceGrantList contains a list of ReferenceGrant.
+type ReferenceGrantList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ReferencePolicy `json:"items"`
+	Items           []ReferenceGrant `json:"items"`
 }
 
-// ReferencePolicySpec identifies a cross namespace relationship that is trusted
+// ReferenceGrantSpec identifies a cross namespace relationship that is trusted
 // for Gateway API.
-type ReferencePolicySpec struct {
+type ReferenceGrantSpec struct {
 	// From describes the trusted namespaces and kinds that can reference the
 	// resources described in "To". Each entry in this list must be considered
 	// to be an additional place that references can be valid from, or to put
@@ -69,7 +69,7 @@ type ReferencePolicySpec struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	From []ReferencePolicyFrom `json:"from"`
+	From []ReferenceGrantFrom `json:"from"`
 
 	// To describes the resources that may be referenced by the resources
 	// described in "From". Each entry in this list must be considered to be an
@@ -80,11 +80,11 @@ type ReferencePolicySpec struct {
 	//
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=16
-	To []ReferencePolicyTo `json:"to"`
+	To []ReferenceGrantTo `json:"to"`
 }
 
-// ReferencePolicyFrom describes trusted namespaces and kinds.
-type ReferencePolicyFrom struct {
+// ReferenceGrantFrom describes trusted namespaces and kinds.
+type ReferenceGrantFrom struct {
 	// Group is the group of the referent.
 	// When empty, the Kubernetes core API group is inferred.
 	//
@@ -107,9 +107,9 @@ type ReferencePolicyFrom struct {
 	Namespace Namespace `json:"namespace"`
 }
 
-// ReferencePolicyTo describes what Kinds are allowed as targets of the
+// ReferenceGrantTo describes what Kinds are allowed as targets of the
 // references.
-type ReferencePolicyTo struct {
+type ReferenceGrantTo struct {
 	// Group is the group of the referent.
 	// When empty, the Kubernetes core API group is inferred.
 	//
