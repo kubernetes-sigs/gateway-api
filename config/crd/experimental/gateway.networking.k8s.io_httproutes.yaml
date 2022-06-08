@@ -511,7 +511,16 @@ spec:
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
                                             with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n <gateway:experimental>"
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n <gateway:experimental>"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -615,7 +624,16 @@ spec:
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
                                             with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n <gateway:experimental>"
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n <gateway:experimental>"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -971,7 +989,14 @@ spec:
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
                                       match of \"/foo\" would be modified to \"/bar\".
-                                      \n <gateway:experimental>"
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not. \n <gateway:experimental>"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1072,7 +1097,14 @@ spec:
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
                                       match of \"/foo\" would be modified to \"/bar\".
-                                      \n <gateway:experimental>"
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not. \n <gateway:experimental>"
                                     maxLength: 1024
                                     type: string
                                   type:
