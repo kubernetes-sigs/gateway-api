@@ -20,7 +20,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 // +genclient
 // +kubebuilder:object:root=true
-// +kubebuilder:resource:categories=gateway-api,shortName=refpol
+// +kubebuilder:resource:categories=gateway-api,shortName=refgrant
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

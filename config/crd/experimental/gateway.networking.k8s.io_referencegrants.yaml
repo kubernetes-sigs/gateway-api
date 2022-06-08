@@ -16,7 +16,7 @@ spec:
     listKind: ReferenceGrantList
     plural: referencegrants
     shortNames:
-    - refpol
+    - refgrant
     singular: referencegrant
   scope: Namespaced
   versions:
