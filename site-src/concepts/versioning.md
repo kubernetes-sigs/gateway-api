@@ -134,8 +134,8 @@ experimental field.
 
 ## Out of Scope
 ### Unreleased APIs
-This project will have frequent updates to the master branch. There are no
-compatibility guarantees associated with code in any branch, including master,
+This project will have frequent updates to the main branch. There are no
+compatibility guarantees associated with code in any branch, including main,
 until it has been released. For example, changes may be reverted before a
 release is published. For the best results, use the latest published release of
 this project.

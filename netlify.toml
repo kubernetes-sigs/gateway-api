@@ -6,20 +6,20 @@
 
 # Standard Netlify redirects
 [[redirects]]
-    from = "https://master--kubernetes-sigs-gateway-api.netlify.com/*"
-    to = "https://master.gateway-api.sigs.k8s.io/:splat"
+    from = "https://main--kubernetes-sigs-gateway-api.netlify.com/*"
+    to = "https://main.gateway-api.sigs.k8s.io/:splat"
     status = 301
     force = true
 
 # HTTP-to-HTTPS rules
 [[redirects]]
-    from = "http://master.gateway-api.sigs.k8s.io/*"
-    to = "https://master.gateway-api.sigs.k8s.io/:splat"
+    from = "http://main.gateway-api.sigs.k8s.io/*"
+    to = "https://main.gateway-api.sigs.k8s.io/:splat"
     status = 301
     force = true
 
 [[redirects]]
-    from = "http://master--kubernetes-sigs-gateway-api.netlify.com/*"
-    to = "http://master.gateway-api.sigs.k8s.io/:splat"
+    from = "http://main--kubernetes-sigs-gateway-api.netlify.com/*"
+    to = "http://main.gateway-api.sigs.k8s.io/:splat"
     status = 301
     force = true
