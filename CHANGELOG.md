@@ -15,6 +15,13 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
+## Unreleased
+
+Changes that are in `main` but have not yet made it to a release.
+
+**NOTE**: unreleased changes are subject to rollback or further change prior
+          to landing in a release.
+
 ## v0.5.0-rc1
 
 API versions: v1beta1, v1alpha2

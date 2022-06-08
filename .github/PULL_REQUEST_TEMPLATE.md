@@ -43,11 +43,6 @@ Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.
 -->
 Fixes #
 
-**Does this PR introduce a user-facing change?**:
-<!--
-If no, just write "NONE" in the release-note block below.
-If yes, please enter a release note below:
--->
-```release-note
+**PR Checklist**
 
-```
+- [ ] the `CHANGELOG.md` was updated with any user-facing changes
