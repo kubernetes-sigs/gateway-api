@@ -187,6 +187,12 @@ type HTTPRouteRule struct {
 	// Specifying a core filter multiple times has unspecified or custom
 	// conformance.
 	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined. If an
+	// implementation can not support other combinations of filters, they must clearly
+	// document that limitation. In all cases where incompatible or unsupported
+	// filters are specified, implementations MUST add a warning condition to status.
+	//
 	// Support: Core
 	//
 	// +optional

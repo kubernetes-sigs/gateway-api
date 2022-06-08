@@ -126,6 +126,12 @@ Conformance levels are defined by the filter type:
 
 Specifying a core filter multiple times has unspecified or custom conformance.
 
+All filters are expected to be compatible with each other except for the
+URLRewrite and RequestRedirect filters, which may not be combined. If an
+implementation can not support other combinations of filters, they must clearly
+document that limitation. In all cases where incompatible or unsupported
+filters are specified, implementations MUST add a warning condition to status.
+
 #### BackendRefs (optional)
 
 BackendRefs defines API objects where matching requests should be sent. If

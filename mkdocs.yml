@@ -47,6 +47,7 @@ nav:
       - Getting started: v1alpha2/guides/getting-started.md
       - Simple Gateway: v1alpha2/guides/simple-gateway.md
       - HTTP routing: v1alpha2/guides/http-routing.md
+      - HTTP redirects and rewrites: v1alpha2/guides/http-redirect-rewrite.md
       - HTTP traffic splitting: v1alpha2/guides/traffic-splitting.md
       - Cross-Namespace routing: v1alpha2/guides/multiple-ns.md
       - TLS: v1alpha2/guides/tls.md
