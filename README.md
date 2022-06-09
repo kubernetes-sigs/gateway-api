@@ -34,7 +34,7 @@ one of the guides.
 A complete API reference, please refer to:
 
 - [API reference][spec]
-- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1)
+- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2)
 
 ## Contributing
 

@@ -24,7 +24,6 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
@@ -186,6 +185,12 @@ type HTTPRouteRule struct {
 	//
 	// Specifying a core filter multiple times has unspecified or custom
 	// conformance.
+	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined. If an
+	// implementation can not support other combinations of filters, they must clearly
+	// document that limitation. In all cases where incompatible or unsupported
+	// filters are specified, implementations MUST add a warning condition to status.
 	//
 	// Support: Core
 	//
@@ -716,6 +721,12 @@ const (
 	// replaced by the substitution value. For example, a path with a prefix
 	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
 	// the "/foo" prefix replaced with "/bar" in matching requests.
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
 )
 
@@ -740,6 +751,12 @@ type HTTPPathModifier struct {
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
 	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024

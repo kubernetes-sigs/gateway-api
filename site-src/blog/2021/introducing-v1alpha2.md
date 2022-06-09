@@ -66,7 +66,7 @@ namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'v1alpha2/reference-grant.yaml' %}
+{% include 'experimental/v1alpha2/reference-grant.yaml' %}
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).

@@ -25,7 +25,6 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api,scope=Cluster,shortName=gc
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Controller",type=string,JSONPath=`.spec.controllerName`
 // +kubebuilder:printcolumn:name="Accepted",type=string,JSONPath=`.status.conditions[?(@.type=="Accepted")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`

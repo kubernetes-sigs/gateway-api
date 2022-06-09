@@ -14,7 +14,7 @@ in order to route them to two separate backend `TCPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `TCP`:
 
 ```
-{% include 'v1alpha2/basic-tcp.yaml' %}
+{% include 'experimental/v1alpha2/basic-tcp.yaml' %}
 ```
 
 In the above example we separate the traffic for the two separate backend TCP

@@ -25,11 +25,13 @@ import (
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 )
 
 type Interface interface {
 	Discovery() discovery.DiscoveryInterface
 	GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface
+	GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface
 }
 
 // Clientset contains the clients for groups. Each group has exactly one
@@ -37,11 +39,17 @@ type Interface interface {
 type Clientset struct {
 	*discovery.DiscoveryClient
 	gatewayV1alpha2 *gatewayv1alpha2.GatewayV1alpha2Client
+	gatewayV1beta1  *gatewayv1beta1.GatewayV1beta1Client
 }
 
 // GatewayV1alpha2 retrieves the GatewayV1alpha2Client
 func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
 	return c.gatewayV1alpha2
+}
+
+// GatewayV1beta1 retrieves the GatewayV1beta1Client
+func (c *Clientset) GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface {
+	return c.gatewayV1beta1
 }
 
 // Discovery retrieves the DiscoveryClient
@@ -69,6 +77,10 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 	if err != nil {
 		return nil, err
 	}
+	cs.gatewayV1beta1, err = gatewayv1beta1.NewForConfig(&configShallowCopy)
+	if err != nil {
+		return nil, err
+	}
 
 	cs.DiscoveryClient, err = discovery.NewDiscoveryClientForConfig(&configShallowCopy)
 	if err != nil {
@@ -82,6 +94,7 @@ func NewForConfig(c *rest.Config) (*Clientset, error) {
 func NewForConfigOrDie(c *rest.Config) *Clientset {
 	var cs Clientset
 	cs.gatewayV1alpha2 = gatewayv1alpha2.NewForConfigOrDie(c)
+	cs.gatewayV1beta1 = gatewayv1beta1.NewForConfigOrDie(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClientForConfigOrDie(c)
 	return &cs
@@ -91,6 +104,7 @@ func NewForConfigOrDie(c *rest.Config) *Clientset {
 func New(c rest.Interface) *Clientset {
 	var cs Clientset
 	cs.gatewayV1alpha2 = gatewayv1alpha2.New(c)
+	cs.gatewayV1beta1 = gatewayv1beta1.New(c)
 
 	cs.DiscoveryClient = discovery.NewDiscoveryClient(c)
 	return &cs

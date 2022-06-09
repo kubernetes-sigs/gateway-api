@@ -31,6 +31,8 @@ import (
 
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	v1a2Validation "sigs.k8s.io/gateway-api/apis/v1alpha2/validation"
+	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1b1Validation "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
@@ -52,6 +54,21 @@ var (
 	v1a2GatewayClassGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
 		Version:  v1alpha2.SchemeGroupVersion.Version,
+		Resource: "gatewayclasses",
+	}
+	v1b1HTTPRouteGVR = meta.GroupVersionResource{
+		Group:    v1beta1.SchemeGroupVersion.Group,
+		Version:  v1beta1.SchemeGroupVersion.Version,
+		Resource: "httproutes",
+	}
+	v1b1GatewayGVR = meta.GroupVersionResource{
+		Group:    v1beta1.SchemeGroupVersion.Group,
+		Version:  v1beta1.SchemeGroupVersion.Version,
+		Resource: "gateways",
+	}
+	v1b1GatewayClassGVR = meta.GroupVersionResource{
+		Group:    v1beta1.SchemeGroupVersion.Group,
+		Version:  v1beta1.SchemeGroupVersion.Version,
 		Resource: "gatewayclasses",
 	}
 )
@@ -154,6 +171,14 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 		}
 
 		fieldErr = v1a2Validation.ValidateHTTPRoute(&hRoute)
+	case v1b1HTTPRouteGVR:
+		var hRoute v1beta1.HTTPRoute
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
+		if err != nil {
+			return nil, err
+		}
+
+		fieldErr = v1b1Validation.ValidateHTTPRoute(&hRoute)
 	case v1a2GatewayGVR:
 		var gateway v1alpha2.Gateway
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
@@ -161,6 +186,13 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 			return nil, err
 		}
 		fieldErr = v1a2Validation.ValidateGateway(&gateway)
+	case v1b1GatewayGVR:
+		var gateway v1beta1.Gateway
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gateway)
+		if err != nil {
+			return nil, err
+		}
+		fieldErr = v1b1Validation.ValidateGateway(&gateway)
 	case v1a2GatewayClassGVR:
 		// runs only for updates
 		if request.Operation != admission.Update {
@@ -177,6 +209,22 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 			return nil, err
 		}
 		fieldErr = v1a2Validation.ValidateGatewayClassUpdate(&gatewayClassOld, &gatewayClass)
+	case v1b1GatewayClassGVR:
+		// runs only for updates
+		if request.Operation != admission.Update {
+			break
+		}
+		var gatewayClass v1beta1.GatewayClass
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gatewayClass)
+		if err != nil {
+			return nil, err
+		}
+		var gatewayClassOld v1beta1.GatewayClass
+		_, _, err = deserializer.Decode(request.OldObject.Raw, nil, &gatewayClassOld)
+		if err != nil {
+			return nil, err
+		}
+		fieldErr = v1b1Validation.ValidateGatewayClassUpdate(&gatewayClassOld, &gatewayClass)
 	default:
 		return nil, fmt.Errorf("unknown resource '%v'", request.Resource.Resource)
 	}
