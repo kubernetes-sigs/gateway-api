@@ -117,7 +117,7 @@ func (c *FakeUDPRoutes) UpdateStatus(ctx context.Context, uDPRoute *v1alpha2.UDP
 // Delete takes name of the uDPRoute and deletes it. Returns an error if one occurs.
 func (c *FakeUDPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(udproutesResource, c.ns, name), &v1alpha2.UDPRoute{})
+		Invokes(testing.NewDeleteActionWithOptions(udproutesResource, c.ns, name, opts), &v1alpha2.UDPRoute{})
 
 	return err
 }
