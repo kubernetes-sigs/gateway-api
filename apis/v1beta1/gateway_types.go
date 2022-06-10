@@ -24,7 +24,6 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api,shortName=gtw
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Class",type=string,JSONPath=`.spec.gatewayClassName`
 // +kubebuilder:printcolumn:name="Address",type=string,JSONPath=`.status.addresses[*].value`
 // +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
@@ -454,7 +453,6 @@ type GatewayAddress struct {
 	// Type of the address.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 

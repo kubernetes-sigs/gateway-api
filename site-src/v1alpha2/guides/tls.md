@@ -92,7 +92,7 @@ target namespace. Without that ReferenceGrant, the cross-namespace reference
 would be invalid.
 
 ```yaml
-{% include 'v1alpha2/tls-cert-cross-namespace.yaml' %}
+{% include 'experimental/v1alpha2/tls-cert-cross-namespace.yaml' %}
 ```
 
 ## Extensions
