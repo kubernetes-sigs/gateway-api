@@ -455,10 +455,10 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
-                  in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                description: Addresses lists the IP addresses that are used to serve
+                  ingress traffic from outside the cluster to the Gateway. These addresses
+                  may differ from the addresses in the Spec, e.g. if the Gateway automatically
+                  assigns an address from a reserved pool.
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
@@ -1146,10 +1146,10 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
-                  in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                description: Addresses lists the IP addresses that are used to serve
+                  ingress traffic from outside the cluster to the Gateway. These addresses
+                  may differ from the addresses in the Spec, e.g. if the Gateway automatically
+                  assigns an address from a reserved pool.
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.

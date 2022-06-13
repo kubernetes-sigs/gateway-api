@@ -469,10 +469,10 @@ type GatewayAddress struct {
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
-	// Addresses lists the IP addresses that have actually been
-	// bound to the Gateway. These addresses may differ from the
-	// addresses in the Spec, e.g. if the Gateway automatically
-	// assigns an address from a reserved pool.
+	// Addresses lists the IP addresses that are used to serve ingress traffic from
+	// outside the cluster to the Gateway. These addresses may differ from the
+	// addresses in the Spec, e.g. if the Gateway automatically assigns an address
+	// from a reserved pool.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
