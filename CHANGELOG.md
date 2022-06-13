@@ -124,7 +124,7 @@ The following APIs have been promoted to a `v1beta1` maturity:
   `example.com/NamedAddress`) has been added instead to better represent the
   custom nature of this support.
   [#1178](https://github.com/kubernetes-sigs/gateway-api/pull/1178)
-- Implementations are now expected to use `502` instead of `503` responses when
+- Implementations are now expected to use `500` instead of `503` responses when
   the data-plane has no matching route.
   [#1151](https://github.com/kubernetes-sigs/gateway-api/pull/1151)
 
