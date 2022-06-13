@@ -1,4 +1,4 @@
 resources:
-- gateway.networking.k8s.io_gatewayclasses.yaml
-- gateway.networking.k8s.io_gateways.yaml
-- gateway.networking.k8s.io_httproutes.yaml
+- standard/gateway.networking.k8s.io_gatewayclasses.yaml
+- standard/gateway.networking.k8s.io_gateways.yaml
+- standard/gateway.networking.k8s.io_httproutes.yaml

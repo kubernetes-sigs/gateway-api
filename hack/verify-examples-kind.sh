@@ -72,7 +72,7 @@ done
 for CHANNEL in experimental standard; do
   ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
   # Install CRDs
-  kubectl apply -f "config/crd/${CHANNEL}" || res=$?
+  kubectl apply -f "config/crd/${CHANNEL}/gateway*.yaml" || res=$?
 
   # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
   sleep 8
