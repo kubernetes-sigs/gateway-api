@@ -18,7 +18,6 @@ package validation
 
 import (
 	"fmt"
-	"regexp"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
@@ -37,11 +36,6 @@ var (
 		gatewayv1a2.UDPProtocolType:  {},
 		gatewayv1a2.TCPProtocolType:  {},
 	}
-
-	addressTypesValid = map[gatewayv1a2.AddressType]struct{}{
-		gatewayv1a2.HostnameAddressType: {},
-		gatewayv1a2.IPAddressType:       {},
-	}
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -59,7 +53,6 @@ func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
 func validateGatewaySpec(spec *gatewayv1a2.GatewaySpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	errs = append(errs, validateGatewayListeners(spec.Listeners, path.Child("listeners"))...)
-	errs = append(errs, validateAddresses(spec.Addresses, path.Child("addresses"))...)
 	return errs
 }
 
@@ -95,34 +88,6 @@ func validateListenerHostname(listeners []gatewayv1a2.Listener, path *field.Path
 		if isProtocolInSubset(h.Protocol, protocolsHostnameInvalid) && h.Hostname != nil {
 			errs = append(errs, field.Forbidden(path.Index(i).Child("hostname"), fmt.Sprintf("should be empty for protocol %v", h.Protocol)))
 		}
-	}
-	return errs
-}
-
-// domainPrefixedStringRegex is a regex used in validation to determine whether
-// a provided string is a domain-prefixed string. Domain-prefixed strings are used
-// to indicate custom (implementation-specific) address types.
-var domainPrefixedStringRegex = regexp.MustCompile(`^([a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$`)
-
-// validateAddresses validates each listener address
-// if there are addresses set. Otherwise, returns no error.
-func validateAddresses(addresses []gatewayv1a2.GatewayAddress, path *field.Path) field.ErrorList {
-	var errs field.ErrorList
-
-	for i, a := range addresses {
-		if a.Type == nil {
-			continue
-		}
-		_, ok := addressTypesValid[*a.Type]
-		if !ok {
-			// Found something that's not one of the upstream AddressTypes
-			// Next, check for a domain-prefixed string
-			match := domainPrefixedStringRegex.Match([]byte(*a.Type))
-			if !match {
-				errs = append(errs, field.Invalid(path.Index(i).Child("type"), a.Type, "should either be a defined constant or a domain-prefixed string (example.com/Type)"))
-			}
-		}
-
 	}
 	return errs
 }

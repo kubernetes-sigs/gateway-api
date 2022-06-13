@@ -82,34 +82,6 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},
-		"Address present with IPAddress": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				ip := gatewayv1a2.IPAddressType
-				gw.Spec.Addresses[0].Type = &ip
-			},
-			expectErrsOnFields: []string{},
-		},
-		"Address present with Hostname": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				host := gatewayv1a2.HostnameAddressType
-				gw.Spec.Addresses[0].Type = &host
-			},
-			expectErrsOnFields: []string{},
-		},
-		"Address present with example.com/CustomAddress": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				customAddress := gatewayv1a2.AddressType("example.com/CustomAddress")
-				gw.Spec.Addresses[0].Type = &customAddress
-			},
-			expectErrsOnFields: []string{},
-		},
-		"Address present with invalid Type": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				customAddress := gatewayv1a2.AddressType("CustomAddress")
-				gw.Spec.Addresses[0].Type = &customAddress
-			},
-			expectErrsOnFields: []string{"spec.addresses[0].type"},
-		},
 	}
 
 	for name, tc := range testCases {

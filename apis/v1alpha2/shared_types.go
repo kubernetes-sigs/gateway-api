@@ -487,12 +487,13 @@ type AnnotationValue string
 //
 // Values `IPAddress` and `Hostname` have Extended support.
 //
-// All other values, including domain-prefixed values have Custom support,
-// which are used in implementation-specific behaviors.
+// All other values, including domain-prefixed values have Custom support, which
+// are used in implementation-specific behaviors. Support for additional
+// predefined CamelCase identifiers may be added in future releases.
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^([a-zA-Z0-9])+$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])\/[a-zA-Z0-9]+$`
+// +kubebuilder:validation:Pattern=`^Hostname|IPAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
 type AddressType string
 
 const (
