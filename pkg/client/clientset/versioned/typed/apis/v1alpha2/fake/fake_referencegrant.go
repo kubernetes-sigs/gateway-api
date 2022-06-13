@@ -105,7 +105,7 @@ func (c *FakeReferenceGrants) Update(ctx context.Context, referenceGrant *v1alph
 // Delete takes name of the referenceGrant and deletes it. Returns an error if one occurs.
 func (c *FakeReferenceGrants) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(referencegrantsResource, c.ns, name), &v1alpha2.ReferenceGrant{})
+		Invokes(testing.NewDeleteActionWithOptions(referencegrantsResource, c.ns, name, opts), &v1alpha2.ReferenceGrant{})
 
 	return err
 }

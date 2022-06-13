@@ -117,7 +117,7 @@ func (c *FakeHTTPRoutes) UpdateStatus(ctx context.Context, hTTPRoute *v1alpha2.H
 // Delete takes name of the hTTPRoute and deletes it. Returns an error if one occurs.
 func (c *FakeHTTPRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(httproutesResource, c.ns, name), &v1alpha2.HTTPRoute{})
+		Invokes(testing.NewDeleteActionWithOptions(httproutesResource, c.ns, name, opts), &v1alpha2.HTTPRoute{})
 
 	return err
 }

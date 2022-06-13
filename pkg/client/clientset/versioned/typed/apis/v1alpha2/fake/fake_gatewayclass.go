@@ -110,7 +110,7 @@ func (c *FakeGatewayClasses) UpdateStatus(ctx context.Context, gatewayClass *v1a
 // Delete takes name of the gatewayClass and deletes it. Returns an error if one occurs.
 func (c *FakeGatewayClasses) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewRootDeleteAction(gatewayclassesResource, name), &v1alpha2.GatewayClass{})
+		Invokes(testing.NewRootDeleteActionWithOptions(gatewayclassesResource, name, opts), &v1alpha2.GatewayClass{})
 	return err
 }
 

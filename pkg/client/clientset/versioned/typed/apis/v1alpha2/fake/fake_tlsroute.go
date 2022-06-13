@@ -117,7 +117,7 @@ func (c *FakeTLSRoutes) UpdateStatus(ctx context.Context, tLSRoute *v1alpha2.TLS
 // Delete takes name of the tLSRoute and deletes it. Returns an error if one occurs.
 func (c *FakeTLSRoutes) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(tlsroutesResource, c.ns, name), &v1alpha2.TLSRoute{})
+		Invokes(testing.NewDeleteActionWithOptions(tlsroutesResource, c.ns, name, opts), &v1alpha2.TLSRoute{})
 
 	return err
 }
