@@ -218,7 +218,7 @@ type HTTPRouteRule struct {
 	// MUST receive a 500 status code.
 	//
 	// When a BackendRef refers to a Service that has no ready endpoints, it is
-	// recommended to return a 503 status code.
+	// recommended to return a 500 status code.
 	//
 	// Support: Core for Kubernetes Service
 	// Support: Custom for any other resource

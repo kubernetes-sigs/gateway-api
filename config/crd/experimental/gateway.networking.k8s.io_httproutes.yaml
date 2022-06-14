@@ -231,7 +231,7 @@ spec:
                         invalid, the proportion of requests that would otherwise have
                         been routed to an invalid backend MUST receive a 500 status
                         code. \n When a BackendRef refers to a Service that has no
-                        ready endpoints, it is recommended to return a 503 status
+                        ready endpoints, it is recommended to return a 500 status
                         code. \n Support: Core for Kubernetes Service Support: Custom
                         for any other resource \n Support for weight: Core"
                       items:
@@ -1763,7 +1763,7 @@ spec:
                         invalid, the proportion of requests that would otherwise have
                         been routed to an invalid backend MUST receive a 500 status
                         code. \n When a BackendRef refers to a Service that has no
-                        ready endpoints, it is recommended to return a 503 status
+                        ready endpoints, it is recommended to return a 500 status
                         code. \n Support: Core for Kubernetes Service Support: Custom
                         for any other resource \n Support for weight: Core"
                       items:
