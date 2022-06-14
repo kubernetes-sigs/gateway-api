@@ -41,86 +41,96 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN)
 
 		testCases := []http.ExpectedResponse{{
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/set",
 				Headers: map[string]string{
 					"Some-Other-Header": "val",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/set",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Set":      "set-overwrites-values",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/set",
+					Headers: map[string]string{
+						"Some-Other-Header": "val",
+						"X-Header-Set":      "set-overwrites-values",
+					},
 				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/set",
 				Headers: map[string]string{
 					"Some-Other-Header": "val",
 					"X-Header-Set":      "some-other-value",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/set",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Set":      "set-overwrites-values",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/set",
+					Headers: map[string]string{
+						"Some-Other-Header": "val",
+						"X-Header-Set":      "set-overwrites-values",
+					},
 				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/add",
 				Headers: map[string]string{
 					"Some-Other-Header": "val",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/add",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Add":      "add-appends-values",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/add",
+					Headers: map[string]string{
+						"Some-Other-Header": "val",
+						"X-Header-Add":      "add-appends-values",
+					},
 				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/add",
 				Headers: map[string]string{
 					"Some-Other-Header": "val",
 					"X-Header-Add":      "some-other-value",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/add",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Add":      "some-other-value,add-appends-values",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/add",
+					Headers: map[string]string{
+						"Some-Other-Header": "val",
+						"X-Header-Add":      "some-other-value,add-appends-values",
+					},
 				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/remove",
 				Headers: map[string]string{
 					"X-Header-Remove": "val",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path:          "/remove",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/remove",
+				},
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/multiple",
 				Headers: map[string]string{
 					"X-Header-Set-2":    "set-val-2",
@@ -129,22 +139,24 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 					"Another-Header":    "another-header-val",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/multiple",
-				Headers: map[string]string{
-					"X-Header-Set-1": "header-set-1",
-					"X-Header-Set-2": "header-set-2",
-					"X-Header-Add-1": "header-add-1",
-					"X-Header-Add-2": "add-val-2,header-add-2",
-					"X-Header-Add-3": "header-add-3",
-					"Another-Header": "another-header-val",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/multiple",
+					Headers: map[string]string{
+						"X-Header-Set-1": "header-set-1",
+						"X-Header-Set-2": "header-set-2",
+						"X-Header-Add-1": "header-add-1",
+						"X-Header-Add-2": "add-val-2,header-add-2",
+						"X-Header-Add-3": "header-add-3",
+						"Another-Header": "another-header-val",
+					},
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
+			Request: &http.Request{
 				Path: "/case-insensitivity",
 				// The filter uses canonicalized header names,
 				// the request uses lowercase names.
@@ -155,11 +167,13 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 					"Another-Header":  "another-header-val",
 				},
 			},
-			BackendRequest: &http.Request{
-				Path: "/case-insensitivity",
-				Headers: map[string]string{
-					"X-Header-Set": "header-set",
-					"X-Header-Add": "original-val-add,header-add",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/case-insensitivity",
+					Headers: map[string]string{
+						"X-Header-Set": "header-set",
+						"X-Header-Add": "original-val-add,header-add",
+					},
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},

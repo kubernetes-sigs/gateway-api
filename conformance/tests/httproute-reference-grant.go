@@ -44,9 +44,11 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 
 		t.Run("Simple HTTP request should reach web-backend", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
-				Request: http.Request{
-					Method: "GET",
-					Path:   "/",
+				ExpectedRequest: http.ExpectedRequest{
+					Request: http.Request{
+						Method: "GET",
+						Path:   "/",
+					},
 				},
 				StatusCode: 200,
 				Backend:    "web-backend",

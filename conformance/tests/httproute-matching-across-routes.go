@@ -43,61 +43,77 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 
 		testCases := []http.ExpectedResponse{{
-			Request: http.Request{
-				Host: "example.com",
-				Path: "/",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host: "example.com",
+					Path: "/",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host: "example.com",
-				Path: "/example",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host: "example.com",
+					Path: "/example",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host: "example.net",
-				Path: "/example",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host: "example.net",
+					Path: "/example",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host:    "example.com",
-				Path:    "/example",
-				Headers: map[string]string{"Version": "one"},
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host:    "example.com",
+					Path:    "/example",
+					Headers: map[string]string{"Version": "one"},
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host: "example.com",
-				Path: "/v2",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host: "example.com",
+					Path: "/v2",
+				},
 			},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				// v2 matches are limited to example.com
-				Host: "example.net",
-				Path: "/v2",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					// v2 matches are limited to example.com
+					Host: "example.net",
+					Path: "/v2",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host: "example.com",
-				Path: "/v2/example",
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host: "example.com",
+					Path: "/v2/example",
+				},
 			},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request: http.Request{
-				Host:    "example.com",
-				Path:    "/",
-				Headers: map[string]string{"Version": "two"},
+			ExpectedRequest: http.ExpectedRequest{
+				Request: http.Request{
+					Host:    "example.com",
+					Path:    "/",
+					Headers: map[string]string{"Version": "two"},
+				},
 			},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
@@ -116,10 +132,17 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 }
 
 func testName(tc http.ExpectedResponse, i int) string {
+	var req http.Request
+	if tc.Request != nil {
+		req = *tc.Request
+	} else {
+		req = tc.ExpectedRequest.Request
+	}
+
 	headerStr := ""
-	if tc.Request.Headers != nil {
+	if req.Headers != nil {
 		headerStr = " with headers"
 	}
 
-	return fmt.Sprintf("%d request to %s%s%s should go to %s", i, tc.Request.Host, tc.Request.Path, headerStr, tc.Backend)
+	return fmt.Sprintf("%d request to %s%s%s should go to %s", i, req.Host, req.Path, headerStr, tc.Backend)
 }

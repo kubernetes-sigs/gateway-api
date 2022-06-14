@@ -29,14 +29,14 @@ import (
 
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
-	// Request defines the request to make.
-	Request Request
+	// ExpectedRequest defines the request that
+	// is expected to arrive at the backend.
+	ExpectedRequest ExpectedRequest
 
-	// BackendRequest defines the request that
-	// is expected to arrive at the backend. If
-	// not specified, it is assumed to be the
-	// same as the original request.
-	BackendRequest *Request
+	// Request defines the request to make.
+	// If not specified, ExpectedRequest.Request
+	// will be used as the request to make.
+	Request *Request
 
 	StatusCode int
 	Backend    string
@@ -51,10 +51,14 @@ type Request struct {
 	Method  string
 	Path    string
 	Headers map[string]string
+}
+
+// ExpectedRequest defines expected properties of a request.
+type ExpectedRequest struct {
+	Request
 
 	// AbsentHeaders are names of headers that are expected
-	// *not* to be present on the request. They have no effect
-	// on a request being made.
+	// *not* to be present on the request.
 	AbsentHeaders []string
 }
 
@@ -76,12 +80,19 @@ const requiredConsecutiveSuccesses = 3
 func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
-	if expected.Request.Method == "" {
-		expected.Request.Method = "GET"
+	if expected.ExpectedRequest.Method == "" {
+		expected.ExpectedRequest.Method = "GET"
 	}
 
 	if expected.StatusCode == 0 {
 		expected.StatusCode = 200
+	}
+
+	// The request to make is the same as the request that
+	// is expected to arrive at the backend, unless otherwise
+	// specifed.
+	if expected.Request == nil {
+		expected.Request = &expected.ExpectedRequest.Request
 	}
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
@@ -101,16 +112,6 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	}
 
 	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
-
-	// The request received by the backend is expected to match
-	// the request made, unless otherwise specified.
-	if expected.BackendRequest == nil {
-		expected.BackendRequest = &expected.Request
-	}
-
-	if expected.BackendRequest.Method == "" {
-		expected.BackendRequest.Method = "GET"
-	}
 
 	ExpectResponse(t, cReq, cRes, expected)
 }
@@ -186,17 +187,17 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 	t.Helper()
 	assert.Equal(t, expected.StatusCode, cRes.StatusCode, "expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
 	if cRes.StatusCode == 200 {
-		assert.Equal(t, expected.BackendRequest.Path, cReq.Path, "expected path to be %s, got %s", expected.BackendRequest.Path, cReq.Path)
-		assert.Equal(t, expected.BackendRequest.Method, cReq.Method, "expected method to be %s, got %s", expected.BackendRequest.Method, cReq.Method)
+		assert.Equal(t, expected.ExpectedRequest.Path, cReq.Path, "expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
+		assert.Equal(t, expected.ExpectedRequest.Method, cReq.Method, "expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
 		assert.Equal(t, expected.Namespace, cReq.Namespace, "expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
-		if expected.BackendRequest.Headers != nil {
+		if expected.ExpectedRequest.Headers != nil {
 			if cReq.Headers == nil {
 				t.Error("No headers captured")
 			} else {
 				for name, val := range cReq.Headers {
 					cReq.Headers[strings.ToLower(name)] = val
 				}
-				for name, expectedVal := range expected.BackendRequest.Headers {
+				for name, expectedVal := range expected.ExpectedRequest.Headers {
 					actualVal, ok := cReq.Headers[strings.ToLower(name)]
 					if !ok {
 						t.Errorf("Expected %s header to be set, actual headers: %v", name, cReq.Headers)
@@ -209,12 +210,12 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 
 		// Verify that headers expected *not* to be present on the
 		// request are actually not present.
-		if len(expected.Request.AbsentHeaders) > 0 {
+		if len(expected.ExpectedRequest.AbsentHeaders) > 0 {
 			for name, val := range cReq.Headers {
 				cReq.Headers[strings.ToLower(name)] = val
 			}
 
-			for _, name := range expected.Request.AbsentHeaders {
+			for _, name := range expected.ExpectedRequest.AbsentHeaders {
 				val, ok := cReq.Headers[strings.ToLower(name)]
 				if ok {
 					t.Errorf("Expected %s header to not be set, got %s", name, val)
