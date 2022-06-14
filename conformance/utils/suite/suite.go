@@ -124,6 +124,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	t.Logf("Test Setup: Applying base manifests")
 	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
 
+	t.Logf("Test Setup: Applying programmatic resources")
+	secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
+	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, []client.Object{secret}, suite.Cleanup)
+
 	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 	namespaces := []string{
 		"gateway-conformance-infra",
