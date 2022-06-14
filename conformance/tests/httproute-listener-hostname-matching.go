@@ -54,35 +54,35 @@ var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 		)
 
 		testCases := []http.ExpectedResponse{{
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "bar.com", Path: "/"}},
-			Backend:         "infra-backend-v1",
-			Namespace:       ns,
+			Request:   http.Request{Host: "bar.com", Path: "/"},
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "foo.bar.com", Path: "/"}},
-			Backend:         "infra-backend-v2",
-			Namespace:       ns,
+			Request:   http.Request{Host: "foo.bar.com", Path: "/"},
+			Backend:   "infra-backend-v2",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "baz.bar.com", Path: "/"}},
-			Backend:         "infra-backend-v3",
-			Namespace:       ns,
+			Request:   http.Request{Host: "baz.bar.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "boo.bar.com", Path: "/"}},
-			Backend:         "infra-backend-v3",
-			Namespace:       ns,
+			Request:   http.Request{Host: "boo.bar.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "multiple.prefixes.bar.com", Path: "/"}},
-			Backend:         "infra-backend-v3",
-			Namespace:       ns,
+			Request:   http.Request{Host: "multiple.prefixes.bar.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "multiple.prefixes.foo.com", Path: "/"}},
-			Backend:         "infra-backend-v3",
-			Namespace:       ns,
+			Request:   http.Request{Host: "multiple.prefixes.foo.com", Path: "/"},
+			Backend:   "infra-backend-v3",
+			Namespace: ns,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "foo.com", Path: "/"}},
-			StatusCode:      404,
+			Request:    http.Request{Host: "foo.com", Path: "/"},
+			StatusCode: 404,
 		}, {
-			ExpectedRequest: http.ExpectedRequest{Request: http.Request{Host: "no.matching.host", Path: "/"}},
-			StatusCode:      404,
+			Request:    http.Request{Host: "no.matching.host", Path: "/"},
+			StatusCode: 404,
 		}}
 
 		for i := range testCases {

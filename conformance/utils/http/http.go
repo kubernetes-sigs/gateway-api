@@ -29,14 +29,14 @@ import (
 
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
-	// ExpectedRequest defines the request that
-	// is expected to arrive at the backend.
-	ExpectedRequest ExpectedRequest
-
 	// Request defines the request to make.
-	// If not specified, ExpectedRequest.Request
-	// will be used as the request to make.
-	Request *Request
+	Request Request
+
+	// ExpectedRequest defines the request that
+	// is expected to arrive at the backend. If
+	// not specified, the backend request will be
+	// expected to match Request.
+	ExpectedRequest *ExpectedRequest
 
 	StatusCode int
 	Backend    string
@@ -80,19 +80,12 @@ const requiredConsecutiveSuccesses = 3
 func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
-	if expected.ExpectedRequest.Method == "" {
-		expected.ExpectedRequest.Method = "GET"
+	if expected.Request.Method == "" {
+		expected.Request.Method = "GET"
 	}
 
 	if expected.StatusCode == 0 {
 		expected.StatusCode = 200
-	}
-
-	// The request to make is the same as the request that
-	// is expected to arrive at the backend, unless otherwise
-	// specifed.
-	if expected.Request == nil {
-		expected.Request = &expected.ExpectedRequest.Request
 	}
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
@@ -109,6 +102,17 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		for name, value := range expected.Request.Headers {
 			req.Headers[name] = []string{value}
 		}
+	}
+
+	// The request expected to arrive at the backend is
+	// the same as the request made, unless otherwise
+	// specified.
+	if expected.ExpectedRequest == nil {
+		expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
+	}
+
+	if expected.ExpectedRequest.Method == "" {
+		expected.ExpectedRequest.Method = "GET"
 	}
 
 	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)

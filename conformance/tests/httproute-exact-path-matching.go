@@ -42,22 +42,22 @@ var HTTPExactPathMatching = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				ExpectedRequest: http.ExpectedRequest{Request: http.Request{Path: "/one"}},
-				Backend:         "infra-backend-v1",
-				Namespace:       ns,
+				Request:   http.Request{Path: "/one"},
+				Backend:   "infra-backend-v1",
+				Namespace: ns,
 			}, {
-				ExpectedRequest: http.ExpectedRequest{Request: http.Request{Path: "/two"}},
-				Backend:         "infra-backend-v2",
-				Namespace:       ns,
+				Request:   http.Request{Path: "/two"},
+				Backend:   "infra-backend-v2",
+				Namespace: ns,
 			}, {
-				ExpectedRequest: http.ExpectedRequest{Request: http.Request{Path: "/"}},
-				StatusCode:      404,
+				Request:    http.Request{Path: "/"},
+				StatusCode: 404,
 			}, {
-				ExpectedRequest: http.ExpectedRequest{Request: http.Request{Path: "/one/example"}},
-				StatusCode:      404,
+				Request:    http.Request{Path: "/one/example"},
+				StatusCode: 404,
 			}, {
-				ExpectedRequest: http.ExpectedRequest{Request: http.Request{Path: "/two/"}},
-				StatusCode:      404,
+				Request:    http.Request{Path: "/two/"},
+				StatusCode: 404,
 			},
 		}
 
