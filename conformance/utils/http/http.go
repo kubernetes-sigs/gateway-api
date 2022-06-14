@@ -104,19 +104,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	// The request expected to arrive at the backend is
-	// the same as the request made, unless otherwise
-	// specified.
-	if expected.ExpectedRequest == nil {
-		expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
-	}
-
-	if expected.ExpectedRequest.Method == "" {
-		expected.ExpectedRequest.Method = "GET"
-	}
-
 	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
-
 	ExpectResponse(t, cReq, cRes, expected)
 }
 
@@ -191,6 +179,17 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 	t.Helper()
 	assert.Equal(t, expected.StatusCode, cRes.StatusCode, "expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
 	if cRes.StatusCode == 200 {
+		// The request expected to arrive at the backend is
+		// the same as the request made, unless otherwise
+		// specified.
+		if expected.ExpectedRequest == nil {
+			expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
+		}
+
+		if expected.ExpectedRequest.Method == "" {
+			expected.ExpectedRequest.Method = "GET"
+		}
+
 		assert.Equal(t, expected.ExpectedRequest.Path, cReq.Path, "expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
 		assert.Equal(t, expected.ExpectedRequest.Method, cReq.Method, "expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
 		assert.Equal(t, expected.Namespace, cReq.Namespace, "expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
