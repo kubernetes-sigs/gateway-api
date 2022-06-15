@@ -29,7 +29,7 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // as the policy.
 //
 // Each ReferenceGrant can be used to represent a unique trust relationship.
-// Additional Reference Policies can be used to add to the set of trusted
+// Additional Reference Grants can be used to add to the set of trusted
 // sources of inbound references for the namespace they are defined within.
 //
 // All cross-namespace references in Gateway API (with the exception of cross-namespace
