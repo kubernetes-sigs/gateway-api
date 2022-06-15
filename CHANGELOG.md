@@ -45,7 +45,7 @@ experimental, and any fields marked in this way are only present in the
 `experimental` channel. Please see the [versioning][vers] docs for a more
 detailed explanation.
 
-One caveat for the stable channel - due to work on the new ReferenceGrant
+One caveat for the standard channel - due to work on the new ReferenceGrant
 resource: conformance tests may not pass with the `standard` set of CRDs.
 
 [vers]:https://gateway-api.sigs.k8s.io/concepts/versioning/
@@ -158,6 +158,9 @@ for the type changes when updating the Gateway API dependency in their projects.
   [#1124](https://github.com/kubernetes-sigs/gateway-api/pull/1124)
 - the `ParentRef` type was renamed to `ParentReference`
   [#982](https://github.com/kubernetes-sigs/gateway-api/pull/982)
+- Types `ConditionRouteAccepted` and `ConditionRouteResolvedRefs` are now
+  deprecated in favor of `RouteConditionAccepted` & `RouteConditionResolvedRefs`
+  [#1114](https://github.com/kubernetes-sigs/gateway-api/pull/1114)
 
 ## v0.4.3
 
@@ -167,9 +170,6 @@ This release includes improvements to our webhook, including:
 
 * Migrating kube-webhook-certgen to k8s.gcr.io/ingress-nginx:v1.1.1.
   [#1126](https://github.com/kubernetes-sigs/gateway-api/pull/1126)
-- Types `ConditionRouteAccepted` and `ConditionRouteResolvedRefs` are now
-  deprecated in favor of `RouteConditionAccepted` & `RouteConditionResolvedRefs`
-  [#1114](https://github.com/kubernetes-sigs/gateway-api/pull/1114)
 * New validation to ensure that a HTTPRouterFilter Type matches its value
   [#1071](https://github.com/kubernetes-sigs/gateway-api/pull/1071)
 * A fix to ensure that Path match validation actually works
