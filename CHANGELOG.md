@@ -15,7 +15,7 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
-## v0.5.0-rc1 (unreleased)
+## v0.5.0-rc1
 
 API versions: v1beta1, v1alpha2
 
