@@ -69,9 +69,9 @@ spec:
                       type: string
                     kind:
                       description: "Kind is the kind of the referent. Although implementations
-                        may support additional resources, the following Route types
-                        are part of the \"Core\" support level for this field: \n
-                        * HTTPRoute * TCPRoute * TLSRoute * UDPRoute"
+                        may support additional resources, the following types are
+                        part of the \"Core\" support level for this field: \n * HTTPRoute
+                        * TCPRoute * TLSRoute * UDPRoute * Gateway"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
