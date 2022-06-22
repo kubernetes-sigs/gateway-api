@@ -68,5 +68,7 @@ nav:
     - Community: contributing/community.md
   - Blog: 
     - Index: blog/index.md
+    - 2022:
+      - blog/2022/first-beta.md
     - 2021:
       - blog/2021/introducing-v1alpha2.md
