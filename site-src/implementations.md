@@ -148,10 +148,15 @@ Kong supports Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic]
 
 Kong also supports Gateway API in the [Kong Gateway Operator][kgo].
 
+For help and support with Kong's implementations please feel free to [create an issue][kong-issue-new] or a [discussion][kong-disc-new]. You can also ask for help in the [#kong channel on Kubernetes slack][kong-slack].
+
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
 [kgo]:https://github.com/kong/gateway-operator
+[kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
+[kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
+[kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
 
 ### Kuma
 
