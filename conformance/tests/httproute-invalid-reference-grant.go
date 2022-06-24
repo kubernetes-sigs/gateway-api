@@ -91,7 +91,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 		// to add check for Accepted condition once
 		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
 		// has been resolved
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, gwNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, kubernetes.NewGatewayRef(gwNN))
 
 		// TODO(mikemorris): Add check for HTTP requests successfully reaching
 		// app-backend-v1 at path "/" if it is determined that a Route with at
