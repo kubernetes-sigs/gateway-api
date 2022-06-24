@@ -3,11 +3,24 @@
 This page contains links to all of the meeting notes, design docs and related
 discussions around the APIs.
 
-## Feedback and Bug Reports
+## Feedback and Questions
 
-Feedback and bug reports should be filed as [Github Issues][gh-issues] on this repo.
+For general feedback, questions or to share ideas please feel free to [create a
+new discussion][gh-disc].
+
+[gh-disc]:https://github.com/kubernetes-sigs/gateway-api/discussions/new
+
+## Bug Reports
+
+Bug reports should be filed as [Github Issues][gh-issues] on this repo.
+
+**NOTE**: If you're reporting a bug that applies to a specific implementation of
+Gateway API and not the API specification itself, please check our
+[implementations page][implementations] to find links to the repositories where
+you can get help with your specific implementation.
 
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
+[implementations]:https://gateway-api.sigs.k8s.io/implementations/
 
 ## Communications
 
