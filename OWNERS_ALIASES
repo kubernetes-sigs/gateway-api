@@ -16,7 +16,10 @@ aliases:
   gateway-api-maintainers:
     - bowei
     - hbagdi
-    - jpeach
     - robscott
-    - thockin
+    - shaneutt
     - youngnick
+
+  emeritus-gateway-api-maintainers:
+    - danehans
+    - jpeach
