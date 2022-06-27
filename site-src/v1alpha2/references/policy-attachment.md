@@ -145,7 +145,7 @@ within the spec. One with override values and the other with default values.
 
 In the following example, the policy attached to the Gateway requires cdn to
 be enabled and provides some default configuration for that. The policy attached
-to the Route changes the value for one of those fields (includeQueryString).
+to the Route changes the value for one of those fields (`includeQueryString`).
 
 ```yaml
 kind: AcmeServicePolicy # Example of implementation specific policy name
@@ -175,11 +175,33 @@ spec:
 ```
 
 In this final example, we can see how the override attached to the Gateway has
-precedence over the default drainTimeout value attached to the Route. At the
-same time, we can see that the default connectionTimeout attached to the Route
+precedence over the default `drainTimeout` value attached to the Route. At the
+same time, we can see that the default `connectionTimeout` attached to the Route
 has precedence over the default attached to the Gateway.
 
-![Hierarchical Policy Example](/v1alpha2/images/policy/hierarchy.png)
+```yaml
+kind: AcmeServicePolicy
+spec:
+  override:
+    cdn:
+      drainTimeout: 10s
+  default:
+    cdn:
+      connectionTimeout: 30s
+  targetRef:
+    kind: Gateway
+    name: example
+---
+kind: AcmeServicePolicy
+spec:
+  default:
+    cdn:
+      drainTimeout: 20s
+      connectionTimeout: 60s
+  targetRef:
+    kind: HTTPRoute
+    name: example
+```
 
 #### Attaching Policy to GatewayClass
 GatewayClass may be the trickiest resource to attach policy to. Policy
