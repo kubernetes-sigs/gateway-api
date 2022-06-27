@@ -1058,9 +1058,14 @@ spec:
                                 a HTTP route by matching HTTP query parameters.
                               properties:
                                 name:
-                                  description: Name is the name of the HTTP query
+                                  description: "Name is the name of the HTTP query
                                     param to be matched. This must be an exact string
                                     match. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
+                                    \n If multiple entries specify equivalent query
+                                    param names, only the first entry with an equivalent
+                                    name MUST be considered for a match. Subsequent
+                                    entries with an equivalent query param name MUST
+                                    be ignored."
                                   maxLength: 256
                                   minLength: 1
                                   type: string
@@ -2345,9 +2350,14 @@ spec:
                                 a HTTP route by matching HTTP query parameters.
                               properties:
                                 name:
-                                  description: Name is the name of the HTTP query
+                                  description: "Name is the name of the HTTP query
                                     param to be matched. This must be an exact string
                                     match. (See https://tools.ietf.org/html/rfc7230#section-2.7.3).
+                                    \n If multiple entries specify equivalent query
+                                    param names, only the first entry with an equivalent
+                                    name MUST be considered for a match. Subsequent
+                                    entries with an equivalent query param name MUST
+                                    be ignored."
                                   maxLength: 256
                                   minLength: 1
                                   type: string

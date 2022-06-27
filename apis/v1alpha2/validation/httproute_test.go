@@ -572,6 +572,128 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 	}
 }
 
+func TestValidateHTTPHeaderMatches(t *testing.T) {
+	tests := []struct {
+		name          string
+		headerMatches []gatewayv1a2.HTTPHeaderMatch
+		errCount      int
+	}{{
+		name:          "no header matches",
+		headerMatches: nil,
+		errCount:      0,
+	}, {
+		name: "no header matched more than once",
+		headerMatches: []gatewayv1a2.HTTPHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "Header-Name-3", Value: "val-3"},
+		},
+		errCount: 0,
+	}, {
+		name: "header matched more than once (same case)",
+		headerMatches: []gatewayv1a2.HTTPHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "Header-Name-1", Value: "val-3"},
+		},
+		errCount: 1,
+	}, {
+		name: "header matched more than once (different case)",
+		headerMatches: []gatewayv1a2.HTTPHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "HEADER-NAME-2", Value: "val-3"},
+		},
+		errCount: 1,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1a2.HTTPRoute{Spec: gatewayv1a2.HTTPRouteSpec{
+				Rules: []gatewayv1a2.HTTPRouteRule{{
+					Matches: []gatewayv1a2.HTTPRouteMatch{{
+						Headers: tc.headerMatches,
+					}},
+					BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+						BackendRef: gatewayv1a2.BackendRef{
+							BackendObjectReference: gatewayv1a2.BackendObjectReference{
+								Name: gatewayv1a2.ObjectName("test"),
+								Port: utils.PortNumberPtr(8080),
+							},
+						},
+					}},
+				}},
+			}}
+
+			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
+
+func TestValidateHTTPQueryParamMatches(t *testing.T) {
+	tests := []struct {
+		name              string
+		queryParamMatches []gatewayv1a2.HTTPQueryParamMatch
+		errCount          int
+	}{{
+		name:              "no query param matches",
+		queryParamMatches: nil,
+		errCount:          0,
+	}, {
+		name: "no query param matched more than once",
+		queryParamMatches: []gatewayv1a2.HTTPQueryParamMatch{
+			{Name: "query-param-1", Value: "val-1"},
+			{Name: "query-param-2", Value: "val-2"},
+			{Name: "query-param-3", Value: "val-3"},
+		},
+		errCount: 0,
+	}, {
+		name: "query param matched more than once",
+		queryParamMatches: []gatewayv1a2.HTTPQueryParamMatch{
+			{Name: "query-param-1", Value: "val-1"},
+			{Name: "query-param-2", Value: "val-2"},
+			{Name: "query-param-1", Value: "val-3"},
+		},
+		errCount: 1,
+	}, {
+		name: "query param names with different casing are not considered duplicates",
+		queryParamMatches: []gatewayv1a2.HTTPQueryParamMatch{
+			{Name: "query-param-1", Value: "val-1"},
+			{Name: "query-param-2", Value: "val-2"},
+			{Name: "QUERY-PARAM-1", Value: "val-3"},
+		},
+		errCount: 0,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1a2.HTTPRoute{Spec: gatewayv1a2.HTTPRouteSpec{
+				Rules: []gatewayv1a2.HTTPRouteRule{{
+					Matches: []gatewayv1a2.HTTPRouteMatch{{
+						QueryParams: tc.queryParamMatches,
+					}},
+					BackendRefs: []gatewayv1a2.HTTPBackendRef{{
+						BackendRef: gatewayv1a2.BackendRef{
+							BackendObjectReference: gatewayv1a2.BackendObjectReference{
+								Name: gatewayv1a2.ObjectName("test"),
+								Port: utils.PortNumberPtr(8080),
+							},
+						},
+					}},
+				}},
+			}}
+
+			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
+
 func TestValidateServicePort(t *testing.T) {
 	portPtr := func(n int) *gatewayv1a2.PortNumber {
 		p := gatewayv1a2.PortNumber(n)
