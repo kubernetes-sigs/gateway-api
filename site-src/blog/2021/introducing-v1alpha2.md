@@ -48,6 +48,13 @@ itself to the `prod-web-gw` Gateway.
 This is covered in more detail in [GEP 724](https://gateway-api.sigs.k8s.io/geps/gep-709/).
 
 ### Safe Cross Namespace References
+
+!!! info "Experimental Channel"
+
+    The `ReferenceGrant` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
 Most notably, forwarding traffic to backends in other namespaces and referring
