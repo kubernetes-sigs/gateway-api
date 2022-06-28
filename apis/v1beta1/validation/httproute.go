@@ -54,14 +54,16 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
 		}
 		for j, m := range rule.Matches {
+			path := path.Child("rules").Index(i).Child("matches").Index(j)
+
 			if m.Path != nil {
-				errs = append(errs, validateHTTPPathMatch(m.Path, path.Child("matches").Index(j).Child("path"))...)
+				errs = append(errs, validateHTTPPathMatch(m.Path, path.Child("path"))...)
 			}
 			if len(m.Headers) > 0 {
-				errs = append(errs, validateHTTPHeaderMatches(m.Headers, path.Child("matches").Index(j).Child("headers"))...)
+				errs = append(errs, validateHTTPHeaderMatches(m.Headers, path.Child("headers"))...)
 			}
 			if len(m.QueryParams) > 0 {
-				errs = append(errs, validateHTTPQueryParamMatches(m.QueryParams, path.Child("matches").Index(j).Child("queryParams"))...)
+				errs = append(errs, validateHTTPQueryParamMatches(m.QueryParams, path.Child("queryParams"))...)
 			}
 		}
 	}
