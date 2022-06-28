@@ -44,16 +44,16 @@ then
     exit 1
 fi
 
-# If our base ref == "master" then we will tag :latest.
+# If our base ref == "main" then we will tag :latest.
 VERSION_TAG=latest
 
 # We tag the go binary with the git-based tag by default
 BINARY_TAG=$GIT_TAG
 
 # $BASE_REF has only two things that it can be set to by cloudbuild and Prow,
-# `master`, or a semver tag.
+# `main`, or a semver tag.
 # This is controlled by k8s.io/test-infra/config/jobs/image-pushing/k8s-staging-gateway-api.yaml.
-if [[ "${BASE_REF}" != "master" ]]
+if [[ "${BASE_REF}" != "main" ]]
 then
     # Since we know this is built from a tag or release branch, we can set the VERSION_TAG
     VERSION_TAG="${BASE_REF}"
