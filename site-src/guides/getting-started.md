@@ -7,13 +7,13 @@ _THEN_
 
 **2.**   **Try out one of the available guides:**
 
-- [Simple Gateway](/v1alpha2/guides/simple-gateway) (a good one to start out with)
-- [HTTP routing](/v1alpha2/guides/http-routing)
-- [HTTP redirects and rewrites](/v1alpha2/guides/http-redirect-rewrite)
-- [HTTP traffic splitting](/v1alpha2/guides/traffic-splitting)
-- [Routing across Namespaces](/v1alpha2/guides/multiple-ns)
-- [Configuring TLS](/v1alpha2/guides/tls)
-- [TCP routing](/v1alpha2/guides/tcp)
+- [Simple Gateway](/guides/simple-gateway) (a good one to start out with)
+- [HTTP routing](/guides/http-routing)
+- [HTTP redirects and rewrites](/guides/http-redirect-rewrite)
+- [HTTP traffic splitting](/guides/traffic-splitting)
+- [Routing across Namespaces](/guides/multiple-ns)
+- [Configuring TLS](/guides/tls)
+- [TCP routing](/guides/tcp)
 
 ## Installing a Gateway controller
 

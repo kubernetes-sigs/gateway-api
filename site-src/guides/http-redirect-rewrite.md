@@ -1,8 +1,8 @@
 # HTTP path redirects and rewrites
 
-[HTTPRoute resources](/v1alpha2/api-types/httproute) can issue redirects to
+[HTTPRoute resources](/api-types/httproute) can issue redirects to
 clients or rewrite paths sent upstream using
-[filters](/v1alpha2/api-types/httproute#filters-optional). This guide shows how
+[filters](/api-types/httproute#filters-optional). This guide shows how
 to use these features.
 
 Note that redirect and rewrite filters are mutually incompatible. Rules cannot
@@ -12,7 +12,7 @@ use both filter types at once.
 
 Redirects return HTTP 3XX responses to a client, instructing it to retrive a
 different resource. [`RequestRedirect` rule
-filters](v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRequestRedirectFilter)
+filters](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRequestRedirectFilter)
 instruct Gateways to emit a redirect response to requests matching a filtered
 HTTPRoute rule.
 
@@ -73,7 +73,7 @@ https://redirect.example/paprika/teaspoon` response headers.
 
 Rewrites modify components of a client request before proxying it upstream. A
 [`URLRewrite`
-filter](/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPURLRewriteFilter)
+filter](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPURLRewriteFilter)
 can change the upstream request hostname and/or path. For example, the
 following HTTPRoute will accept a request for
 `https://rewrite.example/cardamom` and send it upstream to `example-svc` with

@@ -12,7 +12,7 @@ effectively.
 
 ## Client/Server and TLS
 
-![overview](/v1alpha2/images/tls-overview.svg)
+![overview](/images/tls-overview.svg)
 
 For Gateways, there are two connections involved:
 

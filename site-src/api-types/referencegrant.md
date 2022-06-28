@@ -14,7 +14,7 @@ A ReferenceGrant can be used to enable cross namespace references within
 Gateway API. In particular, Routes may forward traffic to backends in other
 namespaces, or Gateways may refer to Secrets in another namespace.
 
-![Reference Grant](/v1alpha2/images/referencegrant-simple.png)
+![Reference Grant](/images/referencegrant-simple.png)
 
 In the past, we've seen that forwarding traffic across namespace boundaries is a
 desired feature, but without a safeguard like ReferenceGrant,
@@ -87,7 +87,7 @@ While the API is simplistic in nature, it comes with a few notable decisions:
    other. This makes it impossible for them to conflict with each other.
 
 Please see the [API
-Specification](/v1alpha2/references/spec#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
+Specification](/references/spec#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
 for more details on how specific ReferenceGrant fields are interpreted.
 
 ## Exceptions

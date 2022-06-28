@@ -28,7 +28,7 @@ Access is granted with RBAC - for example, anyone that has access to create a
 RetryPolicy in a given namespace can attach it to any resource within that
 namespace.
 
-![Simple Ingress Example](/v1alpha2/images/policy/ingress-simple.png)
+![Simple Ingress Example](/images/policy/ingress-simple.png)
 
 To build on that example, it’s possible to attach policies to more resources.
 Each policy applies to the referenced resource and everything below it in terms
@@ -36,7 +36,7 @@ of hierarchy. Although this example is likely more complex than many real world
 use cases, it helps demonstrate how policy attachment can work across
 namespaces.
 
-![Complex Ingress Example](/v1alpha2/images/policy/ingress-complex.png)
+![Complex Ingress Example](/images/policy/ingress-complex.png)
 
 ## Policy Attachment for Mesh
 Although there is a great deal of overlap between ingress and mesh use cases,
@@ -44,7 +44,7 @@ mesh enables more complex policy attachment scenarios. For example, users may
 want to apply policy to requests from a specific namespace to a backend in
 another namespace.
 
-![Simple Mesh Example](/v1alpha2/images/policy/mesh-simple.png)
+![Simple Mesh Example](/images/policy/mesh-simple.png)
 
 Policy attachment can be quite simple with mesh. Policy can be applied to any
 resource in any namespace but it can only apply to requests from the same
@@ -55,7 +55,7 @@ workload to a backend in another namespace. A route can be used to intercept
 these requests and split them between different backends (foo-a and foo-b in
 this case).
 
-![Complex Mesh Example](/v1alpha2/images/policy/mesh-complex.png)
+![Complex Mesh Example](/images/policy/mesh-complex.png)
 
 ## Target Reference API
 
@@ -124,7 +124,7 @@ Each policy MAY include default or override values. Overrides enable admins to
 enforce policy from the top down. Defaults enable app owners to provide default
 values from the bottom up for each individual application.
 
-![Policy Hierarchy](/v1alpha2/images/policy/hierarchy.png)
+![Policy Hierarchy](/images/policy/hierarchy.png)
 
 To illustrate this, consider 3 resources with the following hierarchy: A
 (highest) > B > C. When attaching the concept of defaults and overrides to that,

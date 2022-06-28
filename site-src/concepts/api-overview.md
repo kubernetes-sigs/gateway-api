@@ -285,7 +285,7 @@ reverse proxy is:
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
-Please refer to the [TLS details](/v1alpha2/guides/tls) guide for a deep dive on TLS.
+Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
 
 
 ## Extension points

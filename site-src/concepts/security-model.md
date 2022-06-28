@@ -122,7 +122,7 @@ the ReferenceGrant.
 ```
 
 For more information on ReferenceGrant, refer to our [detailed documentation
-for this resource](/v1alpha2/api-types/referencegrant.md).
+for this resource](/api-types/referencegrant.md).
 
 ## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
 Some infrastructure providers or cluster operators may wish to limit the

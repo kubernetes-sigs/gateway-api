@@ -104,7 +104,7 @@ This is intended to allow things like:
 As a simple example, a TimeoutPolicy may be attached to a Gateway. The effects
 of that policy would cascade down to Routes attached to that policy:
 
-![Simple Ingress Example](/v1alpha2/images/policy/ingress-simple.png)
+![Simple Ingress Example](/images/policy/ingress-simple.png)
 
 This is covered in more detail in [GEP 713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
 
