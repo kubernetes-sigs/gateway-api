@@ -124,20 +124,32 @@ func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerNa
 		if routeNN.Namespace == gwNN.Namespace {
 			namespaceRequired = false
 		}
-		parents := []v1alpha2.RouteParentStatus{{
-			ParentRef: v1alpha2.ParentReference{
-				Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-				Kind:      &kind,
-				Name:      v1alpha2.ObjectName(gwNN.Name),
-				Namespace: &ns,
-			},
-			ControllerName: v1alpha2.GatewayController(controllerName),
-			Conditions: []metav1.Condition{{
-				Type:   string(v1alpha2.RouteConditionAccepted),
-				Status: metav1.ConditionTrue,
-			}},
-		}}
-		HTTPRouteMustHaveParents(t, c, routeNN, parents, namespaceRequired, 60)
+		route := &v1alpha2.HTTPRoute{}
+
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		err := c.Get(ctx, routeNN, route)
+		cancel()
+		require.NoErrorf(t, err, "error fetching HTTPRoute")
+
+		var expectedParentStatuses []v1alpha2.RouteParentStatus
+		for _, parentRef := range route.Spec.ParentRefs {
+			expectedParentStatuses = append(expectedParentStatuses,
+				v1alpha2.RouteParentStatus{
+					ParentRef: v1alpha2.ParentReference{
+						Group:       (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+						Kind:        &kind,
+						Name:        v1alpha2.ObjectName(gwNN.Name),
+						Namespace:   &ns,
+						SectionName: parentRef.SectionName,
+					},
+					ControllerName: v1alpha2.GatewayController(controllerName),
+					Conditions: []metav1.Condition{{
+						Type:   string(v1alpha2.RouteConditionAccepted),
+						Status: metav1.ConditionTrue,
+					}},
+				})
+		}
+		HTTPRouteMustHaveParents(t, c, routeNN, expectedParentStatuses, namespaceRequired, 60)
 	}
 
 	return gwAddr
