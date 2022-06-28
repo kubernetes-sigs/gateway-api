@@ -179,7 +179,7 @@ precedence over the default `drainTimeout` value attached to the Route. At the
 same time, we can see that the default `connectionTimeout` attached to the Route
 has precedence over the default attached to the Gateway.
 
-![Hierarchical Policy Example](images/713-policy-hierarchy.png)
+![Hierarchical Policy Example](images/policy-hierarchy.png)
 
 #### Attaching Policy to GatewayClass
 GatewayClass may be the trickiest resource to attach policy to. Policy
