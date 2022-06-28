@@ -39,7 +39,7 @@ cat << EOF >> release/standard-install.yaml
 #
 EOF
 
-for file in `ls config/webhook/*.yaml config/crd/experimental/*.yaml`
+for file in `ls config/webhook/*.yaml config/crd/experimental/gateway*.yaml`
 do
     echo "---" >> release/experimental-install.yaml
     echo "#" >> release/experimental-install.yaml
