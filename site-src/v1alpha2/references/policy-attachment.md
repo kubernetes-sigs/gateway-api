@@ -179,29 +179,7 @@ precedence over the default `drainTimeout` value attached to the Route. At the
 same time, we can see that the default `connectionTimeout` attached to the Route
 has precedence over the default attached to the Gateway.
 
-```yaml
-kind: AcmeServicePolicy
-spec:
-  override:
-    cdn:
-      drainTimeout: 10s
-  default:
-    cdn:
-      connectionTimeout: 30s
-  targetRef:
-    kind: Gateway
-    name: example
----
-kind: AcmeServicePolicy
-spec:
-  default:
-    cdn:
-      drainTimeout: 20s
-      connectionTimeout: 60s
-  targetRef:
-    kind: HTTPRoute
-    name: example
-```
+![Hierarchical Policy Example](images/policy-hierarchy.png)
 
 #### Attaching Policy to GatewayClass
 GatewayClass may be the trickiest resource to attach policy to. Policy
