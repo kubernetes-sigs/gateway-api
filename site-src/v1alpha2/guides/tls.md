@@ -4,6 +4,12 @@ Gateway API allow for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.
 
+!!! info "Experimental Channel"
+
+    The `TLSRoute` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 ## Client/Server and TLS
 
 ![overview](/v1alpha2/images/tls-overview.svg)
