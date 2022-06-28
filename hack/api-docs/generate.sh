@@ -42,12 +42,12 @@ gendoc::exec() {
         "$@"
 }
 
-if [ "$#" != "2" ]; then
-    echo "usage: generate.sh API_VERSION OUTFILE"
+if [ "$#" != "1" ]; then
+    echo "usage: generate.sh OUTFILE"
     exit 2
 fi
 
 gendoc::build
 gendoc::exec \
-    -api-dir "sigs.k8s.io/gateway-api/apis/${1}" \
-    -out-file "${2}"
+    -api-dir "sigs.k8s.io/gateway-api/apis/" \
+    -out-file "${1}"
