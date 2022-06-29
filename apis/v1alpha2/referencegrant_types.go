@@ -95,6 +95,7 @@ type ReferenceGrantFrom struct {
 	// additional resources, the following Route types are part of the "Core"
 	// support level for this field:
 	//
+	// * Gateway
 	// * HTTPRoute
 	// * TCPRoute
 	// * TLSRoute
@@ -120,6 +121,7 @@ type ReferenceGrantTo struct {
 	// additional resources, the following types are part of the "Core"
 	// support level for this field:
 	//
+	// * Secret
 	// * Service
 	Kind Kind `json:"kind"`
 
