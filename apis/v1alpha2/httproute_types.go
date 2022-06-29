@@ -222,6 +222,7 @@ type HTTPRouteRule struct {
 	// recommended to return a 503 status code.
 	//
 	// Support: Core for Kubernetes Service
+	//
 	// Support: Custom for any other resource
 	//
 	// Support for weight: Core
@@ -554,6 +555,7 @@ type HTTPRouteFilter struct {
 	RequestRedirect *HTTPRequestRedirectFilter `json:"requestRedirect,omitempty"`
 
 	// URLRewrite defines a schema for a filter that modifies a request during forwarding.
+	//
 	// Support: Extended
 	//
 	// <gateway:experimental>
@@ -824,8 +826,9 @@ type HTTPRequestRedirectFilter struct {
 // forwarding. At most one of these filters may be used on a Route rule. This
 // MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.
 //
-// <gateway:experimental>
 // Support: Extended
+//
+// <gateway:experimental>
 type HTTPURLRewriteFilter struct {
 	// Hostname is the value to be used to replace the Host header value during
 	// forwarding.
@@ -864,6 +867,7 @@ type HTTPRequestMirrorFilter struct {
 	// should be used to provide more detail about the problem.
 	//
 	// Support: Extended for Kubernetes Service
+	//
 	// Support: Custom for any other resource
 	BackendRef BackendObjectReference `json:"backendRef"`
 }

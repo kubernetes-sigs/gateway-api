@@ -39,6 +39,7 @@ type ParentReference struct {
 	// Kind is kind of the referent.
 	//
 	// Support: Core (Gateway)
+	//
 	// Support: Custom (Other Resources)
 	//
 	// +kubebuilder:default=Gateway
