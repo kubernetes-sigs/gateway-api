@@ -19,9 +19,9 @@ interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
-- [User guides](/v1alpha2/guides/getting-started)
+- [User guides](/guides/getting-started)
 - [Gateway controller implementations](/implementations)
-- [API reference spec](/v1alpha2/references/spec)
+- [API reference spec](/references/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 
@@ -76,19 +76,19 @@ used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators. The following example shows how this
 works in practice.
 
-A cluster operator creates a [Gateway](/v1alpha2/api-types/gateway) resource derived from a
-[GatewayClass](/v1alpha2/api-types/gatewayclass). This Gateway deploys or configures the
+A cluster operator creates a [Gateway](/api-types/gateway) resource derived from a
+[GatewayClass](/api-types/gatewayclass). This Gateway deploys or configures the
 underlying network resources that it represents. Through the
 [Route Attachment Process](/concepts/api-overview#attaching-routes-to-gateways)
 between the Gateway and Routes, the cluster operator and specific teams must
 agree on what can attach to this Gateway and expose their applications through
-it. Centralized policies [such as TLS](/v1alpha2/guides/tls#downstream-tls) can
+it. Centralized policies [such as TLS](/guides/tls#downstream-tls) can
 be enforced on the Gateway by the cluster operator. Meanwhile, the store and site
-teams run [in their own Namespaces](/v1alpha2/guides/multiple-ns), but attach their
+teams run [in their own Namespaces](/guides/multiple-ns), but attach their
 Routes to the same shared Gateway, allowing them to independently control
-their [routing logic](/v1alpha2/guides/http-routing). This separation of concerns
+their [routing logic](/guides/http-routing). This separation of concerns
 allows the store team to manage their own
-[traffic splitting rollout](/v1alpha2/guides/traffic-splitting) while
+[traffic splitting rollout](/guides/traffic-splitting) while
 leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)
