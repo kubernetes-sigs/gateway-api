@@ -19,7 +19,7 @@ In this example two `TCP` listeners will be applied to the [Gateway][gateway]
 in order to route them to two separate backend `TCPRoutes`, note that the
 `protocol` set for the `listeners` on the `Gateway` is `TCP`:
 
-```
+```yaml
 {% include 'experimental/v1alpha2/basic-tcp.yaml' %}
 ```
 
