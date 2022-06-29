@@ -131,7 +131,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Custom (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -232,8 +232,8 @@ spec:
                         been routed to an invalid backend MUST receive a 500 status
                         code. \n When a BackendRef refers to a Service that has no
                         ready endpoints, it is recommended to return a 503 status
-                        code. \n Support: Core for Kubernetes Service Support: Custom
-                        for any other resource \n Support for weight: Core"
+                        code. \n Support: Core for Kubernetes Service \n Support:
+                        Custom for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
                           forward an HTTP request.
@@ -420,7 +420,7 @@ spec:
                                         Message of the `ResolvedRefs` Condition should
                                         be used to provide more detail about the problem.
                                         \n Support: Extended for Kubernetes Service
-                                        Support: Custom for any other resource"
+                                        \n Support: Custom for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -597,7 +597,7 @@ spec:
                                 urlRewrite:
                                   description: "URLRewrite defines a schema for a
                                     filter that modifies a request during forwarding.
-                                    Support: Extended \n <gateway:experimental>"
+                                    \n Support: Extended \n <gateway:experimental>"
                                   properties:
                                     hostname:
                                       description: "Hostname is the value to be used
@@ -904,7 +904,7 @@ spec:
                                   In either error case, the Message of the `ResolvedRefs`
                                   Condition should be used to provide more detail
                                   about the problem. \n Support: Extended for Kubernetes
-                                  Service Support: Custom for any other resource"
+                                  Service \n Support: Custom for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -1070,7 +1070,7 @@ spec:
                             type: string
                           urlRewrite:
                             description: "URLRewrite defines a schema for a filter
-                              that modifies a request during forwarding. Support:
+                              that modifies a request during forwarding. \n Support:
                               Extended \n <gateway:experimental>"
                             properties:
                               hostname:
@@ -1460,7 +1460,7 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Custom (Other Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1663,7 +1663,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Custom (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1952,7 +1952,7 @@ spec:
                                         Message of the `ResolvedRefs` Condition should
                                         be used to provide more detail about the problem.
                                         \n Support: Extended for Kubernetes Service
-                                        Support: Custom for any other resource"
+                                        \n Support: Custom for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -2129,7 +2129,7 @@ spec:
                                 urlRewrite:
                                   description: "URLRewrite defines a schema for a
                                     filter that modifies a request during forwarding.
-                                    Support: Extended \n <gateway:experimental>"
+                                    \n Support: Extended \n <gateway:experimental>"
                                   properties:
                                     hostname:
                                       description: "Hostname is the value to be used
@@ -2436,7 +2436,7 @@ spec:
                                   In either error case, the Message of the `ResolvedRefs`
                                   Condition should be used to provide more detail
                                   about the problem. \n Support: Extended for Kubernetes
-                                  Service Support: Custom for any other resource"
+                                  Service \n Support: Custom for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -2602,7 +2602,7 @@ spec:
                             type: string
                           urlRewrite:
                             description: "URLRewrite defines a schema for a filter
-                              that modifies a request during forwarding. Support:
+                              that modifies a request during forwarding. \n Support:
                               Extended \n <gateway:experimental>"
                             properties:
                               hostname:
@@ -2992,7 +2992,7 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Custom (Other Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$

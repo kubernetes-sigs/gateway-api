@@ -125,7 +125,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Custom (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -214,7 +214,7 @@ spec:
                         code. Request rejections must respect weight; if an invalid
                         backend is requested to have 80% of requests, then 80% of
                         requests must be rejected instead. \n Support: Core for Kubernetes
-                        Service Support: Custom for any other resource \n Support
+                        Service \n Support: Custom for any other resource \n Support
                         for weight: Extended"
                       items:
                         description: "BackendRef defines how a Route should forward
@@ -443,7 +443,7 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Custom (Other Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
