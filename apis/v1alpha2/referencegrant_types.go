@@ -92,10 +92,15 @@ type ReferenceGrantFrom struct {
 	Group Group `json:"group"`
 
 	// Kind is the kind of the referent. Although implementations may support
-	// additional resources, the following Route types are part of the "Core"
-	// support level for this field:
+	// additional resources, the following types are part of the "Core"
+	// support level for this field.
+	//
+	// When used to permit a SecretObjectReference:
 	//
 	// * Gateway
+	//
+	// When used to permit a BackendObjectReference:
+	//
 	// * HTTPRoute
 	// * TCPRoute
 	// * TLSRoute
@@ -121,8 +126,8 @@ type ReferenceGrantTo struct {
 	// additional resources, the following types are part of the "Core"
 	// support level for this field:
 	//
-	// * Secret
-	// * Service
+	// * Secret when used to permit a SecretObjectReference
+	// * Service when used to permit a BackendObjectReference
 	Kind Kind `json:"kind"`
 
 	// Name is the name of the referent. When unspecified, this policy
