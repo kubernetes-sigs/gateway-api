@@ -18,6 +18,7 @@ package validation
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -53,8 +54,16 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
 		}
 		for j, m := range rule.Matches {
+			matchPath := path.Child("rules").Index(i).Child("matches").Index(j)
+
 			if m.Path != nil {
-				errs = append(errs, validateHTTPPathMatch(m.Path, path.Child("matches").Index(j).Child("path"))...)
+				errs = append(errs, validateHTTPPathMatch(m.Path, matchPath.Child("path"))...)
+			}
+			if len(m.Headers) > 0 {
+				errs = append(errs, validateHTTPHeaderMatches(m.Headers, matchPath.Child("headers"))...)
+			}
+			if len(m.QueryParams) > 0 {
+				errs = append(errs, validateHTTPQueryParamMatches(m.QueryParams, matchPath.Child("queryParams"))...)
 			}
 		}
 	}
@@ -157,6 +166,46 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 		allErrs = append(allErrs, field.NotSupported(fldPath.Child("type"), *path.Type, pathTypes))
 	}
 	return allErrs
+}
+
+// validateHTTPHeaderMatches validates that no header name
+// is matched more than once (case-insensitive).
+func validateHTTPHeaderMatches(matches []gatewayv1a2.HTTPHeaderMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[string]int{}
+
+	for _, match := range matches {
+		// Header names are case-insensitive.
+		counts[strings.ToLower(string(match.Name))]++
+	}
+
+	for name, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, http.CanonicalHeaderKey(name), "cannot match the same header multiple times in the same rule"))
+		}
+	}
+
+	return errs
+}
+
+// validateHTTPQueryParamMatches validates that no query param name
+// is matched more than once (case-sensitive).
+func validateHTTPQueryParamMatches(matches []gatewayv1a2.HTTPQueryParamMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[string]int{}
+
+	for _, match := range matches {
+		// Query param names are case-sensitive.
+		counts[string(match.Name)]++
+	}
+
+	for name, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, name, "cannot match the same query parameter multiple times in the same rule"))
+		}
+	}
+
+	return errs
 }
 
 // validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are

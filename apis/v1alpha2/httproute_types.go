@@ -403,6 +403,10 @@ type HTTPQueryParamMatch struct {
 	// exact string match. (See
 	// https://tools.ietf.org/html/rfc7230#section-2.7.3).
 	//
+	// If multiple entries specify equivalent query param names, only the first
+	// entry with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent query param name MUST be ignored.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
 	Name string `json:"name"`
