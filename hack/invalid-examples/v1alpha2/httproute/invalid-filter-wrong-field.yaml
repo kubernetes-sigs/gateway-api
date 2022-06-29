@@ -8,3 +8,4 @@ spec:
     - type: RequestHeaderModifier
       requestRedirect: 
         port: 443
+

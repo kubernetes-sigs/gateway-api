@@ -19,6 +19,8 @@ limitations under the License.
 package v1alpha2
 
 import (
+	"net/http"
+
 	rest "k8s.io/client-go/rest"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
@@ -30,6 +32,7 @@ type GatewayV1alpha2Interface interface {
 	GatewayClassesGetter
 	HTTPRoutesGetter
 	ReferenceGrantsGetter
+	ReferencePoliciesGetter
 	TCPRoutesGetter
 	TLSRoutesGetter
 	UDPRoutesGetter
@@ -56,6 +59,10 @@ func (c *GatewayV1alpha2Client) ReferenceGrants(namespace string) ReferenceGrant
 	return newReferenceGrants(c, namespace)
 }
 
+func (c *GatewayV1alpha2Client) ReferencePolicies(namespace string) ReferencePolicyInterface {
+	return newReferencePolicies(c, namespace)
+}
+
 func (c *GatewayV1alpha2Client) TCPRoutes(namespace string) TCPRouteInterface {
 	return newTCPRoutes(c, namespace)
 }
@@ -69,12 +76,28 @@ func (c *GatewayV1alpha2Client) UDPRoutes(namespace string) UDPRouteInterface {
 }
 
 // NewForConfig creates a new GatewayV1alpha2Client for the given config.
+// NewForConfig is equivalent to NewForConfigAndClient(c, httpClient),
+// where httpClient was generated with rest.HTTPClientFor(c).
 func NewForConfig(c *rest.Config) (*GatewayV1alpha2Client, error) {
 	config := *c
 	if err := setConfigDefaults(&config); err != nil {
 		return nil, err
 	}
-	client, err := rest.RESTClientFor(&config)
+	httpClient, err := rest.HTTPClientFor(&config)
+	if err != nil {
+		return nil, err
+	}
+	return NewForConfigAndClient(&config, httpClient)
+}
+
+// NewForConfigAndClient creates a new GatewayV1alpha2Client for the given config and http client.
+// Note the http client provided takes precedence over the configured transport values.
+func NewForConfigAndClient(c *rest.Config, h *http.Client) (*GatewayV1alpha2Client, error) {
+	config := *c
+	if err := setConfigDefaults(&config); err != nil {
+		return nil, err
+	}
+	client, err := rest.RESTClientForConfigAndClient(&config, h)
 	if err != nil {
 		return nil, err
 	}

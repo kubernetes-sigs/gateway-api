@@ -48,6 +48,13 @@ itself to the `prod-web-gw` Gateway.
 This is covered in more detail in [GEP 724](https://gateway-api.sigs.k8s.io/geps/gep-709/).
 
 ### Safe Cross Namespace References
+
+!!! info "Experimental Channel"
+
+    The `ReferenceGrant` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
 Most notably, forwarding traffic to backends in other namespaces and referring
@@ -66,7 +73,7 @@ namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'v1alpha2/reference-grant.yaml' %}
+{% include 'experimental/v1alpha2/reference-grant.yaml' %}
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).
@@ -97,7 +104,7 @@ This is intended to allow things like:
 As a simple example, a TimeoutPolicy may be attached to a Gateway. The effects
 of that policy would cascade down to Routes attached to that policy:
 
-![Simple Ingress Example](/v1alpha2/images/policy/ingress-simple.png)
+![Simple Ingress Example](/images/policy/ingress-simple.png)
 
 This is covered in more detail in [GEP 713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
 

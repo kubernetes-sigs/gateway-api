@@ -118,11 +118,11 @@ the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
 the ReferenceGrant.
 
 ```yaml
-{% include 'v1alpha2/reference-grant.yaml' %}
+{% include 'experimental/v1alpha2/reference-grant.yaml' %}
 ```
 
 For more information on ReferenceGrant, refer to our [detailed documentation
-for this resource](/v1alpha2/api-types/referencegrant.md).
+for this resource](/api-types/referencegrant.md).
 
 ## Advanced Concept: Limiting Namespaces Where a GatewayClass Can Be Used
 Some infrastructure providers or cluster operators may wish to limit the

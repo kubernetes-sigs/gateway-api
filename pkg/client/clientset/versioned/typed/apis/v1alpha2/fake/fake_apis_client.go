@@ -44,6 +44,10 @@ func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.Referen
 	return &FakeReferenceGrants{c, namespace}
 }
 
+func (c *FakeGatewayV1alpha2) ReferencePolicies(namespace string) v1alpha2.ReferencePolicyInterface {
+	return &FakeReferencePolicies{c, namespace}
+}
+
 func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
 	return &FakeTCPRoutes{c, namespace}
 }

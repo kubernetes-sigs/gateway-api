@@ -21,14 +21,18 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api,shortName=refpol
+// +kubebuilder:deprecatedversion:warning="ReferencePolicy has been renamed to ReferenceGrant. ReferencePolicy will be removed in v0.6.0 in favor of the identical ReferenceGrant resource."
 // +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
-// ReferenceGrant identifies kinds of resources in other namespaces that are
+// ReferencePolicy identifies kinds of resources in other namespaces that are
 // trusted to reference the specified kinds of resources in the same namespace
 // as the policy.
 //
-// Each ReferenceGrant can be used to represent a unique trust relationship.
+// Note: This resource has been renamed to ReferenceGrant. ReferencePolicy will
+// be removed in v0.6.0 in favor of the identical ReferenceGrant resource.
+//
+// Each ReferencePolicy can be used to represent a unique trust relationship.
 // Additional Reference Policies can be used to add to the set of trusted
 // sources of inbound references for the namespace they are defined within.
 //
@@ -37,11 +41,11 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 //
 // Support: Core
 //
-type ReferenceGrant struct {
+type ReferencePolicy struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	// Spec defines the desired state of ReferenceGrant.
+	// Spec defines the desired state of ReferencePolicy.
 	Spec ReferenceGrantSpec `json:"spec,omitempty"`
 
 	// Note that `Status` sub-resource has been excluded at the
@@ -50,11 +54,11 @@ type ReferenceGrant struct {
 }
 
 // +kubebuilder:object:root=true
-// ReferenceGrantList contains a list of ReferenceGrant.
-type ReferenceGrantList struct {
+// ReferencePolicyList contains a list of ReferencePolicy.
+type ReferencePolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ReferenceGrant `json:"items"`
+	Items           []ReferencePolicy `json:"items"`
 }
 
 // ReferenceGrantSpec identifies a cross namespace relationship that is trusted

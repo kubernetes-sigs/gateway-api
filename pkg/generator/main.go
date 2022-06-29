@@ -35,8 +35,16 @@ const (
 	channelAnnotation       = "gateway.networking.k8s.io/channel"
 
 	// These values must be updated during the release process
-	bundleVersion = "v0.5.0-dev"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/891"
+	bundleVersion = "v0.5.0-rc1"
+	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/1086"
+)
+
+var (
+	standardKinds = map[string]bool{
+		"GatewayClass": true,
+		"Gateway":      true,
+		"HTTPRoute":    true,
+	}
 )
 
 // This generation code is largely copied from
@@ -45,6 +53,7 @@ func main() {
 	roots, err := loader.LoadRoots(
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
+		"sigs.k8s.io/gateway-api/apis/v1beta1",
 	)
 
 	if err != nil {
@@ -80,9 +89,12 @@ func main() {
 		log.Fatalf("no objects in the roots")
 	}
 
-	channels := []string{"stable", "experimental"}
+	channels := []string{"standard", "experimental"}
 	for _, channel := range channels {
 		for groupKind := range kubeKinds {
+			if channel == "standard" && !standardKinds[groupKind.Kind] {
+				continue
+			}
 			log.Printf("generating %s CRD for %v\n", channel, groupKind)
 
 			parser.NeedCRDFor(groupKind, nil)
@@ -126,7 +138,7 @@ func main() {
 func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
 	for name := range props {
 		jsonProps, _ := props[name]
-		if channel == "stable" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
+		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
 			delete(props, name)
 			continue
 		}

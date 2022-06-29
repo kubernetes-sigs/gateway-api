@@ -4,7 +4,7 @@ metadata:
   name: httproute-listener-hostname-matching
   namespace: gateway-conformance-infra
 spec:
-  gatewayClassName: {GATEWAY_CLASS_NAME}
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
   - name: listener-1
     port: 80

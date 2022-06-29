@@ -4,7 +4,7 @@ metadata:
   name: tlsroutes-only
   namespace: gateway-conformance-infra
 spec:
-  gatewayClassName: {GATEWAY_CLASS_NAME}
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
   - name: tls
     port: 443

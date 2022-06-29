@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.5.0-rc1](#v050-rc1)
 - [v0.4.3](#v043)
 - [v0.4.2](#v042)
 - [v0.4.1](#v041)
@@ -13,6 +14,153 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.5.0-rc1
+
+API versions: v1beta1, v1alpha2
+
+This release is all about stability.
+
+Changes in this release can largely be divided into the following categories:
+
+- Release Channels
+- Resources graduating to beta
+- New experimental features
+- Bug Fixes
+- General Improvements
+- Breaking Changes
+  - Validation improvements
+  - Internal type cleanup
+
+### Release channels
+
+In this release, we've made two release channels available, `experimental` and
+`standard`.
+
+The `experimental` channel contains all resources and fields, while `standard`
+contains only resources that mave moved to beta status.
+
+We've also added a way to flag particular fields within a resource as
+experimental, and any fields marked in this way are only present in the
+`experimental` channel. Please see the [versioning][vers] docs for a more
+detailed explanation.
+
+One caveat for the standard channel - due to work on the new ReferenceGrant
+resource: conformance tests may not pass with the `standard` set of CRDs.
+
+[vers]:https://gateway-api.sigs.k8s.io/concepts/versioning/
+
+### Resources Graduating to BETA
+
+The following APIs have been promoted to a `v1beta1` maturity:
+
+- `GatewayClass`
+- `Gateway`
+- `HTTPRoute`
+
+[#1192](https://github.com/kubernetes-sigs/gateway-api/pull/1192)
+
+### New Experimental Features
+
+- Routes can now select `Gateway` listeners by port number
+  [#1002](https://github.com/kubernetes-sigs/gateway-api/pull/1002)
+- Gateway API now includes "Experimental" release channel. Consequently, CRDs now
+  include `gateway.networking.k8s.io/bundle-version` and
+  `gateway.networking.k8s.io/channel` annotations.
+  [#945](https://github.com/kubernetes-sigs/gateway-api/pull/945)
+- URL Rewrites and Path redirects have been added as new "Experimental" features
+  [#945](https://github.com/kubernetes-sigs/gateway-api/pull/945)
+
+### Bug Fixes
+
+- Fixes a problem that would cause webhook deployment to fail on Kubernetes
+  v1.22 and greater.
+  [#991](https://github.com/kubernetes-sigs/gateway-api/pull/991)
+- Fixes a bug where the `Namespace` could be unspecified in `ReferencePolicy`
+  [#964](https://github.com/kubernetes-sigs/gateway-api/pull/964)
+- Fixes a bug where v1alpha2 GatewayClass controller names were not being
+  shown in the output of `kubectl get gatewayclasses`
+  [#909](https://github.com/kubernetes-sigs/gateway-api/pull/909)
+
+### General Improvements
+
+- Conformance tests were introduced with [GEP-917][gep-917] and multiple
+  conformance tests were added from a variety of contributors under the
+  `conformance/` directory.
+- The status of the GatewayClass "Accepted" condition for the `GatewayClass`
+  is now present in `kubectl get` output.
+  [#1168](https://github.com/kubernetes-sigs/gateway-api/pull/1168)
+- New `RouteConditionReason` types `RouteReasonNotAllowedByListeners` and
+  `RouteReasonNoMatchingListenerHostname` were added.
+  [#1155](https://github.com/kubernetes-sigs/gateway-api/pull/1155)
+- New `RouteConditionReason` type added with `RouteReasonAccepted`,
+  `RouteReasonResolvedRefs` and `RouteReasonRefNotPermitted` constants.
+  [#1114](https://github.com/kubernetes-sigs/gateway-api/pull/1114)
+- Introduced PreciseHostname which prevents wildcard characters in relevant
+  Hostname values.
+  [#956](https://github.com/kubernetes-sigs/gateway-api/pull/956)
+
+[gep-917]:https://gateway-api.sigs.k8s.io/geps/gep-917/
+
+### Validation Improvements
+
+- Webhook validation now ensures that a path match exists when required by path
+  modifier in filter.
+  [#1171](https://github.com/kubernetes-sigs/gateway-api/pull/1171)
+- Webhook validation was added to ensure that only type-appropriate fields are
+  set in `HTTPPathModifier`.
+  [#1124](https://github.com/kubernetes-sigs/gateway-api/pull/1124)
+- The Gateway API webhook is now deployed in a `gateway-system` namespace
+  instead of `gateway-api`.
+  [#1051](https://github.com/kubernetes-sigs/gateway-api/pull/1051)
+
+### Breaking Changes
+
+- The v1alpha1 API version was deprecated and removed.
+  [#1197](https://github.com/kubernetes-sigs/gateway-api/pull/1197)
+  [#906](https://github.com/kubernetes-sigs/gateway-api/issues/906)
+- The `NamedAddress` value for `Gateway`'s `spec.addresses[].type` field has
+  been deprecated, and support for domain-prefixed values (like
+  `example.com/NamedAddress`) has been added instead to better represent the
+  custom nature of this support.
+  [#1178](https://github.com/kubernetes-sigs/gateway-api/pull/1178)
+- Implementations are now expected to use `500` instead of `503` responses when
+  the data-plane has no matching route.
+  [#1151](https://github.com/kubernetes-sigs/gateway-api/pull/1151)
+
+#### UX and Status Improvements
+
+The following are **breaking changes** related to status updates and end-user
+experience changes.
+
+- The `UnsupportedExtension` named `ListenerConditionReason` has been removed.
+  [#1146](https://github.com/kubernetes-sigs/gateway-api/pull/1146)
+- The `RouteConflict` named `ListenerConditionReason` has been removed.
+  [#1145](https://github.com/kubernetes-sigs/gateway-api/pull/1145)
+
+#### Internal Type Cleanup
+
+These changes will only affect implementations. Implementors will need to adjust
+for the type changes when updating the Gateway API dependency in their projects.
+
+**NOTE**: These kinds of changes are not always present in the CHANGELOG so
+          please be aware that the CHANGELOG is not an exhaustive list of Go
+          type changes. In this case there were a significant number of changes
+          in a single release, so we included them for extra visibility for
+          implementors.
+
+- `ReferencePolicy` has been renamed to `ReferenceGrant`.
+  [#1179](https://github.com/kubernetes-sigs/gateway-api/pull/1179)
+- `GatewayTLSConfig`'s `CertificateRefs` field is now a slice of pointers to
+  structs instead of the structs directly.
+  [#1176](https://github.com/kubernetes-sigs/gateway-api/pull/1176)
+- `HTTPPathModifer` field `Absolute` renamed to `ReplaceFullPath`
+  [#1124](https://github.com/kubernetes-sigs/gateway-api/pull/1124)
+- the `ParentRef` type was renamed to `ParentReference`
+  [#982](https://github.com/kubernetes-sigs/gateway-api/pull/982)
+- Types `ConditionRouteAccepted` and `ConditionRouteResolvedRefs` are now
+  deprecated in favor of `RouteConditionAccepted` & `RouteConditionResolvedRefs`
+  [#1114](https://github.com/kubernetes-sigs/gateway-api/pull/1114)
 
 ## v0.4.3
 
@@ -154,7 +302,7 @@ The following changes have been made since v0.3.0:
   GEP added in [#749](https://github.com/kubernetes-sigs/gateway-api/pull/749).
   Implemented in [#768](https://github.com/kubernetes-sigs/gateway-api/pull/768).
 
-  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md)
+  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-851.md)
   was a follow up on this change that allowed multiple Certificate Refs per
   Gateway Listener. This was implemented in
   [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852).
@@ -169,7 +317,7 @@ The following changes have been made since v0.3.0:
 ### Small Changes
 * Extension points within match blocks from all Routes have been removed
   [#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
-  [GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-820.md).
+  [GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-820.md).
   These extension points have been removed because they are currently not used,
   are poorly understood, and we don't have good use cases for them. We may
   consider re-adding them in the future.
@@ -316,11 +464,11 @@ The following changes have been made since v0.4.0-rc1:
 ### GEP implementations
 * Replace `CertificateRef` field with `CertificateRefs` in `GatewayTLSConfig`.
 [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852). This implements
-[GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-851.md),
+[GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-851.md),
 Allow Multiple Certificate Refs per Gateway Listener.
 * Extension points within match blocks from all Routes have been removed
 [#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
-[GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/master/site-src/geps/gep-820.md).
+[GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-820.md).
 These extension points have been removed because they are currently not used,
 are poorly understood, and we don't have good use cases for them. We may
 consider re-adding them in the future.

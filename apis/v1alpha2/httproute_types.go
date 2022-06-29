@@ -187,6 +187,12 @@ type HTTPRouteRule struct {
 	// Specifying a core filter multiple times has unspecified or custom
 	// conformance.
 	//
+	// All filters are expected to be compatible with each other except for the
+	// URLRewrite and RequestRedirect filters, which may not be combined. If an
+	// implementation can not support other combinations of filters, they must clearly
+	// document that limitation. In all cases where incompatible or unsupported
+	// filters are specified, implementations MUST add a warning condition to status.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -196,7 +202,7 @@ type HTTPRouteRule struct {
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
 	//
-	// A 404 status code MUST be returned if there are no BackendRefs or filters
+	// A 500 status code MUST be returned if there are no BackendRefs or filters
 	// specified that would result in a response being sent.
 	//
 	// A BackendRef is considered invalid when it refers to:
@@ -206,11 +212,11 @@ type HTTPRouteRule struct {
 	// * a resource in another namespace when the reference has not been
 	//   explicitly allowed by a ReferenceGrant (or equivalent concept).
 	//
-	// When a BackendRef is invalid, 404 status codes MUST be returned for
+	// When a BackendRef is invalid, 500 status codes MUST be returned for
 	// requests that would have otherwise been routed to an invalid backend. If
 	// multiple backends are specified, and some are invalid, the proportion of
 	// requests that would otherwise have been routed to an invalid backend
-	// MUST receive a 404 status code.
+	// MUST receive a 500 status code.
 	//
 	// When a BackendRef refers to a Service that has no ready endpoints, it is
 	// recommended to return a 503 status code.
@@ -396,6 +402,10 @@ type HTTPQueryParamMatch struct {
 	// Name is the name of the HTTP query param to be matched. This must be an
 	// exact string match. (See
 	// https://tools.ietf.org/html/rfc7230#section-2.7.3).
+	//
+	// If multiple entries specify equivalent query param names, only the first
+	// entry with an equivalent name MUST be considered for a match. Subsequent
+	// entries with an equivalent query param name MUST be ignored.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
@@ -716,6 +726,12 @@ const (
 	// replaced by the substitution value. For example, a path with a prefix
 	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
 	// the "/foo" prefix replaced with "/bar" in matching requests.
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
 )
 
@@ -740,6 +756,12 @@ type HTTPPathModifier struct {
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
 	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	//
+	// Note that this matches the behavior of the PathPrefix match type. This
+	// matches full path elements. A path element refers to the list of labels
+	// in the path split by the `/` separator. When specified, a trailing `/` is
+	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
+	// match the prefix `/abc`, but the path `/abcd` would not.
 	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024

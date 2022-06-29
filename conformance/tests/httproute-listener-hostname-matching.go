@@ -42,12 +42,16 @@ var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 		kubernetes.NamespacesMustBeReady(t, suite.Client, []string{ns}, 300)
 
 		gwNN := types.NamespacedName{Name: "httproute-listener-hostname-matching", Namespace: ns}
-		routes := []types.NamespacedName{
-			{Namespace: ns, Name: "backend-v1"},
-			{Namespace: ns, Name: "backend-v2"},
-			{Namespace: ns, Name: "backend-v3"},
-		}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routes...)
+
+		_ = kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-1"),
+			types.NamespacedName{Namespace: ns, Name: "backend-v1"},
+		)
+		_ = kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-2"),
+			types.NamespacedName{Namespace: ns, Name: "backend-v2"},
+		)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN, "listener-3", "listener-4"),
+			types.NamespacedName{Namespace: ns, Name: "backend-v3"},
+		)
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.ExpectedRequest{Host: "bar.com", Path: "/"},

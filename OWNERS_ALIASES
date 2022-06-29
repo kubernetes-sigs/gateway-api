@@ -2,13 +2,13 @@
 # This file should be kept in sync with k/org.
 
 aliases:
-  # Reference: https://github.com/kubernetes/org/blob/master/OWNERS_ALIASES
+  # Reference: https://github.com/kubernetes/org/blob/main/OWNERS_ALIASES
   sig-network-leads:
     - caseydavenport
     - dcbw
     - thockin
 
-  # Reference: https://github.com/kubernetes/org/blob/master/config/kubernetes-sigs/sig-network/teams.yaml
+  # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
   gateway-api-admins:
     - bowei
     - thockin
@@ -16,7 +16,10 @@ aliases:
   gateway-api-maintainers:
     - bowei
     - hbagdi
-    - jpeach
     - robscott
-    - thockin
+    - shaneutt
     - youngnick
+
+  emeritus-gateway-api-maintainers:
+    - danehans
+    - jpeach

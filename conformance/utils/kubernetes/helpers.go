@@ -36,6 +36,31 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
+// GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
+// relying on a specific api version.
+type GatewayRef struct {
+	types.NamespacedName
+	listenerNames []*v1alpha2.SectionName
+}
+
+// NewGatewayRef creates a GatewayRef resource.  ListenerNames are optional.
+func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef {
+	var listeners []*v1alpha2.SectionName
+
+	if len(listenerNames) == 0 {
+		listenerNames = append(listenerNames, "")
+	}
+
+	for _, listener := range listenerNames {
+		sectionName := v1alpha2.SectionName(listener)
+		listeners = append(listeners, &sectionName)
+	}
+	return GatewayRef{
+		NamespacedName: nn,
+		listenerNames:  listeners,
+	}
+}
+
 // GWCMustBeAccepted waits until the specified GatewayClass has an Accepted
 // condition set to true. It also returns the ControllerName for the
 // GatewayClass. This will cause the test to halt if the specified timeout is
@@ -110,33 +135,40 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, namespaces []string, s
 // address assigned to it and the Route has a ParentRef referring to the
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
-func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerName string, gwNN types.NamespacedName, routeNNs ...types.NamespacedName) string {
+func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
-	gwAddr, err := WaitForGatewayAddress(t, c, gwNN, 180)
+	gwAddr, err := WaitForGatewayAddress(t, c, gw.NamespacedName, 180)
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
-	ns := v1alpha2.Namespace(gwNN.Namespace)
+	ns := v1alpha2.Namespace(gw.Namespace)
 	kind := v1alpha2.Kind("Gateway")
 
 	for _, routeNN := range routeNNs {
 		namespaceRequired := true
-		if routeNN.Namespace == gwNN.Namespace {
+		if routeNN.Namespace == gw.Namespace {
 			namespaceRequired = false
 		}
-		parents := []v1alpha2.RouteParentStatus{{
-			ParentRef: v1alpha2.ParentReference{
-				Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-				Kind:      &kind,
-				Name:      v1alpha2.ObjectName(gwNN.Name),
-				Namespace: &ns,
-			},
-			ControllerName: v1alpha2.GatewayController(controllerName),
-			Conditions: []metav1.Condition{{
-				Type:   string(v1alpha2.RouteConditionAccepted),
-				Status: metav1.ConditionTrue,
-			}},
-		}}
+
+		var parents []v1alpha2.RouteParentStatus
+		for _, listener := range gw.listenerNames {
+			parents = append(parents, v1alpha2.RouteParentStatus{
+				ParentRef: v1alpha2.ParentReference{
+					Group:       (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
+					Kind:        &kind,
+					Name:        v1alpha2.ObjectName(gw.Name),
+					Namespace:   &ns,
+					SectionName: listener,
+				},
+				ControllerName: v1alpha2.GatewayController(controllerName),
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(v1alpha2.RouteConditionAccepted),
+						Status: metav1.ConditionTrue,
+					},
+				},
+			})
+		}
 		HTTPRouteMustHaveParents(t, c, routeNN, parents, namespaceRequired, 60)
 	}
 
@@ -361,6 +393,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, condValue string) bool {
 	for _, cond := range conditions {
 		if cond.Type == condName {
+			// TODO(nathancoleman): Compare Reason
 			if cond.Status == metav1.ConditionStatus(condValue) {
 				return true
 			}

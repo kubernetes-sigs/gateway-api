@@ -30,6 +30,11 @@ func TestValidateGateway(t *testing.T) {
 			Hostname: nil,
 		},
 	}
+	addresses := []gatewayv1a2.GatewayAddress{
+		{
+			Type: nil,
+		},
+	}
 	baseGateway := gatewayv1a2.Gateway{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
@@ -38,6 +43,7 @@ func TestValidateGateway(t *testing.T) {
 		Spec: gatewayv1a2.GatewaySpec{
 			GatewayClassName: "foo",
 			Listeners:        listeners,
+			Addresses:        addresses,
 		},
 	}
 	tlsConfig := gatewayv1a2.GatewayTLSConfig{}

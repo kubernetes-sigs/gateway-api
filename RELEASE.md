@@ -17,7 +17,7 @@ documentation].
 ## Releasing a new version
 
 - Write the [changelog](CHANGELOG.md) with user-visible API changes. This must
-  go through the regular PR review process and get merged into the `master` branch.
+  go through the regular PR review process and get merged into the `main` branch.
   Approval of the PR indicates community consensus for a new release.
 
 The following steps must be done by one of the [Gateway API maintainers][gateway-api-team]:
@@ -37,5 +37,5 @@ For all releases:
   the Github release.
 
 [release]: https://gateway-api.sigs.k8s.io/references/releases/
-[gateway-api-team]: https://github.com/kubernetes/org/blob/master/config/kubernetes-sigs/sig-network/teams.yaml
+[gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
 

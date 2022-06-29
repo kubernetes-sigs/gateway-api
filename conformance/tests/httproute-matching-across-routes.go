@@ -40,7 +40,7 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 		routeNN1 := types.NamespacedName{Name: "matching-part1", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "matching-part2", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN1, routeNN2)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 
 		testCases := []http.ExpectedResponse{{
 			Request: http.ExpectedRequest{

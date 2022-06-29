@@ -92,12 +92,26 @@ for either routing or modification, for example using HTTP Headers for routing, 
 modifying them in-flight.
 
 #### TLSRoute
+
+!!! info "Experimental Channel"
+
+    The `TLSRoute` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to use the SNI as the main routing method, and are not interested
 in properties of the higher-level protocols like HTTP.  The byte stream of the
 connection is proxied without any inspection to the backend.
 
 #### TCPRoute and UDPRoute
+
+!!! info "Experimental Channel"
+
+    The `TCPRoute` and `UDPRoute` resources described below are currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 TCPRoute (and UDPRoute) are intended for use for mapping one or more ports
 to a single backend. In this case, there is no discriminator you can
 use to choose different backends on the same port, so each TCPRoute really needs a
@@ -271,7 +285,7 @@ reverse proxy is:
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
-Please refer to the [TLS details](/v1alpha2/guides/tls) guide for a deep dive on TLS.
+Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
 
 
 ## Extension points

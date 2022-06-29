@@ -13,15 +13,13 @@ theme:
     - search.highlight
     - navigation.tabs
     - navigation.top
-edit_uri: edit/master/site-src/
-extra_css:
-  - css/extra.css
+edit_uri: edit/main/site-src/
 plugins:
   - search
   - awesome-pages
   - macros:
       include_dir: examples
-      j2_line_comment_prefix: "##"
+      j2_line_comment_prefix: "#$"
 markdown_extensions:
   - admonition
   - meta
@@ -45,37 +43,22 @@ nav:
     - Implementations: implementations.md
     - FAQ: faq.md
   - Guides:
-    - v1alpha2:
-      - Getting started: v1alpha2/guides/getting-started.md
-      - Simple Gateway: v1alpha2/guides/simple-gateway.md
-      - HTTP routing: v1alpha2/guides/http-routing.md
-      - HTTP traffic splitting: v1alpha2/guides/traffic-splitting.md
-      - Cross-Namespace routing: v1alpha2/guides/multiple-ns.md
-      - TLS: v1alpha2/guides/tls.md
-      - TCP routing: v1alpha2/guides/tcp.md
-    - v1alpha1:
-      - Getting started: v1alpha1/guides/getting-started.md
-      - Simple Gateway: v1alpha1/guides/simple-gateway.md
-      - HTTP routing: v1alpha1/guides/http-routing.md
-      - HTTP traffic splitting: v1alpha1/guides/traffic-splitting.md
-      - Cross-Namespace routing: v1alpha1/guides/multiple-ns.md
-      - TLS: v1alpha1/guides/tls.md
-      - TCP routing: v1alpha1/guides/tcp.md
+    - Getting started: guides/getting-started.md
+    - Simple Gateway: guides/simple-gateway.md
+    - HTTP routing: guides/http-routing.md
+    - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
+    - HTTP traffic splitting: guides/traffic-splitting.md
+    - Cross-Namespace routing: guides/multiple-ns.md
+    - TLS: guides/tls.md
+    - TCP routing: guides/tcp.md
   - Reference:
-    - v1alpha2:
-      - API Types:
-          GatewayClass: v1alpha2/api-types/gatewayclass.md
-          Gateway: v1alpha2/api-types/gateway.md
-          HTTPRoute: v1alpha2/api-types/httproute.md
-          ReferenceGrant: v1alpha2/api-types/referencegrant.md
-      - API specification: v1alpha2/references/spec.md
-      - Policy Attachment: v1alpha2/references/policy-attachment.md
-    - v1alpha1:
-      - API Types:
-          GatewayClass: v1alpha1/api-types/gatewayclass.md
-          Gateway: v1alpha1/api-types/gateway.md
-          HTTPRoute: v1alpha1/api-types/httproute.md
-      - API specification: v1alpha1/references/spec.md
+    - API Types:
+        GatewayClass: api-types/gatewayclass.md
+        Gateway: api-types/gateway.md
+        HTTPRoute: api-types/httproute.md
+        ReferenceGrant: api-types/referencegrant.md
+    - API specification: references/spec.md
+    - Policy Attachment: references/policy-attachment.md
     - Enhancement Proposals:
       - Overview: contributing/gep.md
       - ... | geps/gep-*.md

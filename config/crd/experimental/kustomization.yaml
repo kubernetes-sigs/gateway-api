@@ -1,0 +1,9 @@
+resources:
+- gateway.networking.k8s.io_gatewayclasses.yaml
+- gateway.networking.k8s.io_gateways.yaml
+- gateway.networking.k8s.io_httproutes.yaml
+- gateway.networking.k8s.io_referencegrants.yaml
+- gateway.networking.k8s.io_referencepolicies.yaml
+- gateway.networking.k8s.io_tcproutes.yaml
+- gateway.networking.k8s.io_tlsroutes.yaml
+- gateway.networking.k8s.io_udproutes.yaml

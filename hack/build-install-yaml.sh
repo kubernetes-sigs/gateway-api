@@ -31,15 +31,15 @@ cat << EOF >> release/experimental-install.yaml
 #
 EOF
 
-cat hack/boilerplate/boilerplate.sh.txt > release/stable-install.yaml
-sed -i "s/YEAR/$thisyear/g" release/stable-install.yaml
-cat << EOF >> release/stable-install.yaml
+cat hack/boilerplate/boilerplate.sh.txt > release/standard-install.yaml
+sed -i "s/YEAR/$thisyear/g" release/standard-install.yaml
+cat << EOF >> release/standard-install.yaml
 #
-# Gateway API Stable channel install
+# Gateway API Standard channel install
 #
 EOF
 
-for file in `ls config/webhook/*.yaml config/crd/experimental/*.yaml`
+for file in `ls config/webhook/*.yaml config/crd/experimental/gateway*.yaml`
 do
     echo "---" >> release/experimental-install.yaml
     echo "#" >> release/experimental-install.yaml
@@ -48,13 +48,13 @@ do
     cat $file >> release/experimental-install.yaml
 done
 
-for file in `ls config/webhook/*.yaml config/crd/stable/*.yaml`
+for file in `ls config/webhook/*.yaml config/crd/standard/*.yaml`
 do
-    echo "---" >> release/stable-install.yaml
-    echo "#" >> release/stable-install.yaml
-    echo "# $file" >> release/stable-install.yaml
-    echo "#" >> release/stable-install.yaml
-    cat $file >> release/stable-install.yaml
+    echo "---" >> release/standard-install.yaml
+    echo "#" >> release/standard-install.yaml
+    echo "# $file" >> release/standard-install.yaml
+    echo "#" >> release/standard-install.yaml
+    cat $file >> release/standard-install.yaml
 done
 
 echo "Generated:" release/*-install.yaml
