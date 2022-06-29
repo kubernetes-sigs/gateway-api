@@ -58,5 +58,5 @@ type ReferencePolicy struct {
 type ReferencePolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []ReferenceGrant `json:"items"`
+	Items           []ReferencePolicy `json:"items"`
 }
