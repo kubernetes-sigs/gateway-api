@@ -944,16 +944,17 @@ type HTTPBackendRef struct {
 	// A BackendRef is invalid if:
 	//
 	// * It refers to an unknown or unsupported kind of resource. In this
-	//   case, the Reason and Message of the Condition must explain which kind
-	//   of resource is unknown or unsupported.
+	//   case, the Reason must be set to `InvalidKind` and Message of the
+	//   Condition must explain which kind of resource is unknown or unsupported.
 	//
-	// * It refers to a resource that does not exist. In this case, the Reason
-	//   and Message of the Condition must explain which resource does not exist.
+	// * It refers to a resource that does not exist. In this case, the Reason must
+	//   be set to `BackendNotFound` and the Message of the Condition must explain
+	//   which resource does not exist.
 	//
 	// * It refers a resource in another namespace when the reference has not been
 	//   explicitly allowed by a ReferenceGrant (or equivalent concept). In this
-	//   case, the Reason and Message of the Condition must explain which cross-
-	//   namespace reference is not allowed.
+	//   case, the Reason must be set to `RefNotPermitted` and the Message of the
+	//   Condition must explain which cross-namespace reference is not allowed.
 	//
 	// Support: Core for Kubernetes Service
 	//

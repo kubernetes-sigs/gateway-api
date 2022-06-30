@@ -23,6 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -71,5 +72,17 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		// Listener ResolvedRefs RefNotPermitted condition once
 		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
 		// has been resolved
+
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
+		t.Run("HTTP Request to invalid cross-namespace backend receive a 500", func(t *testing.T) {
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+				Request: http.ExpectedRequest{
+					Method: "GET",
+					Path:   "/v2",
+				},
+				StatusCode: 500,
+			})
+		})
+
 	},
 }

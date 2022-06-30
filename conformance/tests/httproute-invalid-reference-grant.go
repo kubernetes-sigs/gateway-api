@@ -98,13 +98,13 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 		// at least one allowed BackendRef should be accepted by a Gateway
 		// and partially configured.
 
-		t.Run("Simple HTTP request should not reach app-backend-v2", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
 					Path:   "/v2",
 				},
-				StatusCode: 404,
+				StatusCode: 500,
 			})
 		})
 	},
