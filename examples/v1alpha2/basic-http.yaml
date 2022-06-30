@@ -1,5 +1,3 @@
-#$ Used in:
-#$ - site-src/v1alpha2/api-types/httproute.md
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: GatewayClass
 metadata:
