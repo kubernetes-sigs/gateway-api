@@ -197,12 +197,12 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
 
 
-[httproute]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[httprouterule]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1alpha2.Hostname
+[httproute]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
+[httprouterule]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule
+[hostname]: /references/spec/#gateway.networking.k8s.io/v1beta1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteMatch
-[filters]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteFilter
-[backendRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPBackendRef
-[parentRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.ParentRef
+[matches]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
+[filters]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
+[backendRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
+[parentRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
 

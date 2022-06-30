@@ -12,7 +12,7 @@ use both filter types at once.
 
 Redirects return HTTP 3XX responses to a client, instructing it to retrive a
 different resource. [`RequestRedirect` rule
-filters](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRequestRedirectFilter)
+filters](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRequestRedirectFilter)
 instruct Gateways to emit a redirect response to requests matching a filtered
 HTTPRoute rule.
 
@@ -73,7 +73,7 @@ https://redirect.example/paprika/teaspoon` response headers.
 
 Rewrites modify components of a client request before proxying it upstream. A
 [`URLRewrite`
-filter](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPURLRewriteFilter)
+filter](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPURLRewriteFilter)
 can change the upstream request hostname and/or path. For example, the
 following HTTPRoute will accept a request for
 `https://rewrite.example/cardamom` and send it upstream to `example-svc` with

@@ -135,5 +135,5 @@ example.net/gateway/v2.1 // Use version 2.1
 example.net/gateway      // Use the default version
 ```
 
-[gatewayclass]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GatewayClass
+[gatewayclass]: /references/spec/#gateway.networking.k8s.io/v1beta1.GatewayClass
 [ingress-class-api]: https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class
