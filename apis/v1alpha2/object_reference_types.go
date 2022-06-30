@@ -65,10 +65,10 @@ type SecretObjectReference struct {
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.
 	//
-	// Note that when a namespace is specified, a ReferenceGrant object
-	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferenceGrant documentation
-	// for details.
+	// Note that when a different namespace is specified, a ReferenceGrant
+	// object with ReferenceGrantTo.Kind=Secret is required in the referent
+	// namespace to allow that namespace's owner to accept the reference.
+	// See the ReferenceGrant documentation for details.
 	//
 	// Support: Core
 	//
@@ -112,10 +112,10 @@ type BackendObjectReference struct {
 	// Namespace is the namespace of the backend. When unspecified, the local
 	// namespace is inferred.
 	//
-	// Note that when a namespace is specified, a ReferenceGrant object
-	// is required in the referent namespace to allow that namespace's
-	// owner to accept the reference. See the ReferenceGrant documentation
-	// for details.
+	// Note that when a different namespace is specified, a ReferenceGrant
+	// object with ReferenceGrantTo.Kind=Service is required in the referent
+	// namespace to allow that namespace's owner to accept the reference.
+	// See the ReferenceGrant documentation for details.
 	//
 	// Support: Core
 	//
