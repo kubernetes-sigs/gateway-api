@@ -100,7 +100,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 
 		t.Run("Simple HTTP request should not reach app-backend-v2", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
-				Request: http.ExpectedRequest{
+				Request: http.Request{
 					Method: "GET",
 					Path:   "/v2",
 				},

@@ -29,19 +29,37 @@ import (
 
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
-	Request    ExpectedRequest
+	// Request defines the request to make.
+	Request Request
+
+	// ExpectedRequest defines the request that
+	// is expected to arrive at the backend. If
+	// not specified, the backend request will be
+	// expected to match Request.
+	ExpectedRequest *ExpectedRequest
+
 	StatusCode int
 	Backend    string
 	Namespace  string
 }
 
-// ExpectedRequest can be used as both the request to make and a means to verify
-// that echoserver received the expected request.
-type ExpectedRequest struct {
+// Request can be used as both the request to make and a means to verify
+// that echoserver received the expected request. Note that multiple header
+// values can be provided, as a comma-separated value.
+type Request struct {
 	Host    string
 	Method  string
 	Path    string
 	Headers map[string]string
+}
+
+// ExpectedRequest defines expected properties of a request.
+type ExpectedRequest struct {
+	Request
+
+	// AbsentHeaders are names of headers that are expected
+	// *not* to be present on the request.
+	AbsentHeaders []string
 }
 
 // maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
@@ -161,26 +179,53 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 	t.Helper()
 	assert.Equal(t, expected.StatusCode, cRes.StatusCode, "expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
 	if cRes.StatusCode == 200 {
-		assert.Equal(t, expected.Request.Path, cReq.Path, "expected path to be %s, got %s", expected.Request.Path, cReq.Path)
-		assert.Equal(t, expected.Request.Method, cReq.Method, "expected method to be %s, got %s", expected.Request.Method, cReq.Method)
+		// The request expected to arrive at the backend is
+		// the same as the request made, unless otherwise
+		// specified.
+		if expected.ExpectedRequest == nil {
+			expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
+		}
+
+		if expected.ExpectedRequest.Method == "" {
+			expected.ExpectedRequest.Method = "GET"
+		}
+
+		assert.Equal(t, expected.ExpectedRequest.Path, cReq.Path, "expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
+		assert.Equal(t, expected.ExpectedRequest.Method, cReq.Method, "expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
 		assert.Equal(t, expected.Namespace, cReq.Namespace, "expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
-		if expected.Request.Headers != nil {
+		if expected.ExpectedRequest.Headers != nil {
 			if cReq.Headers == nil {
 				t.Error("No headers captured")
 			} else {
 				for name, val := range cReq.Headers {
 					cReq.Headers[strings.ToLower(name)] = val
 				}
-				for name, expectedVal := range expected.Request.Headers {
+				for name, expectedVal := range expected.ExpectedRequest.Headers {
 					actualVal, ok := cReq.Headers[strings.ToLower(name)]
 					if !ok {
 						t.Errorf("Expected %s header to be set, actual headers: %v", name, cReq.Headers)
-					} else if actualVal[0] != expectedVal {
-						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, actualVal[0])
+					} else if strings.Join(actualVal, ",") != expectedVal {
+						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 					}
 				}
 			}
 		}
+
+		// Verify that headers expected *not* to be present on the
+		// request are actually not present.
+		if len(expected.ExpectedRequest.AbsentHeaders) > 0 {
+			for name, val := range cReq.Headers {
+				cReq.Headers[strings.ToLower(name)] = val
+			}
+
+			for _, name := range expected.ExpectedRequest.AbsentHeaders {
+				val, ok := cReq.Headers[strings.ToLower(name)]
+				if ok {
+					t.Errorf("Expected %s header to not be set, got %s", name, val)
+				}
+			}
+		}
+
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			t.Errorf("Expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
 		}

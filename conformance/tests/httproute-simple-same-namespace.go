@@ -43,7 +43,7 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 
 		t.Run("Simple HTTP request should reach infra-backend", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
-				Request:    http.ExpectedRequest{Path: "/"},
+				Request:    http.Request{Path: "/"},
 				StatusCode: 200,
 				Backend:    "infra-backend-v1",
 				Namespace:  "gateway-conformance-infra",

@@ -41,41 +41,41 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		testCases := []http.ExpectedResponse{{
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Version": "one"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "one"}},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Version": "two"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two"}},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Version": "two", "Color": "orange"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "two", "Color": "orange"}},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request:    http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "orange"}},
+			Request:    http.Request{Path: "/", Headers: map[string]string{"Color": "orange"}},
 			StatusCode: 404,
 		}, {
-			Request:    http.ExpectedRequest{Path: "/", Headers: map[string]string{"Some-Other-Header": "one"}},
+			Request:    http.Request{Path: "/", Headers: map[string]string{"Some-Other-Header": "one"}},
 			StatusCode: 404,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "blue"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "blue"}},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "green"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "green"}},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "red"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "red"}},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:   http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "yellow"}},
+			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "yellow"}},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:    http.ExpectedRequest{Path: "/", Headers: map[string]string{"Color": "purple"}},
+			Request:    http.Request{Path: "/", Headers: map[string]string{"Color": "purple"}},
 			StatusCode: 404,
 		}}
 
