@@ -43,42 +43,25 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
-		ns := v1alpha2.Namespace(gwNN.Namespace)
-		kind := v1alpha2.Kind("Gateway")
+		// The Route must be Attached.
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		// TODO(mikemorris): Add check for Accepted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
-			parents := []v1alpha2.RouteParentStatus{{
-				ParentRef: v1alpha2.ParentReference{
-					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-					Kind:      &kind,
-					Name:      v1alpha2.ObjectName(gwNN.Name),
-					Namespace: &ns,
-				},
-				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
-				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.RouteConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
-				}},
-			}}
+		t.Run("HTTPRoute with only a nonexistent BackendRef has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, false, 60)
+			resolvedRefsCond := metav1.Condition{
+				Type:   string(v1alpha2.RouteConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
+			}
+
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, resolvedRefsCond, 60)
 		})
 
-		// TODO(mikemorris): Add check for Listener attached routes or
-		// Listener ResolvedRefs RefNotPermitted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
-		t.Run("HTTP Request to invalid cross-namespace backend receive a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid cross-namespace backend must receive a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.ExpectedRequest{
 					Method: "GET",
-					Path:   "/v2",
+					Path:   "/",
 				},
 				StatusCode: 500,
 			})

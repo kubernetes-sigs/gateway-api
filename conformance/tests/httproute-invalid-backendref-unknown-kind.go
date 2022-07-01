@@ -35,46 +35,27 @@ func init() {
 var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidBackendRefUnknownKind",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set a ResolvedRefs status False with reason RefNotPermitted when attempting to bind to a Gateway in the same namespace if the route has a BackendRef that points to an unknown Kind.",
-	Exemptions: []suite.ExemptFeature{
-		suite.ExemptReferenceGrant,
-	},
-	Manifests: []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
+	Manifests:   []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
-		ns := v1alpha2.Namespace(gwNN.Namespace)
-		kind := v1alpha2.Kind("Gateway")
+		// Both the Gateway and the Route are Accepted.
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		// TODO(mikemorris): Add check for Accepted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
-			parents := []v1alpha2.RouteParentStatus{{
-				ParentRef: v1alpha2.ParentReference{
-					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-					Kind:      &kind,
-					Name:      v1alpha2.ObjectName(gwNN.Name),
-					Namespace: &ns,
-				},
-				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
-				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.RouteConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.RouteReasonInvalidKind),
-				}},
-			}}
+		// The Route must have a ResolvedRefs Condition with a InvalidKind Reason.
+		t.Run("HTTPRoute with Invalid Kind has a ResolvedRefs Condition with status False and Reason InvalidKind", func(t *testing.T) {
 
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeNN, parents, false, 60)
+			resolvedRefsCond := metav1.Condition{
+				Type:   string(v1alpha2.RouteConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(v1alpha2.RouteReasonInvalidKind),
+			}
+
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, resolvedRefsCond, 60)
 		})
 
-		// TODO(mikemorris): Add check for Listener attached routes or
-		// Listener ResolvedRefs RefNotPermitted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
-		t.Run("HTTP Request to invalid cross-namespace backend receive a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with invalid Kind receives a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.ExpectedRequest{
 					Method: "GET",
