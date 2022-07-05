@@ -244,6 +244,9 @@ type HTTPRouteRule struct {
 // - Must begin with the `/` character
 // - Must not contain consecutive `/` characters (e.g. `/foo///`, `//`).
 //
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 type PathMatchType string
 
@@ -298,6 +301,9 @@ type HTTPPathMatch struct {
 //
 // * "Exact"
 // * "RegularExpression"
+//
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type HeaderMatchType string
@@ -373,6 +379,9 @@ type HTTPHeaderMatch struct {
 // * "Exact"
 // * "RegularExpression"
 //
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type QueryParamMatchType string
 
@@ -424,6 +433,10 @@ type HTTPQueryParamMatch struct {
 // [RFC 7231](https://datatracker.ietf.org/doc/html/rfc7231#section-4) and
 // [RFC 5789](https://datatracker.ietf.org/doc/html/rfc5789#section-2).
 // The value is expected in upper case.
+//
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 type HTTPMethod string
 
@@ -523,6 +536,9 @@ type HTTPRouteFilter struct {
 	// If a reference to a custom filter type cannot be resolved, the filter
 	// MUST NOT be skipped. Instead, requests that would have been processed by
 	// that filter MUST receive a HTTP error response.
+	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
@@ -743,6 +759,9 @@ type HTTPPathModifier struct {
 	// Type defines the type of path modifier. Additional types may be
 	// added in a future release of the API.
 	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
+	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
 	Type HTTPPathModifierType `json:"type"`
@@ -780,6 +799,9 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// Support: Extended
 	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
+	//
 	// +optional
 	// +kubebuilder:validation:Enum=http;https
 	Scheme *string `json:"scheme,omitempty"`
@@ -815,6 +837,9 @@ type HTTPRequestRedirectFilter struct {
 	// StatusCode is the HTTP status code to be used in response.
 	//
 	// Support: Core
+	//
+	// Note that values may be added to this enum, implementations
+	// must ensure that unknown values will not cause a crash.
 	//
 	// +optional
 	// +kubebuilder:default=302
