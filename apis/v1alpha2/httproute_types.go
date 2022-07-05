@@ -219,7 +219,8 @@ type HTTPRouteRule struct {
 	// MUST receive a 500 status code.
 	//
 	// For example, if two backends are specified with equal weights, and one is
-	// invalid, 50 percent of traffic must randomly receive a 500.
+	// invalid, 50 percent of traffic must receive a 500. Implementations may
+	// choose how that 50 percent is determined.
 	//
 	// When a HTTPBackendRef refers to a Service that has no ready endpoints,
 	// implementations MAY return a 503 for requests to that backend instead.

@@ -46,7 +46,7 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		// The Route must be Attached.
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		t.Run("HTTPRoute with only a nonexistent BackendRef has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
+		t.Run("HTTPRoute with a cross-namespace BackendRef and no ReferenceGrant has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1alpha2.RouteConditionResolvedRefs),
