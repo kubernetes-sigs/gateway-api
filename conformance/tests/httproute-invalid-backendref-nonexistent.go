@@ -56,7 +56,7 @@ var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
 
 		t.Run("HTTP Request to invalid nonexistent backend receive a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
-				Request: http.ExpectedRequest{
+				Request: http.Request{
 					Method: "GET",
 					Path:   "/",
 				},

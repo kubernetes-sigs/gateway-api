@@ -69,7 +69,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 
 		t.Run("HTTP Request to valid sibling backend should succeed", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
-				Request: http.ExpectedRequest{
+				Request: http.Request{
 					Method: "GET",
 					Path:   "/",
 				},

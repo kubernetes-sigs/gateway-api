@@ -165,6 +165,7 @@ func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerNa
 					{
 						Type:   string(v1alpha2.RouteConditionAccepted),
 						Status: metav1.ConditionTrue,
+						Reason: string(v1alpha2.RouteReasonAccepted),
 					},
 				},
 			})
