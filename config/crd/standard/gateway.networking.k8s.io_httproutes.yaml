@@ -196,7 +196,7 @@ spec:
                         on how many BackendRefs are specified and how many are invalid.
                         \n If *all* entries in BackendRefs are invalid, and there
                         are also no filters specified in this route rule, *all* traffic
-                        which matches this rule MUST recieve a 500 status code (exactly).
+                        which matches this rule MUST receive a 500 status code (exactly).
                         \n See the HTTPBackendRef definition for the rules about what
                         makes a single HTTPBackendRef invalid. \n When a HTTPBackendRef
                         is invalid, 500 status codes MUST be returned for requests
@@ -1527,7 +1527,7 @@ spec:
                         on how many BackendRefs are specified and how many are invalid.
                         \n If *all* entries in BackendRefs are invalid, and there
                         are also no filters specified in this route rule, *all* traffic
-                        which matches this rule MUST recieve a 500 status code (exactly).
+                        which matches this rule MUST receive a 500 status code (exactly).
                         \n See the HTTPBackendRef definition for the rules about what
                         makes a single HTTPBackendRef invalid. \n When a HTTPBackendRef
                         is invalid, 500 status codes MUST be returned for requests

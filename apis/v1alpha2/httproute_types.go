@@ -207,7 +207,7 @@ type HTTPRouteRule struct {
 	//
 	// If *all* entries in BackendRefs are invalid, and there are also no filters
 	// specified in this route rule, *all* traffic which matches this rule MUST
-	// recieve a 500 status code (exactly).
+	// receive a 500 status code (exactly).
 	//
 	// See the HTTPBackendRef definition for the rules about what makes a single
 	// HTTPBackendRef invalid.
