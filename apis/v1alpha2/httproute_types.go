@@ -247,6 +247,10 @@ type HTTPRouteRule struct {
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
 //
+// Unknown values here must result in the implementation setting the
+// Ready Condition for the Listener to `status: False`, with a
+// Reason of `Invalid`.
+//
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 type PathMatchType string
 
