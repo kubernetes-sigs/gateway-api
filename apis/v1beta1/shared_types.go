@@ -284,7 +284,7 @@ type RouteParentStatus struct {
 	//
 	// * The Route refers to a non-existent parent.
 	// * The Route is of a type that the controller does not support.
-	// * The Route is in a namespace the the controller does not have access to.
+	// * The Route is in a namespace the controller does not have access to.
 	//
 	// +listType=map
 	// +listMapKey=type

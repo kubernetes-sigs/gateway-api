@@ -33,7 +33,7 @@ type ExemptFeature string
 
 const (
 	// This option indicates the implementation is exempting itself from the
-	// requirement of a ReferenceGrant to allow cross-namesapce references,
+	// requirement of a ReferenceGrant to allow cross-namespace references,
 	// and has instead implemented alternative safeguards.
 	ExemptReferenceGrant ExemptFeature = "ReferenceGrant"
 )
