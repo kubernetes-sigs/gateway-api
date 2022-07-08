@@ -488,13 +488,16 @@ type AnnotationValue string
 //
 // Values `IPAddress` and `Hostname` have Extended support.
 //
+// The `NamedAddress` value has been deprecated in favor of implementation
+// specific domain-prefixed strings.
+//
 // All other values, including domain-prefixed values have Custom support, which
 // are used in implementation-specific behaviors. Support for additional
 // predefined CamelCase identifiers may be added in future releases.
 //
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^Hostname|IPAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
+// +kubebuilder:validation:Pattern=`^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
 type AddressType string
 
 const (
@@ -517,4 +520,14 @@ const (
 	//
 	// Support: Extended
 	HostnameAddressType AddressType = "Hostname"
+
+	// A NamedAddress provides a way to reference a specific IP address by name.
+	// For example, this may be a name or other unique identifier that refers
+	// to a resource on a cloud provider such as a static IP.
+	//
+	// The `NamedAddress` type has been deprecated in favor of implementation
+	// specific domain-prefixed strings.
+	//
+	// Support: Implementation-Specific
+	NamedAddressType AddressType = "NamedAddress"
 )
