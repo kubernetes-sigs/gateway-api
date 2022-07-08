@@ -7,9 +7,6 @@ in Kubernetes. These resources - `GatewayClass`,`Gateway`, `HTTPRoute`,
 expressive, extensible, and role-oriented interfaces that are implemented by 
 many vendors and have broad industry support. 
 
-*Note: This project was previously named "Service APIs" until being renamed to
-"Gateway API" in February 2021.*
-
 ![Gateway API Model](./images/api-model.png)
 
 ## Getting started

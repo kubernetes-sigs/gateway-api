@@ -286,7 +286,7 @@ spec:
                         condition may not be set due to lack of controller visibility,
                         that includes when: \n * The Route refers to a non-existent
                         parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the the controller
+                        not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of

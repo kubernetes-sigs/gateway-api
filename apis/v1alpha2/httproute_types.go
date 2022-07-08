@@ -143,7 +143,7 @@ type HTTPRouteRule struct {
 	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize rules based on the following criteria, continuing on
-	// ties. Precedence must be given to the the Rule with the largest number
+	// ties. Precedence must be given to the Rule with the largest number
 	// of:
 	//
 	// * Characters in a matching non-wildcard hostname.

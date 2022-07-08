@@ -1,4 +1,4 @@
-# Getting started with Gateway APIs
+# Getting started with Gateway API
 
 **1.**  **[Install a Gateway controller](#installing-a-gateway-controller)**
  _OR_  **[install the Gateway API CRDs manually](#installing-a-gateway-api-bundle)**

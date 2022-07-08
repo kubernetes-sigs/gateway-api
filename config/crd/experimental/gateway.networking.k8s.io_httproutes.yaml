@@ -1147,7 +1147,7 @@ spec:
                         every HTTP request. \n Proxy or Load Balancer routing configuration
                         generated from HTTPRoutes MUST prioritize rules based on the
                         following criteria, continuing on ties. Precedence must be
-                        given to the the Rule with the largest number of: \n * Characters
+                        given to the Rule with the largest number of: \n * Characters
                         in a matching non-wildcard hostname. * Characters in a matching
                         hostname. * Characters in a matching path. * Header matches.
                         * Query param matches. \n If ties still exist across multiple
@@ -1359,7 +1359,7 @@ spec:
                         condition may not be set due to lack of controller visibility,
                         that includes when: \n * The Route refers to a non-existent
                         parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the the controller
+                        not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
@@ -2684,7 +2684,7 @@ spec:
                         every HTTP request. \n Proxy or Load Balancer routing configuration
                         generated from HTTPRoutes MUST prioritize rules based on the
                         following criteria, continuing on ties. Precedence must be
-                        given to the the Rule with the largest number of: \n * Characters
+                        given to the Rule with the largest number of: \n * Characters
                         in a matching non-wildcard hostname. * Characters in a matching
                         hostname. * Characters in a matching path. * Header matches.
                         * Query param matches. \n If ties still exist across multiple
@@ -2896,7 +2896,7 @@ spec:
                         condition may not be set due to lack of controller visibility,
                         that includes when: \n * The Route refers to a non-existent
                         parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the the controller
+                        not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
