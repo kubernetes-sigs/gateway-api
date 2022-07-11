@@ -103,7 +103,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	ExpectResponseEventually(t, r, req, expected, requiredConsecutiveSuccesses)
+	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses)
 }
 
 // awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
@@ -142,10 +142,10 @@ func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
 	}
 }
 
-// ExpectResponseEventually repeats the provided request until it completes with a response having
-// the expected status code consistently. The provided threshold determines how many times in
+// WaitForConsistentResponse repeats the provided request until it completes with a response having
+// the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func ExpectResponseEventually(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) {
+func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) {
 	awaitConvergence(t, threshold, func() bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
