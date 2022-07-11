@@ -16,9 +16,24 @@ documentation].
 
 ## Releasing a new version
 
-- Write the [changelog](CHANGELOG.md) with user-visible API changes. This must
-  go through the regular PR review process and get merged into the `main` branch.
-  Approval of the PR indicates community consensus for a new release.
+### Writing a Changelog
+
+To simplify release notes generation, we recommend using the [Kubernetes release
+notes generator](https://github.com/kubernetes/release/blob/master/cmd/release-notes):
+
+```
+go install k8s.io/release/cmd/release-notes@latest
+export GITHUB_TOKEN=your_token_here
+release-notes --start-sha EXAMPLE_COMMIT --end-sha EXAMPLE_COMMIT --branch main --repo gateway-api --org kubernetes-sigs
+```
+
+This output will likely need to be reorganized and cleaned up a bit, but it
+provides a good starting point. Once you're satisfied with the changelog, create
+a PR. This must go through the regular PR review process and get merged into the
+`main` branch. Approval of the PR indicates community consensus for a new
+release.
+
+### Release Steps
 
 The following steps must be done by one of the [Gateway API maintainers][gateway-api-team]:
 
