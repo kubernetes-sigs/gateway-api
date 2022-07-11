@@ -179,7 +179,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that no features exercised by the test have been opted out of by
 	// the suite.
 	for _, feature := range test.Exemptions {
-		if !slices.Contains(suite.ExemptFeatures, feature) {
+		if slices.Contains(suite.ExemptFeatures, feature) {
 			t.Skipf("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
