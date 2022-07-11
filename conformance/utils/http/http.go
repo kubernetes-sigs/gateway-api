@@ -89,10 +89,12 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
 
+	path, query, _ := strings.Cut(expected.Request.Path, "?")
+
 	req := roundtripper.Request{
 		Method:   expected.Request.Method,
 		Host:     expected.Request.Host,
-		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: expected.Request.Path},
+		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
 		Protocol: "HTTP",
 	}
 
