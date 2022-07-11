@@ -54,7 +54,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, routeNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
 		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t *testing.T) {

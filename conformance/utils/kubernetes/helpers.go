@@ -345,7 +345,7 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, gwNN typ
 
 // HTTPRouteMustHaveConditions checks that the supplied HTTPRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
-func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, routeNN types.NamespacedName, condition metav1.Condition, seconds int) {
+func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition, seconds int) {
 	t.Helper()
 
 	waitFor := time.Duration(seconds) * time.Second
@@ -363,10 +363,11 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, routeNN type
 
 		var conditionFound bool
 		for _, parent := range parents {
-			if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
-				conditionFound = true
+			if parent.ParentRef.Name == v1alpha2.ObjectName(gwNN.Name) && string(*parent.ParentRef.Namespace) == gwNN.Namespace {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
 			}
-
 		}
 
 		return conditionFound, nil

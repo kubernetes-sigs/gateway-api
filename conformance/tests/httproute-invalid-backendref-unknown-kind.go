@@ -45,14 +45,13 @@ var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 
 		// The Route must have a ResolvedRefs Condition with a InvalidKind Reason.
 		t.Run("HTTPRoute with Invalid Kind has a ResolvedRefs Condition with status False and Reason InvalidKind", func(t *testing.T) {
-
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1alpha2.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
 				Reason: string(v1alpha2.RouteReasonInvalidKind),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
 		t.Run("HTTP Request to invalid backend with invalid Kind receives a 500", func(t *testing.T) {

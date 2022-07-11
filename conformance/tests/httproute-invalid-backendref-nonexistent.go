@@ -44,14 +44,13 @@ var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		t.Run("HTTPRoute with only a nonexistent BackendRef has a ResolvedRefs Condition with status False and Reason BackendNotFound", func(t *testing.T) {
-
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1alpha2.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
 				Reason: string(v1alpha2.RouteReasonBackendNotFound),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
 		t.Run("HTTP Request to invalid nonexistent backend receive a 500", func(t *testing.T) {

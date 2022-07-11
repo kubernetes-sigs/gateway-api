@@ -54,7 +54,7 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
 		t.Run("HTTP Request to invalid cross-namespace backend must receive a 500", func(t *testing.T) {
