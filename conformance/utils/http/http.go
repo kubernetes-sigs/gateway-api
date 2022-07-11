@@ -17,12 +17,11 @@ limitations under the License.
 package http
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -104,8 +103,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
-	ExpectResponse(t, cReq, cRes, expected)
+	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses)
 }
 
 // awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
@@ -144,40 +142,31 @@ func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
 	}
 }
 
-// WaitForConsistency repeats the provided request until it completes with a response having
-// the expected status code consistently. The provided threshold determines how many times in
+// WaitForConsistentResponse repeats the provided request until it completes with a response having
+// the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) (*roundtripper.CapturedRequest, *roundtripper.CapturedResponse) {
-	var (
-		cReq *roundtripper.CapturedRequest
-		cRes *roundtripper.CapturedResponse
-		err  error
-	)
-
+func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) {
 	awaitConvergence(t, threshold, func() bool {
-		cReq, cRes, err = r.CaptureRoundTrip(req)
+		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
 		}
 
-		if cRes.StatusCode != expected.StatusCode {
-			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
+		if err := CompareRequest(cReq, cRes, expected); err != nil {
+			t.Logf("Response expectation failed, not ready yet: %v", err)
 			return false
 		}
 
 		return true
 	})
 	t.Logf("Request passed")
-
-	return cReq, cRes
 }
 
-// ExpectResponse verifies that a captured request and response match the
-// provided ExpectedResponse.
-func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) {
-	t.Helper()
-	assert.Equal(t, expected.StatusCode, cRes.StatusCode, "expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
+func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+	if expected.StatusCode != cRes.StatusCode {
+		return fmt.Errorf("expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
+	}
 	if cRes.StatusCode == 200 {
 		// The request expected to arrive at the backend is
 		// the same as the request made, unless otherwise
@@ -190,24 +179,30 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 			expected.ExpectedRequest.Method = "GET"
 		}
 
-		assert.Equal(t, expected.ExpectedRequest.Path, cReq.Path, "expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
-		assert.Equal(t, expected.ExpectedRequest.Method, cReq.Method, "expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
-		assert.Equal(t, expected.Namespace, cReq.Namespace, "expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
+		if expected.ExpectedRequest.Path != cReq.Path {
+			return fmt.Errorf("expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
+		}
+		if expected.ExpectedRequest.Method != cReq.Method {
+			return fmt.Errorf("expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
+		}
+		if expected.Namespace != cReq.Namespace {
+			return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
+		}
 		if expected.ExpectedRequest.Headers != nil {
 			if cReq.Headers == nil {
-				t.Error("No headers captured")
-			} else {
-				for name, val := range cReq.Headers {
-					cReq.Headers[strings.ToLower(name)] = val
+				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
+			}
+			for name, val := range cReq.Headers {
+				cReq.Headers[strings.ToLower(name)] = val
+			}
+			for name, expectedVal := range expected.ExpectedRequest.Headers {
+				actualVal, ok := cReq.Headers[strings.ToLower(name)]
+				if !ok {
+					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cReq.Headers)
+				} else if strings.Join(actualVal, ",") != expectedVal {
+					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 				}
-				for name, expectedVal := range expected.ExpectedRequest.Headers {
-					actualVal, ok := cReq.Headers[strings.ToLower(name)]
-					if !ok {
-						t.Errorf("Expected %s header to be set, actual headers: %v", name, cReq.Headers)
-					} else if strings.Join(actualVal, ",") != expectedVal {
-						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
-					}
-				}
+
 			}
 		}
 
@@ -221,13 +216,14 @@ func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roun
 			for _, name := range expected.ExpectedRequest.AbsentHeaders {
 				val, ok := cReq.Headers[strings.ToLower(name)]
 				if ok {
-					t.Errorf("Expected %s header to not be set, got %s", name, val)
+					return fmt.Errorf("expected %s header to not be set, got %s", name, val)
 				}
 			}
 		}
 
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
-			t.Errorf("Expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
 		}
 	}
+	return nil
 }
