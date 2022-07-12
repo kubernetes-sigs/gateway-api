@@ -29,7 +29,7 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidCrossNamespaceBackendRef)
+	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidNonExistentBackendRef)
 }
 
 var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
