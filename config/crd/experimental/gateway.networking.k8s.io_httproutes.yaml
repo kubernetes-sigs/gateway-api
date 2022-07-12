@@ -534,7 +534,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Attached Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `InvalidEnumValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`. \n <gateway:experimental>"
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -561,7 +561,7 @@ spec:
                                         a crash. \n Unknown values here must result
                                         in the implementation setting the Attached
                                         Condition for the Route to `status: False`,
-                                        with a Reason of `InvalidEnumValue`."
+                                        with a Reason of `UnsupportedValue`."
                                       enum:
                                       - http
                                       - https
@@ -575,7 +575,7 @@ spec:
                                         will not cause a crash. \n Unknown values
                                         here must result in the implementation setting
                                         the Attached Condition for the Route to `status:
-                                        False`, with a Reason of `InvalidEnumValue`."
+                                        False`, with a Reason of `UnsupportedValue`."
                                       enum:
                                       - 301
                                       - 302
@@ -612,7 +612,7 @@ spec:
                                     a crash. \n Unknown values here must result in
                                     the implementation setting the Attached Condition
                                     for the Route to `status: False`, with a Reason
-                                    of `InvalidEnumValue`. \n "
+                                    of `UnsupportedValue`. \n "
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -672,7 +672,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Attached Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `InvalidEnumValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`. \n <gateway:experimental>"
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -1041,7 +1041,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Attached Condition for the Route
-                                      to `status: False`, with a Reason of `InvalidEnumValue`.
+                                      to `status: False`, with a Reason of `UnsupportedValue`.
                                       \n <gateway:experimental>"
                                     enum:
                                     - ReplaceFullPath
@@ -1068,7 +1068,7 @@ spec:
                                   values will not cause a crash. \n Unknown values
                                   here must result in the implementation setting the
                                   Attached Condition for the Route to `status: False`,
-                                  with a Reason of `InvalidEnumValue`."
+                                  with a Reason of `UnsupportedValue`."
                                 enum:
                                 - http
                                 - https
@@ -1081,7 +1081,7 @@ spec:
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Attached Condition for
-                                  the Route to `status: False`, with a Reason of `InvalidEnumValue`."
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
                                 enum:
                                 - 301
                                 - 302
@@ -1115,7 +1115,7 @@ spec:
                               must ensure that unknown values will not cause a crash.
                               \n Unknown values here must result in the implementation
                               setting the Attached Condition for the Route to `status:
-                              False`, with a Reason of `InvalidEnumValue`. \n "
+                              False`, with a Reason of `UnsupportedValue`. \n "
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
@@ -1170,7 +1170,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Attached Condition for the Route
-                                      to `status: False`, with a Reason of `InvalidEnumValue`.
+                                      to `status: False`, with a Reason of `UnsupportedValue`.
                                       \n <gateway:experimental>"
                                     enum:
                                     - ReplaceFullPath
@@ -2131,7 +2131,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Attached Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `InvalidEnumValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`. \n <gateway:experimental>"
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -2158,7 +2158,7 @@ spec:
                                         a crash. \n Unknown values here must result
                                         in the implementation setting the Attached
                                         Condition for the Route to `status: False`,
-                                        with a Reason of `InvalidEnumValue`."
+                                        with a Reason of `UnsupportedValue`."
                                       enum:
                                       - http
                                       - https
@@ -2172,7 +2172,7 @@ spec:
                                         will not cause a crash. \n Unknown values
                                         here must result in the implementation setting
                                         the Attached Condition for the Route to `status:
-                                        False`, with a Reason of `InvalidEnumValue`."
+                                        False`, with a Reason of `UnsupportedValue`."
                                       enum:
                                       - 301
                                       - 302
@@ -2209,7 +2209,7 @@ spec:
                                     a crash. \n Unknown values here must result in
                                     the implementation setting the Attached Condition
                                     for the Route to `status: False`, with a Reason
-                                    of `InvalidEnumValue`. \n "
+                                    of `UnsupportedValue`. \n "
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -2269,7 +2269,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Attached Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `InvalidEnumValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`. \n <gateway:experimental>"
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -2637,7 +2637,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Attached Condition for the Route
-                                      to `status: False`, with a Reason of `InvalidEnumValue`.
+                                      to `status: False`, with a Reason of `UnsupportedValue`.
                                       \n <gateway:experimental>"
                                     enum:
                                     - ReplaceFullPath
@@ -2664,7 +2664,7 @@ spec:
                                   values will not cause a crash. \n Unknown values
                                   here must result in the implementation setting the
                                   Attached Condition for the Route to `status: False`,
-                                  with a Reason of `InvalidEnumValue`."
+                                  with a Reason of `UnsupportedValue`."
                                 enum:
                                 - http
                                 - https
@@ -2677,7 +2677,7 @@ spec:
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Attached Condition for
-                                  the Route to `status: False`, with a Reason of `InvalidEnumValue`."
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
                                 enum:
                                 - 301
                                 - 302
@@ -2711,7 +2711,7 @@ spec:
                               must ensure that unknown values will not cause a crash.
                               \n Unknown values here must result in the implementation
                               setting the Attached Condition for the Route to `status:
-                              False`, with a Reason of `InvalidEnumValue`. \n "
+                              False`, with a Reason of `UnsupportedValue`. \n "
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
@@ -2766,7 +2766,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Attached Condition for the Route
-                                      to `status: False`, with a Reason of `InvalidEnumValue`.
+                                      to `status: False`, with a Reason of `UnsupportedValue`.
                                       \n <gateway:experimental>"
                                     enum:
                                     - ReplaceFullPath

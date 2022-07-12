@@ -248,7 +248,7 @@ type HTTPRouteRule struct {
 //
 // Unknown values here must result in the implementation setting the
 // Attached Condition for the Route to `status: False`, with a
-// Reason of `InvalidEnumValue`.
+// Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 type PathMatchType string
@@ -310,7 +310,7 @@ type HTTPPathMatch struct {
 //
 // Unknown values here must result in the implementation setting the
 // Attached Condition for the Route to `status: False`, with a
-// Reason of `InvalidEnumValue`.
+// Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type HeaderMatchType string
@@ -391,7 +391,7 @@ type HTTPHeaderMatch struct {
 //
 // Unknown values here must result in the implementation setting the
 // Attached Condition for the Route to `status: False`, with a
-// Reason of `InvalidEnumValue`.
+// Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type QueryParamMatchType string
@@ -450,7 +450,7 @@ type HTTPQueryParamMatch struct {
 //
 // Unknown values here must result in the implementation setting the
 // Attached Condition for the Route to `status: False`, with a
-// Reason of `InvalidEnumValue`.
+// Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 type HTTPMethod string
@@ -557,7 +557,7 @@ type HTTPRouteFilter struct {
 	//
 	// Unknown values here must result in the implementation setting the
 	// Attached Condition for the Route to `status: False`, with a
-	// Reason of `InvalidEnumValue`.
+	// Reason of `UnsupportedValue`.
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
@@ -783,7 +783,7 @@ type HTTPPathModifier struct {
 	//
 	// Unknown values here must result in the implementation setting the
 	// Attached Condition for the Route to `status: False`, with a
-	// Reason of `InvalidEnumValue`.
+	// Reason of `UnsupportedValue`.
 	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
@@ -827,7 +827,7 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// Unknown values here must result in the implementation setting the
 	// Attached Condition for the Route to `status: False`, with a
-	// Reason of `InvalidEnumValue`.
+	// Reason of `UnsupportedValue`.
 	//
 	// +optional
 	// +kubebuilder:validation:Enum=http;https
@@ -870,7 +870,7 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// Unknown values here must result in the implementation setting the
 	// Attached Condition for the Route to `status: False`, with a
-	// Reason of `InvalidEnumValue`.
+	// Reason of `UnsupportedValue`.
 	//
 	// +optional
 	// +kubebuilder:default=302
