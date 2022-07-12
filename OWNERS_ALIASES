@@ -20,6 +20,11 @@ aliases:
     - shaneutt
     - youngnick
 
+  gateway-api-mesh-leads:
+    - howardjohn
+    - keithmattix
+    - mikemorris
+
   emeritus-gateway-api-maintainers:
     - danehans
     - jpeach
