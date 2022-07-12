@@ -351,6 +351,13 @@ type GatewayTLSConfig struct {
 
 // TLSModeType type defines how a Gateway handles TLS sessions.
 //
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Ready Condition for the Listener to `status: False`, with a
+// Reason of `Invalid`.
+//
 // +kubebuilder:validation:Enum=Terminate;Passthrough
 type TLSModeType string
 
@@ -397,6 +404,13 @@ type AllowedRoutes struct {
 
 // FromNamespaces specifies namespace from which Routes may be attached to a
 // Gateway.
+//
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Ready Condition for the Listener to `status: False`, with a
+// Reason of `Invalid`.
 //
 // +kubebuilder:validation:Enum=All;Selector;Same
 type FromNamespaces string

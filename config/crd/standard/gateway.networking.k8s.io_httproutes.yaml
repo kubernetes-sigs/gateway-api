@@ -478,7 +478,13 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Support: Extended"
+                                        is used. \n Support: Extended \n Note that
+                                        values may be added to this enum, implementations
+                                        must ensure that unknown values will not cause
+                                        a crash. \n Unknown values here must result
+                                        in the implementation setting the Attached
+                                        Condition for the Route to `status: False`,
+                                        with a Reason of `UnsupportedValue`."
                                       enum:
                                       - http
                                       - https
@@ -486,7 +492,13 @@ spec:
                                     statusCode:
                                       default: 302
                                       description: "StatusCode is the HTTP status
-                                        code to be used in response. \n Support: Core"
+                                        code to be used in response. \n Support: Core
+                                        \n Note that values may be added to this enum,
+                                        implementations must ensure that unknown values
+                                        will not cause a crash. \n Unknown values
+                                        here must result in the implementation setting
+                                        the Attached Condition for the Route to `status:
+                                        False`, with a Reason of `UnsupportedValue`."
                                       enum:
                                       - 301
                                       - 302
@@ -517,7 +529,13 @@ spec:
                                     \n If a reference to a custom filter type cannot
                                     be resolved, the filter MUST NOT be skipped. Instead,
                                     requests that would have been processed by that
-                                    filter MUST receive a HTTP error response. \n "
+                                    filter MUST receive a HTTP error response. \n
+                                    Note that values may be added to this enum, implementations
+                                    must ensure that unknown values will not cause
+                                    a crash. \n Unknown values here must result in
+                                    the implementation setting the Attached Condition
+                                    for the Route to `status: False`, with a Reason
+                                    of `UnsupportedValue`. \n "
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -860,7 +878,12 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Support: Extended"
+                                  Support: Extended \n Note that values may be added
+                                  to this enum, implementations must ensure that unknown
+                                  values will not cause a crash. \n Unknown values
+                                  here must result in the implementation setting the
+                                  Attached Condition for the Route to `status: False`,
+                                  with a Reason of `UnsupportedValue`."
                                 enum:
                                 - http
                                 - https
@@ -868,7 +891,12 @@ spec:
                               statusCode:
                                 default: 302
                                 description: "StatusCode is the HTTP status code to
-                                  be used in response. \n Support: Core"
+                                  be used in response. \n Support: Core \n Note that
+                                  values may be added to this enum, implementations
+                                  must ensure that unknown values will not cause a
+                                  crash. \n Unknown values here must result in the
+                                  implementation setting the Attached Condition for
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
                                 enum:
                                 - 301
                                 - 302
@@ -897,7 +925,12 @@ spec:
                               behavior. \n If a reference to a custom filter type
                               cannot be resolved, the filter MUST NOT be skipped.
                               Instead, requests that would have been processed by
-                              that filter MUST receive a HTTP error response. \n "
+                              that filter MUST receive a HTTP error response. \n Note
+                              that values may be added to this enum, implementations
+                              must ensure that unknown values will not cause a crash.
+                              \n Unknown values here must result in the implementation
+                              setting the Attached Condition for the Route to `status:
+                              False`, with a Reason of `UnsupportedValue`. \n "
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
@@ -1500,8 +1533,8 @@ spec:
                         been routed to an invalid backend MUST receive a 500 status
                         code. \n When a BackendRef refers to a Service that has no
                         ready endpoints, it is recommended to return a 503 status
-                        code. \n Support: Core for Kubernetes Service Support: Custom
-                        for any other resource \n Support for weight: Core"
+                        code. \n Support: Core for Kubernetes Service \n Support:
+                        Custom for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
                           forward an HTTP request.
@@ -1771,7 +1804,13 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Support: Extended"
+                                        is used. \n Support: Extended \n Note that
+                                        values may be added to this enum, implementations
+                                        must ensure that unknown values will not cause
+                                        a crash. \n Unknown values here must result
+                                        in the implementation setting the Attached
+                                        Condition for the Route to `status: False`,
+                                        with a Reason of `UnsupportedValue`."
                                       enum:
                                       - http
                                       - https
@@ -1779,7 +1818,13 @@ spec:
                                     statusCode:
                                       default: 302
                                       description: "StatusCode is the HTTP status
-                                        code to be used in response. \n Support: Core"
+                                        code to be used in response. \n Support: Core
+                                        \n Note that values may be added to this enum,
+                                        implementations must ensure that unknown values
+                                        will not cause a crash. \n Unknown values
+                                        here must result in the implementation setting
+                                        the Attached Condition for the Route to `status:
+                                        False`, with a Reason of `UnsupportedValue`."
                                       enum:
                                       - 301
                                       - 302
@@ -1810,7 +1855,13 @@ spec:
                                     \n If a reference to a custom filter type cannot
                                     be resolved, the filter MUST NOT be skipped. Instead,
                                     requests that would have been processed by that
-                                    filter MUST receive a HTTP error response. \n "
+                                    filter MUST receive a HTTP error response. \n
+                                    Note that values may be added to this enum, implementations
+                                    must ensure that unknown values will not cause
+                                    a crash. \n Unknown values here must result in
+                                    the implementation setting the Attached Condition
+                                    for the Route to `status: False`, with a Reason
+                                    of `UnsupportedValue`. \n "
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -2152,7 +2203,12 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Support: Extended"
+                                  Support: Extended \n Note that values may be added
+                                  to this enum, implementations must ensure that unknown
+                                  values will not cause a crash. \n Unknown values
+                                  here must result in the implementation setting the
+                                  Attached Condition for the Route to `status: False`,
+                                  with a Reason of `UnsupportedValue`."
                                 enum:
                                 - http
                                 - https
@@ -2160,7 +2216,12 @@ spec:
                               statusCode:
                                 default: 302
                                 description: "StatusCode is the HTTP status code to
-                                  be used in response. \n Support: Core"
+                                  be used in response. \n Support: Core \n Note that
+                                  values may be added to this enum, implementations
+                                  must ensure that unknown values will not cause a
+                                  crash. \n Unknown values here must result in the
+                                  implementation setting the Attached Condition for
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
                                 enum:
                                 - 301
                                 - 302
@@ -2189,7 +2250,12 @@ spec:
                               behavior. \n If a reference to a custom filter type
                               cannot be resolved, the filter MUST NOT be skipped.
                               Instead, requests that would have been processed by
-                              that filter MUST receive a HTTP error response. \n "
+                              that filter MUST receive a HTTP error response. \n Note
+                              that values may be added to this enum, implementations
+                              must ensure that unknown values will not cause a crash.
+                              \n Unknown values here must result in the implementation
+                              setting the Attached Condition for the Route to `status:
+                              False`, with a Reason of `UnsupportedValue`. \n "
                             enum:
                             - RequestHeaderModifier
                             - RequestMirror
