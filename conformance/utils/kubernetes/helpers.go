@@ -81,7 +81,8 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, gwcName string, seconds in
 		}
 
 		controllerName = string(gwc.Spec.ControllerName)
-		return findConditionInList(t, gwc.Status.Conditions, "Accepted", "True", "Accepted"), nil
+		// Passing an empty string as the Reason means that any Reason will do.
+		return findConditionInList(t, gwc.Status.Conditions, "Accepted", "True", ""), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have Accepted condition set to True: %v", gwcName, waitErr)
 
@@ -106,7 +107,8 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, namespaces []string, s
 				t.Errorf("Error listing Gateways: %v", err)
 			}
 			for _, gw := range gwList.Items {
-				if !findConditionInList(t, gw.Status.Conditions, "Ready", "True", "Ready") {
+				// Passing an empty string as the Reason means that any Reason will do.
+				if !findConditionInList(t, gw.Status.Conditions, "Ready", "True", "") {
 					t.Logf("%s/%s Gateway not ready yet", ns, gw.Name)
 					return false, nil
 				}
