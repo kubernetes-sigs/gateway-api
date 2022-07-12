@@ -252,8 +252,8 @@ const (
 	// Group and/or Kind.
 	RouteReasonInvalidKind RouteConditionReason = "InvalidKind"
 
-	// This reason is used with the "ResolvedRefs" condition when
-	// one of the Route's rules has a reference to a resource that does not exist.
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 )
 

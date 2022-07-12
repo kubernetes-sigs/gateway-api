@@ -1821,8 +1821,8 @@ spec:
                         on how many BackendRefs are specified and how many are invalid.
                         \n If *all* entries in BackendRefs are invalid, and there
                         are also no filters specified in this route rule, *all* traffic
-                        which matches this rule MUST receive a 500 status code (exactly).
-                        \n See the HTTPBackendRef definition for the rules about what
+                        which matches this rule MUST receive a 500 status code. \n
+                        See the HTTPBackendRef definition for the rules about what
                         makes a single HTTPBackendRef invalid. \n When a HTTPBackendRef
                         is invalid, 500 status codes MUST be returned for requests
                         that would have otherwise been routed to an invalid backend.
@@ -1832,11 +1832,8 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n When a HTTPBackendRef refers to a Service that has no ready
-                        endpoints, implementations MAY return a 503 for requests to
-                        that backend instead. \n Support: Core for Kubernetes Service
-                        \n Support: Custom for any other resource \n Support for weight:
-                        Core"
+                        \n Support: Core for Kubernetes Service \n Support: Custom
+                        for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
                           forward an HTTP request.

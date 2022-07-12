@@ -206,7 +206,7 @@ type HTTPRouteRule struct {
 	//
 	// If *all* entries in BackendRefs are invalid, and there are also no filters
 	// specified in this route rule, *all* traffic which matches this rule MUST
-	// receive a 500 status code (exactly).
+	// receive a 500 status code.
 	//
 	// See the HTTPBackendRef definition for the rules about what makes a single
 	// HTTPBackendRef invalid.
@@ -220,9 +220,6 @@ type HTTPRouteRule struct {
 	// For example, if two backends are specified with equal weights, and one is
 	// invalid, 50 percent of traffic must receive a 500. Implementations may
 	// choose how that 50 percent is determined.
-	//
-	// When a HTTPBackendRef refers to a Service that has no ready endpoints,
-	// implementations MAY return a 503 for requests to that backend instead.
 	//
 	// Support: Core for Kubernetes Service
 	//

@@ -363,7 +363,7 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, routeNN type
 
 		var conditionFound bool
 		for _, parent := range parents {
-			if parent.ParentRef.Name == v1alpha2.ObjectName(gwNN.Name) && string(*parent.ParentRef.Namespace) == gwNN.Namespace {
+			if parent.ParentRef.Name == v1alpha2.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
 				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
 					conditionFound = true
 				}
@@ -424,11 +424,14 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 	return true
 }
 
+// findConditionInList finds a condition in a list of Conditions, checking
+// the Name, Value, and Reason. If an empty reason is passed, any Reason will match.
 func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, condValue, condReason string) bool {
 	for _, cond := range conditions {
 		if cond.Type == condName {
 			if cond.Status == metav1.ConditionStatus(condValue) {
-				if cond.Reason == condReason {
+				// an empty Reason string means "Match any reason".
+				if condReason == "" || cond.Reason == condReason {
 					return true
 				}
 				t.Logf("%s condition Reason set to %s, expected %s", condName, cond.Reason, condReason)

@@ -74,6 +74,8 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 					Path:   "/",
 				},
 				StatusCode: 200,
+				Backend:    "app-backend-v1",
+				Namespace:  "gateway-conformance-app-backend",
 			})
 		})
 
