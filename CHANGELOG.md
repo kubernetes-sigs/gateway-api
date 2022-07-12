@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.5.0-rc2](#v050-rc2)
 - [v0.5.0-rc1](#v050-rc1)
 - [v0.4.3](#v043)
 - [v0.4.2](#v042)
@@ -14,6 +15,40 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.5.0-rc2
+
+API versions: v1beta1, v1alpha2
+
+We expect this to be our final release candidate before launching v0.5.0. This
+release candidate includes a variety of cleanup and documentation updates.
+
+### Webhook
+
+- Adds webhook validation to ensure that no HTTP header or query param is
+  matched more than once in a given route rule. (#1230, @skriss)
+
+### Documentation
+
+- Add examples and documentation for v1beta1 (#1238, @EmilyShepherd)
+- Add policy attachment example (#1233, @keithmattix)
+- Add warning headers for experimental resources/concepts (#1234, @keithmattix)
+- All Enum API fields have had updates to clarify that we may add values at any
+  time, and that implementations must handle unknown Enum values. (#1258,
+  @youngnick)
+- Spacing has been improved around the documentation of feature-level
+  core/extended support for better readability and clarity. (#1241, @acnodal-tc)
+- Update ReferenceGrant docs to include Gateways that reference a Secret in a
+  different namespace (#1181, @nathancoleman)
+
+### Cleanup
+
+- ReferencePolicyList Items is an array of ReferencePolicy again (#1239,
+  @dprotaso)
+- This release of experimental-install.yaml will apply successfully. Previous
+  releases had some extraneous yaml. (#1232, @acnodal-tc)
+- The NamedAddress type is back to support backwards compatibility but it is
+  still formally deprecated. (#1252, @robscott)
 
 ## v0.5.0-rc1
 
