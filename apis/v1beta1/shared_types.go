@@ -217,6 +217,10 @@ const (
 	// compatible Listeners whose Hostname matches the route
 	RouteReasonNoMatchingListenerHostname RouteConditionReason = "NoMatchingListenerHostname"
 
+	// This reason is used with the "Accepted" condition when a value for an Enum
+	// is not recognized.
+	RouteReasonInvalidEnumValue RouteConditionReason = "InvalidEnumValue"
+
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	//

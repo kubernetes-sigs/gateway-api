@@ -248,8 +248,8 @@ type HTTPRouteRule struct {
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Ready Condition for the Listener to `status: False`, with a
-// Reason of `Invalid`.
+// Attached Condition for the Route to `status: False`, with a
+// Reason of `InvalidEnumValue`.
 //
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 type PathMatchType string
@@ -308,6 +308,10 @@ type HTTPPathMatch struct {
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Attached Condition for the Route to `status: False`, with a
+// Reason of `InvalidEnumValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type HeaderMatchType string
@@ -386,6 +390,10 @@ type HTTPHeaderMatch struct {
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
 //
+// Unknown values here must result in the implementation setting the
+// Attached Condition for the Route to `status: False`, with a
+// Reason of `InvalidEnumValue`.
+//
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type QueryParamMatchType string
 
@@ -440,6 +448,10 @@ type HTTPQueryParamMatch struct {
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Attached Condition for the Route to `status: False`, with a
+// Reason of `InvalidEnumValue`.
 //
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 type HTTPMethod string
@@ -543,6 +555,10 @@ type HTTPRouteFilter struct {
 	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
+	//
+	// Unknown values here must result in the implementation setting the
+	// Attached Condition for the Route to `status: False`, with a
+	// Reason of `InvalidEnumValue`.
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
@@ -766,6 +782,10 @@ type HTTPPathModifier struct {
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
 	//
+	// Unknown values here must result in the implementation setting the
+	// Attached Condition for the Route to `status: False`, with a
+	// Reason of `InvalidEnumValue`.
+	//
 	// <gateway:experimental>
 	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
 	Type HTTPPathModifierType `json:"type"`
@@ -806,6 +826,10 @@ type HTTPRequestRedirectFilter struct {
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
 	//
+	// Unknown values here must result in the implementation setting the
+	// Attached Condition for the Route to `status: False`, with a
+	// Reason of `InvalidEnumValue`.
+	//
 	// +optional
 	// +kubebuilder:validation:Enum=http;https
 	Scheme *string `json:"scheme,omitempty"`
@@ -844,6 +868,10 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
+	//
+	// Unknown values here must result in the implementation setting the
+	// Attached Condition for the Route to `status: False`, with a
+	// Reason of `InvalidEnumValue`.
 	//
 	// +optional
 	// +kubebuilder:default=302
