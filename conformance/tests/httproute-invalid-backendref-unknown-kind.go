@@ -29,39 +29,36 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidCrossNamespaceBackendRef)
+	ConformanceTests = append(ConformanceTests, HTTPRouteInvalidBackendRefUnknownKind)
 }
 
-var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
-	ShortName:   "HTTPRouteInvalidCrossNamespaceBackendRef",
-	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set a ResolvedRefs status False with reason RefNotPermitted when attempting to bind to a Gateway in the same namespace if the route has a BackendRef Service in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to route to that Service does not exist",
-	Exemptions: []suite.ExemptFeature{
-		suite.ExemptReferenceGrant,
-	},
-	Manifests: []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
+var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
+	ShortName:   "HTTPRouteInvalidBackendRefUnknownKind",
+	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set a ResolvedRefs status False with reason RefNotPermitted when attempting to bind to a Gateway in the same namespace if the route has a BackendRef that points to an unknown Kind.",
+	Manifests:   []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
-		// The Route must be Attached.
+		// Both the Gateway and the Route are Accepted.
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		t.Run("HTTPRoute with a cross-namespace BackendRef and no ReferenceGrant has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
-
+		// The Route must have a ResolvedRefs Condition with a InvalidKind Reason.
+		t.Run("HTTPRoute with Invalid Kind has a ResolvedRefs Condition with status False and Reason InvalidKind", func(t *testing.T) {
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1alpha2.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
-				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
+				Reason: string(v1alpha2.RouteReasonInvalidKind),
 			}
 
 			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
-		t.Run("HTTP Request to invalid cross-namespace backend must receive a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with invalid Kind receives a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
-					Path:   "/",
+					Path:   "/v2",
 				},
 				StatusCode: 500,
 			})

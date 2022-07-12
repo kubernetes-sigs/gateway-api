@@ -81,7 +81,8 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, gwcName string, seconds in
 		}
 
 		controllerName = string(gwc.Spec.ControllerName)
-		return findConditionInList(t, gwc.Status.Conditions, "Accepted", "True"), nil
+		// Passing an empty string as the Reason means that any Reason will do.
+		return findConditionInList(t, gwc.Status.Conditions, "Accepted", "True", ""), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have Accepted condition set to True: %v", gwcName, waitErr)
 
@@ -106,7 +107,8 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, namespaces []string, s
 				t.Errorf("Error listing Gateways: %v", err)
 			}
 			for _, gw := range gwList.Items {
-				if !findConditionInList(t, gw.Status.Conditions, "Ready", "True") {
+				// Passing an empty string as the Reason means that any Reason will do.
+				if !findConditionInList(t, gw.Status.Conditions, "Ready", "True", "") {
 					t.Logf("%s/%s Gateway not ready yet", ns, gw.Name)
 					return false, nil
 				}
@@ -165,6 +167,7 @@ func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, controllerNa
 					{
 						Type:   string(v1alpha2.RouteConditionAccepted),
 						Status: metav1.ConditionTrue,
+						Reason: string(v1alpha2.RouteReasonAccepted),
 					},
 				},
 			})
@@ -342,6 +345,39 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, gwNN typ
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
 }
 
+// HTTPRouteMustHaveConditions checks that the supplied HTTPRoute has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition, seconds int) {
+	t.Helper()
+
+	waitFor := time.Duration(seconds) * time.Second
+	waitErr := wait.PollImmediate(1*time.Second, waitFor, func() (bool, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		route := &v1alpha2.HTTPRoute{}
+		err := client.Get(ctx, routeNN, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
+		}
+
+		parents := route.Status.Parents
+
+		var conditionFound bool
+		for _, parent := range parents {
+			if parent.ParentRef.Name == v1alpha2.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
+			}
+		}
+
+		return conditionFound, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
+}
+
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
 func listenersMatch(t *testing.T, expected, actual []v1alpha2.ListenerStatus) bool {
 	t.Helper()
@@ -381,7 +417,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 		return false
 	}
 	for _, condition := range expected {
-		if !findConditionInList(t, actual, condition.Type, string(condition.Status)) {
+		if !findConditionInList(t, actual, condition.Type, string(condition.Status), condition.Reason) {
 			return false
 		}
 	}
@@ -390,13 +426,19 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 	return true
 }
 
-func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, condValue string) bool {
+// findConditionInList finds a condition in a list of Conditions, checking
+// the Name, Value, and Reason. If an empty reason is passed, any Reason will match.
+func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, condValue, condReason string) bool {
 	for _, cond := range conditions {
 		if cond.Type == condName {
-			// TODO(nathancoleman): Compare Reason
 			if cond.Status == metav1.ConditionStatus(condValue) {
-				return true
+				// an empty Reason string means "Match any reason".
+				if condReason == "" || cond.Reason == condReason {
+					return true
+				}
+				t.Logf("%s condition Reason set to %s, expected %s", condName, cond.Reason, condReason)
 			}
+
 			t.Logf("%s condition set to %s, expected %s", condName, cond.Status, condValue)
 		}
 	}

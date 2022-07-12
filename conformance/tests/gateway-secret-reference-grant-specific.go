@@ -50,6 +50,7 @@ var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
 					{
 						Type:   string(v1alpha2.ListenerConditionReady),
 						Status: metav1.ConditionTrue,
+						Reason: string(v1alpha2.ListenerReasonReady),
 					},
 				},
 			}}

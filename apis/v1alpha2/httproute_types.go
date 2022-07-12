@@ -202,24 +202,25 @@ type HTTPRouteRule struct {
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent.
 	//
-	// A 500 status code MUST be returned if there are no BackendRefs or filters
-	// specified that would result in a response being sent.
+	// Failure behavior here depends on how many BackendRefs are specified and
+	// how many are invalid.
 	//
-	// A BackendRef is considered invalid when it refers to:
+	// If *all* entries in BackendRefs are invalid, and there are also no filters
+	// specified in this route rule, *all* traffic which matches this rule MUST
+	// receive a 500 status code.
 	//
-	// * an unknown or unsupported kind of resource
-	// * a resource that does not exist
-	// * a resource in another namespace when the reference has not been
-	//   explicitly allowed by a ReferenceGrant (or equivalent concept).
+	// See the HTTPBackendRef definition for the rules about what makes a single
+	// HTTPBackendRef invalid.
 	//
-	// When a BackendRef is invalid, 500 status codes MUST be returned for
+	// When a HTTPBackendRef is invalid, 500 status codes MUST be returned for
 	// requests that would have otherwise been routed to an invalid backend. If
 	// multiple backends are specified, and some are invalid, the proportion of
 	// requests that would otherwise have been routed to an invalid backend
 	// MUST receive a 500 status code.
 	//
-	// When a BackendRef refers to a Service that has no ready endpoints, it is
-	// recommended to return a 503 status code.
+	// For example, if two backends are specified with equal weights, and one is
+	// invalid, 50 percent of traffic must receive a 500. Implementations may
+	// choose how that 50 percent is determined.
 	//
 	// Support: Core for Kubernetes Service
 	//
@@ -933,21 +934,31 @@ type HTTPRequestMirrorFilter struct {
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
-	// If the referent cannot be found, this HTTPBackendRef is invalid and must
-	// be dropped from the Gateway. The controller must ensure the
-	// "ResolvedRefs" condition on the Route is set to `status: False` and not
-	// configure this backend in the underlying implementation.
+	// A BackendRef can be invalid for the following reasons. In all cases, the
+	// implementation MUST ensure the `ResolvedRefs` Condition on the Route
+	// is set to `status: False`, with a Reason and Message that indicate
+	// what is the cause of the error.
 	//
-	// If there is a cross-namespace reference to an *existing* object
-	// that is not covered by a ReferenceGrant, the controller must ensure the
-	// "ResolvedRefs"  condition on the Route is set to `status: False`,
-	// with the "RefNotPermitted" reason and not configure this backend in the
-	// underlying implementation.
+	// A BackendRef is invalid if:
 	//
-	// In either error case, the Message of the `ResolvedRefs` Condition
-	// should be used to provide more detail about the problem.
+	// * It refers to an unknown or unsupported kind of resource. In this
+	//   case, the Reason must be set to `InvalidKind` and Message of the
+	//   Condition must explain which kind of resource is unknown or unsupported.
 	//
-	// Support: Custom
+	// * It refers to a resource that does not exist. In this case, the Reason must
+	//   be set to `BackendNotFound` and the Message of the Condition must explain
+	//   which resource does not exist.
+	//
+	// * It refers a resource in another namespace when the reference has not been
+	//   explicitly allowed by a ReferenceGrant (or equivalent concept). In this
+	//   case, the Reason must be set to `RefNotPermitted` and the Message of the
+	//   Condition must explain which cross-namespace reference is not allowed.
+	//
+	// Support: Core for Kubernetes Service
+	//
+	// Support: Custom for any other resource
+	//
+	// Support for weight: Core
 	//
 	// +optional
 	BackendRef `json:",inline"`

@@ -43,69 +43,41 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 		routeNN := types.NamespacedName{Name: "invalid-reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
-		ns := v1alpha2.Namespace(gwNN.Namespace)
-		gwKind := v1alpha2.Kind("Gateway")
+		// Route and Gateway must be Attached.
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		t.Run("Route status should have a route parent status with a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
-			parents := []v1alpha2.RouteParentStatus{{
-				ParentRef: v1alpha2.ParentReference{
-					Group:     (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-					Kind:      &gwKind,
-					Name:      v1alpha2.ObjectName(gwNN.Name),
-					Namespace: &ns,
-				},
-				ControllerName: v1alpha2.GatewayController(s.ControllerName),
-				Conditions: []metav1.Condition{{
-					Type:   string(v1alpha2.RouteConditionResolvedRefs),
-					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.RouteReasonRefNotPermitted),
-				}},
-			}}
+		t.Run("HTTPRoute with BackendRef in another namespace and no ReferenceGrant covering the Service has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 
-			kubernetes.HTTPRouteMustHaveParents(t, s.Client, routeNN, parents, false, 60)
+			resolvedRefsCond := metav1.Condition{
+				Type:   string(v1alpha2.RouteConditionResolvedRefs),
+				Status: metav1.ConditionFalse,
+				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
+			}
+
+			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, routeNN, gwNN, resolvedRefsCond, 60)
 		})
 
-		// TODO(mikemorris): Un-comment check for Listener ResolvedRefs
-		// RefNotPermitted condition and/or add check for attached
-		// routes and any expected Listener conditions once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-		// t.Run("Gateway listener should have a ResolvedRefs condition with status False and reason RefNotPermitted", func(t *testing.T) {
-		// 	listeners := []v1alpha2.ListenerStatus{{
-		// 		Name: v1alpha2.SectionName("http"),
-		// 		SupportedKinds: []v1alpha2.RouteGroupKind{{
-		// 			Group: (*v1alpha2.Group)(&v1alpha2.GroupVersion.Group),
-		// 			Kind:  v1alpha2.Kind("HTTPRoute"),
-		// 		}},
-		// 		Conditions: []metav1.Condition{{
-		// 			Type:   string(v1alpha2.RouteConditionResolvedRefs),
-		// 			Status: metav1.ConditionFalse,
-		// 			Reason: string(v1alpha2.RouteReasonRefNotPermitted),
-		// 		}},
-		// 	}}
-
-		// 	kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
-		// })
-
-		// TODO(mikemorris): Add routeNN to the end of the arguments below
-		// to add check for Accepted condition once
-		// https://github.com/kubernetes-sigs/gateway-api/issues/1112
-		// has been resolved
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, kubernetes.NewGatewayRef(gwNN))
-
-		// TODO(mikemorris): Add check for HTTP requests successfully reaching
-		// app-backend-v1 at path "/" if it is determined that a Route with at
-		// at least one allowed BackendRef should be accepted by a Gateway
-		// and partially configured.
-
-		t.Run("Simple HTTP request should not reach app-backend-v2", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
 					Path:   "/v2",
 				},
-				StatusCode: 404,
+				StatusCode: 500,
 			})
 		})
+
+		t.Run("HTTP Request to valid sibling backend should succeed", func(t *testing.T) {
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
+				Request: http.Request{
+					Method: "GET",
+					Path:   "/",
+				},
+				StatusCode: 200,
+				Backend:    "app-backend-v1",
+				Namespace:  "gateway-conformance-app-backend",
+			})
+		})
+
 	},
 }

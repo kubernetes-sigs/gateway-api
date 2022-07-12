@@ -199,6 +199,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 					{
 						Type:   string(v1alpha2.RouteConditionAccepted),
 						Status: metav1.ConditionFalse,
+						Reason: string(v1alpha2.RouteReasonNoMatchingListenerHostname),
 					},
 				},
 			}}
