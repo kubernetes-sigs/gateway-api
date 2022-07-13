@@ -25,34 +25,38 @@ network infrastructure that your Gateway resources represent). Note that many
 of the Gateway controller setups will install and remove the Gateway API bundle
 for you.
 
-## Installing a Gateway API Bundle
+## Installing Gateway API
 
 A Gateway API bundle represents the set of CRDs and validating webhook
-associated with a version of Gateway API.
+associated with a version of Gateway API. Each release includes two
+channels with different levels of stability:
 
-### Install the CRDs
+### Install Standard Channel
 
-The following command will install the Gateway API CRDs. This includes
-GatewayClass, Gateway, HTTPRoute, TCPRoute, and more. Note that a running
-Gateway controller in your Kubernetes cluster is required to actually act on
-these resources. Installing the CRDs will just allow you to see and apply the
-resources, but they won't do anything without a controller implementing them.
-
-```
-kubectl apply -k "github.com/kubernetes-sigs/gateway-api/config/crd?ref=v0.4.3"
-```
-
-### Install the Webhook
-
-The validating webhook included with Gateway API is still in active development
-and not as stable as other components included in the API. We expect this
-webhook to reach a greater level of stability in an upcoming v0.4 release.
-Until that point, the webhook can be installed with the following kubectl
-commands:
+The standard release channel includes all resources that have graduated to beta,
+including GatewayClass, Gateway, and HTTPRoute. To install this channel, run the
+following kubectl command:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.3/deploy/admission_webhook.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/gateway-api/v0.4.3/deploy/certificate_config.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.0/standard-install.yaml
+```
+
+### Install Experimental Channel
+
+The experimental release channel includes everything in the standard release
+channel plus some experimental resources and fields. This includes
+ReferencePolicy, TCPRoute, TLSRoute, and UDPRoute. 
+
+Note that future releases of the API could include breaking changes to
+experimental resources and fields. For example, any experimental resource or
+field could be removed in a future release. For more information on the
+experimental channel, refer to our [versioning
+documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/).
+
+To install the experimental channel, run the following kubectl command:
+
+```
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.5.0/experimental-install.yaml
 ```
 
 ### Cleanup
