@@ -27,7 +27,7 @@ here for implementations to support other types of parent resources.
 
 The following example shows how a Route would attach to the `acme-lb` Gateway:
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -56,7 +56,7 @@ rules and filters (optional).
 
 The following example defines hostname "my.example.com":
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -78,7 +78,7 @@ independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 ...
 matches:
@@ -111,7 +111,7 @@ strategies, rate-limiting, and traffic shaping.
 The following example adds header "my-header: foo" to HTTP requests with Host
 header "my.filter.com".
 ```yaml
-{% include 'v1alpha2/http-filter.yaml' %}
+{% include 'v1beta1/http-filter.yaml' %}
 ```
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -143,14 +143,14 @@ The following example forwards HTTP requests for prefix `/bar` to service
 "my-service1" on port `8080` and HTTP requests for prefix `/some/thing` with
 header `magic: foo` to service "my-service2" on port `8080`:
 ```yaml
-{% include 'v1alpha2/basic-http.yaml' %}
+{% include 'v1beta1/basic-http.yaml' %}
 ```
 
 The following example uses the `weight` field to forward 90% of HTTP requests to
 `foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
 Service:
 ```yaml
-{% include 'v1alpha2/traffic-splitting/traffic-split-2.yaml' %}
+{% include 'v1beta1/traffic-splitting/traffic-split-2.yaml' %}
 ```
 
 Reference the [backendRef][backendRef] API documentation for additional details
@@ -176,7 +176,7 @@ appropriate when the route is modified.
 The following example indicates HTTPRoute "http-example" has been accepted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   name: http-example
@@ -197,12 +197,12 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
 
 
-[httproute]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[httprouterule]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1alpha2.Hostname
+[httproute]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
+[httprouterule]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule
+[hostname]: /references/spec/#gateway.networking.k8s.io/v1beta1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteMatch
-[filters]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteFilter
-[backendRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPBackendRef
-[parentRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.ParentRef
+[matches]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
+[filters]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
+[backendRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
+[parentRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
 

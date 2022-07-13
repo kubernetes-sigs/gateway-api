@@ -1,5 +1,3 @@
-#$ Used in:
-#$ - site-src/concepts/api-overview.md
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: HTTPRoute
 metadata:

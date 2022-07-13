@@ -12,7 +12,7 @@ use both filter types at once.
 
 Redirects return HTTP 3XX responses to a client, instructing it to retrive a
 different resource. [`RequestRedirect` rule
-filters](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRequestRedirectFilter)
+filters](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRequestRedirectFilter)
 instruct Gateways to emit a redirect response to requests matching a filtered
 HTTPRoute rule.
 
@@ -21,7 +21,7 @@ example, to issue a permanent redirect (301) from HTTP to HTTPS, configure
 `requestRedirect.statusCode=301` and `requestRedirect.scheme="https"`:
 
 ```yaml
-{% include 'experimental/v1alpha2/http-redirect-rewrite/httproute-redirect-https.yaml' %}
+{% include 'experimental/v1beta1/http-redirect-rewrite/httproute-redirect-https.yaml' %}
 ```
 
 Redirects change configured URL components to match the redirect configuration
@@ -44,7 +44,7 @@ prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
 `redirect.example` requests whose path begins with `/cayenne` to `/paprika`:
 
 ```yaml
-{% include 'experimental/v1alpha2/http-redirect-rewrite/httproute-redirect-full.yaml' %}
+{% include 'experimental/v1beta1/http-redirect-rewrite/httproute-redirect-full.yaml' %}
 ```
 
 Both requests to
@@ -56,7 +56,7 @@ The other path redirect type, `ReplacePrefixMatch`, replaces only the path
 portion matching `matches.path.value`. Changing the filter in the above to:
 
 ```yaml
-{% include 'experimental/v1alpha2/http-redirect-rewrite/httproute-redirect-prefix.yaml' %}
+{% include 'experimental/v1beta1/http-redirect-rewrite/httproute-redirect-prefix.yaml' %}
 ```
 
 will result in redirects with `location:
@@ -73,7 +73,7 @@ https://redirect.example/paprika/teaspoon` response headers.
 
 Rewrites modify components of a client request before proxying it upstream. A
 [`URLRewrite`
-filter](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPURLRewriteFilter)
+filter](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPURLRewriteFilter)
 can change the upstream request hostname and/or path. For example, the
 following HTTPRoute will accept a request for
 `https://rewrite.example/cardamom` and send it upstream to `example-svc` with
@@ -81,7 +81,7 @@ following HTTPRoute will accept a request for
 rewrite.example`.
 
 ```yaml
-{% include 'experimental/v1alpha2/http-redirect-rewrite/httproute-rewrite.yaml' %}
+{% include 'experimental/v1beta1/http-redirect-rewrite/httproute-rewrite.yaml' %}
 ```
 
 Path rewrites also make use of HTTP Path Modifiers. The HTTPRoute below
@@ -91,5 +91,5 @@ Instead using `type: ReplacePrefixMatch` and `replacePrefixMatch: /fennel` will
 request `https://elsewhere.example/fennel/smidgen` upstream.
 
 ```yaml
-{% include 'experimental/v1alpha2/http-redirect-rewrite/httproute-rewrite.yaml' %}
+{% include 'experimental/v1beta1/http-redirect-rewrite/httproute-rewrite.yaml' %}
 ```

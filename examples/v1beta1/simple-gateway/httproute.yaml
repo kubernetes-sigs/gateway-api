@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/v1beta1/guides/simple-gateway.md
+#$ - site-src/guides/simple-gateway.md
 #$ - site-src/blog/2021/introducing-v1beta1.md
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute

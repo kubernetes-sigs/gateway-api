@@ -72,7 +72,7 @@ The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
 Namespace:
 
 ```yaml
-{% include 'v1alpha2/cross-namespace-routing/gateway.yaml' %}
+{% include 'v1beta1/cross-namespace-routing/gateway.yaml' %}
 ```
 
 The `https` listener in the above Gateway matches traffic for the
@@ -94,7 +94,7 @@ or which apps can use this Gateway by allowlisting a set of Namespaces.
 
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 spec:
   listeners:
@@ -114,7 +114,7 @@ a `parentRef`  for `infra-ns/shared-gateway`, it would be ignored by the
 Gateway because the  attachment constraint (Namespace label) was not met.
 
 ```yaml
-{% include 'v1alpha2/cross-namespace-routing/0-namespaces.yaml' %}
+{% include 'v1beta1/cross-namespace-routing/0-namespaces.yaml' %}
 ```
 
 Note that attachment constraints on the Gateway are not required, but they are
@@ -130,7 +130,7 @@ The store team deploys their route for the `store` Service in the `store-ns`
 Namespace:
 
 ```yaml
-{% include 'v1alpha2/cross-namespace-routing/store-route.yaml' %}
+{% include 'v1beta1/cross-namespace-routing/store-route.yaml' %}
 ```
 
 This Route has straightforward routing logic as it just matches for
@@ -151,12 +151,12 @@ specifies `gateway/shared-gateway` in the `infra-ns` Namespace as the only
 Gateway that these Routes want to attach to.
 
 ```yaml
-{% include 'v1alpha2/cross-namespace-routing/site-route.yaml' %}
+{% include 'v1beta1/cross-namespace-routing/site-route.yaml' %}
 ```
 
 After these three Routes are deployed, they will all be attached to the
 `shared-gateway` Gateway. The Gateway merges these Routes into a single flat
-list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRouteRule)
+list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule)
 between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
 resolution](/concepts/guidelines#conflicts). This provides predictable and
