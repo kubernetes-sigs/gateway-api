@@ -17,18 +17,18 @@ limitations under the License.
 package kubernetes
 
 import (
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 // PortSet is a wrapper for handling sets of ports.
-type PortSet []v1alpha2.PortNumber
+type PortSet []v1beta1.PortNumber
 
-func (s *PortSet) AssignAvailablePort() (v1alpha2.PortNumber, bool) {
+func (s *PortSet) AssignAvailablePort() (v1beta1.PortNumber, bool) {
 	if len(*s) == 0 {
 		return 0, false
 	}
 
-	newPort := v1alpha2.PortNumber((*s)[0])
+	newPort := v1beta1.PortNumber((*s)[0])
 	*s = (*s)[1:]
 	return newPort, true
 }

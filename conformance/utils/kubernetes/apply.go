@@ -76,7 +76,7 @@ type Applier struct {
 // Gateway with 2 listeners on different ports, there should be at least three
 // validPorts.
 // If empty or nil, Gateway listener ports are not modified.
-func NewApplier(namespaceLabels map[string]string, validPorts []v1alpha2.PortNumber) *Applier {
+func NewApplier(namespaceLabels map[string]string, validPorts []v1beta1.PortNumber) *Applier {
 	return &Applier{
 		namespaceLabels: namespaceLabels,
 		availablePorts:  validPorts,
