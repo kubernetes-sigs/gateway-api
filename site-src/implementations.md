@@ -8,7 +8,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 
 - [Acnodal EPIC][1] (public preview)
-- [Apache APISIX][2] (work in progress)
+- [Apache APISIX][2] (alpha)
 - [Contour][3] (alpha)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Gloo Edge 2.0][5] (work in progress)
@@ -56,7 +56,7 @@ Documentation can be found at [EPIC Application & API Gateway Service][epic]
 
 [Apache APISIX][apisix] is a dynamic, real-time, high-performance API Gateway. APISIX provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
 
-APISIX is moving forward to implement the Gateway API `v1alpha2` version of the specification for its [Apache APISIX Ingress Controller][apisix-1], and status updates and documentation will be provided here as the work progresses.
+APISIX currently supports Gateway API `v1alpha2` version of the specification for its [Apache APISIX Ingress Controller][apisix-1].
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
