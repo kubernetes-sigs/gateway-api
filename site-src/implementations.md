@@ -104,6 +104,9 @@ The GKE Gateway controller supports weighted traffic splitting, mirroring,
 advanced routing, multi-cluster load balancing and more. See the docs to deploy 
 [private or public Gateways][gke-gateway-deploy] and also [multi-cluster Gateways][gke-multi-cluster-gateway]. 
 
+If you have questions about the GKE Gateway controller or feedback you want to
+share, contact [gke-gateway-feedback@google.com](mailto:gke-gateway-feedback@google.com).
+
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
 [gke-gateway-deploy]:https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
