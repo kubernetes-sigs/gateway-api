@@ -52,11 +52,17 @@ Gateway API community meetings happen weekly on Mondays at 3pm Pacific Time
 * [Convert to your timezone](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)
 * [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NXU4OXYyY2pqNzEzYzUwYnVsYmZwdXJzZDlfMjAyMTA1MTBUMjIwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
 
+[GAMMA](/community/gamma) meetings happen weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
+and 8AM Pacific Time (16:00 UTC):
+
+* [Zoom link](https://zoom.us/j/96951309977)
+* Convert to your timezone: [3pm PT](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)/[8am PT](http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29)
 
 ### Meeting Notes and Recordings
 
 Meeting agendas and notes are maintained in the [meeting notes
-doc][meeting-notes]. Feel free to add topics for discussion at an upcoming
+doc][meeting-notes]. Likewise, GAMMA has its own [meeting notes
+doc][gamma-meeting-notes]. Feel free to add topics for discussion at an upcoming
 meeting.
 
 All meetings are recorded and automatically uploaded to the [Gateway API meetings Youtube playlist][gateway-api-yt-playlist].
@@ -78,6 +84,7 @@ playlist][early-yt-playlist], and then to the [SIG Network Youtube playlist][sig
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
 [sig-net-2019-11-sync]: https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview
 [meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
+[gamma-meeting-notes]: https://docs.google.com/document/d/1s5hQU0CB9ehjFukRmRHQ41f1FA8GX5_1Rv6nHW6NWAA/edit#
 
 ## Presentations and Talks
 
