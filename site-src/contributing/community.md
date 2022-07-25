@@ -52,7 +52,7 @@ Gateway API community meetings happen weekly on Mondays at 3pm Pacific Time
 * [Convert to your timezone](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)
 * [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NXU4OXYyY2pqNzEzYzUwYnVsYmZwdXJzZDlfMjAyMTA1MTBUMjIwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
 
-[GAMMA](/community/gamma) meetings happen weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
+[GAMMA](/contributing/gamma/) meetings happen weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
 and 8AM Pacific Time (16:00 UTC):
 
 * [Zoom link](https://zoom.us/j/96951309977)
