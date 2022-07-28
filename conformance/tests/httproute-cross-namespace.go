@@ -34,6 +34,7 @@ var HTTPRouteCrossNamespace = suite.ConformanceTest{
 	ShortName:   "HTTPRouteCrossNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should attach to Gateway in another namespace",
 	Manifests:   []string{"tests/httproute-cross-namespace.yaml"},
+	MinChannel:  suite.StandardChannel,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "cross-namespace", Namespace: "gateway-conformance-web-backend"}
 		gwNN := types.NamespacedName{Name: "backend-namespaces", Namespace: "gateway-conformance-infra"}

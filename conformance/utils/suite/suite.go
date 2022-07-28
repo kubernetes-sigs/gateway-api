@@ -47,6 +47,14 @@ const (
 	SupportReferencePolicy SupportedFeature = "ReferencePolicy"
 )
 
+// GatewatChannel allows opting between experimental or standard conformance tests.
+type GatewayChannel int
+
+const (
+	ExperimentalChannel GatewayChannel = 1
+	StandardChannel     GatewayChannel = 2
+)
+
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
 type ConformanceTestSuite struct {
@@ -60,6 +68,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	ExemptFeatures    []ExemptFeature
 	SupportedFeatures []SupportedFeature
+	MinChannel        GatewayChannel
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -83,6 +92,7 @@ type Options struct {
 	CleanupBaseResources bool
 	ExemptFeatures       []ExemptFeature
 	SupportedFeatures    []SupportedFeature
+	MinChannel           GatewayChannel
 }
 
 // New returns a new ConformanceTestSuite.
@@ -90,6 +100,11 @@ func New(s Options) *ConformanceTestSuite {
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug}
+	}
+
+	MinChannel := s.MinChannel
+	if MinChannel == 0 {
+		MinChannel = StandardChannel
 	}
 
 	suite := &ConformanceTestSuite{
@@ -105,6 +120,7 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		ExemptFeatures:    s.ExemptFeatures,
 		SupportedFeatures: s.SupportedFeatures,
+		MinChannel:        s.MinChannel,
 	}
 
 	// apply defaults
@@ -152,11 +168,13 @@ type ConformanceTest struct {
 	Slow        bool
 	Parallel    bool
 	Test        func(*testing.T, *ConformanceTestSuite)
+	MinChannel  GatewayChannel
 }
 
 // Run runs an individual tests, applying and cleaning up the required manifests
 // before calling the Test function.
 func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
+
 	if test.Parallel {
 		t.Parallel()
 	}
@@ -175,6 +193,10 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 		if !slices.Contains(suite.ExemptFeatures, feature) {
 			t.Skip("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
+	}
+
+	if test.MinChannel < suite.MinChannel {
+		t.Skipf("Skipping %s: only testing %s channel", test.ShortName, suite.MinChannel)
 	}
 
 	for _, manifestLocation := range test.Manifests {
