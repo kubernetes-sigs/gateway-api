@@ -37,7 +37,8 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 	Exemptions: []suite.ExemptFeature{
 		suite.ExemptReferencePolicy,
 	},
-	Manifests: []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
+	Manifests:  []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
+	MinChannel: suite.StandardChannel,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
