@@ -60,6 +60,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	ExemptFeatures    []ExemptFeature
 	SupportedFeatures []SupportedFeature
+	MinChannel        string
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -83,6 +84,7 @@ type Options struct {
 	CleanupBaseResources bool
 	ExemptFeatures       []ExemptFeature
 	SupportedFeatures    []SupportedFeature
+	MinChannel           string
 }
 
 // New returns a new ConformanceTestSuite.
@@ -90,6 +92,11 @@ func New(s Options) *ConformanceTestSuite {
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug}
+	}
+
+	MinChannel := s.MinChannel
+	if MinChannel == "" {
+		MinChannel = "Standard"
 	}
 
 	suite := &ConformanceTestSuite{
@@ -105,6 +112,7 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		ExemptFeatures:    s.ExemptFeatures,
 		SupportedFeatures: s.SupportedFeatures,
+		MinChannel:        s.MinChannel,
 	}
 
 	// apply defaults
@@ -152,6 +160,7 @@ type ConformanceTest struct {
 	Slow        bool
 	Parallel    bool
 	Test        func(*testing.T, *ConformanceTestSuite)
+	MinChannel  string
 }
 
 // Run runs an individual tests, applying and cleaning up the required manifests
@@ -174,6 +183,12 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	for _, feature := range test.Exemptions {
 		if !slices.Contains(suite.ExemptFeatures, feature) {
 			t.Skip("Skipping %s: suite exempts %s", test.ShortName, feature)
+		}
+	}
+
+	for _, feature := range test.MinChannel {
+		if test.MinChannel < suite.MinChannel {
+			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
 
