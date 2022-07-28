@@ -34,6 +34,7 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHeaderMatching",
 	Description: "A single HTTPRoute with header matching for different backends",
 	Manifests:   []string{"tests/httproute-header-matching.yaml"},
+	MinChannel:  "Standard",
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "header-matching", Namespace: ns}
