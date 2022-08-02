@@ -166,6 +166,10 @@ type ConformanceTest struct {
 // Run runs an individual tests, applying and cleaning up the required manifests
 // before calling the Test function.
 func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
+	const (
+		Experimental Channel = 1
+		Standard     Channel = 2
+	)
 	if test.Parallel {
 		t.Parallel()
 	}
@@ -187,7 +191,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	for _, feature := range test.MinChannel {
-		if test.MinChannel < suite.MinChannel {
+		if Experimental < Standard {
 			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
