@@ -53,7 +53,7 @@ var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 				}},
 			}}
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, gwNN, listeners, 60)
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 	},
 }

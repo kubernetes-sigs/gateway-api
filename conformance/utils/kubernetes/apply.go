@@ -25,7 +25,6 @@ import (
 	"net/http"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -36,6 +35,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance"
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
 // Applier prepares manifests depending on the available options and applies
@@ -137,11 +137,11 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder,
 	return resources, nil
 }
 
-func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, resources []client.Object, cleanup bool) {
+func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
 	for _, resource := range resources {
 		resource := resource
 
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
 		t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
@@ -155,7 +155,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, reso
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
 				t.Logf("Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 				err = c.Delete(ctx, resource)
@@ -168,8 +168,8 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, reso
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
 // provided YAML file and registers a cleanup function for resources it created.
 // Note that this does not remove resources that already existed in the cluster.
-func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location string, gcName string, cleanup bool) {
-	data, err := getContentsFromPathOrURL(location)
+func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, location string, gcName string, cleanup bool) {
+	data, err := getContentsFromPathOrURL(location, timeoutConfig)
 	require.NoError(t, err)
 
 	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
@@ -183,7 +183,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 	for i := range resources {
 		uObj := &resources[i]
 
-		ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
 		namespacedName := types.NamespacedName{Namespace: uObj.GetNamespace(), Name: uObj.GetName()}
@@ -199,7 +199,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 
 			if cleanup {
 				t.Cleanup(func() {
-					ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 					defer cancel()
 					t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
 					err = c.Delete(ctx, uObj)
@@ -215,7 +215,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 
 		if cleanup {
 			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
+				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
 				t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
 				err = c.Delete(ctx, uObj)
@@ -228,11 +228,11 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, location st
 
 // getContentsFromPathOrURL takes a string that can either be a local file
 // path or an https:// URL to YAML manifests and provides the contents.
-func getContentsFromPathOrURL(location string) (*bytes.Buffer, error) {
+func getContentsFromPathOrURL(location string, timeoutConfig config.TimeoutConfig) (*bytes.Buffer, error) {
 	if strings.HasPrefix(location, "http://") {
 		return nil, fmt.Errorf("data can't be retrieved from %s: http is not supported, use https", location)
 	} else if strings.HasPrefix(location, "https://") {
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.ManifestFetchTimeout)
 		defer cancel()
 
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, location, nil)

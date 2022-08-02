@@ -25,7 +25,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"regexp"
-	"time"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
 // RoundTripper is an interface used to make requests within conformance tests.
@@ -67,7 +68,8 @@ type CapturedResponse struct {
 // DefaultRoundTripper is the default implementation of a RoundTripper. It will
 // be used if a custom implementation is not specified.
 type DefaultRoundTripper struct {
-	Debug bool
+	Debug         bool
+	TimeoutConfig config.TimeoutConfig
 }
 
 // CaptureRoundTrip makes a request with the provided parameters and returns the
@@ -82,7 +84,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	if request.Method != "" {
 		method = request.Method
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.TimeoutConfig.RequestTimeout)
 	defer cancel()
 	req, err := http.NewRequestWithContext(ctx, method, request.URL.String(), nil)
 	if err != nil {

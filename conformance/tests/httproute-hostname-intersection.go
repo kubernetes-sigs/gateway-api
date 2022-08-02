@@ -42,7 +42,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
-		kubernetes.NamespacesMustBeReady(t, suite.Client, []string{ns}, 300)
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		t.Run("HTTPRoutes that do intersect with listener hostnames", func(t *testing.T) {
 			routes := []types.NamespacedName{
@@ -51,7 +51,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				{Namespace: ns, Name: "wildcard-host-matches-listener-specific-host"},
 				{Namespace: ns, Name: "wildcard-host-matches-listener-wildcard-host"},
 			}
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
 
 			var testCases []http.ExpectedResponse
 
@@ -183,13 +183,13 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				tc := testCases[i]
 				t.Run(testName(tc, i), func(t *testing.T) {
 					t.Parallel()
-					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, tc)
+					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 				})
 			}
 		})
 
 		t.Run("HTTPRoutes that do not intersect with listener hostnames", func(t *testing.T) {
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
 
 			routeName := types.NamespacedName{Namespace: ns, Name: "no-intersecting-hosts"}
 			parents := []v1alpha2.RouteParentStatus{{
@@ -204,7 +204,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				},
 			}}
 
-			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, routeName, parents, true, 60)
+			kubernetes.HTTPRouteMustHaveParents(t, suite.Client, suite.TimeoutConfig, routeName, parents, true)
 
 			testCases := []http.ExpectedResponse{
 				{
@@ -223,7 +223,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				tc := testCases[i]
 				t.Run(testName(tc, i), func(t *testing.T) {
 					t.Parallel()
-					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, tc)
+					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 				})
 			}
 		})

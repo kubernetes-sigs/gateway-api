@@ -23,6 +23,7 @@ import (
 	"testing"
 	"time"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
@@ -61,10 +62,6 @@ type ExpectedRequest struct {
 	AbsentHeaders []string
 }
 
-// maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
-// requiredConsecutiveSuccesses requests to succeed in a row before failing the test.
-const maxTimeToConsistency = 30 * time.Second
-
 // requiredConsecutiveSuccesses is the number of requests that must succeed in a row
 // for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
 // before making additional assertions on the response body. If this number is not reached within
@@ -76,7 +73,7 @@ const requiredConsecutiveSuccesses = 3
 //
 // Once the request succeeds consistently with the response having the expected status code, make
 // additional assertions on the response body using the provided ExpectedResponse.
-func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
+func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	if expected.Request.Method == "" {
@@ -105,12 +102,12 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses)
+	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
 // awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
 // Each failed attempt has a 1s delay; successful attempts have no delay.
-func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
+func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func() bool) {
 	successes := 0
 	attempts := 0
 	to := time.After(maxTimeToConsistency)
@@ -147,8 +144,8 @@ func awaitConvergence(t *testing.T, threshold int, fn func() bool) {
 // WaitForConsistentResponse repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) {
-	awaitConvergence(t, threshold, func() bool {
+func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
+	awaitConvergence(t, threshold, maxTimeToConsistency, func() bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v", err.Error())
