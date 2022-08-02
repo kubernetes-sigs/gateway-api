@@ -27,4 +27,5 @@ var (
 	GatewayClassName     = flag.String("gateway-class", "gateway-conformance", "Name of GatewayClass to use for tests")
 	ShowDebug            = flag.Bool("debug", false, "Whether to print debug logs")
 	CleanupBaseResources = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
+	Experimental         = flag.Bool("experimental", false, "Designed to run in experimental mode")
 )
