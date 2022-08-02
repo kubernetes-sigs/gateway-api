@@ -93,6 +93,19 @@ type HTTPRouteSpec struct {
 	// implementation must raise an 'Accepted' Condition with a status of
 	// `False` in the corresponding RouteParentStatus.
 	//
+	// If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
+	// Listener and that listener already has another Route (B) of the other
+	// type attached and the intersection of the hostnames of A and B is
+	// non-empty, then the implementation MUST accept exactly one of these two
+	// routes, determined by the following criteria, in order:
+	//
+	// * The oldest Route based on creation timestamp.
+	// * The Route appearing first in alphabetical order by
+	//   "{namespace}/{name}".
+	//
+	// The rejected Route MUST raise an 'Accepted' condition with a status of
+	// 'False' in the corresponding RouteParentStatus.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -326,7 +339,6 @@ const (
 // HTTPHeaderName is the name of an HTTP header.
 //
 // Valid values include:
-//
 // * "Authorization"
 // * "Set-Cookie"
 //
@@ -334,6 +346,7 @@ const (
 //
 // * ":method" - ":" is an invalid character. This means that HTTP/2 pseudo
 //   headers are not currently supported by this type.
+//
 // * "/invalid" - "/" is an invalid character
 //
 // +kubebuilder:validation:MinLength=1
