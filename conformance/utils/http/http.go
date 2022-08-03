@@ -40,6 +40,9 @@ type ExpectedResponse struct {
 	StatusCode int
 	Backend    string
 	Namespace  string
+
+	// User Given TestCase name
+	TestCaseName string
 }
 
 // Request can be used as both the request to make and a means to verify
@@ -228,4 +231,27 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 		}
 	}
 	return nil
+}
+
+// Get User-defined test case name or generate from expected response to a given request.
+func (er *ExpectedResponse) GetTestCaseName(i int) string {
+
+	// If TestCase name is provided then use that or else generate one.
+	if er.TestCaseName != "" {
+		return er.TestCaseName
+	}
+
+	headerStr := ""
+	reqStr := ""
+
+	if er.Request.Headers != nil {
+		headerStr = " with headers"
+	}
+
+	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, er.Request.Host, er.Request.Path, headerStr)
+
+	if er.Backend != "" {
+		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
+	}
+	return fmt.Sprintf("%s should receive a %d", reqStr, er.StatusCode)
 }

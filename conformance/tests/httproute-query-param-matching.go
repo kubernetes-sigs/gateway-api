@@ -83,7 +83,7 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 
 		for i := range testCases {
 			tc := testCases[i]
-			t.Run(testName(tc, i), func(t *testing.T) {
+			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, tc)
 			})
