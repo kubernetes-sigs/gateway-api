@@ -49,6 +49,9 @@ const (
 
 	// This option indicates support for HTTPRoute query param matching (extended conformance).
 	SupportHTTPRouteQueryParamMatching SupportedFeature = "HTTPRouteQueryParamMatching"
+
+	// This option indicates support for HTTPRoute method matching (extended conformance).
+	SupportHTTPRouteMethodMatching SupportedFeature = "HTTPRouteMethodMatching"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
