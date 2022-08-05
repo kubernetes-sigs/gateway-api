@@ -44,7 +44,7 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		// The Route must be Attached.
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		t.Run("HTTPRoute with a cross-namespace BackendRef and no ReferenceGrant has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 
@@ -54,11 +54,11 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, routeNN, gwNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
 		t.Run("HTTP Request to invalid cross-namespace backend must receive a 500", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
 					Path:   "/",

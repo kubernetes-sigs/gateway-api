@@ -39,10 +39,10 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 		ns := v1alpha2.Namespace("gateway-conformance-infra")
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: string(ns)}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: string(ns)}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		t.Run("Simple HTTP request should reach infra-backend", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request:    http.Request{Path: "/"},
 				StatusCode: 200,
 				Backend:    "infra-backend-v1",

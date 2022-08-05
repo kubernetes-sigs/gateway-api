@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -63,6 +64,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	ExemptFeatures    []ExemptFeature
 	SupportedFeatures []SupportedFeature
+	TimeoutConfig     config.TimeoutConfig
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -86,13 +88,14 @@ type Options struct {
 	CleanupBaseResources bool
 	ExemptFeatures       []ExemptFeature
 	SupportedFeatures    []SupportedFeature
+	TimeoutConfig        config.TimeoutConfig
 }
 
 // New returns a new ConformanceTestSuite.
 func New(s Options) *ConformanceTestSuite {
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
-		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug}
+		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
 	suite := &ConformanceTestSuite{
@@ -108,7 +111,9 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		ExemptFeatures:    s.ExemptFeatures,
 		SupportedFeatures: s.SupportedFeatures,
+		TimeoutConfig:     s.TimeoutConfig,
 	}
+	config.SetupTimeoutConfig(&suite.TimeoutConfig)
 
 	// apply defaults
 	if suite.BaseManifests == "" {
@@ -122,14 +127,14 @@ func New(s Options) *ConformanceTestSuite {
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.GatewayClassName, 180)
+	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
 	t.Logf("Test Setup: Applying base manifests")
-	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
+	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
 
 	t.Logf("Test Setup: Applying programmatic resources")
 	secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
-	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, []client.Object{secret}, suite.Cleanup)
+	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
 	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 	namespaces := []string{
@@ -137,7 +142,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		"gateway-conformance-app-backend",
 		"gateway-conformance-web-backend",
 	}
-	kubernetes.NamespacesMustBeReady(t, suite.Client, namespaces, 300)
+	kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 }
 
 // Run runs the provided set of conformance tests.
@@ -186,7 +191,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 	for _, manifestLocation := range test.Manifests {
 		t.Logf("Applying %s", manifestLocation)
-		suite.Applier.MustApplyWithCleanup(t, suite.Client, manifestLocation, suite.GatewayClassName, true)
+		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, suite.GatewayClassName, true)
 	}
 
 	test.Test(t, suite)

@@ -44,7 +44,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		// Route and Gateway must be Attached.
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, s.Client, s.TimeoutConfig, s.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		t.Run("HTTPRoute with BackendRef in another namespace and no ReferenceGrant covering the Service has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
 
@@ -54,11 +54,11 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 				Reason: string(v1alpha2.RouteReasonRefNotPermitted),
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, routeNN, gwNN, resolvedRefsCond, 60)
+			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
 		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
 					Path:   "/v2",
@@ -68,7 +68,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 		})
 
 		t.Run("HTTP Request to valid sibling backend should succeed", func(t *testing.T) {
-			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, gwAddr, http.ExpectedResponse{
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
 					Path:   "/",

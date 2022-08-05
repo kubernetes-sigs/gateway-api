@@ -39,13 +39,13 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
-		kubernetes.NamespacesMustBeReady(t, suite.Client, []string{"gateway-conformance-infra"}, 300)
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{"gateway-conformance-infra"})
 
 		routeName := types.NamespacedName{Name: "disallowed-kind", Namespace: "gateway-conformance-infra"}
 		gwName := types.NamespacedName{Name: "tlsroutes-only", Namespace: "gateway-conformance-infra"}
 
 		t.Run("Route should not have Parents set in status", func(t *testing.T) {
-			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, routeName, 60)
+			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeName)
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
