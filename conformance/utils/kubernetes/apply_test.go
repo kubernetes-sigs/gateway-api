@@ -429,7 +429,7 @@ spec:
 	}, {
 		name: "multiple calls to apply with gateways, free ports",
 		applier: NewApplier(
-			nil, []v1beta1.PortNumber{8000},
+			nil, []v1beta1.PortNumber{8000, 8001},
 		),
 		givens: []given{{
 			resources: `
@@ -442,6 +442,12 @@ spec:
   listeners:
     - name: http
       port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: http-other
+      port: 81
       protocol: HTTP
       allowedRoutes:
         namespaces:
@@ -460,6 +466,16 @@ spec:
 							map[string]interface{}{
 								"name":     "http",
 								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+							map[string]interface{}{
+								"name":     "http-other",
+								"port":     int64(8001),
 								"protocol": "HTTP",
 								"allowedRoutes": map[string]interface{}{
 									"namespaces": map[string]interface{}{
@@ -486,6 +502,12 @@ spec:
       allowedRoutes:
         namespaces:
           from: Same
+    - name: http-other
+      port: 81
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
 `,
 			expected: []unstructured.Unstructured{{
 				Object: map[string]interface{}{
@@ -500,6 +522,16 @@ spec:
 							map[string]interface{}{
 								"name":     "http",
 								"port":     int64(8000),
+								"protocol": "HTTP",
+								"allowedRoutes": map[string]interface{}{
+									"namespaces": map[string]interface{}{
+										"from": "Same",
+									},
+								},
+							},
+							map[string]interface{}{
+								"name":     "http-other",
+								"port":     int64(8001),
 								"protocol": "HTTP",
 								"allowedRoutes": map[string]interface{}{
 									"namespaces": map[string]interface{}{
