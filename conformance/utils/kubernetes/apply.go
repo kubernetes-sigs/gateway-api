@@ -84,9 +84,10 @@ func NewApplier(namespaceLabels map[string]string, validPorts []v1beta1.PortNumb
 	}
 }
 
-// freePortsFor is used to mark ports used by a Gateway as available. It does
-// not lock the availablePorts map.
-func (a *Applier) freePortsFor(name types.NamespacedName) {
+// markPortsAvailable is used to mark ports used by a Gateway as available. It does
+// not lock the availablePorts map because it's intended to be called within a
+// critical section.
+func (a *Applier) markPortsAvailable(name types.NamespacedName) {
 	ports, ok := a.assignedPorts[name]
 	if !ok {
 		return
@@ -100,11 +101,15 @@ func (a *Applier) freePortsFor(name types.NamespacedName) {
 // prepareGateway adjusts both listener ports and the gatewayClassName. It
 // returns the ports used by the listeners if they came from validPorts.
 func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
+	a.portsLock.Lock()
+	defer a.portsLock.Unlock()
+
 	name := types.NamespacedName{
 		Namespace: uObj.GetNamespace(),
 		Name:      uObj.GetName(),
 	}
-	a.freePortsFor(name)
+	// Mark the ports allocated to this Gateway as available
+	a.markPortsAvailable(name)
 
 	err := unstructured.SetNestedField(uObj.Object, a.GatewayClass, "spec", "gatewayClassName")
 	require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
@@ -129,7 +134,7 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 			newPort, ok := newPorts[port]
 			if !ok {
 				var portIsValid bool
-				newPort, portIsValid = a.availablePorts.AssignAvailablePort()
+				newPort, portIsValid = a.availablePorts.PopPort()
 				require.True(t, portIsValid, "not enough unassigned valid ports for Gateway resource")
 				newPorts[port] = newPort
 			}
@@ -181,9 +186,6 @@ func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLa
 // a set of manifests.
 func (a *Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder) ([]unstructured.Unstructured, error) {
 	var resources []unstructured.Unstructured
-	a.portsLock.Lock()
-	defer a.portsLock.Unlock()
-
 	for {
 		uObj := unstructured.Unstructured{}
 		if err := decoder.Decode(&uObj); err != nil {
@@ -284,7 +286,7 @@ func (a *Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutCon
 						require.NoErrorf(t, err, "error deleting resource")
 					}
 					a.portsLock.Lock()
-					a.freePortsFor(namespacedName)
+					a.markPortsAvailable(namespacedName)
 					a.portsLock.Unlock()
 				})
 			}
@@ -305,7 +307,7 @@ func (a *Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutCon
 					require.NoErrorf(t, err, "error deleting resource")
 				}
 				a.portsLock.Lock()
-				a.freePortsFor(namespacedName)
+				a.markPortsAvailable(namespacedName)
 				a.portsLock.Unlock()
 			})
 		}

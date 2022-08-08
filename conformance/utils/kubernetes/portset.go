@@ -23,7 +23,7 @@ import (
 // PortSet is a wrapper for handling sets of ports.
 type PortSet []v1beta1.PortNumber
 
-func (s *PortSet) AssignAvailablePort() (v1beta1.PortNumber, bool) {
+func (s *PortSet) PopPort() (v1beta1.PortNumber, bool) {
 	if len(*s) == 0 {
 		return 0, false
 	}
