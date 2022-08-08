@@ -93,6 +93,8 @@ type Options struct {
 
 // New returns a new ConformanceTestSuite.
 func New(s Options) *ConformanceTestSuite {
+	config.SetupTimeoutConfig(&s.TimeoutConfig)
+
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
@@ -113,7 +115,6 @@ func New(s Options) *ConformanceTestSuite {
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 	}
-	config.SetupTimeoutConfig(&suite.TimeoutConfig)
 
 	// apply defaults
 	if suite.BaseManifests == "" {
