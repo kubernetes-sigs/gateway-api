@@ -21,64 +21,64 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 func TestValidateGateway(t *testing.T) {
-	listeners := []gatewayv1a2.Listener{
+	listeners := []gatewayv1b1.Listener{
 		{
 			Hostname: nil,
 		},
 	}
-	addresses := []gatewayv1a2.GatewayAddress{
+	addresses := []gatewayv1b1.GatewayAddress{
 		{
 			Type: nil,
 		},
 	}
-	baseGateway := gatewayv1a2.Gateway{
+	baseGateway := gatewayv1b1.Gateway{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: metav1.NamespaceDefault,
 		},
-		Spec: gatewayv1a2.GatewaySpec{
+		Spec: gatewayv1b1.GatewaySpec{
 			GatewayClassName: "foo",
 			Listeners:        listeners,
 			Addresses:        addresses,
 		},
 	}
-	tlsConfig := gatewayv1a2.GatewayTLSConfig{}
+	tlsConfig := gatewayv1b1.GatewayTLSConfig{}
 
 	testCases := map[string]struct {
-		mutate             func(gw *gatewayv1a2.Gateway)
+		mutate             func(gw *gatewayv1b1.Gateway)
 		expectErrsOnFields []string
 	}{
 		"tls config present with http protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.HTTPProtocolType
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
 		"tls config present with tcp protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
 		"hostname present with tcp protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("foo.bar.com")
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostname := gatewayv1b1.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},
 		"hostname present with udp protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				hostname := gatewayv1a2.Hostname("foo.bar.com")
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostname := gatewayv1b1.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.UDPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},
