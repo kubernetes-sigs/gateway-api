@@ -39,7 +39,7 @@ var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-missing-reference-grant", Namespace: "gateway-conformance-infra"}
 
-		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidCertificateRef", func(t *testing.T) {
+		t.Run("Gateway listener should have a false ResolvedRefs condition with reason RefNotPermitted", func(t *testing.T) {
 			listeners := []v1alpha2.ListenerStatus{{
 				Name: v1alpha2.SectionName("https"),
 				SupportedKinds: []v1alpha2.RouteGroupKind{{
@@ -49,7 +49,7 @@ var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1alpha2.ListenerConditionResolvedRefs),
 					Status: metav1.ConditionFalse,
-					Reason: string(v1alpha2.ListenerReasonInvalidCertificateRef),
+					Reason: string(v1alpha2.ListenerReasonRefNotPermitted),
 				}},
 			}}
 
