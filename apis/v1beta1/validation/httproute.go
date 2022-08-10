@@ -209,7 +209,7 @@ func validateHTTPQueryParamMatches(matches []gatewayv1b1.HTTPQueryParamMatch, pa
 }
 
 // validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are
-//// set for the specified filter type.
+// set for the specified filter type.
 func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1b1.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	if filter.ExtensionRef != nil && filter.Type != gatewayv1b1.HTTPRouteFilterExtensionRef {
