@@ -68,7 +68,8 @@ type TimeoutConfig struct {
 	RequestTimeout time.Duration
 }
 
-func defaultTimeoutConfig() TimeoutConfig {
+// DefaultTimeoutConfig populates a TimeoutConfig with the default values.
+func DefaultTimeoutConfig() TimeoutConfig {
 	return TimeoutConfig{
 		CreateTimeout:                  60 * time.Second,
 		DeleteTimeout:                  10 * time.Second,
@@ -86,7 +87,7 @@ func defaultTimeoutConfig() TimeoutConfig {
 }
 
 func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
-	defaultTimeoutConfig := defaultTimeoutConfig()
+	defaultTimeoutConfig := DefaultTimeoutConfig()
 	if timeoutConfig.CreateTimeout == 0 {
 		timeoutConfig.CreateTimeout = defaultTimeoutConfig.CreateTimeout
 	}
