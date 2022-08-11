@@ -231,6 +231,8 @@ const (
 	// Possible reasons for this condition to be false are:
 	//
 	// * "RefNotPermitted"
+	// * "InvalidKind"
+	// * "BackendNotFound"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
