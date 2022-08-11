@@ -231,6 +231,8 @@ const (
 	// Possible reasons for this condition to be false are:
 	//
 	// * "RefNotPermitted"
+	// * "InvalidKind"
+	// * "BackendNotFound"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -333,8 +335,7 @@ type RouteStatus struct {
 //
 // 1. IPs are not allowed.
 // 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
-//
-//	label must appear by itself as the first label.
+//    label must appear by itself as the first label.
 //
 // Hostname can be "precise" which is a domain name without the terminating
 // dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
