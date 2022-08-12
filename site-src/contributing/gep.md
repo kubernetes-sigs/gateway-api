@@ -46,7 +46,7 @@ can easily find previous discussions and alternatives considered.
 
 ## Format
 
-GEPs should match the format of the template found in [GEP-696](/geps/gep-696).
+GEPs should match the format of the template found in [GEP-696](/site-src/geps/gep-696).
 
 ## Out of scope
 

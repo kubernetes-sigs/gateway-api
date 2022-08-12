@@ -17,7 +17,7 @@ The specification of an HTTPRoute consists of:
   fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
-![httproute-basic-example](/images/httproute-basic-example.svg)
+![httproute-basic-example](/site-src/images/httproute-basic-example.svg)
 
 ### Attaching to Gateways
 
@@ -197,12 +197,12 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][httprouterule].
 
 
-[httproute]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
-[httprouterule]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1beta1.Hostname
-[rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
-[filters]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
-[backendRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
-[parentRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
+[httproute]:https://gateway-api.sigs.k8s.io/api-types/httproute/
+[httprouterule]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule
+[hostname]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.Hostname
+[rfc-3986]:https://tools.ietf.org/html/rfc3986
+[matches]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
+[filters]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
+[backendRef]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
+[parentRef]:https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
 

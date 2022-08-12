@@ -9,7 +9,7 @@ service mesh projects, regardless of their technology stack or proxy.
 
 ## Deliverables
 
-This group will deliver [Gateway Enhancement Proposals](/contributing/gep)
+This group will deliver [Gateway Enhancement Proposals](/site-src/contributing/gep)
 consisting of resources, additions, and modifications to the Gateway API
 specification for mesh and mesh-adjacent use-cases. Governance of the Gateway
 API specification remains solely with the maintainers of the Gateway API
@@ -23,6 +23,6 @@ PT and 8am PT slots to try to be as time-zone inclusive as possible. Meetings
 will be moderated by the [GAMMA
 leads](https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23)
 with notes taken by a volunteer. Meeting occurences can be found on the
-[sig-network calendar](/contributing/community/#meetings). Community members
+[sig-network calendar](/site-src/contributing/community/#meetings). Community members
 should feel free to attend both GAMMA and Gateway API meetings, but are by no
 means obligated to do so.
