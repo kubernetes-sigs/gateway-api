@@ -190,10 +190,8 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 		}
 	}
 
-	for _, feature := range test.MinChannel {
-		if Experimental < Standard {
-			t.Skip("Skipping %s: suite does not support %s", test.ShortName, feature)
-		}
+	if test.MinChannel < suite.MinChannel {
+		t.Skipf("Skipping %s: only testing %s channel", test.ShortName, suite.MinChannel)
 	}
 
 	for _, manifestLocation := range test.Manifests {
