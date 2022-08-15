@@ -93,7 +93,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v1
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
@@ -139,7 +139,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v2
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
@@ -185,7 +185,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v3
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
@@ -238,7 +238,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v1
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
@@ -284,7 +284,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v2
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
@@ -337,7 +337,7 @@ spec:
     spec:
       containers:
       - name: web-backend
-        image: k8s.gcr.io/ingressconformance/echoserver:v0.0.1
+        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
           valueFrom:
