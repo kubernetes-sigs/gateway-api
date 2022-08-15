@@ -60,7 +60,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	ExemptFeatures    []ExemptFeature
 	SupportedFeatures []SupportedFeature
-	MinChannel        string
+	MinChannel        GatewayChannel
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
