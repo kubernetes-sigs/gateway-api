@@ -47,6 +47,14 @@ const (
 	SupportReferencePolicy SupportedFeature = "ReferencePolicy"
 )
 
+// GatewatChannel allows opting between experimental or standard conformance tests.
+type GatewayChannel string
+
+const (
+	ExperimentalChannel GatewayChannel = "1"
+	StandardChannel     GatewayChannel = "2"
+)
+
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
 type ConformanceTestSuite struct {
@@ -84,7 +92,7 @@ type Options struct {
 	CleanupBaseResources bool
 	ExemptFeatures       []ExemptFeature
 	SupportedFeatures    []SupportedFeature
-	MinChannel           string
+	MinChannel           GatewayChannel
 }
 
 // New returns a new ConformanceTestSuite.
@@ -160,16 +168,13 @@ type ConformanceTest struct {
 	Slow        bool
 	Parallel    bool
 	Test        func(*testing.T, *ConformanceTestSuite)
-	MinChannel  string
+	MinChannel  GatewayChannel
 }
 
 // Run runs an individual tests, applying and cleaning up the required manifests
 // before calling the Test function.
 func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
-	const (
-		Experimental Channel = 1
-		Standard     Channel = 2
-	)
+
 	if test.Parallel {
 		t.Parallel()
 	}

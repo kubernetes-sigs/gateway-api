@@ -36,7 +36,7 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidCrossNamespaceParentRef",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should fail to attach to a Gateway in another namespace that it is not allowed to",
 	Manifests:   []string{"tests/httproute-invalid-cross-namespace-parent-ref.yaml"},
-	MinChannel:  "Standard",
+	MinChannel:  suite.StandardChannel,
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeName := types.NamespacedName{Name: "invalid-cross-namespace-parent-ref", Namespace: "gateway-conformance-web-backend"}
 		gwName := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
