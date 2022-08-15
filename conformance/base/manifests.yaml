@@ -93,6 +93,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v1
+        # From https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
         image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
         env:
         - name: POD_NAME
