@@ -48,11 +48,11 @@ const (
 )
 
 // GatewatChannel allows opting between experimental or standard conformance tests.
-type GatewayChannel string
+type GatewayChannel int
 
 const (
-	ExperimentalChannel GatewayChannel = "1"
-	StandardChannel     GatewayChannel = "2"
+	ExperimentalChannel GatewayChannel = 1
+	StandardChannel     GatewayChannel = 2
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
@@ -103,8 +103,8 @@ func New(s Options) *ConformanceTestSuite {
 	}
 
 	MinChannel := s.MinChannel
-	if MinChannel == "" {
-		MinChannel = "Standard"
+	if MinChannel == 0 {
+		MinChannel = StandardChannel
 	}
 
 	suite := &ConformanceTestSuite{
