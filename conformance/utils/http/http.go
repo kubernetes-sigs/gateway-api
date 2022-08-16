@@ -110,9 +110,10 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 // awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
 // Each failed attempt has a 1s delay; successful attempts have no delay.
-func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func() bool) {
+func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
 	successes := 0
 	attempts := 0
+	start := time.Now()
 	to := time.After(maxTimeToConsistency)
 	delay := time.Second
 	for {
@@ -122,7 +123,7 @@ func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		default:
 		}
 
-		completed := fn()
+		completed := fn(time.Now().Sub(start))
 		attempts++
 		if completed {
 			successes++
@@ -148,15 +149,15 @@ func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
 func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
-	awaitConvergence(t, threshold, maxTimeToConsistency, func() bool {
+	awaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
-			t.Logf("Request failed, not ready yet: %v", err.Error())
+			t.Logf("Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
 			return false
 		}
 
 		if err := CompareRequest(cReq, cRes, expected); err != nil {
-			t.Logf("Response expectation failed, not ready yet: %v", err)
+			t.Logf("Response expectation failed, not ready yet: %v (after %v)", err, elapsed)
 			return false
 		}
 
