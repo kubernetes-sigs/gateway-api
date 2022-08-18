@@ -41,6 +41,21 @@ var (
 )
 
 var (
+	v1a2TCPRouteGVP = meta.GroupVersionResource{
+		Group:    v1alpha2.GroupVersion.Group,
+		Version:  v1alpha2.GroupVersion.Version,
+		Resource: "tcproutes",
+	}
+	v1a2UDPRouteGVP = meta.GroupVersionResource{
+		Group:    v1alpha2.GroupVersion.Group,
+		Version:  v1alpha2.GroupVersion.Version,
+		Resource: "udproutes",
+	}
+	v1a2TLSRouteGVP = meta.GroupVersionResource{
+		Group:    v1alpha2.GroupVersion.Group,
+		Version:  v1alpha2.GroupVersion.Version,
+		Resource: "tlsroutes",
+	}
 	v1a2HTTPRouteGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
 		Version:  v1alpha2.SchemeGroupVersion.Version,
@@ -163,6 +178,27 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 	}
 
 	switch request.Resource {
+	case v1a2TCPRouteGVP:
+		var tRoute v1alpha2.TCPRoute
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &tRoute)
+		if err != nil {
+			return nil, err
+		}
+		fieldErr = v1a2Validation.ValidateTCPRoute(&tRoute)
+	case v1a2UDPRouteGVP:
+		var uRoute v1alpha2.UDPRoute
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &uRoute)
+		if err != nil {
+			return nil, err
+		}
+		fieldErr = v1a2Validation.ValidateUDPRoute(&uRoute)
+	case v1a2TLSRouteGVP:
+		var tRoute v1alpha2.TLSRoute
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &tRoute)
+		if err != nil {
+			return nil, err
+		}
+		fieldErr = v1a2Validation.ValidateTLSRoute(&tRoute)
 	case v1a2HTTPRouteGVR:
 		var hRoute v1alpha2.HTTPRoute
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
