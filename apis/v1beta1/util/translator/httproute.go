@@ -14,20 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package utils
+package translator
 
 import (
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// PathMatchTypePtr translates a string to *PathMatchType
-func PathMatchTypePtr(s string) *gatewayv1b1.PathMatchType {
-	result := gatewayv1b1.PathMatchType(s)
+// HeaderMatchTypePtr translates a string to *PathMatchType
+func HeaderMatchTypePtr(s string) *gatewayv1b1.HeaderMatchType {
+	result := gatewayv1b1.HeaderMatchType(s)
 	return &result
 }
 
-// PortNumberPtr translates an int to a *PortNumber
-func PortNumberPtr(p int) *gatewayv1b1.PortNumber {
-	result := gatewayv1b1.PortNumber(p)
+// PathMatchTypePtr translates a string to *PathMatchType
+func PathMatchTypePtr(s string) *gatewayv1b1.PathMatchType {
+	result := gatewayv1b1.PathMatchType(s)
 	return &result
 }

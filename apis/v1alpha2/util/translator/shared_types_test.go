@@ -14,24 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package utils
+package translator
 
 import (
 	"testing"
 
-	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 func Test_PortNumberPtr(t *testing.T) {
-	var exportedPort65535 gatewayv1b1.PortNumber = 65535
-	var exportedPort1 gatewayv1b1.PortNumber = 1
-	var exportedPort0 gatewayv1b1.PortNumber
-	var exportedPort65536 gatewayv1b1.PortNumber = 65536
+	var exportedPort65535 gatewayv1a2.PortNumber = 65535
+	var exportedPort1 gatewayv1a2.PortNumber = 1
+	var exportedPort0 gatewayv1a2.PortNumber
+	var exportedPort65536 gatewayv1a2.PortNumber = 65536
 
 	portNumberPtrTests := []struct {
 		name         string
 		port         int
-		expectedPort *gatewayv1b1.PortNumber
+		expectedPort *gatewayv1a2.PortNumber
 	}{
 		{
 			name:         "invalid port number",
@@ -64,40 +64,6 @@ func Test_PortNumberPtr(t *testing.T) {
 				}
 			} else if *port != *tc.expectedPort {
 				t.Errorf("Expected port %d, got %d", *tc.expectedPort, *port)
-			}
-		})
-	}
-}
-
-func Test_PathMatchTypePtr(t *testing.T) {
-	pathMatchTypePtrTests := []struct {
-		name         string
-		pathType     string
-		expectedPath gatewayv1b1.PathMatchType
-	}{
-		{
-			name:         "valid path exact match",
-			pathType:     "Exact",
-			expectedPath: gatewayv1b1.PathMatchExact,
-		},
-
-		{
-			name:         "valid path prefix match",
-			pathType:     "PathPrefix",
-			expectedPath: gatewayv1b1.PathMatchPathPrefix,
-		},
-		{
-			name:         "valid path regular expression match",
-			pathType:     "RegularExpression",
-			expectedPath: gatewayv1b1.PathMatchRegularExpression,
-		},
-	}
-
-	for _, tc := range pathMatchTypePtrTests {
-		t.Run(tc.name, func(t *testing.T) {
-			path := PathMatchTypePtr(tc.pathType)
-			if *path != tc.expectedPath {
-				t.Errorf("Expected path %s, got %s", tc.expectedPath, *path)
 			}
 		})
 	}
