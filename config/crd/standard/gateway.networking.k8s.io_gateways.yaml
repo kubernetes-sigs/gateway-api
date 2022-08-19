@@ -711,8 +711,8 @@ spec:
         required:
         - spec
         type: object
-    served: true
-    storage: true
+    served: false
+    storage: false
     subresources:
       status: {}
   - additionalPrinterColumns:
@@ -1406,7 +1406,7 @@ spec:
         - spec
         type: object
     served: true
-    storage: false
+    storage: true
     subresources:
       status: {}
 status:

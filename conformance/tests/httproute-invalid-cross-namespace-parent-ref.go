@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -47,7 +47,7 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
 			require.Eventually(t, func() bool {
-				gw := &v1alpha2.Gateway{}
+				gw := &v1beta1.Gateway{}
 				if err := suite.Client.Get(context.TODO(), gwName, gw); err != nil {
 					t.Logf("error fetching gateway: %v", err)
 					return false

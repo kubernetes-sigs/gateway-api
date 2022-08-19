@@ -24,7 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	_ "sigs.k8s.io/gateway-api/conformance/utils/flags"
 )
 
@@ -108,7 +108,7 @@ metadata:
 		name:    "no listener ports given",
 		applier: Applier{},
 		given: `
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       Gateway
 metadata:
   name: test
@@ -124,7 +124,7 @@ spec:
 `,
 		expected: []unstructured.Unstructured{{
 			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"apiVersion": "gateway.networking.k8s.io/v1beta1",
 				"kind":       "Gateway",
 				"metadata": map[string]interface{}{
 					"name": "test",
@@ -149,10 +149,10 @@ spec:
 	}, {
 		name: "multiple gateways each with multiple listeners",
 		applier: Applier{
-			ValidUniqueListenerPorts: []v1alpha2.PortNumber{8000, 8001, 8002, 8003},
+			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001, 8002, 8003},
 		},
 		given: `
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       Gateway
 metadata:
   name: test
@@ -172,7 +172,7 @@ spec:
         namespaces:
           from: Same
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       Gateway
 metadata:
   name: test2
@@ -194,7 +194,7 @@ spec:
 `,
 		expected: []unstructured.Unstructured{{
 			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"apiVersion": "gateway.networking.k8s.io/v1beta1",
 				"kind":       "Gateway",
 				"metadata": map[string]interface{}{
 					"name": "test",
@@ -227,7 +227,7 @@ spec:
 			},
 		}, {
 			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+				"apiVersion": "gateway.networking.k8s.io/v1beta1",
 				"kind":       "Gateway",
 				"metadata": map[string]interface{}{
 					"name": "test2",
