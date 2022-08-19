@@ -36,6 +36,8 @@ func validateTCPRouteSpec(spec *gatewayv1a2.TCPRouteSpec, path *field.Path) fiel
 	var errs field.ErrorList
 	for i, rule := range spec.Rules {
 		for j, ref := range rule.BackendRefs {
+			// Avoid referencing to the loop variable.
+			ref := ref
 			errs = append(errs, validateBackendRefServicePort(&ref, path.Index(i).Child("backendRefs").Index(j))...)
 		}
 	}

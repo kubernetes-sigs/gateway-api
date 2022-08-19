@@ -37,6 +37,8 @@ func validateUDPRouteSpec(spec *gatewayv1a2.UDPRouteSpec, path *field.Path) fiel
 
 	for i, rule := range spec.Rules {
 		for j, ref := range rule.BackendRefs {
+			// Avoid referencing to the loop variable.
+			ref := ref
 			errs = append(errs, validateBackendRefServicePort(&ref, path.Index(i).Child("backendRefs").Index(j))...)
 		}
 	}
