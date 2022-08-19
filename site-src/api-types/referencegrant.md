@@ -14,7 +14,7 @@ A ReferenceGrant can be used to enable cross namespace references within
 Gateway API. In particular, Routes may forward traffic to backends in other
 namespaces, or Gateways may refer to Secrets in another namespace.
 
-![Reference Grant](/site-src/images/referencegrant-simple.png)
+![Reference Grant](/images/referencegrant-simple.png)
 
 In the past, we've seen that forwarding traffic across namespace boundaries is a
 desired feature, but without a safeguard like ReferenceGrant,
