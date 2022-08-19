@@ -17,37 +17,53 @@ limitations under the License.
 package http
 
 import (
+	"fmt"
 	"net/url"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-
+	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
-	Request    ExpectedRequest
+	// Request defines the request to make.
+	Request Request
+
+	// ExpectedRequest defines the request that
+	// is expected to arrive at the backend. If
+	// not specified, the backend request will be
+	// expected to match Request.
+	ExpectedRequest *ExpectedRequest
+
 	StatusCode int
 	Backend    string
 	Namespace  string
+
+	// User Given TestCase name
+	TestCaseName string
 }
 
-// ExpectedRequest can be used as both the request to make and a means to verify
-// that echoserver received the expected request.
-type ExpectedRequest struct {
+// Request can be used as both the request to make and a means to verify
+// that echoserver received the expected request. Note that multiple header
+// values can be provided, as a comma-separated value.
+type Request struct {
 	Host    string
 	Method  string
 	Path    string
 	Headers map[string]string
 }
 
-// maxTimeToConsistency is the maximum time that WaitForConsistency will wait for
-// requiredConsecutiveSuccesses requests to succeed in a row before failing the test.
-const maxTimeToConsistency = 30 * time.Second
+// ExpectedRequest defines expected properties of a request.
+type ExpectedRequest struct {
+	Request
+
+	// AbsentHeaders are names of headers that are expected
+	// *not* to be present on the request.
+	AbsentHeaders []string
+}
 
 // requiredConsecutiveSuccesses is the number of requests that must succeed in a row
 // for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
@@ -60,7 +76,7 @@ const requiredConsecutiveSuccesses = 3
 //
 // Once the request succeeds consistently with the response having the expected status code, make
 // additional assertions on the response body using the provided ExpectedResponse.
-func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, gwAddr string, expected ExpectedResponse) {
+func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	if expected.Request.Method == "" {
@@ -73,10 +89,12 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
 
+	path, query, _ := strings.Cut(expected.Request.Path, "?")
+
 	req := roundtripper.Request{
 		Method:   expected.Request.Method,
 		Host:     expected.Request.Host,
-		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: expected.Request.Path},
+		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
 		Protocol: "HTTP",
 	}
 
@@ -87,76 +105,150 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		}
 	}
 
-	cReq, cRes := WaitForConsistency(t, r, req, expected, requiredConsecutiveSuccesses)
-	ExpectResponse(t, cReq, cRes, expected)
+	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
-// WaitForConsistency repeats the provided request until it completes with a response having
-// the expected status code consistently. The provided threshold determines how many times in
-// a row this must occur to be considered "consistent".
-func WaitForConsistency(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int) (*roundtripper.CapturedRequest, *roundtripper.CapturedResponse) {
-	var (
-		cReq         *roundtripper.CapturedRequest
-		cRes         *roundtripper.CapturedResponse
-		err          error
-		numSuccesses int
-	)
+// awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
+// Each failed attempt has a 1s delay; successful attempts have no delay.
+func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func() bool) {
+	successes := 0
+	attempts := 0
+	to := time.After(maxTimeToConsistency)
+	delay := time.Second
+	for {
+		select {
+		case <-to:
+			t.Fatalf("timeout while waiting after %d attempts", attempts)
+		default:
+		}
 
-	require.Eventually(t, func() bool {
-		cReq, cRes, err = r.CaptureRoundTrip(req)
+		completed := fn()
+		attempts++
+		if completed {
+			successes++
+			if successes >= threshold {
+				return
+			}
+			// Skip delay if we have a success
+			continue
+		}
+
+		successes = 0
+		select {
+		// Capture the overall timeout
+		case <-to:
+			t.Fatalf("timeout while waiting after %d attempts, %d/%d sucessess", attempts, successes, threshold)
+			// And the per-try delay
+		case <-time.After(delay):
+		}
+	}
+}
+
+// WaitForConsistentResponse repeats the provided request until it completes with a response having
+// the expected response consistently. The provided threshold determines how many times in
+// a row this must occur to be considered "consistent".
+func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
+	awaitConvergence(t, threshold, maxTimeToConsistency, func() bool {
+		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
-			numSuccesses = 0
 			t.Logf("Request failed, not ready yet: %v", err.Error())
 			return false
 		}
 
-		if cRes.StatusCode != expected.StatusCode {
-			numSuccesses = 0
-			t.Logf("Expected response to have status %d but got %d, not ready yet", expected.StatusCode, cRes.StatusCode)
+		if err := CompareRequest(cReq, cRes, expected); err != nil {
+			t.Logf("Response expectation failed, not ready yet: %v", err)
 			return false
 		}
 
-		numSuccesses++
-		if numSuccesses < threshold {
-			t.Logf("Request has passed %d times in a row of the desired %d, not ready yet", numSuccesses, threshold)
-			return false
-		}
-
-		t.Logf("Request has passed %d times in a row of the desired %d, ready!", numSuccesses, threshold)
 		return true
-	}, maxTimeToConsistency, 1*time.Second, "error making request, never got expected status")
-
-	return cReq, cRes
+	})
+	t.Logf("Request passed")
 }
 
-// ExpectResponse verifies that a captured request and response match the
-// provided ExpectedResponse.
-func ExpectResponse(t *testing.T, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) {
-	t.Helper()
-	assert.Equal(t, expected.StatusCode, cRes.StatusCode, "expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
+func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+	if expected.StatusCode != cRes.StatusCode {
+		return fmt.Errorf("expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
+	}
 	if cRes.StatusCode == 200 {
-		assert.Equal(t, expected.Request.Path, cReq.Path, "expected path to be %s, got %s", expected.Request.Path, cReq.Path)
-		assert.Equal(t, expected.Request.Method, cReq.Method, "expected method to be %s, got %s", expected.Request.Method, cReq.Method)
-		assert.Equal(t, expected.Namespace, cReq.Namespace, "expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
-		if expected.Request.Headers != nil {
+		// The request expected to arrive at the backend is
+		// the same as the request made, unless otherwise
+		// specified.
+		if expected.ExpectedRequest == nil {
+			expected.ExpectedRequest = &ExpectedRequest{Request: expected.Request}
+		}
+
+		if expected.ExpectedRequest.Method == "" {
+			expected.ExpectedRequest.Method = "GET"
+		}
+
+		if expected.ExpectedRequest.Path != cReq.Path {
+			return fmt.Errorf("expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
+		}
+		if expected.ExpectedRequest.Method != cReq.Method {
+			return fmt.Errorf("expected method to be %s, got %s", expected.ExpectedRequest.Method, cReq.Method)
+		}
+		if expected.Namespace != cReq.Namespace {
+			return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, cReq.Namespace)
+		}
+		if expected.ExpectedRequest.Headers != nil {
 			if cReq.Headers == nil {
-				t.Error("No headers captured")
-			} else {
-				for name, val := range cReq.Headers {
-					cReq.Headers[strings.ToLower(name)] = val
+				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
+			}
+			for name, val := range cReq.Headers {
+				cReq.Headers[strings.ToLower(name)] = val
+			}
+			for name, expectedVal := range expected.ExpectedRequest.Headers {
+				actualVal, ok := cReq.Headers[strings.ToLower(name)]
+				if !ok {
+					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cReq.Headers)
+				} else if strings.Join(actualVal, ",") != expectedVal {
+					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 				}
-				for name, expectedVal := range expected.Request.Headers {
-					actualVal, ok := cReq.Headers[strings.ToLower(name)]
-					if !ok {
-						t.Errorf("Expected %s header to be set, actual headers: %v", name, cReq.Headers)
-					} else if actualVal[0] != expectedVal {
-						t.Errorf("Expected %s header to be set to %s, got %s", name, expectedVal, actualVal[0])
-					}
+
+			}
+		}
+
+		// Verify that headers expected *not* to be present on the
+		// request are actually not present.
+		if len(expected.ExpectedRequest.AbsentHeaders) > 0 {
+			for name, val := range cReq.Headers {
+				cReq.Headers[strings.ToLower(name)] = val
+			}
+
+			for _, name := range expected.ExpectedRequest.AbsentHeaders {
+				val, ok := cReq.Headers[strings.ToLower(name)]
+				if ok {
+					return fmt.Errorf("expected %s header to not be set, got %s", name, val)
 				}
 			}
 		}
+
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
-			t.Errorf("Expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
 		}
 	}
+	return nil
+}
+
+// Get User-defined test case name or generate from expected response to a given request.
+func (er *ExpectedResponse) GetTestCaseName(i int) string {
+
+	// If TestCase name is provided then use that or else generate one.
+	if er.TestCaseName != "" {
+		return er.TestCaseName
+	}
+
+	headerStr := ""
+	reqStr := ""
+
+	if er.Request.Headers != nil {
+		headerStr = " with headers"
+	}
+
+	reqStr = fmt.Sprintf("%d request to '%s%s'%s", i, er.Request.Host, er.Request.Path, headerStr)
+
+	if er.Backend != "" {
+		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
+	}
+	return fmt.Sprintf("%s should receive a %d", reqStr, er.StatusCode)
 }

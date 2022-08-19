@@ -18,9 +18,9 @@ section in the Security model for details.
 ## Resource model
 
 !!! note
-    As of v1alpha2, resources are in the `gateway.networking.k8s.io` API group as
-    Custom Resource Definitions (CRDs). Unqualified resource names below will implicitly
-    be in this API group. Prior to v1alpha1, the API group was `networking.x-k8s.io`.
+    Gateway API resources are in the `gateway.networking.k8s.io` API group as
+    Custom Resource Definitions (CRDs). Unqualified resource names below will
+    implicitly be in this API group.
 
 There are three main types of objects in our resource model:
 
@@ -36,9 +36,9 @@ the cluster.
 
 GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
-controllers MAY handle more than one GatewayClass.
+controllers may handle more than one GatewayClass.
 
-GatewayClass is a cluster-scoped resource. There MUST be at least one
+GatewayClass is a cluster-scoped resource. There must be at least one
 GatewayClass defined in order to be able to have functional Gateways. A
 controller that implements the Gateway API does so by providing an associated
 GatewayClass resource that the user can reference from their Gateway(s).
@@ -62,8 +62,8 @@ have client traffic originating “outside” the cluster, this is not a
 requirement.
 
 It defines a request for a specific load balancer config that implements the
-GatewayClass’ configuration and behaviour contract. The resource MAY be created
-by an operator directly, or MAY be created by a controller handling a
+GatewayClass’ configuration and behaviour contract. The resource may be created
+by an operator directly, or may be created by a controller handling a
 GatewayClass.
 
 As the Gateway spec captures user intent, it may not contain a complete
@@ -73,7 +73,7 @@ managing the GatewayClass to provide these settings for the user, resulting in a
 more portable spec. This behaviour will be made clear using the GatewayClass
 Status object.
 
-A Gateway MAY be attached to one or more *Route references* which serve to direct
+A Gateway may be attached to one or more *Route references* which serve to direct
 traffic for a subset of traffic *to a specific service.*
 
 ### Route Resources
@@ -92,12 +92,26 @@ for either routing or modification, for example using HTTP Headers for routing, 
 modifying them in-flight.
 
 #### TLSRoute
+
+!!! info "Experimental Channel"
+
+    The `TLSRoute` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to use the SNI as the main routing method, and are not interested
 in properties of the higher-level protocols like HTTP.  The byte stream of the
 connection is proxied without any inspection to the backend.
 
 #### TCPRoute and UDPRoute
+
+!!! info "Experimental Channel"
+
+    The `TCPRoute` and `UDPRoute` resources described below are currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 TCPRoute (and UDPRoute) are intended for use for mapping one or more ports
 to a single backend. In this case, there is no discriminator you can
 use to choose different backends on the same port, so each TCPRoute really needs a
@@ -225,20 +239,20 @@ The following `my-route` Route wants to attach to the `foo-gateway` in the
 attachment from HTTPRoutes in the namespace `gateway-api-example-ns2`.
 
 ```yaml
-{% include 'v1alpha2/http-route-attachment/httproute.yaml' %}
+{% include 'v1beta1/http-route-attachment/httproute.yaml' %}
 ```
 
 This `foo-gateway` allows the `my-route` HTTPRoute to attach.
 
 ```yaml
-{% include 'v1alpha2/http-route-attachment/gateway-strict.yaml' %}
+{% include 'v1beta1/http-route-attachment/gateway-strict.yaml' %}
 ```
 
 For a more permissive example, the below Gateway will allow all HTTPRoute resources
 to attach from Namespaces with the "expose-apps: true" label.
 
 ```yaml
-{% include 'v1alpha2/http-route-attachment/gateway-namespaces.yaml' %}
+{% include 'v1beta1/http-route-attachment/gateway-namespaces.yaml' %}
 ```
 
 ### Combined types
@@ -271,7 +285,7 @@ reverse proxy is:
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
-Please refer to the [TLS details](/v1alpha2/guides/tls) guide for a deep dive on TLS.
+Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
 
 
 ## Extension points

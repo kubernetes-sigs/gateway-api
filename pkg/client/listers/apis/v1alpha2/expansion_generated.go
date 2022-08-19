@@ -18,6 +18,14 @@ limitations under the License.
 
 package v1alpha2
 
+// GRPCRouteListerExpansion allows custom methods to be added to
+// GRPCRouteLister.
+type GRPCRouteListerExpansion interface{}
+
+// GRPCRouteNamespaceListerExpansion allows custom methods to be added to
+// GRPCRouteNamespaceLister.
+type GRPCRouteNamespaceListerExpansion interface{}
+
 // GatewayListerExpansion allows custom methods to be added to
 // GatewayLister.
 type GatewayListerExpansion interface{}
@@ -37,6 +45,14 @@ type HTTPRouteListerExpansion interface{}
 // HTTPRouteNamespaceListerExpansion allows custom methods to be added to
 // HTTPRouteNamespaceLister.
 type HTTPRouteNamespaceListerExpansion interface{}
+
+// ReferenceGrantListerExpansion allows custom methods to be added to
+// ReferenceGrantLister.
+type ReferenceGrantListerExpansion interface{}
+
+// ReferenceGrantNamespaceListerExpansion allows custom methods to be added to
+// ReferenceGrantNamespaceLister.
+type ReferenceGrantNamespaceListerExpansion interface{}
 
 // ReferencePolicyListerExpansion allows custom methods to be added to
 // ReferencePolicyLister.

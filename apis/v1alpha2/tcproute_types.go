@@ -59,13 +59,6 @@ type TCPRouteStatus struct {
 
 // TCPRouteRule is the configuration for a given rule.
 type TCPRouteRule struct {
-	// Matches are rules for routing traffic to backends based on addresses.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=16
-	//  <gateway:experimental>
-	Matches []AddressRouteMatches `json:"matches,omitempty"`
-
 	// BackendRefs defines the backend(s) where matching requests should be
 	// sent. If unspecified or invalid (refers to a non-existent resource or a
 	// Service with no endpoints), the underlying implementation MUST actively
@@ -74,6 +67,7 @@ type TCPRouteRule struct {
 	// connections, then 80% of connections must be rejected instead.
 	//
 	// Support: Core for Kubernetes Service
+	//
 	// Support: Custom for any other resource
 	//
 	// Support for weight: Extended

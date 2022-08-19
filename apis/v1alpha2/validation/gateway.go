@@ -51,7 +51,9 @@ func ValidateGateway(gw *gatewayv1a2.Gateway) field.ErrorList {
 // validateGatewaySpec validates whether required fields of spec are set according to the
 // Gateway API specification.
 func validateGatewaySpec(spec *gatewayv1a2.GatewaySpec, path *field.Path) field.ErrorList {
-	return validateGatewayListeners(spec.Listeners, path.Child("listeners"))
+	var errs field.ErrorList
+	errs = append(errs, validateGatewayListeners(spec.Listeners, path.Child("listeners"))...)
+	return errs
 }
 
 // validateGatewayListeners validates whether required fields of listeners are set according

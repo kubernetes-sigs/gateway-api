@@ -24,12 +24,16 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
+	// GRPCRoutes returns a GRPCRouteInformer.
+	GRPCRoutes() GRPCRouteInformer
 	// Gateways returns a GatewayInformer.
 	Gateways() GatewayInformer
 	// GatewayClasses returns a GatewayClassInformer.
 	GatewayClasses() GatewayClassInformer
 	// HTTPRoutes returns a HTTPRouteInformer.
 	HTTPRoutes() HTTPRouteInformer
+	// ReferenceGrants returns a ReferenceGrantInformer.
+	ReferenceGrants() ReferenceGrantInformer
 	// ReferencePolicies returns a ReferencePolicyInformer.
 	ReferencePolicies() ReferencePolicyInformer
 	// TCPRoutes returns a TCPRouteInformer.
@@ -51,6 +55,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
+// GRPCRoutes returns a GRPCRouteInformer.
+func (v *version) GRPCRoutes() GRPCRouteInformer {
+	return &gRPCRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
 // Gateways returns a GatewayInformer.
 func (v *version) Gateways() GatewayInformer {
 	return &gatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
@@ -64,6 +73,11 @@ func (v *version) GatewayClasses() GatewayClassInformer {
 // HTTPRoutes returns a HTTPRouteInformer.
 func (v *version) HTTPRoutes() HTTPRouteInformer {
 	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// ReferenceGrants returns a ReferenceGrantInformer.
+func (v *version) ReferenceGrants() ReferenceGrantInformer {
+	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReferencePolicies returns a ReferencePolicyInformer.

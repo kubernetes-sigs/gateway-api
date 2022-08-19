@@ -18,6 +18,7 @@ package validation
 
 import (
 	"fmt"
+	"net/http"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -48,13 +49,21 @@ func ValidateHTTPRoute(route *gatewayv1a2.HTTPRoute) field.ErrorList {
 func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, rule := range spec.Rules {
-		errs = append(errs, validateHTTPRouteFilters(rule.Filters, path.Child("rules").Index(i))...)
+		errs = append(errs, validateHTTPRouteFilters(rule.Filters, rule.Matches, path.Child("rules").Index(i))...)
 		for j, backendRef := range rule.BackendRefs {
-			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
+			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
 		}
 		for j, m := range rule.Matches {
+			matchPath := path.Child("rules").Index(i).Child("matches").Index(j)
+
 			if m.Path != nil {
-				errs = append(errs, validateHTTPPathMatch(m.Path, path.Child("matches").Index(j).Child("path"))...)
+				errs = append(errs, validateHTTPPathMatch(m.Path, matchPath.Child("path"))...)
+			}
+			if len(m.Headers) > 0 {
+				errs = append(errs, validateHTTPHeaderMatches(m.Headers, matchPath.Child("headers"))...)
+			}
+			if len(m.QueryParams) > 0 {
+				errs = append(errs, validateHTTPQueryParamMatches(m.QueryParams, matchPath.Child("queryParams"))...)
 			}
 		}
 	}
@@ -90,17 +99,27 @@ func validateHTTPRouteBackendServicePorts(rules []gatewayv1a2.HTTPRouteRule, pat
 
 // validateHTTPRouteFilters validates that a list of core and extended filters
 // is used at most once and that the filter type matches its value
-func validateHTTPRouteFilters(filters []gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
+func validateHTTPRouteFilters(filters []gatewayv1a2.HTTPRouteFilter, matches []gatewayv1a2.HTTPRouteMatch, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	counts := map[gatewayv1a2.HTTPRouteFilterType]int{}
 
 	for i, filter := range filters {
 		counts[filter.Type]++
+		if filter.RequestRedirect != nil && filter.RequestRedirect.Path != nil {
+			errs = append(errs, validateHTTPPathModifier(*filter.RequestRedirect.Path, matches, path.Index(i).Child("requestRedirect", "path"))...)
+		}
+		if filter.URLRewrite != nil && filter.URLRewrite.Path != nil {
+			errs = append(errs, validateHTTPPathModifier(*filter.URLRewrite.Path, matches, path.Index(i).Child("urlRewrite", "path"))...)
+		}
 		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
 	// custom filters don't have any validation
 	for _, key := range repeatableHTTPRouteFilters {
 		delete(counts, key)
+	}
+
+	if counts[gatewayv1a2.HTTPRouteFilterRequestRedirect] > 0 && counts[gatewayv1a2.HTTPRouteFilterURLRewrite] > 0 {
+		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1a2.HTTPRouteFilterRequestRedirect, "Redirect and Rewrite filters cannot be defined in the same list of filters"))
 	}
 
 	for filterType, count := range counts {
@@ -149,8 +168,48 @@ func validateHTTPPathMatch(path *gatewayv1a2.HTTPPathMatch, fldPath *field.Path)
 	return allErrs
 }
 
+// validateHTTPHeaderMatches validates that no header name
+// is matched more than once (case-insensitive).
+func validateHTTPHeaderMatches(matches []gatewayv1a2.HTTPHeaderMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[string]int{}
+
+	for _, match := range matches {
+		// Header names are case-insensitive.
+		counts[strings.ToLower(string(match.Name))]++
+	}
+
+	for name, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, http.CanonicalHeaderKey(name), "cannot match the same header multiple times in the same rule"))
+		}
+	}
+
+	return errs
+}
+
+// validateHTTPQueryParamMatches validates that no query param name
+// is matched more than once (case-sensitive).
+func validateHTTPQueryParamMatches(matches []gatewayv1a2.HTTPQueryParamMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[string]int{}
+
+	for _, match := range matches {
+		// Query param names are case-sensitive.
+		counts[string(match.Name)]++
+	}
+
+	for name, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, name, "cannot match the same query parameter multiple times in the same rule"))
+		}
+	}
+
+	return errs
+}
+
 // validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are
-//// set for the specified filter type.
+// set for the specified filter type.
 func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.HTTPRouteFilterExtensionRef {
@@ -184,4 +243,41 @@ func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter,
 		errs = append(errs, field.Required(path, "filter.URLRewrite must be specified for URLRewrite HTTPRouteFilter.Type"))
 	}
 	return errs
+}
+
+// validateHTTPPathModifier validates that only the expected fields are set in a
+// path modifier.
+func validateHTTPPathModifier(modifier gatewayv1a2.HTTPPathModifier, matches []gatewayv1a2.HTTPRouteMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if modifier.ReplaceFullPath != nil && modifier.Type != gatewayv1a2.FullPathHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplaceFullPath, "must be nil if the HTTPRouteFilter.Type is not ReplaceFullPath"))
+	}
+	if modifier.ReplaceFullPath == nil && modifier.Type == gatewayv1a2.FullPathHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplaceFullPath, "must not be nil if the HTTPRouteFilter.Type is ReplaceFullPath"))
+	}
+	if modifier.ReplacePrefixMatch != nil && modifier.Type != gatewayv1a2.PrefixMatchHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "must be nil if the HTTPRouteFilter.Type is not ReplacePrefixMatch"))
+	}
+	if modifier.ReplacePrefixMatch == nil && modifier.Type == gatewayv1a2.PrefixMatchHTTPPathModifier {
+		errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "must not be nil if the HTTPRouteFilter.Type is ReplacePrefixMatch"))
+	}
+
+	if modifier.Type == gatewayv1a2.PrefixMatchHTTPPathModifier && modifier.ReplacePrefixMatch != nil {
+		if !hasExactlyOnePrefixMatch(matches) {
+			errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "exactly one PathPrefix match must be specified to use this path modifier"))
+		}
+	}
+	return errs
+}
+
+func hasExactlyOnePrefixMatch(matches []gatewayv1a2.HTTPRouteMatch) bool {
+	if len(matches) != 1 || matches[0].Path == nil {
+		return false
+	}
+	pathMatchType := matches[0].Path.Type
+	if *pathMatchType != gatewayv1a2.PathMatchPathPrefix {
+		return false
+	}
+
+	return true
 }

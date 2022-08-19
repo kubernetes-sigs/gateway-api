@@ -135,7 +135,7 @@ type GatewaySpec struct {
 	// it assigns to the Gateway and add a corresponding entry in
 	// GatewayStatus.Addresses.
 	//
-	// Support: Core
+	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
@@ -171,6 +171,10 @@ type Listener struct {
 	// there MUST be an intersection between the values for a Route to be
 	// accepted. For more information, refer to the Route specific Hostnames
 	// documentation.
+	//
+	// Hostnames that are prefixed with a wildcard label (`*.`) are interpreted
+	// as a suffix match. That means that a match for `*.example.com` would match
+	// both `test.example.com`, and `foo.test.example.com`, but not `example.com`.
 	//
 	// Support: Core
 	//
@@ -310,8 +314,8 @@ type GatewayTLSConfig struct {
 	// a Listener, but this behavior is implementation-specific.
 	//
 	// References to a resource in different namespace are invalid UNLESS there
-	// is a ReferencePolicy in the target namespace that allows the certificate
-	// to be attached. If a ReferencePolicy does not allow this reference, the
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "InvalidCertificateRef" reason.
 	//
@@ -327,7 +331,7 @@ type GatewayTLSConfig struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=64
-	CertificateRefs []*SecretObjectReference `json:"certificateRefs,omitempty"`
+	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
@@ -346,6 +350,13 @@ type GatewayTLSConfig struct {
 }
 
 // TLSModeType type defines how a Gateway handles TLS sessions.
+//
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Ready Condition for the Listener to `status: False`, with a
+// Reason of `Invalid`.
 //
 // +kubebuilder:validation:Enum=Terminate;Passthrough
 type TLSModeType string
@@ -393,6 +404,13 @@ type AllowedRoutes struct {
 
 // FromNamespaces specifies namespace from which Routes may be attached to a
 // Gateway.
+//
+// Note that values may be added to this enum, implementations
+// must ensure that unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the
+// Ready Condition for the Listener to `status: False`, with a
+// Reason of `Invalid`.
 //
 // +kubebuilder:validation:Enum=All;Selector;Same
 type FromNamespaces string
@@ -450,7 +468,6 @@ type GatewayAddress struct {
 	// Type of the address.
 	//
 	// +optional
-	// +kubebuilder:validation:Enum=IPAddress;Hostname;NamedAddress
 	// +kubebuilder:default=IPAddress
 	Type *AddressType `json:"type,omitempty"`
 
@@ -641,7 +658,6 @@ const (
 	//
 	// * "HostnameConflict"
 	// * "ProtocolConflict"
-	// * "RouteConflict"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -663,13 +679,6 @@ const (
 	// number, but have conflicting protocol specifications.
 	ListenerReasonProtocolConflict ListenerConditionReason = "ProtocolConflict"
 
-	// This reason is used with the "Conflicted" condition when the route
-	// resources selected for this Listener conflict with other
-	// specified properties of the Listener (e.g. Protocol).
-	// For example, a Listener that specifies "UDP" as the protocol
-	// but a route selector that resolves "TCPRoute" objects.
-	ListenerReasonRouteConflict ListenerConditionReason = "RouteConflict"
-
 	// This reason is used with the "Conflicted" condition when the condition
 	// is False.
 	ListenerReasonNoConflicts ListenerConditionReason = "NoConflicts"
@@ -689,7 +698,6 @@ const (
 	// Possible reasons for this condition to be true are:
 	//
 	// * "PortUnavailable"
-	// * "UnsupportedExtension"
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
@@ -709,12 +717,6 @@ const (
 	// * The port is already in use.
 	// * The port is not supported by the implementation.
 	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
-
-	// This reason is used with the "Detached" condition when the
-	// controller detects that an implementation-specific Listener
-	// extension is being requested, but is not able to support
-	// the extension.
-	ListenerReasonUnsupportedExtension ListenerConditionReason = "UnsupportedExtension"
 
 	// This reason is used with the "Detached" condition when the
 	// Listener could not be attached to be Gateway because its
@@ -769,7 +771,7 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when
 	// one of the Listener's Routes has a BackendRef to an object in
 	// another namespace, where the object in the other namespace does
-	// not have a ReferencePolicy explicitly allowing the reference.
+	// not have a ReferenceGrant explicitly allowing the reference.
 	ListenerReasonRefNotPermitted ListenerConditionReason = "RefNotPermitted"
 )
 

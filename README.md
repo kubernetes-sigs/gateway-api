@@ -1,14 +1,21 @@
 # Kubernetes Gateway API
 
-The Gateway API is a part of the [SIG Network][sn], and this repository contains
+The Gateway API is a part of [SIG Network][sn], and this repository contains
 the specification and Custom Resource Definitions (CRDs).
 
 ## Status
 
-The latest supported version is v1alpha2 as released by the [v0.4.2
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.2) of
-this project. This version of the API is expected to graduate to beta in the
-future with relatively minimal changes.
+The latest supported version is `v1beta1` as released by the [v0.5.0
+release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.5.0) of
+this project.
+
+This version of the API is has beta level support for the following resources:
+
+- `v1beta1.GatewayClass`
+- `v1beta1.Gateway`
+- `v1beta1.HTTPRoute`
+
+For all other APIs we provide alpha level support.
 
 ## Documentation
 
@@ -34,7 +41,7 @@ one of the guides.
 A complete API reference, please refer to:
 
 - [API reference][spec]
-- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha1)
+- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2)
 
 ## Contributing
 

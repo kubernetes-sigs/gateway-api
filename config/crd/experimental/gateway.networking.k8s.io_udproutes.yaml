@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/891
-    gateway.networking.k8s.io/bundle-version: v0.5.0-dev
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1086
+    gateway.networking.k8s.io/bundle-version: v0.6.0-dev
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: udproutes.gateway.networking.k8s.io
@@ -67,10 +67,7 @@ spec:
                     is Gateway. This API may be extended in the future to support
                     additional kinds of parent resources, such as HTTPRoute. \n The
                     API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid. \n
-                    References to objects with invalid Group and Kind are not valid,
-                    and must be rejected by the implementation, with appropriate Conditions
-                    set on the containing object."
+                    be registered in the cluster for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -82,7 +79,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Custom (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -104,25 +101,25 @@ spec:
                     port:
                       description: "Port is the network port this Route targets. It
                         can be interpreted differently based on the type of parent
-                        resource: \n * Gateway: All listeners listening on the specified
-                        port that also support this kind of Route(and select this
-                        Route). It's not recommended to set `Port` unless the networking
-                        behaviors specified in a Route must apply to a specific port
-                        as opposed to a listener(s) whose port(s) may be changed.
-                        When both Port and SectionName are specified, the name and
-                        port of the selected listener must match both specified values.
-                        \n Implementations MAY choose to support other parent resources.
-                        Implementations supporting other types of parent resources
-                        MUST clearly document how/if Port is interpreted. \n For the
-                        purpose of status, an attachment is considered successful
-                        as long as the parent resource accepts it partially. For example,
-                        Gateway listeners can restrict which Routes can attach to
-                        them by Route kind, namespace, or hostname. If 1 of 2 Gateway
-                        listeners accept attachment from the referencing Route, the
-                        Route MUST be considered successfully attached. If no Gateway
-                        listeners accept attachment from this Route, the Route MUST
-                        be considered detached from the Gateway. \n Support: Extended
-                        \n <gateway:experimental>"
+                        resource. \n When the parent resource is a Gateway, this targets
+                        all listeners listening on the specified port that also support
+                        this kind of Route(and select this Route). It's not recommended
+                        to set `Port` unless the networking behaviors specified in
+                        a Route must apply to a specific port as opposed to a listener(s)
+                        whose port(s) may be changed. When both Port and SectionName
+                        are specified, the name and port of the selected listener
+                        must match both specified values. \n Implementations MAY choose
+                        to support other parent resources. Implementations supporting
+                        other types of parent resources MUST clearly document how/if
+                        Port is interpreted. \n For the purpose of status, an attachment
+                        is considered successful as long as the parent resource accepts
+                        it partially. For example, Gateway listeners can restrict
+                        which Routes can attach to them by Route kind, namespace,
+                        or hostname. If 1 of 2 Gateway listeners accept attachment
+                        from the referencing Route, the Route MUST be considered successfully
+                        attached. If no Gateway listeners accept attachment from this
+                        Route, the Route MUST be considered detached from the Gateway.
+                        \n Support: Extended \n <gateway:experimental>"
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -173,9 +170,9 @@ spec:
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a
-                          namespace is specified, a ReferencePolicy object is required
+                          namespace is specified, a ReferenceGrant object is required
                           in the referent namespace to allow that namespace's owner
-                          to accept the reference. See the ReferencePolicy documentation
+                          to accept the reference. See the ReferenceGrant documentation
                           for details."
                         properties:
                           group:
@@ -189,7 +186,8 @@ spec:
                           kind:
                             default: Service
                             description: Kind is kind of the referent. For example
-                              "HTTPRoute" or "Service".
+                              "HTTPRoute" or "Service". Defaults to "Service" when
+                              not specified.
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -202,11 +200,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferencePolicy
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferencePolicy documentation for details. \n Support:
-                              Core"
+                              Note that when a different namespace is specified, a
+                              ReferenceGrant object with ReferenceGrantTo.Kind=Service
+                              is required in the referent namespace to allow that
+                              namespace's owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -214,9 +212,10 @@ spec:
                           port:
                             description: Port specifies the destination port number
                               to use for this resource. Port is required when the
-                              referent is a Kubernetes Service. For other resources,
-                              destination port might be derived from the referent
-                              resource or this field.
+                              referent is a Kubernetes Service. In this case, the
+                              port number is the service port number, not the target
+                              port. For other resources, destination port might be
+                              derived from the referent resource or this field.
                             format: int32
                             maximum: 65535
                             minimum: 1
@@ -245,94 +244,6 @@ spec:
                         type: object
                       maxItems: 16
                       minItems: 1
-                      type: array
-                    matches:
-                      description: "Matches add rules for filtering traffic to backends
-                        based on addresses. \n  <gateway:experimental>"
-                      items:
-                        description: AddressRouteMatches defines AddressMatch rules
-                          for inbound traffic according to source and/or destination
-                          address of a packet or connection.
-                        properties:
-                          destinationAddresses:
-                            description: "DestinationAddresses indicates the destination
-                              network addresses which are valid for routing traffic.
-                              \n Support: Extended"
-                            items:
-                              description: AddressMatch defines matching rules for
-                                network addresses by type.
-                              properties:
-                                type:
-                                  default: IPAddress
-                                  description: "Type of the address, either IPAddress
-                                    or NamedAddress. \n If NamedAddress is used this
-                                    is a custom and specific value for each implementation
-                                    to handle (and add validation for) according to
-                                    their own needs. \n For IPAddress the implementor
-                                    may expect either IPv4 or IPv6. \n Support: Core
-                                    (IPAddress) Support: Custom (NamedAddress)"
-                                  enum:
-                                  - IPAddress
-                                  - NamedAddress
-                                  type: string
-                                value:
-                                  description: "Value of the address. The validity
-                                    of the values will depend on the type and support
-                                    by the controller. \n If implementations support
-                                    proxy-protocol (see: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt)
-                                    they must respect the connection metadata from
-                                    proxy-protocol in the match logic implemented
-                                    for these address values. \n Examples: `1.2.3.4`,
-                                    `128::1`, `my-named-address`. \n Support: Core"
-                                  maxLength: 253
-                                  minLength: 1
-                                  type: string
-                              required:
-                              - value
-                              type: object
-                            type: array
-                          sourceAddresses:
-                            description: "SourceAddresses indicates the originating
-                              (source) network addresses which are valid for routing
-                              traffic. \n Support: Extended"
-                            items:
-                              description: AddressMatch defines matching rules for
-                                network addresses by type.
-                              properties:
-                                type:
-                                  default: IPAddress
-                                  description: "Type of the address, either IPAddress
-                                    or NamedAddress. \n If NamedAddress is used this
-                                    is a custom and specific value for each implementation
-                                    to handle (and add validation for) according to
-                                    their own needs. \n For IPAddress the implementor
-                                    may expect either IPv4 or IPv6. \n Support: Core
-                                    (IPAddress) Support: Custom (NamedAddress)"
-                                  enum:
-                                  - IPAddress
-                                  - NamedAddress
-                                  type: string
-                                value:
-                                  description: "Value of the address. The validity
-                                    of the values will depend on the type and support
-                                    by the controller. \n If implementations support
-                                    proxy-protocol (see: https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt)
-                                    they must respect the connection metadata from
-                                    proxy-protocol in the match logic implemented
-                                    for these address values. \n Examples: `1.2.3.4`,
-                                    `128::1`, `my-named-address`. \n Support: Core"
-                                  maxLength: 253
-                                  minLength: 1
-                                  type: string
-                              required:
-                              - value
-                              type: object
-                            type: array
-                        required:
-                        - destinationAddresses
-                        - sourceAddresses
-                        type: object
-                      maxItems: 16
                       type: array
                   type: object
                 maxItems: 16
@@ -376,7 +287,7 @@ spec:
                         condition may not be set due to lack of controller visibility,
                         that includes when: \n * The Route refers to a non-existent
                         parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the the controller
+                        not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
@@ -461,7 +372,11 @@ spec:
                         with the controllerName field on GatewayClass. \n Example:
                         \"example.net/gateway-controller\". \n The format of this
                         field is DOMAIN \"/\" PATH, where DOMAIN and PATH are valid
-                        Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names)."
+                        Kubernetes names (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+                        \n Controllers MUST populate this field when writing status.
+                        Controllers should ensure that entries to status populated
+                        with their ControllerName are cleaned up when they are no
+                        longer necessary."
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$
@@ -480,7 +395,7 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Custom (Other Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -502,24 +417,25 @@ spec:
                         port:
                           description: "Port is the network port this Route targets.
                             It can be interpreted differently based on the type of
-                            parent resource: \n * Gateway: All listeners listening
-                            on the specified port that also support this kind of Route(and
-                            select this Route). It's not recommended to set `Port`
-                            unless the networking behaviors specified in a Route must
-                            apply to a specific port as opposed to a listener(s) whose
-                            port(s) may be changed. When both Port and SectionName
-                            are specified, the name and port of the selected listener
-                            must match both specified values. \n Implementations MAY
-                            choose to support other parent resources. Implementations
-                            supporting other types of parent resources MUST clearly
-                            document how/if Port is interpreted. \n For the purpose
-                            of status, an attachment is considered successful as long
-                            as the parent resource accepts it partially. For example,
-                            Gateway listeners can restrict which Routes can attach
-                            to them by Route kind, namespace, or hostname. If 1 of
-                            2 Gateway listeners accept attachment from the referencing
-                            Route, the Route MUST be considered successfully attached.
-                            If no Gateway listeners accept attachment from this Route,
+                            parent resource. \n When the parent resource is a Gateway,
+                            this targets all listeners listening on the specified
+                            port that also support this kind of Route(and select this
+                            Route). It's not recommended to set `Port` unless the
+                            networking behaviors specified in a Route must apply to
+                            a specific port as opposed to a listener(s) whose port(s)
+                            may be changed. When both Port and SectionName are specified,
+                            the name and port of the selected listener must match
+                            both specified values. \n Implementations MAY choose to
+                            support other parent resources. Implementations supporting
+                            other types of parent resources MUST clearly document
+                            how/if Port is interpreted. \n For the purpose of status,
+                            an attachment is considered successful as long as the
+                            parent resource accepts it partially. For example, Gateway
+                            listeners can restrict which Routes can attach to them
+                            by Route kind, namespace, or hostname. If 1 of 2 Gateway
+                            listeners accept attachment from the referencing Route,
+                            the Route MUST be considered successfully attached. If
+                            no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
                             \n Support: Extended \n <gateway:experimental>"
                           format: int32

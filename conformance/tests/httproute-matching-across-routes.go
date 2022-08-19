@@ -17,7 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"fmt"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/types"
@@ -40,31 +39,31 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 		routeNN1 := types.NamespacedName{Name: "matching-part1", Namespace: ns}
 		routeNN2 := types.NamespacedName{Name: "matching-part2", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.ControllerName, gwNN, routeNN1, routeNN2)
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN1, routeNN2)
 
 		testCases := []http.ExpectedResponse{{
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host: "example.com",
 				Path: "/",
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host: "example.com",
 				Path: "/example",
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host: "example.net",
 				Path: "/example",
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host:    "example.com",
 				Path:    "/example",
 				Headers: map[string]string{"Version": "one"},
@@ -72,14 +71,14 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host: "example.com",
 				Path: "/v2",
 			},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				// v2 matches are limited to example.com
 				Host: "example.net",
 				Path: "/v2",
@@ -87,14 +86,14 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host: "example.com",
 				Path: "/v2/example",
 			},
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request: http.ExpectedRequest{
+			Request: http.Request{
 				Host:    "example.com",
 				Path:    "/",
 				Headers: map[string]string{"Version": "two"},
@@ -107,19 +106,10 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 			// Declare tc here to avoid loop variable
 			// reuse issues across parallel tests.
 			tc := testCases[i]
-			t.Run(testName(tc, i), func(t *testing.T) {
+			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, gwAddr, tc)
+				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 			})
 		}
 	},
-}
-
-func testName(tc http.ExpectedResponse, i int) string {
-	headerStr := ""
-	if tc.Request.Headers != nil {
-		headerStr = " with headers"
-	}
-
-	return fmt.Sprintf("%d request to %s%s%s should go to %s", i, tc.Request.Host, tc.Request.Path, headerStr, tc.Backend)
 }

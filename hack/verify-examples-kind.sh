@@ -25,7 +25,7 @@ readonly CLUSTER_NAME="verify-gateway-api"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
-export PATH="${PATH}:${GOPATH}/bin"
+export PATH="${GOPATH}/bin:${PATH}"
 
 # Cleanup logic for cleanup on exit
 CLEANED_UP=false
@@ -53,7 +53,9 @@ kind create cluster --name "${CLUSTER_NAME}" || res=$?
 
 # Install webhook
 docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
-kubectl apply -f deploy/
+# Temporary workaround for release
+sed -i 's/v0.5.0/latest/g' config/webhook/admission_webhook.yaml
+kubectl apply -f config/webhook/
 
 # Wait for webhook to be ready
 for check in {1..10}; do 
@@ -69,10 +71,10 @@ for check in {1..10}; do
   echo "Webhook not ready yet, will check again in 5 seconds"
 done
 
-for CHANNEL in experimental stable; do
+for CHANNEL in experimental standard; do
   ##### Test v1alpha2 CRD apply and that invalid examples are invalid.
   # Install CRDs
-  kubectl apply -f "config/crd/${CHANNEL}" || res=$?
+  kubectl apply -f "config/crd/${CHANNEL}/gateway*.yaml" || res=$?
 
   # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
   sleep 8

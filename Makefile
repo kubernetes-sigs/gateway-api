@@ -31,12 +31,12 @@ export GIT_TAG ?= dev
 
 # Prow gives this the reference it's called on.
 # The test-infra config job only allows our cloudbuild to
-# be called on `master` and semver tags, so this will be
+# be called on `main` and semver tags, so this will be
 # set to one of those things.
-export BASE_REF ?= master
+export BASE_REF ?= main
 
 # The commit hash of the current checkout
-# Used to pass a binary version for master,
+# Used to pass a binary version for main,
 # overridden to semver for tagged versions.
 # Cloudbuild will set this in the environment to the
 # commit SHA, since the Prow does not seem to check out
@@ -49,12 +49,27 @@ TOP := $(dir $(firstword $(MAKEFILE_LIST)))
 # ROOT is the root of the mkdocs tree.
 ROOT := $(abspath $(TOP))
 
+# Command-line flags passed to "go test" for the conformance
+# test. These are passed after the "-args" flag.
+CONFORMANCE_FLAGS ?=
+
 all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate:
+generate: update-codegen update-webhook-yaml
+
+.PHONY: update-codegen
+update-codegen:
 	hack/update-codegen.sh
+
+.PHONY: update-webhook-yaml
+update-webhook-yaml:
+	hack/update-webhook-yaml.sh
+
+.PHONY: build-install-yaml
+build-install-yaml:
+	hack/build-install-yaml.sh
 
 # Run go fmt against code
 fmt:
@@ -71,7 +86,7 @@ test:
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
-	go test -v ./conformance/...
+	go test -v ./conformance/... -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

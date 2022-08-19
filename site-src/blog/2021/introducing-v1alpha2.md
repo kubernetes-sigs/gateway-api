@@ -25,7 +25,7 @@ an experimental API group (`networking.x-k8s.io`) to the new
 is concerned, this version is wholly distinct from v1alpha1, and automatic
 conversion is not possible.
 
-![New API group for v1alpha2](/images/v1alpha2-group.png)
+![New API group for v1alpha2](/site-src/images/v1alpha2-group.png)
 
 ### Simpler Route-Gateway Binding
 In v1alpha1 we provided many ways to connect Gateways and Routes. This was a bit
@@ -48,25 +48,32 @@ itself to the `prod-web-gw` Gateway.
 This is covered in more detail in [GEP 724](https://gateway-api.sigs.k8s.io/geps/gep-709/).
 
 ### Safe Cross Namespace References
+
+!!! info "Experimental Channel"
+
+    The `ReferenceGrant` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
 Most notably, forwarding traffic to backends in other namespaces and referring
 to TLS certificates in other namespaces.
 
-To accomplish this, we've introduced a new ReferencePolicy resource that
+To accomplish this, we've introduced a new ReferenceGrant resource that
 provides a handshake mechanism. By default, references across namespaces are not
 permitted; creating a reference across a namespace (like a Route referencing a
 Service in another namespace) must be rejected by implementations. These
-references can be accepted by creating a ReferencePolicy in the referent
+references can be accepted by creating a ReferenceGrant in the referent
 (target) namespace, that specifies what Kind is allowed to accept incoming
 references, and from what namespace and Kind the references may be.
 
-For example, the following ReferencePolicy would allow HTTPRoutes in the prod
-namespace to forward traffic to Services wherever this ReferencePolicy was
+For example, the following ReferenceGrant would allow HTTPRoutes in the prod
+namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'v1alpha2/reference-policy.yaml' %}
+{% include 'experimental/v1alpha2/reference-grant.yaml' %}
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).
@@ -97,7 +104,7 @@ This is intended to allow things like:
 As a simple example, a TimeoutPolicy may be attached to a Gateway. The effects
 of that policy would cascade down to Routes attached to that policy:
 
-![Simple Ingress Example](/v1alpha2/images/policy/ingress-simple.png)
+![Simple Ingress Example](/site-src/images/policy/ingress-simple.png)
 
 This is covered in more detail in [GEP 713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
 
@@ -106,7 +113,7 @@ There are a lot of changes in v1alpha2 that we haven't covered here. For the
 full changelog, refer to our [v0.4.0 release
 notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0). 
 
-Many of our [implementations](/implementations) are planning to release support
+Many of our [implementations](/site-src/implementations) are planning to release support
 for the v1alpha2 API in the coming weeks. We'll update our documentation as
 v1alpha2 implementations become available.
 
@@ -118,4 +125,4 @@ We still have lots more to work on. Some of our next items to discuss include:
 * L4 Route matching
 
 If these kinds of topics interest you, we'd love to have your input. Refer to
-our [community page](/contributing/community) to see how you can get involved.
+our [community page](/site-src/contributing/community) to see how you can get involved.

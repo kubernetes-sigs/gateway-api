@@ -105,7 +105,7 @@ func (c *FakeReferencePolicies) Update(ctx context.Context, referencePolicy *v1a
 // Delete takes name of the referencePolicy and deletes it. Returns an error if one occurs.
 func (c *FakeReferencePolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(referencepoliciesResource, c.ns, name), &v1alpha2.ReferencePolicy{})
+		Invokes(testing.NewDeleteActionWithOptions(referencepoliciesResource, c.ns, name, opts), &v1alpha2.ReferencePolicy{})
 
 	return err
 }
