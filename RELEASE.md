@@ -12,7 +12,7 @@ This repository is the home for both of the above components.
 The versioning strategy for this project is covered in detail in [the release
 documentation].
 
-[the release documentation]: https://gateway-api.sigs.k8s.io/releases/#versioning
+[the release documentation]: https://gateway-api.sigs.k8s.io/concepts/versioning/
 
 ## Releasing a new version
 
@@ -39,6 +39,7 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
 
 For a major or minor release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
+
 For all releases:
 - Check out the `release-major.minor` branch locally
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
@@ -51,6 +52,6 @@ For all releases:
   install files in the `release/` directory and attach these files to
   the Github release.
 
-[release]: https://gateway-api.sigs.k8s.io/references/releases/
+[release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
 
