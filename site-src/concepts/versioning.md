@@ -72,6 +72,7 @@ change across API versions.
 ### Patch version (e.g. v0.4.0 -> v0.4.1)
 * Clarifications to godocs
 * Updates to CRDs and/or code to fix a bug
+* Conformance test fixes
 * Fixes to typos
 
 ### Minor version (e.g. v0.4.0 -> v0.5.0)
