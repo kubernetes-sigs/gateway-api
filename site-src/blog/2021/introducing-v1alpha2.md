@@ -25,7 +25,7 @@ an experimental API group (`networking.x-k8s.io`) to the new
 is concerned, this version is wholly distinct from v1alpha1, and automatic
 conversion is not possible.
 
-![New API group for v1alpha2](/site-src/images/v1alpha2-group.png)
+![New API group for v1alpha2](/images/v1alpha2-group.png)
 
 ### Simpler Route-Gateway Binding
 In v1alpha1 we provided many ways to connect Gateways and Routes. This was a bit
@@ -104,7 +104,7 @@ This is intended to allow things like:
 As a simple example, a TimeoutPolicy may be attached to a Gateway. The effects
 of that policy would cascade down to Routes attached to that policy:
 
-![Simple Ingress Example](/site-src/images/policy/ingress-simple.png)
+![Simple Ingress Example](/images/policy/ingress-simple.png)
 
 This is covered in more detail in [GEP 713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
 
@@ -113,7 +113,7 @@ There are a lot of changes in v1alpha2 that we haven't covered here. For the
 full changelog, refer to our [v0.4.0 release
 notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0). 
 
-Many of our [implementations](/site-src/implementations) are planning to release support
+Many of our [implementations](/implementations) are planning to release support
 for the v1alpha2 API in the coming weeks. We'll update our documentation as
 v1alpha2 implementations become available.
 
@@ -125,4 +125,4 @@ We still have lots more to work on. Some of our next items to discuss include:
 * L4 Route matching
 
 If these kinds of topics interest you, we'd love to have your input. Refer to
-our [community page](/site-src/contributing/community) to see how you can get involved.
+our [community page](/contributing/community) to see how you can get involved.
