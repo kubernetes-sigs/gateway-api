@@ -15,7 +15,7 @@ rewrites.
 
 [:octicons-arrow-right-24: Continue reading][Gateway API Graduates to Beta]
 
-[Gateway API Graduates to Beta]:/site-src/blog/2022/graduating-to-beta
+[Gateway API Graduates to Beta]:/blog/2022/graduating-to-beta
 
 ## [Introducing Gateway API v1alpha2]
 
@@ -30,4 +30,4 @@ the highlights.
 
 [:octicons-arrow-right-24: Continue reading][Introducing Gateway API v1alpha2]
 
-[Introducing Gateway API v1alpha2]: /site-src/blog/2021/introducing-v1alpha2
+[Introducing Gateway API v1alpha2]: /blog/2021/introducing-v1alpha2
