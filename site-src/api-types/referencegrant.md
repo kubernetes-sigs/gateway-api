@@ -94,7 +94,7 @@ for more details on how specific ReferenceGrant fields are interpreted.
 Cross namespace Route -> Gateway binding follows a slightly different pattern
 where the handshake mechanism is built into the Gateway resource. For more
 information on that approach, refer to the relevant [Security Model
-documentation](/site-src/concepts/security-model). Although conceptually similar to
+documentation](/concepts/security-model). Although conceptually similar to
 ReferenceGrant, this configuration is built directly into Gateway Listeners,
 and allows for fine-grained per Listener configuration that would not be
 possible with ReferenceGrant.
