@@ -19,7 +19,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Istio][9] (alpha)
 - [Kong][10] (alpha)
 - [Kuma][11] (alpha)
-- [NGINX Kubernetes Gateway][12] (pre-alpha)
+- [NGINX Kubernetes Gateway][12]
 - [Traefik][13] (alpha)
 
 ## Integration Status
@@ -205,8 +205,13 @@ Kuma is actively working on an implementation of Gateway API specification for t
 
 [NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
 
+If you have any suggestions or experience issues with NGINX Kubernetes Gateway, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-kubernetes-gateway channel on NGINX slack][nginx-slack].
+
 [nginx-kubernetes-gateway]:https://github.com/nginxinc/nginx-kubernetes-gateway
 [nginx]:https://nginx.org/
+[nginx-issue-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/issues/new
+[nginx-disc-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/discussions/new
+[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-kubernetes-gateway
 
 ### Traefik
 
