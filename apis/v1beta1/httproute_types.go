@@ -430,6 +430,15 @@ type HTTPQueryParamMatch struct {
 	// entry with an equivalent name MUST be considered for a match. Subsequent
 	// entries with an equivalent query param name MUST be ignored.
 	//
+	// If a query param is repeated in an HTTP request, the behavior
+	// is purposely left undefined, since different data planes have different
+	// capabilities. However, it's *recommended* that implementations should
+	// match against the first value of the param if the data plane supports it,
+	// as this behavior is expected in other load balancing contexts outside of
+	// the Gateway API.
+	// Users should not route traffic based on repeated query params to guard
+	// themselves against potential differences in the implementations.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
 	Name string `json:"name"`
