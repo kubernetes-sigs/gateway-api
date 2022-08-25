@@ -397,6 +397,7 @@ func listenersMatch(t *testing.T, expected, actual []v1alpha2.ListenerStatus) bo
 			return false
 		}
 		if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
+			t.Logf("Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
 			return false
 		}
 	}
