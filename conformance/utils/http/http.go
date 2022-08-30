@@ -157,7 +157,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 		}
 
 		if err := CompareRequest(cReq, cRes, expected); err != nil {
-			t.Logf("Response expectation failed, not ready yet: %v (after %v)", err, elapsed)
+			t.Logf("Response expectation failed for request: %v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
 
