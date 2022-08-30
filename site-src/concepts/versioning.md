@@ -145,3 +145,15 @@ this project.
 We do not provide stability guarantees for source code imports. The Interfaces
 and behavior may change in an unexpected and backwards-incompatible way in any
 future release.
+
+## Supported Versions
+
+This project aims to provide support for a wide range of Kubernetes versions with
+consistent upgrade experiences across versions. To accomplish that, we commit to:
+
+1. Support a minimum of the most recent 5 Kubernetes minor versions.
+2. Ensure that all standard channel changes between v1beta1 and v1 are fully
+   compatible and convertible.
+3. Take every possible effort to avoid introduction of a conversion webhook. If
+   a conversion webhook needs to be introduced, it will be supported for the
+   lifetime of the API, or at least until an alternative is available.
