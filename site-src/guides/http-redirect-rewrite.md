@@ -91,5 +91,5 @@ Instead using `type: ReplacePrefixMatch` and `replacePrefixMatch: /fennel` will
 request `https://elsewhere.example/fennel/smidgen` upstream.
 
 ```yaml
-{% include 'experimental/http-redirect-rewrite/httproute-rewrite.yaml' %}
+{% include 'experimental/http-redirect-rewrite/httproute-rewritepath.yaml' %}
 ```
