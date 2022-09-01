@@ -22,7 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -192,14 +192,14 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
 
 			routeName := types.NamespacedName{Namespace: ns, Name: "no-intersecting-hosts"}
-			parents := []v1alpha2.RouteParentStatus{{
+			parents := []v1beta1.RouteParentStatus{{
 				ParentRef:      parentRefTo(gwNN),
-				ControllerName: v1alpha2.GatewayController(suite.ControllerName),
+				ControllerName: v1beta1.GatewayController(suite.ControllerName),
 				Conditions: []metav1.Condition{
 					{
-						Type:   string(v1alpha2.RouteConditionAccepted),
+						Type:   string(v1beta1.RouteConditionAccepted),
 						Status: metav1.ConditionFalse,
-						Reason: string(v1alpha2.RouteReasonNoMatchingListenerHostname),
+						Reason: string(v1beta1.RouteReasonNoMatchingListenerHostname),
 					},
 				},
 			}}
@@ -230,15 +230,15 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 	},
 }
 
-func parentRefTo(gateway types.NamespacedName) v1alpha2.ParentReference {
+func parentRefTo(gateway types.NamespacedName) v1beta1.ParentReference {
 	var (
-		group     = v1alpha2.Group(v1alpha2.GroupName)
-		kind      = v1alpha2.Kind("Gateway")
-		namespace = v1alpha2.Namespace(gateway.Namespace)
-		name      = v1alpha2.ObjectName(gateway.Name)
+		group     = v1beta1.Group(v1beta1.GroupName)
+		kind      = v1beta1.Kind("Gateway")
+		namespace = v1beta1.Namespace(gateway.Namespace)
+		name      = v1beta1.ObjectName(gateway.Name)
 	)
 
-	return v1alpha2.ParentReference{
+	return v1beta1.ParentReference{
 		Group:     &group,
 		Kind:      &kind,
 		Namespace: &namespace,

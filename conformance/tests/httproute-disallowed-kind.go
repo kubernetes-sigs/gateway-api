@@ -23,7 +23,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -49,7 +49,7 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 		})
 
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
-			gw := &v1alpha2.Gateway{}
+			gw := &v1beta1.Gateway{}
 			err := suite.Client.Get(context.TODO(), gwName, gw)
 			require.NoError(t, err, "error fetching Gateway")
 			// There are two valid ways to represent this:

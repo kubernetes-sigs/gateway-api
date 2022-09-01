@@ -72,7 +72,7 @@ The infrastructure team deploys the `shared-gateway` Gateway into the `infra-ns`
 Namespace:
 
 ```yaml
-{% include 'v1beta1/cross-namespace-routing/gateway.yaml' %}
+{% include 'standard/cross-namespace-routing/gateway.yaml' %}
 ```
 
 The `https` listener in the above Gateway matches traffic for the
@@ -114,7 +114,7 @@ a `parentRef`  for `infra-ns/shared-gateway`, it would be ignored by the
 Gateway because the  attachment constraint (Namespace label) was not met.
 
 ```yaml
-{% include 'v1beta1/cross-namespace-routing/0-namespaces.yaml' %}
+{% include 'standard/cross-namespace-routing/0-namespaces.yaml' %}
 ```
 
 Note that attachment constraints on the Gateway are not required, but they are
@@ -130,7 +130,7 @@ The store team deploys their route for the `store` Service in the `store-ns`
 Namespace:
 
 ```yaml
-{% include 'v1beta1/cross-namespace-routing/store-route.yaml' %}
+{% include 'standard/cross-namespace-routing/store-route.yaml' %}
 ```
 
 This Route has straightforward routing logic as it just matches for
@@ -151,7 +151,7 @@ specifies `gateway/shared-gateway` in the `infra-ns` Namespace as the only
 Gateway that these Routes want to attach to.
 
 ```yaml
-{% include 'v1beta1/cross-namespace-routing/site-route.yaml' %}
+{% include 'standard/cross-namespace-routing/site-route.yaml' %}
 ```
 
 After these three Routes are deployed, they will all be attached to the

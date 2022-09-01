@@ -33,7 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
@@ -48,12 +48,12 @@ type Applier struct {
 	// For example, given two Gateways, each with 2 listeners, there should be
 	// four ValidUniqueListenerPorts.
 	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts []v1alpha2.PortNumber
+	ValidUniqueListenerPorts []v1beta1.PortNumber
 }
 
 // prepareGateway adjusts both listener ports and the gatewayClassName. It
 // returns an index pointing to the next valid listener port.
-func prepareGateway(t *testing.T, uObj *unstructured.Unstructured, gatewayClassName string, validListenerPorts []v1alpha2.PortNumber, portIndex int) int {
+func prepareGateway(t *testing.T, uObj *unstructured.Unstructured, gatewayClassName string, validListenerPorts []v1beta1.PortNumber, portIndex int) int {
 	err := unstructured.SetNestedField(uObj.Object, gatewayClassName, "spec", "gatewayClassName")
 	require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
 

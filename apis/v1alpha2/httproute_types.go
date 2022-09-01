@@ -24,7 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
-// +kubebuilder:storageversion
+// +kubebuilder:unservedversion
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 

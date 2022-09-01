@@ -21,7 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -36,7 +36,7 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
 	Manifests:   []string{"tests/httproute-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := v1alpha2.Namespace("gateway-conformance-infra")
+		ns := v1beta1.Namespace("gateway-conformance-infra")
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: string(ns)}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: string(ns)}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)

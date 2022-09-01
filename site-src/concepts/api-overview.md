@@ -239,20 +239,20 @@ The following `my-route` Route wants to attach to the `foo-gateway` in the
 attachment from HTTPRoutes in the namespace `gateway-api-example-ns2`.
 
 ```yaml
-{% include 'v1beta1/http-route-attachment/httproute.yaml' %}
+{% include 'standard/http-route-attachment/httproute.yaml' %}
 ```
 
 This `foo-gateway` allows the `my-route` HTTPRoute to attach.
 
 ```yaml
-{% include 'v1beta1/http-route-attachment/gateway-strict.yaml' %}
+{% include 'standard/http-route-attachment/gateway-strict.yaml' %}
 ```
 
 For a more permissive example, the below Gateway will allow all HTTPRoute resources
 to attach from Namespaces with the "expose-apps: true" label.
 
 ```yaml
-{% include 'v1beta1/http-route-attachment/gateway-namespaces.yaml' %}
+{% include 'standard/http-route-attachment/gateway-namespaces.yaml' %}
 ```
 
 ### Combined types

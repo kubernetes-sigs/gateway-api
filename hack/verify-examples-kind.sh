@@ -79,13 +79,12 @@ for CHANNEL in experimental standard; do
   # Temporary workaround for https://github.com/kubernetes/kubernetes/issues/104090
   sleep 8
 
-  # Install all example gateway-api resources.
-  kubectl apply --recursive -f examples/v1alpha2 || res=$?
+  kubectl apply --recursive -f examples/standard || res=$?
 
   # Install all experimental example gateway-api resources when experimental mode is enabled
   if [[ "${CHANNEL}" == "experimental" ]] ; then
       echo "Experimental mode enabled: deploying experimental examples"
-      kubectl apply --recursive -f examples/experimental/v1alpha2 || res=$?
+      kubectl apply --recursive -f examples/experimental || res=$?
   fi
 
   # Install invalid gateway-api resources.
@@ -105,6 +104,9 @@ for CHANNEL in experimental standard; do
         res=2 || \
         echo Examples failed as expected
 done
+
+# Undo workaround from earlier
+sed -i 's/latest/v0.5.0/g' config/webhook/admission_webhook.yaml
 
 # Clean up and exit
 cleanup || res=$?
