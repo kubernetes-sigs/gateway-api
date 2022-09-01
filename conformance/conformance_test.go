@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -40,6 +41,7 @@ func TestConformance(t *testing.T) {
 		t.Fatalf("Error initializing Kubernetes client: %v", err)
 	}
 	v1alpha2.AddToScheme(client.Scheme())
+	v1beta1.AddToScheme(client.Scheme())
 
 	t.Logf("Running conformance tests with %s GatewayClass", *flags.GatewayClassName)
 

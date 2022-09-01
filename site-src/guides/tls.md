@@ -75,7 +75,7 @@ In this example, the Gateway is configured to serve the `foo.example.com` and
 in the Gateway.
 
 ```yaml
-{% include 'v1beta1/tls-basic.yaml' %}
+{% include 'standard/tls-basic.yaml' %}
 ```
 
 #### Wildcard TLS listeners
@@ -87,7 +87,7 @@ Since a specific match takes priority, the Gateway will serve
 `wildcard-example-com-cert` for all other requests.
 
 ```yaml
-{% include 'v1beta1/wildcard-tls-gateway.yaml' %}
+{% include 'standard/wildcard-tls-gateway.yaml' %}
 ```
 
 #### Cross namespace certificate references
@@ -98,7 +98,7 @@ target namespace. Without that ReferenceGrant, the cross-namespace reference
 would be invalid.
 
 ```yaml
-{% include 'experimental/v1alpha2/tls-cert-cross-namespace.yaml' %}
+{% include 'experimental/tls-cert-cross-namespace.yaml' %}
 ```
 
 ## Extensions

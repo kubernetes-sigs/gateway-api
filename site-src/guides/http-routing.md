@@ -28,7 +28,7 @@ should be attached to. The following example shows how the combination
 of `Gateway` and `HTTPRoute` would be configured to serve HTTP traffic:
 
 ```yaml
-{% include 'v1beta1/http-routing/gateway.yaml' %}
+{% include 'standard/http-routing/gateway.yaml' %}
 ```
 
 An HTTPRoute can match against a [single set of hostnames][spec].
@@ -44,7 +44,7 @@ forwarded. Traffic to any other paths that do not begin with `/login` will not
 be matched by this Route.
 
 ```yaml
-{% include 'v1beta1/http-routing/foo-httproute.yaml' %}
+{% include 'standard/http-routing/foo-httproute.yaml' %}
 ```
 
 Similarly, the `bar-route` HTTPRoute matches traffic for `bar.example.com`. All
@@ -54,7 +54,7 @@ canary` header will be forwarded to `bar-svc-canary` and if the header is
 missing or not `canary` then it'll be forwarded to `bar-svc`.
 
 ```yaml
-{% include 'v1beta1/http-routing/bar-httproute.yaml' %}
+{% include 'standard/http-routing/bar-httproute.yaml' %}
 ```
 
 [gateway]: /references/spec/#gateway.networking.k8s.io/v1beta1.Gateway

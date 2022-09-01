@@ -111,7 +111,7 @@ strategies, rate-limiting, and traffic shaping.
 The following example adds header "my-header: foo" to HTTP requests with Host
 header "my.filter.com".
 ```yaml
-{% include 'v1beta1/http-filter.yaml' %}
+{% include 'standard/http-filter.yaml' %}
 ```
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -143,14 +143,14 @@ The following example forwards HTTP requests for prefix `/bar` to service
 "my-service1" on port `8080` and HTTP requests for prefix `/some/thing` with
 header `magic: foo` to service "my-service2" on port `8080`:
 ```yaml
-{% include 'v1beta1/basic-http.yaml' %}
+{% include 'standard/basic-http.yaml' %}
 ```
 
 The following example uses the `weight` field to forward 90% of HTTP requests to
 `foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
 Service:
 ```yaml
-{% include 'v1beta1/traffic-splitting/traffic-split-2.yaml' %}
+{% include 'standard/traffic-splitting/traffic-split-2.yaml' %}
 ```
 
 Reference the [backendRef][backendRef] API documentation for additional details
