@@ -52,6 +52,9 @@ const (
 
 	// This option indicates support for HTTPRoute method matching (extended conformance).
 	SupportHTTPRouteMethodMatching SupportedFeature = "HTTPRouteMethodMatching"
+
+	// This option indicates support for HTTPRoute response header modification (extended conformance).
+	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
