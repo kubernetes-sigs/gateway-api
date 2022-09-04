@@ -1,0 +1,29 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: longest-sni-matching
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+    - name: https
+      port: 443
+      protocol: HTTPS
+      hostname: *.example.com
+      allowedRoutes:
+        namespaces:
+          from: Same
+      tls:
+        certificateRefs:
+          - group: ""
+            kind: Secret
+            name: *.xyz.test.example.com
+            namespace: gateway-conformance-web-backend
+          - group: ""
+            kind: Secret
+            name: *.test.example.com
+            namespace: gateway-conformance-web-backend
+          - group: ""
+            kind: Secret
+            name: *.example.com
+            namespace: gateway-conformance-web-backend

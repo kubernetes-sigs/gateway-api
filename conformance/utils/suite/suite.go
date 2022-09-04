@@ -55,6 +55,9 @@ const (
 
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
 	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
+
+	// This option indicates support for HTTPListner with multiple certificates (extended conformance).
+	SupportHTTPListenerMultipleTLSCerts SupportedFeature = "HTTPListenerMultipleTLSCerts"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
@@ -148,6 +151,9 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		"gateway-conformance-infra",
 		"gateway-conformance-app-backend",
 		"gateway-conformance-web-backend",
+		"*.xyz.test.example.com",
+		"*.test.example.com",
+		"*.example.com",
 	}
 	kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 }
