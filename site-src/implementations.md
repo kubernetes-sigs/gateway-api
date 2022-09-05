@@ -25,6 +25,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 ## Integration Status
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
+- [KubeVela][16] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -42,6 +43,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [14]:#flagger
 [15]:#cert-manager
 [16]:#cilium
+[17]:#kubevela
 
 ## Implementations
 
@@ -245,3 +247,15 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 [cert-manager]:https://cert-manager.io/
 [cert-manager-docs]:https://cert-manager.io/docs/usage/gateway/
+
+### KubeVela
+
+[KubeVela][kubevela] is a modern software delivery platform that makes deploying and operating applications across today's hybrid, multi-cloud environments easier, faster and more reliable.
+
+KubeVela using the Gateway API provides the standard management ability regarding the application access rules. It currently publishes a [gateway-traits][addon] to provide the user API. There are two implementation addon, [Traefik][traefik] and [Istio gateway][istio]. You can refer to the [installation document][document] to install the KubeVela and enable the gateway-traits addon.
+
+[kubevela]:https://kubevela.io
+[addon]:https://github.com/kubevela/catalog/tree/master/experimental/addons/gateway-traits
+[traefik]:https://github.com/kubevela/catalog/tree/master/experimental/addons/traefik-gateway
+[istio]:https://github.com/kubevela/catalog/tree/master/experimental/addons/istio
+[document]:http://kubevela.net/docs/install
