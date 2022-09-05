@@ -47,8 +47,7 @@ type ParentReference struct {
 	Kind *Kind `json:"kind,omitempty"`
 
 	// Namespace is the namespace of the referent. When unspecified, this refers
-	// to the local namespace of the Route. Refer to the Namespace type for valid
-	// values.
+	// to the local namespace of the Route.
 	//
 	// Support: Core
 	//
