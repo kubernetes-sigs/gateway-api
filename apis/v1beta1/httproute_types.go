@@ -160,8 +160,8 @@ type HTTPRouteRule struct {
 	//   "{namespace}/{name}".
 	//
 	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the first matching rule meeting
-	// the above criteria.
+	// matching precedence MUST be granted to the FIRST matching rule (in list
+	// order) meeting the above criteria.
 	//
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
