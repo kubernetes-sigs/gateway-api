@@ -138,8 +138,8 @@ spec:
                       type: string
                     namespace:
                       description: "Namespace is the namespace of the referent. When
-                        unspecified (or empty string), this refers to the local namespace
-                        of the Route. \n Support: Core"
+                        unspecified, this refers to the local namespace of the Route.
+                        \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -457,8 +457,8 @@ spec:
                           type: string
                         namespace:
                           description: "Namespace is the namespace of the referent.
-                            When unspecified (or empty string), this refers to the
-                            local namespace of the Route. \n Support: Core"
+                            When unspecified, this refers to the local namespace of
+                            the Route. \n Support: Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
