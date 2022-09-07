@@ -65,7 +65,7 @@ type HTTPRouteRule = v1beta1.HTTPRouteRule
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
@@ -112,7 +112,7 @@ type HTTPPathMatch = v1beta1.HTTPPathMatch
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
@@ -159,7 +159,7 @@ type HTTPHeaderMatch = v1beta1.HTTPHeaderMatch
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
@@ -187,7 +187,7 @@ type HTTPQueryParamMatch = v1beta1.HTTPQueryParamMatch
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
