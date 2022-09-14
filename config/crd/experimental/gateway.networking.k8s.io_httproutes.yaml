@@ -77,16 +77,7 @@ spec:
                   have specified hostnames, and none match with the criteria above,
                   then the HTTPRoute is not accepted. The implementation must raise
                   an 'Accepted' Condition with a status of `False` in the corresponding
-                  RouteParentStatus. \n If a Route (A) of type HTTPRoute or GRPCRoute
-                  is attached to a Listener and that listener already has another
-                  Route (B) of the other type attached and the intersection of the
-                  hostnames of A and B is non-empty, then the implementation MUST
-                  accept exactly one of these two routes, determined by the following
-                  criteria, in order: \n * The oldest Route based on creation timestamp.
-                  * The Route appearing first in alphabetical order by   \"{namespace}/{name}\".
-                  \n The rejected Route MUST raise an 'Accepted' condition with a
-                  status of 'False' in the corresponding RouteParentStatus. \n Support:
-                  Core"
+                  RouteParentStatus. \n Support: Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
@@ -459,9 +450,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a different namespace is specified,
-                                            a ReferenceGrant object with ReferenceGrantTo.Kind=Service
-                                            is required in the referent namespace
+                                            when a namespace is specified, a ReferenceGrant
+                                            object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
                                             documentation for details. \n Support:
@@ -723,11 +713,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a different namespace is specified, a
-                              ReferenceGrant object with ReferenceGrantTo.Kind=Service
-                              is required in the referent namespace to allow that
-                              namespace's owner to accept the reference. See the ReferenceGrant
-                              documentation for details. \n Support: Core"
+                              Note that when a namespace is specified, a ReferenceGrant
+                              object is required in the referent namespace to allow
+                              that namespace's owner to accept the reference. See
+                              the ReferenceGrant documentation for details. \n Support:
+                              Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -977,12 +967,11 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a different namespace
-                                      is specified, a ReferenceGrant object with ReferenceGrantTo.Kind=Service
-                                      is required in the referent namespace to allow
-                                      that namespace's owner to accept the reference.
-                                      See the ReferenceGrant documentation for details.
-                                      \n Support: Core"
+                                      is inferred. \n Note that when a namespace is
+                                      specified, a ReferenceGrant object is required
+                                      in the referent namespace to allow that namespace's
+                                      owner to accept the reference. See the ReferenceGrant
+                                      documentation for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1230,10 +1219,11 @@ spec:
                         Route based on creation timestamp. * The Route appearing first
                         in alphabetical order by   \"{namespace}/{name}\". \n If ties
                         still exist within the Route that has been given precedence,
-                        matching precedence MUST be granted to the first matching
-                        rule meeting the above criteria. \n When no rules matching
-                        a request have been successfully attached to the parent a
-                        request is coming from, a HTTP 404 status code MUST be returned."
+                        matching precedence MUST be granted to the FIRST matching
+                        rule (in list order) meeting the above criteria. \n When no
+                        rules matching a request have been successfully attached to
+                        the parent a request is coming from, a HTTP 404 status code
+                        MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -1358,7 +1348,17 @@ spec:
                                     param names, only the first entry with an equivalent
                                     name MUST be considered for a match. Subsequent
                                     entries with an equivalent query param name MUST
-                                    be ignored."
+                                    be ignored. \n If a query param is repeated in
+                                    an HTTP request, the behavior is purposely left
+                                    undefined, since different data planes have different
+                                    capabilities. However, it's *recommended* that
+                                    implementations should match against the first
+                                    value of the param if the data plane supports
+                                    it, as this behavior is expected in other load
+                                    balancing contexts outside of the Gateway API.
+                                    Users should not route traffic based on repeated
+                                    query params to guard themselves against potential
+                                    differences in the implementations."
                                   maxLength: 256
                                   minLength: 1
                                   type: string
