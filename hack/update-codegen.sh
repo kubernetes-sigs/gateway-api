@@ -20,11 +20,14 @@ set -o pipefail
 
 readonly SCRIPT_ROOT="$(cd "$(dirname "${BASH_SOURCE}")"/.. && pwd)"
 
+# Keep outer module cache so we don't need to redownload them each time.
+# The build cache already is persisted.
+readonly GOMODCACHE="$(go env GOMODCACHE)"
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 
-export GO111MODULE GOFLAGS GOPATH
+export GOMODCACHE GO111MODULE GOFLAGS GOPATH
 
 # Even when modules are enabled, the code-generator tools always write to
 # a traditional GOPATH directory, so fake on up to point to the current
