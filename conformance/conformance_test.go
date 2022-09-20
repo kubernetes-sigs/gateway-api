@@ -18,6 +18,7 @@ limitations under the License.
 package conformance_test
 
 import (
+	"strings"
 	"testing"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -45,15 +46,37 @@ func TestConformance(t *testing.T) {
 
 	t.Logf("Running conformance tests with %s GatewayClass", *flags.GatewayClassName)
 
+	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
+	exemptFeatures := parseExemptFeatures(*flags.ExemptFeatures)
+
 	cSuite := suite.New(suite.Options{
 		Client:               client,
 		GatewayClassName:     *flags.GatewayClassName,
 		Debug:                *flags.ShowDebug,
 		CleanupBaseResources: *flags.CleanupBaseResources,
-		SupportedFeatures: []suite.SupportedFeature{
-			suite.SupportReferenceGrant,
-		},
+		SupportedFeatures:    supportedFeatures,
+		ExemptFeatures:       exemptFeatures,
 	})
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)
+}
+
+// parseSupportedFeatures parses the arguments for supported-features flag,
+// then converts the string to []suite.SupportedFeature
+func parseSupportedFeatures(f string) []suite.SupportedFeature {
+	var res []suite.SupportedFeature
+	for _, value := range strings.Split(f, ",") {
+		res = append(res, suite.SupportedFeature(value))
+	}
+	return res
+}
+
+// parseExemptFeatures parses the arguments for exempt-features flag,
+// then converts the string to []suite.ExemptFeature
+func parseExemptFeatures(f string) []suite.ExemptFeature {
+	var res []suite.ExemptFeature
+	for _, value := range strings.Split(f, ",") {
+		res = append(res, suite.ExemptFeature(value))
+	}
+	return res
 }
