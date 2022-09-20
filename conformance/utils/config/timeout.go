@@ -27,6 +27,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	DeleteTimeout time.Duration
 
+	// GetTimeout represents the maximum time to get a Kubernetes object.
+	// Max value for conformant implementation: None
+	GetTimeout time.Duration
+
 	// GatewayMustHaveAddress represents the maximum time for at least one IP Address has been set in the status of a Gateway.
 	// Max value for conformant implementation: None
 	GatewayMustHaveAddress time.Duration
@@ -73,6 +77,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 	return TimeoutConfig{
 		CreateTimeout:                  60 * time.Second,
 		DeleteTimeout:                  10 * time.Second,
+		GetTimeout:                     10 * time.Second,
 		GatewayMustHaveAddress:         180 * time.Second,
 		GatewayStatusMustHaveListeners: 60 * time.Second,
 		GWCMustBeAccepted:              180 * time.Second,
@@ -93,6 +98,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.DeleteTimeout == 0 {
 		timeoutConfig.DeleteTimeout = defaultTimeoutConfig.DeleteTimeout
+	}
+	if timeoutConfig.GetTimeout == 0 {
+		timeoutConfig.GetTimeout = defaultTimeoutConfig.GetTimeout
 	}
 	if timeoutConfig.GatewayMustHaveAddress == 0 {
 		timeoutConfig.GatewayMustHaveAddress = defaultTimeoutConfig.GatewayMustHaveAddress
