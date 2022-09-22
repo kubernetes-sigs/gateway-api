@@ -93,6 +93,16 @@ type HTTPRouteSpec struct {
 	// implementation must raise an 'Accepted' Condition with a status of
 	// `False` in the corresponding RouteParentStatus.
 	//
+	// In the event that multiple HTTPRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the HTTPRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// If ties exist across multiple Routes, the matching precedence rules for
+	// HTTPRouteMatches takes over.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -142,12 +152,10 @@ type HTTPRouteRule struct {
 	// HTTP request.
 	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
-	// MUST prioritize rules based on the following criteria, continuing on
-	// ties. Precedence must be given to the Rule with the largest number
-	// of:
+	// MUST prioritize matches based on the following criteria, continuing on
+	// ties. Across all rules specified on applicable Routes, precedence must be
+	// given to the match with the largest number of:
 	//
-	// * Characters in a matching non-wildcard hostname.
-	// * Characters in a matching hostname.
 	// * Characters in a matching path.
 	// * Header matches.
 	// * Query param matches.
@@ -159,9 +167,9 @@ type HTTPRouteRule struct {
 	// * The Route appearing first in alphabetical order by
 	//   "{namespace}/{name}".
 	//
-	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the FIRST matching rule (in list
-	// order) meeting the above criteria.
+	// If ties still exist within an HTTPRoute, matching precedence MUST be granted
+	// to the FIRST matching rule (in list order) with a match meeting the above
+	// criteria.
 	//
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
