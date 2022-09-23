@@ -292,10 +292,10 @@ const (
 // +k8s:deepcopy-gen=false
 type HTTPHeader = v1beta1.HTTPHeader
 
-// HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
-// filter.
+// HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request
+// or response.
 // +k8s:deepcopy-gen=false
-type HTTPRequestHeaderFilter = v1beta1.HTTPRequestHeaderFilter
+type HTTPHeaderFilter = v1beta1.HTTPHeaderFilter
 
 // HTTPPathModifierType defines the type of path redirect or rewrite.
 // +k8s:deepcopy-gen=false

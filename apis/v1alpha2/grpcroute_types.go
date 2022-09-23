@@ -427,7 +427,7 @@ type GRPCRouteFilter struct {
 	// Support: Core
 	//
 	// +optional
-	RequestHeaderModifier *HTTPRequestHeaderFilter `json:"requestHeaderModifier,omitempty"`
+	RequestHeaderModifier *HTTPHeaderFilter `json:"requestHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from

@@ -38,9 +38,14 @@ type ExpectedResponse struct {
 	// expected to match Request.
 	ExpectedRequest *ExpectedRequest
 
-	StatusCode int
-	Backend    string
-	Namespace  string
+	// TODO: move these into a dedicated type named Response
+	// ref: https://github.com/kubernetes-sigs/gateway-api/issues/1384
+	StatusCode    int
+	Headers       map[string]string
+	AbsentHeaders []string
+
+	Backend   string
+	Namespace string
 
 	// User Given TestCase name
 	TestCaseName string
@@ -206,6 +211,37 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
 				}
 
+			}
+		}
+
+		if expected.Headers != nil {
+			if cRes.Headers == nil {
+				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
+			}
+			for name, val := range cRes.Headers {
+				cRes.Headers[strings.ToLower(name)] = val
+			}
+
+			for name, expectedVal := range expected.Headers {
+				actualVal, ok := cRes.Headers[strings.ToLower(name)]
+				if !ok {
+					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
+				} else if strings.Join(actualVal, ",") != expectedVal {
+					return fmt.Errorf("expected %s header to be set to %s, got %s", name, expectedVal, strings.Join(actualVal, ","))
+				}
+			}
+		}
+
+		if len(expected.AbsentHeaders) > 0 {
+			for name, val := range cRes.Headers {
+				cRes.Headers[strings.ToLower(name)] = val
+			}
+
+			for _, name := range expected.AbsentHeaders {
+				val, ok := cRes.Headers[strings.ToLower(name)]
+				if ok {
+					return fmt.Errorf("expected %s header to not be set, got %s", name, val)
+				}
 			}
 		}
 

@@ -224,6 +224,12 @@ func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1b1.HTTPRouteFilter,
 	if filter.RequestHeaderModifier == nil && filter.Type == gatewayv1b1.HTTPRouteFilterRequestHeaderModifier {
 		errs = append(errs, field.Required(path, "filter.RequestHeaderModifier must be specified for RequestHeaderModifier HTTPRouteFilter.Type"))
 	}
+	if filter.ResponseHeaderModifier != nil && filter.Type != gatewayv1b1.HTTPRouteFilterResponseHeaderModifier {
+		errs = append(errs, field.Invalid(path, filter.ResponseHeaderModifier, "must be nil if the HTTPRouteFilter.Type is not ResponseHeaderModifier"))
+	}
+	if filter.ResponseHeaderModifier == nil && filter.Type == gatewayv1b1.HTTPRouteFilterResponseHeaderModifier {
+		errs = append(errs, field.Required(path, "filter.ResponseHeaderModifier must be specified for ResponseHeaderModifier HTTPRouteFilter.Type"))
+	}
 	if filter.RequestMirror != nil && filter.Type != gatewayv1b1.HTTPRouteFilterRequestMirror {
 		errs = append(errs, field.Invalid(path, filter.RequestMirror, "must be nil if the HTTPRouteFilter.Type is not RequestMirror"))
 	}
