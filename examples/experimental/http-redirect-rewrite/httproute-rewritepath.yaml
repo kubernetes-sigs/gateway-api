@@ -12,9 +12,9 @@ spec:
       - type: URLRewrite
         urlRewrite:
           hostname: elsewhere.example
-	        path:
+          path:
             type: ReplacePrefixMatch
-	        replacePrefixMatch: /fennel
+            replacePrefixMatch: /fennel
       backendRefs:
       - name: example-svc
         weight: 1
