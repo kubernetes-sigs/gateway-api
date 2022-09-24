@@ -17,7 +17,7 @@ limitations under the License.
 package v1alpha2
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 // +genclient
@@ -48,18 +48,7 @@ import (
 // Gateway is not deleted while in use.
 //
 // GatewayClass is a Cluster level resource.
-type GatewayClass struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-
-	// Spec defines the desired state of GatewayClass.
-	Spec GatewayClassSpec `json:"spec"`
-
-	// Status defines the current state of GatewayClass.
-	//
-	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
-	Status GatewayClassStatus `json:"status,omitempty"`
-}
+type GatewayClass v1beta1.GatewayClass
 
 const (
 	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
@@ -69,71 +58,24 @@ const (
 )
 
 // GatewayClassSpec reflects the configuration of a class of Gateways.
-type GatewayClassSpec struct {
-	// ControllerName is the name of the controller that is managing Gateways of
-	// this class. The value of this field MUST be a domain prefixed path.
-	//
-	// Example: "example.net/gateway-controller".
-	//
-	// This field is not mutable and cannot be empty.
-	//
-	// Support: Core
-	ControllerName GatewayController `json:"controllerName"`
-
-	// ParametersRef is a reference to a resource that contains the configuration
-	// parameters corresponding to the GatewayClass. This is optional if the
-	// controller does not require any additional configuration.
-	//
-	// ParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap,
-	// or an implementation-specific custom resource. The resource can be
-	// cluster-scoped or namespace-scoped.
-	//
-	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
-	// status condition will be true.
-	//
-	// Support: Custom
-	//
-	// +optional
-	ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
-
-	// Description helps describe a GatewayClass with more details.
-	//
-	// +kubebuilder:validation:MaxLength=64
-	// +optional
-	Description *string `json:"description,omitempty"`
-}
+// +k8s:deepcopy-gen=false
+type GatewayClassSpec = v1beta1.GatewayClassSpec
 
 // ParametersReference identifies an API object containing controller-specific
 // configuration resource within the cluster.
-type ParametersReference struct {
-	// Group is the group of the referent.
-	Group Group `json:"group"`
-
-	// Kind is kind of the referent.
-	Kind Kind `json:"kind"`
-
-	// Name is the name of the referent.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=253
-	Name string `json:"name"`
-
-	// Namespace is the namespace of the referent.
-	// This field is required when referring to a Namespace-scoped resource and
-	// MUST be unset when referring to a Cluster-scoped resource.
-	//
-	// +optional
-	Namespace *Namespace `json:"namespace,omitempty"`
-}
+// +k8s:deepcopy-gen=false
+type ParametersReference = v1beta1.ParametersReference
 
 // GatewayClassConditionType is the type for status conditions on
 // Gateway resources. This type should be used with the
 // GatewayClassStatus.Conditions field.
-type GatewayClassConditionType string
+// +k8s:deepcopy-gen=false
+type GatewayClassConditionType = v1beta1.GatewayClassConditionType
 
 // GatewayClassConditionReason defines the set of reasons that explain why a
 // particular GatewayClass condition type has been raised.
-type GatewayClassConditionReason string
+// +k8s:deepcopy-gen=false
+type GatewayClassConditionReason = v1beta1.GatewayClassConditionReason
 
 const (
 	// This condition indicates whether the GatewayClass has been accepted by
@@ -176,26 +118,10 @@ const (
 )
 
 // GatewayClassStatus is the current status for the GatewayClass.
-type GatewayClassStatus struct {
-	// Conditions is the current status from the controller for
-	// this GatewayClass.
-	//
-	// Controllers should prefer to publish conditions using values
-	// of GatewayClassConditionType for the type of each Condition.
-	//
-	// +optional
-	// +listType=map
-	// +listMapKey=type
-	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
-	Conditions []metav1.Condition `json:"conditions,omitempty"`
-}
+// +k8s:deepcopy-gen=false
+type GatewayClassStatus = v1beta1.GatewayClassStatus
 
 // +kubebuilder:object:root=true
 
 // GatewayClassList contains a list of GatewayClass
-type GatewayClassList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []GatewayClass `json:"items"`
-}
+type GatewayClassList v1beta1.GatewayClassList

@@ -140,7 +140,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Filters: []gatewayv1b1.HTTPRouteFilter{
 					{
 						Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 							Set: []gatewayv1b1.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -160,7 +160,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					},
 					{
 						Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 							Add: []gatewayv1b1.HTTPHeader{
 								{
 									Name:  "my-header",
@@ -174,7 +174,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 	}, {
 		name:     "invalid httpRoute with multiple duplicate filters",
-		errCount: 2,
+		errCount: 3,
 		rules: []gatewayv1b1.HTTPRouteRule{
 			{
 				Matches: []gatewayv1b1.HTTPRouteMatch{
@@ -197,7 +197,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 					},
 					{
 						Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 							Set: []gatewayv1b1.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -217,11 +217,22 @@ func TestValidateHTTPRoute(t *testing.T) {
 					},
 					{
 						Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 							Add: []gatewayv1b1.HTTPHeader{
 								{
 									Name:  "my-header",
 									Value: "bar",
+								},
+							},
+						},
+					},
+					{
+						Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
+						ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+							Add: []gatewayv1b1.HTTPHeader{
+								{
+									Name:  "extra-header",
+									Value: "foo",
 								},
 							},
 						},
@@ -232,6 +243,17 @@ func TestValidateHTTPRoute(t *testing.T) {
 							BackendRef: gatewayv1b1.BackendObjectReference{
 								Name: specialService,
 								Port: translator.PortNumberPtr(8080),
+							},
+						},
+					},
+					{
+						Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
+						ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+							Set: []gatewayv1b1.HTTPHeader{
+								{
+									Name:  "other-header",
+									Value: "bat",
+								},
 							},
 						},
 					},
@@ -254,7 +276,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Filters: []gatewayv1b1.HTTPRouteFilter{
 					{
 						Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 							Set: []gatewayv1b1.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -811,7 +833,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		name: "valid HTTPRouteFilterRequestHeaderModifier route filter",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-			RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{
+			RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
 				Set:    []gatewayv1b1.HTTPHeader{{Name: "name"}},
 				Add:    []gatewayv1b1.HTTPHeader{{Name: "add"}},
 				Remove: []string{"remove"},
@@ -848,7 +870,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		name: "invalid HTTPRouteFilterRequestMirror type filter with non-matching field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type:                  gatewayv1b1.HTTPRouteFilterRequestMirror,
-			RequestHeaderModifier: &gatewayv1b1.HTTPRequestHeaderFilter{},
+			RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{},
 		},
 		errCount: 2,
 	}, {

@@ -73,16 +73,19 @@ change across API versions.
 * Clarifications to godocs
 * Updates to CRDs and/or code to fix a bug
 * Conformance test fixes
+* Additional conformance test coverage for existing features
 * Fixes to typos
 
 ### Minor version (e.g. v0.4.0 -> v0.5.0)
 * Everything that is valid in a patch release
 * New experimental API fields or resources
+* Changes to recommended conditions or reasons in status
 * Loosened validation
 * Making required fields optional
 * Removal of experimental fields
 * Removal of experimental resources
 * Graduation of fields or resources from experimental to standard track
+* Changes to conformance tests to match spec updates
 * Introduction of a new **API version**, which may also include:
   * Renamed fields
   * Anything else that is valid in a new Kubernetes API version

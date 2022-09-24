@@ -93,6 +93,16 @@ type HTTPRouteSpec struct {
 	// implementation must raise an 'Accepted' Condition with a status of
 	// `False` in the corresponding RouteParentStatus.
 	//
+	// In the event that multiple HTTPRoutes specify intersecting hostnames (e.g.
+	// overlapping wildcard matching and exact matching hostnames), precedence must
+	// be given to rules from the HTTPRoute with the largest number of:
+	//
+	// * Characters in a matching non-wildcard hostname.
+	// * Characters in a matching hostname.
+	//
+	// If ties exist across multiple Routes, the matching precedence rules for
+	// HTTPRouteMatches takes over.
+	//
 	// Support: Core
 	//
 	// +optional
@@ -142,12 +152,10 @@ type HTTPRouteRule struct {
 	// HTTP request.
 	//
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
-	// MUST prioritize rules based on the following criteria, continuing on
-	// ties. Precedence must be given to the Rule with the largest number
-	// of:
+	// MUST prioritize matches based on the following criteria, continuing on
+	// ties. Across all rules specified on applicable Routes, precedence must be
+	// given to the match with the largest number of:
 	//
-	// * Characters in a matching non-wildcard hostname.
-	// * Characters in a matching hostname.
 	// * Characters in a matching path.
 	// * Header matches.
 	// * Query param matches.
@@ -159,9 +167,9 @@ type HTTPRouteRule struct {
 	// * The Route appearing first in alphabetical order by
 	//   "{namespace}/{name}".
 	//
-	// If ties still exist within the Route that has been given precedence,
-	// matching precedence MUST be granted to the first matching rule meeting
-	// the above criteria.
+	// If ties still exist within an HTTPRoute, matching precedence MUST be granted
+	// to the FIRST matching rule (in list order) with a match meeting the above
+	// criteria.
 	//
 	// When no rules matching a request have been successfully attached to the
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
@@ -430,6 +438,15 @@ type HTTPQueryParamMatch struct {
 	// entry with an equivalent name MUST be considered for a match. Subsequent
 	// entries with an equivalent query param name MUST be ignored.
 	//
+	// If a query param is repeated in an HTTP request, the behavior
+	// is purposely left undefined, since different data planes have different
+	// capabilities. However, it's *recommended* that implementations should
+	// match against the first value of the param if the data plane supports it,
+	// as this behavior is expected in other load balancing contexts outside of
+	// the Gateway API.
+	// Users should not route traffic based on repeated query params to guard
+	// themselves against potential differences in the implementations.
+	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
 	Name string `json:"name"`
@@ -563,7 +580,7 @@ type HTTPRouteFilter struct {
 	//
 	// +unionDiscriminator
 	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
+	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
 	Type HTTPRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -572,7 +589,16 @@ type HTTPRouteFilter struct {
 	// Support: Core
 	//
 	// +optional
-	RequestHeaderModifier *HTTPRequestHeaderFilter `json:"requestHeaderModifier,omitempty"`
+	RequestHeaderModifier *HTTPHeaderFilter `json:"requestHeaderModifier,omitempty"`
+
+	// ResponseHeaderModifier defines a schema for a filter that modifies response
+	// headers.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	ResponseHeaderModifier *HTTPHeaderFilter `json:"responseHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from
@@ -621,6 +647,15 @@ const (
 	//
 	// Support in HTTPBackendRef: Extended
 	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
+
+	// HTTPRouteFilterResponseHeaderModifier can be used to add or remove an HTTP
+	// header from an HTTP response before it is sent to the client.
+	//
+	// Support in HTTPRouteRule: Extended
+	//
+	// Support in HTTPBackendRef: Extended
+	// <gateway:experimental>
+	HTTPRouteFilterResponseHeaderModifier HTTPRouteFilterType = "ResponseHeaderModifier"
 
 	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
 	// another location. This filter can also be used for HTTP to HTTPS
@@ -681,9 +716,9 @@ type HTTPHeader struct {
 	Value string `json:"value"`
 }
 
-// HTTPRequestHeaderFilter defines configuration for the RequestHeaderModifier
-// filter.
-type HTTPRequestHeaderFilter struct {
+// HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request
+// or response.
+type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
 	// before the action.
 	//

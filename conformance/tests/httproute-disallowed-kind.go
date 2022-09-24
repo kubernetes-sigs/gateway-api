@@ -17,13 +17,10 @@ limitations under the License.
 package tests
 
 import (
-	"context"
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -47,21 +44,8 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 		t.Run("Route should not have Parents set in status", func(t *testing.T) {
 			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeName)
 		})
-
 		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
-			gw := &v1beta1.Gateway{}
-			err := suite.Client.Get(context.TODO(), gwName, gw)
-			require.NoError(t, err, "error fetching Gateway")
-			// There are two valid ways to represent this:
-			// 1. No listeners in status
-			// 2. One listener in status with 0 attached routes
-			if len(gw.Status.Listeners) == 0 {
-				// No listeners in status.
-			} else if len(gw.Status.Listeners) == 1 {
-				require.Equal(t, int32(0), gw.Status.Listeners[0].AttachedRoutes)
-			} else {
-				t.Errorf("Expected no more than 1 listener in status, got %d", len(gw.Status.Listeners))
-			}
+			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwName)
 		})
 	},
 }
