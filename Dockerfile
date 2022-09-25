@@ -18,7 +18,8 @@ WORKDIR /go/src/sig.k8s.io/gateway-api
 COPY  . .
 ARG TAG
 ARG COMMIT
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -o gateway-api-webhook \
+ARG ARCH
+RUN CGO_ENABLED=0 GOARCH=${ARCH} GOOS=linux go build -a -o gateway-api-webhook \
       -ldflags "-s -w -X main.VERSION=$TAG -X main.COMMIT=$COMMIT" ./cmd/admission
 
 FROM gcr.io/distroless/static:nonroot

@@ -43,6 +43,8 @@ export BASE_REF ?= main
 # a git repo.
 export COMMIT ?= $(shell git rev-parse --short HEAD)
 
+ALL_ARCH ?= amd64
+
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
 TOP := $(dir $(firstword $(MAKEFILE_LIST)))
@@ -120,6 +122,16 @@ docs:
 .PHONY: release-staging
 release-staging: 
 	hack/build-and-push.sh
+
+## --------------------------------------
+## Docker - All ARCH
+## --------------------------------------
+
+.PHONY: release-staging-all ## Build docker images for all architectures
+relase-staging-all: $(addprefix release-staging-,$(ALL_ARCH))
+
+release-staging-%:
+	$(MAKE) ARCH=$* release-staging
 
 # Generate a virtualenv install, which is useful for hacking on the
 # docs since it installs mkdocs and all the right dependencies.

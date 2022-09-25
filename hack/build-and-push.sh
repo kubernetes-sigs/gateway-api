@@ -44,6 +44,12 @@ then
     exit 1
 fi
 
+if [[ -z "${ARCH-}" ]];
+then
+    echo "ARCH env var must be set and nonempty."
+    exit 1
+fi
+
 # If our base ref == "main" then we will tag :latest.
 VERSION_TAG=latest
 
@@ -64,10 +70,10 @@ fi
 
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
-docker build --build-arg COMMIT=${COMMIT} --build-arg TAG=${BINARY_TAG} \
+docker build --build-arg COMMIT=${COMMIT} --build-arg TAG=${BINARY_TAG} ARCH=${ARCH} \
   			-t ${REGISTRY}/admission-server:${GIT_TAG} .
-docker push ${REGISTRY}/admission-server:${GIT_TAG}
+docker push ${REGISTRY}/admission-server-${ARCH}:${GIT_TAG}
 
 # Then, we add an extra version tag - either :latest or semver.
-docker tag ${REGISTRY}/admission-server:${GIT_TAG} ${REGISTRY}/admission-server:${VERSION_TAG}
-docker push ${REGISTRY}/admission-server:${VERSION_TAG}
+docker tag ${REGISTRY}/admission-server-${ARCH}:${GIT_TAG} ${REGISTRY}/admission-server-${ARCH}:${VERSION_TAG}
+docker push ${REGISTRY}/admission-server-${ARCH}:${VERSION_TAG}
