@@ -44,7 +44,7 @@ export BASE_REF ?= main
 export COMMIT ?= $(shell git rev-parse --short HEAD)
 
 ARCH ?= amd64
-ALL_ARCH ?= amd64
+ALL_ARCH ?= amd64 arm64
 
 DOCKER ?= docker
 # TOP is the current directory where this Makefile lives.
