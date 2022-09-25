@@ -43,6 +43,7 @@ export BASE_REF ?= main
 # a git repo.
 export COMMIT ?= $(shell git rev-parse --short HEAD)
 
+ARCH ?= amd64
 ALL_ARCH ?= amd64
 
 DOCKER ?= docker
