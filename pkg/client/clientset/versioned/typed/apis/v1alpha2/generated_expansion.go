@@ -28,8 +28,6 @@ type HTTPRouteExpansion interface{}
 
 type ReferenceGrantExpansion interface{}
 
-type ReferencePolicyExpansion interface{}
-
 type TCPRouteExpansion interface{}
 
 type TLSRouteExpansion interface{}

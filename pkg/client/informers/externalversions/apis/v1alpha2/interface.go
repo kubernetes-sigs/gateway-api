@@ -34,8 +34,6 @@ type Interface interface {
 	HTTPRoutes() HTTPRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
 	ReferenceGrants() ReferenceGrantInformer
-	// ReferencePolicies returns a ReferencePolicyInformer.
-	ReferencePolicies() ReferencePolicyInformer
 	// TCPRoutes returns a TCPRouteInformer.
 	TCPRoutes() TCPRouteInformer
 	// TLSRoutes returns a TLSRouteInformer.
@@ -78,11 +76,6 @@ func (v *version) HTTPRoutes() HTTPRouteInformer {
 // ReferenceGrants returns a ReferenceGrantInformer.
 func (v *version) ReferenceGrants() ReferenceGrantInformer {
 	return &referenceGrantInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// ReferencePolicies returns a ReferencePolicyInformer.
-func (v *version) ReferencePolicies() ReferencePolicyInformer {
-	return &referencePolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // TCPRoutes returns a TCPRouteInformer.
