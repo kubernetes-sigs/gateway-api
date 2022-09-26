@@ -33,6 +33,9 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    deprecated: true
+    deprecationWarning: The v1alpha2 version of Gateway has been deprecated and will
+      be removed in a future release of the API. Please upgrade to v1beta1.
     name: v1alpha2
     schema:
       openAPIV3Schema:
@@ -710,7 +713,7 @@ spec:
         required:
         - spec
         type: object
-    served: false
+    served: true
     storage: false
     subresources:
       status: {}
