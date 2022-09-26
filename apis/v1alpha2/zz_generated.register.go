@@ -68,8 +68,6 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 		&HTTPRouteList{},
 		&ReferenceGrant{},
 		&ReferenceGrantList{},
-		&ReferencePolicy{},
-		&ReferencePolicyList{},
 		&TCPRoute{},
 		&TCPRouteList{},
 		&TLSRoute{},
