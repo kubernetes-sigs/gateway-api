@@ -248,7 +248,7 @@ type HTTPRouteRule struct {
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
@@ -310,7 +310,7 @@ type HTTPPathMatch struct {
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
@@ -391,7 +391,7 @@ type HTTPHeaderMatch struct {
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=Exact;RegularExpression
@@ -450,7 +450,7 @@ type HTTPQueryParamMatch struct {
 // must ensure that unknown values will not cause a crash.
 //
 // Unknown values here must result in the implementation setting the
-// Attached Condition for the Route to `status: False`, with a
+// Accepted Condition for the Route to `status: False`, with a
 // Reason of `UnsupportedValue`.
 //
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
@@ -557,7 +557,7 @@ type HTTPRouteFilter struct {
 	// must ensure that unknown values will not cause a crash.
 	//
 	// Unknown values here must result in the implementation setting the
-	// Attached Condition for the Route to `status: False`, with a
+	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
 	// +unionDiscriminator
@@ -783,7 +783,7 @@ type HTTPPathModifier struct {
 	// must ensure that unknown values will not cause a crash.
 	//
 	// Unknown values here must result in the implementation setting the
-	// Attached Condition for the Route to `status: False`, with a
+	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
 	// <gateway:experimental>
@@ -827,7 +827,7 @@ type HTTPRequestRedirectFilter struct {
 	// must ensure that unknown values will not cause a crash.
 	//
 	// Unknown values here must result in the implementation setting the
-	// Attached Condition for the Route to `status: False`, with a
+	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
 	// +optional
@@ -870,7 +870,7 @@ type HTTPRequestRedirectFilter struct {
 	// must ensure that unknown values will not cause a crash.
 	//
 	// Unknown values here must result in the implementation setting the
-	// Attached Condition for the Route to `status: False`, with a
+	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
 	// +optional
