@@ -52,6 +52,7 @@ nav:
     - Cross-Namespace routing: guides/multiple-ns.md
     - TLS: guides/tls.md
     - TCP routing: guides/tcp.md
+    - gRPC Routing: guides/grpc-routing.md
   - Reference:
     - API Types:
         GatewayClass: api-types/gatewayclass.md
