@@ -54,7 +54,7 @@ kind create cluster --name "${CLUSTER_NAME}" || res=$?
 # Install webhook
 docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
 # Temporary workaround for release
-sed -i 's/v0.5.0/latest/g' config/webhook/admission_webhook.yaml
+sed -i 's/v0.5.1/latest/g' config/webhook/admission_webhook.yaml
 kubectl apply -f config/webhook/
 
 # Wait for webhook to be ready
@@ -106,7 +106,7 @@ for CHANNEL in experimental standard; do
 done
 
 # Undo workaround from earlier
-sed -i 's/latest/v0.5.0/g' config/webhook/admission_webhook.yaml
+sed -i 's/latest/v0.5.1/g' config/webhook/admission_webhook.yaml
 
 # Clean up and exit
 cleanup || res=$?
