@@ -22,12 +22,13 @@ import (
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// IsControllerNameValid checks that the provided controllerName complaints with the expected
+var controllerNameRegex = regexp.MustCompile(`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`)
+
+// IsControllerNameValid checks that the provided controllerName complies with the expected
 // format. It must be a non-empty domain prefixed path.
 func IsControllerNameValid(controllerName gatewayv1b1.GatewayController) bool {
 	if controllerName == "" {
 		return false
 	}
-	re := regexp.MustCompile(`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`)
-	return re.Match([]byte(controllerName))
+	return controllerNameRegex.Match([]byte(controllerName))
 }

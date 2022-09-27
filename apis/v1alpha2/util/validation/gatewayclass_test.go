@@ -35,8 +35,18 @@ func TestIsControllerNameValid(t *testing.T) {
 			isvalid:        false,
 		},
 		{
-			name:           "invalid controller name",
+			name:           "invalid controller name 1",
 			controllerName: "example.com",
+			isvalid:        false,
+		},
+		{
+			name:           "invalid controller name 2",
+			controllerName: "example*com/bar",
+			isvalid:        false,
+		},
+		{
+			name:           "invalid controller name 3",
+			controllerName: "example/@bar",
 			isvalid:        false,
 		},
 		{
