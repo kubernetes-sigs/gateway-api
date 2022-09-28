@@ -58,6 +58,7 @@ nav:
         Gateway: api-types/gateway.md
         HTTPRoute: api-types/httproute.md
         ReferenceGrant: api-types/referencegrant.md
+        GRPCRoute: api-types/grpcroute.md
     - API specification: references/spec.md
     - Policy Attachment: references/policy-attachment.md
     - Enhancement Proposals:
