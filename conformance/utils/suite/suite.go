@@ -44,9 +44,6 @@ const (
 type SupportedFeature string
 
 const (
-	// This option indicates support for the ReferenceGrant object.
-	SupportReferenceGrant SupportedFeature = "ReferenceGrant"
-
 	// This option indicates support for HTTPRoute query param matching (extended conformance).
 	SupportHTTPRouteQueryParamMatching SupportedFeature = "HTTPRouteQueryParamMatching"
 

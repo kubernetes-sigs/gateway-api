@@ -34,7 +34,7 @@ func init() {
 var GatewaySecretMissingReferenceGrant = suite.ConformanceTest{
 	ShortName:   "GatewaySecretMissingReferenceGrant",
 	Description: "A Gateway in the gateway-conformance-infra namespace should fail to become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the Secret does not exist",
-	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
+	Exemptions:  []suite.ExemptFeature{suite.ExemptReferenceGrant},
 	Manifests:   []string{"tests/gateway-secret-missing-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-missing-reference-grant", Namespace: "gateway-conformance-infra"}
