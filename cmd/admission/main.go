@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"k8s.io/klog/v2"
 
@@ -72,7 +73,8 @@ func main() {
 	server := &http.Server{
 		Addr: ":8443",
 		// Require at least TLS12 to satisfy golint G402.
-		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{certs}},
+		TLSConfig:         &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{certs}},
+		ReadHeaderTimeout: 16 * time.Second,
 	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("/validate", admission.ServeHTTP)

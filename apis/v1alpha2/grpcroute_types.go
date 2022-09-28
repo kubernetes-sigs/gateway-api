@@ -272,15 +272,15 @@ type GRPCRouteRule struct {
 // For example, the match below will match a gRPC request only if its service
 // is `foo` AND it contains the `version: v1` header:
 //
-// ```
-// matches:
-// - method:
-//    type: Exact
-//    service: "foo"
-//   headers:
-//   - name: "version"
-//     value "v1"
-// ```
+//	```
+//	matches:
+//	- method:
+//	   type: Exact
+//	   service: "foo"
+//	  headers:
+//	  - name: "version"
+//	    value "v1"
+//	```
 type GRPCRouteMatch struct {
 	// Path specifies a gRPC request service/method matcher. If this field is not
 	// specified, all services and methods will match.

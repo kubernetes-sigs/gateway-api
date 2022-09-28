@@ -112,6 +112,17 @@ uninstall:
 verify:
 	hack/verify-all.sh -v
 
+# Run Go linter
+.PHONY: lint
+lint:
+	hack/verify-golint.sh
+
+# Run Go linter auto-fixers if supported
+.PHONY: lint-fix
+lint-fix:
+	hack/verify-golint.sh --fix
+
+
 # Build the documentation.
 .PHONY: docs
 docs:
