@@ -33,6 +33,9 @@ cleanup() {
   if [ "$CLEANED_UP" = "true" ]; then
     return
   fi
+
+  rm config/webhook/kustomization.yaml
+
   if [ "${KIND_CREATE_ATTEMPTED:-}" = true ]; then
     kind delete cluster --name "${CLUSTER_NAME}" || true
   fi
@@ -51,11 +54,19 @@ res=0
 KIND_CREATE_ATTEMPTED=true
 kind create cluster --name "${CLUSTER_NAME}" || res=$?
 
+cat <<EOF >config/webhook/kustomization.yaml
+resources:
+  - 0-namespace.yaml
+  - certificate_config.yaml
+  - admission_webhook.yaml
+images:
+  - name: gcr.io/k8s-staging-gateway-api/admission-server:v0.5.0
+    newTag: latest
+EOF
+
 # Install webhook
 docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
-# Temporary workaround for release
-sed -i 's/v0.5.0/latest/g' config/webhook/admission_webhook.yaml
-kubectl apply -f config/webhook/
+kubectl apply -k config/webhook/
 
 # Wait for webhook to be ready
 for check in {1..10}; do 
@@ -104,9 +115,6 @@ for CHANNEL in experimental standard; do
         res=2 || \
         echo Examples failed as expected
 done
-
-# Undo workaround from earlier
-sed -i 's/latest/v0.5.0/g' config/webhook/admission_webhook.yaml
 
 # Clean up and exit
 cleanup || res=$?
