@@ -1,7 +1,0 @@
-resources:
-  - 0-namespace.yaml
-  - certificate_config.yaml
-  - admission_webhook.yaml
-images:
-  - name: gcr.io/k8s-staging-gateway-api/admission-server:v0.5.0
-    newTag: latest
