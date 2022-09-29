@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.5.1](#v051)
 - [v0.5.0](#v050)
 - [v0.5.0-rc2](#v050-rc2)
 - [v0.5.0-rc1](#v050-rc1)
@@ -16,6 +17,39 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.5.1
+
+API versions: v1beta1, v1alpha2
+
+This release includes a number of bug fixes and clarifications:
+
+### API Spec
+
+* The spec has been clarified to state that the port specified in BackendRef
+  refers to the Service port number, not the target port, when a Service is
+  referenced. [#1332](https://github.com/kubernetes-sigs/gateway-api/pull/1332)
+* The spec has been clarified to state that "Accepted" should be used instead of
+  "Attached" on HTTPRoute.
+  [#1382](https://github.com/kubernetes-sigs/gateway-api/pull/1382)
+
+### Webhook:
+
+* The duplicate gateway-system namespace definitions have been removed.
+  [#1387](https://github.com/kubernetes-sigs/gateway-api/pull/1387)
+* The webhook has been updated to watch v1beta1.
+  [#1365](https://github.com/kubernetes-sigs/gateway-api/pull/1368)
+
+### Conformance:
+
+* The expected condition for a cross-namespace certificate reference that has
+  not been allowed by a ReferenceGrant has been changed from
+  "InvalidCertificateRef" to "RefNotPermitted" to more closely match the spec.
+  [#1351](https://github.com/kubernetes-sigs/gateway-api/pull/1351)
+* A new test has been added to cover when a Gateway references a Secret that
+  does not exist
+  [#1334](https://github.com/kubernetes-sigs/gateway-api/pull/1334)
+
 
 ## v0.5.0
 
