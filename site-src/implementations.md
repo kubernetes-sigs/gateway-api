@@ -12,6 +12,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Cilium][16] (work in progress)
 - [Contour][3] (alpha)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
+- [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
 - [Google Kubernetes Engine][6] (public preview)
 - [HAProxy Ingress][7] (alpha)
@@ -42,6 +43,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [14]:#flagger
 [15]:#cert-manager
 [16]:#cilium
+[17]:#flomesh-service-mesh-fsm
 
 ## Implementations
 
@@ -116,6 +118,15 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 [emissary]:https://www.getambassador.io/docs/edge-stack
 [envoy]:https://envoyproxy.io
 [emissary-gateway-api]:https://www.getambassador.io/docs/edge-stack/latest/topics/using/gateway-api/
+
+### Flomesh Service Mesh (FSM)
+
+[Flomesh Service Mesh][fsm] is a community driven Kubernetes North-South traffic manager, and provides an implementation of Ingress controller, Gateway API, Load Balancer, and cross-cluster service registration and service discovery.
+
+The [Flomesh.io](flomesh) team is actively working towards an implementation of the Gateway API.
+
+[fsm]:https://github.com/flomesh-io/fsm
+[flomesh]:https://fomesh.io
 
 ### Gloo Edge
 
