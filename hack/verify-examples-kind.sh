@@ -22,6 +22,7 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly CLUSTER_NAME="verify-gateway-api"
+readonly ADMISSION_WEBHOOK_VERSION="v0.5.1"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
@@ -60,7 +61,7 @@ resources:
   - certificate_config.yaml
   - admission_webhook.yaml
 images:
-  - name: gcr.io/k8s-staging-gateway-api/admission-server:v0.5.0
+  - name: gcr.io/k8s-staging-gateway-api/admission-server:${ADMISSION_WEBHOOK_VERSION}
     newTag: latest
 EOF
 
