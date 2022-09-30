@@ -747,17 +747,25 @@ const (
 
 	// This reason is used with the "ResolvedRefs" condition when the
 	// Listener has a TLS configuration with at least one TLS CertificateRef
-	// that is invalid or cannot be resolved.
+	// that is invalid or does not exist.
+	// A CertificateRef is considered invalid when it refers to a nonexistent
+	// or unsupported resource or kind, or when the data within that resource
+	// is malformed.
+	// This reason must be used only when the reference is allowed, either by
+	// referencing an object in the same namespace as the Gateway, or when
+	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.
+	// If the reference is not allowed, the reason RefNotPermitted must be used
+	// instead.
 	ListenerReasonInvalidCertificateRef ListenerConditionReason = "InvalidCertificateRef"
 
 	// This reason is used with the "ResolvedRefs" condition when an invalid or
 	// unsupported Route kind is specified by the Listener.
 	ListenerReasonInvalidRouteKinds ListenerConditionReason = "InvalidRouteKinds"
 
-	// This reason is used with the "ResolvedRefs" condition when
-	// one of the Listener's Routes has a BackendRef to an object in
-	// another namespace, where the object in the other namespace does
-	// not have a ReferenceGrant explicitly allowing the reference.
+	// This reason is used with the "ResolvedRefs" condition when the
+	// Listener has a TLS configuration that references an object in another
+	// namespace, where the object in the other namespace does not have a
+	// ReferenceGrant explicitly allowing the reference.
 	ListenerReasonRefNotPermitted ListenerConditionReason = "RefNotPermitted"
 )
 
