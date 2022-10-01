@@ -307,7 +307,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 	t.Helper()
 
 	if len(expected) != len(actual) {
-		t.Logf("Route %s/%s expected %d parents got %d", routeName.Namespace, routeName.Name, len(expected), len(actual))
+		t.Logf("Route %s/%s expected %d Parents got %d", routeName.Namespace, routeName.Name, len(expected), len(actual))
 		return false
 	}
 
