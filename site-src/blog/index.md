@@ -9,7 +9,7 @@
 
 We are excited to announce the v0.5.0 release of Gateway API. For the first
 time, several of our most important Gateway API resources are graduating to
-beta. Additional, we are starting a new initiative to explore how Gateway API
+beta. Additionally, we are starting a new initiative to explore how Gateway API
 can be used for mesh and introducing new experimental concepts such as URL
 rewrites.
 

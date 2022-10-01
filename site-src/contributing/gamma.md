@@ -22,7 +22,7 @@ GAMMA meetings will occur weekly on Tuesdays for 1 hour, alternating between 3pm
 PT and 8am PT slots to try to be as time-zone inclusive as possible. Meetings
 will be moderated by the [GAMMA
 leads](https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23)
-with notes taken by a volunteer. Meeting occurences can be found on the
+with notes taken by a volunteer. Meeting occurrences can be found on the
 [sig-network calendar](/contributing/community/#meetings). Community members
 should feel free to attend both GAMMA and Gateway API meetings, but are by no
 means obligated to do so.
