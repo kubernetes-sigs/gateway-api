@@ -298,16 +298,16 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 
 		actual = route.Status.Parents
 
-		return parentsMatch(t, parents, actual, namespaceRequired), nil
+		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have parents matching expectations")
 }
 
-func parentsMatch(t *testing.T, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
+func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
-		t.Logf("Expected %d Route parents, got %d", len(expected), len(actual))
+		t.Logf("Route %s/%s expected %d Parents got %d", routeName.Namespace, routeName.Name, len(expected), len(actual))
 		return false
 	}
 
@@ -315,24 +315,25 @@ func parentsMatch(t *testing.T, expected, actual []v1beta1.RouteParentStatus, na
 	for i, eParent := range expected {
 		aParent := actual[i]
 		if aParent.ControllerName != eParent.ControllerName {
-			t.Logf("ControllerName doesn't match")
+			t.Logf("Route %s/%s ControllerName doesn't match", routeName.Namespace, routeName.Name)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-			t.Logf("Expected ParentReference.Group to be %v, got %v", eParent.ParentRef.Group, aParent.ParentRef.Group)
+
+			t.Logf("Route %s/%s expected ParentReference.Group to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Group, aParent.ParentRef.Group)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-			t.Logf("Expected ParentReference.Kind to be %v, got %v", eParent.ParentRef.Kind, aParent.ParentRef.Kind)
+			t.Logf("Route %s/%s expected ParentReference.Kind to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Kind, aParent.ParentRef.Kind)
 			return false
 		}
 		if aParent.ParentRef.Name != eParent.ParentRef.Name {
-			t.Logf("ParentReference.Name doesn't match")
+			t.Logf("Route %s/%s ParentReference.Name doesn't match", routeName.Namespace, routeName.Name)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
 			if namespaceRequired || aParent.ParentRef.Namespace != nil {
-				t.Logf("Expected ParentReference.Namespace to be %v, got %v", eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
+				t.Logf("Route %s/%s expected ParentReference.Namespace to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
 				return false
 			}
 		}
@@ -341,7 +342,7 @@ func parentsMatch(t *testing.T, expected, actual []v1beta1.RouteParentStatus, na
 		}
 	}
 
-	t.Logf("Route parents matched expectations")
+	t.Logf("Route %s/%s Parents matched expectations", routeName.Namespace, routeName.Name)
 	return true
 }
 
