@@ -77,10 +77,11 @@ While the API is simplistic in nature, it comes with a few notable decisions:
 1. Each ReferenceGrant only supports a single From and To section. Additional
    trust relationships must be modeled with additional ReferenceGrant
    resources.
-1. Resource names are intentionally excluded from this policy for simplicity and
-   because they rarely provide any meaningful protection. A user that is able to
-   write to resources of a certain kind within a namespace can always rename
-   resources or change the structure of the resources to match a given policy.
+1. Resource names are intentionally excluded from the "From" section of
+   ReferenceGrant because they rarely provide any meaningful protection. A user
+   that is able to write to resources of a certain kind within a namespace can
+   always rename resources or change the structure of the resources to match a
+   given grant.
 1. A single Namespace is allowed per "From" struct. Although a selector would be
    more powerful, it encourages unnecessarily insecure configuration.
 1. The effect of these resources is purely additive, they stack on top of each
@@ -89,6 +90,19 @@ While the API is simplistic in nature, it comes with a few notable decisions:
 Please see the [API
 Specification](/references/spec#gateway.networking.k8s.io/v1alpha2.ReferenceGrant)
 for more details on how specific ReferenceGrant fields are interpreted.
+
+## Implementation Guidelines
+This API relies on runtime verification. Implementations MUST watch for changes
+to these resources and recalculate the validity of cross-namespace references
+after each change or deletion.
+
+When communicating the status of a cross-namespace reference, implementations
+MUST NOT expose information about the existence of a resource in another
+namespace unless a ReferenceGrant exists allowing the reference to occur. This
+means that if a cross-namespace reference is made without a ReferenceGrant to a
+resource that doesn't exist. Any status conditions or warning messages need to
+focus on the fact that a ReferenceGrant does not exist to allow this reference.
+No hints should be provided about whether or not the referenced resource exists.
 
 ## Exceptions
 Cross namespace Route -> Gateway binding follows a slightly different pattern
@@ -122,6 +136,7 @@ ReferenceGrant support is a "CORE" conformance level requirement for
 cross-namespace references that originate from the following objects:
 
 - Gateway
+- GRPCRoute
 - HTTPRoute
 - TLSRoute
 - TCPRoute
@@ -133,3 +148,11 @@ in the Exceptions section above.
 
 Other "ImplementationSpecific" objects and references MUST also use this flow
 for cross-namespace references, except as noted in the Exceptions section above.
+
+## Potential Future API Group Change
+
+ReferenceGrant is starting to gain interest outside of Gateway API and SIG
+Network use cases. It is possible that this resource may move to a more neutral
+home. Users of the ReferenceGrant API may be required to transition to a
+different API Group (instead of `gateway.networking.k8s.io`) at some point in
+the future.
