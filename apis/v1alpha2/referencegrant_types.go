@@ -35,6 +35,10 @@ import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 // All cross-namespace references in Gateway API (with the exception of cross-namespace
 // Gateway-route attachment) require a ReferenceGrant.
 //
+// ReferenceGrant is a form of runtime verification. Implementations that support
+// ReferenceGrant MUST respond to removal of a grant by revoking the access that
+// grant allowed.
+//
 // Support: Core
 //
 type ReferenceGrant struct {
@@ -101,6 +105,7 @@ type ReferenceGrantFrom struct {
 	//
 	// When used to permit a BackendObjectReference:
 	//
+	// * GRPCRoute
 	// * HTTPRoute
 	// * TCPRoute
 	// * TLSRoute
