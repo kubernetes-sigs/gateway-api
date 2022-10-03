@@ -43,7 +43,7 @@ For a major or minor release:
 For all releases:
 - Check out the `release-major.minor` branch locally
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
-- Run the following commnand `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
+- Run the following command `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
   and webhook with the correct version info. Note that the YAMLs will not work until the tag is actually
   published in the next step.
 - Publish a new Git tag. This can  be done using the `git` CLI or Github's [release][release]

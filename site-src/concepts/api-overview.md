@@ -302,7 +302,7 @@ Here is a summary of extension points in the API:
 - **HTTPRouteFilter**: This API type in HTTPRoute provides a way to hook into
 the request/response lifecycle of an HTTP request.
 - **Custom Routes**: If none of the above extensions points suffice for a use
-  case, Implementers can chose to create custom Route resources for protocols
+  case, Implementers can choose to create custom Route resources for protocols
   that are not currently supported in the API. Custom Route types need to share
   the same fields that core Route types do. These are contained within
   CommonRouteSpec and RouteStatus.
