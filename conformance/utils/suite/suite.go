@@ -19,9 +19,7 @@ package suite
 import (
 	"testing"
 
-	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -180,7 +178,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
-		if !slices.Contains(suite.SupportedFeatures, feature) {
+		if !ContainsFeature(suite.SupportedFeatures, feature) {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
@@ -188,7 +186,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that no features exercised by the test have been opted out of by
 	// the suite.
 	for _, feature := range test.Exemptions {
-		if slices.Contains(suite.ExemptFeatures, feature) {
+		if ContainsExempt(suite.ExemptFeatures, feature) {
 			t.Skipf("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
@@ -199,4 +197,24 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	test.Test(t, suite)
+}
+
+// ContainsFeature reports whether v is present in s.
+func ContainsFeature(s []SupportedFeature, v SupportedFeature) bool {
+	for _, vs := range s {
+		if v == vs {
+			return true
+		}
+	}
+	return false
+}
+
+// ContainsExempt reports whether v is present in s.
+func ContainsExempt(s []ExemptFeature, v ExemptFeature) bool {
+	for _, vs := range s {
+		if v == vs {
+			return true
+		}
+	}
+	return false
 }

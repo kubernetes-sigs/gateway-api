@@ -25,6 +25,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/pkg/backport"
 )
 
 // ExpectedResponse defines the response expected for a given request.
@@ -89,7 +90,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
 
-	path, query, _ := strings.Cut(expected.Request.Path, "?")
+	path, query, _ := backport.Cut(expected.Request.Path, "?")
 
 	req := roundtripper.Request{
 		Method:   expected.Request.Method,
