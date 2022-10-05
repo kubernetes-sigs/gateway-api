@@ -223,8 +223,8 @@ type GRPCRouteRule struct {
 	// - Implementation-specific custom filters have no API guarantees across
 	//   implementations.
 	//
-	// Specifying a core filter multiple times has unspecified or custom
-	// conformance.
+	// Specifying a core filter multiple times has unspecified or
+	// implementation-specific conformance.
 	// Support: Core
 	//
 	// +optional
@@ -256,7 +256,7 @@ type GRPCRouteRule struct {
 	//
 	// Support: Core for Kubernetes Service
 	//
-	// Support: Custom for any other resource
+	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
 	//
@@ -308,9 +308,9 @@ type GRPCMethodMatch struct {
 	// Type specifies how to match against the service and/or method.
 	// Support: Core (Exact with service and method specified)
 	//
-	// Support Custom (Exact with method specified but no service specified)
+	// Support: Implementation-specific (Exact with method specified but no service specified)
 	//
-	// Support: Custom (RegularExpression)
+	// Support: Implementation-specific (RegularExpression)
 	//
 	// +optional
 	// +kubebuilder:default=Exact
@@ -402,7 +402,7 @@ type GRPCRouteFilter struct {
 	//   "Support: Extended" in this package, e.g. "RequestMirror". Implementers
 	//   are encouraged to support extended filters.
 	//
-	// - Custom: Filters that are defined and supported by specific vendors.
+	// - Implementation-specific: Filters that are defined and supported by specific vendors.
 	//   In the future, filters showing convergence in behavior across multiple
 	//   implementations will be considered for inclusion in extended or core
 	//   conformance levels. Filter-specific configuration for such filters
@@ -475,7 +475,7 @@ type GRPCBackendRef struct {
 	//
 	// Support: Core for Kubernetes Service
 	//
-	// Support: Custom for any other resource
+	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
 	//
@@ -485,8 +485,8 @@ type GRPCBackendRef struct {
 	// Filters defined at this level MUST be executed if and only if the
 	// request is being forwarded to the backend defined here.
 	//
-	// Support: Custom (For broader support of filters, use the Filters field
-	// in GRPCRouteRule.)
+	// Support: Implementation-specific (For broader support of filters, use the
+	// Filters field in GRPCRouteRule.)
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16

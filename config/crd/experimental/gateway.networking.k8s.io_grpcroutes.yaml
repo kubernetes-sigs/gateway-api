@@ -159,7 +159,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Implementation-specific (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -261,8 +261,8 @@ spec:
                         equal weights, and one is invalid, 50 percent of traffic MUST
                         receive an `UNAVAILABLE` status. Implementations may choose
                         how that 50 percent is determined. \n Support: Core for Kubernetes
-                        Service \n Support: Custom for any other resource \n Support
-                        for weight: Core"
+                        Service \n Support: Implementation-specific for any other
+                        resource \n Support for weight: Core"
                       items:
                         description: GRPCBackendRef defines how a GRPCRoute forwards
                           a gRPC request.
@@ -270,8 +270,9 @@ spec:
                           filters:
                             description: "Filters defined at this level MUST be executed
                               if and only if the request is being forwarded to the
-                              backend defined here. \n Support: Custom (For broader
-                              support of filters, use the Filters field in GRPCRouteRule.)"
+                              backend defined here. \n Support: Implementation-specific
+                              (For broader support of filters, use the Filters field
+                              in GRPCRouteRule.)"
                             items:
                               description: GRPCRouteFilter defines processing steps
                                 that must be completed during the request or response
@@ -448,7 +449,8 @@ spec:
                                         Message of the `ResolvedRefs` Condition should
                                         be used to provide more detail about the problem.
                                         \n Support: Extended for Kubernetes Service
-                                        \n Support: Custom for any other resource"
+                                        \n Support: Implementation-specific for any
+                                        other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -518,21 +520,21 @@ spec:
                                     configuration defined by   \"Support: Extended\"
                                     in this package, e.g. \"RequestMirror\". Implementers
                                     \  are encouraged to support extended filters.
-                                    \n - Custom: Filters that are defined and supported
-                                    by specific vendors.   In the future, filters
-                                    showing convergence in behavior across multiple
-                                    \  implementations will be considered for inclusion
-                                    in extended or core   conformance levels. Filter-specific
-                                    configuration for such filters   is specified
-                                    using the ExtensionRef field. `Type` MUST be set
-                                    to   \"ExtensionRef\" for custom filters. \n Implementers
-                                    are encouraged to define custom implementation
-                                    types to extend the core API with implementation-specific
-                                    behavior. \n If a reference to a custom filter
-                                    type cannot be resolved, the filter MUST NOT be
-                                    skipped. Instead, requests that would have been
-                                    processed by that filter MUST receive a HTTP error
-                                    response. \n "
+                                    \n - Implementation-specific: Filters that are
+                                    defined and supported by specific vendors.   In
+                                    the future, filters showing convergence in behavior
+                                    across multiple   implementations will be considered
+                                    for inclusion in extended or core   conformance
+                                    levels. Filter-specific configuration for such
+                                    filters   is specified using the ExtensionRef
+                                    field. `Type` MUST be set to   \"ExtensionRef\"
+                                    for custom filters. \n Implementers are encouraged
+                                    to define custom implementation types to extend
+                                    the core API with implementation-specific behavior.
+                                    \n If a reference to a custom filter type cannot
+                                    be resolved, the filter MUST NOT be skipped. Instead,
+                                    requests that would have been processed by that
+                                    filter MUST receive a HTTP error response. \n "
                                   enum:
                                   - RequestHeaderModifier
                                   - RequestMirror
@@ -622,8 +624,8 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across   implementations. \n Specifying
-                        a core filter multiple times has unspecified or custom conformance.
-                        Support: Core"
+                        a core filter multiple times has unspecified or implementation-specific
+                        conformance. Support: Core"
                       items:
                         description: GRPCRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -789,7 +791,8 @@ spec:
                                   In either error case, the Message of the `ResolvedRefs`
                                   Condition should be used to provide more detail
                                   about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Custom for any other resource"
+                                  Service \n Support: Implementation-specific for
+                                  any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -854,16 +857,16 @@ spec:
                               corresponding configuration defined by   \"Support:
                               Extended\" in this package, e.g. \"RequestMirror\".
                               Implementers   are encouraged to support extended filters.
-                              \n - Custom: Filters that are defined and supported
-                              by specific vendors.   In the future, filters showing
-                              convergence in behavior across multiple   implementations
-                              will be considered for inclusion in extended or core
-                              \  conformance levels. Filter-specific configuration
-                              for such filters   is specified using the ExtensionRef
-                              field. `Type` MUST be set to   \"ExtensionRef\" for
-                              custom filters. \n Implementers are encouraged to define
-                              custom implementation types to extend the core API with
-                              implementation-specific behavior. \n If a reference
+                              \n - Implementation-specific: Filters that are defined
+                              and supported by specific vendors.   In the future,
+                              filters showing convergence in behavior across multiple
+                              \  implementations will be considered for inclusion
+                              in extended or core   conformance levels. Filter-specific
+                              configuration for such filters   is specified using
+                              the ExtensionRef field. `Type` MUST be set to   \"ExtensionRef\"
+                              for custom filters. \n Implementers are encouraged to
+                              define custom implementation types to extend the core
+                              API with implementation-specific behavior. \n If a reference
                               to a custom filter type cannot be resolved, the filter
                               MUST NOT be skipped. Instead, requests that would have
                               been processed by that filter MUST receive a HTTP error
@@ -993,9 +996,9 @@ spec:
                                 default: Exact
                                 description: "Type specifies how to match against
                                   the service and/or method. Support: Core (Exact
-                                  with service and method specified) \n Support Custom
+                                  with service and method specified) \n Support: Implementation-specific
                                   (Exact with method specified but no service specified)
-                                  \n Support: Custom (RegularExpression)"
+                                  \n Support: Implementation-specific (RegularExpression)"
                                 enum:
                                 - Exact
                                 - RegularExpression
@@ -1151,7 +1154,8 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Implementation-specific (Other
+                            Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$

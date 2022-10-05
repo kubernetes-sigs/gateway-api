@@ -124,7 +124,8 @@ Conformance levels are defined by the filter type:
  - Implementers are encouraged to support "extended" filters.
  - "Custom" filters have no API guarantees across implementations.
 
-Specifying a core filter multiple times has unspecified or custom conformance.
+Specifying a core filter multiple times has unspecified or 
+implementation-specific conformance.
 
 All filters are expected to be compatible with each other except for the
 URLRewrite and RequestRedirect filters, which may not be combined. If an

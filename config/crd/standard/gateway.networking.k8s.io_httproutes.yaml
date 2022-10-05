@@ -140,7 +140,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Implementation-specific (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -216,7 +216,7 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Custom
+                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
@@ -225,9 +225,9 @@ spec:
                           filters:
                             description: "Filters defined at this level should be
                               executed if and only if the request is being forwarded
-                              to the backend defined here. \n Support: Custom (For
-                              broader support of filters, use the Filters field in
-                              HTTPRouteRule.)"
+                              to the backend defined here. \n Support: Implementation-specific
+                              (For broader support of filters, use the Filters field
+                              in HTTPRouteRule.)"
                             items:
                               description: HTTPRouteFilter defines processing steps
                                 that must be completed during the request or response
@@ -404,7 +404,8 @@ spec:
                                         Message of the `ResolvedRefs` Condition should
                                         be used to provide more detail about the problem.
                                         \n Support: Extended for Kubernetes Service
-                                        \n Support: Custom for any other resource"
+                                        \n Support: Implementation-specific for any
+                                        other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -526,9 +527,9 @@ spec:
                                     types and their corresponding configuration defined
                                     by   \"Support: Extended\" in this package, e.g.
                                     \"RequestMirror\". Implementers   are encouraged
-                                    to support extended filters. \n - Custom: Filters
-                                    that are defined and supported by specific vendors.
-                                    \  In the future, filters showing convergence
+                                    to support extended filters. \n - Implementation-specific:
+                                    Filters that are defined and supported by   specific
+                                    vendors.   In the future, filters showing convergence
                                     in behavior across multiple   implementations
                                     will be considered for inclusion in extended or
                                     core   conformance levels. Filter-specific configuration
@@ -637,14 +638,14 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across   implementations. \n Specifying
-                        a core filter multiple times has unspecified or custom conformance.
-                        \n All filters are expected to be compatible with each other
-                        except for the URLRewrite and RequestRedirect filters, which
-                        may not be combined. If an implementation can not support
-                        other combinations of filters, they must clearly document
-                        that limitation. In all cases where incompatible or unsupported
-                        filters are specified, implementations MUST add a warning
-                        condition to status. \n Support: Core"
+                        a core filter multiple times has unspecified or implementation-specific
+                        conformance. \n All filters are expected to be compatible
+                        with each other except for the URLRewrite and RequestRedirect
+                        filters, which may not be combined. If an implementation can
+                        not support other combinations of filters, they must clearly
+                        document that limitation. In all cases where incompatible
+                        or unsupported filters are specified, implementations MUST
+                        add a warning condition to status. \n Support: Core"
                       items:
                         description: HTTPRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -810,7 +811,8 @@ spec:
                                   In either error case, the Message of the `ResolvedRefs`
                                   Condition should be used to provide more detail
                                   about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Custom for any other resource"
+                                  Service \n Support: Implementation-specific for
+                                  any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -925,15 +927,15 @@ spec:
                               - Extended: Filter types and their corresponding configuration
                               defined by   \"Support: Extended\" in this package,
                               e.g. \"RequestMirror\". Implementers   are encouraged
-                              to support extended filters. \n - Custom: Filters that
-                              are defined and supported by specific vendors.   In
-                              the future, filters showing convergence in behavior
-                              across multiple   implementations will be considered
-                              for inclusion in extended or core   conformance levels.
-                              Filter-specific configuration for such filters   is
-                              specified using the ExtensionRef field. `Type` should
-                              be set to   \"ExtensionRef\" for custom filters. \n
-                              Implementers are encouraged to define custom implementation
+                              to support extended filters. \n - Implementation-specific:
+                              Filters that are defined and supported by   specific
+                              vendors.   In the future, filters showing convergence
+                              in behavior across multiple   implementations will be
+                              considered for inclusion in extended or core   conformance
+                              levels. Filter-specific configuration for such filters
+                              \  is specified using the ExtensionRef field. `Type`
+                              should be set to   \"ExtensionRef\" for custom filters.
+                              \n Implementers are encouraged to define custom implementation
                               types to extend the core API with implementation-specific
                               behavior. \n If a reference to a custom filter type
                               cannot be resolved, the filter MUST NOT be skipped.
@@ -1032,12 +1034,12 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the header. \n Support: Core (Exact)
-                                    \n Support: Custom (RegularExpression) \n Since
-                                    RegularExpression HeaderMatchType has custom conformance,
-                                    implementations can support POSIX, PCRE or any
-                                    other dialects of regular expressions. Please
-                                    read the implementation's documentation to determine
-                                    the supported dialect."
+                                    \n Support: Implementation-specific (RegularExpression)
+                                    \n Since RegularExpression HeaderMatchType has
+                                    implementation-specific conformance, implementations
+                                    can support POSIX, PCRE or any other dialects
+                                    of regular expressions. Please read the implementation's
+                                    documentation to determine the supported dialect."
                                   enum:
                                   - Exact
                                   - RegularExpression
@@ -1084,7 +1086,7 @@ spec:
                                 default: PathPrefix
                                 description: "Type specifies how to match against
                                   the path Value. \n Support: Core (Exact, PathPrefix)
-                                  \n Support: Custom (RegularExpression)"
+                                  \n Support: Implementation-specific (RegularExpression)"
                                 enum:
                                 - Exact
                                 - PathPrefix
@@ -1131,10 +1133,11 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the query parameter. \n Support:
-                                    Extended (Exact) \n Support: Custom (RegularExpression)
-                                    \n Since RegularExpression QueryParamMatchType
-                                    has custom conformance, implementations can support
-                                    POSIX, PCRE or any other dialects of regular expressions.
+                                    Extended (Exact) \n Support: Implementation-specific
+                                    (RegularExpression) \n Since RegularExpression
+                                    QueryParamMatchType has Implementation-specific
+                                    conformance, implementations can support POSIX,
+                                    PCRE or any other dialects of regular expressions.
                                     Please read the implementation's documentation
                                     to determine the supported dialect."
                                   enum:
@@ -1306,7 +1309,8 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Implementation-specific (Other
+                            Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1487,7 +1491,7 @@ spec:
                     kind:
                       default: Gateway
                       description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Custom (Other Resources)"
+                        (Gateway) \n Support: Implementation-specific (Other Resources)"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1563,7 +1567,7 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Custom
+                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
@@ -1572,9 +1576,9 @@ spec:
                           filters:
                             description: "Filters defined at this level should be
                               executed if and only if the request is being forwarded
-                              to the backend defined here. \n Support: Custom (For
-                              broader support of filters, use the Filters field in
-                              HTTPRouteRule.)"
+                              to the backend defined here. \n Support: Implementation-specific
+                              (For broader support of filters, use the Filters field
+                              in HTTPRouteRule.)"
                             items:
                               description: HTTPRouteFilter defines processing steps
                                 that must be completed during the request or response
@@ -1751,7 +1755,8 @@ spec:
                                         Message of the `ResolvedRefs` Condition should
                                         be used to provide more detail about the problem.
                                         \n Support: Extended for Kubernetes Service
-                                        \n Support: Custom for any other resource"
+                                        \n Support: Implementation-specific for any
+                                        other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -1873,9 +1878,9 @@ spec:
                                     types and their corresponding configuration defined
                                     by   \"Support: Extended\" in this package, e.g.
                                     \"RequestMirror\". Implementers   are encouraged
-                                    to support extended filters. \n - Custom: Filters
-                                    that are defined and supported by specific vendors.
-                                    \  In the future, filters showing convergence
+                                    to support extended filters. \n - Implementation-specific:
+                                    Filters that are defined and supported by   specific
+                                    vendors.   In the future, filters showing convergence
                                     in behavior across multiple   implementations
                                     will be considered for inclusion in extended or
                                     core   conformance levels. Filter-specific configuration
@@ -1984,14 +1989,14 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across   implementations. \n Specifying
-                        a core filter multiple times has unspecified or custom conformance.
-                        \n All filters are expected to be compatible with each other
-                        except for the URLRewrite and RequestRedirect filters, which
-                        may not be combined. If an implementation can not support
-                        other combinations of filters, they must clearly document
-                        that limitation. In all cases where incompatible or unsupported
-                        filters are specified, implementations MUST add a warning
-                        condition to status. \n Support: Core"
+                        a core filter multiple times has unspecified or implementation-specific
+                        conformance. \n All filters are expected to be compatible
+                        with each other except for the URLRewrite and RequestRedirect
+                        filters, which may not be combined. If an implementation can
+                        not support other combinations of filters, they must clearly
+                        document that limitation. In all cases where incompatible
+                        or unsupported filters are specified, implementations MUST
+                        add a warning condition to status. \n Support: Core"
                       items:
                         description: HTTPRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -2157,7 +2162,8 @@ spec:
                                   In either error case, the Message of the `ResolvedRefs`
                                   Condition should be used to provide more detail
                                   about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Custom for any other resource"
+                                  Service \n Support: Implementation-specific for
+                                  any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -2272,15 +2278,15 @@ spec:
                               - Extended: Filter types and their corresponding configuration
                               defined by   \"Support: Extended\" in this package,
                               e.g. \"RequestMirror\". Implementers   are encouraged
-                              to support extended filters. \n - Custom: Filters that
-                              are defined and supported by specific vendors.   In
-                              the future, filters showing convergence in behavior
-                              across multiple   implementations will be considered
-                              for inclusion in extended or core   conformance levels.
-                              Filter-specific configuration for such filters   is
-                              specified using the ExtensionRef field. `Type` should
-                              be set to   \"ExtensionRef\" for custom filters. \n
-                              Implementers are encouraged to define custom implementation
+                              to support extended filters. \n - Implementation-specific:
+                              Filters that are defined and supported by   specific
+                              vendors.   In the future, filters showing convergence
+                              in behavior across multiple   implementations will be
+                              considered for inclusion in extended or core   conformance
+                              levels. Filter-specific configuration for such filters
+                              \  is specified using the ExtensionRef field. `Type`
+                              should be set to   \"ExtensionRef\" for custom filters.
+                              \n Implementers are encouraged to define custom implementation
                               types to extend the core API with implementation-specific
                               behavior. \n If a reference to a custom filter type
                               cannot be resolved, the filter MUST NOT be skipped.
@@ -2379,12 +2385,12 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the header. \n Support: Core (Exact)
-                                    \n Support: Custom (RegularExpression) \n Since
-                                    RegularExpression HeaderMatchType has custom conformance,
-                                    implementations can support POSIX, PCRE or any
-                                    other dialects of regular expressions. Please
-                                    read the implementation's documentation to determine
-                                    the supported dialect."
+                                    \n Support: Implementation-specific (RegularExpression)
+                                    \n Since RegularExpression HeaderMatchType has
+                                    implementation-specific conformance, implementations
+                                    can support POSIX, PCRE or any other dialects
+                                    of regular expressions. Please read the implementation's
+                                    documentation to determine the supported dialect."
                                   enum:
                                   - Exact
                                   - RegularExpression
@@ -2431,7 +2437,7 @@ spec:
                                 default: PathPrefix
                                 description: "Type specifies how to match against
                                   the path Value. \n Support: Core (Exact, PathPrefix)
-                                  \n Support: Custom (RegularExpression)"
+                                  \n Support: Implementation-specific (RegularExpression)"
                                 enum:
                                 - Exact
                                 - PathPrefix
@@ -2478,10 +2484,11 @@ spec:
                                   default: Exact
                                   description: "Type specifies how to match against
                                     the value of the query parameter. \n Support:
-                                    Extended (Exact) \n Support: Custom (RegularExpression)
-                                    \n Since RegularExpression QueryParamMatchType
-                                    has custom conformance, implementations can support
-                                    POSIX, PCRE or any other dialects of regular expressions.
+                                    Extended (Exact) \n Support: Implementation-specific
+                                    (RegularExpression) \n Since RegularExpression
+                                    QueryParamMatchType has Implementation-specific
+                                    conformance, implementations can support POSIX,
+                                    PCRE or any other dialects of regular expressions.
                                     Please read the implementation's documentation
                                     to determine the supported dialect."
                                   enum:
@@ -2653,7 +2660,8 @@ spec:
                         kind:
                           default: Gateway
                           description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Custom (Other Resources)"
+                            Core (Gateway) \n Support: Implementation-specific (Other
+                            Resources)"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$

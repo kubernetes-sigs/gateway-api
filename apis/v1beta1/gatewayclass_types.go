@@ -91,7 +91,7 @@ type GatewayClassSpec struct {
 	// If the referent cannot be found, the GatewayClass's "InvalidParameters"
 	// status condition will be true.
 	//
-	// Support: Custom
+	// Support: Implementation-specific
 	//
 	// +optional
 	ParametersRef *ParametersReference `json:"parametersRef,omitempty"`
