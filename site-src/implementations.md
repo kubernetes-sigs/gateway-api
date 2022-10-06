@@ -123,10 +123,10 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 
 [Flomesh Service Mesh][fsm] is a community driven Kubernetes North-South traffic manager, and provides an implementation of Ingress controller, Gateway API, Load Balancer, and cross-cluster service registration and service discovery.
 
-The [Flomesh.io](flomesh) team is actively working towards an implementation of the Gateway API.
+The [Flomesh.io](flomesh) team is actively working towards an implementation of the Gateway API. You can track progress of this implementation [here](https://github.com/flomesh-io/fsm/issues/18)
 
 [fsm]:https://github.com/flomesh-io/fsm
-[flomesh]:https://fomesh.io
+[flomesh]:https://flomesh.io
 
 ### Gloo Edge
 
