@@ -356,7 +356,7 @@ func (in *GatewayClassList) DeepCopyInto(out *GatewayClassList) {
 	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1beta1.GatewayClass, len(*in))
+		*out = make([]GatewayClass, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -388,7 +388,7 @@ func (in *GatewayList) DeepCopyInto(out *GatewayList) {
 	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1beta1.Gateway, len(*in))
+		*out = make([]Gateway, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
@@ -447,7 +447,7 @@ func (in *HTTPRouteList) DeepCopyInto(out *HTTPRouteList) {
 	in.ListMeta.DeepCopyInto(&out.ListMeta)
 	if in.Items != nil {
 		in, out := &in.Items, &out.Items
-		*out = make([]v1beta1.HTTPRoute, len(*in))
+		*out = make([]HTTPRoute, len(*in))
 		for i := range *in {
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
