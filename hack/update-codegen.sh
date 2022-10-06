@@ -26,6 +26,12 @@ readonly GOMODCACHE="$(go env GOMODCACHE)"
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
+readonly REQUIRED_GO_VER="1.19"
+
+if [[ $(go version | grep ${REQUIRED_GO_VER} -c) -eq 0 ]]; then
+  echo "Go v${REQUIRED_GO_VER} is required to run code generation"
+  exit 1
+fi
 
 export GOMODCACHE GO111MODULE GOFLAGS GOPATH
 
