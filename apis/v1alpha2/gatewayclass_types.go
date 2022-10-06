@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha2
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -124,4 +125,8 @@ type GatewayClassStatus = v1beta1.GatewayClassStatus
 // +kubebuilder:object:root=true
 
 // GatewayClassList contains a list of GatewayClass
-type GatewayClassList v1beta1.GatewayClassList
+type GatewayClassList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []GatewayClass `json:"items"`
+}

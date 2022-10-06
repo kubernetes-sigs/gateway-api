@@ -17,6 +17,7 @@ limitations under the License.
 package v1alpha2
 
 import (
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -37,7 +38,11 @@ type HTTPRoute v1beta1.HTTPRoute
 // +kubebuilder:object:root=true
 
 // HTTPRouteList contains a list of HTTPRoute.
-type HTTPRouteList v1beta1.HTTPRouteList
+type HTTPRouteList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []HTTPRoute `json:"items"`
+}
 
 // HTTPRouteSpec defines the desired state of HTTPRoute
 // +k8s:deepcopy-gen=false
