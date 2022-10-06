@@ -1,4 +1,4 @@
-# Enhancement Tracking and Backlog
+# Enhancement Requests
 
 Inspired by [Kubernetes enhancements][enhance], Gateway API provides a process for
 introducing new functionality or considerable changes to the project. The
@@ -19,7 +19,7 @@ enhancement into the project.
    (GEP)][gep]
 
 [issue]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
-[gep]: /contributing/gep
+[gep]: /geps/overview
 
 ## What is Considered an Enhancement?
 

@@ -40,7 +40,7 @@ nav:
   - Overview:
     - Introduction: index.md
     - Concepts:
-        API overview: concepts/api-overview.md
+        API Overview: concepts/api-overview.md
         Conformance: concepts/conformance.md
         Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
@@ -67,12 +67,32 @@ nav:
     - API specification: references/spec.md
     - Policy Attachment: references/policy-attachment.md
     - Enhancement Proposals:
-      - Overview: contributing/gep.md
-      - ... | geps/gep-*.md
+      - Overview: geps/overview.md
+      - Provisional:
+        - geps/gep-1324.md
+        - geps/gep-1282.md
+        - geps/gep-735.md
+      - Implementable:
+        - geps/gep-1364.md
+      - Experimental:
+        - geps/gep-1323.md
+        - geps/gep-1016.md
+        - geps/gep-957.md
+        - geps/gep-726.md
+        - geps/gep-713.md
+        - geps/gep-709.md
+      - Standard:
+        - geps/gep-922.md
+        - geps/gep-917.md
+        - geps/gep-851.md
+        - geps/gep-820.md
+        - geps/gep-746.md
+        - geps/gep-724.md
+        - geps/gep-718.md
   - Contributing:
     - How to Get Involved: contributing/index.md
-    - Developer guide: contributing/devguide.md
-    - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
+    - Developer Guide: contributing/devguide.md
+    - Enhancement Requests: contributing/enhancement-requests.md
     - GAMMA: contributing/gamma.md
   - Blog: 
     - Index: blog/index.md
