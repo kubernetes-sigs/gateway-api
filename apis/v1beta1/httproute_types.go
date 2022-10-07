@@ -192,8 +192,8 @@ type HTTPRouteRule struct {
 	// - Implementation-specific custom filters have no API guarantees across
 	//   implementations.
 	//
-	// Specifying a core filter multiple times has unspecified or custom
-	// conformance.
+	// Specifying a core filter multiple times has unspecified or
+	// implementation-specific conformance.
 	//
 	// All filters are expected to be compatible with each other except for the
 	// URLRewrite and RequestRedirect filters, which may not be combined. If an
@@ -232,7 +232,7 @@ type HTTPRouteRule struct {
 	//
 	// Support: Core for Kubernetes Service
 	//
-	// Support: Custom for any other resource
+	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
 	//
@@ -282,8 +282,9 @@ const (
 	// Matches if the URL path matches the given regular expression with
 	// case sensitivity.
 	//
-	// Since `"RegularExpression"` has custom conformance, implementations
-	// can support POSIX, PCRE, RE2 or any other regular expression dialect.
+	// Since `"RegularExpression"` has implementation-specific conformance,
+	// implementations can support POSIX, PCRE, RE2 or any other regular expression
+	// dialect.
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	PathMatchRegularExpression PathMatchType = "RegularExpression"
@@ -295,7 +296,7 @@ type HTTPPathMatch struct {
 	//
 	// Support: Core (Exact, PathPrefix)
 	//
-	// Support: Custom (RegularExpression)
+	// Support: Implementation-specific (RegularExpression)
 	//
 	// +optional
 	// +kubebuilder:default=PathPrefix
@@ -356,12 +357,12 @@ type HTTPHeaderMatch struct {
 	//
 	// Support: Core (Exact)
 	//
-	// Support: Custom (RegularExpression)
+	// Support: Implementation-specific (RegularExpression)
 	//
-	// Since RegularExpression HeaderMatchType has custom conformance,
-	// implementations can support POSIX, PCRE or any other dialects of regular
-	// expressions. Please read the implementation's documentation to determine
-	// the supported dialect.
+	// Since RegularExpression HeaderMatchType has implementation-specific
+	// conformance, implementations can support POSIX, PCRE or any other dialects
+	// of regular expressions. Please read the implementation's documentation to
+	// determine the supported dialect.
 	//
 	// +optional
 	// +kubebuilder:default=Exact
@@ -419,12 +420,12 @@ type HTTPQueryParamMatch struct {
 	//
 	// Support: Extended (Exact)
 	//
-	// Support: Custom (RegularExpression)
+	// Support: Implementation-specific (RegularExpression)
 	//
-	// Since RegularExpression QueryParamMatchType has custom conformance,
-	// implementations can support POSIX, PCRE or any other dialects of regular
-	// expressions. Please read the implementation's documentation to determine
-	// the supported dialect.
+	// Since RegularExpression QueryParamMatchType has Implementation-specific
+	// conformance, implementations can support POSIX, PCRE or any other
+	// dialects of regular expressions. Please read the implementation's
+	// documentation to determine the supported dialect.
 	//
 	// +optional
 	// +kubebuilder:default=Exact
@@ -557,7 +558,8 @@ type HTTPRouteFilter struct {
 	//   "Support: Extended" in this package, e.g. "RequestMirror". Implementers
 	//   are encouraged to support extended filters.
 	//
-	// - Custom: Filters that are defined and supported by specific vendors.
+	// - Implementation-specific: Filters that are defined and supported by
+	//   specific vendors.
 	//   In the future, filters showing convergence in behavior across multiple
 	//   implementations will be considered for inclusion in extended or core
 	//   conformance levels. Filter-specific configuration for such filters
@@ -691,9 +693,9 @@ const (
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
 	//
-	// Support in HTTPRouteRule: Custom
+	// Support in HTTPRouteRule: Implementation-specific
 	//
-	// Support in HTTPBackendRef: Custom
+	// Support in HTTPBackendRef: Implementation-specific
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 
@@ -961,7 +963,7 @@ type HTTPRequestMirrorFilter struct {
 	//
 	// Support: Extended for Kubernetes Service
 	//
-	// Support: Custom for any other resource
+	// Support: Implementation-specific for any other resource
 	BackendRef BackendObjectReference `json:"backendRef"`
 }
 
@@ -991,7 +993,7 @@ type HTTPBackendRef struct {
 	//
 	// Support: Core for Kubernetes Service
 	//
-	// Support: Custom for any other resource
+	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
 	//
@@ -1001,8 +1003,8 @@ type HTTPBackendRef struct {
 	// Filters defined at this level should be executed if and only if the
 	// request is being forwarded to the backend defined here.
 	//
-	// Support: Custom (For broader support of filters, use the Filters field
-	// in HTTPRouteRule.)
+	// Support: Implementation-specific (For broader support of filters, use the
+	// Filters field in HTTPRouteRule.)
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16

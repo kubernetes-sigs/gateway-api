@@ -97,8 +97,9 @@ const (
 	// Matches if the URL path matches the given regular expression with
 	// case sensitivity.
 	//
-	// Since `"RegularExpression"` has custom conformance, implementations
-	// can support POSIX, PCRE, RE2 or any other regular expression dialect.
+	// Since `"RegularExpression"` has implementation-specific conformance,
+	// implementations can support POSIX, PCRE, RE2 or any other regular expression
+	// dialect.
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
 	PathMatchRegularExpression PathMatchType = "RegularExpression"
@@ -288,9 +289,9 @@ const (
 	// HTTPRouteFilterExtensionRef should be used for configuring custom
 	// HTTP filters.
 	//
-	// Support in HTTPRouteRule: Custom
+	// Support in HTTPRouteRule: Implementation-specific
 	//
-	// Support in HTTPBackendRef: Custom
+	// Support in HTTPBackendRef: Implementation-specific
 	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
 )
 

@@ -30,13 +30,13 @@ support level for each feature:
   feature will have the same behavior and semantics. It is expected that some
   number of roadmap features will eventually migrate into the Core. Extended
   features will be part of the API types and schema.
-* **Custom** features are those that are not portable and are vendor-specific.
-  Custom features will not have API types and schema except via generic
-  extension points.
+* **Implementation-specific** features are those that are not portable and are
+  vendor-specific. Implementation-specific features will not have API types and
+  schema except via generic extension points.
 
 Behavior and feature in the Core and Extended set will be defined and validated
-via behavior-driven conformance tests. Custom features will not be covered by
-conformance tests.
+via behavior-driven conformance tests. Implementation-specific features will not
+be covered by conformance tests.
 
 By including and standardizing Extended features in the API spec, we expect to
 be able to converge on portable subsets of the API among implementations without

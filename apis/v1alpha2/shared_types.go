@@ -317,8 +317,8 @@ type AnnotationValue = v1beta1.AnnotationValue
 // The `NamedAddress` value has been deprecated in favor of implementation
 // specific domain-prefixed strings.
 //
-// All other values, including domain-prefixed values have Custom support, which
-// are used in implementation-specific behaviors. Support for additional
+// All other values, including domain-prefixed values have Implementation-specific support,
+// which are used in implementation-specific behaviors. Support for additional
 // predefined CamelCase identifiers may be added in future releases.
 //
 // +kubebuilder:validation:MinLength=1
@@ -354,6 +354,6 @@ const (
 	// The `NamedAddress` type has been deprecated in favor of implementation
 	// specific domain-prefixed strings.
 	//
-	// Support: Implementation-Specific
+	// Support: Implementation-specific
 	NamedAddressType AddressType = "NamedAddress"
 )

@@ -102,10 +102,6 @@ still vary (and that's ok).
 These cases will be specified as defining delimited parts of the API
 "implementation-specific".
 
-The "implementation-specific" designation allows a CORE or EXTENDED feature to
-be well-defined taking into account the realities of some features that are
-mostly but not entirely portable.
-
 
 ## Kind vs. Resource
 
