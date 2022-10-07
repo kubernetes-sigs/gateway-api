@@ -26,10 +26,10 @@ readonly GOMODCACHE="$(go env GOMODCACHE)"
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
-readonly REQUIRED_GO_VER="1.19"
+readonly MIN_REQUIRED_GO_VER="1.19"
 
-if [[ $(go version | grep ${REQUIRED_GO_VER} -c) -eq 0 ]]; then
-  echo "Go v${REQUIRED_GO_VER} is required to run code generation"
+if go version | perl -ne "exit 0 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 >= ${MIN_REQUIRED_GO_VER})"; then
+  echo "Go v${MIN_REQUIRED_GO_VER} or later is required to run code generation"
   exit 1
 fi
 
