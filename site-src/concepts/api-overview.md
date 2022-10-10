@@ -120,6 +120,18 @@ which case the unencrypted byte stream is passed through to the backend.
 You can choose to not terminate TLS, in which case the encrypted byte stream
 is passed through to the backend. 
 
+#### GRPCRoute
+
+!!! info "Experimental Channel"
+
+    The `GRPCRoute` resource described below is currently only included in the
+    "Experimental" channel of Gateway API. For more information on release
+    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+
+GRPCRoute is for idiomatically routing gRPC traffic. Gateways supporting
+GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
+so gRPC traffic is guaranteed to flow properly.
+
 #### Route summary table
 The "Routing Discriminator" column below refers to what information can be used
 to allow multiple Routes to share ports on the Listener.
@@ -130,6 +142,7 @@ to allow multiple Routes to share ports on the Listener.
 |TLSRoute| Somewhere between layer 4 and 7| SNI or other TLS properties| Passthrough or Terminated | Routing of TLS protocols including HTTPS where inspection of the HTTP stream is not required.|
 |TCPRoute| Layer 4| destination port | Passthrough or Terminated | Allows for forwarding of a TCP stream from the Listener to the Backends |
 |UDPRoute| Layer 4| destination port | None | Allows for forwarding of a UDP stream from the Listener to the Backends. |
+|GRPCRoute| Layer 7 | Anything in the gRPC Protocol | Terminated only | gRPC Routing over HTTP/2 and HTTP/2 cleartext|
 
 Note that traffic routed via HTTPRoute and TCPRoute can be encrypted between the
 Gateway and backend (commonly referred to as reencryption). It is not possible
