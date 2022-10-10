@@ -28,7 +28,12 @@ readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly MIN_REQUIRED_GO_VER="1.19"
 
-if go version | perl -ne "exit 0 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 >= ${MIN_REQUIRED_GO_VER})"; then
+function go_version_matches {
+  go version | perl -ne "exit 1 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 < ${MIN_REQUIRED_GO_VER})"
+  return $?
+}
+
+if ! go_version_matches; then
   echo "Go v${MIN_REQUIRED_GO_VER} or later is required to run code generation"
   exit 1
 fi
