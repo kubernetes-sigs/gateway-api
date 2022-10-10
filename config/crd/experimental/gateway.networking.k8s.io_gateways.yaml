@@ -454,7 +454,7 @@ spec:
                 message: Waiting for controller
                 reason: NotReconciled
                 status: Unknown
-                type: Scheduled
+                type: Accepted
             description: Status defines the current state of Gateway.
             properties:
               addresses:
@@ -491,12 +491,12 @@ spec:
                   message: Waiting for controller
                   reason: NotReconciled
                   status: Unknown
-                  type: Scheduled
+                  type: Accepted
                 description: "Conditions describe the current conditions of the Gateway.
                   \n Implementations should prefer to express Gateway conditions using
                   the `GatewayConditionType` and `GatewayConditionReason` constants
                   so that operators and tools can converge on a common vocabulary
-                  to describe Gateway state. \n Known condition types are: \n * \"Scheduled\"
+                  to describe Gateway state. \n Known condition types are: \n * \"Accepted\"
                   * \"Ready\""
                 items:
                   description: "Condition contains details for one aspect of the current
@@ -1148,7 +1148,7 @@ spec:
                 message: Waiting for controller
                 reason: NotReconciled
                 status: Unknown
-                type: Scheduled
+                type: Accepted
             description: Status defines the current state of Gateway.
             properties:
               addresses:
@@ -1185,12 +1185,12 @@ spec:
                   message: Waiting for controller
                   reason: NotReconciled
                   status: Unknown
-                  type: Scheduled
+                  type: Accepted
                 description: "Conditions describe the current conditions of the Gateway.
                   \n Implementations should prefer to express Gateway conditions using
                   the `GatewayConditionType` and `GatewayConditionReason` constants
                   so that operators and tools can converge on a common vocabulary
-                  to describe Gateway state. \n Known condition types are: \n * \"Scheduled\"
+                  to describe Gateway state. \n Known condition types are: \n * \"Accepted\"
                   * \"Ready\""
                 items:
                   description: "Condition contains details for one aspect of the current

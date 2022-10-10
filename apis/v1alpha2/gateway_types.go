@@ -202,7 +202,7 @@ const (
 	//
 	// Possible reasons for this condition to be true are:
 	//
-	// * "Scheduled"
+	// * "Accepted"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -212,17 +212,28 @@ const (
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
+	GatewayConditionAccepted GatewayConditionType = "Accepted"
+
+	// The "Scheduled" GatewayConditionType is deprecated and "Accepted" should
+	// be used instead.
+	// TODO: is there a need/way to add a kubebuilder annotation here?
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
+	// This reason is used with the "Accepted" condition when the condition is
+	// True.
+	GatewayReasonAccepted GatewayConditionReason = "Accepted"
+
 	// This reason is used with the "Scheduled" condition when the condition is
-	// true.
+	// True. This reason is deprecated and GatewayReasonAccepted should be used
+	// with GatewayConditionAccepted instead.
+	// TODO: is there a need/way to add a kubebuilder annotation here?
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
-	// This reason is used with the "Scheduled" condition when no controller has
+	// This reason is used with the "Accepted" condition when no controller has
 	// reconciled the Gateway.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
-	// This reason is used with the "Scheduled" condition when the
+	// This reason is used with the "Accepted" condition when the
 	// Gateway is not scheduled because insufficient infrastructure
 	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
