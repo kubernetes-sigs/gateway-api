@@ -41,7 +41,7 @@ type Gateway struct {
 
 	// Status defines the current state of Gateway.
 	//
-	// +kubebuilder:default={conditions: {{type: "Scheduled", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
+	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayStatus `json:"status,omitempty"`
 }
 
@@ -487,14 +487,14 @@ type GatewayStatus struct {
 	//
 	// Known condition types are:
 	//
-	// * "Scheduled"
+	// * "Accepted"
 	// * "Ready"
 	//
 	// +optional
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Scheduled", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Accepted", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
@@ -520,9 +520,9 @@ const (
 	// Gateway has scheduled the Gateway to the underlying network
 	// infrastructure.
 	//
-	// Possible reasons for this condition to be true are:
+	// Possible reasons for this condition to be True are:
 	//
-	// * "Scheduled"
+	// * "Accepted"
 	//
 	// Possible reasons for this condition to be False are:
 	//
@@ -532,17 +532,26 @@ const (
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
+	GatewayConditionAccepted GatewayConditionType = "Accepted"
+
+	// Deprecated: use "Accepted" instead.
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
+	// This reason is used with the "Accepted" condition when the condition is
+	// True.
+	GatewayReasonAccepted GatewayConditionReason = "Accepted"
+
 	// This reason is used with the "Scheduled" condition when the condition is
-	// true.
+	// True.
+	//
+	// Deprecated: use the "Accepted" condition with reason "Accepted" instead.
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
-	// This reason is used with the "Scheduled" condition when no controller has
+	// This reason is used with the "Accepted" condition when no controller has
 	// reconciled the Gateway.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
-	// This reason is used with the "Scheduled" condition when the
+	// This reason is used with the "Accepted" condition when the
 	// Gateway is not scheduled because insufficient infrastructure
 	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
