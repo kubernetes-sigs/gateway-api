@@ -153,7 +153,10 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "InvalidParameters"
-	// * "Waiting"
+	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
 	//
 	// Controllers should prefer to use the values of GatewayClassConditionReason
 	// for the corresponding Reason, where appropriate.
@@ -172,6 +175,9 @@ const (
 	// requested controller has not yet made a decision about whether
 	// to admit the GatewayClass. It is the default Reason on a new
 	// GatewayClass.
+	GatewayClassReasonPending GatewayClassConditionReason = "Pending"
+
+	// Deprecated: Use "Pending" instead.
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
 )
 
@@ -187,7 +193,7 @@ type GatewayClassStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
