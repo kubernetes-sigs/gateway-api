@@ -352,9 +352,7 @@ const (
 	// interoperability.
 	ListenerConditionAccepted ListenerConditionType = "Accepted"
 
-	// The "Detached" ListenerConditionType is deprecated and "Accepted" should
-	// be used instead.
-	// TODO: is there a need/way to add a kubebuilder annotation here?
+	// Deprecated: use "Accepted" instead.
 	ListenerConditionDetached ListenerConditionType = "Detached"
 
 	// This reason is used with the "Accepted" condition when the condition is
@@ -362,9 +360,9 @@ const (
 	ListenerReasonAccepted ListenerConditionReason = "Accepted"
 
 	// This reason is used with the "Detached" condition when the condition is
-	// False. This reason is deprecated and ListenerReasonAccepted should be used
-	// with ListenerConditionAccepted instead.
-	// TODO: is there a need/way to add a kubebuilder annotation here?
+	// False.
+	//
+	// Deprecated: use the "Accepted" condition with reason "Accepted" instead.
 	ListenerReasonAttached ListenerConditionReason = "Attached"
 
 	// This reason is used with the "Accepted" condition when the Listener
