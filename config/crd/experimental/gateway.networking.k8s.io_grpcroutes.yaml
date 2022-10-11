@@ -48,8 +48,8 @@ spec:
           with an upgrade from HTTP/1. \n Implementations supporting `GRPCRoute` with
           the `HTTP` `ProtocolType` MUST support cleartext HTTP/2 without an initial
           upgrade from HTTP/1.1. If the implementation does not support this, then
-          it MUST set the \"Accepted\" condition to \"False\" for the affected listener with a
-          reason of \"UnsupportedProtocol\". Note that a compliant implementation
+          it MUST set the \"Accepted\" condition to \"False\" for the affected listener
+          with a reason of \"UnsupportedProtocol\". Note that a compliant implementation
           MAY also accept HTTP/2 connections with an upgrade from HTTP/1. \n Support:
           Extended"
         properties:
