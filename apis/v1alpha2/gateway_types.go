@@ -484,7 +484,7 @@ const (
 	// Listener is syntactically or semantically invalid.
 	ListenerReasonInvalid ListenerConditionReason = "Invalid"
 
-	// This reason is used with the "Accpeted" and "Ready" conditions when the
+	// This reason is used with the "Accepted" and "Ready" conditions when the
 	// Listener is either not yet reconciled or not yet not online and ready to
 	// accept client traffic.
 	ListenerReasonPending ListenerConditionReason = "Pending"
