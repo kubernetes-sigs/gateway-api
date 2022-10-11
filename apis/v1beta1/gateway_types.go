@@ -534,9 +534,7 @@ const (
 	// interoperability.
 	GatewayConditionAccepted GatewayConditionType = "Accepted"
 
-	// The "Scheduled" GatewayConditionType is deprecated and "Accepted" should
-	// be used instead.
-	// TODO: is there a need/way to add a kubebuilder annotation here?
+	// Deprecated: use "Accepted" instead.
 	GatewayConditionScheduled GatewayConditionType = "Scheduled"
 
 	// This reason is used with the "Accepted" condition when the condition is
@@ -544,9 +542,9 @@ const (
 	GatewayReasonAccepted GatewayConditionReason = "Accepted"
 
 	// This reason is used with the "Scheduled" condition when the condition is
-	// True. This reason is deprecated and GatewayReasonAccepted should be used
-	// with GatewayConditionAccepted instead.
-	// TODO: is there a need/way to add a kubebuilder annotation here?
+	// True.
+	//
+	// Deprecated: use the "Accepted" condition with reason "Accepted" instead.
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
 	// This reason is used with the "Accepted" condition when no controller has
