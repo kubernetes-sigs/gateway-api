@@ -46,15 +46,17 @@ import (
 //
 // Implementations supporting `GRPCRoute` with the `HTTPS` `ProtocolType` MUST
 // accept HTTP/2 connections without an initial upgrade from HTTP/1.1, i.e. via
-// ALPN. If the implementation does not support this, then it MUST raise a "Detached"
-// condition for the affected listener with a reason of "UnsupportedProtocol".
+// ALPN. If the implementation does not support this, then it MUST set the "Accepted"
+// condition to "False" for the affected listener with a reason of
+// "UnsupportedProtocol".
 // Note that a compliant implementation MAY also accept HTTP/2 connections with an
 // upgrade from HTTP/1.
 //
 // Implementations supporting `GRPCRoute` with the `HTTP` `ProtocolType` MUST
 // support cleartext HTTP/2 without an initial upgrade from HTTP/1.1. If the
-// implementation does not support this, then it MUST raise a "Detached"
-// condition for the affected listener with a reason of "UnsupportedProtocol".
+// implementation does not support this, then it MUST set the "Accepted"
+// condition to "False" for the affected listener with a reason of
+// "UnsupportedProtocol".
 // Note that a compliant implementation MAY also accept HTTP/2 connections with an
 // upgrade from HTTP/1.
 //

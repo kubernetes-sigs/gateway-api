@@ -239,7 +239,7 @@ type Listener struct {
 // ProtocolType defines the application protocol accepted by a Listener.
 // Implementations are not required to accept all the defined protocols.
 // If an implementation does not support a specified protocol, it
-// should raise a "Detached" condition for the affected Listener with
+// should set the "Accepted" condition for the affected Listener with
 // a reason of "UnsupportedProtocol".
 //
 // Core ProtocolType values are listed in the table below.
@@ -690,22 +690,35 @@ const (
 	// if it specifies an unsupported requirement, or prerequisite
 	// resources are not available.
 	//
-	// Possible reasons for this condition to be true are:
+	// Possible reasons for this condition to be True are:
+	//
+	// * "Accepted"
+	//
+	// Possible reasons for this condition to be False are:
 	//
 	// * "PortUnavailable"
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "Attached"
-	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
+	ListenerConditionAccepted ListenerConditionType = "Accepted"
+
+	// Deprecated: use "Accepted" instead.
 	ListenerConditionDetached ListenerConditionType = "Detached"
 
-	// This reason is used with the "Detached" condition when the Listener
+	// This reason is used with the "Accepted" condition when the condition is
+	// True.
+	ListenerReasonAccepted ListenerConditionReason = "Accepted"
+
+	// This reason is used with the "Detached" condition when the condition is
+	// False.
+	//
+	// Deprecated: use the "Accepted" condition with reason "Accepted" instead.
+	ListenerReasonAttached ListenerConditionReason = "Attached"
+
+	// This reason is used with the "Accepted" condition when the Listener
 	// requests a port that cannot be used on the Gateway. This reason could be
 	// used in a number of instances, including:
 	//
@@ -713,22 +726,18 @@ const (
 	// * The port is not supported by the implementation.
 	ListenerReasonPortUnavailable ListenerConditionReason = "PortUnavailable"
 
-	// This reason is used with the "Detached" condition when the
+	// This reason is used with the "Accepted" condition when the
 	// Listener could not be attached to be Gateway because its
 	// protocol type is not supported.
 	ListenerReasonUnsupportedProtocol ListenerConditionReason = "UnsupportedProtocol"
 
-	// This reason is used with the "Detached" condition when the Listener could
+	// This reason is used with the "Accepted" condition when the Listener could
 	// not be attached to the Gateway because the requested address is not
 	// supported. This reason could be used in a number of instances, including:
 	//
 	// * The address is already in use.
 	// * The type of address is not supported by the implementation.
 	ListenerReasonUnsupportedAddress ListenerConditionReason = "UnsupportedAddress"
-
-	// This reason is used with the "Detached" condition when the condition is
-	// False.
-	ListenerReasonAttached ListenerConditionReason = "Attached"
 )
 
 const (
