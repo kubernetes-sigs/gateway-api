@@ -200,6 +200,10 @@ const (
 	// * "NoMatchingListenerHostname"
 	// * "UnsupportedValue"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -221,6 +225,10 @@ const (
 	// This reason is used with the "Accepted" condition when a value for an Enum
 	// is not recognized.
 	RouteReasonUnsupportedValue RouteConditionReason = "UnsupportedValue"
+
+	// This reason is used with the "Accepted" when a controller has not yet
+	// reconciled the route.
+	RouteReasonPending RouteConditionReason = "Pending"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
@@ -334,9 +342,9 @@ type RouteStatus struct {
 // Hostname is the fully qualified domain name of a network host. This matches
 // the RFC 1123 definition of a hostname with 2 notable exceptions:
 //
-// 1. IPs are not allowed.
-// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
-//    label must appear by itself as the first label.
+//  1. IPs are not allowed.
+//  2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
+//     label must appear by itself as the first label.
 //
 // Hostname can be "precise" which is a domain name without the terminating
 // dot of a network host (e.g. "foo.example.com") or "wildcard", which is a
