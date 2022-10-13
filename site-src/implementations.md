@@ -18,7 +18,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
 - [Istio][9] (alpha)
-- [Kong][10] (alpha)
+- [Kong][10] (beta)
 - [Kuma][11] (alpha)
 - [NGINX Kubernetes Gateway][12]
 - [Traefik][13] (alpha)
@@ -198,7 +198,7 @@ For help and support with Kong's implementations please feel free to [create an 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kgo]:https://github.com/kong/gateway-operator
+[kgo]:https://github.com/kong/gateway-operator-docs
 [kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
 [kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
