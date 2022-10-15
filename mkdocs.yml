@@ -20,6 +20,10 @@ plugins:
   - macros:
       include_dir: examples
       j2_line_comment_prefix: "#$"
+  - redirects:
+      redirect_maps:
+        'guides/getting-started.md': 'guides/index.md'
+        'contributing/community.md': 'contributing/index.md'
 markdown_extensions:
   - admonition
   - meta
@@ -44,7 +48,7 @@ nav:
     - Implementations: implementations.md
     - FAQ: faq.md
   - Guides:
-    - Getting started: guides/getting-started.md
+    - Getting started: guides/index.md
     - Simple Gateway: guides/simple-gateway.md
     - HTTP routing: guides/http-routing.md
     - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
@@ -66,9 +70,9 @@ nav:
       - Overview: contributing/gep.md
       - ... | geps/gep-*.md
   - Contributing:
+    - How to Get Involved: contributing/index.md
     - Developer guide: contributing/devguide.md
     - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
-    - Community: contributing/community.md
     - GAMMA: contributing/gamma.md
   - Blog: 
     - Index: blog/index.md

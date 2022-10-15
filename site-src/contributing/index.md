@@ -1,4 +1,4 @@
-# How to contribute
+# How to Get Involved
 
 This page contains links to all of the meeting notes, design docs and related
 discussions around the APIs.
