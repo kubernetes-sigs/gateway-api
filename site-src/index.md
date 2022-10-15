@@ -16,7 +16,7 @@ interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
-- [User guides](/guides/getting-started)
+- [User guides](/guides)
 - [Gateway controller implementations](/implementations)
 - [API reference spec](/references/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
