@@ -17,18 +17,9 @@ limitations under the License.
 package validation
 
 import (
-	"regexp"
-
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	validationutilv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
 )
-
-var controllerNameRegex = regexp.MustCompile(`^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`)
 
 // IsControllerNameValid checks that the provided controllerName complies with the expected
 // format. It must be a non-empty domain prefixed path.
-func IsControllerNameValid(controllerName gatewayv1a2.GatewayController) bool {
-	if controllerName == "" {
-		return false
-	}
-	return controllerNameRegex.Match([]byte(controllerName))
-}
+var IsControllerNameValid = validationutilv1beta1.IsControllerNameValid
