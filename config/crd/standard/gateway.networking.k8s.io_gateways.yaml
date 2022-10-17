@@ -337,9 +337,9 @@ spec:
                             namespace that allows the certificate to be attached.
                             If a ReferenceGrant does not allow this reference, the
                             \"ResolvedRefs\" condition MUST be set to False for this
-                            listener with the \"InvalidCertificateRef\" reason. \n
-                            This field is required to have at least one element when
-                            the mode is set to \"Terminate\" (default) and is optional
+                            listener with the \"RefNotPermitted\" reason. \n This
+                            field is required to have at least one element when the
+                            mode is set to \"Terminate\" (default) and is optional
                             otherwise. \n CertificateRefs can reference to standard
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
@@ -1031,9 +1031,9 @@ spec:
                             namespace that allows the certificate to be attached.
                             If a ReferenceGrant does not allow this reference, the
                             \"ResolvedRefs\" condition MUST be set to False for this
-                            listener with the \"InvalidCertificateRef\" reason. \n
-                            This field is required to have at least one element when
-                            the mode is set to \"Terminate\" (default) and is optional
+                            listener with the \"RefNotPermitted\" reason. \n This
+                            field is required to have at least one element when the
+                            mode is set to \"Terminate\" (default) and is optional
                             otherwise. \n CertificateRefs can reference to standard
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
