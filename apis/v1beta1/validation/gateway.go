@@ -62,6 +62,7 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	var errs field.ErrorList
 	errs = append(errs, validateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
+	errs = append(errs, validateTLSCertificateRefs(listeners, path)...)
 	return errs
 }
 
@@ -87,6 +88,21 @@ func validateListenerHostname(listeners []gatewayv1b1.Listener, path *field.Path
 	for i, h := range listeners {
 		if isProtocolInSubset(h.Protocol, protocolsHostnameInvalid) && h.Hostname != nil {
 			errs = append(errs, field.Forbidden(path.Index(i).Child("hostname"), fmt.Sprintf("should be empty for protocol %v", h.Protocol)))
+		}
+	}
+	return errs
+}
+
+// validateTLSCertificateRefs validates the certificateRefs
+// must be set when tls config is set and TLSModeType is
+// terminate
+func validateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	for i, h := range listeners {
+		if h.TLS != nil {
+			if h.TLS.Mode != nil && *h.TLS.Mode == "Terminate" && h.TLS.CertificateRefs == nil {
+				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set when TLSModeType is Terminate")))
+			}
 		}
 	}
 	return errs
