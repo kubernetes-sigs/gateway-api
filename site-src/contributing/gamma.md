@@ -9,7 +9,7 @@ service mesh projects, regardless of their technology stack or proxy.
 
 ## Deliverables
 
-This group will deliver [Gateway Enhancement Proposals](/contributing/gep)
+This group will deliver [Gateway Enhancement Proposals](/geps/overview)
 consisting of resources, additions, and modifications to the Gateway API
 specification for mesh and mesh-adjacent use-cases. Governance of the Gateway
 API specification remains solely with the maintainers of the Gateway API
