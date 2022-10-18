@@ -317,7 +317,7 @@ type GatewayTLSConfig struct {
 	// is a ReferenceGrant in the target namespace that allows the certificate
 	// to be attached. If a ReferenceGrant does not allow this reference, the
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "InvalidCertificateRef" reason.
+	// "RefNotPermitted" reason.
 	//
 	// This field is required to have at least one element when the mode is set
 	// to "Terminate" (default) and is optional otherwise.
