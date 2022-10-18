@@ -100,7 +100,7 @@ func validateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 	var errs field.ErrorList
 	for i, c := range listeners {
 		if c.Protocol == gatewayv1b1.HTTPSProtocolType && c.TLS != nil {
-			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && c.TLS.CertificateRefs == nil {
+			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
 				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
 			}
 		}
