@@ -86,6 +86,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
 				tlsMode := gatewayv1b1.TLSModeType("Terminate")
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
 				gw.Spec.Listeners[0].Hostname = &hostname
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 				gw.Spec.Listeners[0].TLS.Mode = &tlsMode

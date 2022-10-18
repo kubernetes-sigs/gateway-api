@@ -98,10 +98,10 @@ func validateListenerHostname(listeners []gatewayv1b1.Listener, path *field.Path
 // terminate
 func validateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	for i, h := range listeners {
-		if h.TLS != nil {
-			if h.TLS.Mode != nil && *h.TLS.Mode == "Terminate" && h.TLS.CertificateRefs == nil {
-				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set when TLSModeType is Terminate")))
+	for i, c := range listeners {
+		if c.Protocol == gatewayv1b1.HTTPSProtocolType && c.TLS != nil {
+			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && c.TLS.CertificateRefs == nil {
+				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
 			}
 		}
 	}
