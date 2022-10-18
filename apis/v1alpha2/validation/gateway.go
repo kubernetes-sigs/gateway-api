@@ -94,8 +94,8 @@ func validateListenerHostname(listeners []gatewayv1a2.Listener, path *field.Path
 }
 
 // validateTLSCertificateRefs validates the certificateRefs
-// must be set when tls config is set and TLSModeType is
-// terminate
+// must be set and not empty when tls config is set and
+// TLSModeType is terminate
 func validateTLSCertificateRefs(listeners []gatewayv1a2.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, c := range listeners {
