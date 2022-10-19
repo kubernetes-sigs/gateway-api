@@ -62,7 +62,7 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	var errs field.ErrorList
 	errs = append(errs, validateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
-	errs = append(errs, validateTLSCertificateRefs(listeners, path)...)
+	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
 	return errs
 }
 
@@ -93,10 +93,10 @@ func validateListenerHostname(listeners []gatewayv1b1.Listener, path *field.Path
 	return errs
 }
 
-// validateTLSCertificateRefs validates the certificateRefs
+// ValidateTLSCertificateRefs validates the certificateRefs
 // must be set and not empty when tls config is set and
 // TLSModeType is terminate
-func validateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, c := range listeners {
 		if c.Protocol == gatewayv1b1.HTTPSProtocolType && c.TLS != nil {

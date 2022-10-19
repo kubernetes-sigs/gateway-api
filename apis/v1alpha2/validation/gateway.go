@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
@@ -36,6 +37,11 @@ var (
 		gatewayv1a2.UDPProtocolType:  {},
 		gatewayv1a2.TCPProtocolType:  {},
 	}
+
+	// ValidateTLSCertificateRefs validates the certificateRefs
+    // must be set and not empty when tls config is set and
+    // TLSModeType is terminate
+	validateTLSCertificateRefs = gatewayvalidationv1b1.ValidateTLSCertificateRefs
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -88,21 +94,6 @@ func validateListenerHostname(listeners []gatewayv1a2.Listener, path *field.Path
 	for i, h := range listeners {
 		if isProtocolInSubset(h.Protocol, protocolsHostnameInvalid) && h.Hostname != nil {
 			errs = append(errs, field.Forbidden(path.Index(i).Child("hostname"), fmt.Sprintf("should be empty for protocol %v", h.Protocol)))
-		}
-	}
-	return errs
-}
-
-// validateTLSCertificateRefs validates the certificateRefs
-// must be set and not empty when tls config is set and
-// TLSModeType is terminate
-func validateTLSCertificateRefs(listeners []gatewayv1a2.Listener, path *field.Path) field.ErrorList {
-	var errs field.ErrorList
-	for i, c := range listeners {
-		if c.Protocol == gatewayv1a2.HTTPSProtocolType && c.TLS != nil {
-			if *c.TLS.Mode == gatewayv1a2.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
-				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
-			}
 		}
 	}
 	return errs
