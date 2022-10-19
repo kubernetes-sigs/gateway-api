@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
@@ -36,6 +37,11 @@ var (
 		gatewayv1a2.UDPProtocolType:  {},
 		gatewayv1a2.TCPProtocolType:  {},
 	}
+
+	// ValidateTLSCertificateRefs validates the certificateRefs
+	// must be set and not empty when tls config is set and
+	// TLSModeType is terminate
+	validateTLSCertificateRefs = gatewayvalidationv1b1.ValidateTLSCertificateRefs
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -62,6 +68,7 @@ func validateGatewayListeners(listeners []gatewayv1a2.Listener, path *field.Path
 	var errs field.ErrorList
 	errs = append(errs, validateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
+	errs = append(errs, validateTLSCertificateRefs(listeners, path)...)
 	return errs
 }
 
