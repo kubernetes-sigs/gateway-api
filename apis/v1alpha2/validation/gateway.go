@@ -39,8 +39,8 @@ var (
 	}
 
 	// ValidateTLSCertificateRefs validates the certificateRefs
-    // must be set and not empty when tls config is set and
-    // TLSModeType is terminate
+	// must be set and not empty when tls config is set and
+	// TLSModeType is terminate
 	validateTLSCertificateRefs = gatewayvalidationv1b1.ValidateTLSCertificateRefs
 )
 
