@@ -12,6 +12,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Cilium][16] (work in progress)
 - [Contour][3] (alpha)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
+- [Envoy Gateway][18] (alpha)
 - [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
 - [Google Kubernetes Engine][6] (public preview)
@@ -44,7 +45,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [15]:#cert-manager
 [16]:#cilium
 [17]:#flomesh-service-mesh-fsm
-
+[18]:#envoy-gateway
 ## Implementations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
@@ -118,6 +119,15 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 [emissary]:https://www.getambassador.io/docs/edge-stack
 [envoy]:https://envoyproxy.io
 [emissary-gateway-api]:https://www.getambassador.io/docs/edge-stack/latest/topics/using/gateway-api/
+
+### Envoy Gateway
+
+[Envoy Gateway][eg-home] is an subproject of the Envoy project for managing an Envoy-based Kubernetes-based application
+gateway. Version 0.2.0 includes support for most v1beta1 Gateway API features and objects. You can use the
+[quickstart][eg-quickstart] to get up and running.
+
+[eg-home]:https://gateway.envoyproxy.io/
+[eg-quickstart]:https://gateway.envoyproxy.io/user/quickstart.html
 
 ### Flomesh Service Mesh (FSM)
 
