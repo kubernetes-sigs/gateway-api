@@ -1099,10 +1099,10 @@ spec:
                                 type: string
                             type: object
                           queryParams:
-                            description: QueryParams specifies HTTP query parameter
+                            description: "QueryParams specifies HTTP query parameter
                               matchers. Multiple match values are ANDed together,
                               meaning, a request must match all the specified query
-                              parameters to select the route.
+                              parameters to select the route. \n Support: Extended"
                             items:
                               description: HTTPQueryParamMatch describes how to select
                                 a HTTP route by matching HTTP query parameters.
@@ -2450,10 +2450,10 @@ spec:
                                 type: string
                             type: object
                           queryParams:
-                            description: QueryParams specifies HTTP query parameter
+                            description: "QueryParams specifies HTTP query parameter
                               matchers. Multiple match values are ANDed together,
                               meaning, a request must match all the specified query
-                              parameters to select the route.
+                              parameters to select the route. \n Support: Extended"
                             items:
                               description: HTTPQueryParamMatch describes how to select
                                 a HTTP route by matching HTTP query parameters.
