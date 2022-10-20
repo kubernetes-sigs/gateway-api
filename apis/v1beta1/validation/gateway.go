@@ -36,6 +36,11 @@ var (
 		gatewayv1b1.UDPProtocolType:  {},
 		gatewayv1b1.TCPProtocolType:  {},
 	}
+	// set of protocols for which TLSConfig must be set
+	protocolsTLSRequired = map[gatewayv1b1.ProtocolType]struct{}{
+		gatewayv1b1.HTTPSProtocolType: {},
+		gatewayv1b1.TLSProtocolType:   {},
+	}
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -60,15 +65,20 @@ func validateGatewaySpec(spec *gatewayv1b1.GatewaySpec, path *field.Path) field.
 // to the Gateway API specification.
 func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	errs = append(errs, validateListenerTLSConfig(listeners, path)...)
+	errs = append(errs, ValidateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
 	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
 	return errs
 }
 
-func validateListenerTLSConfig(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+// validateListenerTLSConfig validates TLS config must be set when protocol is HTTPS or TLS,
+// and TLS config shall not be present when protocol is HTTP, TCP or UDP
+func ValidateListenerTLSConfig(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, l := range listeners {
+		if isProtocolInSubset(l.Protocol, protocolsTLSRequired) && l.TLS == nil {
+			errs = append(errs, field.Forbidden(path.Index(i).Child("tls"), fmt.Sprintf("must be set for protocol %v", l.Protocol)))
+		}
 		if isProtocolInSubset(l.Protocol, protocolsTLSInvalid) && l.TLS != nil {
 			errs = append(errs, field.Forbidden(path.Index(i).Child("tls"), fmt.Sprintf("should be empty for protocol %v", l.Protocol)))
 		}
@@ -99,7 +109,7 @@ func validateListenerHostname(listeners []gatewayv1b1.Listener, path *field.Path
 func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, c := range listeners {
-		if c.Protocol == gatewayv1b1.HTTPSProtocolType && c.TLS != nil {
+		if isProtocolInSubset(c.Protocol, protocolsTLSRequired) && c.TLS != nil {
 			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
 				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
 			}

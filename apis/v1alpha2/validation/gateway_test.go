@@ -46,26 +46,11 @@ func TestValidateGateway(t *testing.T) {
 			Addresses:        addresses,
 		},
 	}
-	tlsConfig := gatewayv1a2.GatewayTLSConfig{}
 
 	testCases := map[string]struct {
 		mutate             func(gw *gatewayv1a2.Gateway)
 		expectErrsOnFields []string
 	}{
-		"tls config present with http protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.HTTPProtocolType
-				gw.Spec.Listeners[0].TLS = &tlsConfig
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].tls"},
-		},
-		"tls config present with tcp protocol": {
-			mutate: func(gw *gatewayv1a2.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
-				gw.Spec.Listeners[0].TLS = &tlsConfig
-			},
-			expectErrsOnFields: []string{"spec.listeners[0].tls"},
-		},
 		"hostname present with tcp protocol": {
 			mutate: func(gw *gatewayv1a2.Gateway) {
 				hostname := gatewayv1a2.Hostname("foo.bar.com")

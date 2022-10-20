@@ -66,6 +66,18 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
+		"tls config not set with https protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
+		},
+		"tls config not set with tls protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TLSProtocolType
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
+		},
 		"hostname present with tcp protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
