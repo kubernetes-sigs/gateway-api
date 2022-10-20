@@ -524,6 +524,8 @@ type HTTPRouteMatch struct {
 	// values are ANDed together, meaning, a request must match all the
 	// specified query parameters to select the route.
 	//
+	// Support: Extended
+	//
 	// +listType=map
 	// +listMapKey=name
 	// +optional
