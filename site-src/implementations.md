@@ -10,7 +10,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Acnodal EPIC][1] (public preview)
 - [Apache APISIX][2] (alpha)
 - [Cilium][16] (work in progress)
-- [Contour][3] (alpha)
+- [Contour][3] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (alpha)
 - [Flomesh Service Mesh][17] (work in progress)
@@ -93,9 +93,9 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour implements Gateway API v0.5.0, supporting the v1alpha2 and v1beta1 API versions.
+Contour implements Gateway API v0.5.1, supporting the v1alpha2 and v1beta1 API versions.
 All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute), plus ReferenceGrant and TLSRoute, are supported.
-Contour's implementation passes all Gateway API conformance tests included in the v0.5.0 release.
+Contour's implementation passes all Gateway API conformance tests included in the v0.5.1 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
