@@ -69,6 +69,7 @@ nav:
     - Enhancement Proposals:
       - Overview: geps/overview.md
       - Provisional:
+        - geps/gep-1426.md
         - geps/gep-1324.md
         - geps/gep-1282.md
         - geps/gep-735.md
