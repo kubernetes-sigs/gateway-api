@@ -95,7 +95,7 @@ nav:
     - Developer Guide: contributing/devguide.md
     - Enhancement Requests: contributing/enhancement-requests.md
     - GAMMA: contributing/gamma.md
-  - Blog: 
+  - Blog:
     - Index: blog/index.md
     - 2022:
       - blog/2022/graduating-to-beta.md
