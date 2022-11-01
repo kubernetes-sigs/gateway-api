@@ -47,13 +47,13 @@ func validateGRPCRouteRules(rules []gatewayv1a2.GRPCRouteRule, path *field.Path)
 	return errs
 }
 
-// validateRuleMatches validates that at least one of the fields Service and Method of
+// validateRuleMatches validates that at least one of the fields Service or Method of
 // GRPCMethodMatch to be specified
 func validateRuleMatches(matches []gatewayv1a2.GRPCRouteMatch, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, m := range matches {
 		if m.Method != nil && m.Method.Service == nil && m.Method.Method == nil {
-			errs = append(errs, field.Required(path.Index(i).Child("methods"), "should have at least one of fields Service and Method"))
+			errs = append(errs, field.Required(path.Index(i).Child("methods"), "should have at least one of fields Service or Method"))
 			return errs
 		}
 	}
