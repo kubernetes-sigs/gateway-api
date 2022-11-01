@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	utils "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
 )
 
 var (
@@ -68,6 +69,7 @@ func validateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateHTTPParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
@@ -286,4 +288,40 @@ func hasExactlyOnePrefixMatch(matches []gatewayv1b1.HTTPRouteMatch) bool {
 	}
 
 	return true
+}
+
+// validateHTTPParentRefs validates that if ParentRefs includes 2 or more references
+// to the same parent (based on kind, name, and namespace), those ParentRefs must
+// specify unique SectionName values.
+func validateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if len(parentRefs) <= 1 {
+		return nil
+	}
+	type sameKindParentRefs struct {
+		name      gatewayv1b1.ObjectName
+		namespace gatewayv1b1.Namespace
+		kind      gatewayv1b1.Kind
+	}
+	m := make(map[sameKindParentRefs][]gatewayv1b1.SectionName)
+	for i, p := range parentRefs {
+		if p.Namespace == nil {
+			p.Namespace = new(gatewayv1b1.Namespace)
+		}
+		if p.Kind == nil {
+			p.Kind = new(gatewayv1b1.Kind)
+		}
+		if p.SectionName == nil {
+			p.SectionName = new(gatewayv1b1.SectionName)
+		}
+		t := &sameKindParentRefs{name: p.Name, namespace: *p.Namespace, kind: *p.Kind}
+		if s, ok := m[*t]; ok {
+			if utils.ContainsInSectionNameSlice(s, p.SectionName) {
+				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), p.SectionName, "must be set and unique when ParentRefs includes 2 or more references to the same parent"))
+				return errs
+			}
+		}
+		m[*t] = append(m[*t], *p.SectionName)
+	}
+	return errs
 }

@@ -982,3 +982,137 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		})
 	}
 }
+
+func TestValidateHTTPParentRefs(t *testing.T) {
+	namespace := gatewayv1b1.Namespace("example-namespace")
+	kind := gatewayv1b1.Kind("Gateway")
+	sectionA := gatewayv1b1.SectionName("Section A")
+	sectionB := gatewayv1b1.SectionName("Section B")
+	sectionC := gatewayv1b1.SectionName("Section C")
+
+	tests := []struct {
+		name       string
+		parentRefs []gatewayv1b1.ParentReference
+		errCount   int
+	}{{
+		name: "valid HTTPRouteParentRefs includes 1 reference",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+		},
+		errCount: 0,
+	}, {
+		name: "valid HTTPRouteParentRefs includes 2 references",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionB,
+			},
+		},
+		errCount: 0,
+	}, {
+		name: "valid HTTPRouteParentRefs includes more references to the same parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionB,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionC,
+			},
+		},
+		errCount: 0,
+	}, {
+		name: "invalid HTTPRouteParentRefs due to the same section names to the same parentRefs",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+		},
+		errCount: 1,
+	}, {
+		name: "invalid HTTPRouteParentRefs due to section names not set to the same ParentRefs",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name: "example",
+			},
+			{
+				Name: "example",
+			},
+		},
+		errCount: 1,
+	}, {
+		name: "invalid HTTPRouteParentRefs due to more same section names to the same ParentRefs",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: nil,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionB,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionA,
+			},
+		},
+		errCount: 1,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1b1.HTTPRoute{
+				Spec: gatewayv1b1.HTTPRouteSpec{
+					CommonRouteSpec: gatewayv1b1.CommonRouteSpec{
+						ParentRefs: tc.parentRefs,
+					},
+				},
+			}
+			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
