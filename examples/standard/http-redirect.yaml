@@ -28,6 +28,11 @@ spec:
     - name: https
       protocol: HTTPS
       port: 443
+      tls:
+        certificateRefs:
+        - kind: Secret
+          group: ""
+          name: example-com-cert
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
