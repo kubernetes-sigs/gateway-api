@@ -10,6 +10,11 @@ spec:
   - name: grpc
     protocol: HTTPS
     port: 50051
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: example-com-cert
 ---
 apiVersion: gateway.networking.k8s.io/v1alpha2
 kind: GRPCRoute
