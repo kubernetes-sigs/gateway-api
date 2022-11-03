@@ -61,6 +61,11 @@ var (
 		Version:  v1alpha2.SchemeGroupVersion.Version,
 		Resource: "httproutes",
 	}
+	v1a2GRPCRouteGVR = meta.GroupVersionResource{
+		Group:    v1alpha2.SchemeGroupVersion.Group,
+		Version:  v1alpha2.SchemeGroupVersion.Version,
+		Resource: "grpcroutes",
+	}
 	v1a2GatewayGVR = meta.GroupVersionResource{
 		Group:    v1alpha2.SchemeGroupVersion.Group,
 		Version:  v1alpha2.SchemeGroupVersion.Version,
@@ -207,6 +212,14 @@ func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionR
 		}
 
 		fieldErr = v1a2Validation.ValidateHTTPRoute(&hRoute)
+	case v1a2GRPCRouteGVR:
+		var gRoute v1alpha2.GRPCRoute
+		_, _, err := deserializer.Decode(request.Object.Raw, nil, &gRoute)
+		if err != nil {
+			return nil, err
+		}
+
+		fieldErr = v1a2Validation.ValidateGRPCRoute(&gRoute)
 	case v1b1HTTPRouteGVR:
 		var hRoute v1beta1.HTTPRoute
 		_, _, err := deserializer.Decode(request.Object.Raw, nil, &hRoute)
