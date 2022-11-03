@@ -286,33 +286,33 @@ func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field
 	var errs field.ErrorList
 	singleAction := make(map[string]bool)
 	for i, action := range filter.Add {
-		if needsErr, ok := singleAction[string(action.Name)]; ok {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("add"), filter.Add[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[string(action.Name)] = false
+			singleAction[strings.ToLower(string(action.Name))] = false
 		} else {
-			singleAction[string(action.Name)] = true
+			singleAction[strings.ToLower(string(action.Name))] = true
 		}
 	}
 	for i, action := range filter.Set {
-		if needsErr, ok := singleAction[string(action.Name)]; ok {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("set"), filter.Set[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[string(action.Name)] = false
+			singleAction[strings.ToLower(string(action.Name))] = false
 		} else {
-			singleAction[string(action.Name)] = true
+			singleAction[strings.ToLower(string(action.Name))] = true
 		}
 	}
 	for i, action := range filter.Remove {
-		if needsErr, ok := singleAction[action]; ok {
+		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[action] = false
+			singleAction[strings.ToLower(action)] = false
 		} else {
-			singleAction[action] = true
+			singleAction[strings.ToLower(action)] = true
 		}
 	}
 	return errs
