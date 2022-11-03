@@ -386,6 +386,33 @@ type HeaderName string
 // GRPCRouteFilterType identifies a type of GRPCRoute filter.
 type GRPCRouteFilterType string
 
+const (
+	// GRPCRouteFilterRequestHeaderModifier can be used to add or remove a gRPC
+	// header from a gRPC request before it is sent to the upstream target.
+	//
+	// Support in GRPCRouteRule: Core
+	//
+	// Support in GRPCBackendRef: Extended
+	GRPCRouteFilterRequestHeaderModifier GRPCRouteFilterType = "RequestHeaderModifier"
+
+	// GRPCRouteFilterRequestMirror can be used to mirror gRPC requests to a
+	// different backend. The responses from this backend MUST be ignored by
+	// the Gateway.
+	//
+	// Support in GRPCRouteRule: Extended
+	//
+	// Support in GRPCBackendRef: Extended
+	GRPCRouteFilterRequestMirror GRPCRouteFilterType = "RequestMirror"
+
+	// GRPCRouteFilterExtensionRef should be used for configuring custom
+	// gRPC filters.
+	//
+	// Support in GRPCRouteRule: Implementation-specific
+	//
+	// Support in GRPCBackendRef: Implementation-specific
+	GRPCRouteFilterExtensionRef GRPCRouteFilterType = "ExtensionRef"
+)
+
 // GRPCRouteFilter defines processing steps that must be completed during the
 // request or response lifecycle. GRPCRouteFilters are meant as an extension
 // point to express processing that may be done in Gateway implementations. Some
@@ -482,7 +509,7 @@ type GRPCBackendRef struct {
 	// Support for weight: Core
 	//
 	// +optional
-	BackendRefs BackendRef `json:",inline"`
+	BackendRef `json:",inline"`
 
 	// Filters defined at this level MUST be executed if and only if the
 	// request is being forwarded to the backend defined here.
