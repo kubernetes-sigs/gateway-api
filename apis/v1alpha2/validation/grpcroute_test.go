@@ -71,7 +71,7 @@ func TestValidateGRPCRoute(t *testing.T) {
 						{
 							Method: &gatewayv1a2.GRPCMethodMatch{
 								Service: nil,
-								Method: nil,
+								Method:  nil,
 							},
 						},
 					},
@@ -79,8 +79,8 @@ func TestValidateGRPCRoute(t *testing.T) {
 			},
 			errs: field.ErrorList{
 				{
-					Type:	field.ErrorTypeRequired,
-					Field:	"spec.rules[0].matches[0].methods",
+					Type:   field.ErrorTypeRequired,
+					Field:  "spec.rules[0].matches[0].methods",
 					Detail: "should have at least one of fields Service or Method",
 				},
 			},
