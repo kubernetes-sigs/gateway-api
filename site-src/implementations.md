@@ -18,7 +18,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Google Kubernetes Engine][6] (public preview)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
-- [Istio][9] (alpha)
+- [Istio][9] (beta)
 - [Kong][10] (beta)
 - [Kuma][11] (alpha)
 - [NGINX Kubernetes Gateway][12]
@@ -187,9 +187,9 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[Istio][istio] is an open source [service mesh][mesh].
+[Istio][istio] is an open source [service mesh][mesh] and gateway implementation.
 
-Istio is actively working towards an implementation of the Gateway API and you can use the [Istio Gateway API Documentation][istio-1] to deploy the Istio Gateway API in it's current state.
+Istio supports the Gateway API; see [Istio Gateway API Documentation][istio-1] to get started.
 
 [istio]:https://istio.io
 [mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
