@@ -54,8 +54,8 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 			gatewayNamespacedName types.NamespacedName
 		}{
 			{
-				name:                  "Inexistent secret referenced as CertificateRef in a Gateway listener",
-				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-inexistent-secret", Namespace: "gateway-conformance-infra"},
+				name:                  "Nonexistent secret referenced as CertificateRef in a Gateway listener",
+				gatewayNamespacedName: types.NamespacedName{Name: "gateway-certificate-nonexistent-secret", Namespace: "gateway-conformance-infra"},
 			},
 			{
 				name:                  "Unsupported group resource referenced as CertificateRef in a Gateway listener",
