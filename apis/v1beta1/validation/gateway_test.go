@@ -66,6 +66,36 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].tls"},
 		},
+		"tls config not set with https protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
+		},
+		"tls config not set with tls protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TLSProtocolType
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls"},
+		},
+		"tls config not set with http protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+			},
+			expectErrsOnFields: nil,
+		},
+		"tls config not set with tcp protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
+			},
+			expectErrsOnFields: nil,
+		},
+		"tls config not set with udp protocol": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
+			},
+			expectErrsOnFields: nil,
+		},
 		"hostname present with tcp protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
@@ -81,6 +111,28 @@ func TestValidateGateway(t *testing.T) {
 				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
+		},
+		"certificatedRefs not set with https protocol and TLS terminate mode": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostname := gatewayv1b1.Hostname("foo.bar.com")
+				tlsMode := gatewayv1b1.TLSModeType("Terminate")
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].TLS = &tlsConfig
+				gw.Spec.Listeners[0].TLS.Mode = &tlsMode
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls.certificateRefs"},
+		},
+		"certificatedRefs not set with tls protocol and TLS terminate mode": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostname := gatewayv1b1.Hostname("foo.bar.com")
+				tlsMode := gatewayv1b1.TLSModeType("Terminate")
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TLSProtocolType
+				gw.Spec.Listeners[0].Hostname = &hostname
+				gw.Spec.Listeners[0].TLS = &tlsConfig
+				gw.Spec.Listeners[0].TLS.Mode = &tlsMode
+			},
+			expectErrsOnFields: []string{"spec.listeners[0].tls.certificateRefs"},
 		},
 	}
 

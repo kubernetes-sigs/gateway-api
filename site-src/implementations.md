@@ -10,15 +10,16 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Acnodal EPIC][1] (public preview)
 - [Apache APISIX][2] (alpha)
 - [Cilium][16] (work in progress)
-- [Contour][3] (alpha)
+- [Contour][3] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
+- [Envoy Gateway][18] (alpha)
 - [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
 - [Google Kubernetes Engine][6] (public preview)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
-- [Istio][9] (alpha)
-- [Kong][10] (alpha)
+- [Istio][9] (beta)
+- [Kong][10] (beta)
 - [Kuma][11] (alpha)
 - [NGINX Kubernetes Gateway][12]
 - [Traefik][13] (alpha)
@@ -44,7 +45,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [15]:#cert-manager
 [16]:#cilium
 [17]:#flomesh-service-mesh-fsm
-
+[18]:#envoy-gateway
 ## Implementations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
@@ -92,9 +93,9 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour implements Gateway API v0.5.0, supporting the v1alpha2 and v1beta1 API versions.
+Contour implements Gateway API v0.5.1, supporting the v1alpha2 and v1beta1 API versions.
 All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute), plus ReferenceGrant and TLSRoute, are supported.
-Contour's implementation passes all Gateway API conformance tests included in the v0.5.0 release.
+Contour's implementation passes all Gateway API conformance tests included in the v0.5.1 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
@@ -118,6 +119,18 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 [emissary]:https://www.getambassador.io/docs/edge-stack
 [envoy]:https://envoyproxy.io
 [emissary-gateway-api]:https://www.getambassador.io/docs/edge-stack/latest/topics/using/gateway-api/
+
+### Envoy Gateway
+
+[Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The
+[v0.2][eg-02] release includes support for most `v1beta1` Gateway API features and passes core conformance tests
+included in the v0.5.1 release. Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
+few simple steps.
+
+[eg-home]:https://gateway.envoyproxy.io/
+[envoy-org]:https://github.com/envoyproxy
+[eg-02]:https://gateway.envoyproxy.io/v0.2.0/releases/v0.2.html
+[eg-quickstart]:https://gateway.envoyproxy.io/v0.2.0/user/quickstart.html
 
 ### Flomesh Service Mesh (FSM)
 
@@ -177,9 +190,9 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[Istio][istio] is an open source [service mesh][mesh].
+[Istio][istio] is an open source [service mesh][mesh] and gateway implementation.
 
-Istio is actively working towards an implementation of the Gateway API and you can use the [Istio Gateway API Documentation][istio-1] to deploy the Istio Gateway API in it's current state.
+Istio supports the Gateway API; see [Istio Gateway API Documentation][istio-1] to get started.
 
 [istio]:https://istio.io
 [mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
@@ -198,7 +211,7 @@ For help and support with Kong's implementations please feel free to [create an 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kgo]:https://github.com/kong/gateway-operator
+[kgo]:https://github.com/kong/gateway-operator-docs
 [kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
 [kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD

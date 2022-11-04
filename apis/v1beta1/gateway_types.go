@@ -317,7 +317,7 @@ type GatewayTLSConfig struct {
 	// is a ReferenceGrant in the target namespace that allows the certificate
 	// to be attached. If a ReferenceGrant does not allow this reference, the
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "InvalidCertificateRef" reason.
+	// "RefNotPermitted" reason.
 	//
 	// This field is required to have at least one element when the mode is set
 	// to "Terminate" (default) and is optional otherwise.
@@ -494,7 +494,7 @@ type GatewayStatus struct {
 	// +listType=map
 	// +listMapKey=type
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{type: "Accepted", status: "Unknown", reason:"NotReconciled", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
+	// +kubebuilder:default={{type: "Accepted", status: "Unknown", reason:"Pending", message:"Waiting for controller", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
 	// Listeners provide status for each unique listener port defined in the Spec.
@@ -529,6 +529,10 @@ const (
 	// * "NotReconciled"
 	// * "NoResources"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -549,6 +553,9 @@ const (
 
 	// This reason is used with the "Accepted" condition when no controller has
 	// reconciled the Gateway.
+	GatewayReasonPending GatewayConditionReason = "Pending"
+
+	// Deprecated: Use "Pending" instead.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
 	// This reason is used with the "Accepted" condition when the
@@ -700,6 +707,10 @@ const (
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -800,6 +811,10 @@ const (
 	// * "Invalid"
 	// * "Pending"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -813,8 +828,8 @@ const (
 	// Listener is syntactically or semantically invalid.
 	ListenerReasonInvalid ListenerConditionReason = "Invalid"
 
-	// This reason is used with the "Ready" condition when the
-	// Listener is not yet not online and ready to accept client
-	// traffic.
+	// This reason is used with the "Accepted" and "Ready" conditions when the
+	// Listener is either not yet reconciled or not yet not online and ready to
+	// accept client traffic.
 	ListenerReasonPending ListenerConditionReason = "Pending"
 )

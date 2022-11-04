@@ -1,0 +1,31 @@
+#$ Used in:
+#$ - site-src/guides/grpc-routing.md
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: example-gateway
+spec:
+  gatewayClassName: example-gateway-class
+  listeners:
+  - name: grpc
+    protocol: HTTPS
+    port: 50051
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: example-com-cert
+---
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: GRPCRoute
+metadata:
+  name: example-route
+spec:
+  parentRefs:
+  - name: example-gateway
+  hostnames:
+  - "example.com"
+  rules:
+  - backendRefs:
+    - name: example-svc
+      port: 50051

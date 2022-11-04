@@ -337,9 +337,9 @@ spec:
                             namespace that allows the certificate to be attached.
                             If a ReferenceGrant does not allow this reference, the
                             \"ResolvedRefs\" condition MUST be set to False for this
-                            listener with the \"InvalidCertificateRef\" reason. \n
-                            This field is required to have at least one element when
-                            the mode is set to \"Terminate\" (default) and is optional
+                            listener with the \"RefNotPermitted\" reason. \n This
+                            field is required to have at least one element when the
+                            mode is set to \"Terminate\" (default) and is optional
                             otherwise. \n CertificateRefs can reference to standard
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
@@ -489,7 +489,7 @@ spec:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
                   message: Waiting for controller
-                  reason: NotReconciled
+                  reason: Pending
                   status: Unknown
                   type: Accepted
                 description: "Conditions describe the current conditions of the Gateway.
@@ -1031,9 +1031,9 @@ spec:
                             namespace that allows the certificate to be attached.
                             If a ReferenceGrant does not allow this reference, the
                             \"ResolvedRefs\" condition MUST be set to False for this
-                            listener with the \"InvalidCertificateRef\" reason. \n
-                            This field is required to have at least one element when
-                            the mode is set to \"Terminate\" (default) and is optional
+                            listener with the \"RefNotPermitted\" reason. \n This
+                            field is required to have at least one element when the
+                            mode is set to \"Terminate\" (default) and is optional
                             otherwise. \n CertificateRefs can reference to standard
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
@@ -1183,7 +1183,7 @@ spec:
                 default:
                 - lastTransitionTime: "1970-01-01T00:00:00Z"
                   message: Waiting for controller
-                  reason: NotReconciled
+                  reason: Pending
                   status: Unknown
                   type: Accepted
                 description: "Conditions describe the current conditions of the Gateway.

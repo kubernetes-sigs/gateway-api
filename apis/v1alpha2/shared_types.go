@@ -71,6 +71,10 @@ const (
 	// * "NoMatchingListenerHostname"
 	// * "UnsupportedValue"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -92,6 +96,10 @@ const (
 	// This reason is used with the "Accepted" condition when a value for an Enum
 	// is not recognized.
 	RouteReasonUnsupportedValue RouteConditionReason = "UnsupportedValue"
+
+	// This reason is used with the "Accepted" when a controller has not yet
+	// reconciled the route.
+	RouteReasonPending RouteConditionReason = "Pending"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.

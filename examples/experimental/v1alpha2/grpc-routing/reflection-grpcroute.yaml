@@ -1,0 +1,25 @@
+#$ Used in:
+#$ - site-src/guides/grpc-routing.md
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: GRPCRoute
+metadata:
+  name: foo-route
+spec:
+  parentRefs:
+  - name: example-gateway
+  hostnames:
+  - "foo.example.com"
+  rules:
+  - matches:
+    - method:
+        service: com.example.User
+        method: Login
+    backendRefs:
+    - name: foo-svc
+      port: 50051
+  - matches:
+    - method:
+        service: grpc.reflection.v1.ServerReflection
+    backendRefs:
+    - name: foo-svc
+      port: 50051

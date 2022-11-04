@@ -200,7 +200,7 @@ const (
 	// Gateway has scheduled the Gateway to the underlying network
 	// infrastructure.
 	//
-	// Possible reasons for this condition to be true are:
+	// Possible reasons for this condition to be True are:
 	//
 	// * "Accepted"
 	//
@@ -208,6 +208,10 @@ const (
 	//
 	// * "NotReconciled"
 	// * "NoResources"
+	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -229,6 +233,9 @@ const (
 
 	// This reason is used with the "Accepted" condition when no controller has
 	// reconciled the Gateway.
+	GatewayReasonPending GatewayConditionReason = "Pending"
+
+	// Deprecated: Use "Pending" instead.
 	GatewayReasonNotReconciled GatewayConditionReason = "NotReconciled"
 
 	// This reason is used with the "Accepted" condition when the
@@ -356,6 +363,10 @@ const (
 	// * "UnsupportedProtocol"
 	// * "UnsupportedAddress"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -456,6 +467,10 @@ const (
 	// * "Invalid"
 	// * "Pending"
 	//
+	// Possible reasons for this condition to be Unknown are:
+	//
+	// * "Pending"
+	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
@@ -469,8 +484,8 @@ const (
 	// Listener is syntactically or semantically invalid.
 	ListenerReasonInvalid ListenerConditionReason = "Invalid"
 
-	// This reason is used with the "Ready" condition when the
-	// Listener is not yet not online and ready to accept client
-	// traffic.
+	// This reason is used with the "Accepted" and "Ready" conditions when the
+	// Listener is either not yet reconciled or not yet not online and ready to
+	// accept client traffic.
 	ListenerReasonPending ListenerConditionReason = "Pending"
 )

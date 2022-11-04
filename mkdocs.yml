@@ -20,6 +20,10 @@ plugins:
   - macros:
       include_dir: examples
       j2_line_comment_prefix: "#$"
+  - redirects:
+      redirect_maps:
+        'guides/getting-started.md': 'guides/index.md'
+        'contributing/community.md': 'contributing/index.md'
 markdown_extensions:
   - admonition
   - meta
@@ -36,7 +40,7 @@ nav:
   - Overview:
     - Introduction: index.md
     - Concepts:
-        API overview: concepts/api-overview.md
+        API Overview: concepts/api-overview.md
         Conformance: concepts/conformance.md
         Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
@@ -44,7 +48,7 @@ nav:
     - Implementations: implementations.md
     - FAQ: faq.md
   - Guides:
-    - Getting started: guides/getting-started.md
+    - Getting started: guides/index.md
     - Simple Gateway: guides/simple-gateway.md
     - HTTP routing: guides/http-routing.md
     - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
@@ -52,6 +56,7 @@ nav:
     - Cross-Namespace routing: guides/multiple-ns.md
     - TLS: guides/tls.md
     - TCP routing: guides/tcp.md
+    - gRPC Routing: guides/grpc-routing.md
   - Reference:
     - API Types:
         GatewayClass: api-types/gatewayclass.md
@@ -62,14 +67,36 @@ nav:
     - API specification: references/spec.md
     - Policy Attachment: references/policy-attachment.md
     - Enhancement Proposals:
-      - Overview: contributing/gep.md
-      - ... | geps/gep-*.md
+      - Overview: geps/overview.md
+      - Declined:
+        - geps/gep-735.md
+      - Provisional:
+        - geps/gep-1426.md
+        - geps/gep-1324.md
+        - geps/gep-1282.md
+      - Implementable:
+        - geps/gep-1364.md
+      - Experimental:
+        - geps/gep-1323.md
+        - geps/gep-1016.md
+        - geps/gep-957.md
+        - geps/gep-726.md
+        - geps/gep-713.md
+        - geps/gep-709.md
+      - Standard:
+        - geps/gep-922.md
+        - geps/gep-917.md
+        - geps/gep-851.md
+        - geps/gep-820.md
+        - geps/gep-746.md
+        - geps/gep-724.md
+        - geps/gep-718.md
   - Contributing:
-    - Developer guide: contributing/devguide.md
-    - Enhancement Tracking and Backlog: contributing/enhancement-requests.md
-    - Community: contributing/community.md
+    - How to Get Involved: contributing/index.md
+    - Developer Guide: contributing/devguide.md
+    - Enhancement Requests: contributing/enhancement-requests.md
     - GAMMA: contributing/gamma.md
-  - Blog: 
+  - Blog:
     - Index: blog/index.md
     - 2022:
       - blog/2022/graduating-to-beta.md

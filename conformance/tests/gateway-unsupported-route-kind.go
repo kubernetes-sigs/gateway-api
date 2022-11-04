@@ -39,7 +39,7 @@ var GatewayUnsupportedRouteKind = suite.ConformanceTest{
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and no supportedKinds", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-only-unsupported-route-kind", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
-				Name:           v1beta1.SectionName("https"),
+				Name:           v1beta1.SectionName("http"),
 				SupportedKinds: []v1beta1.RouteGroupKind{},
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionResolvedRefs),
@@ -54,7 +54,7 @@ var GatewayUnsupportedRouteKind = suite.ConformanceTest{
 		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and HTTPRoute must be put in the supportedKinds", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-supported-and-unsupported-route-kind", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
-				Name: v1beta1.SectionName("https"),
+				Name: v1beta1.SectionName("http"),
 				SupportedKinds: []v1beta1.RouteGroupKind{{
 					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 					Kind:  v1beta1.Kind("HTTPRoute"),

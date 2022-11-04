@@ -6,9 +6,9 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: https
-      port: 443
-      protocol: HTTPS
+    - name: http
+      port: 80
+      protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
@@ -23,9 +23,9 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: https
-      port: 443
-      protocol: HTTPS
+    - name: http
+      port: 80
+      protocol: HTTP
       allowedRoutes:
         namespaces:
           from: All
