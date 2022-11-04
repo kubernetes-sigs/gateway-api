@@ -34,7 +34,7 @@ func init() {
 var GatewaySecretReferenceGrantAllInNamespace = suite.ConformanceTest{
 	ShortName:   "GatewaySecretReferenceGrantAllInNamespace",
 	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to all Secrets in the namespace exists",
-	Exemptions:  []suite.ExemptFeature{suite.ExemptReferenceGrant},
+	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
 	Manifests:   []string{"tests/gateway-secret-reference-grant-all-in-namespace.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-reference-grant", Namespace: "gateway-conformance-infra"}

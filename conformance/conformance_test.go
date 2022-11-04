@@ -47,7 +47,10 @@ func TestConformance(t *testing.T) {
 	t.Logf("Running conformance tests with %s GatewayClass", *flags.GatewayClassName)
 
 	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
-	exemptFeatures := parseExemptFeatures(*flags.ExemptFeatures)
+	exemptFeatures := parseSupportedFeatures(*flags.ExemptFeatures)
+	for feature := range exemptFeatures {
+		supportedFeatures[feature] = false
+	}
 
 	cSuite := suite.New(suite.Options{
 		Client:               client,
@@ -55,28 +58,17 @@ func TestConformance(t *testing.T) {
 		Debug:                *flags.ShowDebug,
 		CleanupBaseResources: *flags.CleanupBaseResources,
 		SupportedFeatures:    supportedFeatures,
-		ExemptFeatures:       exemptFeatures,
 	})
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)
 }
 
-// parseSupportedFeatures parses the arguments for supported-features flag,
-// then converts the string to []suite.SupportedFeature
-func parseSupportedFeatures(f string) []suite.SupportedFeature {
-	var res []suite.SupportedFeature
+// parseSupportedFeatures parses flag arguments and converts the string to
+// map[suite.SupportedFeature]bool
+func parseSupportedFeatures(f string) map[suite.SupportedFeature]bool {
+	res := map[suite.SupportedFeature]bool{}
 	for _, value := range strings.Split(f, ",") {
-		res = append(res, suite.SupportedFeature(value))
-	}
-	return res
-}
-
-// parseExemptFeatures parses the arguments for exempt-features flag,
-// then converts the string to []suite.ExemptFeature
-func parseExemptFeatures(f string) []suite.ExemptFeature {
-	var res []suite.ExemptFeature
-	for _, value := range strings.Split(f, ",") {
-		res = append(res, suite.ExemptFeature(value))
+		res[suite.SupportedFeature(value)] = true
 	}
 	return res
 }
