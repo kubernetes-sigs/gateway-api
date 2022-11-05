@@ -78,6 +78,8 @@ func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().GatewayClasses().Informer()}, nil
 	case v1beta1.SchemeGroupVersion.WithResource("httproutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().HTTPRoutes().Informer()}, nil
+	case v1beta1.SchemeGroupVersion.WithResource("referencegrants"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1beta1().ReferenceGrants().Informer()}, nil
 
 	}
 

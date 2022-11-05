@@ -41,9 +41,10 @@ const (
 
 var (
 	standardKinds = map[string]bool{
-		"GatewayClass": true,
-		"Gateway":      true,
-		"HTTPRoute":    true,
+		"GatewayClass":   true,
+		"Gateway":        true,
+		"HTTPRoute":      true,
+		"ReferenceGrant": true,
 	}
 )
 

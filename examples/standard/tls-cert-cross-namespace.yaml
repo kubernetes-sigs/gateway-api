@@ -19,7 +19,7 @@ spec:
         name: wildcard-example-com-cert
         namespace: gateway-api-example-ns2
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: allow-ns1-gateways-to-ref-secrets

@@ -31,6 +31,7 @@ type GatewayV1beta1Interface interface {
 	GatewaysGetter
 	GatewayClassesGetter
 	HTTPRoutesGetter
+	ReferenceGrantsGetter
 }
 
 // GatewayV1beta1Client is used to interact with features provided by the gateway.networking.k8s.io group.
@@ -48,6 +49,10 @@ func (c *GatewayV1beta1Client) GatewayClasses() GatewayClassInterface {
 
 func (c *GatewayV1beta1Client) HTTPRoutes(namespace string) HTTPRouteInterface {
 	return newHTTPRoutes(c, namespace)
+}
+
+func (c *GatewayV1beta1Client) ReferenceGrants(namespace string) ReferenceGrantInterface {
+	return newReferenceGrants(c, namespace)
 }
 
 // NewForConfig creates a new GatewayV1beta1Client for the given config.
