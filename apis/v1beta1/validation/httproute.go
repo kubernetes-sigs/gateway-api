@@ -303,7 +303,7 @@ func validateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *fiel
 		namespace gatewayv1b1.Namespace
 		kind      gatewayv1b1.Kind
 	}
-	m := make(map[sameKindParentRefs][]gatewayv1b1.SectionName)
+	parentRefsSectionMap := make(map[sameKindParentRefs][]gatewayv1b1.SectionName)
 	for i, p := range parentRefs {
 		if p.Namespace == nil {
 			p.Namespace = new(gatewayv1b1.Namespace)
@@ -314,14 +314,14 @@ func validateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *fiel
 		if p.SectionName == nil {
 			p.SectionName = new(gatewayv1b1.SectionName)
 		}
-		t := &sameKindParentRefs{name: p.Name, namespace: *p.Namespace, kind: *p.Kind}
-		if s, ok := m[*t]; ok {
+		t := sameKindParentRefs{name: p.Name, namespace: *p.Namespace, kind: *p.Kind}
+		if s, ok := parentRefsSectionMap[t]; ok {
 			if utils.ContainsInSectionNameSlice(s, p.SectionName) {
 				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), p.SectionName, "must be set and unique when ParentRefs includes 2 or more references to the same parent"))
 				return errs
 			}
 		}
-		m[*t] = append(m[*t], *p.SectionName)
+		parentRefsSectionMap[t] = append(parentRefsSectionMap[t], *p.SectionName)
 	}
 	return errs
 }

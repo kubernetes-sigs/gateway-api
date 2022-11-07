@@ -18,7 +18,7 @@ package validation
 
 import gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
-// containsInSectionNameSlice checks whether the provided SectionName
+// ContainsInSectionNameSlice checks whether the provided SectionName
 // is in the target SectionName slice.
 func ContainsInSectionNameSlice(items []gatewayv1b1.SectionName, item *gatewayv1b1.SectionName) bool {
 	for _, eachItem := range items {
