@@ -69,7 +69,7 @@ func validateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
-	errs = append(errs, validateHTTPParentRefs(spec.ParentRefs, path.Child("spec"))...)
+	errs = append(errs, ValidateHTTPParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
@@ -290,10 +290,10 @@ func hasExactlyOnePrefixMatch(matches []gatewayv1b1.HTTPRouteMatch) bool {
 	return true
 }
 
-// validateHTTPParentRefs validates that if ParentRefs includes 2 or more references
+// ValidateHTTPParentRefs validates that if ParentRefs includes 2 or more references
 // to the same parent (based on kind, name, and namespace), those ParentRefs must
 // specify unique SectionName values.
-func validateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Path) field.ErrorList {
+func ValidateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	if len(parentRefs) <= 1 {
 		return nil

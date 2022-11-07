@@ -24,6 +24,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
@@ -35,6 +36,11 @@ var (
 
 	invalidPathSequences = []string{"//", "/./", "/../", "%2f", "%2F", "#"}
 	invalidPathSuffixes  = []string{"/..", "/."}
+
+	// validateHTTPParentRefs validates that if ParentRefs includes 2 or more references
+	// to the same parent (based on kind, name, and namespace), those ParentRefs must
+	// specify unique SectionName values.
+	validateHTTPParentRefs = gatewayvalidationv1b1.ValidateHTTPParentRefs
 )
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
@@ -68,6 +74,7 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateHTTPParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
