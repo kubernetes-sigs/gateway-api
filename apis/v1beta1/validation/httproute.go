@@ -319,8 +319,12 @@ func ValidateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *fiel
 		}
 		targetParentRefs := sameKindParentRefs{name: p.Name, namespace: *namespace, kind: *kind}
 		if s, ok := parentRefsSectionMap[targetParentRefs]; ok {
-			if len(s[0]) == 0 || len(*section) == 0 || utils.ContainsInSectionNameSlice(s, section) {
-				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), section, "must be set and unique when ParentRefs includes 2 or more references to the same parent"))
+			if len(s[0]) == 0 || len(*section) == 0 {
+				errs = append(errs, field.Required(path, "ParentRefs section names must all be set when ParentRefs includes 2 or more references to the same parent"))
+				return errs
+			}
+			if utils.ContainsInSectionNameSlice(s, section) {
+				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), section, "must be unique when ParentRefs includes 2 or more references to the same parent"))
 				return errs
 			}
 		}
