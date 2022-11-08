@@ -94,7 +94,7 @@ spec:
       containers:
       - name: infra-backend-v1
         # From https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
@@ -140,7 +140,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v2
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
@@ -186,7 +186,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v3
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
@@ -239,7 +239,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v1
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
@@ -285,7 +285,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v2
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
@@ -338,7 +338,7 @@ spec:
     spec:
       containers:
       - name: web-backend
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20220815-e21d1a4
+        image: local/echoserver:9.9
         env:
         - name: POD_NAME
           valueFrom:
