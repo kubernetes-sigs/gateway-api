@@ -1023,6 +1023,23 @@ func TestValidateHTTPParentRefs(t *testing.T) {
 		},
 		errCount: 0,
 	}, {
+		name: "valid HTTPRouteParentRefs when different references have the same section name",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example A",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example B",
+				Namespace:   &namespace,
+				Kind:        &kind,
+				SectionName: &sectionA,
+			},
+		},
+		errCount: 0,
+	}, {
 		name: "valid HTTPRouteParentRefs includes more references to the same parent",
 		parentRefs: []gatewayv1b1.ParentReference{
 			{
@@ -1095,6 +1112,36 @@ func TestValidateHTTPParentRefs(t *testing.T) {
 				Name:        "example",
 				Namespace:   &namespace,
 				SectionName: &sectionA,
+			},
+		},
+		errCount: 1,
+	}, {
+		name: "invalid HTTPRouteParentRefs when one ParentRef section name not set to the same ParentRefs",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: nil,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionA,
+			},
+		},
+		errCount: 1,
+	}, {
+		name: "invalid HTTPRouteParentRefs when next ParentRef section name not set to the same ParentRefs",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: nil,
 			},
 		},
 		errCount: 1,

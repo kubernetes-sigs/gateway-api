@@ -48,7 +48,7 @@ func TestContainsInSectionNameSlice(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			isValid := validationtutils.ContainsInSectionNameSlice(targetSectionSlice, &tc.sectionName)
+			_, isValid := validationtutils.ContainsInSectionNameSlice(targetSectionSlice, &tc.sectionName)
 			if isValid != tc.isvalid {
 				t.Errorf("Expected validity %t, got %t", tc.isvalid, isValid)
 			}

@@ -20,11 +20,11 @@ import gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
 // ContainsInSectionNameSlice checks whether the provided SectionName
 // is in the target SectionName slice.
-func ContainsInSectionNameSlice(items []gatewayv1b1.SectionName, item *gatewayv1b1.SectionName) bool {
-	for _, eachItem := range items {
+func ContainsInSectionNameSlice(items []gatewayv1b1.SectionName, item *gatewayv1b1.SectionName) (int, bool) {
+	for index, eachItem := range items {
 		if eachItem == *item {
-			return true
+			return index, true
 		}
 	}
-	return false
+	return -1, false
 }
