@@ -38,6 +38,10 @@ type ExpectedResponse struct {
 	// expected to match Request.
 	ExpectedRequest *ExpectedRequest
 
+	// BackendSetResponseHeaders is a set of headers
+	// the echoserver should set in its response.
+	BackendSetResponseHeaders map[string]string
+
 	// Response defines what response the test case
 	// should receive.
 	Response Response
@@ -106,14 +110,20 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		Host:     expected.Request.Host,
 		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
 		Protocol: "HTTP",
+		Headers:  map[string][]string{},
 	}
 
 	if expected.Request.Headers != nil {
-		req.Headers = map[string][]string{}
 		for name, value := range expected.Request.Headers {
 			req.Headers[name] = []string{value}
 		}
 	}
+
+	backendSetHeaders := []string{}
+	for name, val := range expected.BackendSetResponseHeaders {
+		backendSetHeaders = append(backendSetHeaders, name+":"+val)
+	}
+	req.Headers["X-Echo-Set-Header"] = backendSetHeaders
 
 	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }

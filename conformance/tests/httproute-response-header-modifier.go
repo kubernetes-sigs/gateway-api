@@ -44,9 +44,9 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		testCases := []http.ExpectedResponse{{
 			Request: http.Request{
 				Path: "/set",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"Some-Other-Header": "val",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
@@ -59,10 +59,10 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/set",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Set":      "some-other-value",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"Some-Other-Header": "val",
+				"X-Header-Set":      "some-other-value",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
@@ -75,9 +75,9 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/add",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"Some-Other-Header": "val",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
@@ -90,10 +90,10 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/add",
-				Headers: map[string]string{
-					"Some-Other-Header": "val",
-					"X-Header-Add":      "some-other-value",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"Some-Other-Header": "val",
+				"X-Header-Add":      "some-other-value",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
@@ -106,12 +106,11 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/remove",
-				Headers: map[string]string{
-					"X-Header-Remove": "val",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"X-Header-Remove": "val",
 			},
 			Response: http.Response{
-				Headers:       map[string]string{},
 				AbsentHeaders: []string{"X-Header-Remove"},
 			},
 			Backend:   "infra-backend-v1",
@@ -119,12 +118,13 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/multiple",
-				Headers: map[string]string{
-					"X-Header-Set-2":    "set-val-2",
-					"X-Header-Add-2":    "add-val-2",
-					"X-Header-Remove-2": "remove-val-2",
-					"Another-Header":    "another-header-val",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"X-Header-Set-2":    "set-val-2",
+				"X-Header-Add-2":    "add-val-2",
+				"X-Header-Remove-2": "remove-val-2",
+				"Another-Header":    "another-header-val",
+				"X-Header-Remove-1": "val",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
@@ -142,20 +142,22 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path: "/case-insensitivity",
-				// The filter uses canonicalized header names,
-				// the request uses lowercase names.
-				Headers: map[string]string{
-					"x-header-set":    "original-val-set",
-					"x-header-add":    "original-val-add",
-					"x-header-remove": "original-val-remove",
-					"Another-Header":  "another-header-val",
-				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"x-header-set":    "original-val-set",
+				"x-header-add":    "original-val-add",
+				"x-header-remove": "original-val-remove",
+				"Another-Header":  "another-header-val",
 			},
 			Response: http.Response{
 				Headers: map[string]string{
-					"X-Header-Set":   "header-set",
-					"X-Header-Add":   "original-val-add,header-add",
-					"Another-Header": "another-header-val",
+					"X-Header-Set":      "header-set",
+					"X-Header-Add":      "original-val-add,header-add",
+					"X-Lowercase-Add":   "lowercase-add",
+					"X-Mixedcase-Add-1": "mixedcase-add-1",
+					"X-Mixedcase-Add-2": "mixedcase-add-2",
+					"X-Uppercase-Add":   "uppercase-add",
+					"Another-Header":    "another-header-val",
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},
