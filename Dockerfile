@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+ARG BUILDPLATFORM=linux/amd64
 FROM --platform=$BUILDPLATFORM golang:1.18 AS build-env
 RUN mkdir -p /go/src/sig.k8s.io/gateway-api
 WORKDIR /go/src/sig.k8s.io/gateway-api
