@@ -32,6 +32,7 @@ func init() {
 var HTTPRouteDisallowedKind = suite.ConformanceTest{
 	ShortName:   "HTTPRouteDisallowedKind",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Listener that does not allow the HTTPRoute kind",
+	Features:    []suite.SupportedFeature{suite.SupportTLSRoute},
 	Manifests:   []string{"tests/httproute-disallowed-kind.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		// This test creates an additional Gateway in the gateway-conformance-infra

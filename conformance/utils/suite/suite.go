@@ -19,7 +19,6 @@ package suite
 import (
 	"testing"
 
-	"golang.org/x/exp/slices"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -28,22 +27,19 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
-// ExemptFeature allows opting out of core conformance tests at an
-// individual feature granularity.
-type ExemptFeature string
-
-const (
-	// This option indicates the implementation is exempting itself from the
-	// requirement of a ReferenceGrant to allow cross-namespace references,
-	// and has instead implemented alternative safeguards.
-	ExemptReferenceGrant ExemptFeature = "ReferenceGrant"
-)
-
 // SupportedFeature allows opting in to additional conformance tests at an
 // individual feature granularity.
 type SupportedFeature string
 
 const (
+	// This option indicates support for ReferenceGrant (core conformance).
+	// Opting out of this requires an implementation to have clearly implemented
+	// and documented equivalent safeguards.
+	SupportReferenceGrant SupportedFeature = "ReferenceGrant"
+
+	// This option indicates support for TLSRoute (extended conformance).
+	SupportTLSRoute SupportedFeature = "TLSRoute"
+
 	// This option indicates support for HTTPRoute query param matching (extended conformance).
 	SupportHTTPRouteQueryParamMatching SupportedFeature = "HTTPRouteQueryParamMatching"
 
@@ -53,6 +49,12 @@ const (
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
 	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
 )
+
+// StandardCoreFeatures are the features that are required to be conformant with
+// the Core API features that are part of the Standard release channel.
+var StandardCoreFeatures = map[SupportedFeature]bool{
+	SupportReferenceGrant: true,
+}
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
@@ -65,8 +67,7 @@ type ConformanceTestSuite struct {
 	Cleanup           bool
 	BaseManifests     string
 	Applier           kubernetes.Applier
-	ExemptFeatures    []ExemptFeature
-	SupportedFeatures []SupportedFeature
+	SupportedFeatures map[SupportedFeature]bool
 	TimeoutConfig     config.TimeoutConfig
 }
 
@@ -89,8 +90,7 @@ type Options struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources bool
-	ExemptFeatures       []ExemptFeature
-	SupportedFeatures    []SupportedFeature
+	SupportedFeatures    map[SupportedFeature]bool
 	TimeoutConfig        config.TimeoutConfig
 }
 
@@ -101,6 +101,16 @@ func New(s Options) *ConformanceTestSuite {
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
+	}
+
+	if s.SupportedFeatures == nil {
+		s.SupportedFeatures = StandardCoreFeatures
+	} else {
+		for feature, val := range StandardCoreFeatures {
+			if _, ok := s.SupportedFeatures[feature]; !ok {
+				s.SupportedFeatures[feature] = val
+			}
+		}
 	}
 
 	suite := &ConformanceTestSuite{
@@ -114,7 +124,6 @@ func New(s Options) *ConformanceTestSuite {
 			NamespaceLabels:          s.NamespaceLabels,
 			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
 		},
-		ExemptFeatures:    s.ExemptFeatures,
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 	}
@@ -164,7 +173,6 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) {
 type ConformanceTest struct {
 	ShortName   string
 	Description string
-	Exemptions  []ExemptFeature
 	Features    []SupportedFeature
 	Manifests   []string
 	Slow        bool
@@ -182,16 +190,8 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
-		if !slices.Contains(suite.SupportedFeatures, feature) {
+		if supported, ok := suite.SupportedFeatures[feature]; !ok || !supported {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
-		}
-	}
-
-	// Check that no features exercised by the test have been opted out of by
-	// the suite.
-	for _, feature := range test.Exemptions {
-		if slices.Contains(suite.ExemptFeatures, feature) {
-			t.Skipf("Skipping %s: suite exempts %s", test.ShortName, feature)
 		}
 	}
 

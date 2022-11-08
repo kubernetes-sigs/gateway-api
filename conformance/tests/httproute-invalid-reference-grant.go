@@ -35,7 +35,7 @@ func init() {
 var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidReferenceGrant",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should fail to attach to a Gateway in the same namespace if the route has a backendRef Service in the gateway-conformance-app-backend namespace and a ReferenceGrant exists but does not grant permission to route to that specific Service",
-	Exemptions:  []suite.ExemptFeature{suite.ExemptReferenceGrant},
+	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
 	Manifests:   []string{"tests/httproute-invalid-reference-grant.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-reference-grant", Namespace: "gateway-conformance-infra"}
