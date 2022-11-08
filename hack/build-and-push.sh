@@ -64,8 +64,9 @@ fi
 
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
-docker build --build-arg COMMIT=${COMMIT} --build-arg TAG=${BINARY_TAG} \
-  			-t ${REGISTRY}/admission-server:${GIT_TAG} .
+docker buildx build --build-arg COMMIT=${COMMIT} --build-arg TAG=${BINARY_TAG} \
+  			-t ${REGISTRY}/admission-server:${GIT_TAG} . --platform linux/amd64,linux/arm64
+
 docker push ${REGISTRY}/admission-server:${GIT_TAG}
 
 # Then, we add an extra version tag - either :latest or semver.

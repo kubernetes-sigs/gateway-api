@@ -67,11 +67,3 @@ Participation in the Kubernetes community is governed by the
 [spec]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
-
-
-## ARM Image Support
-
-Use buildx for image building to support both amd64 and arm64:
-```
-docker buildx build -f Dockerfile -t registry/admission-server:tag . --platform linux/amd64,linux/arm64
-```
