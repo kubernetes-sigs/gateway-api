@@ -132,7 +132,10 @@ spec:
                   properties:
                     group:
                       default: gateway.networking.k8s.io
-                      description: "Group is the group of the referent. \n Support:
+                      description: "Group is the group of the referent. When unspecified,
+                        \"gateway.networking.k8s.io\" is inferred. To set the core
+                        API group (such as for a \"Service\" kind referent), Group
+                        must be explicitly set to \"\" (empty string). \n Support:
                         Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -274,8 +277,9 @@ spec:
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
-                                        For example, "networking.k8s.io". When unspecified
-                                        (empty string), core API group is inferred.
+                                        For example, "gateway.networking.k8s.io".
+                                        When unspecified or empty string, core API
+                                        group is inferred.
                                       maxLength: 253
                                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
@@ -436,9 +440,9 @@ spec:
                                         group:
                                           default: ""
                                           description: Group is the group of the referent.
-                                            For example, "networking.k8s.io". When
-                                            unspecified (empty string), core API group
-                                            is inferred.
+                                            For example, "gateway.networking.k8s.io".
+                                            When unspecified or empty string, core
+                                            API group is inferred.
                                           maxLength: 253
                                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                           type: string
@@ -811,8 +815,8 @@ spec:
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
-                              "networking.k8s.io". When unspecified (empty string),
-                              core API group is inferred.
+                              "gateway.networking.k8s.io". When unspecified or empty
+                              string, core API group is inferred.
                             maxLength: 253
                             pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
@@ -914,8 +918,8 @@ spec:
                             properties:
                               group:
                                 description: Group is the group of the referent. For
-                                  example, "networking.k8s.io". When unspecified (empty
-                                  string), core API group is inferred.
+                                  example, "gateway.networking.k8s.io". When unspecified
+                                  or empty string, core API group is inferred.
                                 maxLength: 253
                                 pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
@@ -1066,8 +1070,9 @@ spec:
                                   group:
                                     default: ""
                                     description: Group is the group of the referent.
-                                      For example, "networking.k8s.io". When unspecified
-                                      (empty string), core API group is inferred.
+                                      For example, "gateway.networking.k8s.io". When
+                                      unspecified or empty string, core API group
+                                      is inferred.
                                     maxLength: 253
                                     pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                     type: string
@@ -1756,8 +1761,11 @@ spec:
                       properties:
                         group:
                           default: gateway.networking.k8s.io
-                          description: "Group is the group of the referent. \n Support:
-                            Core"
+                          description: "Group is the group of the referent. When unspecified,
+                            \"gateway.networking.k8s.io\" is inferred. To set the
+                            core API group (such as for a \"Service\" kind referent),
+                            Group must be explicitly set to \"\" (empty string). \n
+                            Support: Core"
                           maxLength: 253
                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
@@ -1966,7 +1974,10 @@ spec:
                   properties:
                     group:
                       default: gateway.networking.k8s.io
-                      description: "Group is the group of the referent. \n Support:
+                      description: "Group is the group of the referent. When unspecified,
+                        \"gateway.networking.k8s.io\" is inferred. To set the core
+                        API group (such as for a \"Service\" kind referent), Group
+                        must be explicitly set to \"\" (empty string). \n Support:
                         Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -2108,8 +2119,9 @@ spec:
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
-                                        For example, "networking.k8s.io". When unspecified
-                                        (empty string), core API group is inferred.
+                                        For example, "gateway.networking.k8s.io".
+                                        When unspecified or empty string, core API
+                                        group is inferred.
                                       maxLength: 253
                                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
@@ -2270,9 +2282,9 @@ spec:
                                         group:
                                           default: ""
                                           description: Group is the group of the referent.
-                                            For example, "networking.k8s.io". When
-                                            unspecified (empty string), core API group
-                                            is inferred.
+                                            For example, "gateway.networking.k8s.io".
+                                            When unspecified or empty string, core
+                                            API group is inferred.
                                           maxLength: 253
                                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                           type: string
@@ -2645,8 +2657,8 @@ spec:
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
-                              "networking.k8s.io". When unspecified (empty string),
-                              core API group is inferred.
+                              "gateway.networking.k8s.io". When unspecified or empty
+                              string, core API group is inferred.
                             maxLength: 253
                             pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                             type: string
@@ -2748,8 +2760,8 @@ spec:
                             properties:
                               group:
                                 description: Group is the group of the referent. For
-                                  example, "networking.k8s.io". When unspecified (empty
-                                  string), core API group is inferred.
+                                  example, "gateway.networking.k8s.io". When unspecified
+                                  or empty string, core API group is inferred.
                                 maxLength: 253
                                 pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
@@ -2900,8 +2912,9 @@ spec:
                                   group:
                                     default: ""
                                     description: Group is the group of the referent.
-                                      For example, "networking.k8s.io". When unspecified
-                                      (empty string), core API group is inferred.
+                                      For example, "gateway.networking.k8s.io". When
+                                      unspecified or empty string, core API group
+                                      is inferred.
                                     maxLength: 253
                                     pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                     type: string
@@ -3590,8 +3603,11 @@ spec:
                       properties:
                         group:
                           default: gateway.networking.k8s.io
-                          description: "Group is the group of the referent. \n Support:
-                            Core"
+                          description: "Group is the group of the referent. When unspecified,
+                            \"gateway.networking.k8s.io\" is inferred. To set the
+                            core API group (such as for a \"Service\" kind referent),
+                            Group must be explicitly set to \"\" (empty string). \n
+                            Support: Core"
                           maxLength: 253
                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
