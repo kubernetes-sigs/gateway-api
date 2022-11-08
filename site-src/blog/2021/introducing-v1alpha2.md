@@ -83,7 +83,18 @@ namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'experimental/reference-grant.yaml' %}
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: ReferenceGrant
+metadata:
+  name: allow-prod-traffic
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: HTTPRoute
+    namespace: prod
+  to:
+  - group: ""
+    kind: Service
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).
