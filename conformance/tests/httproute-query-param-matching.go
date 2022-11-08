@@ -68,17 +68,17 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:    http.Request{Path: "/?color=blue"},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/?color=blue"},
+			Response: http.Response{StatusCode: 404},
 		}, {
-			Request:    http.Request{Path: "/?animal=dog"},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/?animal=dog"},
+			Response: http.Response{StatusCode: 404},
 		}, {
-			Request:    http.Request{Path: "/?animal=whaledolphin"},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/?animal=whaledolphin"},
+			Response: http.Response{StatusCode: 404},
 		}, {
-			Request:    http.Request{Path: "/"},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/"},
+			Response: http.Response{StatusCode: 404},
 		}}
 
 		for i := range testCases {

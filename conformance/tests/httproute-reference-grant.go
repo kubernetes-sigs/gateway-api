@@ -46,9 +46,9 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/",
 				},
-				StatusCode: 200,
-				Backend:    "web-backend",
-				Namespace:  "gateway-conformance-web-backend",
+				Response:  http.Response{StatusCode: 200},
+				Backend:   "web-backend",
+				Namespace: "gateway-conformance-web-backend",
 			})
 		})
 	},

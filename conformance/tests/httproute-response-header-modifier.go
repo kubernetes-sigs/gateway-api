@@ -48,9 +48,11 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"Some-Other-Header": "val",
 				},
 			},
-			Headers: map[string]string{
-				"Some-Other-Header": "val",
-				"X-Header-Set":      "set-overwrites-values",
+			Response: http.Response{
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Set":      "set-overwrites-values",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
@@ -62,9 +64,11 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"X-Header-Set":      "some-other-value",
 				},
 			},
-			Headers: map[string]string{
-				"Some-Other-Header": "val",
-				"X-Header-Set":      "set-overwrites-values",
+			Response: http.Response{
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Set":      "set-overwrites-values",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
@@ -75,9 +79,11 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"Some-Other-Header": "val",
 				},
 			},
-			Headers: map[string]string{
-				"Some-Other-Header": "val",
-				"X-Header-Add":      "add-appends-values",
+			Response: http.Response{
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Add":      "add-appends-values",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
@@ -89,9 +95,11 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"X-Header-Add":      "some-other-value",
 				},
 			},
-			Headers: map[string]string{
-				"Some-Other-Header": "val",
-				"X-Header-Add":      "some-other-value,add-appends-values",
+			Response: http.Response{
+				Headers: map[string]string{
+					"Some-Other-Header": "val",
+					"X-Header-Add":      "some-other-value,add-appends-values",
+				},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
@@ -102,10 +110,12 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"X-Header-Remove": "val",
 				},
 			},
-			Headers:       map[string]string{},
-			AbsentHeaders: []string{"X-Header-Remove"},
-			Backend:       "infra-backend-v1",
-			Namespace:     ns,
+			Response: http.Response{
+				Headers:       map[string]string{},
+				AbsentHeaders: []string{"X-Header-Remove"},
+			},
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Path: "/multiple",
@@ -116,17 +126,19 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"Another-Header":    "another-header-val",
 				},
 			},
-			Headers: map[string]string{
-				"X-Header-Set-1": "header-set-1",
-				"X-Header-Set-2": "header-set-2",
-				"X-Header-Add-1": "header-add-1",
-				"X-Header-Add-2": "add-val-2,header-add-2",
-				"X-Header-Add-3": "header-add-3",
-				"Another-Header": "another-header-val",
+			Response: http.Response{
+				Headers: map[string]string{
+					"X-Header-Set-1": "header-set-1",
+					"X-Header-Set-2": "header-set-2",
+					"X-Header-Add-1": "header-add-1",
+					"X-Header-Add-2": "add-val-2,header-add-2",
+					"X-Header-Add-3": "header-add-3",
+					"Another-Header": "another-header-val",
+				},
+				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
-			AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
-			Backend:       "infra-backend-v1",
-			Namespace:     ns,
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
 		}, {
 			Request: http.Request{
 				Path: "/case-insensitivity",
@@ -139,14 +151,16 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"Another-Header":  "another-header-val",
 				},
 			},
-			Headers: map[string]string{
-				"X-Header-Set":   "header-set",
-				"X-Header-Add":   "original-val-add,header-add",
-				"Another-Header": "another-header-val",
+			Response: http.Response{
+				Headers: map[string]string{
+					"X-Header-Set":   "header-set",
+					"X-Header-Add":   "original-val-add,header-add",
+					"Another-Header": "another-header-val",
+				},
+				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
 			},
-			AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
-			Backend:       "infra-backend-v1",
-			Namespace:     ns,
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
 		}}
 
 		for i := range testCases {

@@ -51,8 +51,8 @@ var HTTPRouteMethodMatching = suite.ConformanceTest{
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			}, {
-				Request:    http.Request{Method: "HEAD", Path: "/"},
-				StatusCode: 404,
+				Request:  http.Request{Method: "HEAD", Path: "/"},
+				Response: http.Response{StatusCode: 404},
 			},
 		}
 

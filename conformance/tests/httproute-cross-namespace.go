@@ -41,10 +41,10 @@ var HTTPRouteCrossNamespace = suite.ConformanceTest{
 
 		t.Run("Simple HTTP request should reach web-backend", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
-				Request:    http.Request{Path: "/"},
-				StatusCode: 200,
-				Backend:    "web-backend",
-				Namespace:  "gateway-conformance-web-backend",
+				Request:   http.Request{Path: "/"},
+				Response:  http.Response{StatusCode: 200},
+				Backend:   "web-backend",
+				Namespace: "gateway-conformance-web-backend",
 			})
 		})
 	},

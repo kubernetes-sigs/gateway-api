@@ -60,7 +60,7 @@ var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/v2",
 				},
-				StatusCode: 500,
+				Response: http.Response{StatusCode: 500},
 			})
 		})
 

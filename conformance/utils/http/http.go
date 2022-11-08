@@ -38,11 +38,9 @@ type ExpectedResponse struct {
 	// expected to match Request.
 	ExpectedRequest *ExpectedRequest
 
-	// TODO: move these into a dedicated type named Response
-	// ref: https://github.com/kubernetes-sigs/gateway-api/issues/1384
-	StatusCode    int
-	Headers       map[string]string
-	AbsentHeaders []string
+	// Response defines what response the test case
+	// should receive.
+	Response Response
 
 	Backend   string
 	Namespace string
@@ -61,12 +59,19 @@ type Request struct {
 	Headers map[string]string
 }
 
-// ExpectedRequest defines expected properties of a request.
+// ExpectedRequest defines expected properties of a request that reaches a backend.
 type ExpectedRequest struct {
 	Request
 
 	// AbsentHeaders are names of headers that are expected
 	// *not* to be present on the request.
+	AbsentHeaders []string
+}
+
+// Response defines expected properties of a response from a backend.
+type Response struct {
+	StatusCode    int
+	Headers       map[string]string
 	AbsentHeaders []string
 }
 
@@ -88,8 +93,8 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		expected.Request.Method = "GET"
 	}
 
-	if expected.StatusCode == 0 {
-		expected.StatusCode = 200
+	if expected.Response.StatusCode == 0 {
+		expected.Response.StatusCode = 200
 	}
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
@@ -172,8 +177,8 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 }
 
 func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
-	if expected.StatusCode != cRes.StatusCode {
-		return fmt.Errorf("expected status code to be %d, got %d", expected.StatusCode, cRes.StatusCode)
+	if expected.Response.StatusCode != cRes.StatusCode {
+		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
 	}
 	if cRes.StatusCode == 200 {
 		// The request expected to arrive at the backend is
@@ -214,7 +219,7 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 			}
 		}
 
-		if expected.Headers != nil {
+		if expected.Response.Headers != nil {
 			if cRes.Headers == nil {
 				return fmt.Errorf("no headers captured, expected %v", len(expected.ExpectedRequest.Headers))
 			}
@@ -222,7 +227,7 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 				cRes.Headers[strings.ToLower(name)] = val
 			}
 
-			for name, expectedVal := range expected.Headers {
+			for name, expectedVal := range expected.Response.Headers {
 				actualVal, ok := cRes.Headers[strings.ToLower(name)]
 				if !ok {
 					return fmt.Errorf("expected %s header to be set, actual headers: %v", name, cRes.Headers)
@@ -232,12 +237,12 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 			}
 		}
 
-		if len(expected.AbsentHeaders) > 0 {
+		if len(expected.Response.AbsentHeaders) > 0 {
 			for name, val := range cRes.Headers {
 				cRes.Headers[strings.ToLower(name)] = val
 			}
 
-			for _, name := range expected.AbsentHeaders {
+			for _, name := range expected.Response.AbsentHeaders {
 				val, ok := cRes.Headers[strings.ToLower(name)]
 				if ok {
 					return fmt.Errorf("expected %s header to not be set, got %s", name, val)
@@ -287,5 +292,5 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	if er.Backend != "" {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
-	return fmt.Sprintf("%s should receive a %d", reqStr, er.StatusCode)
+	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
 }
