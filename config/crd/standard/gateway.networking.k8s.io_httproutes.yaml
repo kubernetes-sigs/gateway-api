@@ -132,7 +132,10 @@ spec:
                   properties:
                     group:
                       default: gateway.networking.k8s.io
-                      description: "Group is the group of the referent. \n Support:
+                      description: "Group is the group of the referent. When unspecified,
+                        \"gateway.networking.k8s.io\" is inferred. To set the core
+                        API group (such as for a \"Service\" kind referent), Group
+                        must be explicitly set to \"\" (empty string). \n Support:
                         Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -1301,8 +1304,11 @@ spec:
                       properties:
                         group:
                           default: gateway.networking.k8s.io
-                          description: "Group is the group of the referent. \n Support:
-                            Core"
+                          description: "Group is the group of the referent. When unspecified,
+                            \"gateway.networking.k8s.io\" is inferred. To set the
+                            core API group (such as for a \"Service\" kind referent),
+                            Group must be explicitly set to \"\" (empty string). \n
+                            Support: Core"
                           maxLength: 253
                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
@@ -1483,7 +1489,10 @@ spec:
                   properties:
                     group:
                       default: gateway.networking.k8s.io
-                      description: "Group is the group of the referent. \n Support:
+                      description: "Group is the group of the referent. When unspecified,
+                        \"gateway.networking.k8s.io\" is inferred. To set the core
+                        API group (such as for a \"Service\" kind referent), Group
+                        must be explicitly set to \"\" (empty string). \n Support:
                         Core"
                       maxLength: 253
                       pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -2652,8 +2661,11 @@ spec:
                       properties:
                         group:
                           default: gateway.networking.k8s.io
-                          description: "Group is the group of the referent. \n Support:
-                            Core"
+                          description: "Group is the group of the referent. When unspecified,
+                            \"gateway.networking.k8s.io\" is inferred. To set the
+                            core API group (such as for a \"Service\" kind referent),
+                            Group must be explicitly set to \"\" (empty string). \n
+                            Support: Core"
                           maxLength: 253
                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
