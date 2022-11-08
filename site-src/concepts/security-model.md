@@ -118,7 +118,7 @@ the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
 the ReferenceGrant.
 
 ```yaml
-{% include 'experimental/reference-grant.yaml' %}
+{% include 'standard/reference-grant.yaml' %}
 ```
 
 For more information on ReferenceGrant, refer to our [detailed documentation

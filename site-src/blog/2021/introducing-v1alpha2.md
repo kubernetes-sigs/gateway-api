@@ -83,7 +83,7 @@ namespace to forward traffic to Services wherever this ReferenceGrant was
 installed:
 
 ```yaml
-{% include 'experimental/reference-grant.yaml' %}
+{% include 'standard/reference-grant.yaml' %}
 ```
 
 This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).
