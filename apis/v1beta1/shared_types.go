@@ -384,7 +384,7 @@ type PreciseHostname string
 // Valid values include:
 //
 // * "" - empty string implies core Kubernetes API group
-// * "networking.k8s.io"
+// * "gateway.networking.k8s.io"
 // * "foo.example.com"
 //
 // Invalid values include:
