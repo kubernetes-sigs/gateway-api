@@ -722,9 +722,10 @@ type HTTPHeader struct {
 
 // HTTPHeaderFilter defines a filter that modifies the headers of an HTTP
 // request or response. Only one action for a given header name is permitted.
-// Filters MUST NOT specify multiple actions of the same or different type for
-// any one header name. Configuration to set or add multiple values for a
-// header MUST use RFC 7230 header value formatting, separating each value with
+// Filters specifying multiple actions of the same or different type for
+// any one header name are invalid and will be rejected by the webhook if
+// installed. Configuration to set or add multiple values for a
+// header must use RFC 7230 header value formatting, separating each value with
 // a comma.
 type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
