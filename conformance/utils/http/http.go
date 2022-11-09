@@ -123,7 +123,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	for name, val := range expected.BackendSetResponseHeaders {
 		backendSetHeaders = append(backendSetHeaders, name+":"+val)
 	}
-	req.Headers["X-Echo-Set-Header"] = backendSetHeaders
+	req.Headers["X-Echo-Set-Header"] = []string{strings.Join(backendSetHeaders, ",")}
 
 	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }

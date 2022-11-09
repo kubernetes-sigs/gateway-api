@@ -171,8 +171,9 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 				Request: http.Request{
 					Path: "/case-insensitivity",
 					Headers: map[string]string{
-						"X-Header-Set": "header-set",
-						"X-Header-Add": "original-val-add,header-add",
+						"X-Header-Set":   "header-set",
+						"X-Header-Add":   "original-val-add,header-add",
+						"Another-Header": "another-header-val",
 					},
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
