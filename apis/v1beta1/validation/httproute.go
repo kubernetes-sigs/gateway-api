@@ -111,6 +111,12 @@ func validateHTTPRouteFilters(filters []gatewayv1b1.HTTPRouteFilter, matches []g
 		if filter.URLRewrite != nil && filter.URLRewrite.Path != nil {
 			errs = append(errs, validateHTTPPathModifier(*filter.URLRewrite.Path, matches, path.Index(i).Child("urlRewrite", "path"))...)
 		}
+		if filter.RequestHeaderModifier != nil {
+			errs = append(errs, validateHTTPHeaderModifier(*filter.RequestHeaderModifier, path.Index(i).Child("requestHeaderModifier"))...)
+		}
+		if filter.ResponseHeaderModifier != nil {
+			errs = append(errs, validateHTTPHeaderModifier(*filter.ResponseHeaderModifier, path.Index(i).Child("responseHeaderModifier"))...)
+		}
 		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
 	// custom filters don't have any validation
@@ -271,6 +277,42 @@ func validateHTTPPathModifier(modifier gatewayv1b1.HTTPPathModifier, matches []g
 	if modifier.Type == gatewayv1b1.PrefixMatchHTTPPathModifier && modifier.ReplacePrefixMatch != nil {
 		if !hasExactlyOnePrefixMatch(matches) {
 			errs = append(errs, field.Invalid(path, modifier.ReplacePrefixMatch, "exactly one PathPrefix match must be specified to use this path modifier"))
+		}
+	}
+	return errs
+}
+
+func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	singleAction := make(map[string]bool)
+	for i, action := range filter.Add {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("add"), filter.Add[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(string(action.Name))] = false
+		} else {
+			singleAction[strings.ToLower(string(action.Name))] = true
+		}
+	}
+	for i, action := range filter.Set {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("set"), filter.Set[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(string(action.Name))] = false
+		} else {
+			singleAction[strings.ToLower(string(action.Name))] = true
+		}
+	}
+	for i, action := range filter.Remove {
+		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(action)] = false
+		} else {
+			singleAction[strings.ToLower(action)] = true
 		}
 	}
 	return errs

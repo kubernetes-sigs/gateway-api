@@ -285,9 +285,9 @@ spec:
                                         appends to any existing values associated
                                         with the header name. \n Input:   GET /foo
                                         HTTP/1.1   my-header: foo \n Config:   add:
-                                        \  - name: \"my-header\"     value: \"bar\"
+                                        \  - name: \"my-header\"     value: \"bar,baz\"
                                         \n Output:   GET /foo HTTP/1.1   my-header:
-                                        foo   my-header: bar"
+                                        foo,bar,baz"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
@@ -702,8 +702,8 @@ spec:
                                   to any existing values associated with the header
                                   name. \n Input:   GET /foo HTTP/1.1   my-header:
                                   foo \n Config:   add:   - name: \"my-header\"     value:
-                                  \"bar\" \n Output:   GET /foo HTTP/1.1   my-header:
-                                  foo   my-header: bar"
+                                  \"bar,baz\" \n Output:   GET /foo HTTP/1.1   my-header:
+                                  foo,bar,baz"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.
@@ -1644,9 +1644,9 @@ spec:
                                         appends to any existing values associated
                                         with the header name. \n Input:   GET /foo
                                         HTTP/1.1   my-header: foo \n Config:   add:
-                                        \  - name: \"my-header\"     value: \"bar\"
+                                        \  - name: \"my-header\"     value: \"bar,baz\"
                                         \n Output:   GET /foo HTTP/1.1   my-header:
-                                        foo   my-header: bar"
+                                        foo,bar,baz"
                                       items:
                                         description: HTTPHeader represents an HTTP
                                           Header name and value as defined by RFC
@@ -2061,8 +2061,8 @@ spec:
                                   to any existing values associated with the header
                                   name. \n Input:   GET /foo HTTP/1.1   my-header:
                                   foo \n Config:   add:   - name: \"my-header\"     value:
-                                  \"bar\" \n Output:   GET /foo HTTP/1.1   my-header:
-                                  foo   my-header: bar"
+                                  \"bar,baz\" \n Output:   GET /foo HTTP/1.1   my-header:
+                                  foo,bar,baz"
                                 items:
                                   description: HTTPHeader represents an HTTP Header
                                     name and value as defined by RFC 7230.

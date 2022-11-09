@@ -720,8 +720,13 @@ type HTTPHeader struct {
 	Value string `json:"value"`
 }
 
-// HTTPHeaderFilter defines a filter that modifies the headers of an HTTP request
-// or response.
+// HTTPHeaderFilter defines a filter that modifies the headers of an HTTP
+// request or response. Only one action for a given header name is permitted.
+// Filters specifying multiple actions of the same or different type for
+// any one header name are invalid and will be rejected by the webhook if
+// installed. Configuration to set or add multiple values for a
+// header must use RFC 7230 header value formatting, separating each value with
+// a comma.
 type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
 	// before the action.
@@ -756,12 +761,11 @@ type HTTPHeaderFilter struct {
 	// Config:
 	//   add:
 	//   - name: "my-header"
-	//     value: "bar"
+	//     value: "bar,baz"
 	//
 	// Output:
 	//   GET /foo HTTP/1.1
-	//   my-header: foo
-	//   my-header: bar
+	//   my-header: foo,bar,baz
 	//
 	// +optional
 	// +listType=map

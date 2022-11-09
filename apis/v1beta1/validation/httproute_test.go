@@ -445,6 +445,152 @@ func TestValidateHTTPRoute(t *testing.T) {
 				},
 			}},
 		}},
+	}, {
+		name:     "multiple actions for the same request header (invalid)",
+		errCount: 2,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "apple",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-vegetable"),
+							Value: "carrot",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-grain"),
+							Value: "rye",
+						},
+					},
+					Set: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "watermelon",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-grain"),
+							Value: "wheat",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-spice"),
+							Value: "coriander",
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "multiple actions for the same request header with inconsistent case (invalid)",
+		errCount: 1,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "apple",
+						},
+					},
+					Set: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("X-Fruit"),
+							Value: "watermelon",
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "multiple of the same action for the same request header (invalid)",
+		errCount: 1,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "apple",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "plum",
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "multiple actions for different request headers",
+		errCount: 0,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-vegetable"),
+							Value: "carrot",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-grain"),
+							Value: "rye",
+						},
+					},
+					Set: []gatewayv1b1.HTTPHeader{
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+							Value: "watermelon",
+						},
+						{
+							Name:  gatewayv1b1.HTTPHeaderName("x-spice"),
+							Value: "coriander",
+						},
+					},
+				},
+			}},
+		}},
+	}, {
+		name:     "multiple actions for the same response header (invalid)",
+		errCount: 1,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
+				ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{{
+						Name:  gatewayv1b1.HTTPHeaderName("x-example"),
+						Value: "blueberry",
+					}},
+					Set: []gatewayv1b1.HTTPHeader{{
+						Name:  gatewayv1b1.HTTPHeaderName("x-example"),
+						Value: "turnip",
+					}},
+				},
+			}},
+		}},
+	}, {
+		name:     "multiple actions for different response headers",
+		errCount: 0,
+		rules: []gatewayv1b1.HTTPRouteRule{{
+			Filters: []gatewayv1b1.HTTPRouteFilter{{
+				Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
+				ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
+					Add: []gatewayv1b1.HTTPHeader{{
+						Name:  gatewayv1b1.HTTPHeaderName("x-example"),
+						Value: "blueberry",
+					}},
+					Set: []gatewayv1b1.HTTPHeader{{
+						Name:  gatewayv1b1.HTTPHeaderName("x-different"),
+						Value: "turnip",
+					}},
+				},
+			}},
+		}},
 	}}
 
 	for _, tc := range tests {
