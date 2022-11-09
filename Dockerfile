@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.18 AS build-env
+ARG BUILDPLATFORM=linux/amd64
+FROM --platform=$BUILDPLATFORM golang:1.18 AS build-env
 RUN mkdir -p /go/src/sig.k8s.io/gateway-api
 WORKDIR /go/src/sig.k8s.io/gateway-api
 COPY  . .
+ARG TARGETARCH
 ARG TAG
 ARG COMMIT
-RUN CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -a -o gateway-api-webhook \
+RUN CGO_ENABLED=0 GOARCH=$TARGETARCH GOOS=linux go build -a -o gateway-api-webhook \
       -ldflags "-s -w -X main.VERSION=$TAG -X main.COMMIT=$COMMIT" ./cmd/admission
 
 FROM gcr.io/distroless/static:nonroot

@@ -67,4 +67,3 @@ Participation in the Kubernetes community is governed by the
 [spec]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
-
