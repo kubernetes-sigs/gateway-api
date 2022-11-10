@@ -15,7 +15,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Envoy Gateway][18] (alpha)
 - [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
-- [Google Kubernetes Engine][6] (public preview)
+- [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
@@ -153,17 +153,15 @@ Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that br
 
 ### Google Kubernetes Engine
 
-[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform
-offered by Google Cloud. GKE's implementation of the Gateway API is through the 
-[GKE Gateway controller][gke-gateway] (currently in Preview) which provisions 
-Google Cloud Load Balancers for Pods in GKE clusters. 
+[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
+by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
+Gateway controller][gke-gateway] which provisions Google Cloud Load Balancers
+for Pods in GKE clusters.
 
-The GKE Gateway controller supports weighted traffic splitting, mirroring, 
-advanced routing, multi-cluster load balancing and more. See the docs to deploy 
-[private or public Gateways][gke-gateway-deploy] and also [multi-cluster Gateways][gke-multi-cluster-gateway]. 
-
-If you have questions about the GKE Gateway controller or feedback you want to
-share, contact [gke-gateway-feedback@google.com](mailto:gke-gateway-feedback@google.com).
+The GKE Gateway controller supports weighted traffic splitting, mirroring,
+advanced routing, multi-cluster load balancing and more. See the docs to deploy
+[private or public Gateways][gke-gateway-deploy] and also [multi-cluster
+Gateways][gke-multi-cluster-gateway].
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
