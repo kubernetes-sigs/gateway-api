@@ -327,7 +327,7 @@ type GatewayTLSConfig struct {
 	//
 	// Support: Core - A single reference to a Kubernetes Secret of type kubernetes.io/tls
 	//
-	// Support: Implementation-specific (More than one reference or other resource types)
+	// Support: Extended (More than one reference or other resource types)
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=64

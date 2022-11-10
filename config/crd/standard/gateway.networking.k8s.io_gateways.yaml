@@ -344,8 +344,7 @@ spec:
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
                             to a Kubernetes Secret of type kubernetes.io/tls \n Support:
-                            Implementation-specific (More than one reference or other
-                            resource types)"
+                            Extended (More than one reference or other resource types)"
                           items:
                             description: "SecretObjectReference identifies an API
                               object including its namespace, defaulting to Secret.
@@ -1038,8 +1037,7 @@ spec:
                             Kubernetes resources, i.e. Secret, or implementation-specific
                             custom resources. \n Support: Core - A single reference
                             to a Kubernetes Secret of type kubernetes.io/tls \n Support:
-                            Implementation-specific (More than one reference or other
-                            resource types)"
+                            Extended (More than one reference or other resource types)"
                           items:
                             description: "SecretObjectReference identifies an API
                               object including its namespace, defaulting to Secret.
