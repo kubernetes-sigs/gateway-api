@@ -15,6 +15,7 @@ _THEN_
 - [Configuring TLS](/guides/tls)
 - [TCP routing](/guides/tcp)
 - [gRPC routing](/guides/grpc)
+- [Migrating from Ingress](/guides/migrating-from-ingress)
 
 ## Installing a Gateway controller
 
