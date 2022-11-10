@@ -49,11 +49,6 @@ Community meeting schedule, notes and developer guide can be found on the
 [community page][cm].
 Our Kubernetes Slack channel is [#sig-network-gateway-api][slack].
 
-## Technical Leads
-
-- @bowei
-- @thockin
-
 ### Code of conduct
 
 Participation in the Kubernetes community is governed by the
