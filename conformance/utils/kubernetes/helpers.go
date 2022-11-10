@@ -89,10 +89,10 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 	return controllerName
 }
 
-// NamespacesMustBeReady waits until all Pods and Gateways in the provided
-// namespaces are marked as ready. This will cause the test to halt if the
-// specified timeout is exceeded.
-func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
+// NamespacesMustBeAccepted waits until all Pods are marked ready and all Gateways
+// are marked accepted in the provided namespaces. This will cause the test to
+// halt if the specified timeout is exceeded.
+func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
 	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.NamespacesMustBeReady, func() (bool, error) {
@@ -107,7 +107,7 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			}
 			for _, gw := range gwList.Items {
 				// Passing an empty string as the Reason means that any Reason will do.
-				if !findConditionInList(t, gw.Status.Conditions, "Ready", "True", "") {
+				if !findConditionInList(t, gw.Status.Conditions, string(v1beta1.GatewayConditionAccepted), "True", "") {
 					t.Logf("%s/%s Gateway not ready yet", ns, gw.Name)
 					return false, nil
 				}
@@ -132,11 +132,11 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
-// GatewayAndHTTPRoutesMustBeReady waits until the specified Gateway has an IP
+// GatewayAndHTTPRoutesMustBeAccepted waits until the specified Gateway has an IP
 // address assigned to it and the Route has a ParentRef referring to the
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
-func GatewayAndHTTPRoutesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)

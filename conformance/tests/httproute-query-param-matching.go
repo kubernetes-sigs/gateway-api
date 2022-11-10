@@ -40,7 +40,7 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 			ns      = "gateway-conformance-infra"
 			routeNN = types.NamespacedName{Namespace: ns, Name: "query-param-matching"}
 			gwNN    = types.NamespacedName{Namespace: ns, Name: "same-namespace"}
-			gwAddr  = kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+			gwAddr  = kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		)
 
 		testCases := []http.ExpectedResponse{{
