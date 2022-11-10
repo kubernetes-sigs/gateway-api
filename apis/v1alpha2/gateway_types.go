@@ -493,7 +493,7 @@ const (
 )
 
 const (
-	// This condition indicates whether a Listener have generated some
+	// This condition indicates whether a Listener has generated some
 	// configuration that will soon be ready in the underlying data plane.
 	//
 	// It is a positive-polarity summary condition, and so should always be
