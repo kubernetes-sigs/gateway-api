@@ -20,6 +20,13 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	v1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
+)
+
+var (
+	// validateParentRefs validates ParentRefs SectionName must be set and uique
+	// when ParentRefs includes 2 or more references to the same parent
+	validateParentRefs = gatewayvalidationv1b1.ValidateParentRefs
 )
 
 func validateBackendRefServicePort(ref *v1a2.BackendRef, path *field.Path) field.ErrorList {

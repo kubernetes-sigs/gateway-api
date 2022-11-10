@@ -34,6 +34,7 @@ func ValidateGRPCRoute(route *gatewayv1a2.GRPCRoute) field.ErrorList {
 func validateGRPCRouteSpec(spec *gatewayv1a2.GRPCRouteSpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	errs = append(errs, validateGRPCRouteRules(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 

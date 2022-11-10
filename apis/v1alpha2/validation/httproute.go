@@ -68,6 +68,7 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
