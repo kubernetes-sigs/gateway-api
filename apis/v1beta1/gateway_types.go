@@ -520,7 +520,7 @@ const (
 	// configuration that will soon be ready in the underlying data plane.
 	//
 	// It is a positive-polarity summary condition, and so should always be
-	// present on the resource.
+	// present on the resource with ObservedGeneration set.
 	//
 	// It should be set to Unknown if the controller performs updates to the
 	// status before it has all the information it needs to be able to determine
@@ -591,7 +591,8 @@ const (
 	GatewayReasonScheduled GatewayConditionReason = "Scheduled"
 
 	// This reason is used with the "Accepted", "Programmed" and "Ready"
-	// conditions when no controller has reconciled the Gateway.
+	// conditions when the status is "Unknown" and no controller has reconciled
+	// the Gateway.
 	GatewayReasonPending GatewayConditionReason = "Pending"
 
 	// Deprecated: Use "Pending" instead.
@@ -840,7 +841,7 @@ const (
 	// configuration that will soon be ready in the underlying data plane.
 	//
 	// It is a positive-polarity summary condition, and so should always be
-	// present on the resource.
+	// present on the resource with ObservedGeneration set.
 	//
 	// It should be set to Unknown if the controller performs updates to the
 	// status before it has all the information it needs to be able to determine
