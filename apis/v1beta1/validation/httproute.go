@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
-	utils "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
 )
 
 var (
@@ -69,7 +68,7 @@ func validateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
-	errs = append(errs, ValidateHTTPParentRefs(spec.ParentRefs, path.Child("spec"))...)
+	errs = append(errs, ValidateParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
@@ -288,45 +287,4 @@ func hasExactlyOnePrefixMatch(matches []gatewayv1b1.HTTPRouteMatch) bool {
 	}
 
 	return true
-}
-
-// ValidateHTTPParentRefs validates that if ParentRefs includes 2 or more references
-// to the same parent (based on kind, name, and namespace), those ParentRefs must
-// specify unique SectionName values.
-func ValidateHTTPParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Path) field.ErrorList {
-	var errs field.ErrorList
-	if len(parentRefs) <= 1 {
-		return nil
-	}
-	type sameKindParentRefs struct {
-		name      gatewayv1b1.ObjectName
-		namespace gatewayv1b1.Namespace
-		kind      gatewayv1b1.Kind
-	}
-	parentRefsSectionMap := make(map[sameKindParentRefs][]gatewayv1b1.SectionName)
-	for i, p := range parentRefs {
-		targetParentRefs := sameKindParentRefs{name: p.Name, namespace: *new(gatewayv1b1.Namespace), kind: *new(gatewayv1b1.Kind)}
-		targetSection := new(gatewayv1b1.SectionName)
-		if p.Namespace != nil {
-			targetParentRefs.namespace = *p.Namespace
-		}
-		if p.Kind != nil {
-			targetParentRefs.kind = *p.Kind
-		}
-		if p.SectionName != nil {
-			targetSection = p.SectionName
-		}
-		if s, ok := parentRefsSectionMap[targetParentRefs]; ok {
-			if len(s[0]) == 0 || len(*targetSection) == 0 {
-				errs = append(errs, field.Required(path, "ParentRefs section names must all be set when ParentRefs includes 2 or more references to the same parent"))
-				return errs
-			}
-			if utils.ContainsInSectionNameSlice(s, targetSection) {
-				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), targetSection, "must be unique when ParentRefs includes 2 or more references to the same parent"))
-				return errs
-			}
-		}
-		parentRefsSectionMap[targetParentRefs] = append(parentRefsSectionMap[targetParentRefs], *targetSection)
-	}
-	return errs
 }
