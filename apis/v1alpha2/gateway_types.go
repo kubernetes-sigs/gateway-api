@@ -236,8 +236,7 @@ const (
 const (
 	// This condition is true when the controller managing the Gateway is
 	// syntactically and semantically valid enough to produce some configuration
-	// in the underlying data plane, though it has not yet produced such
-	// configuration.
+	// in the underlying data plane, though it has not necessarily configured it yet.
 	//
 	// Possible reasons for this condition to be True are:
 	//
