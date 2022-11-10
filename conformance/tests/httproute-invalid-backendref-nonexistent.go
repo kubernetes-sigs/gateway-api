@@ -59,7 +59,7 @@ var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/",
 				},
-				StatusCode: 500,
+				Response: http.Response{StatusCode: 500},
 			})
 		})
 

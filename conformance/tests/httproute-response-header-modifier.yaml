@@ -83,6 +83,14 @@ spec:
         add:
         - name: X-Header-Add
           value: header-add
+        - name: x-lowercase-add
+          value: lowercase-add
+        - name: x-Mixedcase-ADD-1
+          value: mixedcase-add-1
+        - name: X-mixeDcase-add-2
+          value: mixedcase-add-2
+        - name: X-UPPERCASE-ADD
+          value: uppercase-add
         remove:
         - X-Header-Remove
     backendRefs:

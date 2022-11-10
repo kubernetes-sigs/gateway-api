@@ -57,11 +57,11 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:    http.Request{Path: "/", Headers: map[string]string{"Color": "orange"}},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/", Headers: map[string]string{"Color": "orange"}},
+			Response: http.Response{StatusCode: 404},
 		}, {
-			Request:    http.Request{Path: "/", Headers: map[string]string{"Some-Other-Header": "one"}},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/", Headers: map[string]string{"Some-Other-Header": "one"}},
+			Response: http.Response{StatusCode: 404},
 		}, {
 			Request:   http.Request{Path: "/", Headers: map[string]string{"Color": "blue"}},
 			Backend:   "infra-backend-v1",
@@ -79,8 +79,8 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 			Backend:   "infra-backend-v2",
 			Namespace: ns,
 		}, {
-			Request:    http.Request{Path: "/", Headers: map[string]string{"Color": "purple"}},
-			StatusCode: 404,
+			Request:  http.Request{Path: "/", Headers: map[string]string{"Color": "purple"}},
+			Response: http.Response{StatusCode: 404},
 		}}
 
 		for i := range testCases {

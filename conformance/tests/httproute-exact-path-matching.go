@@ -50,14 +50,14 @@ var HTTPExactPathMatching = suite.ConformanceTest{
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			}, {
-				Request:    http.Request{Path: "/"},
-				StatusCode: 404,
+				Request:  http.Request{Path: "/"},
+				Response: http.Response{StatusCode: 404},
 			}, {
-				Request:    http.Request{Path: "/one/example"},
-				StatusCode: 404,
+				Request:  http.Request{Path: "/one/example"},
+				Response: http.Response{StatusCode: 404},
 			}, {
-				Request:    http.Request{Path: "/two/"},
-				StatusCode: 404,
+				Request:  http.Request{Path: "/two/"},
+				Response: http.Response{StatusCode: 404},
 			},
 		}
 

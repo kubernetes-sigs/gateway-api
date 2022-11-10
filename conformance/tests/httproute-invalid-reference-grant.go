@@ -61,7 +61,7 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/v2",
 				},
-				StatusCode: 500,
+				Response: http.Response{StatusCode: 500},
 			})
 		})
 
@@ -71,9 +71,9 @@ var HTTPRouteInvalidReferenceGrant = suite.ConformanceTest{
 					Method: "GET",
 					Path:   "/",
 				},
-				StatusCode: 200,
-				Backend:    "app-backend-v1",
-				Namespace:  "gateway-conformance-app-backend",
+				Response:  http.Response{StatusCode: 200},
+				Backend:   "app-backend-v1",
+				Namespace: "gateway-conformance-app-backend",
 			})
 		})
 

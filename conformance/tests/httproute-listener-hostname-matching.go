@@ -78,11 +78,11 @@ var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 			Backend:   "infra-backend-v3",
 			Namespace: ns,
 		}, {
-			Request:    http.Request{Host: "foo.com", Path: "/"},
-			StatusCode: 404,
+			Request:  http.Request{Host: "foo.com", Path: "/"},
+			Response: http.Response{StatusCode: 404},
 		}, {
-			Request:    http.Request{Host: "no.matching.host", Path: "/"},
-			StatusCode: 404,
+			Request:  http.Request{Host: "no.matching.host", Path: "/"},
+			Response: http.Response{StatusCode: 404},
 		}}
 
 		for i := range testCases {
