@@ -352,7 +352,7 @@ type GRPCMethodMatchType string
 
 const (
 	// Matches the method or service exactly and with case sensitivity.
-	PathMatchExact GRPCMethodMatchType = "Exact"
+	GRPCMethodMatchExact GRPCMethodMatchType = "Exact"
 
 	// Matches if the method or service matches the given regular expression with
 	// case sensitivity.
@@ -362,7 +362,7 @@ const (
 	// dialect.
 	// Please read the implementation's documentation to determine the supported
 	// dialect.
-	PathMatchRegularExpression GRPCMethodMatchType = "RegularExpression"
+	GRPCMethodMatchRegularExpression GRPCMethodMatchType = "RegularExpression"
 )
 
 // GRPCHeaderMatch describes how to select a gRPC route by matching gRPC request
