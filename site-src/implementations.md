@@ -15,12 +15,13 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Envoy Gateway][18] (alpha)
 - [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
-- [Google Kubernetes Engine][6] (GA)
+- [Google Kubernetes Engine][6] (public preview)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (beta)
 - [Kuma][11] (alpha)
+- [LiteSpeed Ingress Controller][19]
 - [NGINX Kubernetes Gateway][12]
 - [Traefik][13] (alpha)
 
@@ -46,6 +47,8 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [16]:#cilium
 [17]:#flomesh-service-mesh-fsm
 [18]:#envoy-gateway
+[19]:#litespeed-ingress-controller
+
 ## Implementations
 
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
@@ -150,15 +153,17 @@ Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that br
 
 ### Google Kubernetes Engine
 
-[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform offered
-by Google Cloud. GKE's implementation of the Gateway API is through the [GKE
-Gateway controller][gke-gateway] which provisions Google Cloud Load Balancers
-for Pods in GKE clusters.
+[Google Kubernetes Engine (GKE)][gke] is a managed Kubernetes platform
+offered by Google Cloud. GKE's implementation of the Gateway API is through the 
+[GKE Gateway controller][gke-gateway] (currently in Preview) which provisions 
+Google Cloud Load Balancers for Pods in GKE clusters. 
 
-The GKE Gateway controller supports weighted traffic splitting, mirroring,
-advanced routing, multi-cluster load balancing and more. See the docs to deploy
-[private or public Gateways][gke-gateway-deploy] and also [multi-cluster
-Gateways][gke-multi-cluster-gateway].
+The GKE Gateway controller supports weighted traffic splitting, mirroring, 
+advanced routing, multi-cluster load balancing and more. See the docs to deploy 
+[private or public Gateways][gke-gateway-deploy] and also [multi-cluster Gateways][gke-multi-cluster-gateway]. 
+
+If you have questions about the GKE Gateway controller or feedback you want to
+share, contact [gke-gateway-feedback@google.com](mailto:gke-gateway-feedback@google.com).
 
 [gke]:https://cloud.google.com/kubernetes-engine
 [gke-gateway]:https://cloud.google.com/kubernetes-engine/docs/concepts/gateway-api
@@ -222,6 +227,14 @@ Kuma is actively working on an implementation of Gateway API specification for t
 
 [kuma]:https://kuma.io
 [kuma-1]:https://kuma.io/docs/latest/explore/gateway-api/
+
+### LiteSpeed Ingress Controller
+
+The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-web-adc/features/litespeed-ingress-controller) uses the LiteSpeed WebADC controller to operate as an Ingress Controller and Load Balancer to manage your traffic on your Kubernetes cluster.  It implements the full core Gateway API including Gateway, GatewayClass, HTTPRoute and ReferenceGrant and the Gateway functions of cert-manager.  Gateway is fully integrated into the LiteSpeed Ingress Controller.
+
+- [Product documentation](https://docs.litespeedtech.com/cloud/kubernetes/).
+- [Gateway specific documentation](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
+- Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
 
 ### NGINX Kubernetes Gateway
 
