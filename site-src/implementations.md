@@ -47,7 +47,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [16]:#cilium
 [17]:#flomesh-service-mesh-fsm
 [18]:#envoy-gateway
-[19]:#litespeed
+[19]:#litespeed-ingress-controller
 
 ## Implementations
 
@@ -232,9 +232,8 @@ Kuma is actively working on an implementation of Gateway API specification for t
 
 The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-web-adc/features/litespeed-ingress-controller) uses the LiteSpeed WebADC controller to operate as an Ingress Controller and Load Balancer to manage your traffic on your Kubernetes cluster.  It implements the full core Gateway API including Gateway, GatewayClass, HTTPRoute and ReferenceGrant and the Gateway functions of cert-manager.  Gateway is fully integrated into the LiteSpeed Ingress Controller.
 
-The product documentation [here](https://docs.litespeedtech.com/cloud/kubernetes/)
-Gateway specific documentation [here](https://docs.litespeedtech.com/cloud/kubernetes/gateway)
-
+The product documentation [here](https://docs.litespeedtech.com/cloud/kubernetes/).
+Gateway specific documentation [here](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
 Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
 
 ### NGINX Kubernetes Gateway
