@@ -67,7 +67,7 @@ fi
 # And, we add an extra version tag - either :latest or semver.
 # The buildx integrate build and push in one line.
 docker buildx build \
-    --platform $(IMAGE_PLATFORMS) \
+    --platform linux/amd64,linux/arm64 \
     --build-arg "COMMIT=${COMMIT}" \
     --build-arg "TAG=${BINARY_TAG}" \
     --platform linux/amd64,linux/arm64 \
