@@ -3,7 +3,6 @@
 
 approvers:
   - sig-network-leads
-  - gateway-api-admins
   - gateway-api-maintainers
 
 reviewers:

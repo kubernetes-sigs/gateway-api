@@ -9,13 +9,8 @@ aliases:
     - thockin
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
-  gateway-api-admins:
-    - bowei
-    - thockin
-
   gateway-api-maintainers:
     - bowei
-    - hbagdi
     - robscott
     - shaneutt
     - youngnick
@@ -27,4 +22,5 @@ aliases:
 
   emeritus-gateway-api-maintainers:
     - danehans
+    - hbagdi
     - jpeach
