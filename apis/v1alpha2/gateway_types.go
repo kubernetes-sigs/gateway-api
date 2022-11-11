@@ -196,7 +196,7 @@ type GatewayConditionType = v1beta1.GatewayConditionType
 type GatewayConditionReason = v1beta1.GatewayConditionReason
 
 const (
-	// This condition indicates whether a Gateway have generated some
+	// This condition indicates whether a Gateway has generated some
 	// configuration that will soon be ready in the underlying data plane.
 	//
 	// It is a positive-polarity summary condition, and so should always be
