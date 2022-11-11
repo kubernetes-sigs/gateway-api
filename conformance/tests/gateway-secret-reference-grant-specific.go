@@ -33,13 +33,13 @@ func init() {
 
 var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
 	ShortName:   "GatewaySecretReferenceGrantSpecific",
-	Description: "A Gateway in the gateway-conformance-infra namespace should become ready if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the specific Secret exists",
+	Description: "A Gateway in the gateway-conformance-infra namespace should become programmed if the Gateway has a certificateRef for a Secret in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to the specific Secret exists",
 	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
 	Manifests:   []string{"tests/gateway-secret-reference-grant-specific.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-secret-reference-grant", Namespace: "gateway-conformance-infra"}
 
-		t.Run("Gateway listener should have a true ResolvedRefs condition and a true Ready condition", func(t *testing.T) {
+		t.Run("Gateway listener should have a true ResolvedRefs condition and a true Programmed condition", func(t *testing.T) {
 			listeners := []v1beta1.ListenerStatus{{
 				Name: v1beta1.SectionName("https"),
 				SupportedKinds: []v1beta1.RouteGroupKind{{
@@ -48,9 +48,9 @@ var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
 				}},
 				Conditions: []metav1.Condition{
 					{
-						Type:   string(v1beta1.ListenerConditionReady),
+						Type:   string(v1beta1.ListenerConditionProgrammed),
 						Status: metav1.ConditionTrue,
-						Reason: string(v1beta1.ListenerReasonReady),
+						Reason: string(v1beta1.ListenerReasonProgrammed),
 					},
 				},
 			}}

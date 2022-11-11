@@ -42,7 +42,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
-		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
+		kubernetes.NamespacesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		t.Run("HTTPRoutes that do intersect with listener hostnames", func(t *testing.T) {
 			routes := []types.NamespacedName{
@@ -51,7 +51,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				{Namespace: ns, Name: "wildcard-host-matches-listener-specific-host"},
 				{Namespace: ns, Name: "wildcard-host-matches-listener-wildcard-host"},
 			}
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routes...)
 
 			var testCases []http.ExpectedResponse
 
@@ -189,7 +189,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 		})
 
 		t.Run("HTTPRoutes that do not intersect with listener hostnames", func(t *testing.T) {
-			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeReady(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
+			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
 
 			routeName := types.NamespacedName{Namespace: ns, Name: "no-intersecting-hosts"}
 			parents := []v1beta1.RouteParentStatus{{
