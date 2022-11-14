@@ -1,0 +1,7 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: GatewayClass
+metadata:
+  name: gatewayclass-immutable
+spec:
+  controllerName: networking.k8s.io/gateway-controller
+  description: A test GatewayClass
