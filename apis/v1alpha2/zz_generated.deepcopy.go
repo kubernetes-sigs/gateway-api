@@ -134,6 +134,11 @@ func (in *GRPCRouteFilter) DeepCopyInto(out *GRPCRouteFilter) {
 		*out = new(v1beta1.HTTPHeaderFilter)
 		(*in).DeepCopyInto(*out)
 	}
+	if in.ResponseHeaderModifier != nil {
+		in, out := &in.ResponseHeaderModifier, &out.ResponseHeaderModifier
+		*out = new(v1beta1.HTTPHeaderFilter)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.RequestMirror != nil {
 		in, out := &in.RequestMirror, &out.RequestMirror
 		*out = new(v1beta1.HTTPRequestMirrorFilter)

@@ -323,7 +323,6 @@ type GRPCMethodMatch struct {
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	// +optional
-	// +kubebuilder:default=""
 	// +kubebuilder:validation:MaxLength=1024
 	// +kubebuilder:validation:Pattern=`^[^\/]*$`
 	Service *string `json:"service,omitempty"`
@@ -333,7 +332,6 @@ type GRPCMethodMatch struct {
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	// +optional
-	// +kubebuilder:default=""
 	// +kubebuilder:validation:MaxLength=1024
 	// +kubebuilder:validation:Pattern=`^[^\/]*$`
 	Method *string `json:"method,omitempty"`
@@ -349,9 +347,23 @@ type GRPCMethodMatch struct {
 //
 // - Must not contain `/` character
 //
-// +kubebuilder:validation:Enum=Exact;PathPrefix;RegularExpression
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 type GRPCMethodMatchType string
+
+const (
+	// Matches the method or service exactly and with case sensitivity.
+	GRPCMethodMatchExact GRPCMethodMatchType = "Exact"
+
+	// Matches if the method or service matches the given regular expression with
+	// case sensitivity.
+	//
+	// Since `"RegularExpression"` has implementation-specific conformance,
+	// implementations can support POSIX, PCRE, RE2 or any other regular expression
+	// dialect.
+	// Please read the implementation's documentation to determine the supported
+	// dialect.
+	GRPCMethodMatchRegularExpression GRPCMethodMatchType = "RegularExpression"
+)
 
 // GRPCHeaderMatch describes how to select a gRPC route by matching gRPC request
 // headers.
@@ -394,6 +406,14 @@ const (
 	//
 	// Support in GRPCBackendRef: Extended
 	GRPCRouteFilterRequestHeaderModifier GRPCRouteFilterType = "RequestHeaderModifier"
+
+	// GRPCRouteFilterRequestHeaderModifier can be used to add or remove a gRPC
+	// header from a gRPC response before it is sent to the client.
+	//
+	// Support in GRPCRouteRule: Core
+	//
+	// Support in GRPCBackendRef: Extended
+	GRPCRouteFilterResponseHeaderModifier GRPCRouteFilterType = "ResponseHeaderModifier"
 
 	// GRPCRouteFilterRequestMirror can be used to mirror gRPC requests to a
 	// different backend. The responses from this backend MUST be ignored by
@@ -446,8 +466,8 @@ type GRPCRouteFilter struct {
 	// that filter MUST receive a HTTP error response.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;RequestMirror;ExtensionRef>
+	// +kubebuilder:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef
+	// <gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>
 	Type GRPCRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -457,6 +477,15 @@ type GRPCRouteFilter struct {
 	//
 	// +optional
 	RequestHeaderModifier *HTTPHeaderFilter `json:"requestHeaderModifier,omitempty"`
+
+	// ResponseHeaderModifier defines a schema for a filter that modifies response
+	// headers.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	ResponseHeaderModifier *HTTPHeaderFilter `json:"responseHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from
