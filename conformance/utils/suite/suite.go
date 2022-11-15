@@ -48,6 +48,9 @@ const (
 
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
 	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
+
+	// This option indicates support for Destination Port matching (extended conformance).
+	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
