@@ -22,6 +22,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
@@ -30,12 +31,15 @@ var (
 		gatewayv1a2.TCPProtocolType: {},
 		gatewayv1a2.UDPProtocolType: {},
 	}
-	// set of protocols for which TLSConfig shall not be present
-	protocolsTLSInvalid = map[gatewayv1a2.ProtocolType]struct{}{
-		gatewayv1a2.HTTPProtocolType: {},
-		gatewayv1a2.UDPProtocolType:  {},
-		gatewayv1a2.TCPProtocolType:  {},
-	}
+
+	// ValidateTLSCertificateRefs validates the certificateRefs
+	// must be set and not empty when tls config is set and
+	// TLSModeType is terminate
+	validateTLSCertificateRefs = gatewayvalidationv1b1.ValidateTLSCertificateRefs
+
+	// validateListenerTLSConfig validates TLS config must be set when protocol is HTTPS or TLS,
+	// and TLS config shall not be present when protocol is HTTP, TCP or UDP
+	validateListenerTLSConfig = gatewayvalidationv1b1.ValidateListenerTLSConfig
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -62,16 +66,7 @@ func validateGatewayListeners(listeners []gatewayv1a2.Listener, path *field.Path
 	var errs field.ErrorList
 	errs = append(errs, validateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
-	return errs
-}
-
-func validateListenerTLSConfig(listeners []gatewayv1a2.Listener, path *field.Path) field.ErrorList {
-	var errs field.ErrorList
-	for i, l := range listeners {
-		if isProtocolInSubset(l.Protocol, protocolsTLSInvalid) && l.TLS != nil {
-			errs = append(errs, field.Forbidden(path.Index(i).Child("tls"), fmt.Sprintf("should be empty for protocol %v", l.Protocol)))
-		}
-	}
+	errs = append(errs, validateTLSCertificateRefs(listeners, path)...)
 	return errs
 }
 

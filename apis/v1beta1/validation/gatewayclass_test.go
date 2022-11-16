@@ -22,13 +22,13 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 func TestValidateGatewayClassUpdate(t *testing.T) {
 	type args struct {
-		oldClass *gatewayv1a2.GatewayClass
-		newClass *gatewayv1a2.GatewayClass
+		oldClass *gatewayv1b1.GatewayClass
+		newClass *gatewayv1b1.GatewayClass
 	}
 	tests := []struct {
 		name string
@@ -38,15 +38,15 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 		{
 			name: "changing parameters reference is allowed",
 			args: args{
-				oldClass: &gatewayv1a2.GatewayClass{
-					Spec: gatewayv1a2.GatewayClassSpec{
+				oldClass: &gatewayv1b1.GatewayClass{
+					Spec: gatewayv1b1.GatewayClassSpec{
 						ControllerName: "foo",
 					},
 				},
-				newClass: &gatewayv1a2.GatewayClass{
-					Spec: gatewayv1a2.GatewayClassSpec{
+				newClass: &gatewayv1b1.GatewayClass{
+					Spec: gatewayv1b1.GatewayClassSpec{
 						ControllerName: "foo",
-						ParametersRef: &gatewayv1a2.ParametersReference{
+						ParametersRef: &gatewayv1b1.ParametersReference{
 							Group: "example.com",
 							Kind:  "GatewayClassConfig",
 							Name:  "foo",
@@ -59,13 +59,13 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 		{
 			name: "changing controller field results in an error",
 			args: args{
-				oldClass: &gatewayv1a2.GatewayClass{
-					Spec: gatewayv1a2.GatewayClassSpec{
+				oldClass: &gatewayv1b1.GatewayClass{
+					Spec: gatewayv1b1.GatewayClassSpec{
 						ControllerName: "example.com/gateway",
 					},
 				},
-				newClass: &gatewayv1a2.GatewayClass{
-					Spec: gatewayv1a2.GatewayClassSpec{
+				newClass: &gatewayv1b1.GatewayClass{
+					Spec: gatewayv1b1.GatewayClassSpec{
 						ControllerName: "example.org/gateway",
 					},
 				},
@@ -75,7 +75,7 @@ func TestValidateGatewayClassUpdate(t *testing.T) {
 					Type:     field.ErrorTypeInvalid,
 					Field:    "spec.controllerName",
 					Detail:   "cannot update an immutable field",
-					BadValue: gatewayv1a2.GatewayController("example.org/gateway"),
+					BadValue: gatewayv1b1.GatewayController("example.org/gateway"),
 				},
 			},
 		},

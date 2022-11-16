@@ -68,29 +68,18 @@ func validateHTTPRouteSpec(spec *gatewayv1a2.HTTPRouteSpec, path *field.Path) fi
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
+	errs = append(errs, validateParentRefs(spec.ParentRefs, path.Child("spec"))...)
 	return errs
 }
 
 // validateHTTPRouteBackendServicePorts validates that v1.Service backends always have a port.
 func validateHTTPRouteBackendServicePorts(rules []gatewayv1a2.HTTPRouteRule, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
+	path = path.Child("rules")
 
 	for i, rule := range rules {
-		path = path.Index(i).Child("backendRefs")
-		for i, ref := range rule.BackendRefs {
-			if ref.BackendObjectReference.Group != nil &&
-				*ref.BackendObjectReference.Group != "" {
-				continue
-			}
-
-			if ref.BackendObjectReference.Kind != nil &&
-				*ref.BackendObjectReference.Kind != "Service" {
-				continue
-			}
-
-			if ref.BackendObjectReference.Port == nil {
-				errs = append(errs, field.Required(path.Index(i).Child("port"), "missing port for Service reference"))
-			}
+		for j, ref := range rule.BackendRefs {
+			errs = append(errs, validateBackendRefServicePort(&ref.BackendRef, path.Index(i).Child("backendRefs").Index(j))...)
 		}
 	}
 
@@ -209,7 +198,7 @@ func validateHTTPQueryParamMatches(matches []gatewayv1a2.HTTPQueryParamMatch, pa
 }
 
 // validateHTTPRouteFilterTypeMatchesValue validates that only the expected fields are
-//// set for the specified filter type.
+// set for the specified filter type.
 func validateHTTPRouteFilterTypeMatchesValue(filter gatewayv1a2.HTTPRouteFilter, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.HTTPRouteFilterExtensionRef {

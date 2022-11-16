@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Kubernetes Authors.
+Copyright 2022 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,20 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package utils
+package validation
 
-import (
-	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-)
+import gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
-// PathMatchTypePtr translates a string to *PathMatchType
-func PathMatchTypePtr(s string) *gatewayv1a2.PathMatchType {
-	result := gatewayv1a2.PathMatchType(s)
-	return &result
-}
-
-// PortNumberPtr translates an int to a *PortNumber
-func PortNumberPtr(p int) *gatewayv1a2.PortNumber {
-	result := gatewayv1a2.PortNumber(p)
-	return &result
+// ContainsInSectionNameSlice checks whether the provided SectionName
+// is in the target SectionName slice.
+func ContainsInSectionNameSlice(items []gatewayv1b1.SectionName, item *gatewayv1b1.SectionName) bool {
+	for _, eachItem := range items {
+		if eachItem == *item {
+			return true
+		}
+	}
+	return false
 }

@@ -24,9 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 	utilpointer "k8s.io/utils/pointer"
 
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	utils "sigs.k8s.io/gateway-api/apis/v1alpha2/validation/util"
+	"sigs.k8s.io/gateway-api/apis/v1alpha2/util/translator"
 )
 
 func TestValidateHTTPRoute(t *testing.T) {
@@ -46,7 +45,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -56,7 +55,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						BackendRef: gatewayv1a2.BackendRef{
 							BackendObjectReference: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 							Weight: utilpointer.Int32(100),
 						},
@@ -72,7 +71,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -83,7 +82,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8081),
+								Port: translator.PortNumberPtr(8081),
 							},
 						},
 					},
@@ -98,7 +97,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -109,7 +108,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
@@ -118,7 +117,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: specialService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
@@ -133,7 +132,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -141,7 +140,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Filters: []gatewayv1a2.HTTPRouteFilter{
 					{
 						Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Set: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -155,13 +154,13 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
 					{
 						Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Add: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "my-header",
@@ -181,7 +180,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -192,13 +191,13 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
 					{
 						Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Set: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -212,13 +211,13 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
 					{
 						Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Add: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "my-header",
@@ -232,7 +231,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: specialService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
@@ -247,7 +246,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Matches: []gatewayv1a2.HTTPRouteMatch{
 					{
 						Path: &gatewayv1a2.HTTPPathMatch{
-							Type:  utils.PathMatchTypePtr("PathPrefix"),
+							Type:  translator.PathMatchTypePtr("PathPrefix"),
 							Value: utilpointer.String("/"),
 						},
 					},
@@ -255,7 +254,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 				Filters: []gatewayv1a2.HTTPRouteFilter{
 					{
 						Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Set: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "special-header",
@@ -269,7 +268,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 							BackendRef: gatewayv1a2.BackendObjectReference{
 								Name: testService,
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					},
@@ -439,8 +438,8 @@ func TestValidateHTTPRoute(t *testing.T) {
 }
 
 func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
-	var testService v1alpha2.ObjectName = "testService"
-	var specialService v1alpha2.ObjectName = "specialService"
+	var testService gatewayv1a2.ObjectName = "testService"
+	var specialService gatewayv1a2.ObjectName = "specialService"
 	tests := []struct {
 		name     string
 		rules    []gatewayv1a2.HTTPRouteRule
@@ -454,7 +453,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 					BackendRef: gatewayv1a2.BackendRef{
 						BackendObjectReference: gatewayv1a2.BackendObjectReference{
 							Name: testService,
-							Port: utils.PortNumberPtr(8080),
+							Port: translator.PortNumberPtr(8080),
 						},
 						Weight: utilpointer.Int32(100),
 					},
@@ -464,7 +463,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
-									Port: utils.PortNumberPtr(8080),
+									Port: translator.PortNumberPtr(8080),
 								},
 							},
 						},
@@ -481,7 +480,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 					BackendRef: gatewayv1a2.BackendRef{
 						BackendObjectReference: gatewayv1a2.BackendObjectReference{
 							Name: testService,
-							Port: utils.PortNumberPtr(8080),
+							Port: translator.PortNumberPtr(8080),
 						},
 					},
 					Filters: []gatewayv1a2.HTTPRouteFilter{
@@ -490,7 +489,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: testService,
-									Port: utils.PortNumberPtr(8080),
+									Port: translator.PortNumberPtr(8080),
 								},
 							},
 						},
@@ -499,7 +498,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
 								BackendRef: gatewayv1a2.BackendObjectReference{
 									Name: specialService,
-									Port: utils.PortNumberPtr(8080),
+									Port: translator.PortNumberPtr(8080),
 								},
 							},
 						},
@@ -528,21 +527,21 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 	}{{
 		name: "invalid httpRoute prefix",
 		path: &gatewayv1a2.HTTPPathMatch{
-			Type:  utils.PathMatchTypePtr("PathPrefix"),
+			Type:  translator.PathMatchTypePtr("PathPrefix"),
 			Value: utilpointer.String("/."),
 		},
 		errCount: 1,
 	}, {
 		name: "invalid httpRoute Exact",
 		path: &gatewayv1a2.HTTPPathMatch{
-			Type:  utils.PathMatchTypePtr("Exact"),
+			Type:  translator.PathMatchTypePtr("Exact"),
 			Value: utilpointer.String("/foo/./bar"),
 		},
 		errCount: 1,
 	}, {
 		name: "invalid httpRoute prefix",
 		path: &gatewayv1a2.HTTPPathMatch{
-			Type:  utils.PathMatchTypePtr("PathPrefix"),
+			Type:  translator.PathMatchTypePtr("PathPrefix"),
 			Value: utilpointer.String("/"),
 		},
 		errCount: 0,
@@ -559,7 +558,7 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 						BackendRef: gatewayv1a2.BackendRef{
 							BackendObjectReference: gatewayv1a2.BackendObjectReference{
 								Name: gatewayv1a2.ObjectName("test"),
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					}},
@@ -620,7 +619,7 @@ func TestValidateHTTPHeaderMatches(t *testing.T) {
 						BackendRef: gatewayv1a2.BackendRef{
 							BackendObjectReference: gatewayv1a2.BackendObjectReference{
 								Name: gatewayv1a2.ObjectName("test"),
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					}},
@@ -684,7 +683,7 @@ func TestValidateHTTPQueryParamMatches(t *testing.T) {
 						BackendRef: gatewayv1a2.BackendRef{
 							BackendObjectReference: gatewayv1a2.BackendObjectReference{
 								Name: gatewayv1a2.ObjectName("test"),
-								Port: utils.PortNumberPtr(8080),
+								Port: translator.PortNumberPtr(8080),
 							},
 						},
 					}},
@@ -812,7 +811,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		name: "valid HTTPRouteFilterRequestHeaderModifier route filter",
 		routeFilter: gatewayv1a2.HTTPRouteFilter{
 			Type: gatewayv1a2.HTTPRouteFilterRequestHeaderModifier,
-			RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{
+			RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 				Set:    []gatewayv1a2.HTTPHeader{{Name: "name"}},
 				Add:    []gatewayv1a2.HTTPHeader{{Name: "add"}},
 				Remove: []string{"remove"},
@@ -841,7 +840,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Kind:      new(gatewayv1a2.Kind),
 				Name:      "name",
 				Namespace: new(gatewayv1a2.Namespace),
-				Port:      utils.PortNumberPtr(22),
+				Port:      translator.PortNumberPtr(22),
 			}},
 		},
 		errCount: 0,
@@ -849,7 +848,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		name: "invalid HTTPRouteFilterRequestMirror type filter with non-matching field",
 		routeFilter: gatewayv1a2.HTTPRouteFilter{
 			Type:                  gatewayv1a2.HTTPRouteFilterRequestMirror,
-			RequestHeaderModifier: &gatewayv1a2.HTTPRequestHeaderFilter{},
+			RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{},
 		},
 		errCount: 2,
 	}, {
@@ -947,7 +946,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 							BackendRef: gatewayv1a2.BackendRef{
 								BackendObjectReference: gatewayv1a2.BackendObjectReference{
 									Name: gatewayv1a2.ObjectName("test"),
-									Port: utils.PortNumberPtr(8080),
+									Port: translator.PortNumberPtr(8080),
 								},
 							},
 						}},

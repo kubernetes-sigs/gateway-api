@@ -14,60 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package utils
+package translator
 
 import (
 	"testing"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
-
-func Test_PortNumberPtr(t *testing.T) {
-	var exportedPort65535 gatewayv1a2.PortNumber = 65535
-	var exportedPort1 gatewayv1a2.PortNumber = 1
-	var exportedPort0 gatewayv1a2.PortNumber
-	var exportedPort65536 gatewayv1a2.PortNumber = 65536
-
-	portNumberPtrTests := []struct {
-		name         string
-		port         int
-		expectedPort *gatewayv1a2.PortNumber
-	}{
-		{
-			name:         "invalid port number",
-			port:         0,
-			expectedPort: &exportedPort0,
-		},
-		{
-			name:         "valid port number",
-			port:         65535,
-			expectedPort: &exportedPort65535,
-		},
-		{
-			name:         "invalid port number",
-			port:         65536,
-			expectedPort: &exportedPort65536,
-		},
-		{
-			name:         "valid port number",
-			port:         1,
-			expectedPort: &exportedPort1,
-		},
-	}
-
-	for _, tc := range portNumberPtrTests {
-		t.Run(tc.name, func(t *testing.T) {
-			port := PortNumberPtr(tc.port)
-			if port == nil || tc.expectedPort == nil {
-				if port != tc.expectedPort {
-					t.Errorf("Expected port %d, got %d", tc.expectedPort, port)
-				}
-			} else if *port != *tc.expectedPort {
-				t.Errorf("Expected port %d, got %d", *tc.expectedPort, *port)
-			}
-		})
-	}
-}
 
 func Test_PathMatchTypePtr(t *testing.T) {
 	pathMatchTypePtrTests := []struct {
@@ -80,7 +33,11 @@ func Test_PathMatchTypePtr(t *testing.T) {
 			pathType:     "Exact",
 			expectedPath: gatewayv1a2.PathMatchExact,
 		},
-
+		{
+			name:         "valid path exact match using constant",
+			pathType:     string(gatewayv1a2.PathMatchExact),
+			expectedPath: gatewayv1a2.PathMatchExact,
+		},
 		{
 			name:         "valid path prefix match",
 			pathType:     "PathPrefix",
