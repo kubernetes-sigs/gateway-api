@@ -67,7 +67,6 @@ fi
 # And, we add an extra version tag - either :latest or semver.
 # The buildx integrate build and push in one line.
 docker buildx build \
-    -f Dockerfile \
     -t ${REGISTRY}/admission-server:${GIT_TAG} \
     -t ${REGISTRY}/admission-server:${VERSION_TAG} \
     --build-arg "COMMIT=${COMMIT}" \
