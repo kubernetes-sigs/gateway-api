@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.6.0-rc1](#v060-rc1)
 - [v0.5.1](#v051)
 - [v0.5.0](#v050)
 - [v0.5.0-rc2](#v050-rc2)
@@ -17,6 +18,79 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+## v0.6.0-rc1
+
+## Changes by Kind
+
+### Deprecations
+
+- Adds GatewayConditionAccepted and GatewayReasonAccepted Deprecates
+  GatewayConditionScheduled and GatewayReasonScheduled (#1447, @mikemorris)
+- GatewayClass, Gateway, and HTTPRoute are now only supported with the v1beta1
+  version of the API. The v1alpha2 API versions of these resources will be fully
+  removed in a future release. (#1348, @robscott)
+- ReferencePolicy has been removed from the API in favor of ReferenceGrant.
+  (#1406, @robscott)
+
+### API Changes
+
+- Promotes ReferenceGrant to the v1beta1 API and the standard release channel
+  (#1455, @nathancoleman)
+- Introduce GRPCRoute resource. (#1115, @gnossen)
+- A new field `responseHeaderModifier` is added to `.spec.rules.filters`, which
+  allows for modification of HTTP response headers (#1373, @aryan9600)
+- V1alpha2 has been deprecated for Gateway, GatewayClass, and HTTPRoute. This
+  version of the API will be removed from CRDs in a future release.
+  Implementations should update to use v1beta1 for these resources as soon as
+  possible. (#1405, @robscott)
+
+### Status Cleanup
+
+- A `Pending` Reason has been added to Conditions to harmonize the unreconciled
+  state across objects. GatewayClass, Gateway, and Route `Accepted` Conditions
+  have been updated. (#1453, @youngnick)
+- Added "Programmed" Gateway and Listener conditions, moved "Ready" to extended
+  conformance (#1499, @LCaparelli)
+- Status definitions have been updated across the API. (#1383, @youngnick)
+- Adds `ListenerConditionAccepted` and `ListenerReasonAccepted` Deprecates
+  `ListenerConditionDetached` and `ListenerReasonAttached` (#1446, @mikemorris)
+
+### Conformance Tests
+
+- 1. Add flags for SupportedFeatures and ExemptFeatures in conformance tests.
+  2. Remove suite.SupportReferenceGrant as the default value of
+     SupportedFeatures.
+  3. Replace `Features:
+     []suite.SupportedFeature{suite.SupportReferenceGrant}` from Features list
+     to `Exemptions:  []suite.ExemptFeature{suite.ExemptReferenceGrant}` on all
+     tests. (#1394, @gyohuangxin)
+- Conformance: ExemptFeatures have been merged into SupportedFeatures. (#1507,
+  @robscott)
+- Add `RouteReasonNoMatchingParent` reason for `Accepted` condition set on
+  routes when no matching parent has been found (#1516, @pmalek)
+- To be conformant with the API, if there is no ReferenceGrant that grants a
+  listener to reference a secret in another namespace, the
+  ListenerConditionReason for the condition ResolvedRefs must be set to
+  RefNotPermitted instead of InvalidCertificateRef. (#1305, @mlavacca)
+
+### Developer Notes
+
+- Deprecated `v1alpha1` Go types are now aliases to their `v1beta1` versions
+  (#1390, @howardjohn)
+- Moved type translation helpers from the `utils` package to a new package named
+  `translator`. (#1337, @carlisia)
+
+### Documentation
+
+- Clarify that BackendObjectReference's Port field specifies a service port, not
+  a target port, for Kubernetes Service backends. (#1332, @Miciah)
+- HTTPRequestHeaderFilter and HTTPResponseHeaderFilter forbid configuring
+  multiple actions for the same header. (#1497, @rainest)
+- Changes "custom" conformance level to "implementation-specific" (#1436,
+  @LCaparelli)
+- Clarification that changes to ReferenceGrants MUST be reconciled (#1429,
+  @robscott)
 
 ## v0.5.1
 
