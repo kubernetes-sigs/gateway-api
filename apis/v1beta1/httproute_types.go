@@ -439,13 +439,14 @@ type HTTPQueryParamMatch struct {
 	// entry with an equivalent name MUST be considered for a match. Subsequent
 	// entries with an equivalent query param name MUST be ignored.
 	//
-	// If a query param is repeated in an HTTP request, the behavior
-	// is purposely left undefined, since different data planes have different
-	// capabilities. However, it's *recommended* that implementations should
+	// If a query param is repeated in an HTTP request, the behavior is
+	// purposely left undefined, since different data planes have different
+	// capabilities. However, it is *recommended* that implementations should
 	// match against the first value of the param if the data plane supports it,
 	// as this behavior is expected in other load balancing contexts outside of
 	// the Gateway API.
-	// Users should not route traffic based on repeated query params to guard
+	//
+	// Users SHOULD NOT route traffic based on repeated query params to guard
 	// themselves against potential differences in the implementations.
 	//
 	// +kubebuilder:validation:MinLength=1
@@ -722,11 +723,10 @@ type HTTPHeader struct {
 
 // HTTPHeaderFilter defines a filter that modifies the headers of an HTTP
 // request or response. Only one action for a given header name is permitted.
-// Filters specifying multiple actions of the same or different type for
-// any one header name are invalid and will be rejected by the webhook if
-// installed. Configuration to set or add multiple values for a
-// header must use RFC 7230 header value formatting, separating each value with
-// a comma.
+// Filters specifying multiple actions of the same or different type for any one
+// header name are invalid and will be rejected by the webhook if installed.
+// Configuration to set or add multiple values for a header must use RFC 7230
+// header value formatting, separating each value with a comma.
 type HTTPHeaderFilter struct {
 	// Set overwrites the request with the given header (name, value)
 	// before the action.
@@ -861,11 +861,8 @@ type HTTPPathModifier struct {
 // HTTPRequestRedirect defines a filter that redirects a request. This filter
 // MUST NOT be used on the same Route rule as a HTTPURLRewrite filter.
 type HTTPRequestRedirectFilter struct {
-	// Scheme is the scheme to be used in the value of the `Location`
-	// header in the response.
-	// When empty, the scheme of the request is used.
-	//
-	// Support: Extended
+	// Scheme is the scheme to be used in the value of the `Location` header in
+	// the response. When empty, the scheme of the request is used.
 	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
@@ -873,6 +870,8 @@ type HTTPRequestRedirectFilter struct {
 	// Unknown values here must result in the implementation setting the
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
+	//
+	// Support: Extended
 	//
 	// +optional
 	// +kubebuilder:validation:Enum=http;https
@@ -908,14 +907,14 @@ type HTTPRequestRedirectFilter struct {
 
 	// StatusCode is the HTTP status code to be used in response.
 	//
-	// Support: Core
-	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
 	//
 	// Unknown values here must result in the implementation setting the
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
+	//
+	// Support: Core
 	//
 	// +optional
 	// +kubebuilder:default=302

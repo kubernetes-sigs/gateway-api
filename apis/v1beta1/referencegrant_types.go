@@ -63,9 +63,9 @@ type ReferenceGrantList struct {
 // for Gateway API.
 type ReferenceGrantSpec struct {
 	// From describes the trusted namespaces and kinds that can reference the
-	// resources described in "To". Each entry in this list must be considered
+	// resources described in "To". Each entry in this list MUST be considered
 	// to be an additional place that references can be valid from, or to put
-	// this another way, entries must be combined using OR.
+	// this another way, entries MUST be combined using OR.
 	//
 	// Support: Core
 	//
@@ -74,9 +74,9 @@ type ReferenceGrantSpec struct {
 	From []ReferenceGrantFrom `json:"from"`
 
 	// To describes the resources that may be referenced by the resources
-	// described in "From". Each entry in this list must be considered to be an
+	// described in "From". Each entry in this list MUST be considered to be an
 	// additional place that references can be valid to, or to put this another
-	// way, entries must be combined using OR.
+	// way, entries MUST be combined using OR.
 	//
 	// Support: Core
 	//

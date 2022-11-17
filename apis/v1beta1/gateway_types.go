@@ -237,10 +237,10 @@ type Listener struct {
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
-// Implementations are not required to accept all the defined protocols.
-// If an implementation does not support a specified protocol, it
-// should set the "Accepted" condition for the affected Listener with
-// a reason of "UnsupportedProtocol".
+// Implementations are not required to accept all the defined protocols. If an
+// implementation does not support a specified protocol, it MUST set the
+// "Accepted" condition to False for the affected Listener with a reason of
+// "UnsupportedProtocol".
 //
 // Core ProtocolType values are listed in the table below.
 //

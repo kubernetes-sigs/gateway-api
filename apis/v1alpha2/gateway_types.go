@@ -60,10 +60,10 @@ type GatewaySpec = v1beta1.GatewaySpec
 type Listener = v1beta1.Listener
 
 // ProtocolType defines the application protocol accepted by a Listener.
-// Implementations are not required to accept all the defined protocols.
-// If an implementation does not support a specified protocol, it
-// should set the "Accepted" condition to "False" for the affected Listener with
-// a reason of "UnsupportedProtocol".
+// Implementations are not required to accept all the defined protocols. If an
+// implementation does not support a specified protocol, it MUST set the
+// "Accepted" condition to False for the affected Listener with a reason of
+// "UnsupportedProtocol".
 //
 // Core ProtocolType values are listed in the table below.
 //
@@ -470,9 +470,11 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when the
 	// Listener has a TLS configuration with at least one TLS CertificateRef
 	// that is invalid or does not exist.
+	//
 	// A CertificateRef is considered invalid when it refers to a nonexistent
 	// or unsupported resource or kind, or when the data within that resource
 	// is malformed.
+	//
 	// This reason must be used only when the reference is allowed, either by
 	// referencing an object in the same namespace as the Gateway, or when
 	// a cross-namespace reference has been explicitly allowed by a ReferenceGrant.

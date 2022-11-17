@@ -56,8 +56,8 @@ spec:
               from:
                 description: "From describes the trusted namespaces and kinds that
                   can reference the resources described in \"To\". Each entry in this
-                  list must be considered to be an additional place that references
-                  can be valid from, or to put this another way, entries must be combined
+                  list MUST be considered to be an additional place that references
+                  can be valid from, or to put this another way, entries MUST be combined
                   using OR. \n Support: Core"
                 items:
                   description: ReferenceGrantFrom describes trusted namespaces and
@@ -97,9 +97,9 @@ spec:
                 type: array
               to:
                 description: "To describes the resources that may be referenced by
-                  the resources described in \"From\". Each entry in this list must
+                  the resources described in \"From\". Each entry in this list MUST
                   be considered to be an additional place that references can be valid
-                  to, or to put this another way, entries must be combined using OR.
+                  to, or to put this another way, entries MUST be combined using OR.
                   \n Support: Core"
                 items:
                   description: ReferenceGrantTo describes what Kinds are allowed as
@@ -179,8 +179,8 @@ spec:
               from:
                 description: "From describes the trusted namespaces and kinds that
                   can reference the resources described in \"To\". Each entry in this
-                  list must be considered to be an additional place that references
-                  can be valid from, or to put this another way, entries must be combined
+                  list MUST be considered to be an additional place that references
+                  can be valid from, or to put this another way, entries MUST be combined
                   using OR. \n Support: Core"
                 items:
                   description: ReferenceGrantFrom describes trusted namespaces and
@@ -220,9 +220,9 @@ spec:
                 type: array
               to:
                 description: "To describes the resources that may be referenced by
-                  the resources described in \"From\". Each entry in this list must
+                  the resources described in \"From\". Each entry in this list MUST
                   be considered to be an additional place that references can be valid
-                  to, or to put this another way, entries must be combined using OR.
+                  to, or to put this another way, entries MUST be combined using OR.
                   \n Support: Core"
                 items:
                   description: ReferenceGrantTo describes what Kinds are allowed as
