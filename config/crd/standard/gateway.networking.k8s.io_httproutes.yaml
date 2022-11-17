@@ -90,8 +90,8 @@ spec:
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
-                    2 notable exceptions: \n  1. IPs are not allowed.  2. A hostname
-                    may be prefixed with a wildcard label (`*.`). The wildcard     label
+                    2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
+                    may be prefixed with a wildcard label (`*.`). The wildcard    label
                     must appear by itself as the first label. \n Hostname can be \"precise\"
                     which is a domain name without the terminating dot of a network
                     host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain
@@ -494,13 +494,13 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Support: Extended \n Note that
-                                        values may be added to this enum, implementations
-                                        must ensure that unknown values will not cause
-                                        a crash. \n Unknown values here must result
-                                        in the implementation setting the Accepted
-                                        Condition for the Route to `status: False`,
-                                        with a Reason of `UnsupportedValue`."
+                                        is used. \n Note that values may be added
+                                        to this enum, implementations must ensure
+                                        that unknown values will not cause a crash.
+                                        \n Unknown values here must result in the
+                                        implementation setting the Accepted Condition
+                                        for the Route to `status: False`, with a Reason
+                                        of `UnsupportedValue`. \n Support: Extended"
                                       enum:
                                       - http
                                       - https
@@ -508,13 +508,14 @@ spec:
                                     statusCode:
                                       default: 302
                                       description: "StatusCode is the HTTP status
-                                        code to be used in response. \n Support: Core
-                                        \n Note that values may be added to this enum,
-                                        implementations must ensure that unknown values
-                                        will not cause a crash. \n Unknown values
-                                        here must result in the implementation setting
-                                        the Accepted Condition for the Route to `status:
-                                        False`, with a Reason of `UnsupportedValue`."
+                                        code to be used in response. \n Note that
+                                        values may be added to this enum, implementations
+                                        must ensure that unknown values will not cause
+                                        a crash. \n Unknown values here must result
+                                        in the implementation setting the Accepted
+                                        Condition for the Route to `status: False`,
+                                        with a Reason of `UnsupportedValue`. \n Support:
+                                        Core"
                                       enum:
                                       - 301
                                       - 302
@@ -898,12 +899,12 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Support: Extended \n Note that values may be added
-                                  to this enum, implementations must ensure that unknown
-                                  values will not cause a crash. \n Unknown values
-                                  here must result in the implementation setting the
-                                  Accepted Condition for the Route to `status: False`,
-                                  with a Reason of `UnsupportedValue`."
+                                  Note that values may be added to this enum, implementations
+                                  must ensure that unknown values will not cause a
+                                  crash. \n Unknown values here must result in the
+                                  implementation setting the Accepted Condition for
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`.
+                                  \n Support: Extended"
                                 enum:
                                 - http
                                 - https
@@ -911,12 +912,13 @@ spec:
                               statusCode:
                                 default: 302
                                 description: "StatusCode is the HTTP status code to
-                                  be used in response. \n Support: Core \n Note that
-                                  values may be added to this enum, implementations
-                                  must ensure that unknown values will not cause a
-                                  crash. \n Unknown values here must result in the
-                                  implementation setting the Accepted Condition for
-                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
+                                  be used in response. \n Note that values may be
+                                  added to this enum, implementations must ensure
+                                  that unknown values will not cause a crash. \n Unknown
+                                  values here must result in the implementation setting
+                                  the Accepted Condition for the Route to `status:
+                                  False`, with a Reason of `UnsupportedValue`. \n
+                                  Support: Core"
                                 enum:
                                 - 301
                                 - 302
@@ -1123,12 +1125,12 @@ spec:
                                     be ignored. \n If a query param is repeated in
                                     an HTTP request, the behavior is purposely left
                                     undefined, since different data planes have different
-                                    capabilities. However, it's *recommended* that
+                                    capabilities. However, it is *recommended* that
                                     implementations should match against the first
                                     value of the param if the data plane supports
                                     it, as this behavior is expected in other load
                                     balancing contexts outside of the Gateway API.
-                                    Users should not route traffic based on repeated
+                                    \n Users SHOULD NOT route traffic based on repeated
                                     query params to guard themselves against potential
                                     differences in the implementations."
                                   maxLength: 256
@@ -1449,8 +1451,8 @@ spec:
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
-                    2 notable exceptions: \n  1. IPs are not allowed.  2. A hostname
-                    may be prefixed with a wildcard label (`*.`). The wildcard     label
+                    2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
+                    may be prefixed with a wildcard label (`*.`). The wildcard    label
                     must appear by itself as the first label. \n Hostname can be \"precise\"
                     which is a domain name without the terminating dot of a network
                     host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain
@@ -1853,13 +1855,13 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Support: Extended \n Note that
-                                        values may be added to this enum, implementations
-                                        must ensure that unknown values will not cause
-                                        a crash. \n Unknown values here must result
-                                        in the implementation setting the Accepted
-                                        Condition for the Route to `status: False`,
-                                        with a Reason of `UnsupportedValue`."
+                                        is used. \n Note that values may be added
+                                        to this enum, implementations must ensure
+                                        that unknown values will not cause a crash.
+                                        \n Unknown values here must result in the
+                                        implementation setting the Accepted Condition
+                                        for the Route to `status: False`, with a Reason
+                                        of `UnsupportedValue`. \n Support: Extended"
                                       enum:
                                       - http
                                       - https
@@ -1867,13 +1869,14 @@ spec:
                                     statusCode:
                                       default: 302
                                       description: "StatusCode is the HTTP status
-                                        code to be used in response. \n Support: Core
-                                        \n Note that values may be added to this enum,
-                                        implementations must ensure that unknown values
-                                        will not cause a crash. \n Unknown values
-                                        here must result in the implementation setting
-                                        the Accepted Condition for the Route to `status:
-                                        False`, with a Reason of `UnsupportedValue`."
+                                        code to be used in response. \n Note that
+                                        values may be added to this enum, implementations
+                                        must ensure that unknown values will not cause
+                                        a crash. \n Unknown values here must result
+                                        in the implementation setting the Accepted
+                                        Condition for the Route to `status: False`,
+                                        with a Reason of `UnsupportedValue`. \n Support:
+                                        Core"
                                       enum:
                                       - 301
                                       - 302
@@ -2257,12 +2260,12 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Support: Extended \n Note that values may be added
-                                  to this enum, implementations must ensure that unknown
-                                  values will not cause a crash. \n Unknown values
-                                  here must result in the implementation setting the
-                                  Accepted Condition for the Route to `status: False`,
-                                  with a Reason of `UnsupportedValue`."
+                                  Note that values may be added to this enum, implementations
+                                  must ensure that unknown values will not cause a
+                                  crash. \n Unknown values here must result in the
+                                  implementation setting the Accepted Condition for
+                                  the Route to `status: False`, with a Reason of `UnsupportedValue`.
+                                  \n Support: Extended"
                                 enum:
                                 - http
                                 - https
@@ -2270,12 +2273,13 @@ spec:
                               statusCode:
                                 default: 302
                                 description: "StatusCode is the HTTP status code to
-                                  be used in response. \n Support: Core \n Note that
-                                  values may be added to this enum, implementations
-                                  must ensure that unknown values will not cause a
-                                  crash. \n Unknown values here must result in the
-                                  implementation setting the Accepted Condition for
-                                  the Route to `status: False`, with a Reason of `UnsupportedValue`."
+                                  be used in response. \n Note that values may be
+                                  added to this enum, implementations must ensure
+                                  that unknown values will not cause a crash. \n Unknown
+                                  values here must result in the implementation setting
+                                  the Accepted Condition for the Route to `status:
+                                  False`, with a Reason of `UnsupportedValue`. \n
+                                  Support: Core"
                                 enum:
                                 - 301
                                 - 302
@@ -2482,12 +2486,12 @@ spec:
                                     be ignored. \n If a query param is repeated in
                                     an HTTP request, the behavior is purposely left
                                     undefined, since different data planes have different
-                                    capabilities. However, it's *recommended* that
+                                    capabilities. However, it is *recommended* that
                                     implementations should match against the first
                                     value of the param if the data plane supports
                                     it, as this behavior is expected in other load
                                     balancing contexts outside of the Gateway API.
-                                    Users should not route traffic based on repeated
+                                    \n Users SHOULD NOT route traffic based on repeated
                                     query params to guard themselves against potential
                                     differences in the implementations."
                                   maxLength: 256
