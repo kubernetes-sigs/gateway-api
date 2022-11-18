@@ -120,15 +120,14 @@ docs:
 # Verify if support Docker Buildx.
 .PHONY: image.buildx.verify
 image.buildx.verify:
-	docker --help
+	docker version
 	$(eval PASS := $(shell docker buildx --help | grep "docker buildx" ))
 	@if [ -z "$(PASS)" ]; then \
-		echo "\033[36mCannot find docker buildx, please install first\033[0m"; \
+		echo "Cannot find docker buildx, please install first."; \
 		exit 1;\
 	else \
-		echo "\033[36m===========> Support Docker Buildx\033[0m"; \
+		echo "===========> Support docker buildx"; \
 		docker buildx version; \
-		docker buildx help; \
 	fi
 
 .PHONY: release-staging

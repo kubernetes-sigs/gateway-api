@@ -6,7 +6,6 @@ require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/stretchr/testify v1.7.0
-	golang.org/x/exp v0.0.0-20220407100705-7b9b53b0aca4
 	k8s.io/api v0.24.1
 	k8s.io/apiextensions-apiserver v0.24.1
 	k8s.io/apimachinery v0.24.1
