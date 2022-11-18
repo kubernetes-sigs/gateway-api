@@ -117,8 +117,22 @@ verify:
 docs:
 	hack/make-docs.sh
 
+# Verify if support Docker Buildx.
+.PHONY: image.buildx.verify
+image.buildx.verify:
+	docker --help
+	$(eval PASS := $(shell docker buildx --help | grep "docker buildx" ))
+	@if [ -z "$(PASS)" ]; then \
+		echo "\033[36mCannot find docker buildx, please install first\033[0m"; \
+		exit 1;\
+	else \
+		echo "\033[36m===========> Support Docker Buildx\033[0m"; \
+		docker buildx version; \
+		docker buildx help; \
+	fi
+
 .PHONY: release-staging
-release-staging: 
+release-staging: image.buildx.verify
 	hack/build-and-push.sh
 
 # Generate a virtualenv install, which is useful for hacking on the
