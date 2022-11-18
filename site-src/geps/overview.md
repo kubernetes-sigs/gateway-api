@@ -17,7 +17,7 @@ be in one of many forms:
 
 - A [new GitHub Discussion](https://github.com/kubernetes-sigs/gateway-api/discussions/new)
 - On our [Slack Channel](https://kubernetes.slack.com/archives/CR0H13KGA)
-- On one of our [community meetings](contributing/community/#meetings)
+- On one of our [community meetings](https://gateway-api.sigs.k8s.io/contributing/?h=meetings#meetings)
 
 ### 2. Agree on the Goals
 Although it can be tempting to start writing out all the details of your
