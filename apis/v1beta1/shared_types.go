@@ -292,6 +292,17 @@ const (
 	// This condition indicates whether incompatible filters are present on
 	// a Route. Controllers should only add this condition with status true
 	// when an incompatible combination is present.
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "IncompatibleFilters"
+	//
+	// This condition is an error condition and should not be set with status
+	// false.
+	//
+	// Controllers may raise this condition with other reasons,
+	// but should prefer to use the reasons listed above to improve
+	// interoperability.
 	RouteConditionIncompatibleFilters RouteConditionType = "IncompatibleFilters"
 
 	// This reason is used with the "IncompatibleFilters" condition when the
