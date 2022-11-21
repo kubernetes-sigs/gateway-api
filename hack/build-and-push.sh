@@ -62,6 +62,11 @@ then
     BINARY_TAG="${BASE_REF}"
 fi
 
+# Support multi-arch image build and push.
+BUILDX_PLATFORMS="linux/amd64,linux/arm64"
+
+echo "Building and pushing admission-server image...${BUILDX_PLATFORMS}"
+
 # First, build the image, with the version info passed in.
 # Note that an image will *always* be built tagged with the GIT_TAG, so we know when it was built.
 # And, we add an extra version tag - either :latest or semver.
@@ -71,6 +76,6 @@ docker buildx build \
     -t ${REGISTRY}/admission-server:${VERSION_TAG} \
     --build-arg "COMMIT=${COMMIT}" \
     --build-arg "TAG=${BINARY_TAG}" \
-    --platform linux/amd64,linux/arm64 \
+    --platform ${BUILDX_PLATFORMS} \
     --push \
     .
