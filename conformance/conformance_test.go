@@ -60,7 +60,7 @@ func TestConformance(t *testing.T) {
 		SupportedFeatures:    supportedFeatures,
 	})
 	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
+	cSuite.Run(t, []suite.ConformanceTest{tests.HTTPRouteRequestRedirect})
 }
 
 // parseSupportedFeatures parses flag arguments and converts the string to

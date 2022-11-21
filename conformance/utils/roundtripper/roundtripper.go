@@ -37,11 +37,12 @@ type RoundTripper interface {
 
 // Request is the primary input for making a request.
 type Request struct {
-	URL      url.URL
-	Host     string
-	Protocol string
-	Method   string
-	Headers  map[string][]string
+	URL              url.URL
+	Host             string
+	Protocol         string
+	Method           string
+	Headers          map[string][]string
+	UnFollowRedirect bool
 }
 
 // CapturedRequest contains request metadata captured from an echoserver
@@ -57,12 +58,19 @@ type CapturedRequest struct {
 	Pod       string `json:"pod"`
 }
 
+type RedirectRequest struct {
+	Scheme   string
+	Hostname string
+	Port     string
+}
+
 // CapturedResponse contains response metadata.
 type CapturedResponse struct {
-	StatusCode    int
-	ContentLength int64
-	Protocol      string
-	Headers       map[string][]string
+	StatusCode      int
+	ContentLength   int64
+	Protocol        string
+	Headers         map[string][]string
+	RedirectRequest *RedirectRequest
 }
 
 // DefaultRoundTripper is the default implementation of a RoundTripper. It will
@@ -79,6 +87,12 @@ type DefaultRoundTripper struct {
 func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedRequest, *CapturedResponse, error) {
 	cReq := &CapturedRequest{}
 	client := http.DefaultClient
+
+	if request.UnFollowRedirect {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
 
 	method := "GET"
 	if request.Method != "" {
@@ -144,6 +158,18 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		Headers:       resp.Header,
 	}
 
+	if IsRedirect(resp.StatusCode) {
+		redirectURL, err := resp.Location()
+		if err != nil {
+			return nil, nil, err
+		}
+		cRes.RedirectRequest = &RedirectRequest{
+			Scheme:   redirectURL.Scheme,
+			Hostname: redirectURL.Hostname(),
+			Port:     redirectURL.Port(),
+		}
+	}
+
 	return cReq, cRes, nil
 }
 
@@ -152,4 +178,15 @@ var startLineRegex = regexp.MustCompile(`(?m)^`)
 func formatDump(data []byte, prefix string) string {
 	data = startLineRegex.ReplaceAllLiteral(data, []byte(prefix))
 	return string(data)
+}
+
+func IsRedirect(statusCode int) bool {
+	// Gateway allows only 301, and 302
+	switch statusCode {
+	case http.StatusMovedPermanently,
+		http.StatusFound:
+		return true
+	}
+
+	return false
 }
