@@ -133,16 +133,20 @@ image.buildx.verify:
 BUILDX_CONTEXT = gateway-api-builder
 BUILDX_PLATFORMS = linux/amd64,linux/arm64
 
-# Setup multi-arch enviroment
-# Recreate a buildx context for multi-arch images.
+# Setup multi-arch docker buildx enviroment.
 .PHONY: image.multiarch.setup
 image.multiarch.setup: image.buildx.verify
+# Ensure qemu is in binfmt_misc.
+# Docker desktop already has these in versions recent enough to have buildx,
+# We only need to do this setup on linux hosts.
 	@if [ "$(shell uname)" == "Linux" ]; then \
 		docker run --rm --privileged multiarch/qemu-user-static --reset -p yes; \
 	fi
+# Ensure we use a builder that can leverage it, we need to recreate one.
 	docker buildx rm $(BUILDX_CONTEXT) || :
 	docker buildx create --use --name $(BUILDX_CONTEXT) --platform "${BUILDX_PLATFORMS}"
 
+# Build and Push Multi Arch Images.
 .PHONY: release-staging
 release-staging: image.multiarch.setup
 	hack/build-and-push.sh
