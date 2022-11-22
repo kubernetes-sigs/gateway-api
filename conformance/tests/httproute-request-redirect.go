@@ -43,8 +43,8 @@ var HTTPRouteRequestRedirect = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{{
 			Request: http.Request{
-				Path:             "/hostname",
-				UnFollowRedirect: true,
+				Path:             "/hostname-redirect",
+				UnfollowRedirect: true,
 			},
 			Response: http.Response{
 				StatusCode: 302,
@@ -57,7 +57,7 @@ var HTTPRouteRequestRedirect = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path:             "/status-code-301",
-				UnFollowRedirect: true,
+				UnfollowRedirect: true,
 			},
 			Response: http.Response{
 				StatusCode: 301,
@@ -67,7 +67,7 @@ var HTTPRouteRequestRedirect = suite.ConformanceTest{
 		}, {
 			Request: http.Request{
 				Path:             "/host-and-status",
-				UnFollowRedirect: true,
+				UnfollowRedirect: true,
 			},
 			Response: http.Response{
 				StatusCode: 301,

@@ -42,7 +42,7 @@ type Request struct {
 	Protocol         string
 	Method           string
 	Headers          map[string][]string
-	UnFollowRedirect bool
+	UnfollowRedirect bool
 }
 
 // CapturedRequest contains request metadata captured from an echoserver
@@ -58,6 +58,8 @@ type CapturedRequest struct {
 	Pod       string `json:"pod"`
 }
 
+// RedirectRequest contains a follow up request metadata captured from a redirect
+// response.
 type RedirectRequest struct {
 	Scheme   string
 	Hostname string
@@ -88,7 +90,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	cReq := &CapturedRequest{}
 	client := http.DefaultClient
 
-	if request.UnFollowRedirect {
+	if request.UnfollowRedirect {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
 		}
@@ -173,13 +175,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	return cReq, cRes, nil
 }
 
-var startLineRegex = regexp.MustCompile(`(?m)^`)
-
-func formatDump(data []byte, prefix string) string {
-	data = startLineRegex.ReplaceAllLiteral(data, []byte(prefix))
-	return string(data)
-}
-
+// IsRedirect returns true if a given status code is a redirect code supported by the gateway api.
 func IsRedirect(statusCode int) bool {
 	// Gateway allows only 301, and 302
 	switch statusCode {
@@ -189,4 +185,11 @@ func IsRedirect(statusCode int) bool {
 	}
 
 	return false
+}
+
+var startLineRegex = regexp.MustCompile(`(?m)^`)
+
+func formatDump(data []byte, prefix string) string {
+	data = startLineRegex.ReplaceAllLiteral(data, []byte(prefix))
+	return string(data)
 }

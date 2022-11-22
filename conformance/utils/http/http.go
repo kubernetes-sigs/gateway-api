@@ -63,7 +63,7 @@ type Request struct {
 	Method           string
 	Path             string
 	Headers          map[string]string
-	UnFollowRedirect bool
+	UnfollowRedirect bool
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -114,7 +114,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		URL:              url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
 		Protocol:         "HTTP",
 		Headers:          map[string][]string{},
-		UnFollowRedirect: expected.Request.UnFollowRedirect,
+		UnfollowRedirect: expected.Request.UnfollowRedirect,
 	}
 
 	if expected.Request.Headers != nil {

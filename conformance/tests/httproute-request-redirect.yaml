@@ -10,7 +10,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /hostname
+        value: /hostname-redirect
     filters:
     - type: RequestRedirect
       requestRedirect:
