@@ -32,7 +32,7 @@ func PortNumberInt32(name *gatewayv1a2.PortNumber) int32 {
 	return portNum
 }
 
-// SectionNamePtr translates an int to a *SectionName
+// SectionNamePtr translates a string to a *SectionName
 func SectionNamePtr(sectionName string) *gatewayv1a2.SectionName {
 	gwSectionName := gatewayv1a2.SectionName(sectionName)
 	return &gwSectionName
@@ -44,7 +44,7 @@ func SectionNameStr(name *gatewayv1a2.SectionName) string {
 	return sectionName
 }
 
-// HostnamePtr translates an int to a *Hostname
+// HostnamePtr translates a string to a *Hostname
 func HostnamePtr(host string) *gatewayv1a2.Hostname {
 	h := gatewayv1a2.Hostname(host)
 	return &h
@@ -56,7 +56,7 @@ func HostnameStr(name *gatewayv1a2.Hostname) string {
 	return hostName
 }
 
-// PreciseHostnamePtr translates an int to a *PreciseHostname
+// PreciseHostnamePtr translates a string to a *PreciseHostname
 func PreciseHostnamePtr(host string) *gatewayv1a2.PreciseHostname {
 	h := gatewayv1a2.PreciseHostname(host)
 	return &h
@@ -68,7 +68,7 @@ func PreciseHostnameStr(name *gatewayv1a2.PreciseHostname) string {
 	return prechostName
 }
 
-// GroupPtr translates an int to a *Group
+// GroupPtr translates a string to a *Group
 func GroupPtr(group string) *gatewayv1a2.Group {
 	gwGroup := gatewayv1a2.Group(group)
 	return &gwGroup
@@ -80,7 +80,7 @@ func GroupStr(name *gatewayv1a2.Group) string {
 	return groupStr
 }
 
-// KindPtr translates an int to a *Kind
+// KindPtr translates a string to a *Kind
 func KindPtr(kind string) *gatewayv1a2.Kind {
 	gwKind := gatewayv1a2.Kind(kind)
 	return &gwKind
@@ -92,7 +92,7 @@ func KindStr(name *gatewayv1a2.Kind) string {
 	return kindStr
 }
 
-// NamespacePtr translates an int to a *Namespace
+// NamespacePtr translates a string to a *Namespace
 func NamespacePtr(namespace string) *gatewayv1a2.Namespace {
 	gwNamespace := gatewayv1a2.Namespace(namespace)
 	return &gwNamespace
@@ -104,7 +104,7 @@ func NamespaceStr(name *gatewayv1a2.Namespace) string {
 	return namespace
 }
 
-// ObjectNamePtr translates an int to a *ObjectName
+// ObjectNamePtr translates a string to a *ObjectName
 func ObjectNamePtr(name string) *gatewayv1a2.ObjectName {
 	objectName := gatewayv1a2.ObjectName(name)
 	return &objectName
@@ -116,7 +116,7 @@ func ObjectNameStr(name *gatewayv1a2.ObjectName) string {
 	return objname
 }
 
-// GatewayControllerPtr translates an int to a *GatewayController
+// GatewayControllerPtr translates a string to a *GatewayController
 func GatewayControllerPtr(name string) *gatewayv1a2.GatewayController {
 	gwCtrl := gatewayv1a2.GatewayController(name)
 	return &gwCtrl
@@ -128,7 +128,7 @@ func GatewayControllerStr(name *gatewayv1a2.GatewayController) string {
 	return gw
 }
 
-// AnnotationKeyPtr translates an int to a *AnnotationKey
+// AnnotationKeyPtr translates a string to a *AnnotationKey
 func AnnotationKeyPtr(name string) *gatewayv1a2.AnnotationKey {
 	key := gatewayv1a2.AnnotationKey(name)
 	return &key
@@ -140,7 +140,7 @@ func AnnotationKeyStr(name *gatewayv1a2.AnnotationKey) string {
 	return key
 }
 
-// AnnotationValuePtr translates an int to a *AnnotationValue
+// AnnotationValuePtr translates a string to a *AnnotationValue
 func AnnotationValuePtr(name string) *gatewayv1a2.AnnotationValue {
 	val := gatewayv1a2.AnnotationValue(name)
 	return &val
@@ -152,7 +152,7 @@ func AnnotationValueStr(name *gatewayv1a2.AnnotationValue) string {
 	return val
 }
 
-// AddressTypePtr translates an int to a *AddressType
+// AddressTypePtr translates a string to a *AddressType
 func AddressTypePtr(name string) *gatewayv1a2.AddressType {
 	addr := gatewayv1a2.AddressType(name)
 	return &addr
@@ -164,7 +164,7 @@ func AddressTypeStr(name *gatewayv1a2.AddressType) string {
 	return val
 }
 
-// RouteConditionTypePtr translates an int to a *RouteConditionType
+// RouteConditionTypePtr translates a string to a *RouteConditionType
 func RouteConditionTypePtr(name string) *gatewayv1a2.RouteConditionType {
 	str := gatewayv1a2.RouteConditionType(name)
 	return &str
@@ -176,7 +176,7 @@ func RouteConditionTypeStr(name *gatewayv1a2.RouteConditionType) string {
 	return val
 }
 
-// RouteConditionReasonPtr translates an int to a *RouteConditionReason
+// RouteConditionReasonPtr translates a string to a *RouteConditionReason
 func RouteConditionReasonPtr(name string) *gatewayv1a2.RouteConditionReason {
 	str := gatewayv1a2.RouteConditionReason(name)
 	return &str
@@ -188,7 +188,7 @@ func RouteConditionReasonStr(name *gatewayv1a2.RouteConditionType) string {
 	return val
 }
 
-// ProtocolTypePtr translates an int to a *ProtocolType
+// ProtocolTypePtr translates a string to a *ProtocolType
 func ProtocolTypePtr(name string) *gatewayv1a2.ProtocolType {
 	proto := gatewayv1a2.ProtocolType(name)
 	return &proto
@@ -200,7 +200,7 @@ func ProtocolTypeStr(name *gatewayv1a2.ProtocolType) string {
 	return val
 }
 
-// TLSModeTypePtr translates an int to a *TLSModeType
+// TLSModeTypePtr translates a string to a *TLSModeType
 func TLSModeTypePtr(name string) *gatewayv1a2.TLSModeType {
 	tls := gatewayv1a2.TLSModeType(name)
 	return &tls
