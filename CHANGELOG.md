@@ -25,16 +25,14 @@
 
 ### ReferenceGrant moves to `v1beta1`, ReferencePolicy removed
 
-With more implementations now supporting ReferenceGrant, and more conformance coverage of the object, we've moved ReferenceGrant to `v1beta1` in this release. Note that moving to beta also moves the object to the Standard channel (it was Experimental previously).
+With more implementations now supporting ReferenceGrant  (and more conformance coverage of the resource), we've moved ReferenceGrant to `v1beta1` in this release. **Note** that moving to beta also moves the object to the Standard channel (it was Experimental previously).
 
 We've also removed the already-deprecated ReferencePolicy resource, so please move over to the shiny new ReferenceGrant, which has all the same features.
-
 
 - Promotes ReferenceGrant to the v1beta1 API and the standard release channel
   (#1455, @nathancoleman)
 - ReferencePolicy has been removed from the API in favor of ReferenceGrant.
   (#1406, @robscott)
-
 
 ### Introduce GRPCRoute
 
@@ -45,7 +43,6 @@ As it is a new resource, it is introduced in the experimental channel.
 Thanks to @gnossen for pushing this ahead.
 
 - Introduce GRPCRoute resource. (#1115, @gnossen)
-
 
 ### Status updates
 
@@ -70,7 +67,7 @@ GatewayClass and HTTPRoute:
 
 The purpose of these changes is to make the status flows more consistent across objects, and to provide a clear pattern for new objects as we evolve the API.
 
-**This change will require updates for implementations to be able to pass conformance tests**.
+> **Note**: This change will require updates for implementations to be able to pass conformance tests.
 
 - Adds GatewayConditionAccepted and GatewayReasonAccepted Deprecates
   GatewayConditionScheduled and GatewayReasonScheduled (#1447, @mikemorris)
@@ -82,7 +79,6 @@ The purpose of these changes is to make the status flows more consistent across 
 - Status definitions have been updated across the API. (#1383, @youngnick)
 - Adds `ListenerConditionAccepted` and `ListenerReasonAccepted` Deprecates
   `ListenerConditionDetached` and `ListenerReasonAttached` (#1446, @mikemorris)
-
 
 ## Other Changes by type
 
@@ -96,10 +92,7 @@ The purpose of these changes is to make the status flows more consistent across 
   Implementations should update to use v1beta1 for these resources as soon as
   possible. (#1405, @robscott)
 
-
-
 ### API Changes
-
 
 - A new field `responseHeaderModifier` is added to `.spec.rules.filters`, which
   allows for modification of HTTP response headers (#1373, @aryan9600)
