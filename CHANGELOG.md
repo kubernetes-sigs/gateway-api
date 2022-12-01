@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.6.0-rc1](#v060-rc1)
 - [v0.5.1](#v051)
 - [v0.5.0](#v050)
 - [v0.5.0-rc2](#v050-rc2)
@@ -17,6 +18,112 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.6.0-rc1
+
+## Major Changes
+
+### ReferenceGrant moves to `v1beta1`, ReferencePolicy removed
+
+With more implementations now supporting ReferenceGrant (and more conformance coverage of the resource), we've moved ReferenceGrant to `v1beta1` in this release. **Note** that moving to beta also moves the object to the Standard channel (it was Experimental previously).
+
+We've also removed the already-deprecated ReferencePolicy resource, so please move over to the shiny new ReferenceGrant, which has all the same features.
+
+- Promotes ReferenceGrant to the v1beta1 API and the standard release channel
+  (#1455, @nathancoleman)
+- ReferencePolicy has been removed from the API in favor of ReferenceGrant.
+  (#1406, @robscott)
+
+### Introduce GRPCRoute
+
+The `GRPCRoute` resource has been introduced in order to simplify the routing of GRPC requests.
+Its design is described in [GEP-1016](https://gateway-api.sigs.k8s.io/geps/gep-1016/).
+As it is a new resource, it is introduced in the experimental channel.
+
+Thanks to @gnossen for pushing this ahead.
+
+- Introduce GRPCRoute resource. (#1115, @gnossen)
+
+### Status updates
+
+As described in [GEP-1364](https://gateway-api.sigs.k8s.io/geps/gep-1364/), status conditions have been updated within the Gateway resource to make it more consistent with the rest of the API. These changes, along with some other status changes, are detailed below.
+
+Gateway:
+
+* New `Accepted` and `Programmed` conditions introduced.
+* `Scheduled` condition deprecated.
+* Core Conditions now `Accepted` and `Programmed`.
+* Moves to Extended: `Ready`.
+
+Gateway Listener:
+
+* New `Accepted` and `Programmed` conditions introduced.
+* `Detached` condition deprecated.
+* Core Conditions now `Accepted`, `Programmed`, `ResolvedRefs`, and `Conflicted`.
+* Moves to Extended: `Ready`.
+
+All Resources:
+
+* The `Accepted` Condition now has a `Pending` reason, which is the default until
+  the condition is updated by a controller.
+
+Route resources:
+
+* The `Accepted` Condition now has a `NoMatchingParent` reason, to be set on routes
+  when no matching parent can be found.
+
+The purpose of these changes is to make the status flows more consistent across objects, and to provide a clear pattern for new objects as we evolve the API.
+
+> **Note**: This change will require updates for implementations to be able to pass conformance tests. Implementations may choose to publish both new and old conditions, or only new conditions.
+
+- Adds `Accepted` and deprecates `Detached` Listener conditions and reasons (#1446, @mikemorris)
+- Adds `Accepted` and deprecates `Scheduled` Gateway conditions and reasons (#1447, @mikemorris)
+- Adds `Pending` reason for use with all `Accepted` conditions throughout the API (#1453, @youngnick)
+- Adds `Programmed` Gateway and Listener conditions, moves `Ready` to extended
+  conformance (#1499, @LCaparelli)
+- Add `RouteReasonNoMatchingParent` reason for `Accepted` condition. (#1516, @pmalek)
+
+## Other Changes by type
+
+### Deprecations
+
+- GatewayClass, Gateway, and HTTPRoute are now only supported with the v1beta1
+  version of the API. The v1alpha2 API versions of these resources will be fully
+  removed in a future release. Additionally, v1alpha2 is marked as deprecated
+  everywhere. (#1348 and #1405, @robscott)
+
+### API Changes
+
+- A new field `responseHeaderModifier` is added to `.spec.rules.filters`, which
+  allows for modification of HTTP response headers (#1373, @aryan9600)
+
+### Conformance Tests
+
+- ExemptFeatures have been merged into SupportedFeatures providing implementations
+  a uniform way to specify the features they support.
+  (#1507, @robscott) (#1394, @gyohuangxin)
+- To be conformant with the API, if there is no ReferenceGrant that grants a
+  listener to reference a secret in another namespace, the
+  ListenerConditionReason for the condition ResolvedRefs must be set to
+  RefNotPermitted instead of InvalidCertificateRef. (#1305, @mlavacca)
+
+### Developer Notes
+
+- Deprecated `v1alpha2` Go types are now aliases to their `v1beta1` versions
+  (#1390, @howardjohn)
+- Moved type translation helpers from the `utils` package to a new package named
+  `translator`. (#1337, @carlisia)
+
+### Documentation
+
+- Clarify that BackendObjectReference's Port field specifies a service port, not
+  a target port, for Kubernetes Service backends. (#1332, @Miciah)
+- HTTPRequestHeaderFilter and HTTPResponseHeaderFilter forbid configuring
+  multiple actions for the same header. (#1497, @rainest)
+- Changes "custom" conformance level to "implementation-specific" (#1436,
+  @LCaparelli)
+- Clarification that changes to ReferenceGrants MUST be reconciled (#1429,
+  @robscott)
 
 ## v0.5.1
 
