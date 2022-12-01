@@ -109,8 +109,8 @@ spec:
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
-                    2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
-                    may be prefixed with a wildcard label (`*.`). The wildcard    label
+                    2 notable exceptions: \n  1. IPs are not allowed.  2. A hostname
+                    may be prefixed with a wildcard label (`*.`). The wildcard     label
                     must appear by itself as the first label. \n Hostname can be \"precise\"
                     which is a domain name without the terminating dot of a network
                     host (e.g. \"foo.example.com\") or \"wildcard\", which is a domain
@@ -1136,8 +1136,8 @@ spec:
                           if all conditions are satisfied. \n For example, the match
                           below will match a gRPC request only if its service is `foo`
                           AND it contains the `version: v1` header: \n ``` matches:
-                          - method:    type: Exact    service: \"foo\"   headers:
-                          \  - name: \"version\"     value \"v1\" ```"
+                          \  - method:     type: Exact     service: \"foo\"     headers:
+                          \  - name: \"version\"     value \"v1\" \n ```"
                         properties:
                           headers:
                             description: Headers specifies gRPC request header matchers.
