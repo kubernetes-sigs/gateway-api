@@ -49,7 +49,6 @@ import (
 type ReferenceGrant v1beta1.ReferenceGrant
 
 // +kubebuilder:object:root=true
-
 // ReferenceGrantList contains a list of ReferenceGrant.
 type ReferenceGrantList struct {
 	metav1.TypeMeta `json:",inline"`
