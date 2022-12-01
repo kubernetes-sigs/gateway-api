@@ -28,14 +28,15 @@ then
     exit 1
 fi
 
-semver='^v[0-9]+\.[0-9]+\.[0-9]+$'
+semver='^v[0-9]+\.[0-9]+\.[0-9]+.*$'
 
 if [[ "${BASE_REF}" =~ $semver ]]
 then
     echo "Working on semver, need to replace."
     for yaml in `ls config/webhook/*.yaml`
     do
-        sed -i "s/:latest/:${BASE_REF}/g" $yaml
+        echo Replacing in $yaml
+        sed -i -E "s/admission-server:[a-z0-9\.-]+/admission-server:${BASE_REF}/g" $yaml
     done
 else
     echo "No version requested with BASE_REF, nothing to do."
