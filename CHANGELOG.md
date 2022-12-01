@@ -25,7 +25,7 @@
 
 ### ReferenceGrant moves to `v1beta1`, ReferencePolicy removed
 
-With more implementations now supporting ReferenceGrant  (and more conformance coverage of the resource), we've moved ReferenceGrant to `v1beta1` in this release. **Note** that moving to beta also moves the object to the Standard channel (it was Experimental previously).
+With more implementations now supporting ReferenceGrant (and more conformance coverage of the resource), we've moved ReferenceGrant to `v1beta1` in this release. **Note** that moving to beta also moves the object to the Standard channel (it was Experimental previously).
 
 We've also removed the already-deprecated ReferencePolicy resource, so please move over to the shiny new ReferenceGrant, which has all the same features.
 
@@ -46,39 +46,42 @@ Thanks to @gnossen for pushing this ahead.
 
 ### Status updates
 
-As described in [GEP-1364](https://gateway-api.sigs.k8s.io/geps/gep-1364/), Status flows have been updated across all Gateway API objects.
-
-A summary by object type:
+As described in [GEP-1364](https://gateway-api.sigs.k8s.io/geps/gep-1364/), status conditions have been updated within the Gateway resource to make it more consistent with the rest of the API. These changes, along with some other status changes, are detailed below.
 
 Gateway:
-* New `Accepted` and `Programmed` conditions introduced
+
+* New `Accepted` and `Programmed` conditions introduced.
 * `Scheduled` condition deprecated.
 * Core Conditions now `Accepted` and `Programmed`.
 * Moves to Extended: `Ready`.
 
 Gateway Listener:
-* New `Accepted` and `Programmed` conditions introduced
-* `Detached` condition deprecated
-* Core Conditions now `Accepted`, `Programmed`, `ResolvedRefs`, and `Conflicted`
-* Moves to Extended: `Ready`
 
-GatewayClass and HTTPRoute:
-* No changes (both already used `Accepted`).
+* New `Accepted` and `Programmed` conditions introduced.
+* `Detached` condition deprecated.
+* Core Conditions now `Accepted`, `Programmed`, `ResolvedRefs`, and `Conflicted`.
+* Moves to Extended: `Ready`.
+
+All Resources:
+
+* The `Accepted` Condition now has a `Pending` reason, which is the default until
+  the condition is updated by a controller.
+
+Route resources:
+
+* The `Accepted` Condition now has a `NoMatchingParent` reason, to be set on routes
+  when no matching parent can be found.
 
 The purpose of these changes is to make the status flows more consistent across objects, and to provide a clear pattern for new objects as we evolve the API.
 
-> **Note**: This change will require updates for implementations to be able to pass conformance tests.
+> **Note**: This change will require updates for implementations to be able to pass conformance tests. Implementations may choose to publish both new and old conditions, or only new conditions.
 
-- Adds GatewayConditionAccepted and GatewayReasonAccepted Deprecates
-  GatewayConditionScheduled and GatewayReasonScheduled (#1447, @mikemorris)
-- A `Pending` Reason has been added to Conditions to harmonize the unreconciled
-  state across objects. GatewayClass, Gateway, and Route `Accepted` Conditions
-  have been updated. (#1453, @youngnick)
-- Added "Programmed" Gateway and Listener conditions, moved "Ready" to extended
+- Adds `Accepted` and deprecates `Detached` Listener conditions and reasons (#1446, @mikemorris)
+- Adds `Accepted` and deprecates `Scheduled` Gateway conditions and reasons (#1447, @mikemorris)
+- Adds `Pending` reason for use with all `Accepted` conditions throughout the API (#1453, @youngnick)
+- Adds `Programmed` Gateway and Listener conditions, moves `Ready` to extended
   conformance (#1499, @LCaparelli)
-- Status definitions have been updated across the API. (#1383, @youngnick)
-- Adds `ListenerConditionAccepted` and `ListenerReasonAccepted` Deprecates
-  `ListenerConditionDetached` and `ListenerReasonAttached` (#1446, @mikemorris)
+- Add `RouteReasonNoMatchingParent` reason for `Accepted` condition. (#1516, @pmalek)
 
 ## Other Changes by type
 
@@ -86,11 +89,8 @@ The purpose of these changes is to make the status flows more consistent across 
 
 - GatewayClass, Gateway, and HTTPRoute are now only supported with the v1beta1
   version of the API. The v1alpha2 API versions of these resources will be fully
-  removed in a future release. (#1348, @robscott)
-- V1alpha2 has been deprecated for Gateway, GatewayClass, and HTTPRoute. This
-  version of the API will be removed from CRDs in a future release.
-  Implementations should update to use v1beta1 for these resources as soon as
-  possible. (#1405, @robscott)
+  removed in a future release. Additionally, v1alpha2 is marked as deprecated
+  everywhere. (#1348 and #1405, @robscott)
 
 ### API Changes
 
@@ -99,16 +99,9 @@ The purpose of these changes is to make the status flows more consistent across 
 
 ### Conformance Tests
 
-- 1. Add flags for SupportedFeatures and ExemptFeatures in conformance tests.
-  2. Remove suite.SupportReferenceGrant as the default value of
-     SupportedFeatures.
-  3. Replace `Features []suite.SupportedFeature{suite.SupportReferenceGrant}` from Features list
-     to `Exemptions: []suite.ExemptFeature{suite.ExemptReferenceGrant}` on all
-     tests. (#1394, @gyohuangxin)
-- Conformance: ExemptFeatures have been merged into SupportedFeatures. (#1507,
-  @robscott)
-- Add `RouteReasonNoMatchingParent` reason for `Accepted` condition set on
-  routes when no matching parent has been found (#1516, @pmalek)
+- ExemptFeatures have been merged into SupportedFeatures providing implementations
+  a uniform way to specify the features they support.
+  (#1507, @robscott) (#1394, @gyohuangxin)
 - To be conformant with the API, if there is no ReferenceGrant that grants a
   listener to reference a secret in another namespace, the
   ListenerConditionReason for the condition ResolvedRefs must be set to
