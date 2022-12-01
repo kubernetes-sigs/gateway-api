@@ -39,9 +39,7 @@ The following steps must be done by one of the [Gateway API maintainers][gateway
 
 For a major or minor release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
-
-For all releases:
-- Check out the `release-major.minor` branch locally
+- Check out the `release-major.minor` release branch locally.
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
   and webhook with the correct version info. Note that the YAMLs will not work until the tag is actually
@@ -49,8 +47,22 @@ For all releases:
 - Publish a new Git tag. This can  be done using the `git` CLI or Github's [release][release]
   page.
 - Run the `make build-install-yaml` command which will generate
-  install files in the `release/` directory and attach these files to
-  the Github release.
+  install files in the `release/` directory
+- Attach these files to the Github release.
+
+For an RC release:
+- Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
+- Run the following command `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
+  and webhook with the correct version info. Note that the YAMLs will not work until the tag is actually
+  published in the next step.
+- Include the changelog update in this PR.
+- Merge the update PR.
+- Tag the release using the commit on `main` where the changelog update merged.
+  This can  be done using the `git` CLI or Github's [release][release]
+  page.
+- Run the `make build-install-yaml` command which will generate
+  install files in the `release/` directory
+- Attach these files to the Github release.
 
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
