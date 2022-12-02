@@ -78,33 +78,6 @@ type HTTPRouteRule = v1beta1.HTTPRouteRule
 // +k8s:deepcopy-gen=false
 type PathMatchType = v1beta1.PathMatchType
 
-const (
-	// Matches the URL path exactly and with case sensitivity.
-	PathMatchExact PathMatchType = "Exact"
-
-	// Matches based on a URL path prefix split by `/`. Matching is
-	// case sensitive and done on a path element by element basis. A
-	// path element refers to the list of labels in the path split by
-	// the `/` separator. When specified, a trailing `/` is ignored.
-	//
-	// For example, the paths `/abc`, `/abc/`, and `/abc/def` would all match
-	// the prefix `/abc`, but the path `/abcd` would not.
-	//
-	// "PathPrefix" is semantically equivalent to the "Prefix" path type in the
-	// Kubernetes Ingress API.
-	PathMatchPathPrefix PathMatchType = "PathPrefix"
-
-	// Matches if the URL path matches the given regular expression with
-	// case sensitivity.
-	//
-	// Since `"RegularExpression"` has implementation-specific conformance,
-	// implementations can support POSIX, PCRE, RE2 or any other regular expression
-	// dialect.
-	// Please read the implementation's documentation to determine the supported
-	// dialect.
-	PathMatchRegularExpression PathMatchType = "RegularExpression"
-)
-
 // HTTPPathMatch describes how to select a HTTP route by matching the HTTP request path.
 // +k8s:deepcopy-gen=false
 type HTTPPathMatch = v1beta1.HTTPPathMatch
@@ -125,12 +98,6 @@ type HTTPPathMatch = v1beta1.HTTPPathMatch
 // +kubebuilder:validation:Enum=Exact;RegularExpression
 // +k8s:deepcopy-gen=false
 type HeaderMatchType = v1beta1.HeaderMatchType
-
-// HeaderMatchType constants.
-const (
-	HeaderMatchExact             = v1beta1.HeaderMatchExact
-	HeaderMatchRegularExpression = v1beta1.HeaderMatchRegularExpression
-)
 
 // HTTPHeaderName is the name of an HTTP header.
 //
@@ -173,12 +140,6 @@ type HTTPHeaderMatch = v1beta1.HTTPHeaderMatch
 // +k8s:deepcopy-gen=false
 type QueryParamMatchType = v1beta1.QueryParamMatchType
 
-// QueryParamMatchType constants.
-const (
-	QueryParamMatchExact             QueryParamMatchType = "Exact"
-	QueryParamMatchRegularExpression QueryParamMatchType = "RegularExpression"
-)
-
 // HTTPQueryParamMatch describes how to select a HTTP route by matching HTTP
 // query parameters.
 // +k8s:deepcopy-gen=false
@@ -200,18 +161,6 @@ type HTTPQueryParamMatch = v1beta1.HTTPQueryParamMatch
 // +kubebuilder:validation:Enum=GET;HEAD;POST;PUT;DELETE;CONNECT;OPTIONS;TRACE;PATCH
 // +k8s:deepcopy-gen=false
 type HTTPMethod = v1beta1.HTTPMethod
-
-const (
-	HTTPMethodGet     HTTPMethod = "GET"
-	HTTPMethodHead    HTTPMethod = "HEAD"
-	HTTPMethodPost    HTTPMethod = "POST"
-	HTTPMethodPut     HTTPMethod = "PUT"
-	HTTPMethodDelete  HTTPMethod = "DELETE"
-	HTTPMethodConnect HTTPMethod = "CONNECT"
-	HTTPMethodOptions HTTPMethod = "OPTIONS"
-	HTTPMethodTrace   HTTPMethod = "TRACE"
-	HTTPMethodPatch   HTTPMethod = "PATCH"
-)
 
 // HTTPRouteMatch defines the predicate used to match requests to a given
 // action. Multiple match types are ANDed together, i.e. the match will
@@ -246,55 +195,6 @@ type HTTPRouteFilter = v1beta1.HTTPRouteFilter
 // +k8s:deepcopy-gen=false
 type HTTPRouteFilterType = v1beta1.HTTPRouteFilterType
 
-const (
-	// HTTPRouteFilterRequestHeaderModifier can be used to add or remove an HTTP
-	// header from an HTTP request before it is sent to the upstream target.
-	//
-	// Support in HTTPRouteRule: Core
-	//
-	// Support in HTTPBackendRef: Extended
-	HTTPRouteFilterRequestHeaderModifier HTTPRouteFilterType = "RequestHeaderModifier"
-
-	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
-	// another location. This filter can also be used for HTTP to HTTPS
-	// redirects. This may not be used on the same Route rule or BackendRef as a
-	// URLRewrite filter.
-	//
-	// Support in HTTPRouteRule: Core
-	//
-	// Support in HTTPBackendRef: Extended
-	HTTPRouteFilterRequestRedirect HTTPRouteFilterType = "RequestRedirect"
-
-	// HTTPRouteFilterURLRewrite can be used to modify a request during
-	// forwarding. At most one of these filters may be used on a Route rule.
-	// This may not be used on the same Route rule or BackendRef as a
-	// RequestRedirect filter.
-	//
-	// Support in HTTPRouteRule: Extended
-	//
-	// Support in HTTPBackendRef: Extended
-	//
-	// <gateway:experimental>
-	HTTPRouteFilterURLRewrite HTTPRouteFilterType = "URLRewrite"
-
-	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
-	// different backend. The responses from this backend MUST be ignored by
-	// the Gateway.
-	//
-	// Support in HTTPRouteRule: Extended
-	//
-	// Support in HTTPBackendRef: Extended
-	HTTPRouteFilterRequestMirror HTTPRouteFilterType = "RequestMirror"
-
-	// HTTPRouteFilterExtensionRef should be used for configuring custom
-	// HTTP filters.
-	//
-	// Support in HTTPRouteRule: Implementation-specific
-	//
-	// Support in HTTPBackendRef: Implementation-specific
-	HTTPRouteFilterExtensionRef HTTPRouteFilterType = "ExtensionRef"
-)
-
 // HTTPHeader represents an HTTP Header name and value as defined by RFC 7230.
 // +k8s:deepcopy-gen=false
 type HTTPHeader = v1beta1.HTTPHeader
@@ -307,24 +207,6 @@ type HTTPHeaderFilter = v1beta1.HTTPHeaderFilter
 // HTTPPathModifierType defines the type of path redirect or rewrite.
 // +k8s:deepcopy-gen=false
 type HTTPPathModifierType = v1beta1.HTTPPathModifierType
-
-const (
-	// This type of modifier indicates that the full path will be replaced
-	// by the specified value.
-	FullPathHTTPPathModifier HTTPPathModifierType = "ReplaceFullPath"
-
-	// This type of modifier indicates that any prefix path matches will be
-	// replaced by the substitution value. For example, a path with a prefix
-	// match of "/foo" and a ReplacePrefixMatch substitution of "/bar" will have
-	// the "/foo" prefix replaced with "/bar" in matching requests.
-	//
-	// Note that this matches the behavior of the PathPrefix match type. This
-	// matches full path elements. A path element refers to the list of labels
-	// in the path split by the `/` separator. When specified, a trailing `/` is
-	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
-	// match the prefix `/abc`, but the path `/abcd` would not.
-	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
-)
 
 // HTTPPathModifier defines configuration for path modifiers.
 // <gateway:experimental>
