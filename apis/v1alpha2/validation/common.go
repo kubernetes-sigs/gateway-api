@@ -29,6 +29,9 @@ var (
 	validateParentRefs = gatewayvalidationv1b1.ValidateParentRefs
 )
 
+// validateBackendRefServicePort validates whether or not a port was specified
+// for a backendRef which refers to a corev1.Service, asserting that the port
+// field is required.
 func validateBackendRefServicePort(ref *v1a2.BackendRef, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 

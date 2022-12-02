@@ -276,12 +276,13 @@ type GRPCRouteRule struct {
 //
 // ```
 // matches:
-// - method:
-//    type: Exact
-//    service: "foo"
-//   headers:
+//   - method:
+//     type: Exact
+//     service: "foo"
+//     headers:
 //   - name: "version"
 //     value "v1"
+//
 // ```
 type GRPCRouteMatch struct {
 	// Path specifies a gRPC request service/method matcher. If this field is not

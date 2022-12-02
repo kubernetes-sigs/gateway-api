@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package translator
+package translate
 
 import (
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"

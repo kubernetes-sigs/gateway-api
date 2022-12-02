@@ -54,7 +54,7 @@ func validateRuleMatches(matches []gatewayv1a2.GRPCRouteMatch, path *field.Path)
 	var errs field.ErrorList
 	for i, m := range matches {
 		if m.Method != nil && m.Method.Service == nil && m.Method.Method == nil {
-			errs = append(errs, field.Required(path.Index(i).Child("methods"), "should have at least one of fields Service or Method"))
+			errs = append(errs, field.Required(path.Index(i).Child("methods"), "one or both of `service` or `method` must be specified"))
 			return errs
 		}
 	}

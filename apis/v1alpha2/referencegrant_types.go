@@ -39,15 +39,16 @@ import (
 // All cross-namespace references in Gateway API (with the exception of cross-namespace
 // Gateway-route attachment) require a ReferenceGrant.
 //
-// ReferenceGrant is a form of runtime verification. Implementations that support
-// ReferenceGrant MUST respond to removal of a grant by revoking the access that
-// grant allowed.
+// ReferenceGrant is a form of runtime verification allowing users to assert
+// which cross-namespace object references are permitted. Implementations that
+// support ReferenceGrant MUST NOT permit cross-namespace references which have
+// no grant, and MUST respond to the removal of a grant by revoking the access
+// that the grant allowed.
 //
 // Support: Core
 type ReferenceGrant v1beta1.ReferenceGrant
 
 // +kubebuilder:object:root=true
-
 // ReferenceGrantList contains a list of ReferenceGrant.
 type ReferenceGrantList struct {
 	metav1.TypeMeta `json:",inline"`
