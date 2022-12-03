@@ -36,8 +36,8 @@ import (
 // GRPCRoute falls under extended support within the Gateway API. Within the
 // following specification, the word "MUST" indicates that an implementation
 // supporting GRPCRoute must conform to the indicated requirement, but an
-// implementation not supporting need not follow the requirement unless
-// explicitly indicated.
+// implementation not supporting this route type need not follow the requirement
+// unless explicitly indicated.
 //
 // Virtually all existing gRPC connections happen directly over HTTP/2 without
 // first upgrading from HTTP/1. Nearly no server implementations support the
@@ -90,7 +90,7 @@ type GRPCRouteStatus struct {
 type GRPCRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname to match against the GRPC
+	// hostnames defines a set of hostname to match against the GRPC
 	// Host header to select a GRPCRoute to process the request. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
@@ -122,9 +122,9 @@ type GRPCRouteSpec struct {
 	// `test.example.net` MUST NOT be considered for a match.
 	//
 	// If both the Listener and GRPCRoute have specified hostnames, and none
-	// match with the criteria above, then the GRPCRoute is not accepted. The
-	// implementation MUST raise an 'Accepted' Condition with a status of
-	// `False` in the corresponding RouteParentStatus.
+	// match with the criteria above, then the GRPCRoute MUST NOT be accepted by
+	// the implementation. The implementation MUST raise an 'Accepted' Condition
+	// with a status of `False` in the corresponding RouteParentStatus.
 	//
 	// If a Route (A) of type HTTPRoute or GRPCRoute is attached to a
 	// Listener and that listener already has another Route (B) of the other
@@ -153,7 +153,7 @@ type GRPCRouteSpec struct {
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
-// GRPCRouteRule defines semantics for matching an gRPC request based on
+// GRPCRouteRule defines the semantics for matching an gRPC request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
 type GRPCRouteRule struct {
@@ -220,7 +220,8 @@ type GRPCRouteRule struct {
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	//
-	// - ALL core filters MUST be supported by all implementations.
+	// - ALL core filters MUST be supported by all implementations which support
+	//   GRPCRoute.
 	// - Implementers are encouraged to support extended filters.
 	// - Implementation-specific custom filters have no API guarantees across
 	//   implementations.
@@ -285,8 +286,8 @@ type GRPCRouteRule struct {
 //
 // ```
 type GRPCRouteMatch struct {
-	// Path specifies a gRPC request service/method matcher. If this field is not
-	// specified, all services and methods will match.
+	// Method specifies a gRPC request service/method matcher. If this field is
+	// not specified, all services and methods will match.
 	//
 	// +optional
 	// +kubebuilder:default={type: "Exact"}
@@ -320,7 +321,7 @@ type GRPCMethodMatch struct {
 	Type *GRPCMethodMatchType `json:"type,omitempty"`
 
 	// Value of the service to match against. If left empty or omitted, will
-	// match all services.
+	// match any service.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	// +optional
@@ -344,7 +345,7 @@ type GRPCMethodMatch struct {
 // * "Exact"
 // * "RegularExpression"
 //
-// Exact paths MUST be syntactically valid:
+// Exact methods MUST be syntactically valid:
 //
 // - Must not contain `/` character
 //
@@ -382,7 +383,7 @@ type GRPCHeaderMatch struct {
 	// entries with an equivalent header name MUST be ignored. Due to the
 	// case-insensitivity of header names, "foo" and "Foo" are considered
 	// equivalent.
-	Name HeaderName `json:"name"`
+	Name GRPCHeaderName `json:"name"`
 
 	// Value is the value of the gRPC Header to be matched.
 	//
@@ -391,10 +392,31 @@ type GRPCHeaderMatch struct {
 	Value string `json:"value"`
 }
 
+// GRPCHeaderMatchType specifies the semantics of how GRPC header values should
+// be compared. Valid GRPCHeaderMatchType values are:
+//
+// * "Exact" * "RegularExpression"
+//
+// Note that values may be added to this enum, implementations must ensure that
+// unknown values will not cause a crash.
+//
+// Unknown values here must result in the implementation setting the Accepted
+// Condition for the Route to `status: False`, with a Reason of
+// `UnsupportedValue`.
+//
+// +kubebuilder:validation:Enum=Exact;RegularExpression
+type GRPCHeaderMatchType string
+
+// GRPCHeaderMatchType constants.
+const (
+	GRPCHeaderMatchExact             GRPCHeaderMatchType = "Exact"
+	GRPCHeaderMatchRegularExpression GRPCHeaderMatchType = "RegularExpression"
+)
+
 // +kubebuilder:validation:MinLength=1
 // +kubebuilder:validation:MaxLength=256
 // +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
-type HeaderName string
+type GRPCHeaderName string
 
 // GRPCRouteFilterType identifies a type of GRPCRoute filter.
 type GRPCRouteFilterType string
