@@ -69,7 +69,7 @@ spec:
             description: Spec defines the desired state of GRPCRoute.
             properties:
               hostnames:
-                description: "hostnames defines a set of hostname to match against
+                description: "Hostnames defines a set of hostname to match against
                   the GRPC Host header to select a GRPCRoute to process the request.
                   This matches the RFC 1123 definition of a hostname with 2 notable
                   exceptions: \n 1. IPs are not allowed. 2. A hostname may be prefixed
@@ -736,7 +736,7 @@ spec:
                         change in the future based on feedback during the alpha stage.
                         \n Conformance-levels at this level are defined based on the
                         type of filter: \n - ALL core filters MUST be supported by
-                        all implementations which support   GRPCRoute. - Implementers
+                        all implementations that support   GRPCRoute. - Implementers
                         are encouraged to support extended filters. - Implementation-specific
                         custom filters have no API guarantees across   implementations.
                         \n Specifying a core filter multiple times has unspecified

@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 func Test_PathMatchTypePtr(t *testing.T) {
@@ -31,22 +32,22 @@ func Test_PathMatchTypePtr(t *testing.T) {
 		{
 			name:         "valid path exact match",
 			pathType:     "Exact",
-			expectedPath: gatewayv1a2.PathMatchExact,
+			expectedPath: gatewayv1b1.PathMatchExact,
 		},
 		{
 			name:         "valid path exact match using constant",
-			pathType:     string(gatewayv1a2.PathMatchExact),
-			expectedPath: gatewayv1a2.PathMatchExact,
+			pathType:     string(gatewayv1b1.PathMatchExact),
+			expectedPath: gatewayv1b1.PathMatchExact,
 		},
 		{
 			name:         "valid path prefix match",
 			pathType:     "PathPrefix",
-			expectedPath: gatewayv1a2.PathMatchPathPrefix,
+			expectedPath: gatewayv1b1.PathMatchPathPrefix,
 		},
 		{
 			name:         "valid path regular expression match",
 			pathType:     "RegularExpression",
-			expectedPath: gatewayv1a2.PathMatchRegularExpression,
+			expectedPath: gatewayv1b1.PathMatchRegularExpression,
 		},
 	}
 

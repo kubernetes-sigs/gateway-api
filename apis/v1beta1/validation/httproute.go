@@ -126,7 +126,7 @@ func validateHTTPRouteFilters(filters []gatewayv1b1.HTTPRouteFilter, matches []g
 	}
 
 	if counts[gatewayv1b1.HTTPRouteFilterRequestRedirect] > 0 && counts[gatewayv1b1.HTTPRouteFilterURLRewrite] > 0 {
-		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "Redirect and Rewrite filters cannot be defined in the same list of filters"))
+		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "may specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both"))
 	}
 
 	for filterType, count := range counts {

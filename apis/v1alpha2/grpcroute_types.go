@@ -90,7 +90,7 @@ type GRPCRouteStatus struct {
 type GRPCRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// hostnames defines a set of hostname to match against the GRPC
+	// Hostnames defines a set of hostname to match against the GRPC
 	// Host header to select a GRPCRoute to process the request. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
@@ -220,7 +220,7 @@ type GRPCRouteRule struct {
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	//
-	// - ALL core filters MUST be supported by all implementations which support
+	// - ALL core filters MUST be supported by all implementations that support
 	//   GRPCRoute.
 	// - Implementers are encouraged to support extended filters.
 	// - Implementation-specific custom filters have no API guarantees across
@@ -395,12 +395,13 @@ type GRPCHeaderMatch struct {
 // GRPCHeaderMatchType specifies the semantics of how GRPC header values should
 // be compared. Valid GRPCHeaderMatchType values are:
 //
-// * "Exact" * "RegularExpression"
+// * "Exact"
+// * "RegularExpression"
 //
-// Note that values may be added to this enum, implementations must ensure that
-// unknown values will not cause a crash.
+// Note that new values may be added to this enum in future releases of the API,
+// implementations MUST ensure that unknown values will not cause a crash.
 //
-// Unknown values here must result in the implementation setting the Accepted
+// Unknown values here MUST result in the implementation setting the Accepted
 // Condition for the Route to `status: False`, with a Reason of
 // `UnsupportedValue`.
 //

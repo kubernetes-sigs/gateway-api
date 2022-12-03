@@ -22,14 +22,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
 	// set of protocols for which we need to validate that hostname is empty
 	protocolsHostnameInvalid = map[gatewayv1a2.ProtocolType]struct{}{
-		gatewayv1a2.TCPProtocolType: {},
-		gatewayv1a2.UDPProtocolType: {},
+		gatewayv1b1.TCPProtocolType: {},
+		gatewayv1b1.UDPProtocolType: {},
 	}
 
 	// ValidateTLSCertificateRefs validates the certificateRefs
