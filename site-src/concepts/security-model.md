@@ -72,7 +72,7 @@ readable by most roles, so instead we'll focus on write access for this model.
 
 ## Crossing Namespace Boundaries
 Gateway API provides new ways to cross namespace boundaries. These
-cross-namespace capabilities are quire powerful but need to be used carefully to
+cross-namespace capabilities are quite powerful but need to be used carefully to
 avoid accidental exposure. As a rule, every time we allow a namespace boundary
 to be crossed, we require a handshake between namespaces. There are 2 different
 ways that can occur:
