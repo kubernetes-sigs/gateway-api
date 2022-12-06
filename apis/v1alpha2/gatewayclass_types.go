@@ -52,13 +52,6 @@ import (
 // GatewayClass is a Cluster level resource.
 type GatewayClass v1beta1.GatewayClass
 
-const (
-	// GatewayClassFinalizerGatewaysExist should be added as a finalizer to the
-	// GatewayClass whenever there are provisioned Gateways using a
-	// GatewayClass.
-	GatewayClassFinalizerGatewaysExist = "gateway-exists-finalizer.gateway.networking.k8s.io"
-)
-
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 // +k8s:deepcopy-gen=false
 type GatewayClassSpec = v1beta1.GatewayClassSpec
@@ -78,52 +71,6 @@ type GatewayClassConditionType = v1beta1.GatewayClassConditionType
 // particular GatewayClass condition type has been raised.
 // +k8s:deepcopy-gen=false
 type GatewayClassConditionReason = v1beta1.GatewayClassConditionReason
-
-const (
-	// This condition indicates whether the GatewayClass has been accepted by
-	// the controller requested in the `spec.controller` field.
-	//
-	// This condition defaults to Unknown, and MUST be set by a controller when
-	// it sees a GatewayClass using its controller string. The status of this
-	// condition MUST be set to True if the controller will support provisioning
-	// Gateways using this class. Otherwise, this status MUST be set to False.
-	// If the status is set to False, the controller SHOULD set a Message and
-	// Reason as an explanation.
-	//
-	// Possible reasons for this condition to be true are:
-	//
-	// * "Accepted"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "InvalidParameters"
-	//
-	// Possible reasons for this condition to be Unknown are:
-	//
-	// * "Pending"
-	//
-	// Controllers should prefer to use the values of GatewayClassConditionReason
-	// for the corresponding Reason, where appropriate.
-	GatewayClassConditionStatusAccepted GatewayClassConditionType = "Accepted"
-
-	// This reason is used with the "Accepted" condition when the condition is
-	// true.
-	GatewayClassReasonAccepted GatewayClassConditionReason = "Accepted"
-
-	// This reason is used with the "Accepted" condition when the
-	// GatewayClass was not accepted because the parametersRef field
-	// was invalid, with more detail in the message.
-	GatewayClassReasonInvalidParameters GatewayClassConditionReason = "InvalidParameters"
-
-	// This reason is used with the "Accepted" condition when the
-	// requested controller has not yet made a decision about whether
-	// to admit the GatewayClass. It is the default Reason on a new
-	// GatewayClass.
-	GatewayClassReasonPending GatewayClassConditionReason = "Pending"
-
-	// Deprecated: Use "Pending" instead.
-	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
-)
 
 // GatewayClassStatus is the current status for the GatewayClass.
 // +k8s:deepcopy-gen=false

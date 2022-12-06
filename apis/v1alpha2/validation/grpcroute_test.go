@@ -81,7 +81,7 @@ func TestValidateGRPCRoute(t *testing.T) {
 				{
 					Type:   field.ErrorTypeRequired,
 					Field:  "spec.rules[0].matches[0].methods",
-					Detail: "should have at least one of fields Service or Method",
+					Detail: "one or both of `service` or `method` must be specified",
 				},
 			},
 		},

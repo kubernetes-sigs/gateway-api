@@ -35,10 +35,10 @@ spec:
           under extended support within the Gateway API. Within the following specification,
           the word \"MUST\" indicates that an implementation supporting GRPCRoute
           must conform to the indicated requirement, but an implementation not supporting
-          need not follow the requirement unless explicitly indicated. \n Virtually
-          all existing gRPC connections happen directly over HTTP/2 without first
-          upgrading from HTTP/1. Nearly no server implementations support the upgrade
-          and next to no clients start with HTTP/1. As such, certain restrictions
+          this route type need not follow the requirement unless explicitly indicated.
+          \n Virtually all existing gRPC connections happen directly over HTTP/2 without
+          first upgrading from HTTP/1. Nearly no server implementations support the
+          upgrade and next to no clients start with HTTP/1. As such, certain restrictions
           are placed on implementations that claim support for GRPCRoute. \n Implementations
           supporting `GRPCRoute` with the `HTTPS` `ProtocolType` MUST accept HTTP/2
           connections without an initial upgrade from HTTP/1.1, i.e. via ALPN. If
@@ -95,17 +95,18 @@ spec:
                   and `test.example.net`, `test.example.net` MUST NOT be considered
                   for a match. \n If both the Listener and GRPCRoute have specified
                   hostnames, and none match with the criteria above, then the GRPCRoute
-                  is not accepted. The implementation MUST raise an 'Accepted' Condition
-                  with a status of `False` in the corresponding RouteParentStatus.
-                  \n If a Route (A) of type HTTPRoute or GRPCRoute is attached to
-                  a Listener and that listener already has another Route (B) of the
-                  other type attached and the intersection of the hostnames of A and
-                  B is non-empty, then the implementation MUST accept exactly one
-                  of these two routes, determined by the following criteria, in order:
-                  \n * The oldest Route based on creation timestamp. * The Route appearing
-                  first in alphabetical order by   \"{namespace}/{name}\". \n The
-                  rejected Route MUST raise an 'Accepted' condition with a status
-                  of 'False' in the corresponding RouteParentStatus. \n Support: Core"
+                  MUST NOT be accepted by the implementation. The implementation MUST
+                  raise an 'Accepted' Condition with a status of `False` in the corresponding
+                  RouteParentStatus. \n If a Route (A) of type HTTPRoute or GRPCRoute
+                  is attached to a Listener and that listener already has another
+                  Route (B) of the other type attached and the intersection of the
+                  hostnames of A and B is non-empty, then the implementation MUST
+                  accept exactly one of these two routes, determined by the following
+                  criteria, in order: \n * The oldest Route based on creation timestamp.
+                  * The Route appearing first in alphabetical order by   \"{namespace}/{name}\".
+                  \n The rejected Route MUST raise an 'Accepted' condition with a
+                  status of 'False' in the corresponding RouteParentStatus. \n Support:
+                  Core"
                 items:
                   description: "Hostname is the fully qualified domain name of a network
                     host. This matches the RFC 1123 definition of a hostname with
@@ -242,8 +243,8 @@ spec:
                       type: Exact
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
-                  description: GRPCRouteRule defines semantics for matching an gRPC
-                    request based on conditions (matches), processing it (filters),
+                  description: GRPCRouteRule defines the semantics for matching an
+                    gRPC request based on conditions (matches), processing it (filters),
                     and forwarding the request to an API object (backendRefs).
                   properties:
                     backendRefs:
@@ -735,11 +736,11 @@ spec:
                         change in the future based on feedback during the alpha stage.
                         \n Conformance-levels at this level are defined based on the
                         type of filter: \n - ALL core filters MUST be supported by
-                        all implementations. - Implementers are encouraged to support
-                        extended filters. - Implementation-specific custom filters
-                        have no API guarantees across   implementations. \n Specifying
-                        a core filter multiple times has unspecified or implementation-specific
-                        conformance. Support: Core"
+                        all implementations that support   GRPCRoute. - Implementers
+                        are encouraged to support extended filters. - Implementation-specific
+                        custom filters have no API guarantees across   implementations.
+                        \n Specifying a core filter multiple times has unspecified
+                        or implementation-specific conformance. Support: Core"
                       items:
                         description: GRPCRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -1187,7 +1188,7 @@ spec:
                           method:
                             default:
                               type: Exact
-                            description: Path specifies a gRPC request service/method
+                            description: Method specifies a gRPC request service/method
                               matcher. If this field is not specified, all services
                               and methods will match.
                             properties:
@@ -1201,7 +1202,7 @@ spec:
                                 type: string
                               service:
                                 description: "Value of the service to match against.
-                                  If left empty or omitted, will match all services.
+                                  If left empty or omitted, will match any service.
                                   \n At least one of Service and Method MUST be a
                                   non-empty string."
                                 maxLength: 1024
