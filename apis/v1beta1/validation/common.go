@@ -23,7 +23,7 @@ import (
 	utils "sigs.k8s.io/gateway-api/apis/v1beta1/util/validation"
 )
 
-// ValidateParentRefs validates ParentRefs SectionName must be set and uique
+// ValidateParentRefs validates ParentRefs SectionName must be set and unique
 // when ParentRefs includes 2 or more references to the same parent
 func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
@@ -50,15 +50,19 @@ func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Pa
 		}
 		if s, ok := parentRefsSectionMap[targetParentRefs]; ok {
 			if len(s[0]) == 0 || len(*targetSection) == 0 {
-				errs = append(errs, field.Required(path, "ParentRefs section names must all be set when ParentRefs includes 2 or more references to the same parent"))
+				errs = append(errs, field.Required(path.Child("parentRefs"), "sectionNames must be specified when more than one parentRef refers to the same parent"))
 				return errs
 			}
 			if utils.ContainsInSectionNameSlice(s, targetSection) {
-				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), targetSection, "must be unique when ParentRefs includes 2 or more references to the same parent"))
+				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), targetSection, "must be unique when parentRefs includes 2 or more references to the same parent"))
 				return errs
 			}
 		}
 		parentRefsSectionMap[targetParentRefs] = append(parentRefsSectionMap[targetParentRefs], *targetSection)
 	}
 	return errs
+}
+
+func ptrTo[T any](a T) *T {
+	return &a
 }

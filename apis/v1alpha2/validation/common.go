@@ -49,3 +49,7 @@ func validateBackendRefServicePort(ref *v1a2.BackendRef, path *field.Path) field
 
 	return errs
 }
+
+func ptrTo[T any](a T) *T {
+	return &a
+}

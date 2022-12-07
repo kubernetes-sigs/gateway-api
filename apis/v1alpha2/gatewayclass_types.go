@@ -52,6 +52,15 @@ import (
 // GatewayClass is a Cluster level resource.
 type GatewayClass v1beta1.GatewayClass
 
+// +kubebuilder:object:root=true
+
+// GatewayClassList contains a list of GatewayClass
+type GatewayClassList struct {
+	metav1.TypeMeta `json:",inline"`
+	metav1.ListMeta `json:"metadata,omitempty"`
+	Items           []GatewayClass `json:"items"`
+}
+
 // GatewayClassSpec reflects the configuration of a class of Gateways.
 // +k8s:deepcopy-gen=false
 type GatewayClassSpec = v1beta1.GatewayClassSpec
@@ -75,12 +84,3 @@ type GatewayClassConditionReason = v1beta1.GatewayClassConditionReason
 // GatewayClassStatus is the current status for the GatewayClass.
 // +k8s:deepcopy-gen=false
 type GatewayClassStatus = v1beta1.GatewayClassStatus
-
-// +kubebuilder:object:root=true
-
-// GatewayClassList contains a list of GatewayClass
-type GatewayClassList struct {
-	metav1.TypeMeta `json:",inline"`
-	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []GatewayClass `json:"items"`
-}
