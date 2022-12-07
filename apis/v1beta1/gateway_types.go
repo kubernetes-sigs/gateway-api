@@ -237,10 +237,10 @@ type Listener struct {
 }
 
 // ProtocolType defines the application protocol accepted by a Listener.
-// Implementations are not required to accept all the defined protocols.
-// If an implementation does not support a specified protocol, it
-// should set the "Accepted" condition for the affected Listener with
-// a reason of "UnsupportedProtocol".
+// Implementations are not required to accept all the defined protocols. If an
+// implementation does not support a specified protocol, it MUST set the
+// "Accepted" condition to False for the affected Listener with a reason of
+// "UnsupportedProtocol".
 //
 // Core ProtocolType values are listed in the table below.
 //
@@ -517,7 +517,8 @@ type GatewayConditionReason string
 
 const (
 	// This condition indicates whether a Gateway has generated some
-	// configuration that will soon be ready in the underlying data plane.
+	// configuration that is assumed to be ready soon in the underlying data
+	// plane.
 	//
 	// It is a positive-polarity summary condition, and so should always be
 	// present on the resource with ObservedGeneration set.
@@ -556,7 +557,8 @@ const (
 const (
 	// This condition is true when the controller managing the Gateway is
 	// syntactically and semantically valid enough to produce some configuration
-	// in the underlying data plane, though it has not necessarily configured it yet.
+	// in the underlying data plane. This does not indicate whether or not the
+	// configuration has been propagated to the data plane.
 	//
 	// Possible reasons for this condition to be True are:
 	//

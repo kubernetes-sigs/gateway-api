@@ -14,11 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package translator
+package translate
 
 import (
 	"testing"
 
+	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -26,7 +27,7 @@ func Test_PathMatchTypePtr(t *testing.T) {
 	pathMatchTypePtrTests := []struct {
 		name         string
 		pathType     string
-		expectedPath gatewayv1b1.PathMatchType
+		expectedPath gatewayv1a2.PathMatchType
 	}{
 		{
 			name:         "valid path exact match",

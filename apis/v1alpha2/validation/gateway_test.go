@@ -22,6 +22,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 func TestValidateGateway(t *testing.T) {
@@ -55,7 +56,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1a2.Gateway) {
 				hostname := gatewayv1a2.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.TCPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},
@@ -63,7 +64,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1a2.Gateway) {
 				hostname := gatewayv1a2.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1a2.UDPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].hostname"},
 		},

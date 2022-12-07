@@ -22,14 +22,15 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
 var (
 	// set of protocols for which we need to validate that hostname is empty
 	protocolsHostnameInvalid = map[gatewayv1a2.ProtocolType]struct{}{
-		gatewayv1a2.TCPProtocolType: {},
-		gatewayv1a2.UDPProtocolType: {},
+		gatewayv1b1.TCPProtocolType: {},
+		gatewayv1b1.UDPProtocolType: {},
 	}
 
 	// ValidateTLSCertificateRefs validates the certificateRefs
@@ -44,7 +45,8 @@ var (
 
 // ValidateGateway validates gw according to the Gateway API specification.
 // For additional details of the Gateway spec, refer to:
-//  https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+//
+//	https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 //
 // Validation that is not possible with CRD annotations may be added here in the future.
 // See https://github.com/kubernetes-sigs/gateway-api/issues/868 for more information.
