@@ -74,8 +74,6 @@ nav:
         - geps/gep-1426.md
         - geps/gep-1324.md
         - geps/gep-1282.md
-      - Implementable:
-        - geps/gep-1364.md
       - Experimental:
         - geps/gep-1323.md
         - geps/gep-1016.md
@@ -83,6 +81,7 @@ nav:
         - geps/gep-726.md
         - geps/gep-713.md
       - Standard:
+        - geps/gep-1364.md
         - geps/gep-922.md
         - geps/gep-917.md
         - geps/gep-851.md
