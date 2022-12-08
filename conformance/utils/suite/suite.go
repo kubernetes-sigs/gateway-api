@@ -145,8 +145,11 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
 	suite.ControllerName = kubernetes.GWCMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
+	suite.Applier.GatewayClass = suite.GatewayClassName
+	suite.Applier.ControllerName = suite.ControllerName
+
 	t.Logf("Test Setup: Applying base manifests")
-	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.GatewayClassName, suite.Cleanup)
+	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
 
 	t.Logf("Test Setup: Applying programmatic resources")
 	secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
@@ -200,7 +203,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 	for _, manifestLocation := range test.Manifests {
 		t.Logf("Applying %s", manifestLocation)
-		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, suite.GatewayClassName, true)
+		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, true)
 	}
 
 	test.Test(t, suite)
