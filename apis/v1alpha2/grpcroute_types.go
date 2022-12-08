@@ -86,7 +86,7 @@ type GRPCRouteStatus struct {
 type GRPCRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname to match against the GRPC
+	// Hostnames defines a set of hostnames to match against the GRPC
 	// Host header to select a GRPCRoute to process the request. This matches
 	// the RFC 1123 definition of a hostname with 2 notable exceptions:
 	//
