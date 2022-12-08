@@ -132,9 +132,9 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
-// awaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
+// AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
 // Each failed attempt has a 1s delay; successful attempts have no delay.
-func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
+func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
 	successes := 0
 	attempts := 0
 	start := time.Now()
@@ -162,7 +162,7 @@ func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 		select {
 		// Capture the overall timeout
 		case <-to:
-			t.Fatalf("timeout while waiting after %d attempts, %d/%d sucessess", attempts, successes, threshold)
+			t.Fatalf("timeout while waiting after %d attempts, %d/%d successes", attempts, successes, threshold)
 			// And the per-try delay
 		case <-time.After(delay):
 		}
@@ -173,7 +173,7 @@ func awaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
 func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
-	awaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
+	AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
@@ -293,7 +293,7 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 	return nil
 }
 
-// Get User-defined test case name or generate from expected response to a given request.
+// GetTestCaseName gets the user-defined test case name or generates one from expected response to a given request.
 func (er *ExpectedResponse) GetTestCaseName(i int) string {
 
 	// If TestCase name is provided then use that or else generate one.

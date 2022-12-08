@@ -76,13 +76,21 @@ capabilities.
 
 By default, conformance tests will expect a `gateway-conformance` GatewayClass
 to be installed in the cluster and tests will be run against that. A different
-class can be specified with the `--gateway-class` flag along with the
-corresponding test command. For example:
+class can be specified with the `-gateway-class` flag along with the
+corresponding test command. For example, to run a conformance test against Istio,
+run:
 
 ```shell
-go test ./conformance --gateway-class my-class
+go test ./conformance/... -args -gateway-class=istio
 ```
 
+Other useful flags may be found in
+[conformance flags](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/utils/flags/flags.go).
+For example, if you'd like to examine the objects in Kubernetes after your test runs, you can pass a flag to
+suppress cleanup:
+```shell
+go test ./conformance/... -args -gateway-class=istio -cleanup-base-resources=false
+```
 ## Contributing to Conformance
 
 Many implementations run conformance tests as part of their full e2e test suite.
