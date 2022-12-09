@@ -53,7 +53,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			if kubernetes.ConditionsHaveLatestObservedGeneration(existing, existing.Status.Conditions) {
+			if kubernetes.GatewayConditionsHaveLatestObservedGeneration(existing) {
 				t.Fatal("Not all the condition's observedGeneration were updated")
 			}
 
@@ -80,7 +80,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			if kubernetes.ConditionsHaveLatestObservedGeneration(updated, updated.Status.Conditions) {
+			if kubernetes.GatewayConditionsHaveLatestObservedGeneration(updated) {
 				t.Fatal("Not all the condition's observedGeneration were updated")
 			}
 
