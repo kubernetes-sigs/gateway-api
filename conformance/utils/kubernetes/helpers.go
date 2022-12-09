@@ -37,7 +37,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
-// GatewayRef is a tiny type for specifying an HTTP Route ParentRef withouthttps://www.cdw.ca/product/apple-airpods-pro-2nd-generation-true-wireless-earphones-with-mic/7171387?pfm=srh
+// GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
 // relying on a specific api version.
 type GatewayRef struct {
 	types.NamespacedName
