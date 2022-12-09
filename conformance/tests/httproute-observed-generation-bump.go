@@ -66,7 +66,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 				t.Fatal("Not all the condition's observedGeneration were updated")
 			}
 
-			existing.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-new"
+			existing.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-v2"
 			err = s.Client.Update(ctx, existing)
 			require.NoErrorf(t, err, "error updating the HTTPRoute: %v", err)
 

@@ -8,5 +8,5 @@ spec:
   - name: same-namespace
   rules:
   - backendRefs:
-    - name: infra-backend-old
+    - name: infra-backend-v1
       port: 8080
