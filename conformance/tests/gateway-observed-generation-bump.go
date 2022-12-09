@@ -62,7 +62,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// mutate the Gateway Spec
 			existing.Spec.Listeners = append(existing.Spec.Listeners, v1beta1.Listener{
 				Name:     "alternate",
-				Port:     80,
+				Port:     8080,
 				Protocol: v1beta1.HTTPProtocolType,
 				AllowedRoutes: &v1beta1.AllowedRoutes{
 					Namespaces: &v1beta1.RouteNamespaces{From: &all},
