@@ -42,7 +42,7 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 		gwc := types.NamespacedName{Name: "gatewayclass-observed-generation-bump"}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()
 
 			kubernetes.GWCMustBeAccepted(t, s.Client, s.TimeoutConfig, gwc.Name)

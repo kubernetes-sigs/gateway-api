@@ -51,7 +51,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 		}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()
 
 			namespaces := []string{"gateway-conformance-infra"}
