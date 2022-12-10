@@ -175,7 +175,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	return cReq, cRes, nil
 }
 
-// IsRedirect returns true if a given status code is a redirect code supported by the gateway api.
+// IsRedirect returns true if a given status code is a redirect code.
 func IsRedirect(statusCode int) bool {
 	switch statusCode {
 	case http.StatusMultipleChoices,
