@@ -177,13 +177,17 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 
 // IsRedirect returns true if a given status code is a redirect code supported by the gateway api.
 func IsRedirect(statusCode int) bool {
-	// Gateway allows only 301, and 302
 	switch statusCode {
-	case http.StatusMovedPermanently,
-		http.StatusFound:
+	case http.StatusMultipleChoices,
+		http.StatusMovedPermanently,
+		http.StatusFound,
+		http.StatusSeeOther,
+		http.StatusNotModified,
+		http.StatusUseProxy,
+		http.StatusTemporaryRedirect,
+		http.StatusPermanentRedirect:
 		return true
 	}
-
 	return false
 }
 
