@@ -38,6 +38,8 @@ type ExpectedResponse struct {
 	// expected to match Request.
 	ExpectedRequest *ExpectedRequest
 
+	RedirectRequest *roundtripper.RedirectRequest
+
 	// BackendSetResponseHeaders is a set of headers
 	// the echoserver should set in its response.
 	BackendSetResponseHeaders map[string]string
@@ -57,10 +59,11 @@ type ExpectedResponse struct {
 // that echoserver received the expected request. Note that multiple header
 // values can be provided, as a comma-separated value.
 type Request struct {
-	Host    string
-	Method  string
-	Path    string
-	Headers map[string]string
+	Host             string
+	Method           string
+	Path             string
+	Headers          map[string]string
+	UnfollowRedirect bool
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.
@@ -106,11 +109,12 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
 
 	req := roundtripper.Request{
-		Method:   expected.Request.Method,
-		Host:     expected.Request.Host,
-		URL:      url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
-		Protocol: "HTTP",
-		Headers:  map[string][]string{},
+		Method:           expected.Request.Method,
+		Host:             expected.Request.Host,
+		URL:              url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
+		Protocol:         "HTTP",
+		Headers:          map[string][]string{},
+		UnfollowRedirect: expected.Request.UnfollowRedirect,
 	}
 
 	if expected.Request.Headers != nil {
@@ -277,6 +281,13 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 
 		if !strings.HasPrefix(cReq.Pod, expected.Backend) {
 			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, cReq.Pod)
+		}
+	} else if roundtripper.IsRedirect(cRes.StatusCode) {
+		if expected.RedirectRequest == nil {
+			return nil
+		}
+		if expected.RedirectRequest.Hostname != cRes.RedirectRequest.Hostname {
+			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Hostname, cRes.RedirectRequest.Hostname)
 		}
 	}
 	return nil
