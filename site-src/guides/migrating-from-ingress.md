@@ -31,11 +31,11 @@ and [ExternalDNS](https://github.com/kubernetes-sigs/external-dns).
 
 However, the Ingress API has several limitations:
 
-- **Limited features**. The Ingress API only supports TLS termination and
+- *Limited features*. The Ingress API only supports TLS termination and
   simple content-based request routing of HTTP traffic.
-- **Reliance on annotations for extensibility**. The annotations approach to
+- *Reliance on annotations for extensibility*. The annotations approach to
   extensibility leads to the limited portability and awkwardness of the API. 
-- **Insufficient permission model**. The Ingress API is not well-suited for
+- *Insufficient permission model*. The Ingress API is not well-suited for
   multi-team clusters with shared load-balancing infrastructure.
 
 The Gateway API addresses those limitations, as the next section will show.
