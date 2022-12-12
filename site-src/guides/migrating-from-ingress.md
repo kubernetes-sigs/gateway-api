@@ -380,7 +380,8 @@ The following Gateway resource:
 
 Also, note that both listeners allow all HTTPRoutes from the same namespace
 (which is the default setting) and restrict HTTPRoute hostnames to
-the `example.com` subdomain.
+the `example.com` subdomain (allow hostnames like `foo.example.com` but
+not `foo.kubernetes.io`).
 
 ```yaml
 {% include 'standard/simple-http-https/gateway.yaml' %}
