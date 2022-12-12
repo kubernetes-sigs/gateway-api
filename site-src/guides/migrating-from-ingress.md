@@ -261,7 +261,7 @@ default backend.
 An Ingress resource must specify
 a [class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)
 to select which Ingress controller to use. An HTTPRoute must specify which
-Gateway (or multiple Gateways) to attach to via
+Gateway (or Gateways) to attach to via
 a [parentRef](/references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef).
 
 ### Implementation-Specific Ingress Features (Annotations)
