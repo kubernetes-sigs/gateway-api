@@ -109,9 +109,10 @@ users of the Ingress API:
 
 * *Limited portability*. Because so many features are available through
   annotations, switching between Ingress controllers becomes difficult or even
-  impossible, as it is necessary to convert the annotations of one vendor to
-  another (the other vendor might not even support some features of the first
-  one). This limits the portability of the Ingress API.
+  impossible, as it is necessary to convert the annotations of one
+  implementation to another (the other implementation might not even support
+  some features of the first one). This limits the portability of the Ingress
+  API.
 * *Awkwardness of the API*. Because annotations are key-value strings (as
   opposed to a structured scheme like the spec of the Ingress resource) and
   applied at the top of a resource (rather than in the relevant parts of the
@@ -263,11 +264,11 @@ to select which Ingress controller to use. An HTTPRoute must specify which
 Gateway (or multiple Gateways) to attach to via
 a [parentRef](/references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef).
 
-### Vendor-Specific Ingress Features (Annotations)
+### Implementation-Specific Ingress Features (Annotations)
 
-Ingress annotations configure vendor-specific features. Thus, converting them to
-the Gateway API depends both on the Ingress controller and Gateway
-implementation vendors.
+Ingress annotations configure implementation-specific features. Thus, converting
+them to the Gateway API depends both on the Ingress controller and Gateway
+implementations.
 
 Luckily, some of the features supported through annotations are now part of the
 Gateway API (HTTPRoute), primarily:
@@ -277,8 +278,8 @@ Gateway API (HTTPRoute), primarily:
 * Traffic splitting.
 * Header, cookie, or method-based routing.
 
-However, the remaining features remain largely vendor-specific. To convert them,
-consult the Gateway implementation documentation to see
+However, the remaining features remain largely implementation-specific. To
+convert them, consult the Gateway implementation documentation to see
 which [extension point](#approach-to-extensibility) to use.
 
 ## Example
