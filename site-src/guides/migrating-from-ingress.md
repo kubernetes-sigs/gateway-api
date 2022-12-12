@@ -36,7 +36,7 @@ However, the Ingress API has several limitations:
 - **Reliance on annotations for extensibility**. The annotations approach to
   extensibility leads to the limited portability and awkwardness of the API. 
 - **Insufficient permission model**. The Ingress API is not well-suited for
-  multi-team  clusters with shared load balancing infrastructure.
+  multi-team clusters with shared load-balancing infrastructure.
 
 The Gateway API addresses those limitations, as the next section will show.
 
@@ -280,7 +280,7 @@ Gateway API (HTTPRoute), primarily:
 * Request redirects (including a TLS redirect)
 * Request/response manipulation
 * Traffic splitting
-* Header, query param or method-based routing
+* Header, query param, or method-based routing
 
 However, the remaining features remain largely implementation-specific. To
 convert them, consult the Gateway implementation documentation to see
