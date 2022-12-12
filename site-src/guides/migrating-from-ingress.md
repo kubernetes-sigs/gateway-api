@@ -1,15 +1,15 @@
 # Migrating from Ingress
 
-The Gateway API is not backward compatible with the [Ingress API](https://kubernetes.io/docs/concepts/services-networking/ingress/). As a result, if you are an Ingress user and would like to migrate, you will need to convert your Ingress resources to Gateway API resources. 
+The Gateway API project is the successor to `Ingress`, but the resources in Gateway API don't include `Ingress` itself (the closest parallel is `HTTPRoute`). As such a one-time conversion from your previous `Ingress` resources to the relevant Gateway API resources like `HTTPRoute` will need to be done. In some cases this can be partially automated with tools like [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway), but should always be tested and verified.
 
 This guide will help you with the conversion. It will:
 
 * Explain the key differences between the Ingress API and the Gateway API.
-* Map the Ingress features to the Gateway API features.
+* Map Ingress features to Gateway API features.
 * Show an example of an Ingress resource converted to Gateway API resources.
 * Mention a helper tool for automatic conversion.
 
-At the same time, it will not prepare you for a live migration or explain how to convert some vendor-specific features of your Ingress controller. Additionally, since the Ingress API only covers HTTP/HTTPS traffic, this guide does not cover the Gateway API support for other protocols.
+At the same time, it will not prepare you for a live migration or explain how to convert some implementation-specific features of your Ingress controller. Additionally, since the Ingress API only covers HTTP/HTTPS traffic, this guide does not cover the Gateway API support for other protocols.
 
 ## Key Differences Between Ingress API and Gateway API
 
@@ -17,7 +17,7 @@ There are three major differences between the Ingress API and the Gateway API:
 
 * Personas.
 * Available features.
-* Approach to extensibility (vendor-specific features).
+* Approach to extensibility (implementation-specific features).
 
 ### Personas
 
@@ -42,7 +42,7 @@ The table below summarizes the mapping between the Ingress API and the Gateway A
 
 ### Available Features 
 
-The Ingress API comes with basic features only: TLS termination and content-based routing of HTTP traffic based on the host header and the URI of a request. To offer more features, Ingress controllers support them through annotations on the Ingress resource which are vendor-specific extensions to the Ingress API.
+The Ingress API comes with basic features only: TLS termination and content-based routing of HTTP traffic based on the host header and the URI of a request. To offer more features, Ingress controllers support them through annotations on the Ingress resource which are implementation-specific extensions to the Ingress API.
 
 The annotations approach to extensibility has two negative consequences for users of the Ingress API: 
 
@@ -62,7 +62,7 @@ The Gateway API is feature-rich compared with the Ingress API. However, to confi
 
 The Gateway API has the following primary extension points:
 
-* *External references.* A feature (field) of a Gateway API resource can reference a custom resource (CRD) specific to the Gateway implementation that configures that feature. For example:
+* *External references.* A feature (field) of a Gateway API resource can reference a custom resource specific to the Gateway implementation that configures that feature. For example:
     * [HTTPRouteFilter](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter) can reference an external resource via the `extensionRef` field, thus configuring an implementation-specific filter.
     * [BackendObjectReference](/references/spec/#gateway.networking.k8s.io/v1beta1.BackendObjectReference) supports resources other than Services.
     * [SecretObjectReference](/references/spec/#gateway.networking.k8s.io/v1beta1.SecretObjectReference) supports resources other than Secrets.
@@ -70,7 +70,7 @@ The Gateway API has the following primary extension points:
     * The `RegularExpression` type of the [HTTPPathMatch](/references/spec/#gateway.networking.k8s.io/v1beta1.SecretObjectReference).
 * *Policies.* A Gateway implementation can define custom resources (CRDs) called Policies for exposing data plane features like authentication. The Gateway API does not prescribe the details of those resources. However, it prescribes a standard UX. See the [Policy attachment guide](/references/policy-attachment/) for more details. In contrast with the *external references* above, a Gateway API resource does not reference a Policy. Instead, a Policy must reference a Gateway API resource.
 
-The extension points do not include annotations on the Gateway API resources. This approach is strongly discouraged for Gateway implementations.
+The extension points do not include annotations on the Gateway API resources. This approach is strongly discouraged for implementations of the API.
 
 ## Mapping Ingress API features to Gateway API Features
 
@@ -94,7 +94,7 @@ Gateway resources are owned by the cluster operator and the application admin.
 
 The Ingress resource supports TLS termination via the [TLS section](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls), where the TLS certificate and key are stored in a Secret.
 
-In the Gateway API, TLS termination is a property of the [listener](/references/spec/#gateway.networking.k8s.io/v1beta1.Listener), and similarly to the Ingress, a TLS certificate and key are also stored in a Secret.
+In the Gateway API, TLS termination is a property of the [Gateway listener](/references/spec/#gateway.networking.k8s.io/v1beta1.Listener), and similarly to the Ingress, a TLS certificate and key are also stored in a Secret.
 
 Because the listener is part of the Gateway resource, the cluster operator and application admin own TLS termination.
 
