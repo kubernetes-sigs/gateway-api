@@ -1,19 +1,17 @@
 # Migrating from Ingress
 
-The Gateway API project is the successor to `Ingress`, but the resources in
-Gateway API don't include `Ingress` itself (the closest parallel is `HTTPRoute`)
-. As such a one-time conversion from your previous `Ingress` resources to the
-relevant Gateway API resources like `HTTPRoute` will need to be done. In some
-cases this can be partially automated with tools
-like [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway), but
-should always be tested and verified.
+The Gateway API project is the successor to the Ingress API. However, it does
+not include the Ingress resource (the closest parallel is the HTTPRoute). As a
+result, a one-time conversion from your existing Ingress resources to the
+relevant Gateway API resources is necessary.
 
 This guide will help you with the conversion. It will:
 
 * Explain the key differences between the Ingress API and the Gateway API.
 * Map Ingress features to Gateway API features.
 * Show an example of an Ingress resource converted to Gateway API resources.
-* Mention a helper tool for automatic conversion.
+* Mention [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway)
+  for automatic conversion.
 
 At the same time, it will not prepare you for a live migration or explain how to
 convert some implementation-specific features of your Ingress controller.
@@ -399,4 +397,4 @@ configured via an annotation. The HTTPRoute below:
 The [Ingress to Gateway](https://github.com/kubernetes-sigs/ingress2gateway)
 project helps translate Ingress resources to Gateway API resources, specifically
 HTTPRoutes. It is early in the development phase and still experimental in
-nature.
+nature. The conversion results should always be tested and verified.
