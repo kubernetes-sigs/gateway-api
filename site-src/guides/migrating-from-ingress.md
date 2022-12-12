@@ -276,7 +276,7 @@ Gateway API (HTTPRoute), primarily:
 * Request redirects (including a TLS redirect)
 * Request/response manipulation
 * Traffic splitting
-* Header, cookie, or method-based routing
+* Header, query param or method-based routing
 
 However, the remaining features remain largely implementation-specific. To
 convert them, consult the Gateway implementation documentation to see
