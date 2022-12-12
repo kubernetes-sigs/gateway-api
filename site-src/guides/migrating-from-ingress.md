@@ -226,6 +226,10 @@ routing rules, while in the HTTPRoute the routing rules apply to all hostnames.
 > The Ingress API uses the term host while the Gateway API uses the hostname.
 > This guide will use the Gateway API term to refer to the Ingress host.
 
+> The `hostnames` of an HTTPRoute must match the `hostname` of the [Gateway listener](/references/spec/#gateway.networking.k8s.io/v1beta1.Listener).
+> Otherwise, the listener will ignore the routing rules for the unmatched
+> hostnames. See the [HTTPRoute documentation](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteSpec).
+
 HTTPRoutes are owned by the application developer.
 
 The next three sections map additional features of the Ingress routing rules.
