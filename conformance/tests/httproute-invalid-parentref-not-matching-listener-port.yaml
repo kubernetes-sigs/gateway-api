@@ -13,3 +13,4 @@ spec:
   - backendRefs:
     - name: infra-backend-v1
       kind: Service
+      port: 8080
