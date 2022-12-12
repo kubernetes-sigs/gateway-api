@@ -47,9 +47,9 @@ The Gateway API addresses those limitations, as the next section will show.
 
 There are three major differences between the Ingress API and the Gateway API:
 
-* Personas.
-* Available features.
-* Approach to extensibility (implementation-specific features).
+* Personas
+* Available features
+* Approach to extensibility (implementation-specific features)
 
 ### Personas
 
@@ -129,9 +129,9 @@ awkwardness problem.
 
 The Ingress API has two extensions points:
 
-* Annotations on the Ingress resource (described in the previous section).
+* Annotations on the Ingress resource (described in the previous section)
 * [Resource backends](https://kubernetes.io/docs/concepts/services-networking/ingress/#resource-backend),
-   which is the ability to specify a backend other than a Service.
+   which is the ability to specify a backend other than a Service
 
 The Gateway API is feature-rich compared with the Ingress API. However, to
 configure some advanced features like authentication or common but non-portable
@@ -173,9 +173,9 @@ This approach is strongly discouraged for implementations of the API.
 This section will map the Ingress API features to the corresponding Gateway API
 features. It will cover three major areas:
 
-* Entry points.
-* TLS termination.
-* Routing rules.
+* Entry points
+* TLS termination
+* Routing rules
 
 ### Entry Points
 
@@ -273,10 +273,10 @@ implementations.
 Luckily, some of the features supported through annotations are now part of the
 Gateway API (HTTPRoute), primarily:
 
-* Request redirects (including a TLS redirect).
-* Request/response manipulation.
-* Traffic splitting.
-* Header, cookie, or method-based routing.
+* Request redirects (including a TLS redirect)
+* Request/response manipulation
+* Traffic splitting
+* Header, cookie, or method-based routing
 
 However, the remaining features remain largely implementation-specific. To
 convert them, consult the Gateway implementation documentation to see
@@ -373,10 +373,10 @@ The following Gateway resource:
   implementation).
 * Configures HTTP and HTTPS listeners (entry points), which the Ingress resource
   included implicitly:
-    * The HTTP listener `http` on port `80`.
+    * The HTTP listener `http` on port `80`
     * The HTTPS listener `https` on port `443` with TLS termination with the
-      cert and key stored in the `example-com` Secret. It is the same Secret
-      used in the Ingress.
+      cert and key stored in the `example-com` Secret, which is the same Secret
+      used in the Ingress
 
 Also, note that both listeners allow all HTTPRoutes from the same namespace
 (which is the default setting) and restrict HTTPRoute hostnames to
