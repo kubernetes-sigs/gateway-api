@@ -7,7 +7,8 @@ relevant Gateway API resources is necessary.
 
 This guide will help you with the conversion. It will:
 
-* Explain the key differences between the Ingress API and the Gateway API.
+* Explain why you may want to switch to the Gateway API.
+* Describe the key differences between the Ingress API and the Gateway API.
 * Map Ingress features to Gateway API features.
 * Show an example of an Ingress resource converted to Gateway API resources.
 * Mention [ingress2gateway](https://github.com/kubernetes-sigs/ingress2gateway)
@@ -17,6 +18,30 @@ At the same time, it will not prepare you for a live migration or explain how to
 convert some implementation-specific features of your Ingress controller.
 Additionally, since the Ingress API only covers HTTP/HTTPS traffic, this guide
 does not cover the Gateway API support for other protocols.
+
+## Reasons to Switch to Gateway API
+
+The [Ingress API](https://kubernetes.io/docs/concepts/services-networking/ingress/)
+is the standard Kubernetes way to configure external HTTP/HTTPS load balancing
+for Services. It is widely adopted by Kubernetes users and well-supported by
+vendors with many implementations ([Ingress controllers](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/))
+available. Additionally, several cloud-native projects integrate with the
+Ingress API, such as [cert-manager](https://cert-manager.io/)
+and [ExternalDNS](https://github.com/kubernetes-sigs/external-dns).
+
+However, the Ingress API has several limitations:
+
+- **Limited features**. The Ingress API only supports TLS termination and
+  simple content-based request routing of HTTP traffic.
+- **Reliance on annotations for extensibility**. The annotations approach to
+  extensibility leads to the limited portability and awkwardness of the API. 
+- **Insufficient permission model**. The Ingress API is not well-suited for
+  multi-team  clusters with shared load balancing infrastructure.
+
+The Gateway API addresses those limitations, as the next section will show.
+
+> Read more about the [design goals](https://gateway-api.sigs.k8s.io/#gateway-api-concepts)
+> of the Gateway API.
 
 ## Key Differences Between Ingress API and Gateway API
 
