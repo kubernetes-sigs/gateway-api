@@ -109,7 +109,7 @@ type GatewaySpec struct {
 	//
 	// +listType=map
 	// +listMapKey=name
-	// +kubebuilder:validation:MinItems=1
+	// +optional
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []Listener `json:"listeners"`
 
