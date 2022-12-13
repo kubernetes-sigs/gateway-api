@@ -35,8 +35,7 @@ type Interface interface {
 	GatewayV1beta1() gatewayv1beta1.GatewayV1beta1Interface
 }
 
-// Clientset contains the clients for groups. Each group has exactly one
-// version included in a Clientset.
+// Clientset contains the clients for groups.
 type Clientset struct {
 	*discovery.DiscoveryClient
 	gatewayV1alpha2 *gatewayv1alpha2.GatewayV1alpha2Client
