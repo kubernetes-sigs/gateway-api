@@ -1,9 +1,11 @@
 # Migrating from Ingress
 
-The Gateway API project is the successor to the Ingress API. However, it does
-not include the Ingress resource (the closest parallel is the HTTPRoute). As a
-result, a one-time conversion from your existing Ingress resources to the
+The Gateway API project is the successor to the [Ingress API][ing]. However, it
+does not include the Ingress resource (the closest parallel is the HTTPRoute).
+As a result, a one-time conversion from your existing Ingress resources to the
 relevant Gateway API resources is necessary.
+
+[ing]:https://kubernetes.io/docs/concepts/services-networking/ingress/
 
 This guide will help you with the conversion. It will:
 
