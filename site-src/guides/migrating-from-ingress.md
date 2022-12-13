@@ -34,7 +34,8 @@ However, the Ingress API has several limitations:
 - *Limited features*. The Ingress API only supports TLS termination and
   simple content-based request routing of HTTP traffic.
 - *Reliance on annotations for extensibility*. The annotations approach to
-  extensibility leads to the limited portability and awkwardness of the API. 
+  extensibility leads to limited portability as every implementation has its own
+  supported extensions that may not translate to any other implementation.
 - *Insufficient permission model*. The Ingress API is not well-suited for
   multi-team clusters with shared load-balancing infrastructure.
 
@@ -101,9 +102,10 @@ API personas:
 The Ingress API comes with basic features only: TLS termination and
 content-based routing of HTTP traffic based on the host header and the URI of a
 request. To offer more features, Ingress controllers support them through
-annotations on the Ingress resource which are implementation-specific extensions
-to the Ingress API.
+[annotations][anns] on the Ingress resource which are implementation-specific
+extensions to the Ingress API.
 
+[anns]:https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/
 The annotations approach to extensibility has two negative consequences for
 users of the Ingress API:
 
@@ -171,7 +173,7 @@ This approach is strongly discouraged for implementations of the API.
 ## Mapping Ingress API features to Gateway API Features
 
 This section will map the Ingress API features to the corresponding Gateway API
-features. It will cover three major areas:
+features, covering three major areas:
 
 * Entry points
 * TLS termination
@@ -427,5 +429,4 @@ configured via an annotation. The HTTPRoute below:
 
 The [Ingress to Gateway](https://github.com/kubernetes-sigs/ingress2gateway)
 project helps translate Ingress resources to Gateway API resources, specifically
-HTTPRoutes. It is early in the development phase and still experimental in
-nature. The conversion results should always be tested and verified.
+HTTPRoutes. The conversion results should always be tested and verified.
