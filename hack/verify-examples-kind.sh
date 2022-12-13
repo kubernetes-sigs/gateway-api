@@ -49,7 +49,7 @@ trap cleanup INT TERM
 res=0
 
 # Install kind
-(cd $GOPATH && go install sigs.k8s.io/kind@v0.12.0) || res=$?
+(cd $GOPATH && go install sigs.k8s.io/kind@v0.17.0) || res=$?
 
 # Create cluster
 KIND_CREATE_ATTEMPTED=true
@@ -70,14 +70,15 @@ docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
 kubectl apply -k config/webhook/
 
 # Wait for webhook to be ready
-for check in {1..10}; do 
+for check in {1..10}; do
   sleep 5
-  NUM_COMPLETED=$(kubectl get po -n gateway-system | grep Completed | wc -l || echo Failed to get completed Pods)
+  NUM_COMPLETED=$(kubectl get po -n gateway-system | grep Completed | wc -l | xargs || echo Failed to get completed Pods)
   if [ "${NUM_COMPLETED}" = "2" ]; then
     echo "Webhook successfully configured"
     break
   elif [ "${check}" = "10" ]; then
     echo "Timed out waiting for webhook setup to complete"
+    cleanup
     exit 1
   fi
   echo "Webhook not ready yet, will check again in 5 seconds"
@@ -94,27 +95,27 @@ for CHANNEL in experimental standard; do
   kubectl apply --recursive -f examples/standard || res=$?
 
   # Install all experimental example gateway-api resources when experimental mode is enabled
-  if [[ "${CHANNEL}" == "experimental" ]] ; then
-      echo "Experimental mode enabled: deploying experimental examples"
-      kubectl apply --recursive -f examples/experimental || res=$?
+  if [[ "${CHANNEL}" == "experimental" ]]; then
+    echo "Experimental mode enabled: deploying experimental examples"
+    kubectl apply --recursive -f examples/experimental || res=$?
   fi
 
   # Install invalid gateway-api resources.
   # None of these examples should be successfully configured
   # This is very hacky, sorry.
   # Firstly, apply the examples, remembering that errors are on stdout
-  kubectl apply --recursive -f hack/invalid-examples 2>&1 | \
-        # First, we grep out the expected responses.
-        # After this, if everything is as expected, the output should be empty.
-        grep -v 'is invalid' | \
-        grep -v 'missing required field' | \
-        grep -v 'denied the request' | \
-        # Then, we grep for anything else.
-        # If anything else is found, this will return 0
-        # which is *not* what we want.
-        grep -e '.' && \
-        res=2 || \
-        echo Examples failed as expected
+  kubectl apply --recursive -f hack/invalid-examples 2>&1 |
+    # First, we grep out the expected responses.
+    # After this, if everything is as expected, the output should be empty.
+    grep -v 'is invalid' |
+    grep -v 'missing required field' |
+    grep -v 'denied the request' |
+    # Then, we grep for anything else.
+    # If anything else is found, this will return 0
+    # which is *not* what we want.
+    grep -e '.' &&
+    res=2 ||
+    echo Examples failed as expected
 done
 
 # Clean up and exit
