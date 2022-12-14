@@ -27,7 +27,7 @@ import (
 func TestValidateUDPRoute(t *testing.T) {
 	t.Parallel()
 
-	portNumber := gatewayv1a2.PortNumber(9080)
+	var portNumber int32 = 9080
 
 	tests := []struct {
 		name  string
@@ -35,32 +35,12 @@ func TestValidateUDPRoute(t *testing.T) {
 		errs  field.ErrorList
 	}{
 		{
-			name: "valid UDPRoute with 1 backendRef",
-			rules: []gatewayv1a2.UDPRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: &portNumber,
-							},
-						},
-					},
-				},
-			},
+			name:  "valid UDPRoute with 1 backendRef",
+			rules: makeRouteRules[gatewayv1a2.UDPRouteRule](&portNumber),
 		},
 		{
-			name: "invalid UDPRoute with 1 backendRef (missing port)",
-			rules: []gatewayv1a2.UDPRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: nil,
-							},
-						},
-					},
-				},
-			},
+			name:  "invalid UDPRoute with 1 backendRef (missing port)",
+			rules: makeRouteRules[gatewayv1a2.UDPRouteRule](nil),
 			errs: field.ErrorList{
 				{
 					Type:   field.ErrorTypeRequired,

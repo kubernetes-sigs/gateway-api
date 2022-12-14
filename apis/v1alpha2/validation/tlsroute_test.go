@@ -27,7 +27,7 @@ import (
 func TestValidateTLSRoute(t *testing.T) {
 	t.Parallel()
 
-	portNumber := gatewayv1a2.PortNumber(9080)
+	var portNumber int32 = 9080
 
 	tests := []struct {
 		name  string
@@ -35,32 +35,12 @@ func TestValidateTLSRoute(t *testing.T) {
 		errs  field.ErrorList
 	}{
 		{
-			name: "valid TLSRoute with 1 backendRef",
-			rules: []gatewayv1a2.TLSRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: &portNumber,
-							},
-						},
-					},
-				},
-			},
+			name:  "valid TLSRoute with 1 backendRef",
+			rules: makeRouteRules[gatewayv1a2.TLSRouteRule](&portNumber),
 		},
 		{
-			name: "invalid TLSRoute with 1 backendRef (missing port)",
-			rules: []gatewayv1a2.TLSRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: nil,
-							},
-						},
-					},
-				},
-			},
+			name:  "invalid TLSRoute with 1 backendRef (missing port)",
+			rules: makeRouteRules[gatewayv1a2.TLSRouteRule](nil),
 			errs: field.ErrorList{
 				{
 					Type:   field.ErrorTypeRequired,
