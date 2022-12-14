@@ -79,15 +79,13 @@ func TestValidateTLSRoute(t *testing.T) {
 			route := gatewayv1a2.TLSRoute{Spec: gatewayv1a2.TLSRouteSpec{Rules: tc.rules}}
 			errs := ValidateTLSRoute(&route)
 			if len(errs) != len(tc.errs) {
-				t.Errorf("got %d errors, want %d errors: %s", len(errs), len(tc.errs), errs)
-				t.FailNow()
+				t.Fatalf("got %d errors, want %d errors: %s", len(errs), len(tc.errs), errs)
 			}
 			for i := 0; i < len(errs); i++ {
 				realErr := errs[i].Error()
 				expectedErr := tc.errs[i].Error()
 				if realErr != expectedErr {
-					t.Errorf("expect error message: %s, but got: %s", expectedErr, realErr)
-					t.FailNow()
+					t.Fatalf("expect error message: %s, but got: %s", expectedErr, realErr)
 				}
 			}
 		})
