@@ -27,8 +27,8 @@ spec:
     - jsonPath: .status.addresses[*].value
       name: Address
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+    - jsonPath: .status.conditions[?(@.type=="Programmed")].status
+      name: Programmed
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
@@ -724,8 +724,8 @@ spec:
     - jsonPath: .status.addresses[*].value
       name: Address
       type: string
-    - jsonPath: .status.conditions[?(@.type=="Ready")].status
-      name: Ready
+    - jsonPath: .status.conditions[?(@.type=="Programmed")].status
+      name: Programmed
       type: string
     - jsonPath: .metadata.creationTimestamp
       name: Age
