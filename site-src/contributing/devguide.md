@@ -42,11 +42,26 @@ for this project:
 
 Issues labeled `good first issue` and `help wanted` are especially good for a
 first contribution.
-We use [milestones][gh-milestones] to track our progress towards releases. Looking at our current milestone can help identify our highest priority issues.
+
+We use [milestones][gh-milestones] to track our progress towards releases.
+These milestones are generally labeled according to the [semver][semver]
+release version tag that they represent, meaning that in general we only focus
+on the next release in the sequence until it is closed and the release is
+finished. Only Gateway API maintainers are able to create and attach issues to
+milestones.
+
+We use [priority labels][prio-labels] to help indicate the timing importance of
+resolving an issue, or whether an issue needs more support from its creator or
+the community to be prioritized. These labels can be set with the [/priority
+command in PR and issue comments][issue-cmds]. For example,
+`/priority important-soon`.
 
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues
 [gh-dashboard]: https://github.com/kubernetes-sigs/gateway-api/projects/1
 [gh-milestones]: https://github.com/kubernetes-sigs/gateway-api/milestones
+[semver]:https://semver.org/
+[prio-labels]:https://github.com/kubernetes-sigs/gateway-api/labels?q=priority
+[issue-cmds]:https://prow.k8s.io/command-help?repo=kubernetes-sigs%2Fgateway-api
 
 ## Building the code
 
