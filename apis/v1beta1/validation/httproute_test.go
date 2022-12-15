@@ -691,26 +691,40 @@ func TestValidateHTTPPathMatch(t *testing.T) {
 		path     *gatewayv1b1.HTTPPathMatch
 		errCount int
 	}{{
-		name: "invalid httpRoute prefix",
+		name: "invalid httpRoute prefix (/.)",
 		path: &gatewayv1b1.HTTPPathMatch{
 			Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
 			Value: ptrTo("/."),
 		},
 		errCount: 1,
 	}, {
-		name: "invalid httpRoute Exact",
+		name: "invalid exact (/./)",
 		path: &gatewayv1b1.HTTPPathMatch{
 			Type:  ptrTo(gatewayv1b1.PathMatchType("Exact")),
 			Value: ptrTo("/foo/./bar"),
 		},
 		errCount: 1,
 	}, {
-		name: "invalid httpRoute prefix",
+		name: "valid httpRoute prefix",
 		path: &gatewayv1b1.HTTPPathMatch{
 			Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
 			Value: ptrTo("/"),
 		},
 		errCount: 0,
+	}, {
+		name: "invalid httpRoute prefix (/[])",
+		path: &gatewayv1b1.HTTPPathMatch{
+			Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+			Value: ptrTo("/[]"),
+		},
+		errCount: 1,
+	}, {
+		name: "invalid httpRoute exact (/^)",
+		path: &gatewayv1b1.HTTPPathMatch{
+			Type:  ptrTo(gatewayv1b1.PathMatchType("Exact")),
+			Value: ptrTo("/^"),
+		},
+		errCount: 1,
 	}}
 
 	for _, tc := range tests {
