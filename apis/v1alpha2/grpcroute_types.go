@@ -322,7 +322,7 @@ type GRPCMethodMatch struct {
 	// At least one of Service and Method MUST be a non-empty string.
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[^\/]*$`
+	// +kubebuilder:validation:Pattern=`^(?i)[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 	Service *string `json:"service,omitempty"`
 
 	// Value of the method to match against. If left empty or omitted, will
@@ -331,7 +331,7 @@ type GRPCMethodMatch struct {
 	// At least one of Service and Method MUST be a non-empty string.
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[^\/]*$`
+	// +kubebuilder:validation:Pattern=`^[A-Za-z_][A-Za-z_0-9]*$`
 	Method *string `json:"method,omitempty"`
 }
 
