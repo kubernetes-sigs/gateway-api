@@ -336,10 +336,10 @@ type GRPCMethodMatch struct {
 }
 
 // MethodMatchType specifies the semantics of how gRPC methods and services are compared.
-// Valid MethodMatchType values are:
+// Valid MethodMatchType values, along with their conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Exact methods MUST be syntactically valid:
 //
@@ -389,10 +389,11 @@ type GRPCHeaderMatch struct {
 }
 
 // GRPCHeaderMatchType specifies the semantics of how GRPC header values should
-// be compared. Valid GRPCHeaderMatchType values are:
+// be compared. Valid GRPCHeaderMatchType values, along with their conformance
+// levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that new values may be added to this enum in future releases of the API,
 // implementations MUST ensure that unknown values will not cause a crash.
