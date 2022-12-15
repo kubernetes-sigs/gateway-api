@@ -176,7 +176,7 @@ func validateHTTPPathMatch(path *gatewayv1b1.HTTPPathMatch, fldPath *field.Path)
 		r, err := regexp.Compile(validPathCharacters)
 		if err != nil {
 			allErrs = append(allErrs, field.InternalError(fldPath.Child("value"),
-				fmt.Errorf("could not compile path matching regex: %s", err)))
+				fmt.Errorf("could not compile path matching regex: %w", err)))
 		} else if !r.MatchString(*path.Value) {
 			allErrs = append(allErrs, field.Invalid(fldPath.Child("value"), *path.Value,
 				fmt.Sprintf("must only contain valid characters (matching %s)", validPathCharacters)))
@@ -321,14 +321,14 @@ func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field
 			singleAction[strings.ToLower(string(action.Name))] = true
 		}
 	}
-	for i, action := range filter.Remove {
-		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
+	for i, name := range filter.Remove {
+		if needsErr, ok := singleAction[strings.ToLower(name)]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[strings.ToLower(action)] = false
+			singleAction[strings.ToLower(name)] = false
 		} else {
-			singleAction[strings.ToLower(action)] = true
+			singleAction[strings.ToLower(name)] = true
 		}
 	}
 	return errs

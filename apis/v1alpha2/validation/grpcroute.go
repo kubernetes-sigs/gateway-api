@@ -184,14 +184,14 @@ func validateGRPCHeaderModifier(filter gatewayv1a2.HTTPHeaderFilter, path *field
 			singleAction[strings.ToLower(string(action.Name))] = true
 		}
 	}
-	for i, action := range filter.Remove {
-		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
+	for i, name := range filter.Remove {
+		if needsErr, ok := singleAction[strings.ToLower(name)]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[strings.ToLower(action)] = false
+			singleAction[strings.ToLower(name)] = false
 		} else {
-			singleAction[strings.ToLower(action)] = true
+			singleAction[strings.ToLower(name)] = true
 		}
 	}
 	return errs
