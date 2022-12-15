@@ -19,6 +19,36 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
+# v0.6.0-rc2
+
+We expect this to be our final release candidate before launching v0.6.0. This
+release candidate includes a variety of cleanup and documentation updates. The
+changelog below represents the changes since v0.6.0-rc1.
+
+### Conformance Tests
+
+- A new test has been added to cover HTTP Redirects (#1556, @LiorLieberman)
+- Fix Gateway reference in HTTPRouteInvalidParentRefNotMatchingListenerPort
+  (#1591, @sayboras)
+
+### General Cleanup
+
+- Display the Programmed condition instead of the Ready condition in the output
+  of `kubectl get gateways`. (#1602, @skriss)
+- GRPCRoute: Regex validation for Method and Service has been tightened to match
+  GRPC spec. (#1599, @robscott)
+- GRPCRoute: Webhook validation of GRPCRoute has been expanded to closely match
+  HTTPRoute validation. (#1599, @robscott)
+- HTTPRoute and Gateway: Gaps between webhook validation for v1alpha2 and
+  v1beta1 have been closed. (#1599, @robscott)
+- HTTPRoute: Validating webhook now ensures that Exact and Prefix path match
+  values can now only include valid path values per RFC-3986. (RegularExpression
+  path matches are not affected by this change). (#1599, @robscott)
+- The Gateway default conditions list now includes the Programmed condition.
+  (#1604, @youngnick)
+- `RegularExpression` type selectors have been clarified to all be
+  `ImplementationSpecific` conformance. (#1604, @youngnick)
+
 # v0.6.0-rc1
 
 ## Major Changes
