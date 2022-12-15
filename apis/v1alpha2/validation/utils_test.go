@@ -16,15 +16,24 @@ limitations under the License.
 
 package validation
 
-import gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+import (
+	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
+)
 
-// ContainsInSectionNameSlice checks whether the provided SectionName
-// is in the target SectionName slice.
-func ContainsInSectionNameSlice(items []gatewayv1b1.SectionName, item *gatewayv1b1.SectionName) bool {
-	for _, eachItem := range items {
-		if eachItem == *item {
-			return true
-		}
+type routeRule interface {
+	gatewayv1a2.TLSRouteRule | gatewayv1a2.UDPRouteRule
+}
+
+func makeRouteRules[T routeRule](ports ...*int32) (rules []T) {
+	for _, port := range ports {
+		rules = append(rules, T{
+			BackendRefs: []gatewayv1a2.BackendRef{{
+				BackendObjectReference: gatewayv1a2.BackendObjectReference{
+					Port: (*v1beta1.PortNumber)(port),
+				},
+			}},
+		})
 	}
-	return false
+	return
 }
