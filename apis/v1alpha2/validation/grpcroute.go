@@ -17,9 +17,20 @@ limitations under the License.
 package validation
 
 import (
+	"net/http"
+	"strings"
+
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+)
+
+var (
+	// repeatableGRPCRouteFilters are filter types that are allowed to be
+	// repeated multiple times in a rule.
+	repeatableGRPCRouteFilters = []gatewayv1a2.GRPCRouteFilterType{
+		gatewayv1a2.GRPCRouteFilterExtensionRef,
+	}
 )
 
 // ValidateGRPCRoute validates GRPCRoute according to the Gateway API specification.
@@ -44,6 +55,10 @@ func validateGRPCRouteRules(rules []gatewayv1a2.GRPCRouteRule, path *field.Path)
 	var errs field.ErrorList
 	for i, rule := range rules {
 		errs = append(errs, validateRuleMatches(rule.Matches, path.Index(i).Child("matches"))...)
+		errs = append(errs, validateGRPCRouteFilters(rule.Filters, path.Index(i).Child(("filters")))...)
+		for j, backendRef := range rule.BackendRefs {
+			errs = append(errs, validateGRPCRouteFilters(backendRef.Filters, path.Child("rules").Index(i).Child("backendRefs").Index(j))...)
+		}
 	}
 	return errs
 }
@@ -54,8 +69,129 @@ func validateRuleMatches(matches []gatewayv1a2.GRPCRouteMatch, path *field.Path)
 	var errs field.ErrorList
 	for i, m := range matches {
 		if m.Method != nil && m.Method.Service == nil && m.Method.Method == nil {
-			errs = append(errs, field.Required(path.Index(i).Child("methods"), "one or both of `service` or `method` must be specified"))
-			return errs
+			errs = append(errs, field.Required(path.Index(i).Child("method"), "one or both of `service` or `method` must be specified"))
+		}
+		if m.Headers != nil {
+			errs = append(errs, validateGRPCHeaderMatches(m.Headers, path.Index(i).Child("headers"))...)
+		}
+	}
+	return errs
+}
+
+// validateGRPCHeaderMatches validates that no header name is matched more than
+// once (case-insensitive), and that at least one of service or method was
+// provided.
+func validateGRPCHeaderMatches(matches []gatewayv1a2.GRPCHeaderMatch, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[string]int{}
+
+	for _, match := range matches {
+		// Header names are case-insensitive.
+		counts[strings.ToLower(string(match.Name))]++
+	}
+
+	for name, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, http.CanonicalHeaderKey(name), "cannot match the same header multiple times in the same rule"))
+		}
+	}
+
+	return errs
+}
+
+// validateGRPCRouteFilterType validates that only the expected fields are
+// set for the specified filter type.
+func validateGRPCRouteFilterType(filter gatewayv1a2.GRPCRouteFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if filter.ExtensionRef != nil && filter.Type != gatewayv1a2.GRPCRouteFilterExtensionRef {
+		errs = append(errs, field.Invalid(path, filter.ExtensionRef, "must be nil if the GRPCRouteFilter.Type is not ExtensionRef"))
+	}
+	if filter.ExtensionRef == nil && filter.Type == gatewayv1a2.GRPCRouteFilterExtensionRef {
+		errs = append(errs, field.Required(path, "filter.ExtensionRef must be specified for ExtensionRef GRPCRouteFilter.Type"))
+	}
+	if filter.RequestHeaderModifier != nil && filter.Type != gatewayv1a2.GRPCRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Invalid(path, filter.RequestHeaderModifier, "must be nil if the GRPCRouteFilter.Type is not RequestHeaderModifier"))
+	}
+	if filter.RequestHeaderModifier == nil && filter.Type == gatewayv1a2.GRPCRouteFilterRequestHeaderModifier {
+		errs = append(errs, field.Required(path, "filter.RequestHeaderModifier must be specified for RequestHeaderModifier GRPCRouteFilter.Type"))
+	}
+	if filter.ResponseHeaderModifier != nil && filter.Type != gatewayv1a2.GRPCRouteFilterResponseHeaderModifier {
+		errs = append(errs, field.Invalid(path, filter.ResponseHeaderModifier, "must be nil if the GRPCRouteFilter.Type is not ResponseHeaderModifier"))
+	}
+	if filter.ResponseHeaderModifier == nil && filter.Type == gatewayv1a2.GRPCRouteFilterResponseHeaderModifier {
+		errs = append(errs, field.Required(path, "filter.ResponseHeaderModifier must be specified for ResponseHeaderModifier GRPCRouteFilter.Type"))
+	}
+	if filter.RequestMirror != nil && filter.Type != gatewayv1a2.GRPCRouteFilterRequestMirror {
+		errs = append(errs, field.Invalid(path, filter.RequestMirror, "must be nil if the GRPCRouteFilter.Type is not RequestMirror"))
+	}
+	if filter.RequestMirror == nil && filter.Type == gatewayv1a2.GRPCRouteFilterRequestMirror {
+		errs = append(errs, field.Required(path, "filter.RequestMirror must be specified for RequestMirror GRPCRouteFilter.Type"))
+	}
+	return errs
+}
+
+// validateGRPCRouteFilters validates that a list of core and extended filters
+// is used at most once and that the filter type matches its value
+func validateGRPCRouteFilters(filters []gatewayv1a2.GRPCRouteFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	counts := map[gatewayv1a2.GRPCRouteFilterType]int{}
+
+	for i, filter := range filters {
+		counts[filter.Type]++
+		if filter.RequestHeaderModifier != nil {
+			errs = append(errs, validateGRPCHeaderModifier(*filter.RequestHeaderModifier, path.Index(i).Child("requestHeaderModifier"))...)
+		}
+		if filter.ResponseHeaderModifier != nil {
+			errs = append(errs, validateGRPCHeaderModifier(*filter.ResponseHeaderModifier, path.Index(i).Child("responseHeaderModifier"))...)
+		}
+		errs = append(errs, validateGRPCRouteFilterType(filter, path.Index(i))...)
+	}
+	// custom filters don't have any validation
+	for _, key := range repeatableGRPCRouteFilters {
+		delete(counts, key)
+	}
+
+	for filterType, count := range counts {
+		if count > 1 {
+			errs = append(errs, field.Invalid(path, filterType, "cannot be used multiple times in the same rule"))
+		}
+	}
+	return errs
+}
+
+// validateGRPCHeaderModifier ensures that multiple actions cannot be set for
+// the same header.
+func validateGRPCHeaderModifier(filter gatewayv1a2.HTTPHeaderFilter, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	singleAction := make(map[string]bool)
+	for i, action := range filter.Add {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("add"), filter.Add[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(string(action.Name))] = false
+		} else {
+			singleAction[strings.ToLower(string(action.Name))] = true
+		}
+	}
+	for i, action := range filter.Set {
+		if needsErr, ok := singleAction[strings.ToLower(string(action.Name))]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("set"), filter.Set[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(string(action.Name))] = false
+		} else {
+			singleAction[strings.ToLower(string(action.Name))] = true
+		}
+	}
+	for i, action := range filter.Remove {
+		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
+			if needsErr {
+				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
+			}
+			singleAction[strings.ToLower(action)] = false
+		} else {
+			singleAction[strings.ToLower(action)] = true
 		}
 	}
 	return errs
