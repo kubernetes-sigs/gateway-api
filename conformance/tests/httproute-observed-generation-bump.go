@@ -81,20 +81,6 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
 			}
-
-			for _, up := range updated.Status.Parents {
-				originalRef := parentStatusForRef(original.Status.Parents, up.ParentRef)
-				if originalRef == nil {
-					t.Fatalf("Observed unexpected new parent ref %#v", up.ParentRef)
-				}
-				for _, uc := range up.Conditions {
-					for _, oc := range originalRef.Conditions {
-						if oc.Type == uc.Type && oc.ObservedGeneration == uc.ObservedGeneration {
-							t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
-						}
-					}
-				}
-			}
 		})
 	},
 }

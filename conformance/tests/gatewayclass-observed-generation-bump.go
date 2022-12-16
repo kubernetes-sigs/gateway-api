@@ -38,7 +38,6 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 	Description: "A GatewayClass should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
 	Manifests:   []string{"tests/gatewayclass-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-
 		gwc := types.NamespacedName{Name: "gatewayclass-observed-generation-bump"}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
@@ -73,14 +72,6 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 
 			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
-			}
-
-			for _, uc := range updated.Status.Conditions {
-				for _, ec := range original.Status.Conditions {
-					if ec.Type == uc.Type && ec.ObservedGeneration == uc.ObservedGeneration {
-						t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
-					}
-				}
 			}
 		})
 	},

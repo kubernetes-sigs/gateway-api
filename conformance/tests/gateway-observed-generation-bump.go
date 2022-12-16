@@ -85,14 +85,6 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
 			}
-
-			for _, uc := range updated.Status.Conditions {
-				for _, ec := range original.Status.Conditions {
-					if ec.Type == uc.Type && ec.ObservedGeneration == uc.ObservedGeneration {
-						t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
-					}
-				}
-			}
 		})
 	},
 }
