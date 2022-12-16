@@ -48,17 +48,19 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			namespaces := []string{"gateway-conformance-infra"}
 			kubernetes.NamespacesMustBeAccepted(t, s.Client, s.TimeoutConfig, namespaces)
 
-			existing := &v1beta1.Gateway{}
-			err := s.Client.Get(ctx, gwNN, existing)
+			original := &v1beta1.Gateway{}
+			err := s.Client.Get(ctx, gwNN, original)
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			kubernetes.GatewayMustHaveLatestConditions(t, existing)
+			kubernetes.GatewayMustHaveLatestConditions(t, original)
 
 			all := v1beta1.NamespacesFromAll
 
+			mutate := original.DeepCopy()
+
 			// mutate the Gateway Spec
-			existing.Spec.Listeners = append(existing.Spec.Listeners, v1beta1.Listener{
+			mutate.Spec.Listeners = append(mutate.Spec.Listeners, v1beta1.Listener{
 				Name:     "alternate",
 				Port:     8080,
 				Protocol: v1beta1.HTTPProtocolType,
@@ -67,7 +69,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 				},
 			})
 
-			err = s.Client.Update(ctx, existing)
+			err = s.Client.Update(ctx, mutate)
 			require.NoErrorf(t, err, "error updating the Gateway: %v", err)
 
 			// Ensure the generation and observedGeneration sync up
@@ -80,12 +82,12 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.GatewayMustHaveLatestConditions(t, updated)
 
-			if existing.Generation == updated.Generation {
+			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
 			}
 
 			for _, uc := range updated.Status.Conditions {
-				for _, ec := range existing.Status.Conditions {
+				for _, ec := range original.Status.Conditions {
 					if ec.Type == uc.Type && ec.ObservedGeneration == uc.ObservedGeneration {
 						t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
 					}

@@ -47,17 +47,18 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 
 			kubernetes.GWCMustBeAccepted(t, s.Client, s.TimeoutConfig, gwc.Name)
 
-			existing := &v1beta1.GatewayClass{}
-			err := s.Client.Get(ctx, gwc, existing)
+			original := &v1beta1.GatewayClass{}
+			err := s.Client.Get(ctx, gwc, original)
 			require.NoErrorf(t, err, "error getting GatewayClass: %v", err)
 
 			// Sanity check
-			kubernetes.GatewayClassMustHaveLatestConditions(t, existing)
+			kubernetes.GatewayClassMustHaveLatestConditions(t, original)
 
+			mutate := original.DeepCopy()
 			desc := "new"
-			existing.Spec.Description = &desc
+			mutate.Spec.Description = &desc
 
-			err = s.Client.Update(ctx, existing)
+			err = s.Client.Update(ctx, mutate)
 			require.NoErrorf(t, err, "error updating the GatewayClass: %v", err)
 
 			// Ensure the generation and observedGeneration sync up
@@ -70,12 +71,12 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.GatewayClassMustHaveLatestConditions(t, updated)
 
-			if existing.Generation == updated.Generation {
+			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
 			}
 
 			for _, uc := range updated.Status.Conditions {
-				for _, ec := range existing.Status.Conditions {
+				for _, ec := range original.Status.Conditions {
 					if ec.Type == uc.Type && ec.ObservedGeneration == uc.ObservedGeneration {
 						t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
 					}

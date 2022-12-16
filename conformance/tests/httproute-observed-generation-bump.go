@@ -57,15 +57,16 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			namespaces := []string{"gateway-conformance-infra"}
 			kubernetes.NamespacesMustBeAccepted(t, s.Client, s.TimeoutConfig, namespaces)
 
-			existing := &v1beta1.HTTPRoute{}
-			err := s.Client.Get(ctx, routeNN, existing)
+			original := &v1beta1.HTTPRoute{}
+			err := s.Client.Get(ctx, routeNN, original)
 			require.NoErrorf(t, err, "error getting HTTPRoute: %v", err)
 
 			// Sanity check
-			kubernetes.HTTPRouteMustHaveLatestConditions(t, existing)
+			kubernetes.HTTPRouteMustHaveLatestConditions(t, original)
 
-			existing.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-v2"
-			err = s.Client.Update(ctx, existing)
+			mutate := original.DeepCopy()
+			mutate.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-v2"
+			err = s.Client.Update(ctx, mutate)
 			require.NoErrorf(t, err, "error updating the HTTPRoute: %v", err)
 
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, gwNN, acceptedCondition)
@@ -77,18 +78,18 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.HTTPRouteMustHaveLatestConditions(t, updated)
 
-			if existing.Generation == updated.Generation {
+			if original.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
 			}
 
 			for _, up := range updated.Status.Parents {
-				existing := parentStatusForRef(existing.Status.Parents, up.ParentRef)
-				if existing == nil {
+				originalRef := parentStatusForRef(original.Status.Parents, up.ParentRef)
+				if originalRef == nil {
 					t.Fatalf("Observed unexpected new parent ref %#v", up.ParentRef)
 				}
 				for _, uc := range up.Conditions {
-					for _, ec := range existing.Conditions {
-						if ec.Type == uc.Type && ec.ObservedGeneration == uc.ObservedGeneration {
+					for _, oc := range originalRef.Conditions {
+						if oc.Type == uc.Type && oc.ObservedGeneration == uc.ObservedGeneration {
 							t.Errorf("Expected status condition %q observedGeneration to change - remained at %v", uc.Type, uc.ObservedGeneration)
 						}
 					}
