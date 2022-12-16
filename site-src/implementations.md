@@ -198,7 +198,7 @@ the Istio implementation also lets you start trying out the experimental Gateway
 
 Much of Istio's documentation, including all of the [ingress tasks][istio-1] and several mesh-internal traffic management tasks, already includes parallel instructions for
 configuring traffic using either the Gateway API or the Istio configuration API.
-Check out the [Gateway API task][istio-1] for more information about the Gateway API implementation in Istio.
+Check out the [Gateway API task][istio-2] for more information about the Gateway API implementation in Istio.
 
 [istio]:https://istio.io
 [mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
