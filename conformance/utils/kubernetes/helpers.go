@@ -497,9 +497,9 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 		parents := route.Status.Parents
 		var conditionFound bool
 		for _, parent := range parents {
-
 			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+
+				t.Logf("HTTPRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
 				return false, nil
 			}
 
@@ -514,6 +514,13 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
+}
+
+func parentRefToString(p v1beta1.ParentReference) string {
+	if p.Namespace != nil && *p.Namespace != "" {
+		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
+	}
+	return string(p.Name)
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
