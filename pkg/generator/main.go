@@ -36,7 +36,7 @@ const (
 
 	// These values must be updated during the release process
 	bundleVersion = "v0.6.0-rc1"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/1086"
+	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/1538"
 )
 
 var (
