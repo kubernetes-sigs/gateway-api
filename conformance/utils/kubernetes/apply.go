@@ -50,10 +50,10 @@ type Applier struct {
 	// If empty or nil, ports are not modified.
 	ValidUniqueListenerPorts []v1beta1.PortNumber
 
-	// GatewayClass
+	// GatewayClass will be used as the spec.gatewayClassName when applying Gateway resources
 	GatewayClass string
 
-	// ControllerName
+	// ControllerName will be used as the spec.controllerName when applying GatewayClass resources
 	ControllerName string
 }
 
