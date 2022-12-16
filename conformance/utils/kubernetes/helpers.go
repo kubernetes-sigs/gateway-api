@@ -101,8 +101,7 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 func GatewayMustHaveLatestConditions(t *testing.T, gw *v1beta1.Gateway) {
 	t.Helper()
 
-	err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions)
-	if err != nil {
+	if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
 		t.Fatalf("Gateway %v", err)
 	}
 }
@@ -112,8 +111,7 @@ func GatewayMustHaveLatestConditions(t *testing.T, gw *v1beta1.Gateway) {
 func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *v1beta1.GatewayClass) {
 	t.Helper()
 
-	err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions)
-	if err != nil {
+	if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
 		t.Fatalf("GatewayClass %v", err)
 	}
 }
@@ -124,8 +122,7 @@ func HTTPRouteMustHaveLatestConditions(t *testing.T, r *v1beta1.HTTPRoute) {
 	t.Helper()
 
 	for _, parent := range r.Status.Parents {
-		err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions)
-		if err != nil {
+		if err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions); err != nil {
 			t.Fatalf("HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
 		}
 	}
@@ -184,7 +181,7 @@ func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig confi
 			for _, gw := range gwList.Items {
 				gw := gw
 
-				if err := ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
+				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
 					t.Log(err)
 					return false, nil
 				}

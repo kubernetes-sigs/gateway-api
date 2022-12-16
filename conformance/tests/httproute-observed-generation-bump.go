@@ -18,7 +18,6 @@ package tests
 
 import (
 	"context"
-	"reflect"
 	"testing"
 	"time"
 
@@ -83,14 +82,4 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			}
 		})
 	},
-}
-
-func parentStatusForRef(statuses []v1beta1.RouteParentStatus, ref v1beta1.ParentReference) *v1beta1.RouteParentStatus {
-	for _, status := range statuses {
-		if reflect.DeepEqual(status.ParentRef, ref) {
-			return &status
-		}
-	}
-	return nil
-
 }
