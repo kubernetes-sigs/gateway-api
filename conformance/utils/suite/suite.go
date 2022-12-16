@@ -51,6 +51,9 @@ const (
 
 	// This option indicates support for Destination Port matching (extended conformance).
 	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
+
+	// This option indicates GatewayClass will update the observedGeneration in it's conditions when reconciling
+	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
