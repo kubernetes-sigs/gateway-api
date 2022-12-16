@@ -140,7 +140,7 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 
 	var b strings.Builder
 	fmt.Fprint(&b, "expected observedGeneration to be updated for all conditions")
-	fmt.Fprintf(&b, ", only %d/%d were updated.", len(staleConditions), len(conditions))
+	fmt.Fprintf(&b, ", only %d/%d were updated.", len(conditions)-len(staleConditions), len(conditions))
 	fmt.Fprintf(&b, " stale conditions are: ")
 
 	for i, c := range staleConditions {
