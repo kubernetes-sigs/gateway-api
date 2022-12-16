@@ -53,9 +53,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			if kubernetes.GatewayConditionsHaveLatestObservedGeneration(existing) {
-				t.Fatal("Not all the condition's observedGeneration were updated")
-			}
+			kubernetes.GatewayMustHaveLatestConditions(t, existing)
 
 			all := v1beta1.NamespacesFromAll
 
@@ -80,9 +78,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			if kubernetes.GatewayConditionsHaveLatestObservedGeneration(updated) {
-				t.Fatal("Not all the condition's observedGeneration were updated")
-			}
+			kubernetes.GatewayMustHaveLatestConditions(t, updated)
 
 			if existing.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)

@@ -62,9 +62,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting HTTPRoute: %v", err)
 
 			// Sanity check
-			if kubernetes.HTTPRouteConditionsHaveLatestObservedGeneration(existing) {
-				t.Fatal("Not all the condition's observedGeneration were updated")
-			}
+			kubernetes.HTTPRouteMustHaveLatestConditions(t, existing)
 
 			existing.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-v2"
 			err = s.Client.Update(ctx, existing)
@@ -77,9 +75,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// Sanity check
-			if kubernetes.HTTPRouteConditionsHaveLatestObservedGeneration(updated) {
-				t.Fatal("Not all the condition's observedGeneration were updated")
-			}
+			kubernetes.HTTPRouteMustHaveLatestConditions(t, updated)
 
 			if existing.Generation == updated.Generation {
 				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)

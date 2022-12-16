@@ -18,6 +18,7 @@ package kubernetes
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"reflect"
@@ -82,8 +83,8 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 
 		controllerName = string(gwc.Spec.ControllerName)
 
-		if !GatewayClassConditionsHaveLatestObservedGeneration(gwc) {
-			t.Log("GatewayClass conditions didn't bump their observedGeneration")
+		if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
+			t.Log("GatewayClass", err)
 			return false, nil
 		}
 
@@ -95,36 +96,73 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 	return controllerName
 }
 
-func HTTPRouteConditionsHaveLatestObservedGeneration(r *v1beta1.HTTPRoute) bool {
-	for _, p := range r.Status.Parents {
-		if !ConditionsHaveLatestObservedGeneration(r, p.Conditions) {
-			return false
+// GatewayMustHaveLatestConditions will fail the test if there are
+// conditions that were not updated
+func GatewayMustHaveLatestConditions(t *testing.T, gw *v1beta1.Gateway) {
+	t.Helper()
+
+	err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions)
+	if err != nil {
+		t.Fatalf("Gateway %v", err)
+	}
+}
+
+// GatewayClassMustHaveLatestConditions will fail the test if there are
+// conditions that were not updated
+func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *v1beta1.GatewayClass) {
+	t.Helper()
+
+	err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions)
+	if err != nil {
+		t.Fatalf("GatewayClass %v", err)
+	}
+}
+
+// HTTPRouteMustHaveLatestConditions will fail the test if there are
+// conditions that were not updated
+func HTTPRouteMustHaveLatestConditions(t *testing.T, r *v1beta1.HTTPRoute) {
+	t.Helper()
+
+	for _, parent := range r.Status.Parents {
+		err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions)
+		if err != nil {
+			t.Fatalf("HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
 		}
 	}
-	return true
 }
 
-func GatewayClassConditionsHaveLatestObservedGeneration(gc *v1beta1.GatewayClass) bool {
-	if !ConditionsHaveLatestObservedGeneration(gc, gc.Status.Conditions) {
-		return false
+func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []metav1.Condition) error {
+	staleConditions := FilterStaleConditions(obj, conditions)
+
+	if len(staleConditions) == 0 {
+		return nil
 	}
-	return true
-}
 
-func GatewayConditionsHaveLatestObservedGeneration(g *v1beta1.Gateway) bool {
-	if !ConditionsHaveLatestObservedGeneration(g, g.Status.Conditions) {
-		return false
+	var b strings.Builder
+	fmt.Fprint(&b, "expected observedGeneration to be updated for all conditions")
+	fmt.Fprintf(&b, ", only %d/%d were updated.", len(staleConditions), len(conditions))
+	fmt.Fprintf(&b, " stale conditions are: ")
+
+	for i, c := range staleConditions {
+		fmt.Fprintf(&b, c.Type)
+		if i != len(staleConditions)-1 {
+			fmt.Fprintf(&b, ", ")
+		}
 	}
-	return true
+
+	return errors.New(b.String())
 }
 
-func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []metav1.Condition) bool {
+// FilterStaleConditions returns the list of status condition whos observedGeneration does not
+// match the objects metadata.Generation
+func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
+	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
 		if obj.GetGeneration() != condition.ObservedGeneration {
-			return false
+			stale = append(stale, condition)
 		}
 	}
-	return true
+	return stale
 }
 
 // NamespacesMustBeAccepted waits until all Pods are marked ready and all Gateways
@@ -145,8 +183,9 @@ func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig confi
 			}
 			for _, gw := range gwList.Items {
 				gw := gw
-				if !GatewayConditionsHaveLatestObservedGeneration(&gw) {
-					t.Log("Gateway conditions didn't bump their observedGeneration")
+
+				if err := ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
+					t.Log(err)
 					return false, nil
 				}
 
@@ -238,8 +277,8 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
 
-		if !GatewayConditionsHaveLatestObservedGeneration(gw) {
-			t.Log("Gateway conditions didn't bump their observedGeneration")
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			t.Log("Gateway", err)
 			return false, nil
 		}
 
@@ -269,10 +308,12 @@ func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig
 		defer cancel()
 		err := client.Get(ctx, gwName, gw)
 		require.NoError(t, err, "error fetching Gateway")
-		if !GatewayConditionsHaveLatestObservedGeneration(gw) {
-			t.Log("Gateway conditions didn't bump their observedGeneration")
+
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			t.Log("Gateway ", err)
 			return false, nil
 		}
+
 		// There are two valid ways to represent this:
 		// 1. No listeners in status
 		// 2. One listener in status with 0 attached routes
@@ -325,9 +366,11 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 			return false, nil
 		}
 
-		if !HTTPRouteConditionsHaveLatestObservedGeneration(route) {
-			t.Log("HTTPRoute conditions didn't bump their observedGeneration")
-			return false, nil
+		for _, parent := range actual {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+				return false, nil
+			}
 		}
 
 		return conditionsMatch(t, []metav1.Condition{{
@@ -355,9 +398,11 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
 		}
 
-		if !HTTPRouteConditionsHaveLatestObservedGeneration(route) {
-			t.Log("HTTPRoute conditions didn't bump their observedGeneration")
-			return false, nil
+		for _, parent := range actual {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+				return false, nil
+			}
 		}
 
 		actual = route.Status.Parents
@@ -425,12 +470,13 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 		if err != nil {
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
-		if !GatewayConditionsHaveLatestObservedGeneration(gw) {
-			t.Log("Gateway conditions didn't bump their observedGeneration")
+
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			t.Log("Gateway", err)
 			return false, nil
 		}
-		actual = gw.Status.Listeners
 
+		actual = gw.Status.Listeners
 		return listenersMatch(t, listeners, actual), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
@@ -451,14 +497,15 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
 		}
 
-		if !HTTPRouteConditionsHaveLatestObservedGeneration(route) {
-			t.Log("HTTPRoute conditions didn't bump their observedGeneration")
-			return false, nil
-		}
-
 		parents := route.Status.Parents
 		var conditionFound bool
 		for _, parent := range parents {
+
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+				return false, nil
+			}
+
 			if parent.ParentRef.Name == v1beta1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
 				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
 					conditionFound = true
