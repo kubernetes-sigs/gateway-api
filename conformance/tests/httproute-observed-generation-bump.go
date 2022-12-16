@@ -77,9 +77,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.HTTPRouteMustHaveLatestConditions(t, updated)
 
-			if original.Generation == updated.Generation {
-				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
-			}
+			require.NotEqual(t, original.Generation, updated.Generation, "generation should change after an update")
 		})
 	},
 }

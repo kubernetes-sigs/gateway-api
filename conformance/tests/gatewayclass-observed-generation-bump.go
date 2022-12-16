@@ -70,9 +70,7 @@ var GatewayClassObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.GatewayClassMustHaveLatestConditions(t, updated)
 
-			if original.Generation == updated.Generation {
-				t.Errorf("Expected generation to change because of spec change - remained at %v", updated.Generation)
-			}
+			require.NotEqual(t, original.Generation, updated.Generation, "generation should change after an update")
 		})
 	},
 }
