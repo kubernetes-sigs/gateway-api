@@ -88,8 +88,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			for _, up := range updated.Status.Parents {
 				existing := parentStatusForRef(existing.Status.Parents, up.ParentRef)
 				if existing == nil {
-					t.Logf("Observed unexpected new parent ref %#v", up.ParentRef)
-					continue
+					t.Fatalf("Observed unexpected new parent ref %#v", up.ParentRef)
 				}
 				for _, uc := range up.Conditions {
 					for _, ec := range existing.Conditions {
