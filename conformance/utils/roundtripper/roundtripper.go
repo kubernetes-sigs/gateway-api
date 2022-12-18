@@ -61,9 +61,9 @@ type CapturedRequest struct {
 // RedirectRequest contains a follow up request metadata captured from a redirect
 // response.
 type RedirectRequest struct {
-	Scheme   string
-	Hostname string
-	Port     string
+	Scheme string
+	Host   string
+	Port   string
 }
 
 // CapturedResponse contains response metadata.
@@ -166,9 +166,9 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 			return nil, nil, err
 		}
 		cRes.RedirectRequest = &RedirectRequest{
-			Scheme:   redirectURL.Scheme,
-			Hostname: redirectURL.Hostname(),
-			Port:     redirectURL.Port(),
+			Scheme: redirectURL.Scheme,
+			Host:   redirectURL.Hostname(),
+			Port:   redirectURL.Port(),
 		}
 	}
 

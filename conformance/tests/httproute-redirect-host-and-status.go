@@ -28,16 +28,16 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestRedirect)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRedirectHostAndStatus)
 }
 
-var HTTPRouteRequestRedirect = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestRedirect",
+var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRedirectHostAndStatus",
 	Description: "An HTTPRoute with hostname and statusCode redirect filters",
-	Manifests:   []string{"tests/httproute-request-redirect.yaml"},
+	Manifests:   []string{"tests/httproute-redirect-host-and-status.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-redirect", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "redirect", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
@@ -50,7 +50,7 @@ var HTTPRouteRequestRedirect = suite.ConformanceTest{
 				StatusCode: 302,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
-				Hostname: "example.org",
+				Host: "example.org",
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
@@ -73,7 +73,7 @@ var HTTPRouteRequestRedirect = suite.ConformanceTest{
 				StatusCode: 301,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
-				Hostname: "example.org",
+				Host: "example.org",
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,

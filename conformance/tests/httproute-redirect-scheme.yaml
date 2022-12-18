@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: redirect
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /scheme
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: "https"
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /host-and-scheme
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        hostname: example.org
+        scheme: "https"
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /scheme-and-status
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: "https"
+        statusCode: 301
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080

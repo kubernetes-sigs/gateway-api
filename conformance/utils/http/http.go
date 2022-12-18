@@ -101,7 +101,11 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	}
 
 	if expected.Response.StatusCode == 0 {
-		expected.Response.StatusCode = 200
+		if expected.Request.UnfollowRedirect {
+			expected.Response.StatusCode = 302
+		} else {
+			expected.Response.StatusCode = 200
+		}
 	}
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
@@ -286,8 +290,27 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 		if expected.RedirectRequest == nil {
 			return nil
 		}
-		if expected.RedirectRequest.Hostname != cRes.RedirectRequest.Hostname {
-			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Hostname, cRes.RedirectRequest.Hostname)
+		if expected.RedirectRequest.Host == "" {
+			expected.RedirectRequest.Host = cRes.RedirectRequest.Host
+		}
+
+		if expected.RedirectRequest.Port == "" {
+			expected.RedirectRequest.Port = "80"
+		}
+
+		if expected.RedirectRequest.Scheme == "" {
+			expected.RedirectRequest.Scheme = "http"
+		}
+		if expected.RedirectRequest.Host != cRes.RedirectRequest.Host {
+			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
+		}
+
+		if expected.RedirectRequest.Port != cRes.RedirectRequest.Port {
+			return fmt.Errorf("expected redirected port to be %s, got %s", expected.RedirectRequest.Port, cRes.RedirectRequest.Port)
+		}
+
+		if expected.RedirectRequest.Scheme != cRes.RedirectRequest.Scheme {
+			return fmt.Errorf("expected redirected scheme to be %s, got %s", expected.RedirectRequest.Scheme, cRes.RedirectRequest.Scheme)
 		}
 	}
 	return nil
