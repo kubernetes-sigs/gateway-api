@@ -17,8 +17,6 @@ limitations under the License.
 package tls
 
 import (
-	"net/url"
-	"strings"
 	"testing"
 	"time"
 
@@ -38,53 +36,20 @@ const requiredConsecutiveSuccesses = 3
 //
 // Once the request succeeds consistently with the response having the expected status code, make
 // additional assertions on the response body using the provided ExpectedResponse.
-func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, cPem, kPem []byte, server string, expected http.ExpectedResponse) {
+func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, cPem, keyPem []byte, server string, expected http.ExpectedResponse) {
 	t.Helper()
 
-	protocol := "HTTPS"
-	scheme := "https"
+	req := http.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
 
-	if expected.Request.Method == "" {
-		expected.Request.Method = "GET"
-	}
-
-	if expected.Response.StatusCode == 0 {
-		expected.Response.StatusCode = 200
-	}
-
-	t.Logf("Making %s request to %s://%s%s", expected.Request.Method, scheme, gwAddr, expected.Request.Path)
-
-	path, query, _ := strings.Cut(expected.Request.Path, "?")
-
-	req := roundtripper.Request{
-		Method:   expected.Request.Method,
-		Host:     expected.Request.Host,
-		URL:      url.URL{Scheme: scheme, Host: gwAddr, Path: path, RawQuery: query},
-		Protocol: protocol,
-		Headers:  map[string][]string{},
-	}
-
-	if expected.Request.Headers != nil {
-		for name, value := range expected.Request.Headers {
-			req.Headers[name] = []string{value}
-		}
-	}
-
-	backendSetHeaders := []string{}
-	for name, val := range expected.BackendSetResponseHeaders {
-		backendSetHeaders = append(backendSetHeaders, name+":"+val)
-	}
-	req.Headers["X-Echo-Set-Header"] = []string{strings.Join(backendSetHeaders, ",")}
-
-	WaitForConsistentTLSResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, kPem, server)
+	WaitForConsistentTLSResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration, cPem, kPem []byte, server string) {
+func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration, cPem, keyPem []byte, server string) {
 	http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
-		cReq, cRes, err := r.CaptureTLSRoundTrip(req, cPem, kPem, server)
+		cReq, cRes, err := r.CaptureTLSRoundTrip(req, cPem, keyPem, server)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
 			return false

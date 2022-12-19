@@ -91,6 +91,11 @@ suppress cleanup:
 ```shell
 go test ./conformance/... -args -gateway-class=istio -cleanup-base-resources=false
 ```
+If you'd like to run a single test instead of the entire conformance suite, find your test name
+`(suite.ConformanceTest.ShortName)` and use it like this:
+```shell
+go test ./conformance/... --run TestConformance/YOURTESTNAME --gateway-class=istio
+```
 ## Contributing to Conformance
 
 Many implementations run conformance tests as part of their full e2e test suite.

@@ -152,8 +152,8 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 	return errors.New(b.String())
 }
 
-// FilterStaleConditions returns the list of status condition whos observedGeneration does not
-// match the objects metadata.Generation
+// FilterStaleConditions returns the list of status condition whose observedGeneration does not
+// match the object's metadata.Generation
 func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
 	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
@@ -387,7 +387,7 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.HTTPRouteMustHaveParents, func() (bool, error) {
+	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
@@ -410,36 +410,31 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have parents matching expectations")
 }
 
-// TLSRouteInfo waits for the specified TLSRoute to have parents
-// in status that match the expected parents, and also returns the assigned
-// hostnames of the TLSRoute.  This will cause the test to halt if the
-// specified timeout is exceeded.
-func TLSRouteInfo(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) []v1beta1.Hostname {
+// TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
+// in status that match the expected parents, and also returns the TLSRoute.
+// This will cause the test to halt if the specified timeout is exceeded.
+func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
-	var hostnames []v1beta1.Hostname
+	var route v1alpha2.TLSRoute
 
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.HTTPRouteMustHaveParents, func() (bool, error) {
+	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		route := &v1alpha2.TLSRoute{}
-		err := client.Get(ctx, routeName, route)
+		err := client.Get(ctx, routeName, &route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
 		}
 		actual = route.Status.Parents
-		hostnames = route.Spec.Hostnames
 		match := parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired)
 
 		return match, nil
 	})
-	if waitErr != nil {
-		fmt.Errorf("error waiting for TLSRoute to have parents matching expectations")
-	}
+	require.NoErrorf(t, waitErr, "error waiting for TLSRoute to have parents matching expectations")
 
-	return hostnames
+	return route
 }
 
 func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
@@ -598,7 +593,8 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 				},
 			})
 		}
-		hostnames = TLSRouteInfo(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
+		route := TLSRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
+		hostnames = route.Spec.Hostnames
 	}
 
 	return gwAddr, hostnames

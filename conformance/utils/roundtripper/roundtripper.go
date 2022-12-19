@@ -22,11 +22,13 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+	iou "io/ioutil"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
 	"regexp"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
@@ -133,7 +135,9 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	if err != nil {
 		return nil, nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	if d.Debug {
 		var dump []byte
@@ -145,7 +149,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		fmt.Printf("Received Response:\n%s\n\n", formatDump(dump, "< "))
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := iou.ReadAll(resp.Body)
 
 	// we cannot assume the response is JSON
 	if resp.Header.Get("Content-type") == "application/json" {
@@ -197,12 +201,12 @@ func IsRedirect(statusCode int) bool {
 // captured request and response from echoserver. An error will be returned if
 // there is an error running the function but not if an HTTP error status code
 // is received.
-func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, kPem []byte, server string) (*CapturedRequest, *CapturedResponse, error) {
+func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, keyPem []byte, server string) (*CapturedRequest, *CapturedResponse, error) {
 	cReq := &CapturedRequest{}
 	client := http.DefaultClient
 
 	// Create a certificate from the provided cert and key
-	cert, err := tls.X509KeyPair(cPem, kPem)
+	cert, err := tls.X509KeyPair(cPem, keyPem)
 	if err != nil {
 		return nil, nil, fmt.Errorf("unexpected error creating cert: %w", err)
 	}
@@ -223,6 +227,8 @@ func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, kPem []
 			Certificates: []tls.Certificate{cert},
 			ServerName:   server,
 			RootCAs:      certPool,
+			MinVersion:   tls.VersionTLS11,
+			MaxVersion:   tls.VersionTLS13,
 		},
 	}
 
@@ -261,7 +267,9 @@ func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, kPem []
 	if err != nil {
 		return nil, nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	if d.Debug {
 		var dump []byte
@@ -273,7 +281,7 @@ func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, kPem []
 		fmt.Printf("Received Response:\n%s\n\n", formatDump(dump, "< "))
 	}
 
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := iou.ReadAll(resp.Body)
 
 	// we cannot assume the response is JSON
 	if resp.Header.Get("Content-type") == "application/json" {

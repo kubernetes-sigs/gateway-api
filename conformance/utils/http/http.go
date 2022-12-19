@@ -96,6 +96,14 @@ const requiredConsecutiveSuccesses = 3
 func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
+	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
+
+	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+}
+
+func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
+	t.Helper()
+
 	if expected.Request.Method == "" {
 		expected.Request.Method = "GET"
 	}
@@ -104,15 +112,15 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 		expected.Response.StatusCode = 200
 	}
 
-	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
+	t.Logf("Making %s request to %s://%s%s", expected.Request.Method, scheme, gwAddr, expected.Request.Path)
 
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
 
 	req := roundtripper.Request{
 		Method:           expected.Request.Method,
 		Host:             expected.Request.Host,
-		URL:              url.URL{Scheme: "http", Host: gwAddr, Path: path, RawQuery: query},
-		Protocol:         "HTTP",
+		URL:              url.URL{Scheme: scheme, Host: gwAddr, Path: path, RawQuery: query},
+		Protocol:         protocol,
 		Headers:          map[string][]string{},
 		UnfollowRedirect: expected.Request.UnfollowRedirect,
 	}
@@ -129,7 +137,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	}
 	req.Headers["X-Echo-Set-Header"] = []string{strings.Join(backendSetHeaders, ",")}
 
-	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	return req
 }
 
 // AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.

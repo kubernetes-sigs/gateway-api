@@ -51,9 +51,9 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	HTTPRouteMustHaveCondition time.Duration
 
-	// HTTPRouteMustHaveParents represents the maximum time for an HTTPRoute to have parents in status that match the expected parents.
+	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
-	HTTPRouteMustHaveParents time.Duration
+	RouteMustHaveParents time.Duration
 
 	// ManifestFetchTimeout represents the maximum time for getting content from a https:// URL.
 	// Max value for conformant implementation: None
@@ -83,7 +83,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		GWCMustBeAccepted:              180 * time.Second,
 		HTTPRouteMustNotHaveParents:    60 * time.Second,
 		HTTPRouteMustHaveCondition:     60 * time.Second,
-		HTTPRouteMustHaveParents:       60 * time.Second,
+		RouteMustHaveParents:           60 * time.Second,
 		ManifestFetchTimeout:           10 * time.Second,
 		MaxTimeToConsistency:           30 * time.Second,
 		NamespacesMustBeReady:          300 * time.Second,
@@ -117,8 +117,8 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	if timeoutConfig.HTTPRouteMustHaveCondition == 0 {
 		timeoutConfig.HTTPRouteMustHaveCondition = defaultTimeoutConfig.HTTPRouteMustHaveCondition
 	}
-	if timeoutConfig.HTTPRouteMustHaveParents == 0 {
-		timeoutConfig.HTTPRouteMustHaveParents = defaultTimeoutConfig.HTTPRouteMustHaveParents
+	if timeoutConfig.RouteMustHaveParents == 0 {
+		timeoutConfig.RouteMustHaveParents = defaultTimeoutConfig.RouteMustHaveParents
 	}
 	if timeoutConfig.ManifestFetchTimeout == 0 {
 		timeoutConfig.ManifestFetchTimeout = defaultTimeoutConfig.ManifestFetchTimeout

@@ -29,5 +29,4 @@ var (
 	CleanupBaseResources = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
 	SupportedFeatures    = flag.String("supported-features", "", "Supported features included in conformance tests suites")
 	ExemptFeatures       = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
-	RunOneTest           = flag.String("test", "", "A single test name when you want to run only one")
 )

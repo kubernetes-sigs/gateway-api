@@ -48,19 +48,18 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute", Namespace: string(ns)}
 		certNN := types.NamespacedName{Name: "tls-passthrough-checks-certificate", Namespace: string(ns)}
 
-		gwAddr, server := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		if len(server) != 1 {
-			fmt.Errorf("one and only one server required for TLS")
+		gwAddr, hostnames := kubernetes.GatewayAndTLSRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		if len(hostnames) != 1 {
+			t.Fatalf("unexpected error in test configuration, found %d hostnames", len(hostnames))
 		}
-		serverStr := string(server[0])
+		serverStr := string(hostnames[0])
 
-		cPem, kPem, err := GetTLSSecret(suite.Client, certNN)
+		cPem, keyPem, err := GetTLSSecret(suite.Client, certNN)
 		if err != nil {
-			fmt.Errorf("unexpected error finding TLS secret: %w", err)
+			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
-
-		t.Run("Simple HTTP request for TLSRoute should reach infra-backend", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, kPem, serverStr,
+		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t *testing.T) {
+			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
 				http.ExpectedResponse{
 					Request:   http.Request{Host: serverStr, Path: "/"},
 					Backend:   "infra-backend-v4",
