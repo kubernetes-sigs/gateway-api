@@ -51,6 +51,12 @@ const (
 
 	// This option indicates support for Destination Port matching (extended conformance).
 	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
+
+	// This option indicates support for HTTPRoute port redirect (extended conformance).
+	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
+
+	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
+	SupportHTTPRouteSchemeRedirect SupportedFeature = "HTTPRouteSchemeRedirect"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with

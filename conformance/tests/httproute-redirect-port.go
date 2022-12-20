@@ -33,8 +33,9 @@ func init() {
 
 var HTTPRouteRedirectPort = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectPort",
-	Description: "An HTTPRoute with port redirect filter",
+	Description: "An HTTPRoute with a port redirect filter",
 	Manifests:   []string{"tests/httproute-redirect-port.yaml"},
+	Features:    []suite.SupportedFeature{suite.SupportHTTPRoutePortRedirect},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect", Namespace: ns}
@@ -49,18 +50,16 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Port: "8083",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
-				Path:             "/host-and-port",
+				Path:             "/port-and-host",
 				UnfollowRedirect: true,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host: "example.org",
 				Port: "8083",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -73,7 +72,19 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Port: "8083",
 			},
-			Backend:   "infra-backend-v1",
+			Namespace: ns,
+		}, {
+			Request: http.Request{
+				Path:             "/port-and-host-and-status",
+				UnfollowRedirect: true,
+			},
+			Response: http.Response{
+				StatusCode: 301,
+			},
+			RedirectRequest: &roundtripper.RedirectRequest{
+				Port: "8083",
+				Host: "example.org",
+			},
 			Namespace: ns,
 		},
 		}

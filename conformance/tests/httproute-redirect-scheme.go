@@ -33,8 +33,9 @@ func init() {
 
 var HTTPRouteRedirectScheme = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectScheme",
-	Description: "An HTTPRoute with scheme redirect filter",
+	Description: "An HTTPRoute with a scheme redirect filter",
 	Manifests:   []string{"tests/httproute-redirect-scheme.yaml"},
+	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteSchemeRedirect},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect", Namespace: ns}
@@ -49,18 +50,16 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Scheme: "https",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
-				Path:             "/host-and-scheme",
+				Path:             "/scheme-and-host",
 				UnfollowRedirect: true,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host:   "example.org",
 				Scheme: "https",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -73,7 +72,19 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Scheme: "https",
 			},
-			Backend:   "infra-backend-v1",
+			Namespace: ns,
+		}, {
+			Request: http.Request{
+				Path:             "/scheme-and-host-and-status",
+				UnfollowRedirect: true,
+			},
+			Response: http.Response{
+				StatusCode: 301,
+			},
+			RedirectRequest: &roundtripper.RedirectRequest{
+				Scheme: "https",
+				Host:   "example.org",
+			},
 			Namespace: ns,
 		},
 		}

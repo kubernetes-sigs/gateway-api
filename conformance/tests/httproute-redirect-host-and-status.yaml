@@ -15,9 +15,6 @@ spec:
     - type: RequestRedirect
       requestRedirect:
         hostname: example.org
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
   - matches:
     - path:
         type: PathPrefix
@@ -35,6 +32,4 @@ spec:
       requestRedirect:
         statusCode: 301
         hostname: example.org
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
+

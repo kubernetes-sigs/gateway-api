@@ -18,15 +18,12 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /host-and-scheme
+        value: /scheme-and-host
     filters:
     - type: RequestRedirect
       requestRedirect:
         hostname: example.org
         scheme: "https"
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
   - matches:
     - path:
         type: PathPrefix
@@ -36,6 +33,14 @@ spec:
       requestRedirect:
         scheme: "https"
         statusCode: 301
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /scheme-and-host-and-status
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        scheme: "https"
+        statusCode: 301
+        hostname: example.org
+

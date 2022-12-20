@@ -52,7 +52,6 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host: "example.org",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -62,7 +61,6 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 			Response: http.Response{
 				StatusCode: 301,
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		}, {
 			Request: http.Request{
@@ -75,7 +73,6 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host: "example.org",
 			},
-			Backend:   "infra-backend-v1",
 			Namespace: ns,
 		},
 		}

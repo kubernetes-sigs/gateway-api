@@ -18,15 +18,12 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /host-and-port
+        value: /port-and-host
     filters:
     - type: RequestRedirect
       requestRedirect:
         hostname: example.org
         port: 8083
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
   - matches:
     - path:
         type: PathPrefix
@@ -36,6 +33,13 @@ spec:
       requestRedirect:
         port: 8083
         statusCode: 301
-    backendRefs:
-    - name: infra-backend-v1
-      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /port-and-host-and-status
+    filters:
+    - type: RequestRedirect
+      requestRedirect:
+        port: 8083
+        hostname: example.org
+        statusCode: 301

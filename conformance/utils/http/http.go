@@ -295,7 +295,7 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 		}
 
 		if expected.RedirectRequest.Port == "" {
-			expected.RedirectRequest.Port = "80"
+			expected.RedirectRequest.Port = cRes.RedirectRequest.Port
 		}
 
 		if expected.RedirectRequest.Scheme == "" {
