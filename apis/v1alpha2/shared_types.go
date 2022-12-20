@@ -25,6 +25,12 @@ import (
 // with "Core" support is Gateway. This API may be extended in the future to
 // support additional kinds of parent resources, such as HTTPRoute.
 //
+// Note that there are specific rules for ParentRefs which cross namespace
+// boundaries. Cross-namespace references are only valid if they are explicitly
+// allowed by something in the namespace they are referring to. For example:
+// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
+// generic way to enable any other kind of cross-namespace reference.
+//
 // The API object must be valid in the cluster; the Group and Kind must
 // be registered in the cluster for this reference to be valid.
 // +k8s:deepcopy-gen=false
