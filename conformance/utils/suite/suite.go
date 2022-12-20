@@ -55,7 +55,7 @@ const (
 	// This option indicates GatewayClass will update the observedGeneration in it's conditions when reconciling
 	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
 
-  // This option indicates support for HTTPRoute port redirect (extended conformance).
+	// This option indicates support for HTTPRoute port redirect (extended conformance).
 	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
 
 	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
