@@ -29,7 +29,7 @@ import (
 // +kubebuilder:deprecatedversion:warning="The v1alpha2 version of Gateway has been deprecated and will be removed in a future release of the API. Please upgrade to v1beta1."
 // +kubebuilder:printcolumn:name="Class",type=string,JSONPath=`.spec.gatewayClassName`
 // +kubebuilder:printcolumn:name="Address",type=string,JSONPath=`.status.addresses[*].value`
-// +kubebuilder:printcolumn:name="Ready",type=string,JSONPath=`.status.conditions[?(@.type=="Ready")].status`
+// +kubebuilder:printcolumn:name="Programmed",type=string,JSONPath=`.status.conditions[?(@.type=="Programmed")].status`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
 // Gateway represents an instance of a service-traffic handling infrastructure

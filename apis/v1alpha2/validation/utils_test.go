@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Kubernetes Authors.
+Copyright 2022 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,20 +14,26 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package translate
+package validation
 
 import (
-	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// HeaderMatchTypePtr translates a string to *PathMatchType
-func HeaderMatchTypePtr(s string) *gatewayv1b1.HeaderMatchType {
-	result := gatewayv1b1.HeaderMatchType(s)
-	return &result
+type routeRule interface {
+	gatewayv1a2.TLSRouteRule | gatewayv1a2.UDPRouteRule
 }
 
-// PathMatchTypePtr translates a string to *PathMatchType
-func PathMatchTypePtr(s string) *gatewayv1b1.PathMatchType {
-	result := gatewayv1b1.PathMatchType(s)
-	return &result
+func makeRouteRules[T routeRule](ports ...*int32) (rules []T) {
+	for _, port := range ports {
+		rules = append(rules, T{
+			BackendRefs: []gatewayv1a2.BackendRef{{
+				BackendObjectReference: gatewayv1a2.BackendObjectReference{
+					Port: (*v1beta1.PortNumber)(port),
+				},
+			}},
+		})
+	}
+	return
 }

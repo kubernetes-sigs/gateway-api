@@ -242,11 +242,11 @@ type HTTPRouteRule struct {
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
-// Valid PathMatchType values are:
+// Valid PathMatchType values, along with their support levels, are:
 //
-// * "Exact"
-// * "PathPrefix"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "PathPrefix" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // PathPrefix and Exact paths must be syntactically valid:
 //
@@ -311,10 +311,10 @@ type HTTPPathMatch struct {
 }
 
 // HeaderMatchType specifies the semantics of how HTTP header values should be
-// compared. Valid HeaderMatchType values are:
+// compared. Valid HeaderMatchType values, along with their conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
@@ -392,10 +392,11 @@ type HTTPHeaderMatch struct {
 }
 
 // QueryParamMatchType specifies the semantics of how HTTP query parameter
-// values should be compared. Valid QueryParamMatchType values are:
+// values should be compared. Valid QueryParamMatchType values, along with their
+// conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
