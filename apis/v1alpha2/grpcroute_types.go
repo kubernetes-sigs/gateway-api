@@ -320,26 +320,34 @@ type GRPCMethodMatch struct {
 	// match any service.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
+	//
+	// A GRPC Service must be a valid Protobuf Type Name
+	// (https://protobuf.com/docs/language-spec#type-references).
+	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[^\/]*$`
+	// +kubebuilder:validation:Pattern=`^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
 	Service *string `json:"service,omitempty"`
 
 	// Value of the method to match against. If left empty or omitted, will
 	// match all services.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
+	//
+	// A GRPC Method must be a valid Protobuf Method
+	// (https://protobuf.com/docs/language-spec#methods).
+	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[^\/]*$`
+	// +kubebuilder:validation:Pattern=`^[A-Za-z_][A-Za-z_0-9]*$`
 	Method *string `json:"method,omitempty"`
 }
 
 // MethodMatchType specifies the semantics of how gRPC methods and services are compared.
-// Valid MethodMatchType values are:
+// Valid MethodMatchType values, along with their conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Exact methods MUST be syntactically valid:
 //
@@ -389,10 +397,11 @@ type GRPCHeaderMatch struct {
 }
 
 // GRPCHeaderMatchType specifies the semantics of how GRPC header values should
-// be compared. Valid GRPCHeaderMatchType values are:
+// be compared. Valid GRPCHeaderMatchType values, along with their conformance
+// levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that new values may be added to this enum in future releases of the API,
 // implementations MUST ensure that unknown values will not cause a crash.

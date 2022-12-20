@@ -22,7 +22,7 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly CLUSTER_NAME="verify-gateway-api"
-readonly ADMISSION_WEBHOOK_VERSION="v0.5.1"
+readonly ADMISSION_WEBHOOK_VERSION="v0.6.0-rc2"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH

@@ -27,7 +27,7 @@ import (
 func TestValidateUDPRoute(t *testing.T) {
 	t.Parallel()
 
-	portNumber := gatewayv1a2.PortNumber(9080)
+	var portNumber int32 = 9080
 
 	tests := []struct {
 		name  string
@@ -35,32 +35,12 @@ func TestValidateUDPRoute(t *testing.T) {
 		errs  field.ErrorList
 	}{
 		{
-			name: "valid UDPRoute with 1 backendRef",
-			rules: []gatewayv1a2.UDPRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: &portNumber,
-							},
-						},
-					},
-				},
-			},
+			name:  "valid UDPRoute with 1 backendRef",
+			rules: makeRouteRules[gatewayv1a2.UDPRouteRule](&portNumber),
 		},
 		{
-			name: "invalid UDPRoute with 1 backendRef (missing port)",
-			rules: []gatewayv1a2.UDPRouteRule{
-				{
-					BackendRefs: []gatewayv1a2.BackendRef{
-						{
-							BackendObjectReference: gatewayv1a2.BackendObjectReference{
-								Port: nil,
-							},
-						},
-					},
-				},
-			},
+			name:  "invalid UDPRoute with 1 backendRef (missing port)",
+			rules: makeRouteRules[gatewayv1a2.UDPRouteRule](nil),
 			errs: field.ErrorList{
 				{
 					Type:   field.ErrorTypeRequired,
@@ -79,15 +59,13 @@ func TestValidateUDPRoute(t *testing.T) {
 			route := gatewayv1a2.UDPRoute{Spec: gatewayv1a2.UDPRouteSpec{Rules: tc.rules}}
 			errs := ValidateUDPRoute(&route)
 			if len(errs) != len(tc.errs) {
-				t.Errorf("got %d errors, want %d errors: %s", len(errs), len(tc.errs), errs)
-				t.FailNow()
+				t.Fatalf("got %d errors, want %d errors: %s", len(errs), len(tc.errs), errs)
 			}
 			for i := 0; i < len(errs); i++ {
 				realErr := errs[i].Error()
 				expectedErr := tc.errs[i].Error()
 				if realErr != expectedErr {
-					t.Errorf("expect error message: %s, but got: %s", expectedErr, realErr)
-					t.FailNow()
+					t.Fatalf("expect error message: %s, but got: %s", expectedErr, realErr)
 				}
 			}
 		})

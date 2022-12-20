@@ -56,11 +56,11 @@ type HTTPRouteSpec = v1beta1.HTTPRouteSpec
 type HTTPRouteRule = v1beta1.HTTPRouteRule
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
-// Valid PathMatchType values are:
+// Valid PathMatchType values, along with their conformance level, are:
 //
-// * "Exact"
-// * "PathPrefix"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "PathPrefix" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // PathPrefix and Exact paths must be syntactically valid:
 //
@@ -83,10 +83,10 @@ type PathMatchType = v1beta1.PathMatchType
 type HTTPPathMatch = v1beta1.HTTPPathMatch
 
 // HeaderMatchType specifies the semantics of how HTTP header values should be
-// compared. Valid HeaderMatchType values are:
+// compared. Valid HeaderMatchType values, along with their conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.
@@ -124,10 +124,11 @@ type HTTPHeaderName = v1beta1.HTTPHeaderName
 type HTTPHeaderMatch = v1beta1.HTTPHeaderMatch
 
 // QueryParamMatchType specifies the semantics of how HTTP query parameter
-// values should be compared. Valid QueryParamMatchType values are:
+// values should be compared. Valid QueryParamMatchType values, along with their
+// conformance levels, are:
 //
-// * "Exact"
-// * "RegularExpression"
+// * "Exact" - Core
+// * "RegularExpression" - Implementation Specific
 //
 // Note that values may be added to this enum, implementations
 // must ensure that unknown values will not cause a crash.

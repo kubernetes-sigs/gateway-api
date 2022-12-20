@@ -193,11 +193,18 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 [Istio][istio] is an open source [service mesh][mesh] and gateway implementation.
 
-Istio supports the Gateway API; see [Istio Gateway API Documentation][istio-1] to get started.
+A light-weight minimal install of Istio can be used to provide a Beta-quality implementation of the Kubernetes Gateway API for cluster ingress traffic control. For service mesh users,
+the Istio implementation also lets you start trying out the experimental Gateway API [support for east-west traffic management][gamma] within the mesh.
+
+Much of Istio's documentation, including all of the [ingress tasks][istio-1] and several mesh-internal traffic management tasks, already includes parallel instructions for
+configuring traffic using either the Gateway API or the Istio configuration API.
+Check out the [Gateway API task][istio-2] for more information about the Gateway API implementation in Istio.
 
 [istio]:https://istio.io
 [mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
-[istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
+[gamma]:https://gateway-api.sigs.k8s.io/contributing/gamma/
+[istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/
+[istio-2]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
 ### Kong
 

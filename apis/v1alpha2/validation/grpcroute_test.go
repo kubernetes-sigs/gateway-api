@@ -19,6 +19,8 @@ package validation
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -80,8 +82,56 @@ func TestValidateGRPCRoute(t *testing.T) {
 			errs: field.ErrorList{
 				{
 					Type:   field.ErrorTypeRequired,
-					Field:  "spec.rules[0].matches[0].methods",
+					Field:  "spec.rules[0].matches[0].method",
 					Detail: "one or both of `service` or `method` must be specified",
+				},
+			},
+		},
+		{
+			name: "GRPCRoute with duplicate ExtensionRef filters",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Filters: []gatewayv1a2.GRPCRouteFilter{{
+						Type: "ExtensionRef",
+						ExtensionRef: &gatewayv1a2.LocalObjectReference{
+							Kind: "Example1",
+						},
+					}, {
+						Type: "ExtensionRef",
+						ExtensionRef: &gatewayv1a2.LocalObjectReference{
+							Kind: "Example2",
+						},
+					}},
+				},
+			},
+		},
+		{
+			name: "GRPCRoute with duplicate RequestMirror filters",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Filters: []gatewayv1a2.GRPCRouteFilter{{
+						Type: "RequestMirror",
+						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+							BackendRef: gatewayv1a2.BackendObjectReference{
+								Name: "Example1",
+							},
+						},
+					}, {
+						Type: "RequestMirror",
+						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+							BackendRef: gatewayv1a2.BackendObjectReference{
+								Name: "Example2",
+							},
+						},
+					}},
+				},
+			},
+			errs: field.ErrorList{
+				{
+					Type:     field.ErrorTypeInvalid,
+					BadValue: "RequestMirror",
+					Field:    "spec.rules[0].filters",
+					Detail:   "cannot be used multiple times in the same rule",
 				},
 			},
 		},
@@ -105,6 +155,152 @@ func TestValidateGRPCRoute(t *testing.T) {
 					t.Errorf("expect error message: %s, but got: %s", expectedErr, realErr)
 					t.FailNow()
 				}
+			}
+		})
+	}
+}
+
+func TestValidateGRPCBackendUniqueFilters(t *testing.T) {
+	var testService gatewayv1a2.ObjectName = "testService"
+	var specialService gatewayv1a2.ObjectName = "specialService"
+	tests := []struct {
+		name     string
+		rules    []gatewayv1a2.GRPCRouteRule
+		errCount int
+	}{{
+		name:     "valid grpcRoute Rules backendref filters",
+		errCount: 0,
+		rules: []gatewayv1a2.GRPCRouteRule{{
+			BackendRefs: []gatewayv1a2.GRPCBackendRef{
+				{
+					BackendRef: gatewayv1a2.BackendRef{
+						BackendObjectReference: gatewayv1a2.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+						},
+						Weight: ptrTo(int32(100)),
+					},
+					Filters: []gatewayv1a2.GRPCRouteFilter{
+						{
+							Type: gatewayv1a2.GRPCRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1a2.BackendObjectReference{
+									Name: testService,
+									Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+								},
+							},
+						},
+					},
+				},
+			},
+		}},
+	}, {
+		name:     "invalid grpcRoute Rules duplicate mirror filter",
+		errCount: 1,
+		rules: []gatewayv1a2.GRPCRouteRule{{
+			BackendRefs: []gatewayv1a2.GRPCBackendRef{
+				{
+					BackendRef: gatewayv1a2.BackendRef{
+						BackendObjectReference: gatewayv1a2.BackendObjectReference{
+							Name: testService,
+							Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+						},
+					},
+					Filters: []gatewayv1a2.GRPCRouteFilter{
+						{
+							Type: gatewayv1a2.GRPCRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1a2.BackendObjectReference{
+									Name: testService,
+									Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+								},
+							},
+						},
+						{
+							Type: gatewayv1a2.GRPCRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1a2.BackendObjectReference{
+									Name: specialService,
+									Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+								},
+							},
+						},
+					},
+				},
+			},
+		}},
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1a2.GRPCRoute{Spec: gatewayv1a2.GRPCRouteSpec{Rules: tc.rules}}
+			errs := ValidateGRPCRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
+
+func TestValidateGRPCHeaderMatches(t *testing.T) {
+	tests := []struct {
+		name          string
+		headerMatches []gatewayv1a2.GRPCHeaderMatch
+		expectErr     string
+	}{{
+		name:          "no header matches",
+		headerMatches: nil,
+		expectErr:     "",
+	}, {
+		name: "no header matched more than once",
+		headerMatches: []gatewayv1a2.GRPCHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "Header-Name-3", Value: "val-3"},
+		},
+		expectErr: "",
+	}, {
+		name: "header matched more than once (same case)",
+		headerMatches: []gatewayv1a2.GRPCHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "Header-Name-1", Value: "val-3"},
+		},
+		expectErr: "spec.rules[0].matches[0].headers: Invalid value: \"Header-Name-1\": cannot match the same header multiple times in the same rule",
+	}, {
+		name: "header matched more than once (different case)",
+		headerMatches: []gatewayv1a2.GRPCHeaderMatch{
+			{Name: "Header-Name-1", Value: "val-1"},
+			{Name: "Header-Name-2", Value: "val-2"},
+			{Name: "HEADER-NAME-2", Value: "val-3"},
+		},
+		expectErr: "spec.rules[0].matches[0].headers: Invalid value: \"Header-Name-2\": cannot match the same header multiple times in the same rule",
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1a2.GRPCRoute{Spec: gatewayv1a2.GRPCRouteSpec{
+				Rules: []gatewayv1a2.GRPCRouteRule{{
+					Matches: []gatewayv1a2.GRPCRouteMatch{{
+						Headers: tc.headerMatches,
+					}},
+					BackendRefs: []gatewayv1a2.GRPCBackendRef{{
+						BackendRef: gatewayv1a2.BackendRef{
+							BackendObjectReference: gatewayv1a2.BackendObjectReference{
+								Name: gatewayv1a2.ObjectName("test"),
+								Port: ptrTo(gatewayv1a2.PortNumber(8080)),
+							},
+						},
+					}},
+				}},
+			}}
+
+			errs := ValidateGRPCRoute(&route)
+			if len(tc.expectErr) == 0 {
+				assert.Emptyf(t, errs, "expected no errors, got %d errors: %s", len(errs), errs)
+			} else {
+				require.Lenf(t, errs, 1, "expected one error, got %d errors: %s", len(errs), errs)
+				assert.Equal(t, tc.expectErr, errs[0].Error())
 			}
 		})
 	}

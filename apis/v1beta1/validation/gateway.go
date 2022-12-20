@@ -51,12 +51,12 @@ var (
 // Validation that is not possible with CRD annotations may be added here in the future.
 // See https://github.com/kubernetes-sigs/gateway-api/issues/868 for more information.
 func ValidateGateway(gw *gatewayv1b1.Gateway) field.ErrorList {
-	return validateGatewaySpec(&gw.Spec, field.NewPath("spec"))
+	return ValidateGatewaySpec(&gw.Spec, field.NewPath("spec"))
 }
 
-// validateGatewaySpec validates whether required fields of spec are set according to the
+// ValidateGatewaySpec validates whether required fields of spec are set according to the
 // Gateway API specification.
-func validateGatewaySpec(spec *gatewayv1b1.GatewaySpec, path *field.Path) field.ErrorList {
+func ValidateGatewaySpec(spec *gatewayv1b1.GatewaySpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	errs = append(errs, validateGatewayListeners(spec.Listeners, path.Child("listeners"))...)
 	return errs

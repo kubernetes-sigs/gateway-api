@@ -259,13 +259,38 @@ spec:
 				},
 			},
 		}},
+	}, {
+		name:    "setting the controllerName for a GatewayClass",
+		applier: Applier{},
+		given: `
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind:       GatewayClass
+metadata:
+  name: test
+spec:
+  controllerName: {GATEWAY_CONTROLLER_NAME}
+`,
+		expected: []unstructured.Unstructured{{
+			Object: map[string]interface{}{
+				"apiVersion": "gateway.networking.k8s.io/v1beta1",
+				"kind":       "GatewayClass",
+				"metadata": map[string]interface{}{
+					"name": "test",
+				},
+				"spec": map[string]interface{}{
+					"controllerName": "test-controller",
+				},
+			},
+		}},
 	}}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			decoder := yaml.NewYAMLOrJSONDecoder(strings.NewReader(tc.given), 4096)
 
-			resources, err := tc.applier.prepareResources(t, decoder, "test-class")
+			tc.applier.GatewayClass = "test-class"
+			tc.applier.ControllerName = "test-controller"
+			resources, err := tc.applier.prepareResources(t, decoder)
 
 			require.NoError(t, err, "unexpected error preparing resources")
 			require.EqualValues(t, tc.expected, resources)

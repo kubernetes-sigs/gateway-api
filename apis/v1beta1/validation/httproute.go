@@ -19,6 +19,7 @@ package validation
 import (
 	"fmt"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -27,31 +28,35 @@ import (
 )
 
 var (
-	// repeatableHTTPRouteFilters are filter types that can are allowed to be
+	// repeatableHTTPRouteFilters are filter types that are allowed to be
 	// repeated multiple times in a rule.
 	repeatableHTTPRouteFilters = []gatewayv1b1.HTTPRouteFilterType{
 		gatewayv1b1.HTTPRouteFilterExtensionRef,
 	}
 
+	// Invalid path sequences and suffixes, primarily related to directory traversal
 	invalidPathSequences = []string{"//", "/./", "/../", "%2f", "%2F", "#"}
 	invalidPathSuffixes  = []string{"/..", "/."}
+
+	// All valid path characters per RFC-3986
+	validPathCharacters = "^[A-Za-z0-9\\/\\-._~%!$&'()*+,;=:]+$"
 )
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
 // For additional details of the HTTPRoute spec, refer to:
 // https://gateway-api.sigs.k8s.io/v1beta1/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
 func ValidateHTTPRoute(route *gatewayv1b1.HTTPRoute) field.ErrorList {
-	return validateHTTPRouteSpec(&route.Spec, field.NewPath("spec"))
+	return ValidateHTTPRouteSpec(&route.Spec, field.NewPath("spec"))
 }
 
-// validateHTTPRouteSpec validates that required fields of spec are set according to the
+// ValidateHTTPRouteSpec validates that required fields of spec are set according to the
 // HTTPRoute specification.
-func validateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) field.ErrorList {
+func ValidateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	for i, rule := range spec.Rules {
 		errs = append(errs, validateHTTPRouteFilters(rule.Filters, rule.Matches, path.Child("rules").Index(i))...)
 		for j, backendRef := range rule.BackendRefs {
-			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendsrefs").Index(j))...)
+			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendRefs").Index(j))...)
 		}
 		for j, m := range rule.Matches {
 			matchPath := path.Child("rules").Index(i).Child("matches").Index(j)
@@ -167,6 +172,16 @@ func validateHTTPPathMatch(path *gatewayv1b1.HTTPPathMatch, fldPath *field.Path)
 				}
 			}
 		}
+
+		r, err := regexp.Compile(validPathCharacters)
+		if err != nil {
+			allErrs = append(allErrs, field.InternalError(fldPath.Child("value"),
+				fmt.Errorf("could not compile path matching regex: %w", err)))
+		} else if !r.MatchString(*path.Value) {
+			allErrs = append(allErrs, field.Invalid(fldPath.Child("value"), *path.Value,
+				fmt.Sprintf("must only contain valid characters (matching %s)", validPathCharacters)))
+		}
+
 	case gatewayv1b1.PathMatchRegularExpression:
 	default:
 		pathTypes := []string{string(gatewayv1b1.PathMatchExact), string(gatewayv1b1.PathMatchPathPrefix), string(gatewayv1b1.PathMatchRegularExpression)}
@@ -306,14 +321,14 @@ func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field
 			singleAction[strings.ToLower(string(action.Name))] = true
 		}
 	}
-	for i, action := range filter.Remove {
-		if needsErr, ok := singleAction[strings.ToLower(action)]; ok {
+	for i, name := range filter.Remove {
+		if needsErr, ok := singleAction[strings.ToLower(name)]; ok {
 			if needsErr {
 				errs = append(errs, field.Invalid(path.Child("remove"), filter.Remove[i], "cannot specify multiple actions for header"))
 			}
-			singleAction[strings.ToLower(action)] = false
+			singleAction[strings.ToLower(name)] = false
 		} else {
-			singleAction[strings.ToLower(action)] = true
+			singleAction[strings.ToLower(name)] = true
 		}
 	}
 	return errs

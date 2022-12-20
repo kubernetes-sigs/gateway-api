@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: GRPCRoute
+metadata:
+  name: invalid-method
+spec:
+  parentRefs:
+  - name: example-gateway
+  hostnames:
+  - "bar.example.com"
+  rules:
+  - matches:
+    - method:
+      - method: ../
+    backendRefs:
+    - name: bar-svc
+      port: 50051
