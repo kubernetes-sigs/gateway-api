@@ -88,7 +88,7 @@ type DefaultRoundTripper struct {
 // is received.
 func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedRequest, *CapturedResponse, error) {
 	cReq := &CapturedRequest{}
-	client := http.DefaultClient
+	client := &http.Client{}
 
 	if request.UnfollowRedirect {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
