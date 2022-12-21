@@ -129,6 +129,13 @@ The purpose of these changes is to make the status flows more consistent across 
 - Fix Gateway reference in HTTPRouteInvalidParentRefNotMatchingListenerPort
   (#1591, @sayboras)
 
+### Build Changes
+
+- We now provide a [multi-arch](https://www.docker.com/blog/multi-arch-images/)
+  image including new support for `arm64` in addition to `amd64` for our
+  validating webhook.
+  (#627, @wilsonwu & @Xunzhuo)
+
 ### Developer Notes
 
 - Deprecated `v1alpha2` Go types are now aliases to their `v1beta1` versions
