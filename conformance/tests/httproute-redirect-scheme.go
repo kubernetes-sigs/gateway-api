@@ -47,6 +47,9 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 				Path:             "/scheme",
 				UnfollowRedirect: true,
 			},
+			Response: http.Response{
+				StatusCode: 302,
+			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Scheme: "https",
 			},
@@ -55,6 +58,9 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 			Request: http.Request{
 				Path:             "/scheme-and-host",
 				UnfollowRedirect: true,
+			},
+			Response: http.Response{
+				StatusCode: 302,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host:   "example.org",

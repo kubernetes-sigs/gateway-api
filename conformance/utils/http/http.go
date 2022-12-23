@@ -101,11 +101,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	}
 
 	if expected.Response.StatusCode == 0 {
-		if expected.Request.UnfollowRedirect {
-			expected.Response.StatusCode = 302
-		} else {
-			expected.Response.StatusCode = 200
-		}
+		expected.Response.StatusCode = 200
 	}
 
 	t.Logf("Making %s request to http://%s%s", expected.Request.Method, gwAddr, expected.Request.Path)
@@ -184,7 +180,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 			return false
 		}
 
-		if err := CompareRequest(cReq, cRes, expected); err != nil {
+		if err := CompareRequest(&req, cReq, cRes, expected); err != nil {
 			t.Logf("Response expectation failed for request: %v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
@@ -194,7 +190,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	t.Logf("Request passed")
 }
 
-func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
 	}
@@ -290,16 +286,23 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 		if expected.RedirectRequest == nil {
 			return nil
 		}
+
+		// if the expected host is nil it means we do not test host redirect.
+		// in that case we are setting it to the one we got from the response because we do not know the ip/host of the gateway.
 		if expected.RedirectRequest.Host == "" {
 			expected.RedirectRequest.Host = cRes.RedirectRequest.Host
 		}
 
 		if expected.RedirectRequest.Port == "" {
-			expected.RedirectRequest.Port = cRes.RedirectRequest.Port
+			expected.RedirectRequest.Port = req.URL.Port()
 		}
 
 		if expected.RedirectRequest.Scheme == "" {
-			expected.RedirectRequest.Scheme = "http"
+			expected.RedirectRequest.Scheme = req.URL.Scheme
+		}
+
+		if expected.RedirectRequest.Path == "" {
+			expected.RedirectRequest.Path = req.URL.Path
 		}
 		if expected.RedirectRequest.Host != cRes.RedirectRequest.Host {
 			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
@@ -311,6 +314,10 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 
 		if expected.RedirectRequest.Scheme != cRes.RedirectRequest.Scheme {
 			return fmt.Errorf("expected redirected scheme to be %s, got %s", expected.RedirectRequest.Scheme, cRes.RedirectRequest.Scheme)
+		}
+
+		if expected.RedirectRequest.Path != cRes.RedirectRequest.Path {
+			return fmt.Errorf("expected redirected path to be %s, got %s", expected.RedirectRequest.Path, cRes.RedirectRequest.Path)
 		}
 	}
 	return nil

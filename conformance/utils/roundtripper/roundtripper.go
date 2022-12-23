@@ -64,6 +64,7 @@ type RedirectRequest struct {
 	Scheme string
 	Host   string
 	Port   string
+	Path   string
 }
 
 // CapturedResponse contains response metadata.
@@ -169,6 +170,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 			Scheme: redirectURL.Scheme,
 			Host:   redirectURL.Hostname(),
 			Port:   redirectURL.Port(),
+			Path:   redirectURL.Path,
 		}
 	}
 

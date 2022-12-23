@@ -47,6 +47,9 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 				Path:             "/port",
 				UnfollowRedirect: true,
 			},
+			Response: http.Response{
+				StatusCode: 302,
+			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Port: "8083",
 			},
@@ -55,6 +58,9 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 			Request: http.Request{
 				Path:             "/port-and-host",
 				UnfollowRedirect: true,
+			},
+			Response: http.Response{
+				StatusCode: 302,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Host: "example.org",

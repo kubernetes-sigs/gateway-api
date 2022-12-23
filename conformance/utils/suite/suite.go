@@ -60,6 +60,9 @@ const (
 
 	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
 	SupportHTTPRouteSchemeRedirect SupportedFeature = "HTTPRouteSchemeRedirect"
+
+	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
+	SupportHTTPRoutePathRedirect SupportedFeature = "HTTPRoutePathRedirect"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
