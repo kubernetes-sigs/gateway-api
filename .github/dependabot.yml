@@ -11,12 +11,14 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
-      
+
+  # Dependencies listed in Dockerfile
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
-      
+
+  # Dependencies listed in requirements.txt
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
