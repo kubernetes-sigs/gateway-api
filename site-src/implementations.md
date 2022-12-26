@@ -49,7 +49,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [17]:#flomesh-service-mesh-fsm
 [18]:#envoy-gateway
 [19]:#litespeed-ingress-controller
-[20]:#BIG-IP-Kubernetes-Gateway
+[20]:#big-ip-kubernetes-gateway
 
 ## Implementations
 
@@ -73,11 +73,11 @@ APISIX currently supports Gateway API `v1alpha2` version of the specification fo
 
 ### BIG-IP Kubernetes Gateway
 
-[BIG-IP Kubernetes Gateway][BIG-IP-Kubernetes-Gateway] is an open-source project that provides an implementation of the Gateway API using [F5 BIG-IP][f5bigip] as the data plane. It provides enterprises with high-performance Gateway API implementation
+[BIG-IP Kubernetes Gateway][big-ip-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [F5 BIG-IP][f5bigip] as the data plane. It provides enterprises with high-performance Gateway API implementation
 
 We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues]or [PR][bigipgwpr].
 
-[BIG-IP-Kubernetes-Gateway]:https://gateway-api.f5se.io/
+[big-ip-kubernetes-gateway]:https://gateway-api.f5se.io/
 [f5bigip]:https://f5.com
 [bigipgwfeatures]:https://github.com/f5devcentral/bigip-kubernetes-gateway/blob/master/docs/gateway-api-compatibility.md
 [bigipgwissues]:https://github.com/f5devcentral/bigip-kubernetes-gateway/issues
