@@ -75,7 +75,7 @@ APISIX currently supports Gateway API `v1alpha2` version of the specification fo
 
 [BIG-IP Kubernetes Gateway][big-ip-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [F5 BIG-IP][f5bigip] as the data plane. It provides enterprises with high-performance Gateway API implementation
 
-We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues]or [PR][bigipgwpr].
+We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues] or [PR][bigipgwpr].
 
 [big-ip-kubernetes-gateway]:https://gateway-api.f5se.io/
 [f5bigip]:https://f5.com
