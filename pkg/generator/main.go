@@ -39,14 +39,12 @@ const (
 	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/1538"
 )
 
-var (
-	standardKinds = map[string]bool{
-		"GatewayClass":   true,
-		"Gateway":        true,
-		"HTTPRoute":      true,
-		"ReferenceGrant": true,
-	}
-)
+var standardKinds = map[string]bool{
+	"GatewayClass":   true,
+	"Gateway":        true,
+	"HTTPRoute":      true,
+	"ReferenceGrant": true,
+}
 
 // This generation code is largely copied from
 // github.com/kubernetes-sigs/controller-tools/blob/ab52f76cc7d167925b2d5942f24bf22e30f49a02/pkg/crd/gen.go
@@ -56,7 +54,6 @@ func main() {
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
 	)
-
 	if err != nil {
 		log.Fatalf("failed to load package roots: %s", err)
 	}
@@ -92,7 +89,7 @@ func main() {
 
 	channels := []string{"standard", "experimental"}
 	for _, channel := range channels {
-		for groupKind := range kubeKinds {
+		for _, groupKind := range kubeKinds {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
 			}
@@ -128,7 +125,7 @@ func main() {
 			}
 
 			fileName := fmt.Sprintf("config/crd/%s/%s_%s.yaml", channel, crdRaw.Spec.Group, crdRaw.Spec.Names.Plural)
-			err = os.WriteFile(fileName, out, 0600)
+			err = os.WriteFile(fileName, out, 0o600)
 			if err != nil {
 				log.Fatalf("failed to write CRD: %s", err)
 			}
