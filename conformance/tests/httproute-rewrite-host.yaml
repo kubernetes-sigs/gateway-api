@@ -27,21 +27,3 @@ spec:
     backendRefs:
     - name: infra-backend-v2
       port: 8080
-  # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /status-code-301
-  #   filters:
-  #   - type: RequestRedirect
-  #     requestRedirect:
-  #       statusCode: 301
-  # - matches:
-  #   - path:
-  #       type: PathPrefix
-  #       value: /host-and-status
-  #   filters:
-  #   - type: RequestRedirect
-  #     requestRedirect:
-  #       statusCode: 301
-  #       hostname: example.org
-
