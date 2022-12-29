@@ -180,7 +180,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 			return false
 		}
 
-		if err := CompareRequest(cReq, cRes, expected); err != nil {
+		if err := CompareRequest(&req, cReq, cRes, expected); err != nil {
 			t.Logf("Response expectation failed for request: %v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
@@ -190,7 +190,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	t.Logf("Request passed")
 }
 
-func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
 	}
@@ -286,8 +286,23 @@ func CompareRequest(cReq *roundtripper.CapturedRequest, cRes *roundtripper.Captu
 		if expected.RedirectRequest == nil {
 			return nil
 		}
-		if expected.RedirectRequest.Hostname != cRes.RedirectRequest.Hostname {
-			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Hostname, cRes.RedirectRequest.Hostname)
+
+		setRedirectRequestDefaults(req, cRes, &expected)
+
+		if expected.RedirectRequest.Host != cRes.RedirectRequest.Host {
+			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
+		}
+
+		if expected.RedirectRequest.Port != cRes.RedirectRequest.Port {
+			return fmt.Errorf("expected redirected port to be %s, got %s", expected.RedirectRequest.Port, cRes.RedirectRequest.Port)
+		}
+
+		if expected.RedirectRequest.Scheme != cRes.RedirectRequest.Scheme {
+			return fmt.Errorf("expected redirected scheme to be %s, got %s", expected.RedirectRequest.Scheme, cRes.RedirectRequest.Scheme)
+		}
+
+		if expected.RedirectRequest.Path != cRes.RedirectRequest.Path {
+			return fmt.Errorf("expected redirected path to be %s, got %s", expected.RedirectRequest.Path, cRes.RedirectRequest.Path)
 		}
 	}
 	return nil
@@ -314,4 +329,24 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 		return fmt.Sprintf("%s should go to %s", reqStr, er.Backend)
 	}
 	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
+}
+
+func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
+	// If the expected host is nil it means we do not test host redirect.
+	// In that case we are setting it to the one we got from the response because we do not know the ip/host of the gateway.
+	if expected.RedirectRequest.Host == "" {
+		expected.RedirectRequest.Host = cRes.RedirectRequest.Host
+	}
+
+	if expected.RedirectRequest.Port == "" {
+		expected.RedirectRequest.Port = req.URL.Port()
+	}
+
+	if expected.RedirectRequest.Scheme == "" {
+		expected.RedirectRequest.Scheme = req.URL.Scheme
+	}
+
+	if expected.RedirectRequest.Path == "" {
+		expected.RedirectRequest.Path = req.URL.Path
+	}
 }
