@@ -287,7 +287,7 @@ func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedReques
 			return nil
 		}
 
-		setRedriectRequestDefaults(req, cRes, &expected)
+		setRedirectRequestDefaults(req, cRes, &expected)
 
 		if expected.RedirectRequest.Host != cRes.RedirectRequest.Host {
 			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
@@ -331,7 +331,7 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 	return fmt.Sprintf("%s should receive a %d", reqStr, er.Response.StatusCode)
 }
 
-func setRedriectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
+func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.CapturedResponse, expected *ExpectedResponse) {
 	// If the expected host is nil it means we do not test host redirect.
 	// In that case we are setting it to the one we got from the response because we do not know the ip/host of the gateway.
 	if expected.RedirectRequest.Host == "" {
