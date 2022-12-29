@@ -38,7 +38,7 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 	Features:    []suite.SupportedFeature{suite.SupportHTTPRoutePortRedirect},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "redirect", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "redirect-port", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
@@ -85,7 +85,7 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 				UnfollowRedirect: true,
 			},
 			Response: http.Response{
-				StatusCode: 301,
+				StatusCode: 302,
 			},
 			RedirectRequest: &roundtripper.RedirectRequest{
 				Port: "8083",

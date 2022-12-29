@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: redirect
+  name: redirect-scheme
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
@@ -41,6 +41,6 @@ spec:
     - type: RequestRedirect
       requestRedirect:
         scheme: "https"
-        statusCode: 301
+        statusCode: 302
         hostname: example.org
 
