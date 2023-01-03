@@ -125,8 +125,11 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 		uListeners, _, err := unstructured.NestedSlice(uObj.Object, "spec", "listeners")
 		require.NoErrorf(t, err, "error getting `spec.listeners` on %s Gateway resource", uObj.GetName())
 
-		var listeners []interface{}
-		newPorts := map[int64]v1beta1.PortNumber{}
+		// Track which new ports are assigned for a given listener port
+		// because ports can be shared between listeners
+		allocatedForListenerPort := map[int64]v1beta1.PortNumber{}
+
+		var preparedListeners []interface{}
 		for i, uListener := range uListeners {
 			listener, ok := uListener.(map[string]interface{})
 			require.Truef(t, ok, "unexpected type at `spec.listeners[%d]` on %s Gateway resource", i, uObj.GetName())
@@ -136,25 +139,23 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 
 			// For each listener port either allocate a new port or use the port
 			// already allocated for this listener port
-			newPort, ok := newPorts[port]
+			newPort, ok := allocatedForListenerPort[port]
 			if !ok {
 				var portIsValid bool
 				newPort, portIsValid = a.availablePorts.PopPort()
 				require.True(t, portIsValid, "not enough unassigned valid ports for Gateway resource")
-				newPorts[port] = newPort
+
+				allocatedForListenerPort[port] = newPort
+				allocatedPorts = append(allocatedPorts, newPort)
 			}
 
 			portErr = unstructured.SetNestedField(listener, int64(newPort), "port")
 			require.NoErrorf(t, portErr, "error setting `spec.listeners[%d].port` on %s Gateway resource", i, uObj.GetName())
 
-			listeners = append(listeners, listener)
+			preparedListeners = append(preparedListeners, listener)
 		}
 
-		for _, port := range newPorts {
-			allocatedPorts = append(allocatedPorts, port)
-		}
-
-		err = unstructured.SetNestedSlice(uObj.Object, listeners, "spec", "listeners")
+		err = unstructured.SetNestedSlice(uObj.Object, preparedListeners, "spec", "listeners")
 		require.NoErrorf(t, err, "error setting `spec.listeners` on %s Gateway resource", uObj.GetName())
 	}
 
