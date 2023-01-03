@@ -206,6 +206,10 @@ func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedReques
 			expected.ExpectedRequest.Method = "GET"
 		}
 
+		if expected.ExpectedRequest.Host != "" && expected.ExpectedRequest.Host != cReq.Host {
+			return fmt.Errorf("expected host to be %s, got %s", expected.ExpectedRequest.Host, cReq.Host)
+		}
+
 		if expected.ExpectedRequest.Path != cReq.Path {
 			return fmt.Errorf("expected path to be %s, got %s", expected.ExpectedRequest.Path, cReq.Path)
 		}

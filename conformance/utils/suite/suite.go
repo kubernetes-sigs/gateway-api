@@ -63,6 +63,12 @@ const (
 
 	// This option indicates support for HTTPRoute path redirect (experimental conformance).
 	SupportHTTPRoutePathRedirect SupportedFeature = "HTTPRoutePathRedirect"
+
+	// This option indicates support for HTTPRoute host rewrite (experimental conformance)
+	SupportHTTPRouteHostRewrite SupportedFeature = "HTTPRouteHostRewrite"
+
+	// This option indicates support for HTTPRoute path rewrite (experimental conformance)
+	SupportHTTPRoutePathRewrite SupportedFeature = "HTTPRoutePathRewrite"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
