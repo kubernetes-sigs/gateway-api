@@ -54,6 +54,21 @@ const (
 
 	// This option indicates GatewayClass will update the observedGeneration in it's conditions when reconciling
 	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
+
+	// This option indicates support for HTTPRoute port redirect (extended conformance).
+	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
+
+	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
+	SupportHTTPRouteSchemeRedirect SupportedFeature = "HTTPRouteSchemeRedirect"
+
+	// This option indicates support for HTTPRoute path redirect (experimental conformance).
+	SupportHTTPRoutePathRedirect SupportedFeature = "HTTPRoutePathRedirect"
+
+	// This option indicates support for HTTPRoute host rewrite (experimental conformance)
+	SupportHTTPRouteHostRewrite SupportedFeature = "HTTPRouteHostRewrite"
+
+	// This option indicates support for HTTPRoute path rewrite (experimental conformance)
+	SupportHTTPRoutePathRewrite SupportedFeature = "HTTPRoutePathRewrite"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with

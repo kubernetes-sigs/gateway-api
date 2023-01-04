@@ -19,7 +19,7 @@ package admission
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	admission "k8s.io/api/admission/v1"
@@ -131,7 +131,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.StatusBadRequest)
 		return
 	}
-	data, err := ioutil.ReadAll(r.Body)
+	data, err := io.ReadAll(r.Body)
 	if err != nil {
 		log500(w, err)
 		return

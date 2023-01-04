@@ -49,13 +49,17 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 // a row this must occur to be considered "consistent".
 func WaitForConsistentTLSResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected http.ExpectedResponse, threshold int, maxTimeToConsistency time.Duration, cPem, keyPem []byte, server string) {
 	http.AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
-		cReq, cRes, err := r.CaptureTLSRoundTrip(req, cPem, keyPem, server)
+		req.KeyPem = keyPem
+		req.CertPem = cPem
+		req.Server = server
+
+		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
 			t.Logf("Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
 			return false
 		}
 
-		if err := http.CompareRequest(cReq, cRes, expected); err != nil {
+		if err := http.CompareRequest(&req, cReq, cRes, expected); err != nil {
 			t.Logf("Response expectation failed for request: %v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}

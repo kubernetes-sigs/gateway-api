@@ -11,7 +11,7 @@ spec:
   - abc.example.com
   rules:
   - backendRefs:
-    - name: infra-backend-v4
+    - name: tls-backend
       port: 443
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1

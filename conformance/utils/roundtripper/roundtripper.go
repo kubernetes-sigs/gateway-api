@@ -36,7 +36,6 @@ import (
 // This can be overridden with custom implementations whenever necessary.
 type RoundTripper interface {
 	CaptureRoundTrip(Request) (*CapturedRequest, *CapturedResponse, error)
-	CaptureTLSRoundTrip(Request, []byte, []byte, string) (*CapturedRequest, *CapturedResponse, error)
 }
 
 // Request is the primary input for making a request.
@@ -47,6 +46,9 @@ type Request struct {
 	Method           string
 	Headers          map[string][]string
 	UnfollowRedirect bool
+	CertPem          []byte
+	KeyPem           []byte
+	Server           string
 }
 
 // CapturedRequest contains request metadata captured from an echoserver
@@ -65,9 +67,10 @@ type CapturedRequest struct {
 // RedirectRequest contains a follow up request metadata captured from a redirect
 // response.
 type RedirectRequest struct {
-	Scheme   string
-	Hostname string
-	Port     string
+	Scheme string
+	Host   string
+	Port   string
+	Path   string
 }
 
 // CapturedResponse contains response metadata.
@@ -92,11 +95,41 @@ type DefaultRoundTripper struct {
 // is received.
 func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedRequest, *CapturedResponse, error) {
 	cReq := &CapturedRequest{}
-	client := http.DefaultClient
+	client := &http.Client{}
 
 	if request.UnfollowRedirect {
 		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
 			return http.ErrUseLastResponse
+		}
+	}
+
+	// Setup TLS transport if there are CertPem, KeyPem, and Server in the request
+	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
+		// Create a certificate from the provided cert and key
+		cert, err := tls.X509KeyPair(request.CertPem, request.KeyPem)
+		if err != nil {
+			return nil, nil, fmt.Errorf("unexpected error creating cert: %w", err)
+		}
+
+		// Add the provided cert as a trusted CA
+		certPool := x509.NewCertPool()
+		if !certPool.AppendCertsFromPEM(request.CertPem) {
+			return nil, nil, fmt.Errorf("unexpected error adding trusted CA: %w", err)
+		}
+
+		if request.Server == "" {
+			return nil, nil, fmt.Errorf("unexpected error, server name required for TLS")
+		}
+
+		// Create the Transport for this provided host, cert, and trusted CA
+		client.Transport = &http.Transport{
+			// Disable G402: TLS MinVersion too low. (gosec)
+			// #nosec G402
+			TLSClientConfig: &tls.Config{
+				Certificates: []tls.Certificate{cert},
+				ServerName:   request.Server,
+				RootCAs:      certPool,
+			},
 		}
 	}
 
@@ -172,9 +205,10 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 			return nil, nil, err
 		}
 		cRes.RedirectRequest = &RedirectRequest{
-			Scheme:   redirectURL.Scheme,
-			Hostname: redirectURL.Hostname(),
-			Port:     redirectURL.Port(),
+			Scheme: redirectURL.Scheme,
+			Host:   redirectURL.Hostname(),
+			Port:   redirectURL.Port(),
+			Path:   redirectURL.Path,
 		}
 	}
 
@@ -195,110 +229,6 @@ func IsRedirect(statusCode int) bool {
 		return true
 	}
 	return false
-}
-
-// CaptureTLSRoundTrip makes a request with the provided parameters and returns the
-// captured request and response from echoserver. An error will be returned if
-// there is an error running the function but not if an HTTP error status code
-// is received.
-func (d *DefaultRoundTripper) CaptureTLSRoundTrip(request Request, cPem, keyPem []byte, server string) (*CapturedRequest, *CapturedResponse, error) {
-	cReq := &CapturedRequest{}
-	client := http.DefaultClient
-
-	// Create a certificate from the provided cert and key
-	cert, err := tls.X509KeyPair(cPem, keyPem)
-	if err != nil {
-		return nil, nil, fmt.Errorf("unexpected error creating cert: %w", err)
-	}
-
-	// Add the provided cert as a trusted CA
-	certPool := x509.NewCertPool()
-	if !certPool.AppendCertsFromPEM(cPem) {
-		return nil, nil, fmt.Errorf("unexpected error adding trusted CA: %w", err)
-	}
-
-	if server == "" {
-		return nil, nil, fmt.Errorf("unexpected error, server name required for TLS")
-	}
-
-	// Create the Transport for this provided host, cert, and trusted CA
-	client.Transport = &http.Transport{
-		TLSClientConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
-			ServerName:   server,
-			RootCAs:      certPool,
-			MinVersion:   tls.VersionTLS11,
-			MaxVersion:   tls.VersionTLS13,
-		},
-	}
-
-	method := "GET"
-	if request.Method != "" {
-		method = request.Method
-	}
-	ctx, cancel := context.WithTimeout(context.Background(), d.TimeoutConfig.RequestTimeout)
-	defer cancel()
-	req, err := http.NewRequestWithContext(ctx, method, request.URL.String(), nil)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if request.Host != "" {
-		req.Host = request.Host
-	}
-
-	if request.Headers != nil {
-		for name, value := range request.Headers {
-			req.Header.Set(name, value[0])
-		}
-	}
-
-	if d.Debug {
-		var dump []byte
-		dump, err = httputil.DumpRequestOut(req, true)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		fmt.Printf("Sending Request:\n%s\n\n", formatDump(dump, "< "))
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(resp.Body)
-
-	if d.Debug {
-		var dump []byte
-		dump, err = httputil.DumpResponse(resp, true)
-		if err != nil {
-			return nil, nil, err
-		}
-
-		fmt.Printf("Received Response:\n%s\n\n", formatDump(dump, "< "))
-	}
-
-	body, _ := iou.ReadAll(resp.Body)
-
-	// we cannot assume the response is JSON
-	if resp.Header.Get("Content-type") == "application/json" {
-		err = json.Unmarshal(body, cReq)
-		if err != nil {
-			return nil, nil, fmt.Errorf("unexpected error reading response: %w", err)
-		}
-	}
-
-	cRes := &CapturedResponse{
-		StatusCode:    resp.StatusCode,
-		ContentLength: resp.ContentLength,
-		Protocol:      resp.Proto,
-		Headers:       resp.Header,
-	}
-
-	return cReq, cRes, nil
 }
 
 var startLineRegex = regexp.MustCompile(`(?m)^`)
