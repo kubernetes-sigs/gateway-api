@@ -63,7 +63,7 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 						Path: "/one",
 					},
 				},
-				Backend:   "infra-backend-v2",
+				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
 		}
