@@ -366,7 +366,7 @@ spec:
                               kind:
                                 default: Secret
                                 description: Kind is kind of the referent. For example
-                                  "HTTPRoute" or "Service".
+                                  "Secret".
                                 maxLength: 63
                                 minLength: 1
                                 pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1063,7 +1063,7 @@ spec:
                               kind:
                                 default: Secret
                                 description: Kind is kind of the referent. For example
-                                  "HTTPRoute" or "Service".
+                                  "Secret".
                                 maxLength: 63
                                 minLength: 1
                                 pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
