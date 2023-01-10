@@ -57,6 +57,7 @@ nav:
     - TLS: guides/tls.md
     - TCP routing: guides/tcp.md
     - gRPC Routing: guides/grpc-routing.md
+    - Migrating from Ingress: guides/migrating-from-ingress.md
   - Reference:
     - API Types:
         GatewayClass: api-types/gatewayclass.md
