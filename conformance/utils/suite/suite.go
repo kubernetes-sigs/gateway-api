@@ -113,19 +113,19 @@ type ConformanceTestSuite struct {
 
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
-	Client                     client.Client
-	GatewayClassName           string
-	Debug                      bool
-	RoundTripper               roundtripper.RoundTripper
-	BaseManifests              string
-	NamespaceLabels            map[string]string
+	Client           client.Client
+	GatewayClassName string
+	Debug            bool
+	RoundTripper     roundtripper.RoundTripper
+	BaseManifests    string
+	NamespaceLabels  map[string]string
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
 	// manifests to a valid, unique port. There must be as many
 	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
 	// For example, given two Gateways, each with 2 listeners, there should be
 	// four ValidUniqueListenerPorts.
 	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts   []v1beta1.PortNumber
+	ValidUniqueListenerPorts []v1beta1.PortNumber
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
