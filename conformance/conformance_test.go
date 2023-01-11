@@ -54,11 +54,12 @@ func TestConformance(t *testing.T) {
 		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
-		Client:               client,
-		GatewayClassName:     *flags.GatewayClassName,
-		Debug:                *flags.ShowDebug,
-		CleanupBaseResources: *flags.CleanupBaseResources,
-		SupportedFeatures:    supportedFeatures,
+		Client:                     client,
+		GatewayClassName:           *flags.GatewayClassName,
+		Debug:                      *flags.ShowDebug,
+		CleanupBaseResources:       *flags.CleanupBaseResources,
+		SupportedFeatures:          supportedFeatures,
+		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 	})
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)

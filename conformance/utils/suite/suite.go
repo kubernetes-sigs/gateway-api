@@ -78,6 +78,23 @@ var StandardCoreFeatures = map[SupportedFeature]bool{
 	SupportReferenceGrant: true,
 }
 
+// AllFeatures contains all the supported features and can be used to run all
+// conformance tests with `all-features` flag.
+var AllFeatures = map[SupportedFeature]bool{
+	SupportReferenceGrant: true,
+	SupportTLSRoute: true,
+	SupportHTTPRouteQueryParamMatching: true,
+	SupportHTTPRouteMethodMatching: true,
+	SupportHTTPResponseHeaderModification: true,
+	SupportRouteDestinationPortMatching: true,
+	SupportGatewayClassObservedGenerationBump: true,
+	SupportHTTPRoutePortRedirect: true,
+	SupportHTTPRouteSchemeRedirect: true,
+	SupportHTTPRoutePathRedirect: true,
+	SupportHTTPRouteHostRewrite: true,
+	SupportHTTPRoutePathRewrite: true,
+}
+
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
 type ConformanceTestSuite struct {
@@ -96,28 +113,26 @@ type ConformanceTestSuite struct {
 
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
-	Client           client.Client
-	GatewayClassName string
-	Debug            bool
-	RoundTripper     roundtripper.RoundTripper
-	BaseManifests    string
-	NamespaceLabels  map[string]string
+	Client                     client.Client
+	GatewayClassName           string
+	Debug                      bool
+	RoundTripper               roundtripper.RoundTripper
+	BaseManifests              string
+	NamespaceLabels            map[string]string
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
 	// manifests to a valid, unique port. There must be as many
 	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
 	// For example, given two Gateways, each with 2 listeners, there should be
 	// four ValidUniqueListenerPorts.
 	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts []v1beta1.PortNumber
+	ValidUniqueListenerPorts   []v1beta1.PortNumber
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources bool
-	SupportedFeatures    map[SupportedFeature]bool
-	TimeoutConfig        config.TimeoutConfig
-	// SkipTests contains all the tests not to be run and can be used to opt out
-	// of specific tests
-	SkipTests []string
+	CleanupBaseResources       bool
+	SupportedFeatures          map[SupportedFeature]bool
+	EnableAllSupportedFeatures bool
+	TimeoutConfig              config.TimeoutConfig
 }
 
 // New returns a new ConformanceTestSuite.
@@ -129,7 +144,9 @@ func New(s Options) *ConformanceTestSuite {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
-	if s.SupportedFeatures == nil {
+	if s.EnableAllSupportedFeatures == true {
+		s.SupportedFeatures = AllFeatures
+	} else if s.SupportedFeatures == nil {
 		s.SupportedFeatures = StandardCoreFeatures
 	} else {
 		for feature, val := range StandardCoreFeatures {
