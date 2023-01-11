@@ -81,18 +81,18 @@ var StandardCoreFeatures = map[SupportedFeature]bool{
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
 var AllFeatures = map[SupportedFeature]bool{
-	SupportReferenceGrant: true,
-	SupportTLSRoute: true,
-	SupportHTTPRouteQueryParamMatching: true,
-	SupportHTTPRouteMethodMatching: true,
-	SupportHTTPResponseHeaderModification: true,
-	SupportRouteDestinationPortMatching: true,
+	SupportReferenceGrant:                     true,
+	SupportTLSRoute:                           true,
+	SupportHTTPRouteQueryParamMatching:        true,
+	SupportHTTPRouteMethodMatching:            true,
+	SupportHTTPResponseHeaderModification:     true,
+	SupportRouteDestinationPortMatching:       true,
 	SupportGatewayClassObservedGenerationBump: true,
-	SupportHTTPRoutePortRedirect: true,
-	SupportHTTPRouteSchemeRedirect: true,
-	SupportHTTPRoutePathRedirect: true,
-	SupportHTTPRouteHostRewrite: true,
-	SupportHTTPRoutePathRewrite: true,
+	SupportHTTPRoutePortRedirect:              true,
+	SupportHTTPRouteSchemeRedirect:            true,
+	SupportHTTPRoutePathRedirect:              true,
+	SupportHTTPRouteHostRewrite:               true,
+	SupportHTTPRoutePathRewrite:               true,
 }
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
