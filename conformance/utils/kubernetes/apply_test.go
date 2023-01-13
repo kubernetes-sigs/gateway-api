@@ -260,13 +260,13 @@ spec:
 			},
 		}},
 	}, {
-		name:    "setting the controllerName for a GatewayClass",
+		name:    "setting the controllerName/gatewayClassName for a GatewayClass",
 		applier: Applier{},
 		given: `
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind:       GatewayClass
 metadata:
-  name: test
+  name: {GATEWAY_CLASS_NAME}
 spec:
   controllerName: {GATEWAY_CONTROLLER_NAME}
 `,
@@ -275,7 +275,7 @@ spec:
 				"apiVersion": "gateway.networking.k8s.io/v1beta1",
 				"kind":       "GatewayClass",
 				"metadata": map[string]interface{}{
-					"name": "test",
+					"name": "test-class",
 				},
 				"spec": map[string]interface{}{
 					"controllerName": "test-controller",

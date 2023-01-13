@@ -92,6 +92,9 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured, p
 func (a Applier) prepareGatewayClass(t *testing.T, uObj *unstructured.Unstructured) {
 	err := unstructured.SetNestedField(uObj.Object, a.ControllerName, "spec", "controllerName")
 	require.NoErrorf(t, err, "error setting `spec.controllerName` on %s GatewayClass resource", uObj.GetName())
+
+	err = unstructured.SetNestedField(uObj.Object, a.GatewayClass, "metadata", "name")
+	require.NoErrorf(t, err, "error setting `metadata.name` on %s GatewayClass resource", uObj.GetName())
 }
 
 // prepareNamespace adjusts the Namespace labels.
