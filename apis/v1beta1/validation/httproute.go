@@ -39,7 +39,7 @@ var (
 	invalidPathSuffixes  = []string{"/..", "/."}
 
 	// All valid path characters per RFC-3986
-	validPathCharacters = "^[A-Za-z0-9\\/\\-._~%!$&'()*+,;=:]+$"
+	validPathCharacters = "^(?:[A-Za-z0-9\\/\\-._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$"
 )
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
