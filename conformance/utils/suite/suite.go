@@ -19,6 +19,7 @@ package suite
 import (
 	"testing"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -90,6 +91,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	SupportedFeatures map[SupportedFeature]bool
 	TimeoutConfig     config.TimeoutConfig
+	SkipTests         []string
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -113,6 +115,9 @@ type Options struct {
 	CleanupBaseResources bool
 	SupportedFeatures    map[SupportedFeature]bool
 	TimeoutConfig        config.TimeoutConfig
+	// SkipTests contains all the tests not to be run and can be used to opt out
+	// of specific tests
+	SkipTests []string
 }
 
 // New returns a new ConformanceTestSuite.
@@ -147,6 +152,7 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
+		SkipTests:         s.SkipTests,
 	}
 
 	// apply defaults
@@ -217,6 +223,12 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 		if supported, ok := suite.SupportedFeatures[feature]; !ok || !supported {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
+	}
+
+	// check that the test should not be skipped
+	if sets.New(suite.SkipTests...).Has(test.ShortName) {
+		t.Logf("Skipping %s", test.ShortName)
+		return
 	}
 
 	for _, manifestLocation := range test.Manifests {
