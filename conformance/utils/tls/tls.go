@@ -25,12 +25,6 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
 
-// requiredConsecutiveSuccesses is the number of requests that must succeed in a row
-// for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
-// before making additional assertions on the response body. If this number is not reached within
-// maxTimeToConsistency, the test will fail.
-const requiredConsecutiveSuccesses = 3
-
 // MakeTLSRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
 // understanding that the request may fail for some amount of time.
 //
@@ -41,7 +35,7 @@ func MakeTLSRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtr
 
 	req := http.MakeRequest(t, &expected, gwAddr, "HTTPS", "https")
 
-	WaitForConsistentTLSResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
+	WaitForConsistentTLSResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, cPem, keyPem, server)
 }
 
 // WaitForConsistentTLSResponse - repeats the provided request until it completes with a response having

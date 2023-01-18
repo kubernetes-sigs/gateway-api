@@ -74,14 +74,13 @@ capabilities.
 
 ### Running Tests
 
-By default, conformance tests will expect a `gateway-conformance` GatewayClass
-to be installed in the cluster and tests will be run against that. A different
-class can be specified with the `-gateway-class` flag along with the
-corresponding test command. For example, to run a conformance test against Istio,
-run:
+By default, conformance tests will expect a GatewayClass named `gateway-conformance`
+to be installed in the cluster, and tests will be run against that. Most often,
+you'll use a different class, which can be specified with the `-gateway-class` flag along with the
+corresponding test command. Check your instance for the `gateway-class` name to use.
 
 ```shell
-go test ./conformance/... -args -gateway-class=istio
+go test ./conformance/... -args -gateway-class=my-gateway-class
 ```
 
 Other useful flags may be found in

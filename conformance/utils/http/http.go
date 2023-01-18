@@ -82,12 +82,6 @@ type Response struct {
 	AbsentHeaders []string
 }
 
-// requiredConsecutiveSuccesses is the number of requests that must succeed in a row
-// for MakeRequestAndExpectEventuallyConsistentResponse to consider the response "consistent"
-// before making additional assertions on the response body. If this number is not reached within
-// maxTimeToConsistency, the test will fail.
-const requiredConsecutiveSuccesses = 3
-
 // MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
 // understanding that the request may fail for some amount of time.
 //
@@ -98,7 +92,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
 
-	WaitForConsistentResponse(t, r, req, expected, requiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
+	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
 func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {

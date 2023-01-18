@@ -70,6 +70,11 @@ type TimeoutConfig struct {
 	// RequestTimeout represents the maximum time for making an HTTP Request with the roundtripper.
 	// Max value for conformant implementation: None
 	RequestTimeout time.Duration
+
+	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
+	// to consider a response "consistent" before making additional assertions on the response body.
+	// If this number is not reached within MaxTimeToConsistency, the test will fail.
+	RequiredConsecutiveSuccesses int
 }
 
 // DefaultTimeoutConfig populates a TimeoutConfig with the default values.
@@ -88,6 +93,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		MaxTimeToConsistency:           30 * time.Second,
 		NamespacesMustBeReady:          300 * time.Second,
 		RequestTimeout:                 10 * time.Second,
+		RequiredConsecutiveSuccesses:   3,
 	}
 }
 
