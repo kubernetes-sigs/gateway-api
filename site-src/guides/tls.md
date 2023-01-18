@@ -63,9 +63,6 @@ listeners:
       name: default-cert
 ```
 
-If `hostname.match` is set to `Exact`, then the TLS settings apply to only the
-specific hostname that is set in `hostname.name`.
-
 ### Examples
 
 #### Listeners with different certificates
