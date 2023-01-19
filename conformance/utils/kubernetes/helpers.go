@@ -63,11 +63,21 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 	}
 }
 
-// GWCMustBeAccepted waits until the specified GatewayClass has an Accepted
-// condition set. Passing an empty status string means that any Status will do.
-// It also returns the ControllerName for the GatewayClass.
+// GWCMustBeAcceptedConditionTrue waits until the specified GatewayClass has an Accepted condition set with a status value equal to True.
+func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, metav1.ConditionTrue)
+}
+
+// GWCMustBeAcceptedConditionAny waits until the specified GatewayClass has an Accepted condition set with a status set to any value.
+func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, "")
+}
+
+// gwcMustBeAccepted waits until the specified GatewayClass has an Accepted
+// condition set. Passing an empty status string means that any value
+// will be accepted. It also returns the ControllerName for the GatewayClass.
 // This will cause the test to halt if the specified timeout is exceeded.
-func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
+func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
 	t.Helper()
 
 	var controllerName string
