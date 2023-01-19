@@ -161,7 +161,7 @@ func New(s Options) *ConformanceTestSuite {
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-	suite.ControllerName = kubernetes.GWCMustBeAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
+	suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
 	suite.Applier.GatewayClass = suite.GatewayClassName
 	suite.Applier.ControllerName = suite.ControllerName
