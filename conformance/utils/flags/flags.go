@@ -29,5 +29,5 @@ var (
 	CleanupBaseResources       = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
 	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites")
 	ExemptFeatures             = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
-	EnableAllSupportedFeatures = flag.Bool("all-features", false, "Whether to enable all supported feature conformance tests")
+	EnableAllSupportedFeatures = flag.Bool("all-features", false, "Whether to enable all supported features for conformance tests")
 )

@@ -80,6 +80,9 @@ var StandardCoreFeatures = map[SupportedFeature]bool{
 
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
+//
+// Note that the AllFeatures must in sync with defined features when the
+// feature constants change.
 var AllFeatures = map[SupportedFeature]bool{
 	SupportReferenceGrant:                     true,
 	SupportTLSRoute:                           true,
