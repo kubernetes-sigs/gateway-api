@@ -91,7 +91,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	SupportedFeatures map[SupportedFeature]bool
 	TimeoutConfig     config.TimeoutConfig
-	SkipTests         []string
+	SkipTests         sets.Set[string]
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -152,7 +152,7 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
-		SkipTests:         s.SkipTests,
+		SkipTests:         sets.New(s.SkipTests...),
 	}
 
 	// apply defaults
@@ -226,7 +226,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	// check that the test should not be skipped
-	if sets.New(suite.SkipTests...).Has(test.ShortName) {
+	if suite.SkipTests.Has(test.ShortName) {
 		t.Logf("Skipping %s", test.ShortName)
 		return
 	}
