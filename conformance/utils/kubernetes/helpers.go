@@ -65,7 +65,7 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 
 // GWCMustBeAcceptedConditionTrue waits until the specified GatewayClass has an Accepted condition set with a status value equal to True.
 func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
-	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, metav1.ConditionTrue)
+	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))
 }
 
 // GWCMustBeAcceptedConditionAny waits until the specified GatewayClass has an Accepted condition set with a status set to any value.
