@@ -26,7 +26,7 @@ example, to issue a permanent redirect (301) from HTTP to HTTPS, configure
 
 Redirects change configured URL components to match the redirect configuration
 while preserving other components from the original request URL. In this
-example, the request `GET http://redirect.example/cinammon` will result in a
+example, the request `GET http://redirect.example/cinnamon` will result in a
 301 response with a `location: https://redirect.example/cinnamon` header. The
 hostname (`redirect.example`), path (`/cinnamon`), and port (implicit) remain
 unchanged.
