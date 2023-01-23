@@ -213,6 +213,7 @@ const (
 	//
 	// * "NotAllowedByListeners"
 	// * "NoMatchingListenerHostname"
+	// * "NoMatchingParent"
 	// * "UnsupportedValue"
 	// * "ParentRefNotPermitted"
 	//
