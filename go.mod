@@ -10,7 +10,7 @@ require (
 	k8s.io/apiextensions-apiserver v0.26.0
 	k8s.io/apimachinery v0.26.0
 	k8s.io/client-go v0.26.0
-	k8s.io/code-generator v0.26.0
+	k8s.io/code-generator v0.26.1
 	k8s.io/klog/v2 v2.80.1
 	sigs.k8s.io/controller-runtime v0.14.1
 	sigs.k8s.io/controller-tools v0.11.1
