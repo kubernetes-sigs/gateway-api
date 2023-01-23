@@ -44,13 +44,14 @@ func TestConformance(t *testing.T) {
 	v1alpha2.AddToScheme(client.Scheme())
 	v1beta1.AddToScheme(client.Scheme())
 
-	t.Logf("Running conformance tests with %s GatewayClass", *flags.GatewayClassName)
-
 	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := parseSupportedFeatures(*flags.ExemptFeatures)
 	for feature := range exemptFeatures {
 		supportedFeatures[feature] = false
 	}
+
+	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n supported features: [%v]\n exempt features: [%v]",
+		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
 		Client:               client,

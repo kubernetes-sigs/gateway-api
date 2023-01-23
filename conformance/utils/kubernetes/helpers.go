@@ -28,12 +28,14 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
@@ -150,8 +152,8 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 	return errors.New(b.String())
 }
 
-// FilterStaleConditions returns the list of status condition whos observedGeneration does not
-// match the objects metadata.Generation
+// FilterStaleConditions returns the list of status condition whose observedGeneration does not
+// match the object's metadata.Generation
 func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []metav1.Condition {
 	stale := make([]metav1.Condition, 0, len(conditions))
 	for _, condition := range conditions {
@@ -385,7 +387,7 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.HTTPRouteMustHaveParents, func() (bool, error) {
+	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
@@ -406,6 +408,33 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have parents matching expectations")
+}
+
+// TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
+// in status that match the expected parents, and also returns the TLSRoute.
+// This will cause the test to halt if the specified timeout is exceeded.
+func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
+	t.Helper()
+
+	var actual []v1beta1.RouteParentStatus
+	var route v1alpha2.TLSRoute
+
+	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		err := client.Get(ctx, routeName, &route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
+		}
+		actual = route.Status.Parents
+		match := parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired)
+
+		return match, nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for TLSRoute to have parents matching expectations")
+
+	return route
 }
 
 func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
@@ -479,7 +508,7 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
 }
 
-// HTTPRouteMustHaveConditions checks that the supplied HTTPRoute has the supplied Condition,
+// HTTPRouteMustHaveCondition checks that the supplied HTTPRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
@@ -523,6 +552,54 @@ func parentRefToString(p v1beta1.ParentReference) string {
 	return string(p.Name)
 }
 
+// GatewayAndTLSRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the TLSRoute has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []v1beta1.Hostname) {
+	t.Helper()
+
+	var hostnames []v1beta1.Hostname
+
+	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
+	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+
+	ns := v1beta1.Namespace(gw.Namespace)
+	kind := v1beta1.Kind("Gateway")
+
+	for _, routeNN := range routeNNs {
+		namespaceRequired := true
+		if routeNN.Namespace == gw.Namespace {
+			namespaceRequired = false
+		}
+
+		var parents []v1beta1.RouteParentStatus
+		for _, listener := range gw.listenerNames {
+			parents = append(parents, v1beta1.RouteParentStatus{
+				ParentRef: v1beta1.ParentReference{
+					Group:       (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+					Kind:        &kind,
+					Name:        v1beta1.ObjectName(gw.Name),
+					Namespace:   &ns,
+					SectionName: listener,
+				},
+				ControllerName: v1beta1.GatewayController(controllerName),
+				Conditions: []metav1.Condition{
+					{
+						Type:   string(v1beta1.RouteConditionAccepted),
+						Status: metav1.ConditionTrue,
+						Reason: string(v1beta1.RouteReasonAccepted),
+					},
+				},
+			})
+		}
+		route := TLSRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
+		hostnames = route.Spec.Hostnames
+	}
+
+	return gwAddr, hostnames
+}
+
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
 func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) bool {
 	t.Helper()
@@ -558,6 +635,8 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 }
 
 func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
+	t.Helper()
+
 	if len(actual) < len(expected) {
 		t.Logf("Expected more conditions to be present")
 		return false
@@ -575,6 +654,8 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 // findConditionInList finds a condition in a list of Conditions, checking
 // the Name, Value, and Reason. If an empty reason is passed, any Reason will match.
 func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, expectedStatus, expectedReason string) bool {
+	t.Helper()
+
 	for _, cond := range conditions {
 		if cond.Type == condName {
 			if cond.Status == metav1.ConditionStatus(expectedStatus) {
@@ -589,11 +670,13 @@ func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, 
 		}
 	}
 
-	t.Logf("%s was not in conditions list", condName)
+	t.Logf("%s was not in conditions list [%v]", condName, conditions)
 	return false
 }
 
 func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName, condValue string) bool {
+	t.Helper()
+
 	for _, cond := range conditions {
 		if cond.Type == v1.PodConditionType(condName) {
 			if cond.Status == v1.ConditionStatus(condValue) {

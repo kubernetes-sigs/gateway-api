@@ -74,15 +74,27 @@ capabilities.
 
 ### Running Tests
 
-By default, conformance tests will expect a `gateway-conformance` GatewayClass
-to be installed in the cluster and tests will be run against that. A different
-class can be specified with the `--gateway-class` flag along with the
-corresponding test command. For example:
+By default, conformance tests will expect a GatewayClass named `gateway-conformance`
+to be installed in the cluster, and tests will be run against that. Most often,
+you'll use a different class, which can be specified with the `-gateway-class` flag along with the
+corresponding test command. Check your instance for the `gateway-class` name to use.
 
 ```shell
-go test ./conformance --gateway-class my-class
+go test ./conformance/... -args -gateway-class=my-gateway-class
 ```
 
+Other useful flags may be found in
+[conformance flags](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/utils/flags/flags.go).
+For example, if you'd like to examine the objects in Kubernetes after your test runs, you can pass a flag to
+suppress cleanup:
+```shell
+go test ./conformance/... -args -gateway-class=istio -cleanup-base-resources=false
+```
+If you'd like to run a single test instead of the entire conformance suite, find your test name
+`(suite.ConformanceTest.ShortName)` and use it like this:
+```shell
+go test ./conformance/... --run TestConformance/YOURTESTNAME --gateway-class=istio
+```
 ## Contributing to Conformance
 
 Many implementations run conformance tests as part of their full e2e test suite.
