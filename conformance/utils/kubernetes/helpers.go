@@ -65,11 +65,21 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 	}
 }
 
-// GWCMustBeAccepted waits until the specified GatewayClass has an Accepted
-// condition set to true. It also returns the ControllerName for the
-// GatewayClass. This will cause the test to halt if the specified timeout is
-// exceeded.
-func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+// GWCMustBeAcceptedConditionTrue waits until the specified GatewayClass has an Accepted condition set with a status value equal to True.
+func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))
+}
+
+// GWCMustBeAcceptedConditionAny waits until the specified GatewayClass has an Accepted condition set with a status set to any value.
+func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, "")
+}
+
+// gwcMustBeAccepted waits until the specified GatewayClass has an Accepted
+// condition set. Passing an empty status string means that any value
+// will be accepted. It also returns the ControllerName for the GatewayClass.
+// This will cause the test to halt if the specified timeout is exceeded.
+func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
 	t.Helper()
 
 	var controllerName string
@@ -91,9 +101,9 @@ func GWCMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 		}
 
 		// Passing an empty string as the Reason means that any Reason will do.
-		return findConditionInList(t, gwc.Status.Conditions, "Accepted", "True", ""), nil
+		return findConditionInList(t, gwc.Status.Conditions, "Accepted", expectedStatus, ""), nil
 	})
-	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have Accepted condition set to True: %v", gwcName, waitErr)
+	require.NoErrorf(t, waitErr, "error waiting for %s GatewayClass to have Accepted condition to be set: %v", gwcName, waitErr)
 
 	return controllerName
 }
@@ -653,12 +663,14 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 
 // findConditionInList finds a condition in a list of Conditions, checking
 // the Name, Value, and Reason. If an empty reason is passed, any Reason will match.
+// If an empty status is passed, any Status will match.
 func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, expectedStatus, expectedReason string) bool {
 	t.Helper()
 
 	for _, cond := range conditions {
 		if cond.Type == condName {
-			if cond.Status == metav1.ConditionStatus(expectedStatus) {
+			// an empty Status string means "Match any status".
+			if expectedStatus == "" || cond.Status == metav1.ConditionStatus(expectedStatus) {
 				// an empty Reason string means "Match any reason".
 				if expectedReason == "" || cond.Reason == expectedReason {
 					return true
