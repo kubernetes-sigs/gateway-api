@@ -264,7 +264,7 @@ const (
 	// * "RefNotPermitted"
 	// * "InvalidKind"
 	// * "BackendNotFound"
-	// * "Cross-namespace ParentRef"
+	// * "ParentRefNotPermitted"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -289,6 +289,12 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one of the
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
+	
+	//This reason is used with the "ResolvedRef" condition when one of
+	// route has not been accepted because a ParentRef references a Gateway 
+	//in another namespace, but no ReferenceGrant allows such a reference.
+       RouteReasonRefNotPermitted RouteConditionReason = "ParentRefNotPermitted"
+
 )
 
 // RouteParentStatus describes the status of a route with respect to an
