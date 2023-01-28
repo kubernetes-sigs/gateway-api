@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -47,7 +48,7 @@ func TestConformance(t *testing.T) {
 	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := parseSupportedFeatures(*flags.ExemptFeatures)
 	for feature := range exemptFeatures {
-		supportedFeatures[feature] = false
+		supportedFeatures.Delete(feature)
 	}
 
 	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n supported features: [%v]\n exempt features: [%v]",
@@ -67,10 +68,10 @@ func TestConformance(t *testing.T) {
 
 // parseSupportedFeatures parses flag arguments and converts the string to
 // map[suite.SupportedFeature]bool
-func parseSupportedFeatures(f string) map[suite.SupportedFeature]bool {
-	res := map[suite.SupportedFeature]bool{}
+func parseSupportedFeatures(f string) sets.Set[suite.SupportedFeature] {
+	res := sets.Set[suite.SupportedFeature]{}
 	for _, value := range strings.Split(f, ",") {
-		res[suite.SupportedFeature(value)] = true
+		res.Insert(suite.SupportedFeature(value))
 	}
 	return res
 }

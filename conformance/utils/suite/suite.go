@@ -74,8 +74,8 @@ const (
 
 // StandardCoreFeatures are the features that are required to be conformant with
 // the Core API features that are part of the Standard release channel.
-var StandardCoreFeatures = map[SupportedFeature]bool{
-	SupportReferenceGrant: true,
+var StandardCoreFeatures = sets.Set[SupportedFeature]{
+	SupportReferenceGrant: {},
 }
 
 // AllFeatures contains all the supported features and can be used to run all
@@ -83,19 +83,19 @@ var StandardCoreFeatures = map[SupportedFeature]bool{
 //
 // Note that the AllFeatures must in sync with defined features when the
 // feature constants change.
-var AllFeatures = map[SupportedFeature]bool{
-	SupportReferenceGrant:                     true,
-	SupportTLSRoute:                           true,
-	SupportHTTPRouteQueryParamMatching:        true,
-	SupportHTTPRouteMethodMatching:            true,
-	SupportHTTPResponseHeaderModification:     true,
-	SupportRouteDestinationPortMatching:       true,
-	SupportGatewayClassObservedGenerationBump: true,
-	SupportHTTPRoutePortRedirect:              true,
-	SupportHTTPRouteSchemeRedirect:            true,
-	SupportHTTPRoutePathRedirect:              true,
-	SupportHTTPRouteHostRewrite:               true,
-	SupportHTTPRoutePathRewrite:               true,
+var AllFeatures = sets.Set[SupportedFeature]{
+	SupportReferenceGrant:                     {},
+	SupportTLSRoute:                           {},
+	SupportHTTPRouteQueryParamMatching:        {},
+	SupportHTTPRouteMethodMatching:            {},
+	SupportHTTPResponseHeaderModification:     {},
+	SupportRouteDestinationPortMatching:       {},
+	SupportGatewayClassObservedGenerationBump: {},
+	SupportHTTPRoutePortRedirect:              {},
+	SupportHTTPRouteSchemeRedirect:            {},
+	SupportHTTPRoutePathRedirect:              {},
+	SupportHTTPRouteHostRewrite:               {},
+	SupportHTTPRoutePathRewrite:               {},
 }
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
@@ -109,7 +109,7 @@ type ConformanceTestSuite struct {
 	Cleanup           bool
 	BaseManifests     string
 	Applier           kubernetes.Applier
-	SupportedFeatures map[SupportedFeature]bool
+	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
 	SkipTests         sets.Set[string]
 }
@@ -133,7 +133,7 @@ type Options struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          map[SupportedFeature]bool
+	SupportedFeatures          sets.Set[SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -155,9 +155,9 @@ func New(s Options) *ConformanceTestSuite {
 	} else if s.SupportedFeatures == nil {
 		s.SupportedFeatures = StandardCoreFeatures
 	} else {
-		for feature, val := range StandardCoreFeatures {
-			if _, ok := s.SupportedFeatures[feature]; !ok {
-				s.SupportedFeatures[feature] = val
+		for feature := range StandardCoreFeatures {
+			if !s.SupportedFeatures.Has(feature) {
+				s.SupportedFeatures.Insert(feature)
 			}
 		}
 	}
@@ -245,7 +245,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
-		if supported, ok := suite.SupportedFeatures[feature]; !ok || !supported {
+		if suite.SupportedFeatures.Has(feature) {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
