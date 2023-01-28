@@ -136,6 +136,9 @@ type Options struct {
 	SupportedFeatures          map[SupportedFeature]bool
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
+	// SkipTests contains all the tests not to be run and can be used to opt out
+	// of specific tests
+	SkipTests []string
 }
 
 // New returns a new ConformanceTestSuite.
