@@ -74,29 +74,29 @@ const (
 
 // StandardCoreFeatures are the features that are required to be conformant with
 // the Core API features that are part of the Standard release channel.
-var StandardCoreFeatures = sets.Set[SupportedFeature]{
-	SupportReferenceGrant: {},
-}
+var StandardCoreFeatures = sets.New(
+	SupportReferenceGrant,
+)
 
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
 //
 // Note that the AllFeatures must in sync with defined features when the
 // feature constants change.
-var AllFeatures = sets.Set[SupportedFeature]{
-	SupportReferenceGrant:                     {},
-	SupportTLSRoute:                           {},
-	SupportHTTPRouteQueryParamMatching:        {},
-	SupportHTTPRouteMethodMatching:            {},
-	SupportHTTPResponseHeaderModification:     {},
-	SupportRouteDestinationPortMatching:       {},
-	SupportGatewayClassObservedGenerationBump: {},
-	SupportHTTPRoutePortRedirect:              {},
-	SupportHTTPRouteSchemeRedirect:            {},
-	SupportHTTPRoutePathRedirect:              {},
-	SupportHTTPRouteHostRewrite:               {},
-	SupportHTTPRoutePathRewrite:               {},
-}
+var AllFeatures = sets.New(
+	SupportReferenceGrant,
+	SupportTLSRoute,
+	SupportHTTPRouteQueryParamMatching,
+	SupportHTTPRouteMethodMatching,
+	SupportHTTPResponseHeaderModification,
+	SupportRouteDestinationPortMatching,
+	SupportGatewayClassObservedGenerationBump,
+	SupportHTTPRoutePortRedirect,
+	SupportHTTPRouteSchemeRedirect,
+	SupportHTTPRoutePathRedirect,
+	SupportHTTPRouteHostRewrite,
+	SupportHTTPRoutePathRewrite,
+)
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
