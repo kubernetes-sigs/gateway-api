@@ -253,9 +253,9 @@ const (
 	// reconciled the route.
 	RouteReasonPending RouteConditionReason = "Pending"
 
-	// This reason is used with the "ResolvedRef" condition when one of
-	// route has not been accepted because a ParentRef references a Gateway
-	// in another namespace, but no ReferenceGrant allows such a reference.
+	// This reason is used with the "Accepted" condition when the route has not
+	// been accepted by a Gateway because it has a cross-namespace parentRef,
+	// but no ReferenceGrant in the other namespace allows such a reference.
 	RouteReasonParentRefNotPermitted RouteConditionReason = "ParentRefNotPermitted"
 
 	// This condition indicates whether the controller was able to resolve all
