@@ -49,6 +49,7 @@ For a major or minor release:
 - Run the `make build-install-yaml` command which will generate
   install files in the `release/` directory
 - Attach these files to the Github release.
+- Update the `README.md` as needed for any latest release references.
 
 For an RC release:
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
