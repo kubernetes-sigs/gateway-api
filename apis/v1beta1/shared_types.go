@@ -215,7 +215,8 @@ const (
 	// * "NoMatchingListenerHostname"
 	// * "NoMatchingParent"
 	// * "UnsupportedValue"
-	//
+	// * "ParentRefNotPermitted"
+
 	// Possible reasons for this condition to be Unknown are:
 	//
 	// * "Pending"
@@ -251,6 +252,11 @@ const (
 	// This reason is used with the "Accepted" when a controller has not yet
 	// reconciled the route.
 	RouteReasonPending RouteConditionReason = "Pending"
+	
+	//This reason is used with the "ResolvedRef" condition when one of
+	// route has not been accepted because a ParentRef references a Gateway
+	//in another namespace, but no ReferenceGrant allows such a reference.
+	RouteReasonParentRefNotPermitted RouteConditionReason = "ParentRefNotPermitted"
 
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
@@ -264,7 +270,6 @@ const (
 	// * "RefNotPermitted"
 	// * "InvalidKind"
 	// * "BackendNotFound"
-	// * "ParentRefNotPermitted"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -290,10 +295,6 @@ const (
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 
-	//This reason is used with the "ResolvedRef" condition when one of
-	// route has not been accepted because a ParentRef references a Gateway
-	//in another namespace, but no ReferenceGrant allows such a reference.
-	RouteReasonParentRefNotPermitted RouteConditionReason = "ParentRefNotPermitted"
 )
 
 // RouteParentStatus describes the status of a route with respect to an
