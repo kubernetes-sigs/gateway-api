@@ -149,7 +149,7 @@ type GRPCRouteSpec struct {
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
-// GRPCRouteRule defines the semantics for matching an gRPC request based on
+// GRPCRouteRule defines the semantics for matching a gRPC request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
 type GRPCRouteRule struct {
