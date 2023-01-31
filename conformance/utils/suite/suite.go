@@ -156,9 +156,7 @@ func New(s Options) *ConformanceTestSuite {
 		s.SupportedFeatures = StandardCoreFeatures
 	} else {
 		for feature := range StandardCoreFeatures {
-			if !s.SupportedFeatures.Has(feature) {
-				s.SupportedFeatures.Insert(feature)
-			}
+			s.SupportedFeatures.Insert(feature)
 		}
 	}
 
