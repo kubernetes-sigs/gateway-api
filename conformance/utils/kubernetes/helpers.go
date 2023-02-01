@@ -32,6 +32,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -628,24 +629,24 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 		}
 
 		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
-			t.Logf("Expected SupportedKinds to be empty, got %v", aListener.SupportedKinds)
+			t.Logf("Expected list of SupportedKinds was empty, but the actual list for comparison was not:  %v",
+				aListener.SupportedKinds)
 			return false
 		}
 		// Ensure that the expected Listener.SupportedKinds items are present in actual Listener.SupportedKinds
 		// Find the items instead of performing an exact match of the slice because the implementation
 		// might support more Kinds than defined in the test
+		eSupportedKindsSet := sets.NewString()
+		aSupportedKindsSet := sets.NewString()
 		for _, eKind := range eListener.SupportedKinds {
-			found := false
-			for _, aKind := range aListener.SupportedKinds {
-				if eKind.Kind == aKind.Kind {
-					found = true
-					break
-				}
-			}
-			if !found {
-				t.Logf("Expected %s to be present in SupportedKinds", eKind.Kind)
-				return false
-			}
+			eSupportedKindsSet.Insert(string(eKind.Kind))
+		}
+		for _, aKind := range aListener.SupportedKinds {
+			aSupportedKindsSet.Insert(string(aKind.Kind))
+		}
+		if !aSupportedKindsSet.IsSuperset(eSupportedKindsSet) {
+			t.Logf("Expected %v kinds to be present in SupportedKinds", eSupportedKindsSet.Difference(aSupportedKindsSet))
+			return false
 		}
 		if aListener.AttachedRoutes != eListener.AttachedRoutes {
 			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
