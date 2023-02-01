@@ -626,9 +626,21 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 			t.Logf("Name doesn't match")
 			return false
 		}
-		if !reflect.DeepEqual(aListener.SupportedKinds, eListener.SupportedKinds) {
-			t.Logf("Expected SupportedKinds to be %v, got %v", eListener.SupportedKinds, aListener.SupportedKinds)
-			return false
+		// Ensure that the expected Listener.SupportedKinds items are present in actual Listener.SupportedKinds
+		// Find the items instead of performing an exact match of the slice because the implementation
+		// might support more Kinds than defined in the test
+		for _, eKind := range eListener.SupportedKinds {
+			found := false
+			for _, aKind := range aListener.SupportedKinds {
+				if eKind.Kind == aKind.Kind {
+					found = true
+					break
+				}
+			}
+			if !found {
+				t.Logf("Expected %s to be present in SupportedKinds", eKind.Kind)
+				return false
+			}
 		}
 		if aListener.AttachedRoutes != eListener.AttachedRoutes {
 			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
