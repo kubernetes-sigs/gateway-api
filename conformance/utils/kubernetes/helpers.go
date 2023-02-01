@@ -636,14 +636,8 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 		// Ensure that the expected Listener.SupportedKinds items are present in actual Listener.SupportedKinds
 		// Find the items instead of performing an exact match of the slice because the implementation
 		// might support more Kinds than defined in the test
-		eSupportedKindsSet := sets.NewString()
-		aSupportedKindsSet := sets.NewString()
-		for _, eKind := range eListener.SupportedKinds {
-			eSupportedKindsSet.Insert(string(eKind.Kind))
-		}
-		for _, aKind := range aListener.SupportedKinds {
-			aSupportedKindsSet.Insert(string(aKind.Kind))
-		}
+		eSupportedKindsSet := sets.New(eListener.SupportedKinds...)
+		aSupportedKindsSet := sets.New(aListener.SupportedKinds...)
 		if !aSupportedKindsSet.IsSuperset(eSupportedKindsSet) {
 			t.Logf("Expected %v kinds to be present in SupportedKinds", eSupportedKindsSet.Difference(aSupportedKindsSet))
 			return false
