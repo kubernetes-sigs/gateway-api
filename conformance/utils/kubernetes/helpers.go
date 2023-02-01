@@ -626,6 +626,11 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 			t.Logf("Name doesn't match")
 			return false
 		}
+
+		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
+			t.Logf("Expected SupportedKinds to be empty, got %v", aListener.SupportedKinds)
+			return false
+		}
 		// Ensure that the expected Listener.SupportedKinds items are present in actual Listener.SupportedKinds
 		// Find the items instead of performing an exact match of the slice because the implementation
 		// might support more Kinds than defined in the test
