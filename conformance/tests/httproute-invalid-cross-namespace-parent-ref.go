@@ -40,7 +40,7 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-parent-ref", Namespace: "gateway-conformance-web-backend"}
 
 		// The Route must have an Accepted Condition with a ParentRefNotPermitted Reason.
-		t.Run("HTTPRoute with a cross-namespace ParentRef and no ReferenceGrants allows such a reference, has an Accepted Condition with status False and Reason ParentRefNotPermitted", func(t *testing.T) {
+		t.Run("HTTPRoute with a cross-namespace ParentRef where no ReferenceGrants allows such a reference, has an Accepted Condition with status False and Reason ParentRefNotPermitted", func(t *testing.T) {
 			acceptedCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionAccepted),
 				Status: metav1.ConditionFalse,
