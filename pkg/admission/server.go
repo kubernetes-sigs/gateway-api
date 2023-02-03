@@ -35,6 +35,8 @@ import (
 	v1b1Validation "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
+const admissionReview = "AdmissionReview"
+
 var (
 	scheme = runtime.NewScheme()
 	codecs = serializer.NewCodecFactory(scheme)
@@ -98,20 +100,6 @@ func log500(w http.ResponseWriter, err error) {
 	http.Error(w, err.Error(), http.StatusInternalServerError)
 }
 
-// ensureKindAdmissionReview check that our admission server is only getting requests
-// for kind AdmissionReview and reject all others
-func ensureKindAdmissionReview(req []byte) (bool, error) {
-	type reqBody struct {
-		Kind  string                 `json:"kind"`
-		Extra map[string]interface{} `json:"-"`
-	}
-	var msg reqBody
-	if err := json.Unmarshal(req, &msg); err != nil {
-		return false, err
-	}
-	return msg.Kind == "AdmissionReview", nil
-}
-
 // ServeHTTP parses AdmissionReview requests and responds back
 // with the validation result of the entity.
 func ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -132,21 +120,15 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	res, err := ensureKindAdmissionReview(data)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	if !res {
-		invalidKind := "submitted object is not of kind AdmissionReview"
-		http.Error(w, invalidKind, http.StatusBadRequest)
-		return
-	}
-
 	review := admission.AdmissionReview{}
 	err = json.Unmarshal(data, &review)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if review.Kind != admissionReview {
+		http.Error(w, "submitted object is not of kind AdmissionReview", http.StatusBadRequest)
 		return
 	}
 
