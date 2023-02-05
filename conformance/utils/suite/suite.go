@@ -243,7 +243,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
-		if suite.SupportedFeatures.Has(feature) {
+		if !suite.SupportedFeatures.Has(feature) {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
