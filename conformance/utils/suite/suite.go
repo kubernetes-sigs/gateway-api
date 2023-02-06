@@ -74,9 +74,29 @@ const (
 
 // StandardCoreFeatures are the features that are required to be conformant with
 // the Core API features that are part of the Standard release channel.
-var StandardCoreFeatures = map[SupportedFeature]bool{
-	SupportReferenceGrant: true,
-}
+var StandardCoreFeatures = sets.New(
+	SupportReferenceGrant,
+)
+
+// AllFeatures contains all the supported features and can be used to run all
+// conformance tests with `all-features` flag.
+//
+// Note that the AllFeatures must in sync with defined features when the
+// feature constants change.
+var AllFeatures = sets.New(
+	SupportReferenceGrant,
+	SupportTLSRoute,
+	SupportHTTPRouteQueryParamMatching,
+	SupportHTTPRouteMethodMatching,
+	SupportHTTPResponseHeaderModification,
+	SupportRouteDestinationPortMatching,
+	SupportGatewayClassObservedGenerationBump,
+	SupportHTTPRoutePortRedirect,
+	SupportHTTPRouteSchemeRedirect,
+	SupportHTTPRoutePathRedirect,
+	SupportHTTPRouteHostRewrite,
+	SupportHTTPRoutePathRewrite,
+)
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
@@ -89,7 +109,7 @@ type ConformanceTestSuite struct {
 	Cleanup           bool
 	BaseManifests     string
 	Applier           kubernetes.Applier
-	SupportedFeatures map[SupportedFeature]bool
+	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
 	SkipTests         sets.Set[string]
 }
@@ -112,9 +132,10 @@ type Options struct {
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources bool
-	SupportedFeatures    map[SupportedFeature]bool
-	TimeoutConfig        config.TimeoutConfig
+	CleanupBaseResources       bool
+	SupportedFeatures          sets.Set[SupportedFeature]
+	EnableAllSupportedFeatures bool
+	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
@@ -129,13 +150,13 @@ func New(s Options) *ConformanceTestSuite {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
-	if s.SupportedFeatures == nil {
+	if s.EnableAllSupportedFeatures == true {
+		s.SupportedFeatures = AllFeatures
+	} else if s.SupportedFeatures == nil {
 		s.SupportedFeatures = StandardCoreFeatures
 	} else {
-		for feature, val := range StandardCoreFeatures {
-			if _, ok := s.SupportedFeatures[feature]; !ok {
-				s.SupportedFeatures[feature] = val
-			}
+		for feature := range StandardCoreFeatures {
+			s.SupportedFeatures.Insert(feature)
 		}
 	}
 
@@ -222,7 +243,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	// Check that all features exercised by the test have been opted into by
 	// the suite.
 	for _, feature := range test.Features {
-		if supported, ok := suite.SupportedFeatures[feature]; !ok || !supported {
+		if !suite.SupportedFeatures.Has(feature) {
 			t.Skipf("Skipping %s: suite does not support %s", test.ShortName, feature)
 		}
 	}
