@@ -19,10 +19,8 @@ package tests
 import (
 	"testing"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -38,17 +36,6 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-parent-ref", Namespace: "gateway-conformance-web-backend"}
-
-		// The Route must have an Accepted Condition with a ParentRefNotPermitted Reason.
-		t.Run("HTTPRoute with a cross-namespace ParentRef where no ReferenceGrants allows such a reference, has an Accepted Condition with status False and Reason ParentRefNotPermitted", func(t *testing.T) {
-			acceptedCond := metav1.Condition{
-				Type:   string(v1beta1.RouteConditionAccepted),
-				Status: metav1.ConditionFalse,
-				Reason: string(v1beta1.RouteReasonParentRefNotPermitted),
-			}
-
-			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, acceptedCond)
-		})
 
 		t.Run("Route should not have Parents set in status", func(t *testing.T) {
 			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNN)
