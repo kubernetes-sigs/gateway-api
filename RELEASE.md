@@ -37,6 +37,23 @@ release.
 
 The following steps must be done by one of the [Gateway API maintainers][gateway-api-team]:
 
+For a patch release:
+- Create a new branch in your fork named something like `<githubuser>/release-x.x.x`. Use the new branch
+  in the upcoming steps.
+- Use `git` to cherry-pick all relevant PRs into your branch.
+- Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
+- Run the following command `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
+  and webhook with the correct version info. Note that the YAMLs will not work until the tag is actually
+  published in the next step.
+- Create a pull request of the `<githubuser>/release-x.x.x` branch into the `release-x.x` branch upstream
+  (which should already exist since this is a patch release).
+- Verify the CI tests pass and once the above merges publish a new Git tag. This can be done using the
+  `git` CLI or Github's [release][release] page.
+- Run the `make build-install-yaml` command which will generate
+  install files in the `release/` directory.
+- Attach these files to the Github release.
+- Update the `README.md` as needed for any latest release references.
+
 For a major or minor release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
 - Check out the `release-major.minor` release branch locally.
@@ -44,10 +61,10 @@ For a major or minor release:
 - Run the following command `BASE_REF=vmajor.minor.patch make generate` which will update generated docs
   and webhook with the correct version info. Note that the YAMLs will not work until the tag is actually
   published in the next step.
-- Publish a new Git tag. This can  be done using the `git` CLI or Github's [release][release]
-  page.
+- Verify the CI tests pass and once the above merges publish a new Git tag. This can be done using the
+  `git` CLI or Github's [release][release] page.
 - Run the `make build-install-yaml` command which will generate
-  install files in the `release/` directory
+  install files in the `release/` directory.
 - Attach these files to the Github release.
 - Update the `README.md` as needed for any latest release references.
 
@@ -62,7 +79,7 @@ For an RC release:
   This can  be done using the `git` CLI or Github's [release][release]
   page.
 - Run the `make build-install-yaml` command which will generate
-  install files in the `release/` directory
+  install files in the `release/` directory.
 - Attach these files to the Github release.
 
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
