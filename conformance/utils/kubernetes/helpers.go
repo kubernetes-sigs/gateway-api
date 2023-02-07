@@ -637,7 +637,16 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 		// might support more Kinds than defined in the test
 		for _, eKind := range eListener.SupportedKinds {
 			found := false
+
 			for _, aKind := range aListener.SupportedKinds {
+				if eKind.Group == nil {
+					eKind.Group = (*v1beta1.Group)(&v1beta1.GroupVersion.Group)
+				}
+
+				if aKind.Group == nil {
+					aKind.Group = (*v1beta1.Group)(&v1beta1.GroupVersion.Group)
+				}
+
 				if *eKind.Group == *aKind.Group && eKind.Kind == aKind.Kind {
 					found = true
 					break
