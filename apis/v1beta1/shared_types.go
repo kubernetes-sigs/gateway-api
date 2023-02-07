@@ -215,7 +215,6 @@ const (
 	// * "NoMatchingListenerHostname"
 	// * "NoMatchingParent"
 	// * "UnsupportedValue"
-	// * "ParentRefNotPermitted"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -248,11 +247,6 @@ const (
 	// This reason is used with the "Accepted" condition when a value for an Enum
 	// is not recognized.
 	RouteReasonUnsupportedValue RouteConditionReason = "UnsupportedValue"
-
-	// This reason is used with the "Accepted" condition when the route has not
-	// been accepted by a Gateway because it has a cross-namespace parentRef,
-	// but no ReferenceGrant in the other namespace allows such a reference.
-	RouteReasonParentRefNotPermitted RouteConditionReason = "ParentRefNotPermitted"
 
 	// This reason is used with the "Accepted" when a controller has not yet
 	// reconciled the route.
