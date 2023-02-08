@@ -41,6 +41,7 @@ func init() {
 var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 	ShortName:   "TLSRouteSimpleSameNamespace",
 	Description: "A single TLSRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
+	Features:    []suite.SupportedFeature{suite.SupportTLSRoute},
 	Manifests:   []string{"tests/tlsroute-simple-same-namespace.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := v1beta1.Namespace("gateway-conformance-infra")
