@@ -40,7 +40,7 @@ func TestPrepareResources(t *testing.T) {
 		applier *Applier
 	}{{
 		name:    "empty namespace labels",
-		applier: NewApplier(nil, nil),
+		applier: &Applier{},
 		givens: []given{{
 			resources: `
 apiVersion: v1
@@ -60,12 +60,11 @@ metadata:
 		}},
 	}, {
 		name: "simple namespace labels",
-		applier: NewApplier(
-			map[string]string{
+		applier: &Applier{
+			NamespaceLabels: map[string]string{
 				"test": "false",
 			},
-			nil,
-		),
+		},
 		givens: []given{{
 			resources: `
 apiVersion: v1
@@ -88,12 +87,11 @@ metadata:
 		}},
 	}, {
 		name: "overwrite namespace labels",
-		applier: NewApplier(
-			map[string]string{
+		applier: &Applier{
+			NamespaceLabels: map[string]string{
 				"test": "true",
 			},
-			nil,
-		),
+		},
 		givens: []given{{
 			resources: `
 apiVersion: v1
@@ -118,7 +116,7 @@ metadata:
 		}},
 	}, {
 		name:    "no listener ports given",
-		applier: NewApplier(nil, nil),
+		applier: &Applier{},
 		givens: []given{{
 			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -162,10 +160,9 @@ spec:
 		}},
 	}, {
 		name: "multiple gateways each with multiple listeners",
-		applier: NewApplier(
-			nil,
-			[]v1beta1.PortNumber{8000, 8001, 8002, 8003},
-		),
+		applier: &Applier{
+			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001, 8002, 8003},
+		},
 		givens: []given{{
 			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -277,8 +274,10 @@ spec:
 			}},
 		}},
 	}, {
-		name:    "gateway with multiple listeners on the same port",
-		applier: NewApplier(nil, []v1beta1.PortNumber{8000}),
+		name: "gateway with multiple listeners on the same port",
+		applier: &Applier{
+			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000},
+		},
 		givens: []given{{
 			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -342,9 +341,9 @@ spec:
 		}},
 	}, {
 		name: "multiple calls to apply with gateways",
-		applier: NewApplier(
-			nil, []v1beta1.PortNumber{8000, 8001},
-		),
+		applier: &Applier{
+			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001},
+		},
 		givens: []given{{
 			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -428,9 +427,9 @@ spec:
 		}},
 	}, {
 		name: "multiple calls to apply with gateways, free ports",
-		applier: NewApplier(
-			nil, []v1beta1.PortNumber{8000, 8001},
-		),
+		applier: &Applier{
+			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001},
+		},
 		givens: []given{{
 			resources: `
 apiVersion: gateway.networking.k8s.io/v1beta1

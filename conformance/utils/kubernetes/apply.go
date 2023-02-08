@@ -42,13 +42,18 @@ import (
 // Applier prepares manifests depending on the available options and applies
 // them to the Kubernetes cluster.
 type Applier struct {
+	// Labels to apply to namespaces created by the Applier
+	NamespaceLabels map[string]string
+
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
-	// manifests to a valid, unique port. There must be as many
-	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
-	// For example, given two Gateways, each with 2 listeners, there should be
-	// four ValidUniqueListenerPorts.
+	// manifests to a valid, unique port.
+	// There must be as many validPorts as the maximum number of ports
+	// used by listeners simultaneously.
+	// For example, given one Gateway with 2 listeners on the same port and one
+	// Gateway with 2 listeners on different ports, there should be at least three
+	// validPorts.
 	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts []v1beta1.PortNumber
+	ValidUniqueListenerPorts PortSet
 
 	// GatewayClass will be used as the spec.gatewayClassName when applying Gateway resources
 	GatewayClass string
@@ -59,30 +64,10 @@ type Applier struct {
 	// FS is the filesystem to use when reading manifests.
 	FS embed.FS
 
-	namespaceLabels map[string]string
-	// availablePorts holds ports that can still be assigned
-	availablePorts PortSet
-	// assignedPorts tracks ports used for Gateway objects
 	assignedPorts map[types.NamespacedName]PortSet
 	// portsLock is used for the critical section around freeing and assigning
 	// ports to Gateway listeners.
 	portsLock sync.Mutex
-}
-
-// NewApplier creates a new Applier object.
-// validPorts should contain a list of valid ports for Gateway listeners.
-// There must be as many validPorts as the maximum number of ports
-// used simultaneously.
-// For example, given one Gateway with 2 listeners on the same port and one
-// Gateway with 2 listeners on different ports, there should be at least three
-// validPorts.
-// If empty or nil, Gateway listener ports are not modified.
-func NewApplier(namespaceLabels map[string]string, validPorts []v1beta1.PortNumber) *Applier {
-	return &Applier{
-		namespaceLabels: namespaceLabels,
-		availablePorts:  validPorts,
-		assignedPorts:   map[types.NamespacedName]PortSet{},
-	}
 }
 
 // markPortsAvailable is used to mark ports used by a Gateway as available. It does
@@ -94,7 +79,7 @@ func (a *Applier) markPortsAvailable(name types.NamespacedName) {
 		return
 	}
 	for _, port := range ports {
-		a.availablePorts = append(a.availablePorts, port)
+		a.ValidUniqueListenerPorts = append(a.ValidUniqueListenerPorts, port)
 	}
 	delete(a.assignedPorts, name)
 }
@@ -120,7 +105,7 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 
 	var allocatedPorts []v1beta1.PortNumber
 
-	if len(a.availablePorts) > 0 {
+	if len(a.ValidUniqueListenerPorts) > 0 {
 		uListeners, _, err := unstructured.NestedSlice(uObj.Object, "spec", "listeners")
 		require.NoErrorf(t, err, "error getting `spec.listeners` on %s Gateway resource", uObj.GetName())
 
@@ -141,7 +126,7 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 			newPort, ok := allocatedForListenerPort[port]
 			if !ok {
 				var portIsValid bool
-				newPort, portIsValid = a.availablePorts.PopPort()
+				newPort, portIsValid = a.ValidUniqueListenerPorts.PopPort()
 				require.True(t, portIsValid, "not enough unassigned valid ports for Gateway resource")
 
 				allocatedForListenerPort[port] = newPort
@@ -159,6 +144,9 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 	}
 
 	// Remember the ports we've allocated for this Gateway resource.
+	if a.assignedPorts == nil {
+		a.assignedPorts = map[types.NamespacedName]PortSet{}
+	}
 	a.assignedPorts[name] = allocatedPorts
 }
 
@@ -212,7 +200,7 @@ func (a *Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder
 		}
 
 		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
-			prepareNamespace(t, &uObj, a.namespaceLabels)
+			prepareNamespace(t, &uObj, a.NamespaceLabels)
 		}
 
 		resources = append(resources, uObj)
