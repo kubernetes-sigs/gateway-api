@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"k8s.io/utils/pointer"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -68,6 +69,30 @@ func Test_listenersMatch(t *testing.T) {
 					SupportedKinds: []v1beta1.RouteGroupKind{
 						{
 							Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+							Kind:  v1beta1.Kind("HTTPRoute"),
+						},
+					},
+				},
+			},
+			want: true,
+		},
+		{
+			name: "SupportedKinds: expected and actual are equal values, Group pointers are different",
+			expected: []v1beta1.ListenerStatus{
+				{
+					SupportedKinds: []v1beta1.RouteGroupKind{
+						{
+							Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+							Kind:  v1beta1.Kind("HTTPRoute"),
+						},
+					},
+				},
+			},
+			actual: []v1beta1.ListenerStatus{
+				{
+					SupportedKinds: []v1beta1.RouteGroupKind{
+						{
+							Group: (*v1beta1.Group)(pointer.String("gateway.networking.k8s.io")),
 							Kind:  v1beta1.Kind("HTTPRoute"),
 						},
 					},
