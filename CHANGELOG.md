@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.6.1](#v061)
 - [v0.6.0](#v060)
 - [v0.6.0-rc2](#v060-rc2)
 - [v0.6.0-rc1](#v060-rc1)
@@ -20,6 +21,59 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.6.1
+
+This is a patch release that predominantly includes updated conformance tests
+for implementations to implement.
+
+For all major changes since the `v0.5.x` release series, please see the
+[v0.6.0](/#v060) release notes.
+
+## Bug Fixes
+
+- Our regex for validating path characters was updated to accurately identify
+  "p-chars" as per RFC-3986.
+  (#1644, @jackstine)
+- An erroneous "namespace" field was present in our webhook ClusterRoleBindings
+  and has been removed.
+  (#1684, @tao12345666333)
+
+## New Features
+
+- Conditions for Policies have been added to the Golang library, enabling
+  Go-based implementations to re-use those for their downstream Policies.
+  (#1682, @mmamczur)
+
+## Conformance Test Updates
+
+- Added conformance tests for checking Port, Scheme and Path to the extended and
+  experimental features.
+  (#1611, @LiorLieberman)
+- Added conformance tests for HTTP rewrite
+  (#1622, #1628, @LiorLieberman)
+- Added more conformance tests for path matching to catch known edge cases.
+  (#1627, @sunjayBhatia)
+- Added some initial conformance tests for TLSRoute passthrough.
+  (#1579, @candita)
+- Added conformance tests that exercise NotAllowedByListeners reason.
+  (#1669, @mlavacca)
+- Loosen the Accepted check in GatewayClass observed generation tests to
+  provide a more realistic test for implementations.
+  (#1655, @arkodg)
+- A "SkipTests" field has been added to accomodate implementations in
+  running subsets of the tests as needed, this can be particularly helpful
+  for new implementations that want to add conformance iteratively.
+  (#1578, @mlavacca)
+- Fixed a broken test for GRPCRoute that caused an erronous failure.
+  (#1692, @arkodg)
+- Added "all-features" flag to conformance test to enable all supported
+  features on test runs.
+  (#1642, @gyohuangxin)
+- Fixed usage of `net/http` default client in conformance test suite
+  (#1617, @howardjohn)
+- Fixed missing reference to NoMatchingParent in godoc
+  (#1671, @mlavacca)
 
 # v0.6.0
 
