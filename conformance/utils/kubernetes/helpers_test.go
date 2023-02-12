@@ -34,6 +34,38 @@ func Test_listenersMatch(t *testing.T) {
 		want     bool
 	}{
 		{
+			name: "listeners do not match if a different number of actual and expected listeners are provided",
+			expected: []v1beta1.ListenerStatus{
+				{
+					SupportedKinds: []v1beta1.RouteGroupKind{
+						{
+							Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+							Kind:  v1beta1.Kind("HTTPRoute"),
+						},
+					},
+				},
+				{
+					SupportedKinds: []v1beta1.RouteGroupKind{
+						{
+							Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+							Kind:  v1beta1.Kind("GRPCRoute"),
+						},
+					},
+				},
+			},
+			actual: []v1beta1.ListenerStatus{
+				{
+					SupportedKinds: []v1beta1.RouteGroupKind{
+						{
+							Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+							Kind:  v1beta1.Kind("HTTPRoute"),
+						},
+					},
+				},
+			},
+			want: false,
+		},
+		{
 			name: "SupportedKinds: expected empty and actual is non empty",
 			expected: []v1beta1.ListenerStatus{
 				{
