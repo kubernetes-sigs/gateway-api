@@ -47,7 +47,7 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 				Status: metav1.ConditionFalse,
 				Reason: string(v1beta1.ListenerReasonInvalidCertificateRef),
 			}},
-			AttachedRoutes: 1,
+			AttachedRoutes: 0,
 		}}
 
 		testCases := []struct {
