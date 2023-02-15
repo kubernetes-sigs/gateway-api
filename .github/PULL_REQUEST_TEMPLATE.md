@@ -23,15 +23,15 @@ Add one of the following kinds:
 /kind cleanup
 /kind documentation
 /kind feature
-/kind design
 /kind gep
+/kind test
 
 Optionally add one or more of the following kinds if applicable:
-/kind api-change
 /kind deprecation
 /kind failing-test
 /kind flake
 /kind regression
+/area conformance
 -->
 
 **What this PR does / why we need it**:
