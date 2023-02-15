@@ -174,10 +174,10 @@ func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []m
 	return stale
 }
 
-// NamespacesMustBeAccepted waits until all Pods are marked ready and all Gateways
-// are marked accepted in the provided namespaces. This will cause the test to
-// halt if the specified timeout is exceeded.
-func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
+// NamespacesMustBeReady waits until all Pods are marked Ready and all Gateways
+// are marked Accepted and Programmed in the specified namespace(s). This will
+// cause the test to halt if the specified timeout is exceeded.
+func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
 	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.NamespacesMustBeReady, func() (bool, error) {
@@ -200,7 +200,13 @@ func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig confi
 
 				// Passing an empty string as the Reason means that any Reason will do.
 				if !findConditionInList(t, gw.Status.Conditions, string(v1beta1.GatewayConditionAccepted), "True", "") {
-					t.Logf("%s/%s Gateway not ready yet", ns, gw.Name)
+					t.Logf("%s/%s Gateway not Accepted yet", ns, gw.Name)
+					return false, nil
+				}
+
+				// Passing an empty string as the Reason means that any Reason will do.
+				if !findConditionInList(t, gw.Status.Conditions, string(v1beta1.GatewayConditionProgrammed), "True", "") {
+					t.Logf("%s/%s Gateway not Programmed yet", ns, gw.Name)
 					return false, nil
 				}
 			}

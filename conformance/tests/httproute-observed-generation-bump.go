@@ -54,7 +54,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 			defer cancel()
 
 			namespaces := []string{"gateway-conformance-infra"}
-			kubernetes.NamespacesMustBeAccepted(t, s.Client, s.TimeoutConfig, namespaces)
+			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			original := &v1beta1.HTTPRoute{}
 			err := s.Client.Get(ctx, routeNN, original)
