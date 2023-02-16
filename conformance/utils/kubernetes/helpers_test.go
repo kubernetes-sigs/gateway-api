@@ -80,6 +80,60 @@ func TestNewGatewayRef(t *testing.T) {
 	}
 }
 
+func TestVerifyConditionsMatchGeneration(t *testing.T) {
+	tests := []struct {
+		name       string
+		obj        metav1.Object
+		conditions []metav1.Condition
+		expected   error
+	}{
+		{},
+		{
+			name: "if no conditions are provided this technically passes verification",
+		},
+		{
+			name: "conditions where all match the generation pass verification",
+			obj:  &v1beta1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			conditions: []metav1.Condition{
+				{Type: "FakeCondition1", ObservedGeneration: 20},
+				{Type: "FakeCondition2", ObservedGeneration: 20},
+				{Type: "FakeCondition3", ObservedGeneration: 20},
+			},
+		},
+		{
+			name: "conditions where one does not match the generation fail verification",
+			obj:  &v1beta1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			conditions: []metav1.Condition{
+				{Type: "FakeCondition1", ObservedGeneration: 20},
+				{Type: "FakeCondition2", ObservedGeneration: 19},
+				{Type: "FakeCondition3", ObservedGeneration: 20},
+			},
+			expected: fmt.Errorf("expected observedGeneration to be updated for all conditions, only 2/3 were updated. stale conditions are: FakeCondition2"),
+		},
+		{
+			name: "conditions where most do not match the generation fail verification",
+			obj:  &v1beta1.Gateway{ObjectMeta: metav1.ObjectMeta{Name: "fake-gateway", Generation: 20}},
+			conditions: []metav1.Condition{
+				{Type: "FakeCondition1", ObservedGeneration: 18},
+				{Type: "FakeCondition2", ObservedGeneration: 18},
+				{Type: "FakeCondition3", ObservedGeneration: 14},
+				{Type: "FakeCondition4", ObservedGeneration: 20},
+				{Type: "FakeCondition5", ObservedGeneration: 16},
+				{Type: "FakeCondition6", ObservedGeneration: 15},
+			},
+			expected: fmt.Errorf("expected observedGeneration to be updated for all conditions, only 1/6 were updated. stale conditions are: FakeCondition1, FakeCondition2, FakeCondition3, FakeCondition5, FakeCondition6"),
+		},
+	}
+
+	for i := 0; i < len(tests); i++ {
+		test := tests[i]
+		t.Run(test.name, func(t *testing.T) {
+			err := ConditionsHaveLatestObservedGeneration(test.obj, test.conditions)
+			assert.Equal(t, test.expected, err)
+		})
+	}
+}
+
 // -----------------------------------------------------------------------------
 // Test - Private Functions
 // -----------------------------------------------------------------------------
