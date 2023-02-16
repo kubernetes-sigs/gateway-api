@@ -28,6 +28,10 @@ type FakeGatewayV1alpha2 struct {
 	*testing.Fake
 }
 
+func (c *FakeGatewayV1alpha2) CustomGRPCRoutes(namespace string) v1alpha2.CustomGRPCRouteInterface {
+	return &FakeCustomGRPCRoutes{c, namespace}
+}
+
 func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
 	return &FakeGRPCRoutes{c, namespace}
 }
