@@ -67,7 +67,7 @@ func TestConformance(t *testing.T) {
 }
 
 // parseSupportedFeatures parses flag arguments and converts the string to
-// map[suite.SupportedFeature]bool
+// sets.Set[suite.SupportedFeature]
 func parseSupportedFeatures(f string) sets.Set[suite.SupportedFeature] {
 	res := sets.Set[suite.SupportedFeature]{}
 	for _, value := range strings.Split(f, ",") {
