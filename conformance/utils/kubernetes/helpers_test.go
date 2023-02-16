@@ -17,14 +17,72 @@ limitations under the License.
 package kubernetes
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/utils/pointer"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
+
+// -----------------------------------------------------------------------------
+// Test - Public Functions
+// -----------------------------------------------------------------------------
+
+func TestNewGatewayRef(t *testing.T) {
+	tests := []struct {
+		name          string
+		nsn           types.NamespacedName
+		listenerNames []string
+	}{
+		{
+			name: "verifying the contents of a GatewayRef with no provided listeners",
+			nsn:  types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: "fake-gateway"},
+		},
+		{
+			name:          "verifying the contents of a GatewayRef listeners with one listener provided",
+			nsn:           types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: "fake-gateway"},
+			listenerNames: []string{"fake-listener-1"},
+		},
+		{
+			name: "verifying the contents of a GatewayRef listeners with multiple listeners provided",
+			nsn:  types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: "fake-gateway"},
+			listenerNames: []string{
+				"fake-listener-1",
+				"fake-listener-2",
+				"fake-listener-3",
+			},
+		},
+	}
+
+	for i := 0; i < len(tests); i++ {
+		test := tests[i]
+		t.Run(test.name, func(t *testing.T) {
+			ref := NewGatewayRef(test.nsn, test.listenerNames...)
+			require.IsType(t, GatewayRef{}, ref)
+			if test.listenerNames == nil {
+				require.Len(t, ref.listenerNames, 1)
+				assert.Equal(t, "", string(*ref.listenerNames[0]))
+			} else {
+				require.Len(t, ref.listenerNames, len(test.listenerNames))
+				for i := 0; i < len(ref.listenerNames); i++ {
+					assert.Equal(t, test.listenerNames[i], string(*ref.listenerNames[i]))
+				}
+			}
+			assert.Equal(t, test.nsn, ref.NamespacedName)
+		})
+	}
+}
+
+// -----------------------------------------------------------------------------
+// Test - Private Functions
+// -----------------------------------------------------------------------------
 
 func Test_listenersMatch(t *testing.T) {
 	tests := []struct {
