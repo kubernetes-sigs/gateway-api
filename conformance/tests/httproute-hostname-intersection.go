@@ -42,7 +42,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
-		kubernetes.NamespacesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, []string{ns})
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
 		t.Run("HTTPRoutes that do intersect with listener hostnames", func(t *testing.T) {
 			routes := []types.NamespacedName{

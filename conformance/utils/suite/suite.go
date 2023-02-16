@@ -210,7 +210,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		"gateway-conformance-app-backend",
 		"gateway-conformance-web-backend",
 	}
-	kubernetes.NamespacesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, namespaces)
+	kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 }
 
 // Run runs the provided set of conformance tests.

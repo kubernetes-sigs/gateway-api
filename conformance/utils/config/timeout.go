@@ -63,7 +63,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: 30 seconds
 	MaxTimeToConsistency time.Duration
 
-	// NamespacesMustBeReady represents the maximum time for all Pods and Gateways in a namespaces to be marked as ready.
+	// NamespacesMustBeReady represents the maximum time for the following to happen within
+	// specified namespace(s):
+	// * All Pods to be marked as "Ready"
+	// * All Gateways to be marked as "Accepted" and "Programmed"
 	// Max value for conformant implementation: None
 	NamespacesMustBeReady time.Duration
 

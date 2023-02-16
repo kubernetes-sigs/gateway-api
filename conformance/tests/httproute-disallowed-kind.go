@@ -39,7 +39,7 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
-		kubernetes.NamespacesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, []string{"gateway-conformance-infra"})
+		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{"gateway-conformance-infra"})
 
 		routeNN := types.NamespacedName{Name: "disallowed-kind", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "tlsroutes-only", Namespace: "gateway-conformance-infra"}
