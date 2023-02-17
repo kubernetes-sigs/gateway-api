@@ -901,7 +901,8 @@ type HTTPRequestRedirectFilter struct {
 
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
-	// When empty, port (if specified) of the request is used.
+	// When empty, port (if specified) in the `Host` header
+	// of the request is used.
 	//
 	// Support: Extended
 	//
