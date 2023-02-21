@@ -2,7 +2,7 @@
 
 This document provides an overview of Gateway API.
 
-## Roles and personas.
+## Roles and personas
 
 There are 3 primary roles in Gateway API:
 
@@ -86,6 +86,7 @@ that are implementation-specific are encouraged for other protocols. New route
 types may be added to the API in future.
 
 #### HTTPRoute
+
 HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
 for use in cases where you want to inspect the HTTP stream and use HTTP request data
 for either routing or modification, for example using HTTP Headers for routing, or
@@ -118,7 +119,7 @@ use to choose different backends on the same port, so each TCPRoute really needs
 different port on the listener (in general, anyway). You can terminate TLS in
 which case the unencrypted byte stream is passed through to the backend.
 You can choose to not terminate TLS, in which case the encrypted byte stream
-is passed through to the backend. 
+is passed through to the backend.
 
 #### GRPCRoute
 
@@ -133,6 +134,7 @@ GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
 so gRPC traffic is guaranteed to flow properly.
 
 #### Route summary table
+
 The "Routing Discriminator" column below refers to what information can be used
 to allow multiple Routes to share ports on the Listener.
 
@@ -282,16 +284,16 @@ relationships between the different resources:
 A typical client/gateway API request flow for a gateway implemented using a
 reverse proxy is:
 
- 1. A client makes a request to http://foo.example.com.
+ 1. A client makes a request to <http://foo.example.com>.
  2. DNS resolves the name to a `Gateway` address.
  3. The reverse proxy receives the request on a `Listener` and uses the [Host
  header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
  `HTTPRoute`.
- 5. Optionally, the reverse proxy can perform request header and/or path
+ 4. Optionally, the reverse proxy can perform request header and/or path
  matching based on `match` rules of the `HTTPRoute`.
- 6. Optionally, the reverse proxy can modify the request, i.e. add/remove
+ 5. Optionally, the reverse proxy can modify the request, i.e. add/remove
  headers, based on `filter` rules of the `HTTPRoute`.
- 7. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
+ 6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
  `Service`, in the cluster based on `forwardTo` rules of the `HTTPRoute`.
 
 ## TLS Configuration
@@ -299,7 +301,6 @@ reverse proxy is:
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
 Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
-
 
 ## Extension points
 
@@ -324,4 +325,3 @@ Whenever you are using an extension point without any prior art, please let
 the community know. As we learn more about usage of extension points, we would
 like to find the common denominators and promote the features to core/extended
 API conformance.
-
