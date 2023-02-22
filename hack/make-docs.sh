@@ -30,6 +30,9 @@ run::sed() {
 esac
 }
 
+# Move GEPs to site-src
+cp -r geps site-src/geps
+
 # Ensure site dir exists
 mkdir -p site
 # Generate docs with mkdocs
