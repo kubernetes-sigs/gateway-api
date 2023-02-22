@@ -326,7 +326,6 @@ type GRPCMethodMatch struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
 	Service *string `json:"service,omitempty"`
 
 	// Value of the method to match against. If left empty or omitted, will
@@ -339,7 +338,6 @@ type GRPCMethodMatch struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[A-Za-z_][A-Za-z_0-9]*$`
 	Method *string `json:"method,omitempty"`
 }
 
