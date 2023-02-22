@@ -205,7 +205,6 @@ type GRPCRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{method: {type: "Exact"}}}
 	Matches []GRPCRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
@@ -286,7 +285,6 @@ type GRPCRouteMatch struct {
 	// not specified, all services and methods will match.
 	//
 	// +optional
-	// +kubebuilder:default={type: "Exact"}
 	Method *GRPCMethodMatch `json:"method,omitempty"`
 
 	// Headers specifies gRPC request header matchers. Multiple match values are
