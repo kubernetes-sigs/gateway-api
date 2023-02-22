@@ -321,9 +321,6 @@ type GRPCMethodMatch struct {
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	//
-	// A GRPC Service must be a valid Protobuf Type Name
-	// (https://protobuf.com/docs/language-spec#type-references).
-	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
 	Service *string `json:"service,omitempty"`
@@ -332,9 +329,6 @@ type GRPCMethodMatch struct {
 	// match all services.
 	//
 	// At least one of Service and Method MUST be a non-empty string.
-	//
-	// A GRPC Method must be a valid Protobuf Method
-	// (https://protobuf.com/docs/language-spec#methods).
 	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
