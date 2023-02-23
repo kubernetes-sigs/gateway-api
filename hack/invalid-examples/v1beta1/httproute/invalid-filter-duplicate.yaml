@@ -8,11 +8,11 @@ spec:
     - type: RequestHeaderModifier
       requestHeaderModifier:
         add:
-          - name: my-header
-            value: foo
+        - name: my-header
+          value: foo
     - type: RequestHeaderModifier
       requestHeaderModifier:
         add:
-          - name: my-header
-            value: bar
+        - name: my-header
+          value: bar
 

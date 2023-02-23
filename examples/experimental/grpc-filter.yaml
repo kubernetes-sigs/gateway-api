@@ -9,12 +9,12 @@ spec:
     - my.filter.com
   rules:
     - filters:
-      - type: RequestHeaderModifier
-        requestHeaderModifier:
-          add:
-            - name: my-header
-              value: foo
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            add:
+              - name: my-header
+                value: foo
       backendRefs:
-      - name: my-filter-svc1
-        weight: 1
-        port: 50051
+        - name: my-filter-svc1
+          weight: 1
+          port: 50051

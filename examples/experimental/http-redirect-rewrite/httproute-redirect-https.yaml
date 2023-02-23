@@ -9,11 +9,11 @@ spec:
     - redirect.example
   rules:
     - filters:
-      - type: RequestRedirect
-        requestRedirect:
-          scheme: https
-          statusCode: 301
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301
       backendRefs:
-      - name: example-svc
-        weight: 1
-        port: 80
+        - name: example-svc
+          weight: 1
+          port: 80

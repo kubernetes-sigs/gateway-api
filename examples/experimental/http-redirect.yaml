@@ -8,11 +8,11 @@ spec:
   - name: my-filter-gateway
     sectionName: http
   hostnames:
-    - my-filter.example.com
+  - my-filter.example.com
   rules:
-    - filters:
-      - type: RequestRedirect
-        requestRedirect:
-          path:
-            type: ReplaceFullPath
-            replaceFullPath: /foo
+  - filters:
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /foo
