@@ -29,8 +29,9 @@ import (
 func TestValidateGRPCRoute(t *testing.T) {
 	t.Parallel()
 
-	service := "foo"
-	method := "login"
+	service := "foo.Test.Example"
+	method := "Login"
+	regex := ".*"
 
 	tests := []struct {
 		name  string
@@ -86,6 +87,115 @@ func TestValidateGRPCRoute(t *testing.T) {
 					Detail: "one or both of `service` or `method` must be specified",
 				},
 			},
+		},
+		{
+			name: "GRPCRoute use regex in service and method with undefined match type",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Matches: []gatewayv1a2.GRPCRouteMatch{
+						{
+							Method: &gatewayv1a2.GRPCMethodMatch{
+								Service: &regex,
+								Method:  &regex,
+							},
+						},
+					},
+				},
+			},
+			errs: field.ErrorList{
+				{
+					Type:     field.ErrorTypeInvalid,
+					BadValue: regex,
+					Field:    "spec.rules[0].matches[0].method",
+					Detail:   `must only contain valid characters (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)`,
+				},
+				{
+					Type:     field.ErrorTypeInvalid,
+					BadValue: regex,
+					Field:    "spec.rules[0].matches[0].method",
+					Detail:   `must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)`,
+				},
+			},
+		},
+		{
+			name: "GRPCRoute use regex in service and method with match type Exact",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Matches: []gatewayv1a2.GRPCRouteMatch{
+						{
+							Method: &gatewayv1a2.GRPCMethodMatch{
+								Service: &regex,
+								Method:  &regex,
+								Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+							},
+						},
+					},
+				},
+			},
+			errs: field.ErrorList{
+				{
+					Type:     field.ErrorTypeInvalid,
+					BadValue: regex,
+					Field:    "spec.rules[0].matches[0].method",
+					Detail:   `must only contain valid characters (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)`,
+				},
+				{
+					Type:     field.ErrorTypeInvalid,
+					BadValue: regex,
+					Field:    "spec.rules[0].matches[0].method",
+					Detail:   `must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)`,
+				},
+			},
+		},
+		{
+			name: "GRPCRoute use regex in service and method with match type RegularExpression",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Matches: []gatewayv1a2.GRPCRouteMatch{
+						{
+							Method: &gatewayv1a2.GRPCMethodMatch{
+								Service: &regex,
+								Method:  &regex,
+								Type:    ptrTo(gatewayv1a2.GRPCMethodMatchRegularExpression),
+							},
+						},
+					},
+				},
+			},
+			errs: field.ErrorList{},
+		},
+		{
+			name: "GRPCRoute use valid service and method with undefined match type",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Matches: []gatewayv1a2.GRPCRouteMatch{
+						{
+							Method: &gatewayv1a2.GRPCMethodMatch{
+								Service: &service,
+								Method:  &method,
+							},
+						},
+					},
+				},
+			},
+			errs: field.ErrorList{},
+		},
+		{
+			name: "GRPCRoute use valid service and method with match type Exact",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Matches: []gatewayv1a2.GRPCRouteMatch{
+						{
+							Method: &gatewayv1a2.GRPCMethodMatch{
+								Service: &service,
+								Method:  &method,
+								Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+							},
+						},
+					},
+				},
+			},
+			errs: field.ErrorList{},
 		},
 		{
 			name: "GRPCRoute with duplicate ExtensionRef filters",
