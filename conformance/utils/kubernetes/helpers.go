@@ -195,7 +195,7 @@ func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig confi
 				gw := gw
 
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
-					t.Log(err)
+					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)
 					return false, nil
 				}
 
