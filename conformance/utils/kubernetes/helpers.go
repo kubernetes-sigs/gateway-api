@@ -194,7 +194,7 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 				gw := gw
 
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
-					t.Log(err)
+					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)
 					return false, nil
 				}
 
