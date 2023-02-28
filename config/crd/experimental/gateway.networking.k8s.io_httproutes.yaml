@@ -511,7 +511,8 @@ spec:
                                       description: "Hostname is the hostname to be
                                         used in the value of the `Location` header
                                         in the response. When empty, the hostname
-                                        of the request is used. \n Support: Core"
+                                        in the `Host` header of the request is used.
+                                        \n Support: Core"
                                       maxLength: 253
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -570,8 +571,9 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, port (if specified)
-                                        of the request is used. \n Support: Extended"
+                                        response. When empty, the Gateway listener
+                                        port is used (except when it is a default
+                                        port - 80 or 443). \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -1135,8 +1137,8 @@ spec:
                               hostname:
                                 description: "Hostname is the hostname to be used
                                   in the value of the `Location` header in the response.
-                                  When empty, the hostname of the request is used.
-                                  \n Support: Core"
+                                  When empty, the hostname in the `Host` header of
+                                  the request is used. \n Support: Core"
                                 maxLength: 253
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -1190,8 +1192,8 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. When empty,
-                                  port (if specified) of the request is used. \n Support:
-                                  Extended"
+                                  the Gateway listener port is used (except when it
+                                  is a default port - 80 or 443). \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -2366,7 +2368,8 @@ spec:
                                       description: "Hostname is the hostname to be
                                         used in the value of the `Location` header
                                         in the response. When empty, the hostname
-                                        of the request is used. \n Support: Core"
+                                        in the `Host` header of the request is used.
+                                        \n Support: Core"
                                       maxLength: 253
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -2425,8 +2428,9 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, port (if specified)
-                                        of the request is used. \n Support: Extended"
+                                        response. When empty, the Gateway listener
+                                        port is used (except when it is a default
+                                        port - 80 or 443). \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -2990,8 +2994,8 @@ spec:
                               hostname:
                                 description: "Hostname is the hostname to be used
                                   in the value of the `Location` header in the response.
-                                  When empty, the hostname of the request is used.
-                                  \n Support: Core"
+                                  When empty, the hostname in the `Host` header of
+                                  the request is used. \n Support: Core"
                                 maxLength: 253
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -3045,8 +3049,8 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. When empty,
-                                  port (if specified) of the request is used. \n Support:
-                                  Extended"
+                                  the Gateway listener port is used (except when it
+                                  is a default port - 80 or 443). \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
