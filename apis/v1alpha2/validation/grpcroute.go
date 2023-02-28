@@ -75,7 +75,7 @@ func validateRuleMatches(matches []gatewayv1a2.GRPCRouteMatch, path *field.Path)
 			if m.Method.Service == nil && m.Method.Method == nil {
 				errs = append(errs, field.Required(path.Index(i).Child("method"), "one or both of `service` or `method` must be specified"))
 			}
-			// GRPCRoute method matchers admits two types: Exact and RegularExpression.
+			// GRPCRoute method matcher admits two types: Exact and RegularExpression.
 			// If not specified, the match will be treated as type Exact
 			if m.Method.Type == nil || *m.Method.Type == gatewayv1a2.GRPCMethodMatchExact {
 				if m.Method.Service != nil {
