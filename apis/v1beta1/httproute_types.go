@@ -902,8 +902,8 @@ type HTTPRequestRedirectFilter struct {
 
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
-	// When empty, port (if specified) in the `Host` header
-	// of the request is used.
+	// When empty, the Gateway listener port is used (except
+	// when it is a default port - 80 or 443).
 	//
 	// Support: Extended
 	//
