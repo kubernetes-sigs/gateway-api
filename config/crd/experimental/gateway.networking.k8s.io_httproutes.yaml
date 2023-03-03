@@ -571,9 +571,13 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway listener
-                                        port is used (except when it is a default
-                                        port - 80 or 443). \n Support: Extended"
+                                        response. When empty, the Gateway Listener
+                                        port is used. In all cases, when the protocol
+                                        is http and the port is port 80, then the
+                                        port must be omitted. Similarly, when the
+                                        protocol is https and the port is port 443,
+                                        then the port must also be omitted. \n Support:
+                                        Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -1192,8 +1196,11 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. When empty,
-                                  the Gateway listener port is used (except when it
-                                  is a default port - 80 or 443). \n Support: Extended"
+                                  the Gateway Listener port is used. In all cases,
+                                  when the protocol is http and the port is port 80,
+                                  then the port must be omitted. Similarly, when the
+                                  protocol is https and the port is port 443, then
+                                  the port must also be omitted. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -2428,9 +2435,13 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway listener
-                                        port is used (except when it is a default
-                                        port - 80 or 443). \n Support: Extended"
+                                        response. When empty, the Gateway Listener
+                                        port is used. In all cases, when the protocol
+                                        is http and the port is port 80, then the
+                                        port must be omitted. Similarly, when the
+                                        protocol is https and the port is port 443,
+                                        then the port must also be omitted. \n Support:
+                                        Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -3049,8 +3060,11 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. When empty,
-                                  the Gateway listener port is used (except when it
-                                  is a default port - 80 or 443). \n Support: Extended"
+                                  the Gateway Listener port is used. In all cases,
+                                  when the protocol is http and the port is port 80,
+                                  then the port must be omitted. Similarly, when the
+                                  protocol is https and the port is port 443, then
+                                  the port must also be omitted. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
