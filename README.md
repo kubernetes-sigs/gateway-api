@@ -5,8 +5,8 @@ the specification and Custom Resource Definitions (CRDs).
 
 ## Status
 
-The latest supported version is `v1beta1` as released by the [v0.5.1
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.5.1) of
+The latest supported version is `v1beta1` as released by the [v0.6.1
+release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.6.1) of
 this project.
 
 This version of the API is has beta level support for the following resources:
@@ -14,6 +14,7 @@ This version of the API is has beta level support for the following resources:
 - `v1beta1.GatewayClass`
 - `v1beta1.Gateway`
 - `v1beta1.HTTPRoute`
+- `v1beta1.ReferenceGrant`
 
 For all other APIs we provide alpha level support.
 

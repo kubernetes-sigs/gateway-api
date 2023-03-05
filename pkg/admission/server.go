@@ -35,6 +35,8 @@ import (
 	v1b1Validation "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
+const admissionReview = "AdmissionReview"
+
 var (
 	scheme = runtime.NewScheme()
 	codecs = serializer.NewCodecFactory(scheme)
@@ -96,25 +98,6 @@ var (
 func log500(w http.ResponseWriter, err error) {
 	klog.Errorf("failed to process request: %v\n", err)
 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	return
-}
-
-// ensureKindAdmissionReview check that our admission server is only getting requests
-// for kind AdmissionReview and reject all others
-func ensureKindAdmissionReview(req []byte) bool {
-	type reqBody struct {
-		Kind  string                 `json:"kind"`
-		Extra map[string]interface{} `json:"-"`
-	}
-	var msg reqBody
-	err := json.Unmarshal(req, &msg)
-	if err != nil {
-		return false
-	}
-	if msg.Kind != "AdmissionReview" {
-		return false
-	}
-	return true
 }
 
 // ServeHTTP parses AdmissionReview requests and responds back
@@ -143,11 +126,12 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if !ensureKindAdmissionReview(data) {
-		invalidKind := "submitted object is not of kind AdmissionReview"
-		http.Error(w, invalidKind, http.StatusBadRequest)
+
+	if review.Kind != admissionReview {
+		http.Error(w, "submitted object is not of kind AdmissionReview", http.StatusBadRequest)
 		return
 	}
+
 	response, err := handleValidation(*review.Request)
 	if err != nil {
 		log500(w, err)
@@ -164,7 +148,6 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		klog.Errorf("failed to write HTTP response: %v\n", err)
 		return
 	}
-	return
 }
 
 func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionResponse, error) {

@@ -81,7 +81,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./pkg/...
+	go test -race -cover ./pkg/... ./apis/... ./conformance/utils/...
 
 # Run conformance tests against controller implementation
 .PHONY: conformance

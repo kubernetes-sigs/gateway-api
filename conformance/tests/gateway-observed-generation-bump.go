@@ -46,7 +46,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			defer cancel()
 
 			namespaces := []string{"gateway-conformance-infra"}
-			kubernetes.NamespacesMustBeAccepted(t, s.Client, s.TimeoutConfig, namespaces)
+			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			original := &v1beta1.Gateway{}
 			err := s.Client.Get(ctx, gwNN, original)
@@ -73,7 +73,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error updating the Gateway: %v", err)
 
 			// Ensure the generation and observedGeneration sync up
-			kubernetes.NamespacesMustBeAccepted(t, s.Client, s.TimeoutConfig, namespaces)
+			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 
 			updated := &v1beta1.Gateway{}
 			err = s.Client.Get(ctx, gwNN, updated)

@@ -160,7 +160,7 @@ The Gateway API has the following primary extension points:
   (custom)  [conformance level](/concepts/conformance/#2-support-levels). For
   example:
     * The `RegularExpression` type of
-      the [HTTPPathMatch](/references/spec/#gateway.networking.k8s.io/v1beta1.SecretObjectReference).
+      the [HTTPPathMatch](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPPathMatch).
 * *Policies.* A Gateway implementation can define custom resources called
   Policies for exposing data plane features like authentication. The Gateway API
   does not prescribe the details of those resources. However, it prescribes a
