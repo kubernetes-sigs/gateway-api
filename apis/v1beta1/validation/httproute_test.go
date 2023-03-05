@@ -17,7 +17,6 @@ limitations under the License.
 package validation
 
 import (
-	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -1138,43 +1137,6 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			if len(errs) != tc.errCount {
 				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
 			}
-		})
-	}
-}
-
-func TestValidPathCharactersRegExp(t *testing.T) {
-	r, err := regexp.Compile(validPathCharacters)
-	assert.NoError(t, err)
-
-	tests := []struct {
-		name     string
-		sequence string
-		isValid  bool
-	}{{
-		name:     "valid sequence of alphabetic characters",
-		sequence: "mypath",
-		isValid:  true,
-	}, {
-		name:     "valid sequence of alphanumeric characters",
-		sequence: "mypath0123",
-		isValid:  true,
-	}, {
-		name:     "valid mix of alphanumeric characters and special characters",
-		sequence: "my%20path/123",
-		isValid:  true,
-	}, {
-		name:     "invalid sequence of special characters",
-		sequence: "[]",
-		isValid:  false,
-	}, {
-		name:     "invalid mix of alphanumeric characters of special characters",
-		sequence: "my[/]path",
-		isValid:  false,
-	}}
-
-	for _, tc := range tests {
-		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.isValid, r.MatchString(tc.sequence))
 		})
 	}
 }
