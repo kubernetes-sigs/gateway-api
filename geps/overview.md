@@ -124,8 +124,7 @@ What is out of scope: see [text from KEP][kep-when-to-use]. Examples:
     indicate to your fellow community members that we're in a state of active
     practical tests and experiments which are intended to help us learn and
     iterate on the GEP. These can include distributing content, but not under
-    any release (e.g. it has to be unavailable except when explicitly opted
-    in to).
+        any release channel.
 
 [kep]: https://github.com/kubernetes/enhancements
 [kep-when-to-use]: https://github.com/kubernetes/enhancements/tree/master/keps#do-i-have-to-use-the-kep-process
