@@ -66,6 +66,11 @@ meeting before merging. Most GEPS will proceed through the following states:
 
 * **Provisional:** The goals described by this GEP have consensus but
   implementation details have not been agreed to yet.
+* **Prototyping:** An extension of `Provisional` which can be opted in to in
+  order to indicate to the community that there are some active practical tests
+  and experiments going on which are intended to be a part of the development
+  of this GEP. This may include APIs or code, but that content _must_ not be
+  distributed with releases.
 * **Implementable:** The goals and implementation details described by this GEP
   have consensus but have not been fully implemented yet.
 * **Experimental:** This GEP has been implemented and is part of the
