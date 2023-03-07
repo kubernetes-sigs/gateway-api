@@ -55,15 +55,6 @@ var StandardCoreFeatures = sets.New(
 // -----------------------------------------------------------------------------
 
 const (
-	// This option indicates GatewayClass will update the observedGeneration in
-	// it's conditions when reconciling (extended conformance).
-	//
-	// NOTE: we intend to make this core and require implementations to do it
-	//       as we expect this is something every implementation should be able
-	//       to do and it's ideal behavior.
-	//
-	//       See: https://github.com/kubernetes-sigs/gateway-api/issues/1780
-	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
 	// This option indicates that the Gateway can also use port 8080
 	SupportGatewayPort8080 SupportedFeature = "GatewayPort8080"
 )
@@ -74,7 +65,6 @@ const (
 // TODO: we need clarity for standard vs experimental features.
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var StandardExtendedFeatures = sets.New(
-	SupportGatewayClassObservedGenerationBump,
 	SupportGatewayPort8080,
 ).Insert(StandardCoreFeatures.UnsortedList()...)
 
