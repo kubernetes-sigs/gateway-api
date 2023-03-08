@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -65,8 +66,8 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 
 			mutate := original.DeepCopy()
 			mutate.Spec.Rules[0].BackendRefs[0].Name = "infra-backend-v2"
-			err = s.Client.Update(ctx, mutate)
-			require.NoErrorf(t, err, "error updating the HTTPRoute: %v", err)
+			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
+			require.NoErrorf(t, err, "error patching the HTTPRoute: %v", err)
 
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, gwNN, acceptedCondition)
 
