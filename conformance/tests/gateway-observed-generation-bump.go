@@ -36,7 +36,7 @@ func init() {
 
 var GatewayObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "GatewayObservedGenerationBump",
-	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
+	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Manifests:   []string{"tests/gateway-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 

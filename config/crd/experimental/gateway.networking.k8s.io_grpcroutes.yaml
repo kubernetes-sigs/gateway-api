@@ -251,7 +251,7 @@ spec:
                       type: Exact
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
-                  description: GRPCRouteRule defines the semantics for matching an
+                  description: GRPCRouteRule defines the semantics for matching a
                     gRPC request based on conditions (matches), processing it (filters),
                     and forwarding the request to an API object (backendRefs).
                   properties:
