@@ -74,6 +74,33 @@ func ValidateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
 	errs = append(errs, ValidateParentRefs(spec.ParentRefs, path.Child("spec"))...)
+	errs = append(errs, validateInvalidBackendWithRedirectFilter(spec.Rules, path.Child("rules"))...)
+	return errs
+}
+
+// validateInvalidBackendWithRedirectFilter validates if an HTTPRoute that specifies a redirect filter and specifying a backendRef
+func validateInvalidBackendWithRedirectFilter(rules []gatewayv1b1.HTTPRouteRule, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+
+	for ri, rule := range rules {
+		for fi, filter := range rule.Filters {
+			if filter.RequestRedirect != nil {
+				if len(rule.BackendRefs) != 0 {
+					errs = append(errs, field.Invalid(path.Index(ri).Child("filters").Index(fi), filter.RequestRedirect, "cannot specify backendRefs when using redirect filter"))
+				}
+				break
+			}
+		}
+		for bi, backendRef := range rule.BackendRefs {
+			for fi, filter := range backendRef.Filters {
+				if filter.RequestRedirect != nil {
+					errs = append(errs, field.Invalid(path.Index(ri).Child("backendRefs").Index(bi).Child("filters").Index(fi), filter.RequestRedirect, "cannot specify backendRef when using redirect filter"))
+					break
+				}
+			}
+		}
+	}
+
 	return errs
 }
 
@@ -338,10 +365,6 @@ func hasExactlyOnePrefixMatch(matches []gatewayv1b1.HTTPRouteMatch) bool {
 	if len(matches) != 1 || matches[0].Path == nil {
 		return false
 	}
-	pathMatchType := matches[0].Path.Type
-	if *pathMatchType != gatewayv1b1.PathMatchPathPrefix {
-		return false
-	}
 
-	return true
+	return *matches[0].Path.Type == gatewayv1b1.PathMatchPathPrefix
 }

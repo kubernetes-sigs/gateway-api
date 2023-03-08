@@ -22,6 +22,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/validation/field"
+	"k8s.io/utils/pointer"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
@@ -986,6 +987,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 	tests := []struct {
 		name        string
 		routeFilter gatewayv1b1.HTTPRouteFilter
+		backendRefs []gatewayv1b1.HTTPBackendRef
 		errCount    int
 	}{{
 		name: "valid HTTPRouteFilterRequestHeaderModifier route filter",
@@ -997,6 +999,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Remove: []string{"remove"},
 			},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 0,
 	}, {
 		name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with non-matching field",
@@ -1004,12 +1014,28 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			Type:          gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
 			RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 2,
 	}, {
 		name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with empty value field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 1,
 	}, {
 		name: "valid HTTPRouteFilterRequestMirror route filter",
@@ -1023,6 +1049,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Port:      ptrTo(gatewayv1b1.PortNumber(22)),
 			}},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 0,
 	}, {
 		name: "invalid HTTPRouteFilterRequestMirror type filter with non-matching field",
@@ -1030,12 +1064,28 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			Type:                  gatewayv1b1.HTTPRouteFilterRequestMirror,
 			RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 2,
 	}, {
 		name: "invalid HTTPRouteFilterRequestMirror type filter with empty value field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 1,
 	}, {
 		name: "valid HTTPRouteFilterRequestRedirect route filter",
@@ -1051,17 +1101,54 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 		},
 		errCount: 0,
 	}, {
+		name: "invalid HTTPRouteFilterRequestRedirect route filter with backendRefs",
+		routeFilter: gatewayv1b1.HTTPRouteFilter{
+			Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+			RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+				Scheme:     new(string),
+				Hostname:   new(gatewayv1b1.PreciseHostname),
+				Path:       &gatewayv1b1.HTTPPathModifier{},
+				Port:       new(gatewayv1b1.PortNumber),
+				StatusCode: new(int),
+			},
+		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
+		errCount: 1,
+	}, {
 		name: "invalid HTTPRouteFilterRequestRedirect type filter with non-matching field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type:          gatewayv1b1.HTTPRouteFilterRequestRedirect,
 			RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 2,
 	}, {
 		name: "invalid HTTPRouteFilterRequestRedirect type filter with empty value field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 1,
 	}, {
 		name: "valid HTTPRouteFilterExtensionRef filter",
@@ -1073,6 +1160,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Name:  "name",
 			},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 0,
 	}, {
 		name: "invalid HTTPRouteFilterExtensionRef type filter with non-matching field",
@@ -1080,12 +1175,28 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			Type:          gatewayv1b1.HTTPRouteFilterExtensionRef,
 			RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 2,
 	}, {
 		name: "invalid HTTPRouteFilterExtensionRef type filter with empty value field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterExtensionRef,
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 1,
 	}, {
 		name: "valid HTTPRouteFilterURLRewrite route filter",
@@ -1096,6 +1207,14 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				Path:     &gatewayv1b1.HTTPPathModifier{},
 			},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 0,
 	}, {
 		name: "invalid HTTPRouteFilterURLRewrite type filter with non-matching field",
@@ -1103,17 +1222,41 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			Type:          gatewayv1b1.HTTPRouteFilterURLRewrite,
 			RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 2,
 	}, {
 		name: "invalid HTTPRouteFilterURLRewrite type filter with empty value field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
 			Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
 		},
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
 		errCount: 1,
 	}, {
 		name:        "empty type filter is valid (caught by CRD validation)",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{},
-		errCount:    0,
+		backendRefs: []gatewayv1b1.HTTPBackendRef{{
+			BackendRef: gatewayv1b1.BackendRef{
+				BackendObjectReference: gatewayv1b1.BackendObjectReference{
+					Name: gatewayv1b1.ObjectName("test"),
+					Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+				},
+			},
+		}},
+		errCount: 0,
 	}}
 
 	for _, tc := range tests {
@@ -1121,21 +1264,152 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 			route := gatewayv1b1.HTTPRoute{
 				Spec: gatewayv1b1.HTTPRouteSpec{
 					Rules: []gatewayv1b1.HTTPRouteRule{{
-						Filters: []gatewayv1b1.HTTPRouteFilter{tc.routeFilter},
-						BackendRefs: []gatewayv1b1.HTTPBackendRef{{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
-									Name: gatewayv1b1.ObjectName("test"),
-									Port: ptrTo(gatewayv1b1.PortNumber(8080)),
-								},
-							},
-						}},
+						Filters:     []gatewayv1b1.HTTPRouteFilter{tc.routeFilter},
+						BackendRefs: tc.backendRefs,
 					}},
 				},
 			}
 			errs := ValidateHTTPRoute(&route)
 			if len(errs) != tc.errCount {
 				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
+
+func TestValidateInvalidBackendWithRedirectFilter(t *testing.T) {
+	testcases := []struct {
+		name       string
+		inputRules []gatewayv1b1.HTTPRouteRule
+		errorCount int
+	}{
+		{
+			name:       "valid usage of redirect filter",
+			errorCount: 0,
+			inputRules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Filters: []gatewayv1b1.HTTPRouteFilter{
+						{
+							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+								Scheme:     pointer.String("https"),
+								StatusCode: pointer.Int(301),
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name:       "invalid usage of redirect filter in rule level",
+			errorCount: 1,
+			inputRules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Filters: []gatewayv1b1.HTTPRouteFilter{
+						{
+							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+								Scheme:     pointer.String("https"),
+								StatusCode: pointer.Int(301),
+							},
+						},
+					},
+					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+						{
+							BackendRef: gatewayv1b1.BackendRef{
+								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+									Name: "example-svc",
+									Port: (*gatewayv1b1.PortNumber)(pointer.Int32(8080)),
+								},
+								Weight: pointer.Int32(1),
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name:       "invalid usage of redirect filter in backend level",
+			errorCount: 1,
+			inputRules: []gatewayv1b1.HTTPRouteRule{
+				{
+					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+						{
+							BackendRef: gatewayv1b1.BackendRef{
+								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+									Name: "example-svc",
+									Port: (*gatewayv1b1.PortNumber)(pointer.Int32(8080)),
+								},
+								Weight: pointer.Int32(1),
+							},
+							Filters: []gatewayv1b1.HTTPRouteFilter{
+								{
+									Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+									RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+										Scheme:     pointer.String("https"),
+										StatusCode: pointer.Int(301),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}, {
+			name:       "invalid usage of redirect filter in both rule and backend level",
+			errorCount: 2,
+			inputRules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Filters: []gatewayv1b1.HTTPRouteFilter{
+						{
+							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+								Scheme:     pointer.String("https"),
+								StatusCode: pointer.Int(301),
+							},
+						},
+					},
+					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+						{
+							BackendRef: gatewayv1b1.BackendRef{
+								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+									Name: "example-svc",
+									Port: (*gatewayv1b1.PortNumber)(pointer.Int32(8080)),
+								},
+								Weight: pointer.Int32(1),
+							},
+						},
+					},
+				},
+				{
+					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+						{
+							BackendRef: gatewayv1b1.BackendRef{
+								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+									Name: "example-svc",
+									Port: (*gatewayv1b1.PortNumber)(pointer.Int32(8080)),
+								},
+								Weight: pointer.Int32(1),
+							},
+							Filters: []gatewayv1b1.HTTPRouteFilter{
+								{
+									Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+									RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+										Scheme:     pointer.String("https"),
+										StatusCode: pointer.Int(301),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			errs := validateInvalidBackendWithRedirectFilter(tc.inputRules, field.NewPath("spec").Child("rules"))
+			if len(errs) != tc.errorCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errorCount, errs)
 			}
 		})
 	}
