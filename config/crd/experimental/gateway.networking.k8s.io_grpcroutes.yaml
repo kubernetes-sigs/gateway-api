@@ -1191,19 +1191,15 @@ spec:
                                 description: "Value of the method to match against.
                                   If left empty or omitted, will match all services.
                                   \n At least one of Service and Method MUST be a
-                                  non-empty string. \n A GRPC Method must be a valid
-                                  Protobuf Method (https://protobuf.com/docs/language-spec#methods)."
+                                  non-empty string."
                                 maxLength: 1024
-                                pattern: ^[A-Za-z_][A-Za-z_0-9]*$
                                 type: string
                               service:
                                 description: "Value of the service to match against.
                                   If left empty or omitted, will match any service.
                                   \n At least one of Service and Method MUST be a
-                                  non-empty string. \n A GRPC Service must be a valid
-                                  Protobuf Type Name (https://protobuf.com/docs/language-spec#type-references)."
+                                  non-empty string."
                                 maxLength: 1024
-                                pattern: ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$
                                 type: string
                               type:
                                 default: Exact
