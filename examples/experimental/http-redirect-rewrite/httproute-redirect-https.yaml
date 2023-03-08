@@ -13,7 +13,3 @@ spec:
         requestRedirect:
           scheme: https
           statusCode: 301
-      backendRefs:
-      - name: example-svc
-        weight: 1
-        port: 80
