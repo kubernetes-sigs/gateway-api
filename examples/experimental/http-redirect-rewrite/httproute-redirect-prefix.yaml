@@ -19,7 +19,3 @@ spec:
             type: ReplacePrefixMatch
             replacePrefixMatch: /paprika
           statusCode: 302
-      backendRefs:
-      - name: example-svc
-        weight: 1
-        port: 80
