@@ -23,6 +23,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -35,7 +36,7 @@ func init() {
 
 var GatewayObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "GatewayObservedGenerationBump",
-	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
+	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Manifests:   []string{"tests/gateway-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 
@@ -69,8 +70,8 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 				},
 			})
 
-			err = s.Client.Update(ctx, mutate)
-			require.NoErrorf(t, err, "error updating the Gateway: %v", err)
+			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
+			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
 
 			// Ensure the generation and observedGeneration sync up
 			kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)

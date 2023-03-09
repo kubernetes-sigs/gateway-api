@@ -66,6 +66,11 @@ meeting before merging. Most GEPS will proceed through the following states:
 
 * **Provisional:** The goals described by this GEP have consensus but
   implementation details have not been agreed to yet.
+* **Prototyping:** An extension of `Provisional` which can be opted in to in
+  order to indicate to the community that there are some active practical tests
+  and experiments going on which are intended to be a part of the development
+  of this GEP. This may include APIs or code, but that content _must_ not be
+  distributed with releases.
 * **Implementable:** The goals and implementation details described by this GEP
   have consensus but have not been fully implemented yet.
 * **Experimental:** This GEP has been implemented and is part of the
@@ -112,6 +117,14 @@ What is out of scope: see [text from KEP][kep-when-to-use]. Examples:
     key goal of GEPs is to show why we made a decision and which alternatives
     were considered. If separate docs are used, it's important that we can
     still see all relevant context and decisions in the final GEP.
+* Q: When should I mark a GEP as `Prototyping` as opposed to `Provisional`?
+  * A: The `Prototyping` status carries the same base meaning as `Provisional`
+    in that consensus is not complete between stakeholders and we're not ready
+    to move toward releasing content yet. You should use `Prototyping` to
+    indicate to your fellow community members that we're in a state of active
+    practical tests and experiments which are intended to help us learn and
+    iterate on the GEP. These can include distributing content, but not under
+    any release channel.
 
 [kep]: https://github.com/kubernetes/enhancements
 [kep-when-to-use]: https://github.com/kubernetes/enhancements/tree/master/keps#do-i-have-to-use-the-kep-process

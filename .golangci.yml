@@ -13,6 +13,7 @@ linters:
   - goimports
   - revive
   - govet
+  - gomodguard
   - misspell
   - exportloopref
   disable:
@@ -36,7 +37,16 @@ linters-settings:
     check-shadowing: true
   misspell:
     locale: US
-    ignore-words:
+    ignore-words: []
+  gomodguard:
+    blocked:
+    # List of blocked modules.
+      modules:
+        - io/ioutil:
+            recommendations:
+              - io
+              - os
+            reason: "Deprecation of package ioutil in Go 1.16."
 
 issues:
   exclude-rules:

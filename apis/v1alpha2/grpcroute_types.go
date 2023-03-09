@@ -149,7 +149,7 @@ type GRPCRouteSpec struct {
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
-// GRPCRouteRule defines the semantics for matching an gRPC request based on
+// GRPCRouteRule defines the semantics for matching a gRPC request based on
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
 type GRPCRouteRule struct {
@@ -205,7 +205,6 @@ type GRPCRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
-	// +kubebuilder:default={{method: {type: "Exact"}}}
 	Matches []GRPCRouteMatch `json:"matches,omitempty"`
 
 	// Filters define the filters that are applied to requests that match
@@ -286,7 +285,6 @@ type GRPCRouteMatch struct {
 	// not specified, all services and methods will match.
 	//
 	// +optional
-	// +kubebuilder:default={type: "Exact"}
 	Method *GRPCMethodMatch `json:"method,omitempty"`
 
 	// Headers specifies gRPC request header matchers. Multiple match values are
@@ -321,12 +319,8 @@ type GRPCMethodMatch struct {
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	//
-	// A GRPC Service must be a valid Protobuf Type Name
-	// (https://protobuf.com/docs/language-spec#type-references).
-	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
 	Service *string `json:"service,omitempty"`
 
 	// Value of the method to match against. If left empty or omitted, will
@@ -334,12 +328,8 @@ type GRPCMethodMatch struct {
 	//
 	// At least one of Service and Method MUST be a non-empty string.
 	//
-	// A GRPC Method must be a valid Protobuf Method
-	// (https://protobuf.com/docs/language-spec#methods).
-	//
 	// +optional
 	// +kubebuilder:validation:MaxLength=1024
-	// +kubebuilder:validation:Pattern=`^[A-Za-z_][A-Za-z_0-9]*$`
 	Method *string `json:"method,omitempty"`
 }
 

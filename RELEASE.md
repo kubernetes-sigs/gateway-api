@@ -53,7 +53,7 @@ For a **PATCH** release:
   Github's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the Github release.
-- Update the `README.md` as needed for any latest release references.
+- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 For a **MAJOR** or **MINOR** release:
 - Cut a `release-major.minor` branch that we can tag things in as needed.
@@ -67,7 +67,7 @@ For a **MAJOR** or **MINOR** release:
   Github's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the Github release.
-- Update the `README.md` as needed for any latest release references.
+- Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 For an **RC** release:
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.

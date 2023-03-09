@@ -24,6 +24,7 @@ plugins:
       redirect_maps:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
+  - mermaid2
 markdown_extensions:
   - admonition
   - meta
@@ -32,10 +33,15 @@ markdown_extensions:
       emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.highlight
   - pymdownx.inlinehilite
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.snippets
   - toc:
       permalink: true
+  - tables
 nav:
   - Overview:
     - Introduction: index.md
@@ -72,9 +78,12 @@ nav:
       - Declined:
         - geps/gep-735.md
       - Provisional:
+        - geps/gep-1742.md
         - geps/gep-1426.md
         - geps/gep-1324.md
         - geps/gep-1282.md
+      - Prototyping:
+        - geps/gep-1709.md
       - Experimental:
         - geps/gep-1323.md
         - geps/gep-1016.md

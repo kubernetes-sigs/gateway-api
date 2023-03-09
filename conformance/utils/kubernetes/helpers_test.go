@@ -108,7 +108,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 				{Type: "FakeCondition2", ObservedGeneration: 19},
 				{Type: "FakeCondition3", ObservedGeneration: 20},
 			},
-			expected: fmt.Errorf("expected observedGeneration to be updated for all conditions, only 2/3 were updated. stale conditions are: FakeCondition2"),
+			expected: fmt.Errorf("expected observedGeneration to be updated to 20 for all conditions, only 2/3 were updated. stale conditions are: FakeCondition2 (generation 19)"),
 		},
 		{
 			name: "conditions where most do not match the generation fail verification",
@@ -121,7 +121,7 @@ func TestVerifyConditionsMatchGeneration(t *testing.T) {
 				{Type: "FakeCondition5", ObservedGeneration: 16},
 				{Type: "FakeCondition6", ObservedGeneration: 15},
 			},
-			expected: fmt.Errorf("expected observedGeneration to be updated for all conditions, only 1/6 were updated. stale conditions are: FakeCondition1, FakeCondition2, FakeCondition3, FakeCondition5, FakeCondition6"),
+			expected: fmt.Errorf("expected observedGeneration to be updated to 20 for all conditions, only 1/6 were updated. stale conditions are: FakeCondition1 (generation 18), FakeCondition2 (generation 18), FakeCondition3 (generation 14), FakeCondition5 (generation 16), FakeCondition6 (generation 15)"),
 		},
 	}
 
