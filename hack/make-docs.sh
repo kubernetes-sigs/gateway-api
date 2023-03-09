@@ -31,6 +31,7 @@ esac
 }
 
 # Move GEPs to site-src
+rm -rf site-src/geps
 cp -r geps site-src/geps
 
 # Ensure site dir exists
