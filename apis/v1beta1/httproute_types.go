@@ -452,6 +452,7 @@ type HTTPQueryParamMatch struct {
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=256
+	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
 	Name string `json:"name"`
 
 	// Value is the value of HTTP query param to be matched.
