@@ -30,7 +30,7 @@ spec:
   parentRefs:
   - name: default-match-gw
   hostnames:
-    - default-match.com
+  - default-match.com
   rules:
   - matches:
     - headers:

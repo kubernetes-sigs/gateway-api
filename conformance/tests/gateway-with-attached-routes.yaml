@@ -10,8 +10,8 @@ spec:
     port: 80
     protocol: HTTP
     allowedRoutes:
-      kinds: 
-        - kind: HTTPRoute
+      kinds:
+      - kind: HTTPRoute
       namespaces:
         from: Selector
         selector:
@@ -47,8 +47,8 @@ spec:
     port: 80
     protocol: HTTP
     allowedRoutes:
-      kinds: 
-        - kind: HTTPRoute
+      kinds:
+      - kind: HTTPRoute
       namespaces:
         from: Selector
         selector:

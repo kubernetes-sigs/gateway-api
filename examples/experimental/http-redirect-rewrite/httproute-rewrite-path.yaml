@@ -9,17 +9,17 @@ spec:
     - rewrite.example
   rules:
     - matches:
-      - path:
-          type: PathPrefix
-          value: /cardamom
+        - path:
+            type: PathPrefix
+            value: /cardamom
       filters:
-      - type: URLRewrite
-        urlRewrite:
-          hostname: elsewhere.example
-          path:
-            type: ReplaceFullPath
-            replaceFullPath: /fennel
+        - type: URLRewrite
+          urlRewrite:
+            hostname: elsewhere.example
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /fennel
       backendRefs:
-      - name: example-svc
-        weight: 1
-        port: 80
+        - name: example-svc
+          weight: 1
+          port: 80

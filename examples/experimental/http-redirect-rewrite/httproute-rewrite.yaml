@@ -9,10 +9,10 @@ spec:
     - rewrite.example
   rules:
     - filters:
-      - type: URLRewrite
-        urlRewrite:
-          hostname: elsewhere.example
+        - type: URLRewrite
+          urlRewrite:
+            hostname: elsewhere.example
       backendRefs:
-      - name: example-svc
-        weight: 1
-        port: 80
+        - name: example-svc
+          weight: 1
+          port: 80

@@ -9,13 +9,13 @@ spec:
     - redirect.example
   rules:
     - matches:
-      - path:
-          type: PathPrefix
-          value: /cayenne
+        - path:
+            type: PathPrefix
+            value: /cayenne
       filters:
-      - type: RequestRedirect
-        requestRedirect:
-          path:
-            type: ReplacePrefixMatch
-            replacePrefixMatch: /paprika
-          statusCode: 302
+        - type: RequestRedirect
+          requestRedirect:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /paprika
+            statusCode: 302

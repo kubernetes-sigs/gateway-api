@@ -70,9 +70,9 @@ spec:
   selector:
     app: infra-backend-v1
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -117,9 +117,9 @@ spec:
   selector:
     app: infra-backend-v2
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -163,9 +163,9 @@ spec:
   selector:
     app: infra-backend-v3
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -209,9 +209,9 @@ spec:
   selector:
     app: tls-backend
   ports:
-    - protocol: TCP
-      port: 443
-      targetPort: 8443
+  - protocol: TCP
+    port: 443
+    targetPort: 8443
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -237,18 +237,18 @@ spec:
         - name: secret-volume
           mountPath: /etc/secret-volume
         env:
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: TLS_SERVER_CERT
-            value: /etc/secret-volume/crt
-          - name: TLS_SERVER_PRIVKEY
-            value: /etc/secret-volume/key
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: TLS_SERVER_CERT
+          value: /etc/secret-volume/crt
+        - name: TLS_SERVER_PRIVKEY
+          value: /etc/secret-volume/key
         resources:
           requests:
             cpu: 10m
@@ -278,9 +278,9 @@ spec:
   selector:
     app: app-backend-v1
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -324,9 +324,9 @@ spec:
   selector:
     app: app-backend-v2
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -377,9 +377,9 @@ spec:
   selector:
     app: web-backend
   ports:
-    - protocol: TCP
-      port: 8080
-      targetPort: 3000
+  - protocol: TCP
+    port: 8080
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
