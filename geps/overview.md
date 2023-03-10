@@ -23,7 +23,7 @@ flowchart TD
     Prototyping -->|GEP Doc PR<br />done| Implementable
     Implementable -->|Gateway API<br />work completed| Experimental
     Experimental -->|Implemented in<br />controllers| Standard
-    
+    Standard -->|Entire change is GA or implemented| Completed
 ```
 </div>
 
@@ -78,6 +78,16 @@ any of the following:
 1. Graduating the resource to beta
 2. Graduating fields to "standard" by removing `<gateway:experimental>` tags
 3. Graduating a concept to "standard" by updating documentation
+
+### 6. Close out the GEP issue
+
+The GEP issue should only be closed once the feature has:
+- Moved to the standard channel for distribution (if necessary)
+- Moved to a "v1" `apiVersion` for CRDs
+- been completely implemented and has wide acceptance (for process changes).
+
+In short, the GEP issue should only be closed when the work is "done" (whatever
+that means for that GEP).
 
 ## Status
 
