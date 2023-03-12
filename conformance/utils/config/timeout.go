@@ -18,6 +18,7 @@ package config
 
 import "time"
 
+// TODO: Add gRPC timeouts.
 type TimeoutConfig struct {
 	// CreateTimeout represents the maximum time for a Kubernetes object to be created.
 	// Max value for conformant implementation: None

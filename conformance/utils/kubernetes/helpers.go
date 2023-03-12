@@ -231,11 +231,7 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
-// GatewayAndHTTPRoutesMustBeAccepted waits until the specified Gateway has an IP
-// address assigned to it and the Route has a ParentRef referring to the
-// Gateway. The test will fail if these conditions are not met before the
-// timeouts.
-func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
@@ -270,10 +266,18 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 				},
 			})
 		}
-		HTTPRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
+		RouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired, routeType)
 	}
 
 	return gwAddr
+}
+
+// GatewayAndHTTPRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the Route has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1beta1.HTTPRoute{}, routeNNs...)
 }
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
@@ -397,34 +401,65 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have no accepted parents")
 }
 
-// HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
-// in status that match the expected parents. This will cause the test to halt
-// if the specified timeout is exceeded.
-func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) {
+// RouteTypeMustHaveParentsField ensures the provided routeType has a
+// routeType.Status.Parents field of type []v1alpha2.RouteParentStatus.
+func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	t.Helper()
+	routeTypePointerObj := reflect.TypeOf(routeType)
+	require.Equal(t, routeTypePointerObj.Kind(), reflect.Pointer)
+
+	routeTypeObj := routeTypePointerObj.Elem()
+	routeTypeName := routeTypeObj.Name()
+
+	statusField, ok := routeTypeObj.FieldByName("Status")
+	require.True(t, ok, "%s does not have a Status field", routeTypeName)
+
+	parentsField, ok := statusField.Type.FieldByName("Parents")
+	require.True(t, ok, "%s.Status does not have a Parents field", routeTypeName)
+	require.Equal(t, parentsField.Type, reflect.TypeOf([]v1alpha2.RouteParentStatus{}))
+
+	return routeTypeName
+}
+
+func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool, routeType any) {
+	t.Helper()
+
+	routeTypeName := RouteTypeMustHaveParentsField(t, routeType)
+
+	cliObj, ok := routeType.(client.Object)
+	require.True(t, ok, "error converting %v to client.Object", routeType)
+
+	metaObj, ok := routeType.(metav1.Object)
+	require.True(t, ok, "error converting %v to metav1.Object", routeType)
 
 	var actual []v1beta1.RouteParentStatus
 	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		route := &v1beta1.HTTPRoute{}
-		err := client.Get(ctx, routeName, route)
+		err := cli.Get(ctx, routeName, cliObj)
 		if err != nil {
-			return false, fmt.Errorf("error fetching HTTPRoute: %w", err)
+			return false, fmt.Errorf("error fetching %s: %w", routeTypeName, err)
 		}
 
 		for _, parent := range actual {
-			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+			if err := ConditionsHaveLatestObservedGeneration(metaObj, parent.Conditions); err != nil {
+				t.Logf("%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
 				return false, nil
 			}
 		}
 
-		actual = route.Status.Parents
+		actual = reflect.ValueOf(cliObj).Elem().FieldByName("Status").FieldByName("Parents").Interface().([]v1alpha2.RouteParentStatus)
 		return parentsForRouteMatch(t, routeName, parents, actual, namespaceRequired), nil
 	})
-	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute to have parents matching expectations")
+	require.NoErrorf(t, waitErr, "error waiting for %s to have parents matching expectations", routeTypeName)
+}
+
+// HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
+// in status that match the expected parents. This will cause the test to halt
+// if the specified timeout is exceeded.
+func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) {
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1beta1.HTTPRoute{})
 }
 
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents

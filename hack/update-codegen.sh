@@ -97,3 +97,35 @@ do
     paths="${APIS_PKG}/apis/${VERSION}" 
 
 done
+
+echo "Generating gRPC/Protobuf code"
+
+readonly PROTOC_CACHE_DIR="/tmp/protoc.cache"
+readonly PROTOC_BINARY="${PROTOC_CACHE_DIR}/bin/protoc"
+readonly PROTOC_URL="https://github.com/protocolbuffers/protobuf/releases/download/v22.2/protoc-22.2-linux-x86_64.zip"
+readonly PROTOC_CHECKSUM="4805ba56594556402a6c327a8d885a47640ee363  ${PROTOC_BINARY}"
+
+function verify_protoc {
+  if ! echo "${PROTOC_CHECKSUM}" | shasum -c; then
+    echo "Downloaded protoc binary failed checksum." >/dev/stderr
+    exit 1
+  fi
+}
+
+function ensure_protoc {
+  mkdir -p "${PROTOC_CACHE_DIR}"
+  if [ ! -f "${PROTOC_BINARY}" ]; then
+    curl -sL -o "${PROTOC_CACHE_DIR}/protoc.zip" "${PROTOC_URL}"
+    unzip -d "${PROTOC_CACHE_DIR}" "${PROTOC_CACHE_DIR}/protoc.zip"
+  fi
+  verify_protoc
+}
+
+ensure_protoc
+go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28
+go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2
+
+"${PROTOC_BINARY}" --go_out=. --go_opt=paths=source_relative \
+  --go-grpc_out=. --go-grpc_opt=paths=source_relative \
+  conformance/proto/grpcechoserver/grpcecho.proto
+
