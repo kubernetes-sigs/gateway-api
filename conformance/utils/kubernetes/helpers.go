@@ -562,6 +562,16 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
 }
 
+// HTTPRouteMustHaveResolvedRefsConditionsTrue checks that the supplied HTTPRoute has the resolvedRefsCondition
+// set to true.
+func HTTPRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	HTTPRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(v1beta1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: string(v1beta1.RouteReasonResolvedRefs),
+	})
+}
+
 func parentRefToString(p v1beta1.ParentReference) string {
 	if p.Namespace != nil && *p.Namespace != "" {
 		return fmt.Sprintf("%v/%v", p.Namespace, p.Name)
