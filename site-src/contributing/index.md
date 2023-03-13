@@ -35,9 +35,10 @@ questions, discussions.
 
 ## Meetings
 
-Meetings discussing the evolution of the Gateway API will alternate times to
-accommodate participants from various time zones. This calendar includes all
-Gateway API meetings as well as any other SIG-Network meetings.
+Gateway API has multiple meetings covering different aspects and topics of the
+Gateway API project. The following calendar includes _all_ SIG Network meetings
+(which therefore includes all Gateway API meetings which include "Gateway API"
+somewhere in their name):
 
 <iframe
   src="https://calendar.google.com/calendar/embed?src=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com"
@@ -45,18 +46,52 @@ Gateway API meetings as well as any other SIG-Network meetings.
   scrolling="no">
 </iframe>
 
-Gateway API community meetings happen weekly on Mondays at 3pm Pacific Time
-(23:00 UTC):
+### Main Meeting
+
+The main Gateway API community meetings happen weekly on Mondays at 3pm Pacific
+Time (23:00 UTC):
 
 * [Zoom link](https://zoom.us/j/441530404)
 * [Convert to your timezone](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)
 * [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NXU4OXYyY2pqNzEzYzUwYnVsYmZwdXJzZDlfMjAyMTA1MTBUMjIwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
 
-[GAMMA](/contributing/gamma/) meetings happen weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
-and 8AM Pacific Time (16:00 UTC):
+Being the main meeting for Gateway API, the topics can vary here and often this
+is where new topics and ideas are discussed. However if you're simply
+interested in the ingress use case, this is the common forum for that.
+
+### Mesh Meeting
+
+[GAMMA](/contributing/gamma/) is the initative within Gateway API to use the
+resources provided by Gateway API for service mesh use cases. Meetings happen
+weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC) and 8AM
+Pacific Time (16:00 UTC):
 
 * [Zoom link](https://zoom.us/j/96951309977)
 * Convert to your timezone: [3pm PT](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)/[8am PT](http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29)
+
+### Code Jam Meeting
+
+The Gateway API "Code Jam" is less of a meeting and more of a hangout to discuss
+and pair on Gateway API and technologies relevant to the project. This is an
+open agenda meeting (feel free to bring your topics) where the following kinds
+of activities (focusing on Gateway API related things) are encouraged:
+
+- Brainstorming
+- Code pairing
+- Demos
+- Getting help
+
+This meeting puts an emphasis on being fun and laid back: If you're looking to
+build further consensus and progress a [GEP][geps] then the _main_ meeting is
+likely the place you'll want to bring your topic. However, if you're working on
+adding [conformance tests][conformance] to your downstream implementation and
+having some trouble and want some help getting things working, this meeting is a
+good place for that kind of topic.
+
+* [Zoom link](https://zoom.us/j/96900767253)
+* [8:30am PT](http://www.thetimezoneconverter.com/?t=08:30&tz=PT%20%28Pacific%20Time%29)
+
+[geps]:https://gateway-api.sigs.k8s.io/geps/overview/
 
 ### Meeting Notes and Recordings
 
