@@ -839,7 +839,7 @@ The following changes have been made since v0.3.0:
   GEP added in [#749](https://github.com/kubernetes-sigs/gateway-api/pull/749).
   Implemented in [#768](https://github.com/kubernetes-sigs/gateway-api/pull/768).
 
-  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-851.md)
+  [GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-851.md)
   was a follow up on this change that allowed multiple Certificate Refs per
   Gateway Listener. This was implemented in
   [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852).
@@ -854,7 +854,7 @@ The following changes have been made since v0.3.0:
 ### Small Changes
 * Extension points within match blocks from all Routes have been removed
   [#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
-  [GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-820.md).
+  [GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-820.md).
   These extension points have been removed because they are currently not used,
   are poorly understood, and we don't have good use cases for them. We may
   consider re-adding them in the future.
@@ -1001,11 +1001,11 @@ The following changes have been made since v0.4.0-rc1:
 ### GEP implementations
 * Replace `CertificateRef` field with `CertificateRefs` in `GatewayTLSConfig`.
 [#852](https://github.com/kubernetes-sigs/gateway-api/pull/852). This implements
-[GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-851.md),
+[GEP-851](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-851.md),
 Allow Multiple Certificate Refs per Gateway Listener.
 * Extension points within match blocks from all Routes have been removed
 [#829](https://github.com/kubernetes-sigs/gateway-api/pull/829). Implements
-[GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/site-src/geps/gep-820.md).
+[GEP-820](https://github.com/kubernetes-sigs/gateway-api/blob/main/geps/gep-820.md).
 These extension points have been removed because they are currently not used,
 are poorly understood, and we don't have good use cases for them. We may
 consider re-adding them in the future.
