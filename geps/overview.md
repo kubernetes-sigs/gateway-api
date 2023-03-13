@@ -22,7 +22,7 @@ flowchart TD
     Provisional -->|If practical <br /> work needed| Prototyping
     Prototyping -->|GEP Doc PR<br />done| Implementable
     Implementable -->|Gateway API<br />work completed| Experimental
-    Experimental -->|Implemented in<br />controllers| Standard
+    Experimental -->|Supported in<br />multiple implementations<br />+ Conformance tests| Standard
     Standard -->|Entire change is GA or implemented| Completed
 ```
 </div>
