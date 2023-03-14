@@ -45,7 +45,7 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 					Kind:  v1beta1.Kind("HTTPRoute"),
 				}},
 				Conditions: []metav1.Condition{{
-					Type:   string(v1beta1.RouteConditionAccepted),
+					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
 					Reason: "", //any reason
 				}},
@@ -64,7 +64,7 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 					Kind:  v1beta1.Kind("HTTPRoute"),
 				}},
 				Conditions: []metav1.Condition{{
-					Type:   string(v1beta1.RouteConditionAccepted),
+					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
 					Reason: "", //any reason
 				}},
