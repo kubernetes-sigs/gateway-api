@@ -474,9 +474,20 @@ spec:
                                           type: string
                                         kind:
                                           default: Service
-                                          description: Kind is kind of the referent.
-                                            For example "HTTPRoute" or "Service".
-                                            Defaults to "Service" when not specified.
+                                          description: "Kind is the Kubernetes resource
+                                            kind of the referent. For example \"Service\".
+                                            \n Defaults to \"Service\" when not specified.
+                                            \n ExternalName services can refer to
+                                            CNAME DNS records that may live outside
+                                            of the cluster and as such are difficult
+                                            to reason about in terms of conformance.
+                                            They also may not be safe to forward to
+                                            (see CVE-2021-25740 for more information).
+                                            Implementations SHOULD NOT support ExternalName
+                                            Services. \n Support: Core (Services with
+                                            a type other than ExternalName) \n Support:
+                                            Implementation-specific (Services with
+                                            type ExternalName)"
                                           maxLength: 63
                                           minLength: 1
                                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -674,9 +685,17 @@ spec:
                             type: string
                           kind:
                             default: Service
-                            description: Kind is kind of the referent. For example
-                              "HTTPRoute" or "Service". Defaults to "Service" when
-                              not specified.
+                            description: "Kind is the Kubernetes resource kind of
+                              the referent. For example \"Service\". \n Defaults to
+                              \"Service\" when not specified. \n ExternalName services
+                              can refer to CNAME DNS records that may live outside
+                              of the cluster and as such are difficult to reason about
+                              in terms of conformance. They also may not be safe to
+                              forward to (see CVE-2021-25740 for more information).
+                              Implementations SHOULD NOT support ExternalName Services.
+                              \n Support: Core (Services with a type other than ExternalName)
+                              \n Support: Implementation-specific (Services with type
+                              ExternalName)"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -923,9 +942,18 @@ spec:
                                     type: string
                                   kind:
                                     default: Service
-                                    description: Kind is kind of the referent. For
-                                      example "HTTPRoute" or "Service". Defaults to
-                                      "Service" when not specified.
+                                    description: "Kind is the Kubernetes resource
+                                      kind of the referent. For example \"Service\".
+                                      \n Defaults to \"Service\" when not specified.
+                                      \n ExternalName services can refer to CNAME
+                                      DNS records that may live outside of the cluster
+                                      and as such are difficult to reason about in
+                                      terms of conformance. They also may not be safe
+                                      to forward to (see CVE-2021-25740 for more information).
+                                      Implementations SHOULD NOT support ExternalName
+                                      Services. \n Support: Core (Services with a
+                                      type other than ExternalName) \n Support: Implementation-specific
+                                      (Services with type ExternalName)"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
