@@ -147,13 +147,14 @@ func ConditionsHaveLatestObservedGeneration(obj metav1.Object, conditions []meta
 		return nil
 	}
 
+	wantGeneration := obj.GetGeneration()
 	var b strings.Builder
-	fmt.Fprint(&b, "expected observedGeneration to be updated for all conditions")
+	fmt.Fprintf(&b, "expected observedGeneration to be updated to %d for all conditions", wantGeneration)
 	fmt.Fprintf(&b, ", only %d/%d were updated.", len(conditions)-len(staleConditions), len(conditions))
 	fmt.Fprintf(&b, " stale conditions are: ")
 
 	for i, c := range staleConditions {
-		fmt.Fprintf(&b, c.Type)
+		fmt.Fprintf(&b, "%s (generation %d)", c.Type, c.ObservedGeneration)
 		if i != len(staleConditions)-1 {
 			fmt.Fprintf(&b, ", ")
 		}
@@ -194,7 +195,7 @@ func NamespacesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig confi
 				gw := gw
 
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
-					t.Log(err)
+					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)
 					return false, nil
 				}
 
@@ -553,6 +554,16 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for HTTPRoute status to have a Condition matching expectations")
+}
+
+// HTTPRouteMustHaveResolvedRefsConditionsTrue checks that the supplied HTTPRoute has the resolvedRefsCondition
+// set to true.
+func HTTPRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+	HTTPRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
+		Type:   string(v1beta1.RouteConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: string(v1beta1.RouteReasonResolvedRefs),
+	})
 }
 
 func parentRefToString(p v1beta1.ParentReference) string {

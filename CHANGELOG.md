@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.6.2](#v062)
 - [v0.6.1](#v061)
 - [v0.6.0](#v060)
 - [v0.6.0-rc2](#v060-rc2)
@@ -21,6 +22,55 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.6.2
+
+This is a patch release that predominantly includes updated conformance tests
+for implementations to implement.
+
+For all major changes since the `v0.5.x` release series, please see the
+[v0.6.0](/#v060) release notes.
+
+## Maintenance
+
+- As per [changes in upstream to container image registries] we replaced all
+  usage of the k8s.gcr.io registry with registry.k8s.io.
+  (#1736, @shaneutt)
+
+[changes in upstream to container image registries]:https://github.com/kubernetes/k8s.io/issues/4738
+
+## Bug Fixes
+
+- Fix invalid HTTP redirect/rewrite examples.
+  (#1787, @Xunzhuo)
+
+## Conformance Test Updates
+
+- The `HTTPRouteInvalidCrossNamespaceParentRef` conformance test now checks for
+  the `NotAllowedByListeners` reason on the `HTTPRoute`'s `Accepted: false`
+  condition to better indicate why the route was note accepted.
+  (#1714, @skriss)
+- A conformance test was added for `HTTPRoute` to cover the behavior of a
+  non-matching `SectionName` similar to what was already present for
+  `ListenerPort`.
+  (#1719, @zaunist)
+- Fixed an issue where tests may fail erroneously on the removal of resources
+  that are already removed.
+  (#1745, @mlavacca)
+- Logging in conformance utilities related to resource's `ObservedGeneration`
+  has been improved to emit the `ObservedGenerations that are found for the
+  purpose of making it easier to debug test failures and be more verbose about
+  the objects in question.
+  (#1761, @briantkennedy)
+  (#1763, @briantkennedy)
+- Patch instead of update in some places in conformance tests to reduce noise
+  in logs.
+  (#1760, @michaelbeaumont)
+- Added `AttachedRoutes` testing to conformance tests.
+  (#1624, @ChaningHwang)
+- The conformance tests always check that the HTTPRoute ResolvedRefs condition
+  is enforced, even when the status is true.
+  (#1668, @mlavacca)
 
 # v0.6.1
 
