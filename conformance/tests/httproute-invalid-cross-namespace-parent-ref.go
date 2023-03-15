@@ -38,6 +38,7 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-parent-ref", Namespace: "gateway-conformance-web-backend"}
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		// When running conformance tests, implementations are expected to have visibility across all namespaces, and
 		// must be setting this condition on routes that are not allowed. However, outside of conformance testing,
