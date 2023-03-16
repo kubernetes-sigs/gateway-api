@@ -1,11 +1,5 @@
 # ReferenceGrant
 
-!!! info "Experimental Channel"
-
-    The `ReferenceGrant` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
-
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
     to "ReferenceGrant" to avoid any confusion with policy attachment.
