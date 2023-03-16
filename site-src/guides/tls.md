@@ -57,8 +57,8 @@ listeners:
   port: 443
   tls:
     mode: Terminate # If protocol is `TLS`, `Passthrough` is a possible mode
-    certificateRef:
-      kind: Secret
+    certificateRefs:
+    - kind: Secret
       group: ""
       name: default-cert
 ```
