@@ -23,7 +23,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Kong][10] (beta)
 - [Kuma][11] (alpha)
 - [LiteSpeed Ingress Controller][19]
-- [NGINX Kubernetes Gateway][12]
+- [NGINX Kubernetes Gateway][12] (beta)
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 
