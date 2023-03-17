@@ -30,6 +30,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 ## Integration Status
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
+- [argo-rollouts][22] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -52,6 +53,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [19]:#litespeed-ingress-controller
 [20]:#big-ip-kubernetes-gateway
 [21]:#stunner
+[22]:#argo-rollouts
 
 ## Implementations
 
@@ -310,3 +312,10 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 [cert-manager]:https://cert-manager.io/
 [cert-manager-docs]:https://cert-manager.io/docs/usage/gateway/
+
+### Argo rollouts
+
+[Argo Rollouts][argo-rollouts] is a progressive delivery controller for Kubernetes. It supports several advanced deployment methods such as blue/green and canaries. Argo Rollouts supports the Gateway API via [a plugin][argo-rollouts-plugin].
+
+[argo-rollouts]:https://argo-rollouts.readthedocs.io/en/stable/
+[argo-rollouts-plugin]:https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/
