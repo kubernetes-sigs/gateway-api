@@ -1,0 +1,18 @@
+name: Verify docs
+
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  verify:
+    name: Verify doc links
+    runs-on: [ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v3
+    - name: checking for broken links
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        folder-path: './site-src, ./geps'
+        file-path: './CHANGELOG.md, ./CONTRIBUTING.md, ./README.md, ./RELEASE.md'
