@@ -488,6 +488,7 @@ type GatewayStatus struct {
 	// Known condition types are:
 	//
 	// * "Accepted"
+	// * "Programmed"
 	// * "Ready"
 	//
 	// +optional
