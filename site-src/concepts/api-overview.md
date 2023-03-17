@@ -294,7 +294,7 @@ reverse proxy is:
  5. Optionally, the reverse proxy can modify the request, i.e. add/remove
  headers, based on `filter` rules of the `HTTPRoute`.
  6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
- `Service`, in the cluster based on `forwardTo` rules of the `HTTPRoute`.
+ `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
 
 ## TLS Configuration
 

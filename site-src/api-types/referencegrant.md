@@ -47,8 +47,7 @@ spec:
   rules:
   - matches:
     - path: /bar
-    forwardTo:
-      backend:
+    backendRefs:
       - name: bar
         namespace: bar
 ---
