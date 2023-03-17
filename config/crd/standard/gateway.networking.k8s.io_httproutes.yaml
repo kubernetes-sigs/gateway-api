@@ -505,12 +505,16 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway Listener
-                                        port is used. In all cases, when the protocol
-                                        is http and the port is port 80, then the
-                                        port must be omitted. Similarly, when the
-                                        protocol is https and the port is port 443,
-                                        then the port must also be omitted. \n Support:
+                                        response. \n When empty, the Gateway Listener
+                                        port is used. \n Implementers should _not_
+                                        include the port number in the 'Location'
+                                        header in the following cases: \n * a Location
+                                        header that will use HTTP (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 80. * a Location
+                                        header that will use HTTPS (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 443. \n Support:
                                         Extended"
                                       format: int32
                                       maximum: 65535
@@ -930,12 +934,16 @@ spec:
                                 type: string
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. When empty,
-                                  the Gateway Listener port is used. In all cases,
-                                  when the protocol is http and the port is port 80,
-                                  then the port must be omitted. Similarly, when the
-                                  protocol is https and the port is port 443, then
-                                  the port must also be omitted. \n Support: Extended"
+                                  of the `Location` header in the response. \n When
+                                  empty, the Gateway Listener port is used. \n Implementers
+                                  should _not_ include the port number in the 'Location'
+                                  header in the following cases: \n * a Location header
+                                  that will use HTTP (whether that is determined via
+                                  the Listener protocol or the Scheme field) _and_
+                                  use port 80. * a Location header that will use HTTPS
+                                  (whether that is determined via the Listener protocol
+                                  or the Scheme field) _and_ use port 443. \n Support:
+                                  Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -1917,12 +1925,16 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway Listener
-                                        port is used. In all cases, when the protocol
-                                        is http and the port is port 80, then the
-                                        port must be omitted. Similarly, when the
-                                        protocol is https and the port is port 443,
-                                        then the port must also be omitted. \n Support:
+                                        response. \n When empty, the Gateway Listener
+                                        port is used. \n Implementers should _not_
+                                        include the port number in the 'Location'
+                                        header in the following cases: \n * a Location
+                                        header that will use HTTP (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 80. * a Location
+                                        header that will use HTTPS (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 443. \n Support:
                                         Extended"
                                       format: int32
                                       maximum: 65535
@@ -2342,12 +2354,16 @@ spec:
                                 type: string
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. When empty,
-                                  the Gateway Listener port is used. In all cases,
-                                  when the protocol is http and the port is port 80,
-                                  then the port must be omitted. Similarly, when the
-                                  protocol is https and the port is port 443, then
-                                  the port must also be omitted. \n Support: Extended"
+                                  of the `Location` header in the response. \n When
+                                  empty, the Gateway Listener port is used. \n Implementers
+                                  should _not_ include the port number in the 'Location'
+                                  header in the following cases: \n * a Location header
+                                  that will use HTTP (whether that is determined via
+                                  the Listener protocol or the Scheme field) _and_
+                                  use port 80. * a Location header that will use HTTPS
+                                  (whether that is determined via the Listener protocol
+                                  or the Scheme field) _and_ use port 443. \n Support:
+                                  Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
