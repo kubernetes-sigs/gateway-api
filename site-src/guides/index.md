@@ -7,19 +7,19 @@ _THEN_
 
 **2.**   **Try out one of the available guides:**
 
-- [Simple Gateway](/guides/simple-gateway) (a good one to start out with)
-- [HTTP routing](/guides/http-routing)
-- [HTTP redirects and rewrites](/guides/http-redirect-rewrite)
-- [HTTP traffic splitting](/guides/traffic-splitting)
-- [Routing across Namespaces](/guides/multiple-ns)
-- [Configuring TLS](/guides/tls)
-- [TCP routing](/guides/tcp)
-- [gRPC routing](/guides/grpc)
-- [Migrating from Ingress](/guides/migrating-from-ingress)
+- [Simple Gateway](../guides/simple-gateway) (a good one to start out with)
+- [HTTP routing](../guides/http-routing)
+- [HTTP redirects and rewrites](../guides/http-redirect-rewrite)
+- [HTTP traffic splitting](../guides/traffic-splitting)
+- [Routing across Namespaces](../guides/multiple-ns)
+- [Configuring TLS](../guides/tls)
+- [TCP routing](../guides/tcp)
+- [gRPC routing](../guides/grpc)
+- [Migrating from Ingress](../guides/migrating-from-ingress)
 
 ## Installing a Gateway controller
 
-There are [multiple projects](/implementations) that support the
+There are [multiple projects](../implementations) that support the
 Gateway API. By installing a Gateway controller in your Kubernetes cluster,
 you can try out the guides above. This will demonstrate that the desired routing
 configuration is actually being implemented by your Gateway resources (and the

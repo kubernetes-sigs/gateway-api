@@ -47,7 +47,7 @@
       a proud tradition of extending Ingress objects.
 
     * Use API-defined extension points. Some Gateway
-      API objects have explicit [extension points](/concepts/api-overview#extension-points)
+      API objects have explicit [extension points](./concepts/api-overview#extension-points)
       for implementations to use.
 
 *  **Q: Where can I find Gateway API releases?<br>**
@@ -73,6 +73,6 @@
 
 [1]: https://github.com/kubernetes-sigs/gateway-api
 [2]: https://github.com/kubernetes-sigs/gateway-api/releases
-[tls]:https://en.wikipedia.org/wiki/Transport_Layer_Security
-[tlsroute]:/concepts/api-overview#tlsroute
-[tlsguide]:/guides/tls
+[tls]: https://en.wikipedia.org/wiki/Transport_Layer_Security
+[tlsroute]: ./concepts/api-overview#tlsroute
+[tlsguide]: ./guides/tls

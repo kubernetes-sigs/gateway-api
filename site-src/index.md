@@ -15,11 +15,11 @@ Whether you are a user interested in using the Gateway API or an implementer
 interested in conforming to the API, the following resources will help give 
 you the necessary background:
 
-- [API overview](/concepts/api-overview)
-- [User guides](/guides)
-- [Gateway controller implementations](/implementations)
-- [API reference spec](/references/spec)
-- [Community links](/contributing/community) and [developer guide](/contributing/devguide)
+- [API overview](./concepts/api-overview)
+- [User guides](./guides)
+- [Gateway controller implementations](./implementations)
+- [API reference spec](./references/spec)
+- [Community links](./contributing/community) and [developer guide](./contributing/devguide)
 
 
 ## Gateway API concepts
@@ -73,19 +73,19 @@ used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators. The following example shows how this
 works in practice.
 
-A cluster operator creates a [Gateway](/api-types/gateway) resource derived from a
-[GatewayClass](/api-types/gatewayclass). This Gateway deploys or configures the
+A cluster operator creates a [Gateway](./api-types/gateway) resource derived from a
+[GatewayClass](./api-types/gatewayclass). This Gateway deploys or configures the
 underlying network resources that it represents. Through the
-[Route Attachment Process](/concepts/api-overview#attaching-routes-to-gateways)
+[Route Attachment Process](./concepts/api-overview#attaching-routes-to-gateways)
 between the Gateway and Routes, the cluster operator and specific teams must
 agree on what can attach to this Gateway and expose their applications through
-it. Centralized policies [such as TLS](/guides/tls#downstream-tls) can
+it. Centralized policies [such as TLS](./guides/tls#downstream-tls) can
 be enforced on the Gateway by the cluster operator. Meanwhile, the store and site
-teams run [in their own Namespaces](/guides/multiple-ns), but attach their
+teams run [in their own Namespaces](./guides/multiple-ns), but attach their
 Routes to the same shared Gateway, allowing them to independently control
-their [routing logic](/guides/http-routing). This separation of concerns
+their [routing logic](./guides/http-routing). This separation of concerns
 allows the store team to manage their own
-[traffic splitting rollout](/guides/traffic-splitting) while
+[traffic splitting rollout](./guides/traffic-splitting) while
 leaving centralized policies and control to the cluster operators.
 
 ![Gateway API Roles](./images/gateway-roles.png)

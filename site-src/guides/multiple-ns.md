@@ -36,7 +36,7 @@ to centrally control security without directly involving application teams.
 
 The logical relationship between the Gateway API resources looks like this:
 
-![Cross-Namespace routing](/images/cross-namespace-routing.svg)
+![Cross-Namespace routing](../images/cross-namespace-routing.svg)
 
 ## Cross-namespace Route Attachment
 
@@ -156,10 +156,10 @@ Gateway that these Routes want to attach to.
 
 After these three Routes are deployed, they will all be attached to the
 `shared-gateway` Gateway. The Gateway merges these Routes into a single flat
-list of routing rules. [Routing precedence](/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule)
+list of routing rules. [Routing precedence](../references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule)
 between these routing rules is determined by most specific match and
 conflicts are handled according to [conflict
-resolution](/concepts/guidelines#conflicts). This provides predictable and
+resolution](../concepts/guidelines#conflicts). This provides predictable and
 deterministic merging of routing rules between independent users.
 
 Thanks to cross-Namespace routing, the Foobar Corporation can distribute
@@ -167,4 +167,4 @@ ownership of their infrastructure more evenly, while still retaining centralized
 control. This gives them the best of both worlds, all delivered through
 declarative and open source APIs.
 
-[attachment]:/concepts/api-overview/#attaching-routes-to-gateways
+[attachment]: ../concepts/api-overview/#attaching-routes-to-gateways

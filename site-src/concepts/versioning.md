@@ -17,7 +17,7 @@ backwards incompatible ways. For more information on API versions, refer to the
 [full Kubernetes API versioning
 documentation](https://kubernetes.io/docs/reference/using-api/#api-versioning).
 
-![Lifecycle of New Gateway API Resources](/images/lifecycle-new-resources.png)
+![Lifecycle of New Gateway API Resources](../images/lifecycle-new-resources.png)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
 
 ### Release Channels (e.g. Experimental, Standard)
@@ -36,7 +36,7 @@ channel, plus:
 * New fields that are considered experimental and have not yet graduated to the
   standard channel
 
-![Release Channel Overlap](/images/release-channel-overlap.svg)
+![Release Channel Overlap](../images/release-channel-overlap.svg)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
 
 Release channels are used to indicate feature stability within Gateway API. For
@@ -50,10 +50,10 @@ Instead of trying to recreate feature gates in this project, we've introduced
 release channels. Starting in v0.5.0, all new fields and features will start in
 the Experimental release channel. From that point, these may graduate to the
 Standard release channel or be dropped from the API entirely. See
-[GEP-922](/geps/gep-922) for a more detailed discussion of this approach to new
+[GEP-922](../geps/gep-922) for a more detailed discussion of this approach to new
 fields and features.
 
-![Lifecycle of New Gateway API Fields](/images/lifecycle-new-fields.svg)
+![Lifecycle of New Gateway API Fields](../images/lifecycle-new-fields.svg)
 <!-- Source: https://docs.google.com/presentation/d/1sfZTV-vlisDUIie_iK_B2HqKia_querT6m6T2_vbAk0/edit -->
 
 ## Version Indicators

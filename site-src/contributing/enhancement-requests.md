@@ -19,7 +19,7 @@ enhancement into the project.
    (GEP)][gep]
 
 [issue]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
-[gep]: /geps/overview
+[gep]: ./geps/overview
 
 ## What is Considered an Enhancement?
 

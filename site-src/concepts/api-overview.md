@@ -12,7 +12,7 @@ There are 3 primary roles in Gateway API:
 
 There could be a fourth role of Application Admin in some use cases.
 
-Please refer to the [roles and personas](/concepts/security-model#roles-and-personas)
+Please refer to the [roles and personas](../concepts/security-model#roles-and-personas)
 section in the Security model for details.
 
 ## Resource model
@@ -191,7 +191,7 @@ own Gateway `dedicated-gw`  in the `C` Namespace that can only be used by apps
 in the `C` Namespace.
 
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
-![route binding](/images/gateway-route-binding.png)
+![route binding](../images/gateway-route-binding.png)
 
 ### How it Works
 
@@ -277,14 +277,14 @@ defines an implementable load-balancer. The diagram below illustrates the
 relationships between the different resources:
 
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
-![schema](/images/schema-uml.svg)
+![schema](../images/schema-uml.svg)
 
 ## Request flow
 
 A typical client/gateway API request flow for a gateway implemented using a
 reverse proxy is:
 
- 1. A client makes a request to <http://foo.example.com>.
+ 1. A client makes a request to `http://foo.example.com`.
  2. DNS resolves the name to a `Gateway` address.
  3. The reverse proxy receives the request on a `Listener` and uses the [Host
  header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
@@ -300,7 +300,7 @@ reverse proxy is:
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
-Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
+Please refer to the [TLS details](./guides/tls) guide for a deep dive on TLS.
 
 ## Extension points
 

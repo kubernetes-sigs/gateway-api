@@ -1,0 +1,9 @@
+{
+    "ignorePatterns": [
+        {
+            "pattern": "https://static.sched.com/"
+        }
+    ],
+    "retryOn429": false,
+    "aliveStatusCodes": [200, 206, 429, 403, 503]
+}

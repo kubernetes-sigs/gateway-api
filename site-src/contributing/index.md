@@ -61,7 +61,7 @@ interested in the ingress use case, this is the common forum for that.
 
 ### Mesh Meeting
 
-[GAMMA](/contributing/gamma/) is the initative within Gateway API to use the
+[GAMMA](./contributing/gamma/) is the initative within Gateway API to use the
 resources provided by Gateway API for service mesh use cases. Meetings happen
 weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC) and 8AM
 Pacific Time (16:00 UTC):

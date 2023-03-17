@@ -71,7 +71,7 @@ GEPs that have not been both implemented and documented before a release
 cut off will be excluded from the release.
 
 ### 5. Graduate the GEP to "Standard"
-Once this feature has met the [graduation criteria](/concepts/versioning/#graduation-criteria), it is
+Once this feature has met the [graduation criteria](/site-src/concepts/versioning/#graduation-criteria), it is
 time to graduate it to the "Standard" channel of the API. Depending on the feature, this may include
 any of the following:
 
@@ -122,7 +122,7 @@ Although less common, some GEPs may end up in one of the following states:
 
 ## Format
 
-GEPs should match the format of the template found in [GEP-696](/geps/gep-696).
+GEPs should match the format of the template found in [GEP-696](./gep-696).
 
 ## Out of scope
 
