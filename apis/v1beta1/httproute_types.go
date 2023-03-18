@@ -343,12 +343,8 @@ const (
 //
 //   - ":method" - ":" is an invalid character. This means that HTTP/2 pseudo
 //     headers are not currently supported by this type.
-//   - "/invalid" - "/" is an invalid character
-//
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=256
-// +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
-type HTTPHeaderName string
+//   - "/invalid" - "/ " is an invalid character
+type HTTPHeaderName HeaderName
 
 // HTTPHeaderMatch describes how to select a HTTP route by matching HTTP request
 // headers.
@@ -449,11 +445,7 @@ type HTTPQueryParamMatch struct {
 	//
 	// Users SHOULD NOT route traffic based on repeated query params to guard
 	// themselves against potential differences in the implementations.
-	//
-	// +kubebuilder:validation:MinLength=1
-	// +kubebuilder:validation:MaxLength=256
-	// +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
-	Name string `json:"name"`
+	Name HTTPHeaderName `json:"name"`
 
 	// Value is the value of HTTP query param to be matched.
 	//
