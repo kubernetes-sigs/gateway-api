@@ -1,7 +1,9 @@
 # How to Get Involved
 
 This page contains links to all of the meeting notes, design docs and related
-discussions around the APIs.
+discussions around the APIs. If you're interested in working towards a formal
+role in the project, refer to the [Contributor
+Ladder](/contributing/contributor-ladder).
 
 ## Feedback and Questions
 
