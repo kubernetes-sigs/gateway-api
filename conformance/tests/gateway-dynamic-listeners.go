@@ -198,10 +198,10 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 }
 
 func nextPort(start, end int, ports sets.Set[int]) int {
-	port := start + rand.Intn(end-start)
+	port := start + rand.Intn(end-start) //nolint:gosec
 	// We want a unique port
 	for ports.Has(port) {
-		port = start + rand.Intn(end-start)
+		port = start + rand.Intn(end-start) //nolint:gosec
 	}
 	ports.Insert(port)
 	return port
