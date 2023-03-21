@@ -64,6 +64,9 @@ const (
 	//
 	//       See: https://github.com/kubernetes-sigs/gateway-api/issues/1780
 	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
+
+	// This option indicates support for Gateway to support dynamic ports in their listeners
+	SupportGatewayListenerDynamicPorts SupportedFeature = "GatewayListenerDynamicPorts"
 )
 
 // StandardExtendedFeatures are extra generic features that implementations may
@@ -73,6 +76,7 @@ const (
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var StandardExtendedFeatures = sets.New(
 	SupportGatewayClassObservedGenerationBump,
+	SupportGatewayListenerDynamicPorts,
 ).Insert(StandardCoreFeatures.UnsortedList()...)
 
 // -----------------------------------------------------------------------------
