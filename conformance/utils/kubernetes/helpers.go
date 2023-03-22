@@ -636,12 +636,17 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 		return false
 	}
 
-	// TODO(mikemorris): Allow for arbitrarily ordered listeners
-	for i, eListener := range expected {
-		aListener := actual[i]
-		if aListener.Name != eListener.Name {
-			t.Logf("Name doesn't match")
-			return false
+	for _, eListener := range expected {
+		var aListener *v1beta1.ListenerStatus
+		for i := range actual {
+			if actual[i].Name == eListener.Name {
+				aListener = &actual[i]
+				break
+			}
+		}
+		if aListener == nil {
+			t.Logf("Expected status for listener %s to be present", eListener.Name)
+			continue
 		}
 
 		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
