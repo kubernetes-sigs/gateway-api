@@ -16,35 +16,25 @@
     and models more infrastructure components to provide better
     deployment and management options for cluster operators.
 
+    For more information, see the [Migrating from Ingress](https://gateway-api.sigs.k8s.io/guides/migrating-from-ingress/) guide.
+
 *   **Q: Will there be a default controller implementation (in this repo)?<br>**
     A: There is no current plan to have an "official" or "default"
     implementation. You will see the controller code in this repo be
     used for testing the support libraries.
 
 *   **Q: How can I expose custom capabilities through Gateway API?<br>**
-    A: There is a lot of diversity in the networking and proxying
-    ecosystem, and many products will have features that are not directly
-    supported in the API.  However, there are a few mechanisms available
+    A: There are a few mechanisms available
     for extending the API with implementation-specific capabilities:
 
-    * Decorate Gateway API objects with implementation-specific objects. A
+    * The [Policy Attachment](https://gateway-api.sigs.k8s.io/references/policy-attachment/)
+      model allows you to decorate Gateway API objects with implementation-specific CRDs. A
       policy or configuration object could match the Gateway API object either
       by name or by using an explicit object reference.
 
-        For example, given a `Gateway` object with name "inbound",
-        creating a `AccessPolicy` object that also has the name "inbound"
-        could cause an implementation to attach a specified access
-        control policy. This is an example of matching the object by name.
+    * Use implementation-specific values for string fields in Gateway API resources.
 
-    * Use implementation-specific values for string fields. In many
-      places, the fields of Gateway API resources have the type
-      "string". This allows an implementation to support custom values
-      for those fields in addition to any values specified in the API.
-
-    * Use implementation-specific annotations. For some kinds of
-      configuration, implementations may choose to support custom
-      annotations on Gateway API objects. This approach continues
-      a proud tradition of extending Ingress objects.
+    * As a last resort, use implementation-specific annotations on Gateway API objects.
 
     * Use API-defined extension points. Some Gateway
       API objects have explicit [extension points](/concepts/api-overview#extension-points)
@@ -59,10 +49,10 @@
   are still experimental in nature and may either be removed or changed in
   breaking ways in future releases of Gateway API.
 
+  See the [Versioning](https://gateway-api.sigs.k8s.io/concepts/versioning/) documentation for more info.
+
 * **Q: Which Kubernetes versions are supported?<br>**
-  A: Generally, we support Kubernetes 1.16+, but certain features like 
-  AppProtocol depend on Kubernetes 1.18 (opt-in) or 1.19 (on by default). 
-  There are not any other exceptions to the 1.16+ guideline right now.
+  A: See our policy on [Supported Version](https://gateway-api.sigs.k8s.io/concepts/versioning/#supported-versions)
 
 * **Q: Is SSL Passthrough supported?**
   A: SSL Passthrough (wherein a Gateway routes traffic with the [Transport
