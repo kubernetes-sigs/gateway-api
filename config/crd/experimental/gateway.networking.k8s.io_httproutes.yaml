@@ -533,14 +533,12 @@ spec:
                                         modify the path of the incoming request. The
                                         modified path is then used to construct the
                                         `Location` header. When empty, the request
-                                        path is used as-is. \n Support: Extended \n
-                                        <gateway:experimental>"
+                                        path is used as-is. \n Support: Extended"
                                       properties:
                                         replaceFullPath:
-                                          description: "ReplaceFullPath specifies
-                                            the value with which to replace the full
-                                            path of a request during a rewrite or
-                                            redirect. \n <gateway:experimental>"
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
                                           maxLength: 1024
                                           type: string
                                         replacePrefixMatch:
@@ -557,8 +555,7 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not.
-                                            \n <gateway:experimental>"
+                                            `/abc`, but the path `/abcd` would not."
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -571,7 +568,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Accepted Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `UnsupportedValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`."
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -778,25 +775,24 @@ spec:
                                 urlRewrite:
                                   description: "URLRewrite defines a schema for a
                                     filter that modifies a request during forwarding.
-                                    \n Support: Extended \n <gateway:experimental>"
+                                    \n Support: Extended"
                                   properties:
                                     hostname:
                                       description: "Hostname is the value to be used
                                         to replace the Host header value during forwarding.
-                                        \n Support: Extended \n <gateway:experimental>"
+                                        \n Support: Extended"
                                       maxLength: 253
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
                                     path:
                                       description: "Path defines a path rewrite. \n
-                                        Support: Extended \n <gateway:experimental>"
+                                        Support: Extended"
                                       properties:
                                         replaceFullPath:
-                                          description: "ReplaceFullPath specifies
-                                            the value with which to replace the full
-                                            path of a request during a rewrite or
-                                            redirect. \n <gateway:experimental>"
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
                                           maxLength: 1024
                                           type: string
                                         replacePrefixMatch:
@@ -813,8 +809,7 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not.
-                                            \n <gateway:experimental>"
+                                            `/abc`, but the path `/abcd` would not."
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -827,7 +822,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Accepted Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `UnsupportedValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`."
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -1184,12 +1179,12 @@ spec:
                                   the path of the incoming request. The modified path
                                   is then used to construct the `Location` header.
                                   When empty, the request path is used as-is. \n Support:
-                                  Extended \n <gateway:experimental>"
+                                  Extended"
                                 properties:
                                   replaceFullPath:
-                                    description: "ReplaceFullPath specifies the value
+                                    description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
-                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                      during a rewrite or redirect.
                                     maxLength: 1024
                                     type: string
                                   replacePrefixMatch:
@@ -1205,7 +1200,7 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n <gateway:experimental>"
+                                      `/abcd` would not."
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1216,8 +1211,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Accepted Condition for the Route
-                                      to `status: False`, with a Reason of `UnsupportedValue`.
-                                      \n <gateway:experimental>"
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
@@ -1410,24 +1404,24 @@ spec:
                           urlRewrite:
                             description: "URLRewrite defines a schema for a filter
                               that modifies a request during forwarding. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               hostname:
                                 description: "Hostname is the value to be used to
                                   replace the Host header value during forwarding.
-                                  \n Support: Extended \n <gateway:experimental>"
+                                  \n Support: Extended"
                                 maxLength: 253
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               path:
                                 description: "Path defines a path rewrite. \n Support:
-                                  Extended \n <gateway:experimental>"
+                                  Extended"
                                 properties:
                                   replaceFullPath:
-                                    description: "ReplaceFullPath specifies the value
+                                    description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
-                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                      during a rewrite or redirect.
                                     maxLength: 1024
                                     type: string
                                   replacePrefixMatch:
@@ -1443,7 +1437,7 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n <gateway:experimental>"
+                                      `/abcd` would not."
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1454,8 +1448,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Accepted Condition for the Route
-                                      to `status: False`, with a Reason of `UnsupportedValue`.
-                                      \n <gateway:experimental>"
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
@@ -2436,14 +2429,12 @@ spec:
                                         modify the path of the incoming request. The
                                         modified path is then used to construct the
                                         `Location` header. When empty, the request
-                                        path is used as-is. \n Support: Extended \n
-                                        <gateway:experimental>"
+                                        path is used as-is. \n Support: Extended"
                                       properties:
                                         replaceFullPath:
-                                          description: "ReplaceFullPath specifies
-                                            the value with which to replace the full
-                                            path of a request during a rewrite or
-                                            redirect. \n <gateway:experimental>"
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
                                           maxLength: 1024
                                           type: string
                                         replacePrefixMatch:
@@ -2460,8 +2451,7 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not.
-                                            \n <gateway:experimental>"
+                                            `/abc`, but the path `/abcd` would not."
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2474,7 +2464,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Accepted Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `UnsupportedValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`."
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -2681,25 +2671,24 @@ spec:
                                 urlRewrite:
                                   description: "URLRewrite defines a schema for a
                                     filter that modifies a request during forwarding.
-                                    \n Support: Extended \n <gateway:experimental>"
+                                    \n Support: Extended"
                                   properties:
                                     hostname:
                                       description: "Hostname is the value to be used
                                         to replace the Host header value during forwarding.
-                                        \n Support: Extended \n <gateway:experimental>"
+                                        \n Support: Extended"
                                       maxLength: 253
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
                                     path:
                                       description: "Path defines a path rewrite. \n
-                                        Support: Extended \n <gateway:experimental>"
+                                        Support: Extended"
                                       properties:
                                         replaceFullPath:
-                                          description: "ReplaceFullPath specifies
-                                            the value with which to replace the full
-                                            path of a request during a rewrite or
-                                            redirect. \n <gateway:experimental>"
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
                                           maxLength: 1024
                                           type: string
                                         replacePrefixMatch:
@@ -2716,8 +2705,7 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not.
-                                            \n <gateway:experimental>"
+                                            `/abc`, but the path `/abcd` would not."
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2730,7 +2718,7 @@ spec:
                                             values here must result in the implementation
                                             setting the Accepted Condition for the
                                             Route to `status: False`, with a Reason
-                                            of `UnsupportedValue`. \n <gateway:experimental>"
+                                            of `UnsupportedValue`."
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
@@ -3087,12 +3075,12 @@ spec:
                                   the path of the incoming request. The modified path
                                   is then used to construct the `Location` header.
                                   When empty, the request path is used as-is. \n Support:
-                                  Extended \n <gateway:experimental>"
+                                  Extended"
                                 properties:
                                   replaceFullPath:
-                                    description: "ReplaceFullPath specifies the value
+                                    description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
-                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                      during a rewrite or redirect.
                                     maxLength: 1024
                                     type: string
                                   replacePrefixMatch:
@@ -3108,7 +3096,7 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n <gateway:experimental>"
+                                      `/abcd` would not."
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3119,8 +3107,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Accepted Condition for the Route
-                                      to `status: False`, with a Reason of `UnsupportedValue`.
-                                      \n <gateway:experimental>"
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
@@ -3313,24 +3300,24 @@ spec:
                           urlRewrite:
                             description: "URLRewrite defines a schema for a filter
                               that modifies a request during forwarding. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               hostname:
                                 description: "Hostname is the value to be used to
                                   replace the Host header value during forwarding.
-                                  \n Support: Extended \n <gateway:experimental>"
+                                  \n Support: Extended"
                                 maxLength: 253
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
                               path:
                                 description: "Path defines a path rewrite. \n Support:
-                                  Extended \n <gateway:experimental>"
+                                  Extended"
                                 properties:
                                   replaceFullPath:
-                                    description: "ReplaceFullPath specifies the value
+                                    description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
-                                      during a rewrite or redirect. \n <gateway:experimental>"
+                                      during a rewrite or redirect.
                                     maxLength: 1024
                                     type: string
                                   replacePrefixMatch:
@@ -3346,7 +3333,7 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n <gateway:experimental>"
+                                      `/abcd` would not."
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3357,8 +3344,7 @@ spec:
                                       unknown values will not cause a crash. \n Unknown
                                       values here must result in the implementation
                                       setting the Accepted Condition for the Route
-                                      to `status: False`, with a Reason of `UnsupportedValue`.
-                                      \n <gateway:experimental>"
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch

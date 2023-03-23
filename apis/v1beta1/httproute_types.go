@@ -583,7 +583,7 @@ type HTTPRouteFilter struct {
 	// Reason of `UnsupportedValue`.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;ExtensionRef
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
 	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
 	Type HTTPRouteFilterType `json:"type"`
 
@@ -625,7 +625,6 @@ type HTTPRouteFilter struct {
 	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	// +optional
 	URLRewrite *HTTPURLRewriteFilter `json:"urlRewrite,omitempty"`
 
@@ -658,6 +657,7 @@ const (
 	// Support in HTTPRouteRule: Extended
 	//
 	// Support in HTTPBackendRef: Extended
+	//
 	// <gateway:experimental>
 	HTTPRouteFilterResponseHeaderModifier HTTPRouteFilterType = "ResponseHeaderModifier"
 
@@ -679,8 +679,6 @@ const (
 	// Support in HTTPRouteRule: Extended
 	//
 	// Support in HTTPBackendRef: Extended
-	//
-	// <gateway:experimental>
 	HTTPRouteFilterURLRewrite HTTPRouteFilterType = "URLRewrite"
 
 	// HTTPRouteFilterRequestMirror can be used to mirror HTTP requests to a
@@ -817,7 +815,6 @@ const (
 )
 
 // HTTPPathModifier defines configuration for path modifiers.
-// <gateway:experimental>
 type HTTPPathModifier struct {
 	// Type defines the type of path modifier. Additional types may be
 	// added in a future release of the API.
@@ -829,14 +826,12 @@ type HTTPPathModifier struct {
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
-	// <gateway:experimental>
 	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
 	Type HTTPPathModifierType `json:"type"`
 
 	// ReplaceFullPath specifies the value with which to replace the full path
 	// of a request during a rewrite or redirect.
 	//
-	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
 	ReplaceFullPath *string `json:"replaceFullPath,omitempty"`
@@ -851,7 +846,6 @@ type HTTPPathModifier struct {
 	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
 	// match the prefix `/abc`, but the path `/abcd` would not.
 	//
-	// <gateway:experimental>
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
 	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
@@ -892,7 +886,6 @@ type HTTPRequestRedirectFilter struct {
 	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	// +optional
 	Path *HTTPPathModifier `json:"path,omitempty"`
 
@@ -935,15 +928,12 @@ type HTTPRequestRedirectFilter struct {
 // MUST NOT be used on the same Route rule as a HTTPRequestRedirect filter.
 //
 // Support: Extended
-//
-// <gateway:experimental>
 type HTTPURLRewriteFilter struct {
 	// Hostname is the value to be used to replace the Host header value during
 	// forwarding.
 	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	// +optional
 	Hostname *PreciseHostname `json:"hostname,omitempty"`
 
@@ -951,7 +941,6 @@ type HTTPURLRewriteFilter struct {
 	//
 	// Support: Extended
 	//
-	// <gateway:experimental>
 	// +optional
 	Path *HTTPPathModifier `json:"path,omitempty"`
 }
