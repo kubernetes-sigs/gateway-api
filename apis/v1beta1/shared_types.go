@@ -289,9 +289,11 @@ const (
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 
-	// This condition indicates whether incompatible filters are present on
-	// a Route. Controllers should only add this condition with status true
-	// when an incompatible combination is present.
+	// This condition indicates whether configuration present in a Route is
+	// partially invalid. This may occur in the form of a combination of
+	// incompatible filters present in an individual route rule that an
+	// implementation wishes to call out. Controllers should only add this
+	// condition with status true when such an error is present.
 	//
 	// Possible reasons for this condition to be true are:
 	//
@@ -303,10 +305,11 @@ const (
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
 	// interoperability.
-	RouteConditionIncompatibleFilters RouteConditionType = "IncompatibleFilters"
+	RouteConditionPartiallyInvalid RouteConditionType = "PartiallyInvalid"
 
-	// This reason is used with the "IncompatibleFilters" condition when the
-	// condition is true.
+	// This reason is used with the "PartiallyInvalid" condition when the
+	// there are incompatible filters present on a route rule (for example if
+	// the URLRewrite and RequestRedirect are both present on an HTTPRoute).
 	RouteReasonIncompatibleFilters RouteConditionReason = "IncompatibleFilters"
 )
 
