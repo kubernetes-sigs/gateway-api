@@ -646,7 +646,7 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 		}
 		if aListener == nil {
 			t.Logf("Expected status for listener %s to be present", eListener.Name)
-			continue
+			return false
 		}
 
 		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
