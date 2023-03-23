@@ -1632,6 +1632,7 @@ spec:
                                     differences in the implementations."
                                   maxLength: 256
                                   minLength: 1
+                                  pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                   type: string
                                 type:
                                   default: Exact
@@ -3524,6 +3525,7 @@ spec:
                                     differences in the implementations."
                                   maxLength: 256
                                   minLength: 1
+                                  pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                   type: string
                                 type:
                                   default: Exact
