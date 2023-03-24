@@ -69,6 +69,7 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	errs = append(errs, ValidateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
 	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
+	errs = append(errs, ValidateListenerNames(listeners, path)...)
 	return errs
 }
 
@@ -115,6 +116,20 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
 			}
 		}
+	}
+	return errs
+}
+
+// ValidateListenerNames validates the names of the listeners
+// must be unique within the Gateway
+func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	nameMap := map[gatewayv1b1.SectionName]struct{}{}
+	for i, c := range listeners {
+		if _, found := nameMap[c.Name]; found {
+			errs = append(errs, field.Forbidden(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
+		}
+		nameMap[c.Name] = struct{}{}
 	}
 	return errs
 }
