@@ -22,8 +22,7 @@ are their goals and how they use Gateway API resources to accomplish them:
 isolate access and  configuration across their apps as much as possible to
 minimize access and failure domains. They use separate HTTPRoutes attached to
 the same Gateway to isolate routing configurations, such as canary rollouts,
-and still share the same but share the same IP address, port, DNS domain, and
-TLS certificate.
+but still share the same IP address, port, DNS domain, and TLS certificate.
 - The store team has a single Service called _store_ that they have deployed
 in the `store-ns` Namespace which also needs to be exposed behind the same IP
 address and domain.
