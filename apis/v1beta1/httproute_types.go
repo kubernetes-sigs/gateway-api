@@ -156,9 +156,12 @@ type HTTPRouteRule struct {
 	// ties. Across all rules specified on applicable Routes, precedence must be
 	// given to the match with the largest number of:
 	//
-	// * Characters in a matching path.
+	// * Characters in a matching "Exact" path match
+	// * Characters in a matching "Prefix" path match
 	// * Header matches.
 	// * Query param matches.
+	//
+	// Note: The precedence of RegularExpression path matches are implementation-specific.
 	//
 	// If ties still exist across multiple Routes, matching precedence MUST be
 	// determined in order of the following criteria, continuing on ties:

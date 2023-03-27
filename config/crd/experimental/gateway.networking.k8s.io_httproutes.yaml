@@ -1491,10 +1491,12 @@ spec:
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
                         applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching path.
-                        * Header matches. * Query param matches. \n If ties still
-                        exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing
+                        the largest number of: \n * Characters in a matching \"Exact\"
+                        path match * Characters in a matching \"Prefix\" path match
+                        * Header matches. * Query param matches. \n Note: The precedence
+                        of RegularExpression path matches are implementation-specific.
+                        \n If ties still exist across multiple Routes, matching precedence
+                        MUST be determined in order of the following criteria, continuing
                         on ties: \n * The oldest Route based on creation timestamp.
                         * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
                         \n If ties still exist within an HTTPRoute, matching precedence
@@ -3392,10 +3394,12 @@ spec:
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
                         applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching path.
-                        * Header matches. * Query param matches. \n If ties still
-                        exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing
+                        the largest number of: \n * Characters in a matching \"Exact\"
+                        path match * Characters in a matching \"Prefix\" path match
+                        * Header matches. * Query param matches. \n Note: The precedence
+                        of RegularExpression path matches are implementation-specific.
+                        \n If ties still exist across multiple Routes, matching precedence
+                        MUST be determined in order of the following criteria, continuing
                         on ties: \n * The oldest Route based on creation timestamp.
                         * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
                         \n If ties still exist within an HTTPRoute, matching precedence
