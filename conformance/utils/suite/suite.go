@@ -17,6 +17,7 @@ limitations under the License.
 package suite
 
 import (
+	"net/http"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -120,6 +121,7 @@ type Options struct {
 	GatewayClassName string
 	Debug            bool
 	RoundTripper     roundtripper.RoundTripper
+	HTTPRoundTripper http.RoundTripper
 	BaseManifests    string
 	NamespaceLabels  map[string]string
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
@@ -147,7 +149,7 @@ func New(s Options) *ConformanceTestSuite {
 
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
-		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
+		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig, HTTPRoundTripper: s.HTTPRoundTripper}
 	}
 
 	if s.EnableAllSupportedFeatures == true {

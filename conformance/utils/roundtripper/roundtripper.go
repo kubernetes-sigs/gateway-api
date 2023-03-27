@@ -84,8 +84,9 @@ type CapturedResponse struct {
 // DefaultRoundTripper is the default implementation of a RoundTripper. It will
 // be used if a custom implementation is not specified.
 type DefaultRoundTripper struct {
-	Debug         bool
-	TimeoutConfig config.TimeoutConfig
+	Debug            bool
+	TimeoutConfig    config.TimeoutConfig
+	HTTPRoundTripper http.RoundTripper
 }
 
 // CaptureRoundTrip makes a request with the provided parameters and returns the
