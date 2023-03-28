@@ -31,13 +31,13 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GRPCExactPathMatching)
+	ConformanceTests = append(ConformanceTests, GRPCExactMethoMatching)
 }
 
-var GRPCExactPathMatching = suite.ConformanceTest{
-	ShortName:   "GRPCExactPathMatching",
-	Description: "A single GRPCRoute with exact path matching for different backends",
-	Manifests:   []string{"tests/grpcroute-exact-path-matching.yaml"},
+var GRPCExactMethoMatching = suite.ConformanceTest{
+	ShortName:   "GRPCExactMethoMatching",
+	Description: "A single GRPCRoute with exact method matching for different backends",
+	Manifests:   []string{"tests/grpcroute-exact-method-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "exact-matching", Namespace: ns}
