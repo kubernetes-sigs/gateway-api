@@ -35,7 +35,10 @@ var HTTPRouteRedirectPort = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectPort",
 	Description: "An HTTPRoute with a port redirect filter",
 	Manifests:   []string{"tests/httproute-redirect-port.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRoutePortRedirect},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRoutePortRedirect,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect-port", Namespace: ns}

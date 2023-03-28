@@ -35,7 +35,10 @@ func init() {
 var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHostnameIntersection",
 	Description: "HTTPRoutes should attach to listeners only if they have intersecting hostnames, and should accept requests only for the intersecting hostnames",
-	Manifests:   []string{"tests/httproute-hostname-intersection.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-hostname-intersection.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		gwNN := types.NamespacedName{Name: "httproute-hostname-intersection", Namespace: ns}

@@ -34,7 +34,10 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteQueryParamMatching",
 	Description: "A single HTTPRoute with query param matching for different backends",
 	Manifests:   []string{"tests/httproute-query-param-matching.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteQueryParamMatching},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteQueryParamMatching,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Namespace: ns, Name: "query-param-matching"}

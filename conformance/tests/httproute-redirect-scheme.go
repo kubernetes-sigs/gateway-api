@@ -35,7 +35,10 @@ var HTTPRouteRedirectScheme = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectScheme",
 	Description: "An HTTPRoute with a scheme redirect filter",
 	Manifests:   []string{"tests/httproute-redirect-scheme.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteSchemeRedirect},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteSchemeRedirect,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect-scheme", Namespace: ns}

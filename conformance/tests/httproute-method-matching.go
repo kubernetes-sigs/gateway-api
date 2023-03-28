@@ -34,7 +34,10 @@ var HTTPRouteMethodMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteMethodMatching",
 	Description: "A single HTTPRoute with method matching for different backends",
 	Manifests:   []string{"tests/httproute-method-matching.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteMethodMatching},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteMethodMatching,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "method-matching", Namespace: ns}

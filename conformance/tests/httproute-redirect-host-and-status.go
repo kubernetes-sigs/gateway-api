@@ -34,7 +34,10 @@ func init() {
 var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectHostAndStatus",
 	Description: "An HTTPRoute with hostname and statusCode redirect filters",
-	Manifests:   []string{"tests/httproute-redirect-host-and-status.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-redirect-host-and-status.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect-host-and-status", Namespace: ns}
