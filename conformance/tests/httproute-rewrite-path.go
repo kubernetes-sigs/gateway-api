@@ -34,7 +34,10 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRewritePath",
 	Description: "An HTTPRoute with path rewrite filter",
 	Manifests:   []string{"tests/httproute-rewrite-path.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRoutePathRewrite},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRoutePathRewrite,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "rewrite-path", Namespace: ns}

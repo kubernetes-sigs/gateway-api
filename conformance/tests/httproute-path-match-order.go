@@ -33,7 +33,10 @@ func init() {
 var HTTPRoutePathMatchOrder = suite.ConformanceTest{
 	ShortName:   "HTTPRoutePathMatchOrder",
 	Description: "An HTTPRoute where there are multiple matches routing to any given backend follows match order precedence",
-	Manifests:   []string{"tests/httproute-path-match-order.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-path-match-order.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Namespace: ns, Name: "path-matching-order"}

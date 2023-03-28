@@ -33,7 +33,10 @@ func init() {
 var HTTPExactPathMatching = suite.ConformanceTest{
 	ShortName:   "HTTPExactPathMatching",
 	Description: "A single HTTPRoute with exact path matching for different backends",
-	Manifests:   []string{"tests/httproute-exact-path-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-exact-path-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "exact-matching", Namespace: ns}

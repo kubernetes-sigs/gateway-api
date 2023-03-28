@@ -33,8 +33,11 @@ func init() {
 var HTTPRouteReferenceGrant = suite.ConformanceTest{
 	ShortName:   "HTTPRouteReferenceGrant",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
-	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
-	Manifests:   []string{"tests/httproute-reference-grant.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportReferenceGrant,
+	},
+	Manifests: []string{"tests/httproute-reference-grant.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
