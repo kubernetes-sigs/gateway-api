@@ -517,9 +517,12 @@ type GatewayConditionType string
 type GatewayConditionReason string
 
 const (
-	// This condition indicates whether a Gateway has generated some
-	// configuration that is assumed to be ready soon in the underlying data
-	// plane.
+	// This condition indicates whether a Gateway has generated some configuration and programmed the
+	// underlying data plane implementation. Implementations should wait until resources are fully
+	// provisioned, to the best of their knowledge. This may include waiting for load balancers to be
+	// provisioned, waiting for addresses to be allocated, or waiting until configuration has been
+	// received by the data plane. However, as implementations may be eventually consistent, this does
+	// not guarantee the gateway is *immediately* able to recieve traffic.
 	//
 	// It is a positive-polarity summary condition, and so should always be
 	// present on the resource with ObservedGeneration set.
@@ -536,6 +539,7 @@ const (
 	//
 	// * "Invalid"
 	// * "Pending"
+	// * "AddressNotAssigned"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -553,6 +557,13 @@ const (
 	// This reason is used with the "Programmed" condition when the Listener is
 	// syntactically or semantically invalid.
 	GatewayReasonInvalid GatewayConditionReason = "Invalid"
+
+	// This reason is used with the "Programmed" condition when none of the requested
+	// addresses have been assigned to the Gateway. This reason can be used to
+	// express a range of circumstances, including (but not limited to) IPAM
+	// address exhaustion, invalid or unsupported address requests, or a named
+	// address not being found.
+	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
 const (
@@ -607,48 +618,21 @@ const (
 )
 
 const (
-	// Ready is an optional Condition that has Extended support. When it's set,
-	// the condition indicates whether the Gateway has been completely configured
-	// and traffic is ready to flow through the data plane immediately.
+	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
+	// Note: its not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
+	// to alert about usage.
 	//
-	// If both the "ListenersNotValid" and "ListenersNotReady"
-	// reasons are true, the Gateway controller should prefer the
-	// "ListenersNotValid" reason.
-	//
-	// Possible reasons for this condition to be true are:
-	//
-	// * "Ready"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "ListenersNotValid"
-	// * "ListenersNotReady"
-	// * "AddressNotAssigned"
-	//
-	// Controllers may raise this condition with other reasons,
-	// but should prefer to use the reasons listed above to improve
-	// interoperability.
+	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
 
-	// This reason is used with the "Ready" condition when the condition is
-	// true.
+	// Deprecated: Ready is reserved for future use
 	GatewayReasonReady GatewayConditionReason = "Ready"
 
-	// This reason is used with the "Ready" condition when one or
-	// more Listeners have an invalid or unsupported configuration
-	// and cannot be configured on the Gateway.
+	// Deprecated: Ready is reserved for future use
 	GatewayReasonListenersNotValid GatewayConditionReason = "ListenersNotValid"
 
-	// This reason is used with the "Ready" condition when one or
-	// more Listeners are not ready to serve traffic.
+	// Deprecated: Ready is reserved for future use
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
-
-	// This reason is used with the "Ready" condition when none of the requested
-	// addresses have been assigned to the Gateway. This reason can be used to
-	// express a range of circumstances, including (but not limited to) IPAM
-	// address exhaustion, invalid or unsupported address requests, or a named
-	// address not being found.
-	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
 // ListenerStatus is the status associated with a Listener.
@@ -873,38 +857,19 @@ const (
 )
 
 const (
-	// Ready is an optional Condition that has Extended support. When it's set,
-	// the condition indicates whether the Listener has been configured on the
-	// Gateway and traffic is ready to flow through the data plane immediately.
+	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
+	// Note: its not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
+	// to alert about usage.
 	//
-	// Possible reasons for this condition to be True are:
-	//
-	// * "Ready"
-	//
-	// Possible reasons for this condition to be False are:
-	//
-	// * "Invalid"
-	// * "Pending"
-	//
-	// Possible reasons for this condition to be Unknown are:
-	//
-	// * "Pending"
-	//
-	// Controllers may raise this condition with other reasons,
-	// but should prefer to use the reasons listed above to improve
-	// interoperability.
+	// Deprecated: Ready is reserved for future use
 	ListenerConditionReady ListenerConditionType = "Ready"
 
-	// This reason is used with the "Ready" condition when the condition is
-	// true.
+	// Deprecated: Ready is reserved for future use
 	ListenerReasonReady ListenerConditionReason = "Ready"
 
-	// This reason is used with the "Ready" and "Programmed" conditions when the
-	// Listener is syntactically or semantically invalid.
+	// Deprecated: Ready is reserved for future use
 	ListenerReasonInvalid ListenerConditionReason = "Invalid"
 
-	// This reason is used with the "Accepted", "Ready" and "Programmed"
-	// conditions when the Listener is either not yet reconciled or not yet not
-	// online and ready to accept client traffic.
+	// Deprecated: Ready is reserved for future use
 	ListenerReasonPending ListenerConditionReason = "Pending"
 )
