@@ -45,6 +45,11 @@ type Response struct {
   Response 	*pb.EchoResponse
 }
 
+type RequestMetadata struct {
+  // The :authority pseudoheader to set on the outgoing request.
+  Authority	string
+}
+
 // ExpectedResponse defines the response expected for a given request.
 type ExpectedResponse struct {
 	// Defines the request to make. Only one of EchoRequest and EchoTwoRequest
@@ -52,6 +57,9 @@ type ExpectedResponse struct {
 	EchoRequest *pb.EchoRequest
 	EchoTwoRequest *pb.EchoRequest
 	EchoThreeRequest *pb.EchoRequest
+
+	// Metadata describing the outgoing request.
+	RequestMetadata *RequestMetadata
 
 	// Response defines what response the test case
 	// should receive.
@@ -103,6 +111,7 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 
 type client struct {
 	Conn *grpc.ClientConn
+	RequestMetadata *RequestMetadata
 }
 
 func (c *client) ensureConnection(address string) error {
@@ -110,7 +119,12 @@ func (c *client) ensureConnection(address string) error {
 		return nil
 	}
 	var err error
-	c.Conn, err = grpc.Dial(address, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	dialOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	if c.RequestMetadata != nil && c.RequestMetadata.Authority != "" {
+		dialOpts = append(dialOpts, grpc.WithAuthority(c.RequestMetadata.Authority))
+	}
+
+	c.Conn, err = grpc.Dial(address, dialOpts...)
 	if err != nil {
 		c.Conn = nil
 		return err
@@ -215,6 +229,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, timeoutConfi
 	validateExpectedResponse(t, expected)
 	c := &client{
 		Conn: nil,
+		RequestMetadata: expected.RequestMetadata,
 	}
 	defer c.Close()
 	sendRPC := func(elapsed time.Duration) bool {
