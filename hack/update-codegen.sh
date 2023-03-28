@@ -102,8 +102,30 @@ echo "Generating gRPC/Protobuf code"
 
 readonly PROTOC_CACHE_DIR="/tmp/protoc.cache"
 readonly PROTOC_BINARY="${PROTOC_CACHE_DIR}/bin/protoc"
-readonly PROTOC_URL="https://github.com/protocolbuffers/protobuf/releases/download/v22.2/protoc-22.2-linux-x86_64.zip"
-readonly PROTOC_CHECKSUM="4805ba56594556402a6c327a8d885a47640ee363  ${PROTOC_BINARY}"
+readonly PROTOC_VERSION="22.2"
+readonly PROTOC_REPO="https://github.com/protocolbuffers/protobuf"
+
+readonly PROTOC_X86_URL="${PROTOC_REPO}/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-x86_64.zip"
+readonly PROTOC_X86_CHECKSUM="73243017d21ebe1cc1fda4005b5ace91ffc68218  ${PROTOC_BINARY}"
+
+readonly PROTOC_ARM64_URL="${PROTOC_REPO}/releases/download/v${PROTOC_VERSION}/protoc-${PROTOC_VERSION}-linux-aarch_64.zip"
+readonly PROTOC_ARM64_CHECKSUM="b6077aef64f28f4a73190928b474ee6618162438  ${PROTOC_BINARY}"
+
+PROTOC_URL=""
+PROTOC_CHECKSUM=""
+
+ARCH=$(uname -m)
+
+if [[ "$ARCH" == "x86_64" ]]; then
+	URL="$PROTOC_X86_URL"
+	CHECKSUM="$PROTOC_X86_CHECKSUM"
+elif [[ "$ARCH" == "arm64" ]]; then
+	URL="$PROTOC_ARM64_URL"
+	CHECKSUM="$PROTOC_ARM64_CHECKSUM"
+else
+	echo "Architecture ${ARCH} is not supported." >/dev/stderr
+	exit 1
+fi
 
 function verify_protoc {
   if ! echo "${PROTOC_CHECKSUM}" | shasum -c; then
