@@ -27,7 +27,7 @@ import "k8s.io/apimachinery/pkg/util/sets"
 type SupportedFeature string
 
 // -----------------------------------------------------------------------------
-// Features - All Profiles (Core)
+// Features - Standard (Core)
 // -----------------------------------------------------------------------------
 
 const (
@@ -38,7 +38,7 @@ const (
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
-// the Core API features. All conformance profiles include this standard set.
+// the Core API features (e.g. GatewayClass, Gateway, e.t.c.).
 //
 // TODO: we need clarity for standard vs experimental features.
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
@@ -47,7 +47,7 @@ var StandardCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
-// Features - All Profiles (Extended)
+// Features - Standard (Extended)
 // -----------------------------------------------------------------------------
 
 const (
@@ -76,7 +76,7 @@ var StandardExtendedFeatures = sets.New(
 ).Insert(StandardCoreFeatures.UnsortedList()...)
 
 // -----------------------------------------------------------------------------
-// Features - HTTP Conformance Profile (Core)
+// Features - HTTPRoute Conformance (Core)
 // -----------------------------------------------------------------------------
 
 const (
@@ -85,13 +85,13 @@ const (
 )
 
 // HTTPCoreFeatures includes all SupportedFeatures needed to be conformant with
-// the HTTP conformance profile at a Core level of support.
+// the HTTPRoute.
 var HTTPCoreFeatures = sets.New(
 	SupportHTTPRoute,
 )
 
 // -----------------------------------------------------------------------------
-// Features - HTTP Conformance Profile (Extended)
+// Features - HTTPRoute Conformance (Extended)
 // -----------------------------------------------------------------------------
 
 const (
@@ -120,9 +120,9 @@ const (
 	SupportHTTPRoutePathRewrite SupportedFeature = "HTTPRoutePathRewrite"
 )
 
-// HTTPExtendedFeatures includes all the supported features for the HTTP conformance
-// profile and can be used to opt-in to run all HTTP tests (including extended
-// and experimental features).
+// HTTPExtendedFeatures includes all the supported features for HTTPRoute
+// conformance and can be used to opt-in to run all HTTPRoute tests, including
+// extended features.
 var HTTPExtendedFeatures = sets.New(
 	SupportHTTPRouteQueryParamMatching,
 	SupportHTTPRouteMethodMatching,
@@ -135,7 +135,7 @@ var HTTPExtendedFeatures = sets.New(
 ).Insert(HTTPCoreFeatures.UnsortedList()...)
 
 // -----------------------------------------------------------------------------
-// Features - TLS Conformance Profile
+// Features - TLSRoute Conformance (Core)
 // -----------------------------------------------------------------------------
 
 const (
@@ -143,8 +143,8 @@ const (
 	SupportTLSRoute SupportedFeature = "TLSRoute"
 )
 
-// TLSCoreFeatures includes all the supported features for the TLS conformance
-// profile at a Core level of support.
+// TLSCoreFeatures includes all the supported features for the TLSRoute API at
+// a Core level of support.
 var TLSCoreFeatures = sets.New(
 	SupportTLSRoute,
 )
@@ -156,8 +156,7 @@ var TLSCoreFeatures = sets.New(
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
 //
-// NOTE: as new profiles and levels are added, they should be inserted into
-// this set.
+// NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
 	Insert(StandardExtendedFeatures.UnsortedList()...).
 	Insert(HTTPExtendedFeatures.UnsortedList()...).
