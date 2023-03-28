@@ -2,9 +2,17 @@ package suite
 
 import "k8s.io/apimachinery/pkg/util/sets"
 
+// -----------------------------------------------------------------------------
+// Features - Types
+// -----------------------------------------------------------------------------
+
 // SupportedFeature allows opting in to additional conformance tests at an
 // individual feature granularity.
 type SupportedFeature string
+
+// -----------------------------------------------------------------------------
+// Features - All Profiles
+// -----------------------------------------------------------------------------
 
 const (
 	// This option indicates support for ReferenceGrant (core conformance).
@@ -12,8 +20,21 @@ const (
 	// and documented equivalent safeguards.
 	SupportReferenceGrant SupportedFeature = "ReferenceGrant"
 
-	// This option indicates support for TLSRoute (extended conformance).
-	SupportTLSRoute SupportedFeature = "TLSRoute"
+	// This option indicates GatewayClass will update the observedGeneration in it's conditions when reconciling
+	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
+)
+
+// StandardCoreFeatures are the features that are required to be conformant with
+// the Core API features that are part of the Standard release channel.
+var StandardCoreFeatures = sets.New(
+	SupportReferenceGrant,
+)
+
+// -----------------------------------------------------------------------------
+// Features - HTTP Conformance Profile
+// -----------------------------------------------------------------------------
+
+const (
 
 	// This option indicates support for HTTPRoute query param matching (extended conformance).
 	SupportHTTPRouteQueryParamMatching SupportedFeature = "HTTPRouteQueryParamMatching"
@@ -26,9 +47,6 @@ const (
 
 	// This option indicates support for Destination Port matching (extended conformance).
 	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
-
-	// This option indicates GatewayClass will update the observedGeneration in it's conditions when reconciling
-	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
 
 	// This option indicates support for HTTPRoute port redirect (extended conformance).
 	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
@@ -46,11 +64,18 @@ const (
 	SupportHTTPRoutePathRewrite SupportedFeature = "HTTPRoutePathRewrite"
 )
 
-// StandardCoreFeatures are the features that are required to be conformant with
-// the Core API features that are part of the Standard release channel.
-var StandardCoreFeatures = sets.New(
-	SupportReferenceGrant,
+// -----------------------------------------------------------------------------
+// Features - TLS Conformance Profile
+// -----------------------------------------------------------------------------
+
+const (
+	// This option indicates support for TLSRoute (extended conformance).
+	SupportTLSRoute SupportedFeature = "TLSRoute"
 )
+
+// -----------------------------------------------------------------------------
+// Features - Compilations
+// -----------------------------------------------------------------------------
 
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
