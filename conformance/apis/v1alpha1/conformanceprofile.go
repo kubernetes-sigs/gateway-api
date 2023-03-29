@@ -22,8 +22,8 @@ package v1alpha1
 // ProfileReport is the generated report for the test results of a specific
 // named conformance profile.
 type ProfileReport struct {
-	// Name indicates the name of the conformance profile (e.g. "HTTPRoute",
-	// "TCPRoute", "UDPRoute", e.t.c.).
+	// Name indicates the name of the conformance profile (e.g. "HTTP",
+	// "TLS", "Mesh", e.t.c.).
 	Name string `json:"name"`
 
 	// Core indicates the core support level which includes the set of tests
@@ -52,7 +52,7 @@ type ExtendedStatus struct {
 
 // Status includes details on the results of a test.
 type Status struct {
-	Result `json:"status"`
+	Result `json:"result"`
 
 	// Summary is a human-readable message intended for end-users to understand
 	// the overall status at a glance.
