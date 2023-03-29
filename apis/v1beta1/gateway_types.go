@@ -584,6 +584,7 @@ const (
 	// * "Invalid"
 	// * "NotReconciled"
 	// * "UnsupportedAddress"
+	// * "ListenersNotValid"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -597,6 +598,13 @@ const (
 	// This reason is used with the "Accepted" condition when the condition is
 	// True.
 	GatewayReasonAccepted GatewayConditionReason = "Accepted"
+
+	// This reason is used with the "Accepted" condition when one or
+	// more Listeners have an invalid or unsupported configuration
+	// and cannot be configured on the Gateway.
+	// This can be the reason when "Accepted" is "True" or "False", depending on whether
+	// the listener being invalid causes the entire Gateway to not be accepted.
+	GatewayReasonListenersNotValid GatewayConditionReason = "ListenersNotValid"
 
 	// This reason is used with the "Accepted" and "Programmed"
 	// conditions when the status is "Unknown" and no controller has reconciled
@@ -636,9 +644,6 @@ const (
 
 	// Deprecated: Ready is reserved for future use
 	GatewayReasonReady GatewayConditionReason = "Ready"
-
-	// Deprecated: Ready is reserved for future use
-	GatewayReasonListenersNotValid GatewayConditionReason = "ListenersNotValid"
 
 	// Deprecated: Ready is reserved for future use
 	GatewayReasonListenersNotReady GatewayConditionReason = "ListenersNotReady"
