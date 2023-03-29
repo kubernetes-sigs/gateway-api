@@ -636,8 +636,15 @@ const (
 
 const (
 	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
-	// Note: its not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
+	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
+	//
+	// If used in the future, "Ready" will represent the final state where all configuration is confirmed good
+	// _and has completely propagated to the data plane_. That is, it is a _guarantee_ that, as soon as something
+	// sees the Condition as `true`, then connections will be correctly routed _immediately_.
+	//
+	// This is a very strong guarantee, and to date no implementation has satisfied it enough to implement it.
+	// This reservation can be discussed in the future if necessary.
 	//
 	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
@@ -872,8 +879,15 @@ const (
 
 const (
 	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
-	// Note: its not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
+	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
+	//
+	// If used in the future, "Ready" will represent the final state where all configuration is confirmed good
+	// _and has completely propagated to the data plane_. That is, it is a _guarantee_ that, as soon as something
+	// sees the Condition as `true`, then connections will be correctly routed _immediately_.
+	//
+	// This is a very strong guarantee, and to date no implementation has satisfied it enough to implement it.
+	// This reservation can be discussed in the future if necessary.
 	//
 	// Deprecated: Ready is reserved for future use
 	ListenerConditionReady ListenerConditionType = "Ready"
