@@ -20,10 +20,10 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-// PortSet is a wrapper for handling sets of ports.
-type PortSet []v1beta1.PortNumber
+// PortStack is a wrapper for handling sets of ports.
+type PortStack []v1beta1.PortNumber
 
-func (s *PortSet) PopPort() (v1beta1.PortNumber, bool) {
+func (s *PortStack) PopPort() (v1beta1.PortNumber, bool) {
 	if len(*s) == 0 {
 		return 0, false
 	}

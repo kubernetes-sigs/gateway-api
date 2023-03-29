@@ -53,7 +53,7 @@ type Applier struct {
 	// Gateway with 2 listeners on different ports, there should be at least three
 	// validPorts.
 	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts PortSet
+	ValidUniqueListenerPorts PortStack
 
 	// GatewayClass will be used as the spec.gatewayClassName when applying Gateway resources
 	GatewayClass string
@@ -64,7 +64,8 @@ type Applier struct {
 	// FS is the filesystem to use when reading manifests.
 	FS embed.FS
 
-	assignedPorts map[types.NamespacedName]PortSet
+	// assignedPorts tracks ports used for Gateway objects
+	assignedPorts map[types.NamespacedName]PortStack
 	// portsLock is used for the critical section around freeing and assigning
 	// ports to Gateway listeners.
 	portsLock sync.Mutex
@@ -87,7 +88,7 @@ func (a *Applier) markPortsAvailable(name types.NamespacedName) {
 // prepareGateway adjusts both listener ports and the gatewayClassName. It
 // returns the ports used by the listeners if they came from validPorts.
 func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
-	// This locks serves as a critical section for the logic around manipulating
+	// This lock serves as a critical section for the logic around manipulating
 	// ports and we enter it every time we prepare a Gateway.
 	a.portsLock.Lock()
 	defer a.portsLock.Unlock()
@@ -145,7 +146,7 @@ func (a *Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) 
 
 	// Remember the ports we've allocated for this Gateway resource.
 	if a.assignedPorts == nil {
-		a.assignedPorts = map[types.NamespacedName]PortSet{}
+		a.assignedPorts = map[types.NamespacedName]PortStack{}
 	}
 	a.assignedPorts[name] = allocatedPorts
 }
