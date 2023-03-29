@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Kubernetes Authors.
+Copyright 2023 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package validation
 import (
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -70,6 +71,7 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	errs = append(errs, validateListenerHostname(listeners, path)...)
 	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
 	errs = append(errs, ValidateListenerNames(listeners, path)...)
+	errs = append(errs, validateHostnameProtocolPort(listeners, path)...)
 	return errs
 }
 
@@ -131,5 +133,27 @@ func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) f
 		}
 		nameMap[c.Name] = struct{}{}
 	}
+	return errs
+}
+
+// validateHostnameProtocolPort validates that the combination of port, protocol, and name are
+// unique for each listener.
+func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	hostnameProtocolPortSets:= sets.Set[string]{}
+	for i, listener := range listeners {
+		hostname := new(gatewayv1b1.Hostname)
+		if listener.Hostname != nil {
+			hostname = listener.Hostname
+		}
+		protocol := listener.Protocol
+		port := listener.Port
+		
+		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
+		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
+			errs = append(errs, field.Forbidden(path.Index(i), fmt.Sprintln("combination of port, protocol, and name must be unique for each listener")))
+		}
+		hostnameProtocolPortSets.Insert(hostnameProtocolPort)
+	} 
 	return errs
 }
