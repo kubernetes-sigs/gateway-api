@@ -140,10 +140,11 @@ func TestValidateGateway(t *testing.T) {
 				hostnameBar := gatewayv1b1.Hostname("bar.com")
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
-				gw.Spec.Listeners = append(gw.Spec.Listeners, gatewayv1b1.Listener{
-					Name: "foo",
-					Hostname: &hostnameBar,
-				},
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "foo",
+						Hostname: &hostnameBar,
+					},
 				)
 			},
 			expectErrsOnFields: []string{"spec.listeners[1].name"},
@@ -155,12 +156,13 @@ func TestValidateGateway(t *testing.T) {
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
 				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
 				gw.Spec.Listeners[0].Port = 80
-				gw.Spec.Listeners = append(gw.Spec.Listeners, gatewayv1b1.Listener{
-					Name: "bar",
-					Hostname: &hostnameFoo,
-					Protocol: gatewayv1b1.HTTPProtocolType,
-					Port: 80,
-				},
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Hostname: &hostnameFoo,
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     80,
+					},
 				)
 			},
 			expectErrsOnFields: []string{"spec.listeners[1]"},
