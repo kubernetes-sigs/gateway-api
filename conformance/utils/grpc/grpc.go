@@ -122,7 +122,6 @@ func (er *ExpectedResponse) GetTestCaseName(i int) string {
 		rm := er.RequestMetadata
 		authority = rm.Authority
 		if len(rm.Metadata) >0 {
-			// TODO: Sort by key then value to make deterministic.
 			headerStr = fmt.Sprintf(" with headers '%s'", getMapDeterministicStr(rm.Metadata))
 		}
 	}
