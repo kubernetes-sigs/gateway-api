@@ -60,9 +60,6 @@ const (
 	//
 	//       See: https://github.com/kubernetes-sigs/gateway-api/issues/1780
 	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
-
-	// This option indicates support for Destination Port matching.
-	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
 )
 
 // StandardExtendedFeatures are extra generic features that implementations may
@@ -72,8 +69,26 @@ const (
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var StandardExtendedFeatures = sets.New(
 	SupportGatewayClassObservedGenerationBump,
-	SupportRouteDestinationPortMatching,
 ).Insert(StandardCoreFeatures.UnsortedList()...)
+
+// -----------------------------------------------------------------------------
+// Features - Experimental (Extended)
+// -----------------------------------------------------------------------------
+
+const (
+	// This option indicates support for Destination Port matching.
+	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
+)
+
+// ExperimentalExtendedFeatures are extra generic features that are currently
+// only available in our experimental release channel, and at an extended
+// support level.
+//
+// TODO: we need clarity for standard vs experimental features.
+// See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
+var ExperimentalExtendedFeatures = sets.New(
+	SupportRouteDestinationPortMatching,
+)
 
 // -----------------------------------------------------------------------------
 // Features - HTTPRoute Conformance (Core)
@@ -159,5 +174,6 @@ var TLSCoreFeatures = sets.New(
 // NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
 	Insert(StandardExtendedFeatures.UnsortedList()...).
+	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
 	Insert(HTTPExtendedFeatures.UnsortedList()...).
 	Insert(TLSCoreFeatures.UnsortedList()...)
