@@ -53,7 +53,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// verify that the implementation is tracking the most recent resource changes
-			kubernetes.GatewayMustHaveLatestConditions(t, original)
+			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
 
 			all := v1beta1.NamespacesFromAll
 
@@ -112,7 +112,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 
 			// verify that the implementation continues to keep up to date with the resource changes we've been making
-			kubernetes.GatewayMustHaveLatestConditions(t, updated)
+			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, updated)
 
 			require.NotEqual(t, original.Generation, updated.Generation, "generation should change after an update")
 		})
@@ -129,7 +129,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// verify that the implementation is tracking the most recent resource changes
-			kubernetes.GatewayMustHaveLatestConditions(t, original)
+			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
 
 			mutate := original.DeepCopy()
 			require.Equalf(t, 2, len(mutate.Spec.Listeners), "the gateway must have 2 listeners")
@@ -171,7 +171,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 
 			// verify that the implementation continues to keep up to date with the resource changes we've been making
-			kubernetes.GatewayMustHaveLatestConditions(t, updated)
+			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, updated)
 
 			require.NotEqual(t, original.Generation, updated.Generation, "generation should change after an update")
 		})

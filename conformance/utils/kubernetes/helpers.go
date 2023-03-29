@@ -108,14 +108,21 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 	return controllerName
 }
 
-// GatewayMustHaveLatestConditions will fail the test if there are
-// conditions that were not updated
-func GatewayMustHaveLatestConditions(t *testing.T, gw *v1beta1.Gateway) {
+// GatewayMustHaveLatestConditions waits until the specified Gateway has
+// the latest conditions to set.
+func GatewayMustHaveLatestConditions(t *testing.T, timeoutConfig config.TimeoutConfig, gw *v1beta1.Gateway) {
 	t.Helper()
 
-	if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-		t.Fatalf("Gateway %v", err)
-	}
+	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.LatestObservedGenerationSet, func() (bool, error) {
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			t.Logf("Gateway %s/%s latest conditions not set yet: %v", gw.Namespace, gw.Name, err)
+			return false, nil
+		}
+
+		return true, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for %s Gateway to have Latest ObservedGeneration to be set: %v", gw.Name, waitErr)
 }
 
 // GatewayClassMustHaveLatestConditions will fail the test if there are
