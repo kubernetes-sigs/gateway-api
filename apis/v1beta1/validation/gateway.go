@@ -140,7 +140,7 @@ func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) f
 // unique for each listener.
 func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	hostnameProtocolPortSets:= sets.Set[string]{}
+	hostnameProtocolPortSets := sets.Set[string]{}
 	for i, listener := range listeners {
 		hostname := new(gatewayv1b1.Hostname)
 		if listener.Hostname != nil {
