@@ -88,7 +88,6 @@ nav:
         - geps/gep-1323.md
         - geps/gep-1016.md
         - geps/gep-957.md
-        - geps/gep-726.md
         - geps/gep-713.md
       - Standard:
         - geps/gep-1364.md
@@ -97,6 +96,7 @@ nav:
         - geps/gep-851.md
         - geps/gep-820.md
         - geps/gep-746.md
+        - geps/gep-726.md
         - geps/gep-724.md
         - geps/gep-718.md
         - geps/gep-709.md
