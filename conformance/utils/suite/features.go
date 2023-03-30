@@ -35,6 +35,9 @@ const (
 	// Opting out of this requires an implementation to have clearly implemented
 	// and documented equivalent safeguards.
 	SupportReferenceGrant SupportedFeature = "ReferenceGrant"
+	// This option indicates support for Gateway (core conformance).
+	// Opting out of this is allowed only for GAMMA-only implementations
+	SupportGateway SupportedFeature = "Gateway"
 )
 
 // StandardCoreFeatures are the features that are required to be conformant with
@@ -44,6 +47,7 @@ const (
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var StandardCoreFeatures = sets.New(
 	SupportReferenceGrant,
+	SupportGateway,
 )
 
 // -----------------------------------------------------------------------------
@@ -165,6 +169,20 @@ var TLSCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
+// Features - Mesh Conformance
+// -----------------------------------------------------------------------------
+const (
+	// This option indicates general support for GAMMA
+	SupportGAMMA SupportedFeature = "GAMMA"
+)
+
+// GAMMACoreFeatures includes all the supported features for the GAMMA API at
+// a Core level of support.
+var GAMMACoreFeatures = sets.New(
+	SupportGAMMA,
+)
+
+// -----------------------------------------------------------------------------
 // Features - Compilations
 // -----------------------------------------------------------------------------
 
@@ -176,4 +194,5 @@ var AllFeatures = sets.New[SupportedFeature]().
 	Insert(StandardExtendedFeatures.UnsortedList()...).
 	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
 	Insert(HTTPExtendedFeatures.UnsortedList()...).
-	Insert(TLSCoreFeatures.UnsortedList()...)
+	Insert(TLSCoreFeatures.UnsortedList()...).
+	Insert(GAMMACoreFeatures.UnsortedList()...)

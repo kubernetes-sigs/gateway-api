@@ -64,6 +64,7 @@ type Request struct {
 	Path             string
 	Headers          map[string]string
 	UnfollowRedirect bool
+	Protocol         string
 }
 
 // ExpectedRequest defines expected properties of a request that reaches a backend.

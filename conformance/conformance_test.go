@@ -63,7 +63,16 @@ func TestConformance(t *testing.T) {
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 	})
 	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
+
+	var toRun []suite.ConformanceTest
+	if supportedFeatures.Has(suite.SupportGateway) {
+		toRun = append(toRun, tests.ConformanceTests...)
+	}
+	if supportedFeatures.Has(suite.SupportGAMMA) {
+		toRun = append(toRun, tests.MeshConformanceTests...)
+	}
+
+	cSuite.Run(t, toRun)
 }
 
 // parseSupportedFeatures parses flag arguments and converts the string to
