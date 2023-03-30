@@ -9,7 +9,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 - [Acnodal EPIC][1] (public preview)
 - [Apache APISIX][2] (alpha)
-- [BIG-IP Kubernetes Gateway][20]
+- [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
@@ -79,13 +79,15 @@ APISIX currently supports Gateway API `v1alpha2` version of the specification fo
 
 [BIG-IP Kubernetes Gateway][big-ip-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [F5 BIG-IP][f5bigip] as the data plane. It provides enterprises with high-performance Gateway API implementation.
 
-We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues] or [PR][bigipgwpr].
+We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues] or [PR][bigipgwpr]. Also, you are welcome to connect with us in the [slack channel][bigipgwslacklink].
+
 
 [big-ip-kubernetes-gateway]:https://gateway-api.f5se.io/
 [f5bigip]:https://f5.com
 [bigipgwfeatures]:https://github.com/f5devcentral/bigip-kubernetes-gateway/blob/master/docs/gateway-api-compatibility.md
 [bigipgwissues]:https://github.com/f5devcentral/bigip-kubernetes-gateway/issues
 [bigipgwpr]:https://github.com/f5devcentral/bigip-kubernetes-gateway/pulls
+[bigipgwslacklink]: https://gateway-api.f5se.io/Support-and-contact/
 
 ### Cilium
 
