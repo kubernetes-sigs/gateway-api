@@ -25,7 +25,7 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshBasic)
+	ConformanceTests = append(ConformanceTests, MeshBasic)
 }
 
 var MeshBasic = suite.ConformanceTest{

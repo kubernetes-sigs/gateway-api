@@ -25,7 +25,7 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshTrafficSplit)
+	ConformanceTests = append(ConformanceTests, MeshTrafficSplit)
 }
 
 var MeshTrafficSplit = suite.ConformanceTest{
