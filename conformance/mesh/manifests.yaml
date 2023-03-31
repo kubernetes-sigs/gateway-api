@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: echo
-        image: gcr.io/istio-testing/app:latest
+        image: gcr.io/istio-release/app:1.17.1
         imagePullPolicy: IfNotPresent
         args:
         - --tcp=9090
@@ -79,7 +79,7 @@ spec:
     spec:
       containers:
       - name: echo
-        image: gcr.io/istio-testing/app:latest
+        image: gcr.io/istio-release/app:1.17.1
         imagePullPolicy: IfNotPresent
         args:
         - --tcp=9090
