@@ -19,10 +19,9 @@ limitations under the License.
 
 package v1alpha1
 
-// ConformanceProfile is the collection of support levels and features for a set
-// of conformance test results which indicates whether or not an implementation
-// is conformant, and what extra features (if any) it supports.
-type ConformanceProfile struct {
+// ProfileReport is the generated report for the test results of a specific
+// named conformance profile.
+type ProfileReport struct {
 	// Name indicates the name of the conformance profile (e.g. "HTTPRoute",
 	// "TCPRoute", "UDPRoute", e.t.c.).
 	Name string `json:"name"`
