@@ -34,6 +34,7 @@ var HTTPRoutePathMatchOrder = suite.ConformanceTest{
 	ShortName:   "HTTPRoutePathMatchOrder",
 	Description: "An HTTPRoute where there are multiple matches routing to any given backend follows match order precedence",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-path-match-order.yaml"},

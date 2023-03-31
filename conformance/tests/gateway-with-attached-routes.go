@@ -34,7 +34,10 @@ func init() {
 var GatewayWithAttachedRoutes = suite.ConformanceTest{
 	ShortName:   "GatewayWithAttachedRoutes",
 	Description: "A Gateway in the gateway-conformance-infra namespace should be attached to routes.",
-	Manifests:   []string{"tests/gateway-with-attached-routes.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+	},
+	Manifests: []string{"tests/gateway-with-attached-routes.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		t.Run("Gateway listener should have one valid http routes attached", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-with-one-attached-route", Namespace: "gateway-conformance-infra"}

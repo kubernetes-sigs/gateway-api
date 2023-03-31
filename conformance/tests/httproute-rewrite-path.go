@@ -35,6 +35,7 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 	Description: "An HTTPRoute with path rewrite filter",
 	Manifests:   []string{"tests/httproute-rewrite-path.yaml"},
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportHTTPRoutePathRewrite,
 	},

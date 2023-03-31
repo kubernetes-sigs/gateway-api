@@ -34,6 +34,7 @@ var HTTPRouteMatchingAcrossRoutes = suite.ConformanceTest{
 	ShortName:   "HTTPRouteMatchingAcrossRoutes",
 	Description: "Two HTTPRoutes with path matching for different backends",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-matching-across-routes.yaml"},

@@ -31,7 +31,10 @@ func init() {
 var MeshBasic = suite.ConformanceTest{
 	ShortName:   "MeshBasic",
 	Description: "A mesh client can communicate with a mesh server. This tests basic reachability with no configuration applied.",
-	Manifests:   []string{},
+	Features: []suite.SupportedFeature{
+		suite.SupportMesh,
+	},
+	Manifests: []string{},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 		cases := []http.ExpectedResponse{{

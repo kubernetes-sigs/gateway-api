@@ -35,6 +35,7 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectHostAndStatus",
 	Description: "An HTTPRoute with hostname and statusCode redirect filters",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-redirect-host-and-status.yaml"},

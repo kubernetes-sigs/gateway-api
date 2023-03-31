@@ -34,6 +34,7 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 	ShortName:   "HTTPRouteReferenceGrant",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportReferenceGrant,
 	},

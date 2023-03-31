@@ -38,7 +38,10 @@ func init() {
 var GatewayModifyListeners = suite.ConformanceTest{
 	ShortName:   "GatewayModifyListeners",
 	Description: "A Gateway in the gateway-conformance-infra namespace should handle adding and removing listeners.",
-	Manifests:   []string{"tests/gateway-modify-listeners.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+	},
+	Manifests: []string{"tests/gateway-modify-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 
 		t.Run("should be able to add a listener that then becomes available for routing traffic", func(t *testing.T) {
