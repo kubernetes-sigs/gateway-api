@@ -70,7 +70,7 @@ func TestConformance(t *testing.T) {
 	if supportedFeatures.Has(suite.SupportGateway) {
 		toRun = append(toRun, tests.ConformanceTests...)
 	}
-	if supportedFeatures.Has(suite.SupportGAMMA) {
+	if supportedFeatures.Has(suite.SupportMesh) {
 		toRun = append(toRun, tests.MeshConformanceTests...)
 	}
 
