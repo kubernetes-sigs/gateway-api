@@ -37,9 +37,9 @@ type ConformanceReport struct {
 	// test report was made for.
 	GatewayAPIVersion string `json:"gatewayAPIVersion"`
 
-	// Profiles is a list of the conformance profiles that were enabled for
-	// this test run.
-	Profiles []ConformanceProfile `json:"profiles"`
+	// ProfileReports is a list of the individual reports for each conformance
+	// profile that was enabled for a test run.
+	ProfileReports []ProfileReport `json:"profiles"`
 }
 
 // Implementation provides metadata information on the downstream
