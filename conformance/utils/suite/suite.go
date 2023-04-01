@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
@@ -142,7 +143,7 @@ type Options struct {
 	// of specific tests
 	SkipTests []string
 
-	FS embed.FS
+	FS *embed.FS
 }
 
 // New returns a new ConformanceTestSuite.
@@ -164,6 +165,10 @@ func New(s Options) *ConformanceTestSuite {
 		}
 	}
 
+	if s.FS == nil {
+		s.FS = &conformance.Manifests
+	}
+
 	suite := &ConformanceTestSuite{
 		Client:           s.Client,
 		RoundTripper:     roundTripper,
@@ -178,7 +183,7 @@ func New(s Options) *ConformanceTestSuite {
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 		SkipTests:         sets.New(s.SkipTests...),
-		FS:                s.FS,
+		FS:                *s.FS,
 	}
 
 	// apply defaults
