@@ -17,6 +17,7 @@ limitations under the License.
 package suite
 
 import (
+	"embed"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -112,6 +113,7 @@ type ConformanceTestSuite struct {
 	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
 	SkipTests         sets.Set[string]
+	FS                embed.FS
 }
 
 // Options can be used to initialize a ConformanceTestSuite.
@@ -139,6 +141,8 @@ type Options struct {
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
+
+	FS embed.FS
 }
 
 // New returns a new ConformanceTestSuite.
@@ -174,6 +178,7 @@ func New(s Options) *ConformanceTestSuite {
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 		SkipTests:         sets.New(s.SkipTests...),
+		FS:                s.FS,
 	}
 
 	// apply defaults
@@ -192,6 +197,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 
 	suite.Applier.GatewayClass = suite.GatewayClassName
 	suite.Applier.ControllerName = suite.ControllerName
+	suite.Applier.FS = suite.FS
 
 	t.Logf("Test Setup: Applying base manifests")
 	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
