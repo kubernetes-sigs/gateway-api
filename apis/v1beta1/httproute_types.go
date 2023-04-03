@@ -205,9 +205,10 @@ type HTTPRouteRule struct {
 	// All filters are expected to be compatible with each other except for the
 	// URLRewrite and RequestRedirect filters, which may not be combined. If an
 	// implementation can not support other combinations of filters, they must clearly
-	// document that limitation. In all cases where incompatible or unsupported
-	// filters are specified, implementations MUST add the `PartiallyInvalid` error
-	// condition with status `True` and reason `IncompatibleFilters`.
+	// document that limitation. In cases where incompatible or unsupported
+	// filters are specified on subset of the rules on a route, implementations
+	// MUST add the `PartiallyInvalid` error condition with status `True` and
+	// reason `IncompatibleFilters`.
 	//
 	// Support: Core
 	//

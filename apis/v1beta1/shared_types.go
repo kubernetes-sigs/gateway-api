@@ -298,6 +298,8 @@ const (
 	// Possible reasons for this condition to be true are:
 	//
 	// * "IncompatibleFilters"
+	// * "RefNotPermitted"
+	// * "UnsupportedValue"
 	//
 	// This condition is an error condition and should not be set with status
 	// false.
