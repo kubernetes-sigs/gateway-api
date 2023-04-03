@@ -63,7 +63,18 @@ func TestConformance(t *testing.T) {
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 	})
 	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
+
+	// TODO(https://github.com/kubernetes-sigs/gateway-api/issues/1891) this will likely changed;
+	// for now, we use this mechanism to split mesh and gateway types
+	var toRun []suite.ConformanceTest
+	if supportedFeatures.Has(suite.SupportGateway) {
+		toRun = append(toRun, tests.ConformanceTests...)
+	}
+	if supportedFeatures.Has(suite.SupportGAMMA) {
+		toRun = append(toRun, tests.MeshConformanceTests...)
+	}
+
+	cSuite.Run(t, toRun)
 }
 
 // parseSupportedFeatures parses flag arguments and converts the string to
