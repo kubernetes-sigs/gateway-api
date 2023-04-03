@@ -583,8 +583,7 @@ type HTTPRouteFilter struct {
 	// Reason of `UnsupportedValue`.
 	//
 	// +unionDiscriminator
-	// +kubebuilder:validation:Enum=RequestHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
-	// <gateway:experimental:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef>
+	// +kubebuilder:validation:Enum=RequestHeaderModifier;ResponseHeaderModifier;RequestMirror;RequestRedirect;URLRewrite;ExtensionRef
 	Type HTTPRouteFilterType `json:"type"`
 
 	// RequestHeaderModifier defines a schema for a filter that modifies request
@@ -601,7 +600,6 @@ type HTTPRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	ResponseHeaderModifier *HTTPHeaderFilter `json:"responseHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
@@ -657,8 +655,6 @@ const (
 	// Support in HTTPRouteRule: Extended
 	//
 	// Support in HTTPBackendRef: Extended
-	//
-	// <gateway:experimental>
 	HTTPRouteFilterResponseHeaderModifier HTTPRouteFilterType = "ResponseHeaderModifier"
 
 	// HTTPRouteFilterRequestRedirect can be used to redirect a request to
