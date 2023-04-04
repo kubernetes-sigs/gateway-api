@@ -151,8 +151,9 @@ func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.
 		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
 		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
 			errs = append(errs, field.Forbidden(path.Index(i), fmt.Sprintln("combination of port, protocol, and name must be unique for each listener")))
+		} else {
+			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 		}
-		hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 	}
 	return errs
 }
