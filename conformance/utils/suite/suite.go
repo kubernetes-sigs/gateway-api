@@ -62,12 +62,19 @@ type Options struct {
 	BaseManifests    string
 	MeshManifests    string
 	NamespaceLabels  map[string]string
-	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
-	// manifests to a valid, unique port. There must be as many
-	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
-	// For example, given two Gateways, each with 2 listeners, there should be
-	// four ValidUniqueListenerPorts.
-	// If empty or nil, ports are not modified.
+	// ValidUniqueListenerPorts is the set of ports that listeners may be
+	// assigned. This ensures that listeners are assigned only ports from
+	// this set, as opposed to the defaults that are set in the manifests.
+	// This is useful when the test infrastructure is constrained to exposing
+	// only a limited set of ports outside of the cluster.
+	// The Applier maps each listener port of each Gateway in the manifests
+	// to a port from ValidUniqueListenerPorts.
+	// There must be as many validPorts as the maximum number of ports
+	// used by listeners simultaneously.
+	// For example, given one Gateway with 2 listeners on the same port and one
+	// Gateway with 2 listeners on different ports, there should be at least three
+	// validPorts.
+	// If empty or nil, listener ports are not modified.
 	ValidUniqueListenerPorts []v1beta1.PortNumber
 
 	// CleanupBaseResources indicates whether or not the base test

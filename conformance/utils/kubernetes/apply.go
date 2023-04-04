@@ -45,14 +45,19 @@ type Applier struct {
 	// Labels to apply to namespaces created by the Applier
 	NamespaceLabels map[string]string
 
-	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
-	// manifests to a valid, unique port.
+	// ValidUniqueListenerPorts is the set of ports that listeners may be
+	// assigned. This ensures that listeners are assigned only ports from
+	// this set, as opposed to the defaults that are set in the manifests.
+	// This is useful when the test infrastructure is constrained to exposing
+	// only a limited set of ports outside of the cluster.
+	// The Applier maps each listener port of each Gateway in the manifests
+	// to a port from ValidUniqueListenerPorts.
 	// There must be as many validPorts as the maximum number of ports
 	// used by listeners simultaneously.
 	// For example, given one Gateway with 2 listeners on the same port and one
 	// Gateway with 2 listeners on different ports, there should be at least three
 	// validPorts.
-	// If empty or nil, ports are not modified.
+	// If empty or nil, listener ports are not modified.
 	ValidUniqueListenerPorts PortStack
 
 	// GatewayClass will be used as the spec.gatewayClassName when applying Gateway resources
