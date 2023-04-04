@@ -39,6 +39,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "HTTPRouteObservedGenerationBump",
 	Description: "A HTTPRoute in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-observed-generation-bump.yaml"},

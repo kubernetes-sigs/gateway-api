@@ -34,6 +34,7 @@ var HTTPExactPathMatching = suite.ConformanceTest{
 	ShortName:   "HTTPExactPathMatching",
 	Description: "A single HTTPRoute with exact path matching for different backends",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-exact-path-matching.yaml"},

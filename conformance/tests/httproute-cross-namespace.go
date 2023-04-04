@@ -34,6 +34,7 @@ var HTTPRouteCrossNamespace = suite.ConformanceTest{
 	ShortName:   "HTTPRouteCrossNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should attach to Gateway in another namespace",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-cross-namespace.yaml"},

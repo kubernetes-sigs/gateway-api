@@ -34,6 +34,7 @@ var HTTPRouteHeaderMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHeaderMatching",
 	Description: "A single HTTPRoute with header matching for different backends",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-header-matching.yaml"},

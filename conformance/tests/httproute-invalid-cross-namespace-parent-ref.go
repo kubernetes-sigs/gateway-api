@@ -35,6 +35,7 @@ var HTTPRouteInvalidCrossNamespaceParentRef = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidCrossNamespaceParentRef",
 	Description: "A single HTTPRoute in the gateway-conformance-web-backend namespace should fail to attach to a Gateway in another namespace that it is not allowed to",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-invalid-cross-namespace-parent-ref.yaml"},

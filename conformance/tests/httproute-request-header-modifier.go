@@ -34,6 +34,7 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestHeaderModifier",
 	Description: "An HTTPRoute has request header modifier filters applied correctly",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier.yaml"},

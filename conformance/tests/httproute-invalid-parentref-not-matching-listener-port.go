@@ -35,6 +35,7 @@ var HTTPRouteInvalidParentRefNotMatchingListenerPort = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidParentRefNotMatchingListenerPort",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set the Accepted status to False with reason NoMatchingParent when attempting to bind to a Gateway that does not have a matching ListenerPort.",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportRouteDestinationPortMatching,
 	},

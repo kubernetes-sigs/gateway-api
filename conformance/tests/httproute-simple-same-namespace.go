@@ -35,6 +35,7 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 	ShortName:   "HTTPRouteSimpleSameNamespace",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace attaches to a Gateway in the same namespace",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-simple-same-namespace.yaml"},

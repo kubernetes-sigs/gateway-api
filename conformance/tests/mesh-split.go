@@ -25,13 +25,16 @@ import (
 )
 
 func init() {
-	MeshConformanceTests = append(MeshConformanceTests, MeshTrafficSplit)
+	ConformanceTests = append(ConformanceTests, MeshTrafficSplit)
 }
 
 var MeshTrafficSplit = suite.ConformanceTest{
 	ShortName:   "MeshTrafficSplit",
 	Description: "A mesh client can send traffic to a Service which is split between two versions",
-	Manifests:   []string{"tests/mesh-split.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportMesh,
+	},
+	Manifests: []string{"tests/mesh-split.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 		cases := []http.ExpectedResponse{

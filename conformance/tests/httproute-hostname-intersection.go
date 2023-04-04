@@ -36,6 +36,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHostnameIntersection",
 	Description: "HTTPRoutes should attach to listeners only if they have intersecting hostnames, and should accept requests only for the intersecting hostnames",
 	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-hostname-intersection.yaml"},

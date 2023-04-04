@@ -156,7 +156,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		}
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-	if suite.SupportedFeatures.Has(SupportGAMMA) {
+	if suite.SupportedFeatures.Has(SupportMesh) {
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
 		t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")

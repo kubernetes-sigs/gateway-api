@@ -169,17 +169,18 @@ var TLSCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
-// Features - Mesh Conformance
+// Features - Mesh Conformance (Core)
 // -----------------------------------------------------------------------------
+
 const (
-	// This option indicates general support for GAMMA
-	SupportGAMMA SupportedFeature = "GAMMA"
+	// This option indicates general support for service mesh
+	SupportMesh SupportedFeature = "Mesh"
 )
 
-// GAMMACoreFeatures includes all the supported features for the GAMMA API at
+// MeshCoreFeatures includes all the supported features for the service mesh at
 // a Core level of support.
-var GAMMACoreFeatures = sets.New(
-	SupportGAMMA,
+var MeshCoreFeatures = sets.New(
+	SupportMesh,
 )
 
 // -----------------------------------------------------------------------------
@@ -195,4 +196,4 @@ var AllFeatures = sets.New[SupportedFeature]().
 	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
 	Insert(HTTPExtendedFeatures.UnsortedList()...).
 	Insert(TLSCoreFeatures.UnsortedList()...).
-	Insert(GAMMACoreFeatures.UnsortedList()...)
+	Insert(MeshCoreFeatures.UnsortedList()...)
