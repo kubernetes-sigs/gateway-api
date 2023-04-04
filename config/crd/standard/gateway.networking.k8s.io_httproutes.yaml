@@ -554,16 +554,15 @@ spec:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
                                         response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementers should _not_
-                                        include the port number in the 'Location'
-                                        header in the following cases: \n * a Location
-                                        header that will use HTTP (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 80. * a Location
-                                        header that will use HTTPS (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 443. \n Support:
-                                        Extended"
+                                        port is used. \n Implementations SHOULD NOT
+                                        add the port number in the 'Location' header
+                                        in the following cases: \n * A Location header
+                                        that will use HTTP (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 80. * A Location header that
+                                        will use HTTPS (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 443. \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -1088,12 +1087,12 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementers
-                                  should _not_ include the port number in the 'Location'
-                                  header in the following cases: \n * a Location header
+                                  empty, the Gateway Listener port is used. \n Implementations
+                                  SHOULD NOT add the port number in the 'Location'
+                                  header in the following cases: \n * A Location header
                                   that will use HTTP (whether that is determined via
                                   the Listener protocol or the Scheme field) _and_
-                                  use port 80. * a Location header that will use HTTPS
+                                  use port 80. * A Location header that will use HTTPS
                                   (whether that is determined via the Listener protocol
                                   or the Scheme field) _and_ use port 443. \n Support:
                                   Extended"
@@ -2187,16 +2186,15 @@ spec:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
                                         response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementers should _not_
-                                        include the port number in the 'Location'
-                                        header in the following cases: \n * a Location
-                                        header that will use HTTP (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 80. * a Location
-                                        header that will use HTTPS (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 443. \n Support:
-                                        Extended"
+                                        port is used. \n Implementations SHOULD NOT
+                                        add the port number in the 'Location' header
+                                        in the following cases: \n * A Location header
+                                        that will use HTTP (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 80. * A Location header that
+                                        will use HTTPS (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 443. \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -2721,12 +2719,12 @@ spec:
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementers
-                                  should _not_ include the port number in the 'Location'
-                                  header in the following cases: \n * a Location header
+                                  empty, the Gateway Listener port is used. \n Implementations
+                                  SHOULD NOT add the port number in the 'Location'
+                                  header in the following cases: \n * A Location header
                                   that will use HTTP (whether that is determined via
                                   the Listener protocol or the Scheme field) _and_
-                                  use port 80. * a Location header that will use HTTPS
+                                  use port 80. * A Location header that will use HTTPS
                                   (whether that is determined via the Listener protocol
                                   or the Scheme field) _and_ use port 443. \n Support:
                                   Extended"
