@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1538
-    gateway.networking.k8s.io/bundle-version: v0.6.1
+    gateway.networking.k8s.io/bundle-version: v0.6.2
     gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: httproutes.gateway.networking.k8s.io
@@ -431,9 +431,20 @@ spec:
                                           type: string
                                         kind:
                                           default: Service
-                                          description: Kind is kind of the referent.
-                                            For example "HTTPRoute" or "Service".
-                                            Defaults to "Service" when not specified.
+                                          description: "Kind is the Kubernetes resource
+                                            kind of the referent. For example \"Service\".
+                                            \n Defaults to \"Service\" when not specified.
+                                            \n ExternalName services can refer to
+                                            CNAME DNS records that may live outside
+                                            of the cluster and as such are difficult
+                                            to reason about in terms of conformance.
+                                            They also may not be safe to forward to
+                                            (see CVE-2021-25740 for more information).
+                                            Implementations SHOULD NOT support ExternalName
+                                            Services. \n Support: Core (Services with
+                                            a type other than ExternalName) \n Support:
+                                            Implementation-specific (Services with
+                                            type ExternalName)"
                                           maxLength: 63
                                           minLength: 1
                                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -491,15 +502,67 @@ spec:
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
+                                    path:
+                                      description: "Path defines parameters used to
+                                        modify the path of the incoming request. The
+                                        modified path is then used to construct the
+                                        `Location` header. When empty, the request
+                                        path is used as-is. \n Support: Extended"
+                                      properties:
+                                        replaceFullPath:
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not."
+                                          maxLength: 1024
+                                          type: string
+                                        type:
+                                          description: "Type defines the type of path
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n Note
+                                            that values may be added to this enum,
+                                            implementations must ensure that unknown
+                                            values will not cause a crash. \n Unknown
+                                            values here must result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`, with a Reason
+                                            of `UnsupportedValue`."
+                                          enum:
+                                          - ReplaceFullPath
+                                          - ReplacePrefixMatch
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway Listener
-                                        port is used. In all cases, when the protocol
-                                        is http and the port is port 80, then the
-                                        port must be omitted. Similarly, when the
-                                        protocol is https and the port is port 443,
-                                        then the port must also be omitted. \n Support:
+                                        response. \n When empty, the Gateway Listener
+                                        port is used. \n Implementers should _not_
+                                        include the port number in the 'Location'
+                                        header in the following cases: \n * a Location
+                                        header that will use HTTP (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 80. * a Location
+                                        header that will use HTTPS (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 443. \n Support:
                                         Extended"
                                       format: int32
                                       maximum: 65535
@@ -572,8 +635,68 @@ spec:
                                   - RequestHeaderModifier
                                   - RequestMirror
                                   - RequestRedirect
+                                  - URLRewrite
                                   - ExtensionRef
                                   type: string
+                                urlRewrite:
+                                  description: "URLRewrite defines a schema for a
+                                    filter that modifies a request during forwarding.
+                                    \n Support: Extended"
+                                  properties:
+                                    hostname:
+                                      description: "Hostname is the value to be used
+                                        to replace the Host header value during forwarding.
+                                        \n Support: Extended"
+                                      maxLength: 253
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    path:
+                                      description: "Path defines a path rewrite. \n
+                                        Support: Extended"
+                                      properties:
+                                        replaceFullPath:
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not."
+                                          maxLength: 1024
+                                          type: string
+                                        type:
+                                          description: "Type defines the type of path
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n Note
+                                            that values may be added to this enum,
+                                            implementations must ensure that unknown
+                                            values will not cause a crash. \n Unknown
+                                            values here must result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`, with a Reason
+                                            of `UnsupportedValue`."
+                                          enum:
+                                          - ReplaceFullPath
+                                          - ReplacePrefixMatch
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                  type: object
                               required:
                               - type
                               type: object
@@ -589,9 +712,17 @@ spec:
                             type: string
                           kind:
                             default: Service
-                            description: Kind is kind of the referent. For example
-                              "HTTPRoute" or "Service". Defaults to "Service" when
-                              not specified.
+                            description: "Kind is the Kubernetes resource kind of
+                              the referent. For example \"Service\". \n Defaults to
+                              \"Service\" when not specified. \n ExternalName services
+                              can refer to CNAME DNS records that may live outside
+                              of the cluster and as such are difficult to reason about
+                              in terms of conformance. They also may not be safe to
+                              forward to (see CVE-2021-25740 for more information).
+                              Implementations SHOULD NOT support ExternalName Services.
+                              \n Support: Core (Services with a type other than ExternalName)
+                              \n Support: Implementation-specific (Services with type
+                              ExternalName)"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -844,9 +975,18 @@ spec:
                                     type: string
                                   kind:
                                     default: Service
-                                    description: Kind is kind of the referent. For
-                                      example "HTTPRoute" or "Service". Defaults to
-                                      "Service" when not specified.
+                                    description: "Kind is the Kubernetes resource
+                                      kind of the referent. For example \"Service\".
+                                      \n Defaults to \"Service\" when not specified.
+                                      \n ExternalName services can refer to CNAME
+                                      DNS records that may live outside of the cluster
+                                      and as such are difficult to reason about in
+                                      terms of conformance. They also may not be safe
+                                      to forward to (see CVE-2021-25740 for more information).
+                                      Implementations SHOULD NOT support ExternalName
+                                      Services. \n Support: Core (Services with a
+                                      type other than ExternalName) \n Support: Implementation-specific
+                                      (Services with type ExternalName)"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -900,14 +1040,63 @@ spec:
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
+                              path:
+                                description: "Path defines parameters used to modify
+                                  the path of the incoming request. The modified path
+                                  is then used to construct the `Location` header.
+                                  When empty, the request path is used as-is. \n Support:
+                                  Extended"
+                                properties:
+                                  replaceFullPath:
+                                    description: ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect.
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not."
+                                    maxLength: 1024
+                                    type: string
+                                  type:
+                                    description: "Type defines the type of path modifier.
+                                      Additional types may be added in a future release
+                                      of the API. \n Note that values may be added
+                                      to this enum, implementations must ensure that
+                                      unknown values will not cause a crash. \n Unknown
+                                      values here must result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
+                                    enum:
+                                    - ReplaceFullPath
+                                    - ReplacePrefixMatch
+                                    type: string
+                                required:
+                                - type
+                                type: object
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. When empty,
-                                  the Gateway Listener port is used. In all cases,
-                                  when the protocol is http and the port is port 80,
-                                  then the port must be omitted. Similarly, when the
-                                  protocol is https and the port is port 443, then
-                                  the port must also be omitted. \n Support: Extended"
+                                  of the `Location` header in the response. \n When
+                                  empty, the Gateway Listener port is used. \n Implementers
+                                  should _not_ include the port number in the 'Location'
+                                  header in the following cases: \n * a Location header
+                                  that will use HTTP (whether that is determined via
+                                  the Listener protocol or the Scheme field) _and_
+                                  use port 80. * a Location header that will use HTTPS
+                                  (whether that is determined via the Listener protocol
+                                  or the Scheme field) _and_ use port 443. \n Support:
+                                  Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -974,8 +1163,65 @@ spec:
                             - RequestHeaderModifier
                             - RequestMirror
                             - RequestRedirect
+                            - URLRewrite
                             - ExtensionRef
                             type: string
+                          urlRewrite:
+                            description: "URLRewrite defines a schema for a filter
+                              that modifies a request during forwarding. \n Support:
+                              Extended"
+                            properties:
+                              hostname:
+                                description: "Hostname is the value to be used to
+                                  replace the Host header value during forwarding.
+                                  \n Support: Extended"
+                                maxLength: 253
+                                minLength: 1
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                type: string
+                              path:
+                                description: "Path defines a path rewrite. \n Support:
+                                  Extended"
+                                properties:
+                                  replaceFullPath:
+                                    description: ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect.
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not."
+                                    maxLength: 1024
+                                    type: string
+                                  type:
+                                    description: "Type defines the type of path modifier.
+                                      Additional types may be added in a future release
+                                      of the API. \n Note that values may be added
+                                      to this enum, implementations must ensure that
+                                      unknown values will not cause a crash. \n Unknown
+                                      values here must result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
+                                    enum:
+                                    - ReplaceFullPath
+                                    - ReplacePrefixMatch
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                            type: object
                         required:
                         - type
                         type: object
@@ -1003,10 +1249,12 @@ spec:
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
                         applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching path.
-                        * Header matches. * Query param matches. \n If ties still
-                        exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing
+                        the largest number of: \n * Characters in a matching \"Exact\"
+                        path match * Characters in a matching \"Prefix\" path match
+                        * Header matches. * Query param matches. \n Note: The precedence
+                        of RegularExpression path matches are implementation-specific.
+                        \n If ties still exist across multiple Routes, matching precedence
+                        MUST be determined in order of the following criteria, continuing
                         on ties: \n * The oldest Route based on creation timestamp.
                         * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
                         \n If ties still exist within an HTTPRoute, matching precedence
@@ -1152,6 +1400,7 @@ spec:
                                     differences in the implementations."
                                   maxLength: 256
                                   minLength: 1
+                                  pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                   type: string
                                 type:
                                   default: Exact
@@ -1815,9 +2064,20 @@ spec:
                                           type: string
                                         kind:
                                           default: Service
-                                          description: Kind is kind of the referent.
-                                            For example "HTTPRoute" or "Service".
-                                            Defaults to "Service" when not specified.
+                                          description: "Kind is the Kubernetes resource
+                                            kind of the referent. For example \"Service\".
+                                            \n Defaults to \"Service\" when not specified.
+                                            \n ExternalName services can refer to
+                                            CNAME DNS records that may live outside
+                                            of the cluster and as such are difficult
+                                            to reason about in terms of conformance.
+                                            They also may not be safe to forward to
+                                            (see CVE-2021-25740 for more information).
+                                            Implementations SHOULD NOT support ExternalName
+                                            Services. \n Support: Core (Services with
+                                            a type other than ExternalName) \n Support:
+                                            Implementation-specific (Services with
+                                            type ExternalName)"
                                           maxLength: 63
                                           minLength: 1
                                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1875,15 +2135,67 @@ spec:
                                       minLength: 1
                                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                       type: string
+                                    path:
+                                      description: "Path defines parameters used to
+                                        modify the path of the incoming request. The
+                                        modified path is then used to construct the
+                                        `Location` header. When empty, the request
+                                        path is used as-is. \n Support: Extended"
+                                      properties:
+                                        replaceFullPath:
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not."
+                                          maxLength: 1024
+                                          type: string
+                                        type:
+                                          description: "Type defines the type of path
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n Note
+                                            that values may be added to this enum,
+                                            implementations must ensure that unknown
+                                            values will not cause a crash. \n Unknown
+                                            values here must result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`, with a Reason
+                                            of `UnsupportedValue`."
+                                          enum:
+                                          - ReplaceFullPath
+                                          - ReplacePrefixMatch
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. When empty, the Gateway Listener
-                                        port is used. In all cases, when the protocol
-                                        is http and the port is port 80, then the
-                                        port must be omitted. Similarly, when the
-                                        protocol is https and the port is port 443,
-                                        then the port must also be omitted. \n Support:
+                                        response. \n When empty, the Gateway Listener
+                                        port is used. \n Implementers should _not_
+                                        include the port number in the 'Location'
+                                        header in the following cases: \n * a Location
+                                        header that will use HTTP (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 80. * a Location
+                                        header that will use HTTPS (whether that is
+                                        determined via the Listener protocol or the
+                                        Scheme field) _and_ use port 443. \n Support:
                                         Extended"
                                       format: int32
                                       maximum: 65535
@@ -1956,8 +2268,68 @@ spec:
                                   - RequestHeaderModifier
                                   - RequestMirror
                                   - RequestRedirect
+                                  - URLRewrite
                                   - ExtensionRef
                                   type: string
+                                urlRewrite:
+                                  description: "URLRewrite defines a schema for a
+                                    filter that modifies a request during forwarding.
+                                    \n Support: Extended"
+                                  properties:
+                                    hostname:
+                                      description: "Hostname is the value to be used
+                                        to replace the Host header value during forwarding.
+                                        \n Support: Extended"
+                                      maxLength: 253
+                                      minLength: 1
+                                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                      type: string
+                                    path:
+                                      description: "Path defines a path rewrite. \n
+                                        Support: Extended"
+                                      properties:
+                                        replaceFullPath:
+                                          description: ReplaceFullPath specifies the
+                                            value with which to replace the full path
+                                            of a request during a rewrite or redirect.
+                                          maxLength: 1024
+                                          type: string
+                                        replacePrefixMatch:
+                                          description: "ReplacePrefixMatch specifies
+                                            the value with which to replace the prefix
+                                            match of a request during a rewrite or
+                                            redirect. For example, a request to \"/foo/bar\"
+                                            with a prefix match of \"/foo\" would
+                                            be modified to \"/bar\". \n Note that
+                                            this matches the behavior of the PathPrefix
+                                            match type. This matches full path elements.
+                                            A path element refers to the list of labels
+                                            in the path split by the `/` separator.
+                                            When specified, a trailing `/` is ignored.
+                                            For example, the paths `/abc`, `/abc/`,
+                                            and `/abc/def` would all match the prefix
+                                            `/abc`, but the path `/abcd` would not."
+                                          maxLength: 1024
+                                          type: string
+                                        type:
+                                          description: "Type defines the type of path
+                                            modifier. Additional types may be added
+                                            in a future release of the API. \n Note
+                                            that values may be added to this enum,
+                                            implementations must ensure that unknown
+                                            values will not cause a crash. \n Unknown
+                                            values here must result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`, with a Reason
+                                            of `UnsupportedValue`."
+                                          enum:
+                                          - ReplaceFullPath
+                                          - ReplacePrefixMatch
+                                          type: string
+                                      required:
+                                      - type
+                                      type: object
+                                  type: object
                               required:
                               - type
                               type: object
@@ -1973,9 +2345,17 @@ spec:
                             type: string
                           kind:
                             default: Service
-                            description: Kind is kind of the referent. For example
-                              "HTTPRoute" or "Service". Defaults to "Service" when
-                              not specified.
+                            description: "Kind is the Kubernetes resource kind of
+                              the referent. For example \"Service\". \n Defaults to
+                              \"Service\" when not specified. \n ExternalName services
+                              can refer to CNAME DNS records that may live outside
+                              of the cluster and as such are difficult to reason about
+                              in terms of conformance. They also may not be safe to
+                              forward to (see CVE-2021-25740 for more information).
+                              Implementations SHOULD NOT support ExternalName Services.
+                              \n Support: Core (Services with a type other than ExternalName)
+                              \n Support: Implementation-specific (Services with type
+                              ExternalName)"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -2228,9 +2608,18 @@ spec:
                                     type: string
                                   kind:
                                     default: Service
-                                    description: Kind is kind of the referent. For
-                                      example "HTTPRoute" or "Service". Defaults to
-                                      "Service" when not specified.
+                                    description: "Kind is the Kubernetes resource
+                                      kind of the referent. For example \"Service\".
+                                      \n Defaults to \"Service\" when not specified.
+                                      \n ExternalName services can refer to CNAME
+                                      DNS records that may live outside of the cluster
+                                      and as such are difficult to reason about in
+                                      terms of conformance. They also may not be safe
+                                      to forward to (see CVE-2021-25740 for more information).
+                                      Implementations SHOULD NOT support ExternalName
+                                      Services. \n Support: Core (Services with a
+                                      type other than ExternalName) \n Support: Implementation-specific
+                                      (Services with type ExternalName)"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -2284,14 +2673,63 @@ spec:
                                 minLength: 1
                                 pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                                 type: string
+                              path:
+                                description: "Path defines parameters used to modify
+                                  the path of the incoming request. The modified path
+                                  is then used to construct the `Location` header.
+                                  When empty, the request path is used as-is. \n Support:
+                                  Extended"
+                                properties:
+                                  replaceFullPath:
+                                    description: ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect.
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not."
+                                    maxLength: 1024
+                                    type: string
+                                  type:
+                                    description: "Type defines the type of path modifier.
+                                      Additional types may be added in a future release
+                                      of the API. \n Note that values may be added
+                                      to this enum, implementations must ensure that
+                                      unknown values will not cause a crash. \n Unknown
+                                      values here must result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
+                                    enum:
+                                    - ReplaceFullPath
+                                    - ReplacePrefixMatch
+                                    type: string
+                                required:
+                                - type
+                                type: object
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. When empty,
-                                  the Gateway Listener port is used. In all cases,
-                                  when the protocol is http and the port is port 80,
-                                  then the port must be omitted. Similarly, when the
-                                  protocol is https and the port is port 443, then
-                                  the port must also be omitted. \n Support: Extended"
+                                  of the `Location` header in the response. \n When
+                                  empty, the Gateway Listener port is used. \n Implementers
+                                  should _not_ include the port number in the 'Location'
+                                  header in the following cases: \n * a Location header
+                                  that will use HTTP (whether that is determined via
+                                  the Listener protocol or the Scheme field) _and_
+                                  use port 80. * a Location header that will use HTTPS
+                                  (whether that is determined via the Listener protocol
+                                  or the Scheme field) _and_ use port 443. \n Support:
+                                  Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -2358,8 +2796,65 @@ spec:
                             - RequestHeaderModifier
                             - RequestMirror
                             - RequestRedirect
+                            - URLRewrite
                             - ExtensionRef
                             type: string
+                          urlRewrite:
+                            description: "URLRewrite defines a schema for a filter
+                              that modifies a request during forwarding. \n Support:
+                              Extended"
+                            properties:
+                              hostname:
+                                description: "Hostname is the value to be used to
+                                  replace the Host header value during forwarding.
+                                  \n Support: Extended"
+                                maxLength: 253
+                                minLength: 1
+                                pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                type: string
+                              path:
+                                description: "Path defines a path rewrite. \n Support:
+                                  Extended"
+                                properties:
+                                  replaceFullPath:
+                                    description: ReplaceFullPath specifies the value
+                                      with which to replace the full path of a request
+                                      during a rewrite or redirect.
+                                    maxLength: 1024
+                                    type: string
+                                  replacePrefixMatch:
+                                    description: "ReplacePrefixMatch specifies the
+                                      value with which to replace the prefix match
+                                      of a request during a rewrite or redirect. For
+                                      example, a request to \"/foo/bar\" with a prefix
+                                      match of \"/foo\" would be modified to \"/bar\".
+                                      \n Note that this matches the behavior of the
+                                      PathPrefix match type. This matches full path
+                                      elements. A path element refers to the list
+                                      of labels in the path split by the `/` separator.
+                                      When specified, a trailing `/` is ignored. For
+                                      example, the paths `/abc`, `/abc/`, and `/abc/def`
+                                      would all match the prefix `/abc`, but the path
+                                      `/abcd` would not."
+                                    maxLength: 1024
+                                    type: string
+                                  type:
+                                    description: "Type defines the type of path modifier.
+                                      Additional types may be added in a future release
+                                      of the API. \n Note that values may be added
+                                      to this enum, implementations must ensure that
+                                      unknown values will not cause a crash. \n Unknown
+                                      values here must result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`, with a Reason of `UnsupportedValue`."
+                                    enum:
+                                    - ReplaceFullPath
+                                    - ReplacePrefixMatch
+                                    type: string
+                                required:
+                                - type
+                                type: object
+                            type: object
                         required:
                         - type
                         type: object
@@ -2387,10 +2882,12 @@ spec:
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
                         applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching path.
-                        * Header matches. * Query param matches. \n If ties still
-                        exist across multiple Routes, matching precedence MUST be
-                        determined in order of the following criteria, continuing
+                        the largest number of: \n * Characters in a matching \"Exact\"
+                        path match * Characters in a matching \"Prefix\" path match
+                        * Header matches. * Query param matches. \n Note: The precedence
+                        of RegularExpression path matches are implementation-specific.
+                        \n If ties still exist across multiple Routes, matching precedence
+                        MUST be determined in order of the following criteria, continuing
                         on ties: \n * The oldest Route based on creation timestamp.
                         * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
                         \n If ties still exist within an HTTPRoute, matching precedence
@@ -2536,6 +3033,7 @@ spec:
                                     differences in the implementations."
                                   maxLength: 256
                                   minLength: 1
+                                  pattern: ^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$
                                   type: string
                                 type:
                                   default: Exact

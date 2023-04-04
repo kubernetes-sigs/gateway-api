@@ -134,6 +134,16 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: []string{"spec.listeners[0].tls.certificateRefs"},
 		},
+		"names are not unique within the Gateway": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners = append(gw.Spec.Listeners, gatewayv1b1.Listener{
+					Name: "foo",
+				},
+				)
+			},
+			expectErrsOnFields: []string{"spec.listeners[1].name"},
+		},
 	}
 
 	for name, tc := range testCases {

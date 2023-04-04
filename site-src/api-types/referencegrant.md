@@ -1,11 +1,5 @@
 # ReferenceGrant
 
-!!! info "Experimental Channel"
-
-    The `ReferenceGrant` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
-
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
     to "ReferenceGrant" to avoid any confusion with policy attachment.
@@ -53,8 +47,7 @@ spec:
   rules:
   - matches:
     - path: /bar
-    forwardTo:
-      backend:
+    backendRefs:
       - name: bar
         namespace: bar
 ---
@@ -101,7 +94,7 @@ When communicating the status of a cross-namespace reference, implementations
 MUST NOT expose information about the existence of a resource in another
 namespace unless a ReferenceGrant exists allowing the reference to occur. This
 means that if a cross-namespace reference is made without a ReferenceGrant to a
-resource that doesn't exist. Any status conditions or warning messages need to
+resource that doesn't exist, any status conditions or warning messages need to
 focus on the fact that a ReferenceGrant does not exist to allow this reference.
 No hints should be provided about whether or not the referenced resource exists.
 

@@ -285,9 +285,9 @@ func TestServeHTTPSubmissions(t *testing.T) {
    								               }
    								            }
    								         ],
-   								         "forwardTo": [
+								         "backendRefs": [
    								            {
-   								               "serviceName": "my-service1",
+								               "name": "RequestMirror",
    								               "port": 8080
    								            }
    								         ]

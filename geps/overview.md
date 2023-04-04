@@ -11,7 +11,23 @@ process for the main Kubernetes project:
 
 ## Process
 
-### 1. Circulate the Idea
+This diagram shows the state diagram of the GEP process at a high level, but the details are below.
+
+<div align="center">
+```mermaid
+flowchart TD
+    D([Discuss with<br />the community]) --> C
+    C([Issue Created]) --> Provisional
+    Provisional -->|GEP Doc PR<br />done| Implementable
+    Provisional -->|If practical <br /> work needed| Prototyping
+    Prototyping -->|GEP Doc PR<br />done| Implementable
+    Implementable -->|Gateway API<br />work completed| Experimental
+    Experimental -->|Supported in<br />multiple implementations<br />+ Conformance tests| Standard
+    Standard -->|Entire change is GA or implemented| Completed
+```
+</div>
+
+### 1. Discuss with the community
 Before creating a GEP, share your high level idea with the community. This can
 be in one of many forms:
 
@@ -19,7 +35,12 @@ be in one of many forms:
 - On our [Slack Channel](https://kubernetes.slack.com/archives/CR0H13KGA)
 - On one of our [community meetings](https://gateway-api.sigs.k8s.io/contributing/?h=meetings#meetings)
 
-### 2. Agree on the Goals
+### 2. Create an Issue
+[Create a GEP issue](https://github.com/kubernetes-sigs/gateway-api/issues/new?assignees=&labels=kind%2Ffeature&template=enhancement.md) in the repo describing your change.
+At this point, you should copy the outcome of any other conversations or documents
+into this document.
+
+### 3. Agree on the Goals
 Although it can be tempting to start writing out all the details of your
 proposal, it's important to first ensure we all agree on the goals. The first
 version of your GEP should aim for a "Provisional" status and leave out any
@@ -57,6 +78,16 @@ any of the following:
 1. Graduating the resource to beta
 2. Graduating fields to "standard" by removing `<gateway:experimental>` tags
 3. Graduating a concept to "standard" by updating documentation
+
+### 6. Close out the GEP issue
+
+The GEP issue should only be closed once the feature has:
+- Moved to the standard channel for distribution (if necessary)
+- Moved to a "v1" `apiVersion` for CRDs
+- been completely implemented and has wide acceptance (for process changes).
+
+In short, the GEP issue should only be closed when the work is "done" (whatever
+that means for that GEP).
 
 ## Status
 

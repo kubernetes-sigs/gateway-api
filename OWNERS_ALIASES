@@ -24,3 +24,10 @@ aliases:
     - danehans
     - hbagdi
     - jpeach
+
+  gateway-api-conformance-reviewers:
+    - arkodg
+    - michaelbeaumont
+    - mlavacca
+    - sunjayBhatia
+    - xunzhuo

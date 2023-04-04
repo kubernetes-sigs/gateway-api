@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1538
-    gateway.networking.k8s.io/bundle-version: v0.6.1
+    gateway.networking.k8s.io/bundle-version: v0.6.2
     gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: gateways.gateway.networking.k8s.io
@@ -506,7 +506,7 @@ spec:
                   the `GatewayConditionType` and `GatewayConditionReason` constants
                   so that operators and tools can converge on a common vocabulary
                   to describe Gateway state. \n Known condition types are: \n * \"Accepted\"
-                  * \"Ready\""
+                  * \"Programmed\" * \"Ready\""
                 items:
                   description: "Condition contains details for one aspect of the current
                     state of this API Resource. --- This struct is intended for direct
@@ -1208,7 +1208,7 @@ spec:
                   the `GatewayConditionType` and `GatewayConditionReason` constants
                   so that operators and tools can converge on a common vocabulary
                   to describe Gateway state. \n Known condition types are: \n * \"Accepted\"
-                  * \"Ready\""
+                  * \"Programmed\" * \"Ready\""
                 items:
                   description: "Condition contains details for one aspect of the current
                     state of this API Resource. --- This struct is intended for direct

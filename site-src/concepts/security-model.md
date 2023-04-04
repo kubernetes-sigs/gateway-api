@@ -113,8 +113,8 @@ Backends (usually Services). In these cases, the required handshake is
 accomplished with a ReferenceGrant resource. This resource exists within a
 target namespace and can be used to allow references from other namespaces.
 
-For example, the following ReferenceGrant allows references from Gateways in
-the "prod" namespace to HTTPRoutes that are deployed in the same namespace as
+For example, the following ReferenceGrant allows references from HTTPRoutes in
+the "prod" namespace to Services that are deployed in the same namespace as
 the ReferenceGrant.
 
 ```yaml

@@ -34,14 +34,16 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteQueryParamMatching",
 	Description: "A single HTTPRoute with query param matching for different backends",
 	Manifests:   []string{"tests/httproute-query-param-matching.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteQueryParamMatching},
+	Features: []suite.SupportedFeature{
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteQueryParamMatching,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		var (
-			ns      = "gateway-conformance-infra"
-			routeNN = types.NamespacedName{Namespace: ns, Name: "query-param-matching"}
-			gwNN    = types.NamespacedName{Namespace: ns, Name: "same-namespace"}
-			gwAddr  = kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		)
+		ns := "gateway-conformance-infra"
+		routeNN := types.NamespacedName{Namespace: ns, Name: "query-param-matching"}
+		gwNN := types.NamespacedName{Namespace: ns, Name: "same-namespace"}
+		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		testCases := []http.ExpectedResponse{{
 			Request:   http.Request{Path: "/?animal=whale"},
