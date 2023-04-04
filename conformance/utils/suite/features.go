@@ -187,13 +187,18 @@ var MeshCoreFeatures = sets.New(
 // Features - Compilations
 // -----------------------------------------------------------------------------
 
+// AllGatewayFeatures are all the features applicable for Gateway (Ingress).
+// NOTE: as new feature sets are added they should be inserted into this set.
+var AllGatewayFeatures = sets.New[SupportedFeature]().
+	Insert(StandardExtendedFeatures.UnsortedList()...).
+	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
+	Insert(HTTPExtendedFeatures.UnsortedList()...).
+	Insert(TLSCoreFeatures.UnsortedList()...)
+
 // AllFeatures contains all the supported features and can be used to run all
 // conformance tests with `all-features` flag.
 //
 // NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
-	Insert(StandardExtendedFeatures.UnsortedList()...).
-	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
-	Insert(HTTPExtendedFeatures.UnsortedList()...).
-	Insert(TLSCoreFeatures.UnsortedList()...).
+	Insert(AllGatewayFeatures.UnsortedList()...).
 	Insert(MeshCoreFeatures.UnsortedList()...)

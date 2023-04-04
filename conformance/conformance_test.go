@@ -51,16 +51,15 @@ func TestConformance(t *testing.T) {
 		supportedFeatures.Delete(feature)
 	}
 
-	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
-		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
+	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n supported features: [%v]\n exempt features: [%v]",
+		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
-		Client:                     client,
-		GatewayClassName:           *flags.GatewayClassName,
-		Debug:                      *flags.ShowDebug,
-		CleanupBaseResources:       *flags.CleanupBaseResources,
-		SupportedFeatures:          supportedFeatures,
-		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+		Client:               client,
+		GatewayClassName:     *flags.GatewayClassName,
+		Debug:                *flags.ShowDebug,
+		CleanupBaseResources: *flags.CleanupBaseResources,
+		SupportedFeatures:    supportedFeatures,
 	})
 	cSuite.Setup(t)
 

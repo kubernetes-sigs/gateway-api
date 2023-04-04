@@ -69,10 +69,9 @@ type Options struct {
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
-	CleanupBaseResources       bool
-	SupportedFeatures          sets.Set[SupportedFeature]
-	EnableAllSupportedFeatures bool
-	TimeoutConfig              config.TimeoutConfig
+	CleanupBaseResources bool
+	SupportedFeatures    sets.Set[SupportedFeature]
+	TimeoutConfig        config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
@@ -87,9 +86,7 @@ func New(s Options) *ConformanceTestSuite {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
-	if s.EnableAllSupportedFeatures == true {
-		s.SupportedFeatures = AllFeatures
-	} else if s.SupportedFeatures == nil {
+	if s.SupportedFeatures == nil {
 		s.SupportedFeatures = StandardCoreFeatures
 	} else {
 		for feature := range StandardCoreFeatures {
