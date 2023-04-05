@@ -300,7 +300,7 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 
 ### Amazon Elastic Kubernetes Service
 
-[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [Amazon Gateway Controller][eks-gateway] which provisions [AWS VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
+[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [AWS Gateway API Controller][eks-gateway] which provisions [Amazon VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
 
 
 [eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
