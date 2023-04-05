@@ -62,6 +62,7 @@ func TestConformance(t *testing.T) {
 		Client:                     client,
 		RESTClient:                 clientset.CoreV1().RESTClient().(*rest.RESTClient),
 		RestConfig:                 cfg,
+		Clientset:                  clientset,
 		GatewayClassName:           *flags.GatewayClassName,
 		Debug:                      *flags.ShowDebug,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
