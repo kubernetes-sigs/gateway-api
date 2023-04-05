@@ -29,9 +29,6 @@ import (
 // DumpEchoLogs returns logs of the echoserver pod in
 // in the given namespace and with the given name.
 func DumpEchoLogs(ns, name string, c client.Client, cs *clientset.Clientset) ([][]byte, error) {
-	// ns = valOrDefault(ns, "gateway-conformance-infra")
-	// name = valOrDefault(name, "ingress-conformance-echo")
-
 	var logs [][]byte
 
 	pods := new(corev1.PodList)
