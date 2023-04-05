@@ -196,7 +196,7 @@ var AllGatewayFeatures = sets.New[SupportedFeature]().
 	Insert(TLSCoreFeatures.UnsortedList()...)
 
 // AllFeatures contains all the supported features and can be used to run all
-// conformance tests with `all-features` flag.
+// conformance tests.
 //
 // NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
