@@ -8,6 +8,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 
 - [Acnodal EPIC][1] (public preview)
+- [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Apache APISIX][2] (alpha)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
@@ -27,10 +28,12 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 
+
 ## Integration Status
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
+
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -54,6 +57,8 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [20]:#big-ip-kubernetes-gateway
 [21]:#stunner
 [22]:#argo-rollouts
+[23]:#amazon-kubernetes-service
+
 
 ## Implementations
 
@@ -65,6 +70,15 @@ In this section you will find specific links to blog posts, documentation and ot
 Documentation can be found at [EPIC Application & API Gateway Service][epic]
 
 [epic]:https://www.epick8sgw.io
+
+### Amazon Elastic Kubernetes Service
+
+[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [AWS Gateway API Controller][eks-gateway] which provisions [Amazon VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
+
+
+[eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+[eks-gateway]:https://github.com/aws/aws-application-networking-k8s
+[vpc-lattice]:https://aws.amazon.com/vpc/lattice/
 
 ### APISIX
 
@@ -292,6 +306,7 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+
 
 ## Integrations
 
