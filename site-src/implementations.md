@@ -25,12 +25,15 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [LiteSpeed Ingress Controller][19]
 - [NGINX Kubernetes Gateway][12]
 - [STUNner][21] (beta)
+- [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Traefik][13] (alpha)
+
 
 ## Integration Status
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
+
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -54,6 +57,8 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [20]:#big-ip-kubernetes-gateway
 [21]:#stunner
 [22]:#argo-rollouts
+[23]:#amazon-kubernetes-service
+
 
 ## Implementations
 
@@ -292,6 +297,18 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+
+### Amazon Elastic Kubernetes Service
+
+[Amazon Elastic Kubernetes Service (EKS)][eks] is a managed service that you can use to run Kubernetes on AWS without needing to install, operate, and maintain your own Kubernetes control plane or nodes. EKS's implementation of the Gateway API is through [Amazon Gateway Controller][eks-gateway] which provisions [AWS VPC Lattice][vpc-lattice] Resources for gateway(s), HTTPRoute(s) in EKS clusters.
+
+
+[eks]:https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+[eks-gateway]:https://github.com/aws/aws-application-networking-k8s
+[vpc-lattice]:https://aws.amazon.com/vpc/lattice/
+
+
+
 
 ## Integrations
 
