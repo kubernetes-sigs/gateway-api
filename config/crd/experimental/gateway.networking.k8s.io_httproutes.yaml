@@ -628,7 +628,7 @@ spec:
                                 responseHeaderModifier:
                                   description: "ResponseHeaderModifier defines a schema
                                     for a filter that modifies response headers. \n
-                                    Support: Extended \n <gateway:experimental>"
+                                    Support: Extended"
                                   properties:
                                     add:
                                       description: "Add adds the given header(s) (name,
@@ -763,7 +763,7 @@ spec:
                                     a crash. \n Unknown values here must result in
                                     the implementation setting the Accepted Condition
                                     for the Route to `status: False`, with a Reason
-                                    of `UnsupportedValue`. \n "
+                                    of `UnsupportedValue`."
                                   enum:
                                   - RequestHeaderModifier
                                   - ResponseHeaderModifier
@@ -1267,7 +1267,7 @@ spec:
                           responseHeaderModifier:
                             description: "ResponseHeaderModifier defines a schema
                               for a filter that modifies response headers. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               add:
                                 description: "Add adds the given header(s) (name,
@@ -1391,8 +1391,7 @@ spec:
                               implementations must ensure that unknown values will
                               not cause a crash. \n Unknown values here must result
                               in the implementation setting the Accepted Condition
-                              for the Route to `status: False`, with a Reason of `UnsupportedValue`.
-                              \n "
+                              for the Route to `status: False`, with a Reason of `UnsupportedValue`."
                             enum:
                             - RequestHeaderModifier
                             - ResponseHeaderModifier
@@ -2524,7 +2523,7 @@ spec:
                                 responseHeaderModifier:
                                   description: "ResponseHeaderModifier defines a schema
                                     for a filter that modifies response headers. \n
-                                    Support: Extended \n <gateway:experimental>"
+                                    Support: Extended"
                                   properties:
                                     add:
                                       description: "Add adds the given header(s) (name,
@@ -2659,7 +2658,7 @@ spec:
                                     a crash. \n Unknown values here must result in
                                     the implementation setting the Accepted Condition
                                     for the Route to `status: False`, with a Reason
-                                    of `UnsupportedValue`. \n "
+                                    of `UnsupportedValue`."
                                   enum:
                                   - RequestHeaderModifier
                                   - ResponseHeaderModifier
@@ -3163,7 +3162,7 @@ spec:
                           responseHeaderModifier:
                             description: "ResponseHeaderModifier defines a schema
                               for a filter that modifies response headers. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               add:
                                 description: "Add adds the given header(s) (name,
@@ -3287,8 +3286,7 @@ spec:
                               implementations must ensure that unknown values will
                               not cause a crash. \n Unknown values here must result
                               in the implementation setting the Accepted Condition
-                              for the Route to `status: False`, with a Reason of `UnsupportedValue`.
-                              \n "
+                              for the Route to `status: False`, with a Reason of `UnsupportedValue`."
                             enum:
                             - RequestHeaderModifier
                             - ResponseHeaderModifier

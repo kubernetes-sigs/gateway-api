@@ -533,7 +533,7 @@ spec:
                                 responseHeaderModifier:
                                   description: "ResponseHeaderModifier defines a schema
                                     for a filter that modifies response headers. \n
-                                    Support: Extended \n <gateway:experimental>"
+                                    Support: Extended"
                                   properties:
                                     add:
                                       description: "Add adds the given header(s) (name,
@@ -996,7 +996,7 @@ spec:
                           responseHeaderModifier:
                             description: "ResponseHeaderModifier defines a schema
                               for a filter that modifies response headers. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               add:
                                 description: "Add adds the given header(s) (name,
