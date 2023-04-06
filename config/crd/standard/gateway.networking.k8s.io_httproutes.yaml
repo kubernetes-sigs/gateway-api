@@ -230,7 +230,8 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
+                        \n Support: Core for Kubernetes Service \n Support: Extended
+                        for Kubernetes ServiceImport \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
@@ -2070,7 +2071,8 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
+                        \n Support: Core for Kubernetes Service \n Support: Extended
+                        for Kubernetes ServiceImport \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should

@@ -228,8 +228,9 @@ spec:
                         code. Request rejections must respect weight; if an invalid
                         backend is requested to have 80% of requests, then 80% of
                         requests must be rejected instead. \n Support: Core for Kubernetes
-                        Service \n Support: Implementation-specific for any other
-                        resource \n Support for weight: Extended"
+                        Service \n Support: Extended for Kubernetes ServiceImport
+                        \n Support: Implementation-specific for any other resource
+                        \n Support for weight: Extended"
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a

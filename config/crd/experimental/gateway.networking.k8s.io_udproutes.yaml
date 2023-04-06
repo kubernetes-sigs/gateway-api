@@ -179,8 +179,9 @@ spec:
                         attempts to this backend. Packet drops must respect weight;
                         if an invalid backend is requested to have 80% of the packets,
                         then 80% of packets must be dropped instead. \n Support: Core
-                        for Kubernetes Service Support: Implementation-specific for
-                        any other resource \n Support for weight: Extended"
+                        for Kubernetes Service \n Support: Extended for Kubernetes
+                        ServiceImport \n Support: Implementation-specific for any
+                        other resource \n Support for weight: Extended"
                       items:
                         description: "BackendRef defines how a Route should forward
                           a request to a Kubernetes resource. \n Note that when a
