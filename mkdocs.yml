@@ -85,6 +85,7 @@ nav:
       - Prototyping:
         - geps/gep-1709.md
       - Experimental:
+        - geps/gep-1748.md
         - geps/gep-1323.md
         - geps/gep-1016.md
         - geps/gep-957.md
