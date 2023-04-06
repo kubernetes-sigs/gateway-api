@@ -136,7 +136,7 @@ func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) f
 	return errs
 }
 
-// validateHostnameProtocolPort validates that the combination of port, protocol, and name are
+// validateHostnameProtocolPort validates that the combination of port, protocol, and hostname are
 // unique for each listener.
 func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
@@ -150,7 +150,7 @@ func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.
 		port := listener.Port
 		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
 		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
-			errs = append(errs, field.Forbidden(path.Index(i), fmt.Sprintln("combination of port, protocol, and name must be unique for each listener")))
+			errs = append(errs, field.Forbidden(path.Index(i), fmt.Sprintln("combination of port, protocol, and hostname must be unique for each listener")))
 		} else {
 			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 		}
