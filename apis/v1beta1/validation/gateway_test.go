@@ -136,13 +136,116 @@ func TestValidateGateway(t *testing.T) {
 		},
 		"names are not unique within the Gateway": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				hostnameBar := gatewayv1b1.Hostname("bar.com")
 				gw.Spec.Listeners[0].Name = "foo"
-				gw.Spec.Listeners = append(gw.Spec.Listeners, gatewayv1b1.Listener{
-					Name: "foo",
-				},
+				gw.Spec.Listeners[0].Hostname = &hostnameFoo
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "foo",
+						Hostname: &hostnameBar,
+					},
 				)
 			},
 			expectErrsOnFields: []string{"spec.listeners[1].name"},
+		},
+		"combination of port, protocol, and hostname are not unique for each listener": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners[0].Hostname = &hostnameFoo
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Port = 80
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Hostname: &hostnameFoo,
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     80,
+					},
+				)
+			},
+			expectErrsOnFields: []string{"spec.listeners[1]"},
+		},
+		"combination of port and protocol are not unique for each listenr when hostnames not set": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Port = 80
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     80,
+					},
+				)
+			},
+			expectErrsOnFields: []string{"spec.listeners[1]"},
+		},
+		"port is unique when protocol and hostname are the same": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners[0].Hostname = &hostnameFoo
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Port = 80
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Hostname: &hostnameFoo,
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     8080,
+					},
+				)
+			},
+			expectErrsOnFields: nil,
+		},
+		"hostname is unique when protocol and port are the same": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				hostnameBar := gatewayv1b1.Hostname("bar.com")
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners[0].Hostname = &hostnameFoo
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Port = 80
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Hostname: &hostnameBar,
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     80,
+					},
+				)
+			},
+			expectErrsOnFields: nil,
+		},
+		"protocol is unique when port and hostname are the same": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				tlsConfigFoo := tlsConfig
+				tlsModeFoo := gatewayv1b1.TLSModeType("Terminate")
+				tlsConfigFoo.Mode = &tlsModeFoo
+				tlsConfigFoo.CertificateRefs = []gatewayv1b1.SecretObjectReference{
+					{
+						Name: "FooCertificateRefs",
+					},
+				}
+				gw.Spec.Listeners[0].Name = "foo"
+				gw.Spec.Listeners[0].Hostname = &hostnameFoo
+				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+				gw.Spec.Listeners[0].Port = 8000
+				gw.Spec.Listeners[0].TLS = &tlsConfigFoo
+				gw.Spec.Listeners = append(gw.Spec.Listeners,
+					gatewayv1b1.Listener{
+						Name:     "bar",
+						Hostname: &hostnameFoo,
+						Protocol: gatewayv1b1.TLSProtocolType,
+						Port:     8000,
+						TLS:      &tlsConfigFoo,
+					},
+				)
+			},
+			expectErrsOnFields: nil,
 		},
 	}
 
