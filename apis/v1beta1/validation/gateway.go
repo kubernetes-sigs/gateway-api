@@ -19,6 +19,7 @@ package validation
 import (
 	"fmt"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -69,6 +70,8 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	errs = append(errs, ValidateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
 	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
+	errs = append(errs, ValidateListenerNames(listeners, path)...)
+	errs = append(errs, validateHostnameProtocolPort(listeners, path)...)
 	return errs
 }
 
@@ -114,6 +117,42 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
 				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
 			}
+		}
+	}
+	return errs
+}
+
+// ValidateListenerNames validates the names of the listeners
+// must be unique within the Gateway
+func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	nameMap := make(map[gatewayv1b1.SectionName]struct{}, len(listeners))
+	for i, c := range listeners {
+		if _, found := nameMap[c.Name]; found {
+			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
+		}
+		nameMap[c.Name] = struct{}{}
+	}
+	return errs
+}
+
+// validateHostnameProtocolPort validates that the combination of port, protocol, and hostname are
+// unique for each listener.
+func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	hostnameProtocolPortSets := sets.Set[string]{}
+	for i, listener := range listeners {
+		hostname := new(gatewayv1b1.Hostname)
+		if listener.Hostname != nil {
+			hostname = listener.Hostname
+		}
+		protocol := listener.Protocol
+		port := listener.Port
+		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
+		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
+			errs = append(errs, field.Duplicate(path.Index(i), fmt.Sprintln("combination of port, protocol, and hostname must be unique for each listener")))
+		} else {
+			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 		}
 	}
 	return errs
