@@ -9,6 +9,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 - [Acnodal EPIC][1] (public preview)
 - [Apache APISIX][2] (alpha)
+- [AWS Gateway API Controller for VPC Lattice][23] (alpha)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
@@ -54,6 +55,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [20]:#big-ip-kubernetes-gateway
 [21]:#stunner
 [22]:#argo-rollouts
+[23]:#aws-gateway-api-controller-for-vpc-lattice
 
 ## Implementations
 
@@ -74,6 +76,14 @@ APISIX currently supports Gateway API `v1alpha2` version of the specification fo
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
+
+### AWS Gateway API Controller for VPC Lattice
+
+The [AWS Gateway API Controller][aws-gateway-api-controller] lets you connect services across multiple Kubernetes clusters through the Kubernetes Gateway API interface. It is also designed to connect services running on EC2 instances, containers, and as serverless functions. It does this by leveraging [Amazon VPC Lattice][amazon-vpc-lattice], which works with Kubernetes Gateway API calls to manage Kubernetes objects.
+
+[aws-gateway-api-controller]:https://www.gateway-api-controller.eks.aws.dev/
+[amazon-vpc-lattice]:https://aws.amazon.com/vpc/lattice/
+
 
 ### BIG-IP Kubernetes Gateway
 
