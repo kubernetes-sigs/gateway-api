@@ -200,7 +200,7 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: nil,
 		},
-		"hostname is unique when protoco and port are the same": {
+		"hostname is unique when protocol and port are the same": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostnameFoo := gatewayv1b1.Hostname("foo.com")
 				hostnameBar := gatewayv1b1.Hostname("bar.com")
