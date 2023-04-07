@@ -2,7 +2,7 @@
 
 Gateway API is an open source project managed by the [SIG-NETWORK][sig-network]
 community. It is a collection of resources that model service networking 
-in Kubernetes. These resources - `GatewayClass`,`Gateway`, `HTTPRoute`, 
+in Kubernetes. These resources - `GatewayClass`, `Gateway`, `HTTPRoute`, 
 `TCPRoute`, `Service`, etc - aim to evolve Kubernetes service networking through 
 expressive, extensible, and role-oriented interfaces that are implemented by 
 many vendors and have broad industry support. 
