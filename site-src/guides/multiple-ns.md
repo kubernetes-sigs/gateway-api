@@ -43,7 +43,7 @@ The logical relationship between the Gateway API resources looks like this:
 attach to Gateways and program their routing rules. It is especially relevant
 when there are Routes across Namespaces that share one or more Gateways.
 Gateway and Route attachment is bidirectional - attachment can only succeed if
-the Gateway owner and Route owner owner both agree to the relationship. This
+the Gateway owner and Route owner both agree to the relationship. This
 bi-directional relationship exists for two reasons:
 
 - Route owners don't want to overexpose their applications through paths they 
