@@ -552,7 +552,7 @@ const (
 	// true.
 	GatewayReasonProgrammed GatewayConditionReason = "Programmed"
 
-	// This reason is used with the "Programmed" and "Accepted" condition when the Gateway is
+	// This reason is used with the "Programmed" and "Accepted" conditions when the Gateway is
 	// syntactically or semantically invalid.
 	GatewayReasonInvalid GatewayConditionReason = "Invalid"
 
@@ -635,9 +635,7 @@ const (
 )
 
 const (
-	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
-	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
-	// to alert about usage.
+	// "Ready" is a condition type reserved for future use. It should not be used by implementations.
 	//
 	// If used in the future, "Ready" will represent the final state where all configuration is confirmed good
 	// _and has completely propagated to the data plane_. That is, it is a _guarantee_ that, as soon as something
@@ -646,6 +644,8 @@ const (
 	// This is a very strong guarantee, and to date no implementation has satisfied it enough to implement it.
 	// This reservation can be discussed in the future if necessary.
 	//
+	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
+	// to alert about usage.
 	// Deprecated: Ready is reserved for future use
 	GatewayConditionReady GatewayConditionType = "Ready"
 
@@ -878,7 +878,7 @@ const (
 )
 
 const (
-	// "Ready" is a reserved condition type for future use. It should not be used by implementations.
+	// "Ready" is a condition type reserved for future use. It should not be used by implementations.
 	// Note: This condition is not really "deprecated", but rather "reserved"; however, deprecated triggers Go linters
 	// to alert about usage.
 	//
