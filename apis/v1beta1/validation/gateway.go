@@ -129,7 +129,7 @@ func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) f
 	nameMap := map[gatewayv1b1.SectionName]struct{}{}
 	for i, c := range listeners {
 		if _, found := nameMap[c.Name]; found {
-			errs = append(errs, field.Forbidden(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
+			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
 		}
 		nameMap[c.Name] = struct{}{}
 	}
@@ -150,7 +150,7 @@ func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.
 		port := listener.Port
 		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
 		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
-			errs = append(errs, field.Forbidden(path.Index(i), fmt.Sprintln("combination of port, protocol, and hostname must be unique for each listener")))
+			errs = append(errs, field.Duplicate(path.Index(i), fmt.Sprintln("combination of port, protocol, and hostname must be unique for each listener")))
 		} else {
 			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 		}
