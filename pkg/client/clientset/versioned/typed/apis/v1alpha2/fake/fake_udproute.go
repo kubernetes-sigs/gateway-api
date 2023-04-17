@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeUDPRoutes struct {
 	ns   string
 }
 
-var udproutesResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "udproutes"}
+var udproutesResource = v1alpha2.SchemeGroupVersion.WithResource("udproutes")
 
-var udproutesKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "UDPRoute"}
+var udproutesKind = v1alpha2.SchemeGroupVersion.WithKind("UDPRoute")
 
 // Get takes name of the uDPRoute, and returns the corresponding uDPRoute object, and an error if there is any.
 func (c *FakeUDPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.UDPRoute, err error) {

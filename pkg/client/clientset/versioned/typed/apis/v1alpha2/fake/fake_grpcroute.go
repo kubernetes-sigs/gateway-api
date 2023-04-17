@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeGRPCRoutes struct {
 	ns   string
 }
 
-var grpcroutesResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "grpcroutes"}
+var grpcroutesResource = v1alpha2.SchemeGroupVersion.WithResource("grpcroutes")
 
-var grpcroutesKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "GRPCRoute"}
+var grpcroutesKind = v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute")
 
 // Get takes name of the gRPCRoute, and returns the corresponding gRPCRoute object, and an error if there is any.
 func (c *FakeGRPCRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.GRPCRoute, err error) {

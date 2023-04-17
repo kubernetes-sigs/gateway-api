@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeTLSRoutes struct {
 	ns   string
 }
 
-var tlsroutesResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "tlsroutes"}
+var tlsroutesResource = v1alpha2.SchemeGroupVersion.WithResource("tlsroutes")
 
-var tlsroutesKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "TLSRoute"}
+var tlsroutesKind = v1alpha2.SchemeGroupVersion.WithKind("TLSRoute")
 
 // Get takes name of the tLSRoute, and returns the corresponding tLSRoute object, and an error if there is any.
 func (c *FakeTLSRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.TLSRoute, err error) {
