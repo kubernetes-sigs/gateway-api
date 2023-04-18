@@ -122,7 +122,7 @@ Conformance levels are defined by the filter type:
 
  - All "core" filters MUST be supported by implementations.
  - Implementers are encouraged to support "extended" filters.
- - "Custom" filters have no API guarantees across implementations.
+ - "Implementation-specific" filters have no API guarantees across implementations.
 
 Specifying a core filter multiple times has unspecified or 
 implementation-specific conformance.
