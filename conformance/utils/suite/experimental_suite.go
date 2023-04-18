@@ -21,7 +21,6 @@ import (
 	"fmt"
 	"strings"
 	"sync"
-	"testing"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -32,6 +31,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // -----------------------------------------------------------------------------
@@ -183,12 +183,12 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
-func (suite *ExperimentalConformanceTestSuite) Setup(t *testing.T) {
+func (suite *ExperimentalConformanceTestSuite) Setup(t tester.Tester) {
 	suite.ConformanceTestSuite.Setup(t)
 }
 
 // Run runs the provided set of conformance tests.
-func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) error {
+func (suite *ExperimentalConformanceTestSuite) Run(t tester.Tester, tests []ConformanceTest) error {
 	// verify that the test suite isn't already running, don't start a new run
 	// until the previous run finishes
 	suite.lock.Lock()
@@ -206,7 +206,7 @@ func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []Conform
 	// run all tests and collect the test results for conformance reporting
 	results := make(map[string]testResult)
 	for _, test := range tests {
-		succeeded := t.Run(test.ShortName, func(t *testing.T) {
+		succeeded := t.Run(test.ShortName, func(t tester.Tester) {
 			test.Run(t, &suite.ConformanceTestSuite)
 		})
 		res := testSucceeded

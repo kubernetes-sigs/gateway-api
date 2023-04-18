@@ -21,7 +21,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"testing"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -34,6 +33,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // MeshPod represents a connection to a specific pod running in the mesh.
@@ -53,7 +53,7 @@ const (
 	MeshAppEchoV2 MeshApplication = "app=echo,version=v2"
 )
 
-func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, exp http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
+func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t tester.Tester, exp http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
 	t.Helper()
 
 	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
@@ -75,7 +75,7 @@ func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T,
 	t.Logf("Request passed")
 }
 
-func makeRequest(t *testing.T, r http.Request) []string {
+func makeRequest(t tester.Tester, r http.Request) []string {
 	protocol := strings.ToLower(r.Protocol)
 	if protocol == "" {
 		protocol = "http"
@@ -149,11 +149,11 @@ func (m *MeshPod) request(args []string) (Response, error) {
 	return ParseResponse(stdoutBuf.String()), nil
 }
 
-func ConnectToApp(t *testing.T, s *suite.ConformanceTestSuite, app MeshApplication) MeshPod {
+func ConnectToApp(t tester.Tester, s *suite.ConformanceTestSuite, app MeshApplication) MeshPod {
 	return ConnectToAppInNamespace(t, s, app, "gateway-conformance-mesh")
 }
 
-func ConnectToAppInNamespace(t *testing.T, s *suite.ConformanceTestSuite, app MeshApplication, ns string) MeshPod {
+func ConnectToAppInNamespace(t tester.Tester, s *suite.ConformanceTestSuite, app MeshApplication, ns string) MeshPod {
 	lbls, _ := klabels.Parse(string(app))
 
 	podsList := v1.PodList{}

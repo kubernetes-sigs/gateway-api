@@ -17,13 +17,12 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -38,7 +37,7 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "request-header-modifier", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
@@ -191,7 +190,7 @@ var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 			// Declare tc here to avoid loop variable
 			// reuse issues across parallel tests.
 			tc := testCases[i]
-			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Run(tc.GetTestCaseName(i), func(t tester.Tester) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 			})

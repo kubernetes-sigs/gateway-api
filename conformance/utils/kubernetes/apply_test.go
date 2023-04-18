@@ -25,6 +25,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 
 	_ "sigs.k8s.io/gateway-api/conformance/utils/flags"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func TestPrepareResources(t *testing.T) {
@@ -176,7 +177,7 @@ spec:
 
 			tc.applier.GatewayClass = "test-class"
 			tc.applier.ControllerName = "test-controller"
-			resources, err := tc.applier.prepareResources(t, decoder)
+			resources, err := tc.applier.prepareResources(tester.New(t), decoder)
 
 			require.NoError(t, err, "unexpected error preparing resources")
 			require.EqualValues(t, tc.expected, resources)

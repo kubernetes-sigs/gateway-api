@@ -17,8 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -26,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -40,7 +39,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-hostname-intersection.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		gwNN := types.NamespacedName{Name: "httproute-hostname-intersection", Namespace: ns}
 
@@ -48,7 +47,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 		// namespace so we have to wait for it to be ready.
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{ns})
 
-		t.Run("HTTPRoutes that do intersect with listener hostnames", func(t *testing.T) {
+		t.Run("HTTPRoutes that do intersect with listener hostnames", func(t tester.Tester) {
 			routes := []types.NamespacedName{
 				{Namespace: ns, Name: "specific-host-matches-listener-specific-host"},
 				{Namespace: ns, Name: "specific-host-matches-listener-wildcard-host"},
@@ -195,14 +194,14 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				// Declare tc here to avoid loop variable
 				// reuse issues across parallel tests.
 				tc := testCases[i]
-				t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
+				t.Run(tc.GetTestCaseName(i), func(t tester.Tester) {
 					t.Parallel()
 					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 				})
 			}
 		})
 
-		t.Run("HTTPRoutes that do not intersect with listener hostnames", func(t *testing.T) {
+		t.Run("HTTPRoutes that do not intersect with listener hostnames", func(t tester.Tester) {
 			gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN))
 			routeNN := types.NamespacedName{Namespace: ns, Name: "no-intersecting-hosts"}
 
@@ -235,7 +234,7 @@ var HTTPRouteHostnameIntersection = suite.ConformanceTest{
 				// Declare tc here to avoid loop variable
 				// reuse issues across parallel tests.
 				tc := testCases[i]
-				t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
+				t.Run(tc.GetTestCaseName(i), func(t tester.Tester) {
 					t.Parallel()
 					http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
 				})

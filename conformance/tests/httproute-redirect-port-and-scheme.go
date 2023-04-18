@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 )
 
@@ -42,7 +41,7 @@ var HTTPRouteRedirectPortAndScheme = suite.ConformanceTest{
 		suite.SupportHTTPRoutePortRedirect,
 		suite.SupportGatewayPort8080,
 	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
@@ -154,7 +153,7 @@ var HTTPRouteRedirectPortAndScheme = suite.ConformanceTest{
 
 		for i := range testCases {
 			tc := testCases[i]
-			t.Run("http-listener-on-80/"+tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Run("http-listener-on-80/"+tc.GetTestCaseName(i), func(t tester.Tester) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr80, tc)
 			})
@@ -206,7 +205,7 @@ var HTTPRouteRedirectPortAndScheme = suite.ConformanceTest{
 
 		for i := range testCases {
 			tc := testCases[i]
-			t.Run("http-listener-on-8080/"+tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Run("http-listener-on-8080/"+tc.GetTestCaseName(i), func(t tester.Tester) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr8080, tc)
 			})
@@ -301,7 +300,7 @@ var HTTPRouteRedirectPortAndScheme = suite.ConformanceTest{
 
 		for i := range testCases {
 			tc := testCases[i]
-			t.Run("https-listener-on-443/"+tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Run("https-listener-on-443/"+tc.GetTestCaseName(i), func(t tester.Tester) {
 				t.Parallel()
 				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr443, cPem, keyPem, "example.org", tc)
 			})

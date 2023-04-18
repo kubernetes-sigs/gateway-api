@@ -17,8 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -26,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -40,14 +39,14 @@ var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-invalid-backendref-nonexistent.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-nonexistent-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		// Gateway and Route must be Accepted.
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		t.Run("HTTPRoute with only a nonexistent BackendRef has a ResolvedRefs Condition with status False and Reason BackendNotFound", func(t *testing.T) {
+		t.Run("HTTPRoute with only a nonexistent BackendRef has a ResolvedRefs Condition with status False and Reason BackendNotFound", func(t tester.Tester) {
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
@@ -57,7 +56,7 @@ var HTTPRouteInvalidNonExistentBackendRef = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
-		t.Run("HTTP Request to invalid nonexistent backend receive a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid nonexistent backend receive a 500", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",

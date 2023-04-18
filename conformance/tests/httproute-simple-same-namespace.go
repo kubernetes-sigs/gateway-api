@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -39,14 +38,14 @@ var HTTPRouteSimpleSameNamespace = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-simple-same-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		ns := v1beta1.Namespace("gateway-conformance-infra")
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: string(ns)}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: string(ns)}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		t.Run("Simple HTTP request should reach infra-backend", func(t *testing.T) {
+		t.Run("Simple HTTP request should reach infra-backend", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request:   http.Request{Path: "/"},
 				Response:  http.Response{StatusCode: 200},

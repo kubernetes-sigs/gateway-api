@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"regexp"
 	"sync"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -28,9 +27,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
-func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []BackendRef, path string) {
+func ExpectMirroredRequest(t tester.Tester, client client.Client, clientset clientset.Interface, mirrorPods []BackendRef, path string) {
 	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
 			t.Fatalf("Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)

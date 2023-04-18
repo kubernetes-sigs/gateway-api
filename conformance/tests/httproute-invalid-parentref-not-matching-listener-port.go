@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -40,13 +39,13 @@ var HTTPRouteInvalidParentRefNotMatchingListenerPort = suite.ConformanceTest{
 		suite.SupportRouteDestinationPortMatching,
 	},
 	Manifests: []string{"tests/httproute-invalid-parentref-not-matching-listener-port.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "httproute-listener-not-matching-route-port", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		// The Route must have an Accepted Condition with a NoMatchingParent Reason.
-		t.Run("HTTPRoute with no matching port in ParentRef has an Accepted Condition with status False and Reason NoMatchingParent", func(t *testing.T) {
+		t.Run("HTTPRoute with no matching port in ParentRef has an Accepted Condition with status False and Reason NoMatchingParent", func(t tester.Tester) {
 			acceptedCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionAccepted),
 				Status: metav1.ConditionFalse,
@@ -56,11 +55,11 @@ var HTTPRouteInvalidParentRefNotMatchingListenerPort = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, acceptedCond)
 		})
 
-		t.Run("Route should not have Parents accepted in status", func(t *testing.T) {
+		t.Run("Route should not have Parents accepted in status", func(t tester.Tester) {
 			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNN)
 		})
 
-		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
+		t.Run("Gateway should have 0 Routes attached", func(t tester.Tester) {
 			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwNN)
 		})
 	},

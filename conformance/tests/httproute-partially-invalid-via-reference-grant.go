@@ -17,8 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -26,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -41,14 +40,14 @@ var HTTPRoutePartiallyInvalidViaInvalidReferenceGrant = suite.ConformanceTest{
 		suite.SupportReferenceGrant,
 	},
 	Manifests: []string{"tests/httproute-partially-invalid-via-reference-grant.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		// Route and Gateway must be Attached.
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, s.Client, s.TimeoutConfig, s.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		t.Run("HTTPRoute with BackendRef in another namespace and no ReferenceGrant covering the Service has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
+		t.Run("HTTPRoute with BackendRef in another namespace and no ReferenceGrant covering the Service has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t tester.Tester) {
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
@@ -58,7 +57,7 @@ var HTTPRoutePartiallyInvalidViaInvalidReferenceGrant = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
-		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with missing referenceGrant should receive a 500", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
@@ -68,7 +67,7 @@ var HTTPRoutePartiallyInvalidViaInvalidReferenceGrant = suite.ConformanceTest{
 			})
 		})
 
-		t.Run("HTTP Request to valid sibling backend should succeed", func(t *testing.T) {
+		t.Run("HTTP Request to valid sibling backend should succeed", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",

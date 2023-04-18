@@ -25,6 +25,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
@@ -74,7 +75,7 @@ func TestConformance(t *testing.T) {
 		NamespaceAnnotations:       namespaceAnnotations,
 		SkipTests:                  skipTests,
 	})
-	cSuite.Setup(t)
+	cSuite.Setup(tester.New(t))
 
-	cSuite.Run(t, tests.ConformanceTests)
+	cSuite.Run(tester.New(t), tests.ConformanceTests)
 }

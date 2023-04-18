@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -38,7 +37,7 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 		suite.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-tls-certificateref.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
 		listeners := []v1beta1.ListenerStatus{{
 			Name: v1beta1.SectionName("https"),
 			SupportedKinds: []v1beta1.RouteGroupKind{{
@@ -77,7 +76,7 @@ var GatewayInvalidTLSConfiguration = suite.ConformanceTest{
 
 		for _, tc := range testCases {
 			tc := tc
-			t.Run(tc.name, func(t *testing.T) {
+			t.Run(tc.name, func(t tester.Tester) {
 				t.Parallel()
 				kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, tc.gatewayNamespacedName, listeners)
 			})

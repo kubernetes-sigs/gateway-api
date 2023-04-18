@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -40,7 +39,7 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 		suite.SupportTLSRoute,
 	},
 	Manifests: []string{"tests/httproute-disallowed-kind.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		// This test creates an additional Gateway in the gateway-conformance-infra
 		// namespace so we have to wait for it to be ready.
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, []string{"gateway-conformance-infra"})
@@ -49,17 +48,17 @@ var HTTPRouteDisallowedKind = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "tlsroutes-only", Namespace: "gateway-conformance-infra"}
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		t.Run("Route should not have been accepted with reason NotAllowedByListeners", func(t *testing.T) {
+		t.Run("Route should not have been accepted with reason NotAllowedByListeners", func(t tester.Tester) {
 			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, metav1.Condition{
 				Type:   string(v1beta1.RouteConditionAccepted),
 				Status: metav1.ConditionFalse,
 				Reason: string(v1beta1.RouteReasonNotAllowedByListeners),
 			})
 		})
-		t.Run("Route should not have Parents set in status", func(t *testing.T) {
+		t.Run("Route should not have Parents set in status", func(t tester.Tester) {
 			kubernetes.HTTPRouteMustHaveNoAcceptedParents(t, suite.Client, suite.TimeoutConfig, routeNN)
 		})
-		t.Run("Gateway should have 0 Routes attached", func(t *testing.T) {
+		t.Run("Gateway should have 0 Routes attached", func(t tester.Tester) {
 			kubernetes.GatewayMustHaveZeroRoutes(t, suite.Client, suite.TimeoutConfig, gwNN)
 		})
 	},

@@ -33,6 +33,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 var (
@@ -124,8 +125,8 @@ func testExperimentalConformance(t *testing.T) {
 		t.Fatalf("error creating experimental conformance test suite: %v", err)
 	}
 
-	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
+	cSuite.Setup(tester.New(t))
+	cSuite.Run(tester.New(t), tests.ConformanceTests)
 	report, err := cSuite.Report()
 	if err != nil {
 		t.Fatalf("error generating conformance profile report: %v", err)

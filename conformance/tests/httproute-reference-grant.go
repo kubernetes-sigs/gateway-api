@@ -18,7 +18,6 @@ package tests
 
 import (
 	"context"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -28,6 +27,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -43,13 +43,13 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 		suite.SupportReferenceGrant,
 	},
 	Manifests: []string{"tests/httproute-reference-grant.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		t.Run("Simple HTTP request should reach web-backend", func(t *testing.T) {
+		t.Run("Simple HTTP request should reach web-backend", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
@@ -71,7 +71,7 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 		}
 		require.NoError(t, suite.Client.Delete(ctx, &rg))
 
-		t.Run("Simple HTTP request should return 500 after deleting the relevant reference grant", func(t *testing.T) {
+		t.Run("Simple HTTP request should return 500 after deleting the relevant reference grant", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",

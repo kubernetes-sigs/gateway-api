@@ -18,7 +18,6 @@ package tests
 
 import (
 	"context"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -29,6 +28,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -42,8 +42,8 @@ var GatewayModifyListeners = suite.ConformanceTest{
 		suite.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-modify-listeners.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		t.Run("should be able to add a listener that then becomes available for routing traffic", func(t *testing.T) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
+		t.Run("should be able to add a listener that then becomes available for routing traffic", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-add-listener", Namespace: "gateway-conformance-infra"}
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()
@@ -135,7 +135,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			require.NotEqual(t, original.Generation, updated.Generation, "generation should change after an update")
 		})
 
-		t.Run("should be able to remove listeners, which would then stop routing the relevant traffic", func(t *testing.T) {
+		t.Run("should be able to remove listeners, which would then stop routing the relevant traffic", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-remove-listener", Namespace: "gateway-conformance-infra"}
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()

@@ -29,6 +29,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // -----------------------------------------------------------------------------
@@ -315,7 +316,7 @@ func Test_listenersMatch(t *testing.T) {
 	for _, test := range tests {
 		test := test
 		t.Run(test.name, func(t *testing.T) {
-			assert.Equal(t, test.want, listenersMatch(t, test.expected, test.actual))
+			assert.Equal(t, test.want, listenersMatch(tester.New(t), test.expected, test.actual))
 		})
 	}
 }

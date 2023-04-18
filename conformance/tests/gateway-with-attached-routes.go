@@ -17,14 +17,13 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -38,8 +37,8 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 		suite.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-with-attached-routes.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		t.Run("Gateway listener should have one valid http routes attached", func(t *testing.T) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
+		t.Run("Gateway listener should have one valid http routes attached", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-with-one-attached-route", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
 				Name: v1beta1.SectionName("http"),
@@ -65,7 +64,7 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 
-		t.Run("Gateway listener should have two valid http routes attached", func(t *testing.T) {
+		t.Run("Gateway listener should have two valid http routes attached", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-with-two-attached-routes", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
 				Name: v1beta1.SectionName("http"),
@@ -101,8 +100,8 @@ var GatewayWithAttachedRoutesWithPort8080 = suite.ConformanceTest{
 		suite.SupportGatewayPort8080,
 	},
 	Manifests: []string{"tests/gateway-with-attached-routes-with-port-8080.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		t.Run("Gateway listener should have attached route by specifying the sectionName", func(t *testing.T) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
+		t.Run("Gateway listener should have attached route by specifying the sectionName", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-with-two-listeners-and-one-attached-route", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{
 				{

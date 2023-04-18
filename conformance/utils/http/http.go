@@ -21,11 +21,11 @@ import (
 	"net"
 	"net/url"
 	"strings"
-	"testing"
 	"time"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // ExpectedResponse defines the response expected for a given request.
@@ -97,7 +97,7 @@ type BackendRef struct {
 //
 // Once the request succeeds consistently with the response having the expected status code, make
 // additional assertions on the response body using the provided ExpectedResponse.
-func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
+func MakeRequestAndExpectEventuallyConsistentResponse(t tester.Tester, r roundtripper.RoundTripper, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 
 	req := MakeRequest(t, &expected, gwAddr, "HTTP", "http")
@@ -105,7 +105,7 @@ func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, r roundtripp
 	WaitForConsistentResponse(t, r, req, expected, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency)
 }
 
-func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
+func MakeRequest(t tester.Tester, expected *ExpectedResponse, gwAddr, protocol, scheme string) roundtripper.Request {
 	t.Helper()
 
 	if expected.Request.Method == "" {
@@ -150,7 +150,7 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 // case of any error, the input gwAddr will be returned as the default.
 //
 // [HTTP spec]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23
-func CalculateHost(t *testing.T, gwAddr, scheme string) string {
+func CalculateHost(t tester.Tester, gwAddr, scheme string) string {
 	host, port, err := net.SplitHostPort(gwAddr) // note: this will strip brackets of an IPv6 address
 	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
@@ -184,7 +184,7 @@ func ipv6SafeHost(host string) string {
 
 // AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
 // Each failed attempt has a 1s delay; successful attempts have no delay.
-func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
+func AwaitConvergence(t tester.Tester, threshold int, maxTimeToConsistency time.Duration, fn func(elapsed time.Duration) bool) {
 	successes := 0
 	attempts := 0
 	start := time.Now()
@@ -222,7 +222,7 @@ func AwaitConvergence(t *testing.T, threshold int, maxTimeToConsistency time.Dur
 // WaitForConsistentResponse repeats the provided request until it completes with a response having
 // the expected response consistently. The provided threshold determines how many times in
 // a row this must occur to be considered "consistent".
-func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
+func WaitForConsistentResponse(t tester.Tester, r roundtripper.RoundTripper, req roundtripper.Request, expected ExpectedResponse, threshold int, maxTimeToConsistency time.Duration) {
 	AwaitConvergence(t, threshold, maxTimeToConsistency, func(elapsed time.Duration) bool {
 		cReq, cRes, err := r.CaptureRoundTrip(req)
 		if err != nil {
@@ -240,7 +240,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	t.Logf("Request passed")
 }
 
-func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRequest(t tester.Tester, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
 	}

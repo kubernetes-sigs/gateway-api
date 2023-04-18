@@ -24,7 +24,6 @@ import (
 	"reflect"
 	"strconv"
 	"strings"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -38,6 +37,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
@@ -66,12 +66,12 @@ func NewGatewayRef(nn types.NamespacedName, listenerNames ...string) GatewayRef 
 }
 
 // GWCMustBeAcceptedConditionTrue waits until the specified GatewayClass has an Accepted condition set with a status value equal to True.
-func GWCMustHaveAcceptedConditionTrue(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+func GWCMustHaveAcceptedConditionTrue(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
 	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, string(metav1.ConditionTrue))
 }
 
 // GWCMustBeAcceptedConditionAny waits until the specified GatewayClass has an Accepted condition set with a status set to any value.
-func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
+func GWCMustHaveAcceptedConditionAny(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, gwcName string) string {
 	return gwcMustBeAccepted(t, c, timeoutConfig, gwcName, "")
 }
 
@@ -79,7 +79,7 @@ func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfi
 // condition set. Passing an empty status string means that any value
 // will be accepted. It also returns the ControllerName for the GatewayClass.
 // This will cause the test to halt if the specified timeout is exceeded.
-func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
+func gwcMustBeAccepted(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
 	t.Helper()
 
 	var controllerName string
@@ -107,7 +107,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 
 // GatewayMustHaveLatestConditions waits until the specified Gateway has
 // all conditions updated with the latest observed generation.
-func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
+func GatewayMustHaveLatestConditions(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
@@ -130,7 +130,7 @@ func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfi
 
 // GatewayClassMustHaveLatestConditions will fail the test if there are
 // conditions that were not updated
-func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *v1beta1.GatewayClass) {
+func GatewayClassMustHaveLatestConditions(t tester.Tester, gwc *v1beta1.GatewayClass) {
 	t.Helper()
 
 	if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
@@ -140,7 +140,7 @@ func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *v1beta1.GatewayClas
 
 // HTTPRouteMustHaveLatestConditions will fail the test if there are
 // conditions that were not updated
-func HTTPRouteMustHaveLatestConditions(t *testing.T, r *v1beta1.HTTPRoute) {
+func HTTPRouteMustHaveLatestConditions(t tester.Tester, r *v1beta1.HTTPRoute) {
 	t.Helper()
 
 	for _, parent := range r.Status.Parents {
@@ -188,7 +188,7 @@ func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []m
 // NamespacesMustBeReady waits until all Pods are marked Ready and all Gateways
 // are marked Accepted and Programmed in the specified namespace(s). This will
 // cause the test to halt if the specified timeout is exceeded.
-func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
+func NamespacesMustBeReady(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
@@ -242,7 +242,7 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 // MeshNamespacesMustBeReady waits until all Pods are marked Ready. This is
 // intended to be used for mesh tests and does not require any Gateways to
 // exist. This will cause the test to halt if the specified timeout is exceeded.
-func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
+func MeshNamespacesMustBeReady(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
@@ -274,7 +274,7 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 //
 // The test will fail if these conditions are not met before the
 // timeouts.
-func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+func GatewayAndHTTPRoutesMustBeAccepted(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
@@ -323,7 +323,7 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
 // status of the specified Gateway.
-func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) (string, error) {
+func WaitForGatewayAddress(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) (string, error) {
 	t.Helper()
 
 	var ipAddr, port string
@@ -358,7 +358,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 
 // GatewayListenersMustHaveCondition checks if every listener of the specified gateway has a
 // certain condition.
-func GatewayListenersMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, condition metav1.Condition) {
+func GatewayListenersMustHaveCondition(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveCondition, true, func(ctx context.Context) (bool, error) {
@@ -381,7 +381,7 @@ func GatewayListenersMustHaveCondition(t *testing.T, client client.Client, timeo
 
 // GatewayMustHaveZeroRoutes validates that the gateway has zero routes attached.  The status
 // may indicate a single listener with zero attached routes or no listeners.
-func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
+func GatewayMustHaveZeroRoutes(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
 	var gotStatus *v1beta1.GatewayStatus
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, true, func(ctx context.Context) (bool, error) {
@@ -416,7 +416,7 @@ func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig
 
 // HTTPRouteMustHaveNoAcceptedParents waits for the specified HTTPRoute to have either no parents
 // or a single parent that is not accepted. This is used to validate HTTPRoute errors.
-func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
+func HTTPRouteMustHaveNoAcceptedParents(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
@@ -462,7 +462,7 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 // HTTPRouteMustHaveParents waits for the specified HTTPRoute to have parents
 // in status that match the expected parents. This will cause the test to halt
 // if the specified timeout is exceeded.
-func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) {
+func HTTPRouteMustHaveParents(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) {
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
@@ -489,7 +489,7 @@ func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig 
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
 // in status that match the expected parents, and also returns the TLSRoute.
 // This will cause the test to halt if the specified timeout is exceeded.
-func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
+func TLSRouteMustHaveParents(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
 	t.Helper()
 
 	var actual []v1beta1.RouteParentStatus
@@ -510,7 +510,7 @@ func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	return route
 }
 
-func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
+func parentsForRouteMatch(t tester.Tester, routeName types.NamespacedName, expected, actual []v1beta1.RouteParentStatus, namespaceRequired bool) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
@@ -555,7 +555,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 // GatewayStatusMustHaveListeners waits for the specified Gateway to have listeners
 // in status that match the expected listeners. This will cause the test to halt
 // if the specified timeout is exceeded.
-func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName, listeners []v1beta1.ListenerStatus) {
+func GatewayStatusMustHaveListeners(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName, listeners []v1beta1.ListenerStatus) {
 	t.Helper()
 
 	var actual []v1beta1.ListenerStatus
@@ -579,7 +579,7 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 
 // HTTPRouteMustHaveCondition checks that the supplied HTTPRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
-func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+func HTTPRouteMustHaveCondition(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
@@ -612,7 +612,7 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 
 // HTTPRouteMustHaveResolvedRefsConditionsTrue checks that the supplied HTTPRoute has the resolvedRefsCondition
 // set to true.
-func HTTPRouteMustHaveResolvedRefsConditionsTrue(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
+func HTTPRouteMustHaveResolvedRefsConditionsTrue(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName) {
 	HTTPRouteMustHaveCondition(t, client, timeoutConfig, routeNN, gwNN, metav1.Condition{
 		Type:   string(v1beta1.RouteConditionResolvedRefs),
 		Status: metav1.ConditionTrue,
@@ -631,7 +631,7 @@ func parentRefToString(p v1beta1.ParentReference) string {
 // address assigned to it and the TLSRoute has a ParentRef referring to the
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
-func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []v1beta1.Hostname) {
+func GatewayAndTLSRoutesMustBeAccepted(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []v1beta1.Hostname) {
 	t.Helper()
 
 	var hostnames []v1beta1.Hostname
@@ -677,7 +677,7 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 
 // TLSRouteMustHaveCondition checks that the supplied TLSRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
-func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+func TLSRouteMustHaveCondition(t tester.Tester, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.TLSRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
@@ -709,7 +709,7 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 }
 
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
-func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) bool {
+func listenersMatch(t tester.Tester, expected, actual []v1beta1.ListenerStatus) bool {
 	t.Helper()
 
 	if len(expected) != len(actual) {
@@ -775,7 +775,7 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 	return true
 }
 
-func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
+func conditionsMatch(t tester.Tester, expected, actual []metav1.Condition) bool {
 	t.Helper()
 
 	if len(actual) < len(expected) {
@@ -795,7 +795,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 // findConditionInList finds a condition in a list of Conditions, checking
 // the Name, Value, and Reason. If an empty reason is passed, any Reason will match.
 // If an empty status is passed, any Status will match.
-func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, expectedStatus, expectedReason string) bool {
+func findConditionInList(t tester.Tester, conditions []metav1.Condition, condName, expectedStatus, expectedReason string) bool {
 	t.Helper()
 
 	for _, cond := range conditions {
@@ -817,7 +817,7 @@ func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, 
 	return false
 }
 
-func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName, condValue string) bool {
+func findPodConditionInList(t tester.Tester, conditions []v1.PodCondition, condName, condValue string) bool {
 	t.Helper()
 
 	for _, cond := range conditions {

@@ -17,13 +17,12 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	"k8s.io/apimachinery/pkg/types"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -38,13 +37,13 @@ var HTTPRouteCrossNamespace = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-cross-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "cross-namespace", Namespace: "gateway-conformance-web-backend"}
 		gwNN := types.NamespacedName{Name: "backend-namespaces", Namespace: "gateway-conformance-infra"}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		t.Run("Simple HTTP request should reach web-backend", func(t *testing.T) {
+		t.Run("Simple HTTP request should reach web-backend", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request:   http.Request{Path: "/"},
 				Response:  http.Response{StatusCode: 200},

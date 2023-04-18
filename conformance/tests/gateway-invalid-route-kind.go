@@ -17,10 +17,10 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -38,8 +38,8 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 		suite.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-invalid-route-kind.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and no supportedKinds", func(t *testing.T) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
+		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and no supportedKinds", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-only-invalid-route-kind", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
 				Name:           v1beta1.SectionName("http"),
@@ -55,7 +55,7 @@ var GatewayInvalidRouteKind = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 
-		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and HTTPRoute must be put in the supportedKinds", func(t *testing.T) {
+		t.Run("Gateway listener should have a false ResolvedRefs condition with reason InvalidRouteKinds and HTTPRoute must be put in the supportedKinds", func(t tester.Tester) {
 			gwNN := types.NamespacedName{Name: "gateway-supported-and-invalid-route-kind", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{{
 				Name: v1beta1.SectionName("http"),

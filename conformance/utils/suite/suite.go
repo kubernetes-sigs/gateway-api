@@ -19,7 +19,6 @@ package suite
 import (
 	"embed"
 	"strings"
-	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 	clientset "k8s.io/client-go/kubernetes"
@@ -30,6 +29,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
@@ -141,7 +141,7 @@ func New(s Options) *ConformanceTestSuite {
 
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
-func (suite *ConformanceTestSuite) Setup(t *testing.T) {
+func (suite *ConformanceTestSuite) Setup(t tester.Tester) {
 	suite.Applier.FS = suite.FS
 
 	if suite.SupportedFeatures.Has(SupportGateway) {
@@ -187,9 +187,9 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 }
 
 // Run runs the provided set of conformance tests.
-func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) {
+func (suite *ConformanceTestSuite) Run(t tester.Tester, tests []ConformanceTest) {
 	for _, test := range tests {
-		t.Run(test.ShortName, func(t *testing.T) {
+		t.Run(test.ShortName, func(t tester.Tester) {
 			test.Run(t, suite)
 		})
 	}
@@ -203,12 +203,12 @@ type ConformanceTest struct {
 	Manifests   []string
 	Slow        bool
 	Parallel    bool
-	Test        func(*testing.T, *ConformanceTestSuite)
+	Test        func(tester.Tester, *ConformanceTestSuite)
 }
 
 // Run runs an individual tests, applying and cleaning up the required manifests
 // before calling the Test function.
-func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
+func (test *ConformanceTest) Run(t tester.Tester, suite *ConformanceTestSuite) {
 	if test.Parallel {
 		t.Parallel()
 	}

@@ -25,7 +25,6 @@ import (
 	"io"
 	"net/http"
 	"strings"
-	"testing"
 
 	"github.com/stretchr/testify/require"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -35,6 +34,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 // Applier prepares manifests depending on the available options and applies
@@ -54,19 +54,19 @@ type Applier struct {
 }
 
 // prepareGateway adjusts the gatewayClassName.
-func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
+func (a Applier) prepareGateway(t tester.Tester, uObj *unstructured.Unstructured) {
 	err := unstructured.SetNestedField(uObj.Object, a.GatewayClass, "spec", "gatewayClassName")
 	require.NoErrorf(t, err, "error setting `spec.gatewayClassName` on %s Gateway resource", uObj.GetName())
 }
 
 // prepareGatewayClass adjust the spec.controllerName on the resource
-func (a Applier) prepareGatewayClass(t *testing.T, uObj *unstructured.Unstructured) {
+func (a Applier) prepareGatewayClass(t tester.Tester, uObj *unstructured.Unstructured) {
 	err := unstructured.SetNestedField(uObj.Object, a.ControllerName, "spec", "controllerName")
 	require.NoErrorf(t, err, "error setting `spec.controllerName` on %s GatewayClass resource", uObj.GetName())
 }
 
 // prepareNamespace adjusts the Namespace labels.
-func (a Applier) prepareNamespace(t *testing.T, uObj *unstructured.Unstructured) {
+func (a Applier) prepareNamespace(t tester.Tester, uObj *unstructured.Unstructured) {
 	labels, _, err := unstructured.NestedStringMap(uObj.Object, "metadata", "labels")
 	require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
 
@@ -104,7 +104,7 @@ func (a Applier) prepareNamespace(t *testing.T, uObj *unstructured.Unstructured)
 
 // prepareResources uses the options from an Applier to tweak resources given by
 // a set of manifests.
-func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder) ([]unstructured.Unstructured, error) {
+func (a Applier) prepareResources(t tester.Tester, decoder *yaml.YAMLOrJSONDecoder) ([]unstructured.Unstructured, error) {
 	var resources []unstructured.Unstructured
 
 	for {
@@ -136,7 +136,7 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder)
 	return resources, nil
 }
 
-func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
+func (a Applier) MustApplyObjectsWithCleanup(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
 	for _, resource := range resources {
 		resource := resource
 
@@ -167,7 +167,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
 // provided YAML file and registers a cleanup function for resources it created.
 // Note that this does not remove resources that already existed in the cluster.
-func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, location string, cleanup bool) {
+func (a Applier) MustApplyWithCleanup(t tester.Tester, c client.Client, timeoutConfig config.TimeoutConfig, location string, cleanup bool) {
 	data, err := getContentsFromPathOrURL(a.FS, location, timeoutConfig)
 	require.NoError(t, err)
 

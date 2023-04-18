@@ -17,11 +17,10 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	"sigs.k8s.io/gateway-api/conformance/utils/echo"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -37,7 +36,7 @@ var MeshFrontend = suite.ConformanceTest{
 		suite.SupportHTTPResponseHeaderModification,
 	},
 	Manifests: []string{"tests/mesh-frontend.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 		v2 := echo.ConnectToApp(t, s, echo.MeshAppEchoV2)
 		cases := []http.ExpectedResponse{
@@ -73,7 +72,7 @@ var MeshFrontend = suite.ConformanceTest{
 			// Declare tc here to avoid loop variable
 			// reuse issues across parallel tests.
 			tc := cases[i]
-			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Run(tc.GetTestCaseName(i), func(t tester.Tester) {
 				client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
 			})
 		}

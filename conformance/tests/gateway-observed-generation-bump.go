@@ -18,7 +18,6 @@ package tests
 
 import (
 	"context"
-	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
@@ -28,6 +27,7 @@ import (
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -42,10 +42,10 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 		suite.SupportGatewayPort8080,
 	},
 	Manifests: []string{"tests/gateway-observed-generation-bump.yaml"},
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, s *suite.ConformanceTestSuite) {
 		gwNN := types.NamespacedName{Name: "gateway-observed-generation-bump", Namespace: "gateway-conformance-infra"}
 
-		t.Run("observedGeneration should increment", func(t *testing.T) {
+		t.Run("observedGeneration should increment", func(t tester.Tester) {
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 			defer cancel()
 

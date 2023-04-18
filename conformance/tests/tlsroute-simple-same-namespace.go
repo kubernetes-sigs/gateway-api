@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"testing"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -30,6 +29,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 	"sigs.k8s.io/gateway-api/conformance/utils/tls"
 )
 
@@ -45,7 +45,7 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		suite.SupportTLSRoute,
 	},
 	Manifests: []string{"tests/tlsroute-simple-same-namespace.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "gateway-conformance-infra-test", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "gateway-tlsroute", Namespace: ns}
@@ -63,7 +63,7 @@ var TLSRouteSimpleSameNamespace = suite.ConformanceTest{
 		if err != nil {
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
-		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t *testing.T) {
+		t.Run("Simple TLS request matching TLSRoute should reach infra-backend", func(t tester.Tester) {
 			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, serverStr,
 				http.ExpectedResponse{
 					Request:   http.Request{Host: serverStr, Path: "/"},

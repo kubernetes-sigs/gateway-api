@@ -17,8 +17,6 @@ limitations under the License.
 package tests
 
 import (
-	"testing"
-
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -26,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/conformance/utils/tester"
 )
 
 func init() {
@@ -40,7 +39,7 @@ var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-invalid-backendref-unknown-kind.yaml"},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+	Test: func(t tester.Tester, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-backend-ref-unknown-kind", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
@@ -48,7 +47,7 @@ var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		// The Route must have a ResolvedRefs Condition with a InvalidKind Reason.
-		t.Run("HTTPRoute with Invalid Kind has a ResolvedRefs Condition with status False and Reason InvalidKind", func(t *testing.T) {
+		t.Run("HTTPRoute with Invalid Kind has a ResolvedRefs Condition with status False and Reason InvalidKind", func(t tester.Tester) {
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
@@ -58,7 +57,7 @@ var HTTPRouteInvalidBackendRefUnknownKind = suite.ConformanceTest{
 			kubernetes.HTTPRouteMustHaveCondition(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN, resolvedRefsCond)
 		})
 
-		t.Run("HTTP Request to invalid backend with invalid Kind receives a 500", func(t *testing.T) {
+		t.Run("HTTP Request to invalid backend with invalid Kind receives a 500", func(t tester.Tester) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
 				Request: http.Request{
 					Method: "GET",
