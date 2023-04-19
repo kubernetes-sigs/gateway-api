@@ -14,7 +14,7 @@ _THEN_
 - [Routing across Namespaces](/guides/multiple-ns)
 - [Configuring TLS](/guides/tls)
 - [TCP routing](/guides/tcp)
-- [gRPC routing](/guides/grpc)
+- [gRPC routing](/guides/grpc-routing)
 - [Migrating from Ingress](/guides/migrating-from-ingress)
 
 ## Installing a Gateway controller
