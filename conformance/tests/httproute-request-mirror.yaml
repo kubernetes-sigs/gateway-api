@@ -15,7 +15,7 @@ spec:
     - type: RequestMirror
       requestMirror:
         backendRef:
-          name: infra-backend-v2
+          name: mirrored-backend
           namespace: gateway-conformance-infra
           port: 8080
     backendRefs:

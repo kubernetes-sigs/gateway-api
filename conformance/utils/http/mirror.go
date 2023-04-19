@@ -25,26 +25,36 @@ import (
 	"github.com/stretchr/testify/require"
 	clientset "k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 )
 
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset *clientset.Clientset, ns, mirrorPod, path string) {
+	if mirrorPod == "" {
+		t.Fatalf("MirroredTo wasn't provided in the testcase, this test should only check http request mirror.")
+	}
+
 	require.Eventually(t, func() bool {
 		var mirrored bool
 		mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
 
+		t.Log("Searching for the mirrored request log")
+		t.Logf("Reading \"%s/%s\" logs", ns, mirrorPod)
 		logs, err := kubernetes.DumpEchoLogs(ns, mirrorPod, client, clientset)
 		if err != nil {
+			t.Logf("could not read \"%s/%s\" logs: %v", ns, mirrorPod, err)
 			return false
 		}
 
 		for _, log := range logs {
 			if mirrorLogRegexp.MatchString(string(log)) {
 				mirrored = true
+				break
 			}
 		}
 		return mirrored
 
-	}, 60*time.Second, time.Second)
+	}, 60*time.Second, time.Second, "Mirrored request log wasn't found")
 
+	t.Log("Mirrored request log found")
 }
