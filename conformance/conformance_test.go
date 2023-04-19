@@ -66,11 +66,9 @@ func TestConformance(t *testing.T) {
 		Debug:                      *flags.ShowDebug,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
 		SupportedFeatures:          supportedFeatures,
+		ExemptFeatures:             exemptFeatures,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 	})
-	for feature := range exemptFeatures {
-		cSuite.SupportedFeatures.Delete(feature)
-	}
 	cSuite.Setup(t)
 
 	cSuite.Run(t, tests.ConformanceTests)

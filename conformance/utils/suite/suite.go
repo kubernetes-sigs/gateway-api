@@ -74,6 +74,7 @@ type Options struct {
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
 	SupportedFeatures          sets.Set[SupportedFeature]
+	ExemptFeatures             sets.Set[SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -100,6 +101,10 @@ func New(s Options) *ConformanceTestSuite {
 		for feature := range StandardCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}
+	}
+
+	for feature := range s.ExemptFeatures {
+		s.SupportedFeatures.Delete(feature)
 	}
 
 	if s.FS == nil {
