@@ -288,11 +288,11 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) (string, error) {
 	t.Helper()
 
-	var ipAddr, port string
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.GatewayMustHaveAddress, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	var ipAddr, port string
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.GatewayMustHaveAddress, true, func(_ context.Context) (bool, error) {
 		gw := &v1beta1.Gateway{}
 		err := client.Get(ctx, gwName, gw)
 		if err != nil {
@@ -325,10 +325,13 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 // may indicate a single listener with zero attached routes or no listeners.
 func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) {
 	var gotStatus *v1beta1.GatewayStatus
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, func() (bool, error) {
+
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.GetTimeout)
+	defer cancel()
+
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, true, func(_ context.Context) (bool, error) {
 		gw := &v1beta1.Gateway{}
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.GetTimeout)
-		defer cancel()
+
 		err := client.Get(ctx, gwName, gw)
 		require.NoError(t, err, "error fetching Gateway")
 
@@ -361,11 +364,12 @@ func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig
 func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName) {
 	t.Helper()
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
 	var actual []v1beta1.RouteParentStatus
 	emptyChecked := false
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(_ context.Context) (bool, error) {
 
 		route := &v1beta1.HTTPRoute{}
 		err := client.Get(ctx, routeName, route)
@@ -409,12 +413,11 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 // if the specified timeout is exceeded.
 func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1beta1.RouteParentStatus, namespaceRequired bool) {
 	t.Helper()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	var actual []v1beta1.RouteParentStatus
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
-
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.RouteMustHaveParents, true, func(_ context.Context) (bool, error) {
 		route := &v1beta1.HTTPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
@@ -443,10 +446,10 @@ func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 	var actual []v1beta1.RouteParentStatus
 	var route v1alpha2.TLSRoute
 
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.RouteMustHaveParents, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.RouteMustHaveParents, true, func(_ context.Context) (bool, error) {
 		err := client.Get(ctx, routeName, &route)
 		if err != nil {
 			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
@@ -510,11 +513,11 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName, listeners []v1beta1.ListenerStatus) {
 	t.Helper()
 
-	var actual []v1beta1.ListenerStatus
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	var actual []v1beta1.ListenerStatus
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.GatewayStatusMustHaveListeners, true, func(_ context.Context) (bool, error) {
 		gw := &v1beta1.Gateway{}
 		err := client.Get(ctx, gwNN, gw)
 		if err != nil {
@@ -537,10 +540,10 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
 	t.Helper()
 
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.HTTPRouteMustHaveCondition, true, func(_ context.Context) (bool, error) {
 		route := &v1beta1.HTTPRoute{}
 		err := client.Get(ctx, routeNN, route)
 		if err != nil {
