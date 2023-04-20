@@ -34,7 +34,7 @@ type ProfileReport struct {
 	// Extended indicates the extended support level which includes additional
 	// optional features which the implementation may choose to implement
 	// support for, but are not required.
-	Extended ExtendedStatus `json:"extended,omitempty"`
+	Extended *ExtendedStatus `json:"extended,omitempty"`
 }
 
 // ExtendedStatus shows the testing results for the extended support level.
@@ -66,4 +66,8 @@ type Status struct {
 	// results as being partial and the implementation will not be considered
 	// conformant at any level.
 	SkippedTests []string `json:"skippedTests,omitempty"`
+
+	// FailedTests indicates which tests were failing during the execution of
+	// test suite.
+	FailedTests []string `json:"failedTests,omitempty"`
 }

@@ -20,6 +20,7 @@ limitations under the License.
 package suite
 
 import (
+	"k8s.io/apimachinery/pkg/util/sets"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 )
 
@@ -28,9 +29,18 @@ import (
 // -----------------------------------------------------------------------------
 
 type testResult struct {
-	test      ConformanceTest
-	succeeded bool
+	test   ConformanceTest
+	result resultType
 }
+
+type resultType string
+
+var (
+	testSucceeded    resultType = "SUCCEEDED"
+	testFailed       resultType = "FAILED"
+	testSkipped      resultType = "SKIPPED"
+	testNotSupported resultType = "NOT_SUPPORTED"
+)
 
 type profileReportsMap map[ConformanceProfileName]confv1a1.ProfileReport
 
@@ -38,42 +48,64 @@ func newReports() profileReportsMap {
 	return make(profileReportsMap)
 }
 
-func (p profileReportsMap) addTestResults(testResults ...testResult) error {
-	for _, testResult := range testResults {
-		conformanceProfile, err := getConformanceProfileForTest(testResult.test.ShortName)
-		if err != nil {
-			return err
-		}
-
-		// initialize the profile report if not already initialized
-		if _, ok := p[conformanceProfile.Name]; !ok {
-			p[conformanceProfile.Name] = confv1a1.ProfileReport{
-				Name: string(conformanceProfile.Name),
-			}
-		}
-
-		// TODO: refactor and clean this up later
-		testIsExtended := isTestExtended(conformanceProfile, testResult.test)
-		if testResult.succeeded {
-			if testIsExtended {
-				extended := p[conformanceProfile.Name].Extended
-				extended.Statistics.Passed++
-			} else {
-				core := p[conformanceProfile.Name].Core
-				core.Statistics.Passed++
-			}
-		} else {
-			if testIsExtended {
-				extended := p[conformanceProfile.Name].Extended
-				extended.Statistics.Failed++
-			} else {
-				core := p[conformanceProfile.Name].Core
-				core.Statistics.Failed++
-			}
+func (p profileReportsMap) addTestResults(conformanceProfile ConformanceProfile, result testResult) {
+	// initialize the profile report if not already initialized
+	if _, ok := p[conformanceProfile.Name]; !ok {
+		p[conformanceProfile.Name] = confv1a1.ProfileReport{
+			Name: string(conformanceProfile.Name),
 		}
 	}
 
-	return nil
+	testIsExtended := isTestExtended(conformanceProfile, result.test)
+	report := p[conformanceProfile.Name]
+
+	switch result.result {
+	case testSucceeded:
+		if testIsExtended {
+			if report.Extended == nil {
+				report.Extended = &confv1a1.ExtendedStatus{}
+			}
+			report.Extended.Statistics.Passed++
+
+		} else {
+			report.Core.Statistics.Passed++
+		}
+	case testFailed:
+		if testIsExtended {
+			if report.Extended == nil {
+				report.Extended = &confv1a1.ExtendedStatus{}
+			}
+			if report.Extended.FailedTests == nil {
+				report.Extended.FailedTests = []string{}
+			}
+			report.Extended.FailedTests = append(report.Extended.FailedTests, result.test.ShortName)
+			report.Extended.Statistics.Failed++
+		} else {
+			report.Core.Statistics.Failed++
+			if report.Core.FailedTests == nil {
+				report.Core.FailedTests = []string{}
+			}
+			report.Core.FailedTests = append(report.Core.FailedTests, result.test.ShortName)
+		}
+	case testSkipped:
+		if testIsExtended {
+			if report.Extended == nil {
+				report.Extended = &confv1a1.ExtendedStatus{}
+			}
+			report.Extended.Statistics.Skipped++
+			if report.Extended.SkippedTests == nil {
+				report.Extended.SkippedTests = []string{}
+			}
+			report.Extended.SkippedTests = append(report.Extended.SkippedTests, result.test.ShortName)
+		} else {
+			report.Core.Statistics.Skipped++
+			if report.Core.SkippedTests == nil {
+				report.Core.SkippedTests = []string{}
+			}
+			report.Core.SkippedTests = append(report.Core.SkippedTests, result.test.ShortName)
+		}
+	}
+	p[conformanceProfile.Name] = report
 }
 
 func (p profileReportsMap) list() (profileReports []confv1a1.ProfileReport) {
@@ -83,10 +115,10 @@ func (p profileReportsMap) list() (profileReports []confv1a1.ProfileReport) {
 	return
 }
 
-func (p profileReportsMap) compileResults() {
-	for _, report := range p {
+func (p profileReportsMap) compileResults(supportedFeaturesMap map[ConformanceProfileName]sets.Set[SupportedFeature], unsupportedFeaturesMap map[ConformanceProfileName]sets.Set[SupportedFeature]) {
+	for key, report := range p {
 		// report the overall result for core features
-		if report.Core.Passed == 0 || report.Core.Failed > 0 {
+		if report.Core.Failed > 0 {
 			report.Core.Result = confv1a1.Failure
 		} else if report.Core.Skipped > 0 {
 			report.Core.Result = confv1a1.Partial
@@ -94,13 +126,40 @@ func (p profileReportsMap) compileResults() {
 			report.Core.Result = confv1a1.Success
 		}
 
-		// report the overall result for extended features
-		if report.Extended.Passed == 0 || report.Extended.Failed > 0 {
-			report.Extended.Result = confv1a1.Failure
-		} else if report.Extended.Skipped > 0 {
-			report.Extended.Result = confv1a1.Partial
-		} else {
-			report.Extended.Result = confv1a1.Success
+		if report.Extended != nil {
+			// report the overall result for extended features
+			if report.Extended.Failed > 0 {
+				report.Extended.Result = confv1a1.Failure
+			} else if report.Extended.Skipped > 0 {
+				report.Extended.Result = confv1a1.Partial
+			} else {
+				report.Extended.Result = confv1a1.Success
+			}
+		}
+		p[key] = report
+
+		supportedFeatures := supportedFeaturesMap[ConformanceProfileName(report.Name)]
+		if report.Extended != nil {
+			if supportedFeatures != nil {
+				if report.Extended.SupportedFeatures == nil {
+					report.Extended.SupportedFeatures = make([]string, 0)
+				}
+				for _, f := range supportedFeatures.UnsortedList() {
+					report.Extended.SupportedFeatures = append(report.Extended.SupportedFeatures, string(f))
+				}
+			}
+		}
+
+		unsupportedFeatures := unsupportedFeaturesMap[ConformanceProfileName(report.Name)]
+		if report.Extended != nil {
+			if unsupportedFeatures != nil {
+				if report.Extended.UnsupportedFeatures == nil {
+					report.Extended.UnsupportedFeatures = make([]string, 0)
+				}
+				for _, f := range unsupportedFeatures.UnsortedList() {
+					report.Extended.UnsupportedFeatures = append(report.Extended.UnsupportedFeatures, string(f))
+				}
+			}
 		}
 	}
 }

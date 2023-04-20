@@ -218,8 +218,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 	// check that the test should not be skipped
 	if suite.SkipTests.Has(test.ShortName) {
-		t.Logf("Skipping %s", test.ShortName)
-		return
+		t.Skipf("Skipping %s: test explicitly skipped", test.ShortName)
 	}
 
 	for _, manifestLocation := range test.Manifests {
