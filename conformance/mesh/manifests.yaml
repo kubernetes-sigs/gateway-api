@@ -4,7 +4,7 @@ kind: Namespace
 metadata:
   name: gateway-conformance-mesh
   labels:
-    gateway-conformance: infra
+    gateway-conformance: mesh
 ---
 
 apiVersion: apps/v1

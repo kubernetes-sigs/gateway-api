@@ -34,6 +34,5 @@ var (
 
 // Mesh specific flags
 var (
-	MeshOnly               = flag.Bool("mesh-only", false, "Whether to run mesh conformance tests only")
-	MeshImplementationName = flag.String("mesh-implementation-name", "", "Name of the mesh implementation being tested")
+	MeshNamespaceLabels = flag.String("mesh-namespace-labels", "", "Comma-separated list of name=value labels to add to mesh namespaces")
 )

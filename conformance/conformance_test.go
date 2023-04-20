@@ -51,6 +51,8 @@ func TestConformance(t *testing.T) {
 		supportedFeatures.Delete(feature)
 	}
 
+	meshNamespaceLabels := parseNamespaceLabels(*flags.MeshNamespaceLabels)
+
 	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
 		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
@@ -61,6 +63,7 @@ func TestConformance(t *testing.T) {
 		CleanupBaseResources:       *flags.CleanupBaseResources,
 		SupportedFeatures:          supportedFeatures,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+		MeshNamespaceLabels:        meshNamespaceLabels,
 	})
 	cSuite.Setup(t)
 
@@ -73,6 +76,18 @@ func parseSupportedFeatures(f string) sets.Set[suite.SupportedFeature] {
 	res := sets.Set[suite.SupportedFeature]{}
 	for _, value := range strings.Split(f, ",") {
 		res.Insert(suite.SupportedFeature(value))
+	}
+	return res
+}
+
+func parseNamespaceLabels(f string) map[string]string {
+	if f == "" {
+		return nil
+	}
+	res := map[string]string{}
+	for _, kv := range strings.Split(f, ",") {
+		parts := strings.Split(kv, "=")
+		res[parts[0]] = parts[1]
 	}
 	return res
 }

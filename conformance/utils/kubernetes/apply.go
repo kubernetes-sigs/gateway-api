@@ -41,7 +41,9 @@ import (
 // Applier prepares manifests depending on the available options and applies
 // them to the Kubernetes cluster.
 type Applier struct {
-	NamespaceLabels map[string]string
+	NamespaceLabels     map[string]string
+	MeshNamespaceLabels map[string]string
+
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
 	// manifests to a valid, unique port. There must be as many
 	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
@@ -98,11 +100,11 @@ func (a Applier) prepareGatewayClass(t *testing.T, uObj *unstructured.Unstructur
 }
 
 // prepareNamespace adjusts the Namespace labels.
-func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLabels map[string]string) {
+func (a Applier) prepareNamespace(t *testing.T, uObj *unstructured.Unstructured) {
 	labels, _, err := unstructured.NestedStringMap(uObj.Object, "metadata", "labels")
 	require.NoErrorf(t, err, "error getting labels on Namespace %s", uObj.GetName())
 
-	for k, v := range namespaceLabels {
+	for k, v := range a.NamespaceLabels {
 		if labels == nil {
 			labels = map[string]string{}
 		}
@@ -112,6 +114,11 @@ func prepareNamespace(t *testing.T, uObj *unstructured.Unstructured, namespaceLa
 
 	// SetNestedStringMap converts nil to an empty map
 	if labels != nil {
+		if labels["gateway-conformance"] == "mesh" {
+			for k, v := range a.MeshNamespaceLabels {
+				labels[k] = v
+			}
+		}
 		err = unstructured.SetNestedStringMap(uObj.Object, labels, "metadata", "labels")
 	}
 	require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())
@@ -146,7 +153,7 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder)
 		}
 
 		if uObj.GetKind() == "Namespace" && uObj.GetObjectKind().GroupVersionKind().Group == "" {
-			prepareNamespace(t, &uObj, a.NamespaceLabels)
+			a.prepareNamespace(t, &uObj)
 		}
 
 		resources = append(resources, uObj)

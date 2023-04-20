@@ -62,6 +62,11 @@ type Options struct {
 	BaseManifests    string
 	MeshManifests    string
 	NamespaceLabels  map[string]string
+
+	// MeshNamespaceLabels are implentation-specific labels that should be added
+	// to namespaces where mesh-enabled services will be deployed.
+	MeshNamespaceLabels map[string]string
+
 	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
 	// manifests to a valid, unique port. There must be as many
 	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
@@ -118,6 +123,7 @@ func New(s Options) *ConformanceTestSuite {
 		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
 			NamespaceLabels:          s.NamespaceLabels,
+			MeshNamespaceLabels:      s.MeshNamespaceLabels,
 			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
 		},
 		SupportedFeatures: s.SupportedFeatures,

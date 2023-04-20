@@ -57,7 +57,7 @@ func (m *MeshPod) SendRequest(t *testing.T, exp http.ExpectedResponse) {
 	if protocol == "" {
 		protocol = "http"
 	}
-	args := []string{"client", fmt.Sprintf("%s://%s/%s", protocol, r.Host, r.Path)}
+	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, r.Host, r.Path)}
 	if r.Method != "" {
 		args = append(args, "--method="+r.Method)
 	}
@@ -86,6 +86,9 @@ func (m *MeshPod) SendRequest(t *testing.T, exp http.ExpectedResponse) {
 		if got := resp.RequestHeaders.Get(k); got != v {
 			t.Errorf("expected header %v=%v, got %v", k, v, got)
 		}
+	}
+	if !strings.HasPrefix(resp.Hostname, exp.Backend) {
+		t.Errorf("expected backend %v, got %v", exp.Backend, resp.Hostname)
 	}
 }
 
