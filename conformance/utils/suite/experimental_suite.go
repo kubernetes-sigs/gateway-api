@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -43,6 +44,12 @@ import (
 type ExperimentalConformanceTestSuite struct {
 	ConformanceTestSuite
 
+	implementation confv1a1.Implementation
+
+	// conformanceProfiles is a compiled list of profiles to check
+	// conformance against.
+	conformanceProfiles sets.Set[ConformanceProfileName]
+
 	// running indicates whether the test suite is currently running
 	running bool
 
@@ -50,9 +57,13 @@ type ExperimentalConformanceTestSuite struct {
 	// the test suite, organized by the tests unique name.
 	results map[string]testResult
 
-	// unsupportedFeatures is a compiled list of named features that were
+	// extendedSupportedFeatures is a compiled list of named features that were
+	// marked as supported, and is used for reporting the test results.
+	extendedSupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
+
+	// extendedUnsupportedFeatures is a compiled list of named features that were
 	// marked as not supported, and is used for reporting the test results.
-	unsupportedFeatures sets.Set[SupportedFeature]
+	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
 
 	// lock is a mutex to help ensure thread safety of the test suite object.
 	lock sync.RWMutex
@@ -62,10 +73,11 @@ type ExperimentalConformanceTestSuite struct {
 type ExperimentalConformanceOptions struct {
 	Options
 
+	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
-// New returns a new ConformanceTestSuite.
+// NewExperimentalConformanceTestSuite returns a new ExperimentalConformanceTestSuite.
 func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*ExperimentalConformanceTestSuite, error) {
 	config.SetupTimeoutConfig(&s.TimeoutConfig)
 
@@ -75,8 +87,11 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 	}
 
 	suite := &ExperimentalConformanceTestSuite{
-		results:             make(map[string]testResult),
-		unsupportedFeatures: sets.New[SupportedFeature](),
+		results:                     make(map[string]testResult),
+		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
+		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
+		conformanceProfiles:         s.ConformanceProfiles,
+		implementation:              s.Implementation,
 	}
 
 	// test suite callers are required to provide a conformance profile OR at
@@ -91,6 +106,9 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 	if s.EnableAllSupportedFeatures {
 		s.SupportedFeatures = AllFeatures
 	} else {
+		if s.SupportedFeatures == nil {
+			s.SupportedFeatures = sets.New[SupportedFeature]()
+		}
 		// the use of a conformance profile implicitly enables any features of
 		// that profile which are supported at a Core level of support.
 		for _, conformanceProfileName := range s.ConformanceProfiles.UnsortedList() {
@@ -98,17 +116,24 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 			if err != nil {
 				return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
 			}
-			s.SupportedFeatures.Insert(conformanceProfile.CoreFeatures.UnsortedList()...)
-		}
-
-		// conformance reports includes a list of features which are NOT supported as well
-		// as features that are supported for easy programmatic and human-readable
-		// discernment, so we compile that list here for later reporting.
-		for _, knownFeature := range AllFeatures.UnsortedList() {
-			if !s.SupportedFeatures.Has(knownFeature) {
-				suite.unsupportedFeatures.Insert(knownFeature)
+			for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
+				if s.SupportedFeatures.Has(f) {
+					if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
+						suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					}
+					suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
+				} else {
+					if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
+						suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					}
+					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
+				}
 			}
 		}
+	}
+
+	if s.FS == nil {
+		s.FS = &conformance.Manifests
 	}
 
 	suite.ConformanceTestSuite = ConformanceTestSuite{
@@ -125,6 +150,7 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 		SkipTests:         sets.New(s.SkipTests...),
+		FS:                *s.FS,
 	}
 
 	// apply defaults
@@ -147,6 +173,7 @@ func (suite *ExperimentalConformanceTestSuite) Setup(t *testing.T) {
 
 	suite.Applier.GatewayClass = suite.GatewayClassName
 	suite.Applier.ControllerName = suite.ControllerName
+	suite.Applier.FS = suite.FS
 
 	t.Logf("Test Setup: Applying base manifests")
 	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
@@ -190,9 +217,21 @@ func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []Conform
 		succeeded := t.Run(test.ShortName, func(t *testing.T) {
 			test.Run(t, &suite.ConformanceTestSuite)
 		})
+		res := testSucceeded
+		if suite.SkipTests.Has(test.ShortName) {
+			res = testSkipped
+		}
+		if !suite.SupportedFeatures.HasAll(test.Features...) {
+			res = testNotSupported
+		}
+
+		if !succeeded {
+			res = testFailed
+		}
+
 		results[test.ShortName] = testResult{
-			test:      test,
-			succeeded: succeeded,
+			test:   test,
+			result: res,
 		}
 	}
 
@@ -218,19 +257,21 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 
 	profileReports := newReports()
 	for _, testResult := range suite.results {
-		if err := profileReports.addTestResults(testResult); err != nil {
+		conformanceProfiles, err := getConformanceProfilesForTest(testResult.test.ShortName, suite.conformanceProfiles)
+		if err != nil {
 			return nil, err
 		}
+
+		for _, profile := range conformanceProfiles.UnsortedList() {
+			profileReports.addTestResults(*profile, testResult)
+		}
 	}
-	profileReports.compileResults()
 
-	// TODO: need to know which tests were skipped and submit those before
-	// the results are compiled.
-
-	// TODO: add handling for supported and unsupported extended features
+	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
 
 	return &confv1a1.ConformanceReport{
 		Date:              time.Now().Format(time.RFC3339),
+		Implementation:    suite.implementation,
 		GatewayAPIVersion: "TODO",
 		ProfileReports:    profileReports.list(),
 	}, nil

@@ -127,22 +127,38 @@ func getConformanceProfileForName(name ConformanceProfileName) (ConformanceProfi
 	return profile, nil
 }
 
-// getConformanceProfileForTest retrieves the ConformanceProfile a test belongs to
+// getConformanceProfilesForTest retrieves the ConformanceProfiles a test belongs to
 // given the name of the test.
 //
 // TODO: this is a hack right now using the name of the test itself to determine
 // what profile a test belongs to. If we take this past the
 // Prototyping/Provisional phase we should look into associating profiles more
 // directly with the test (perhaps ON the tests like features).
-func getConformanceProfileForTest(name string) (ConformanceProfile, error) {
-	var conformanceProfileName ConformanceProfileName
+func getConformanceProfilesForTest(name string, conformanceProfiles sets.Set[ConformanceProfileName]) (sets.Set[*ConformanceProfile], error) {
+	var featurePrefix SupportedFeature
 	switch {
-	case strings.HasPrefix(name, string(HTTPConformanceProfileName)):
-		conformanceProfileName = HTTPConformanceProfileName
-	case strings.HasPrefix(name, string(TLSConformanceProfileName)):
-		conformanceProfileName = TLSConformanceProfileName
-	case strings.HasPrefix(name, string(MeshConformanceProfileName)):
-		conformanceProfileName = MeshConformanceProfileName
+	case strings.HasPrefix(name, string(SupportGatewayClassObservedGenerationBump)):
+		featurePrefix = SupportGatewayClassObservedGenerationBump
+	case strings.HasPrefix(name, string(SupportGateway)):
+		featurePrefix = SupportGateway
+	case strings.HasPrefix(name, string(SupportHTTPRoute)):
+		featurePrefix = SupportHTTPRoute
+	case strings.HasPrefix(name, string(SupportTLSRoute)):
+		featurePrefix = SupportTLSRoute
+	case strings.HasPrefix(name, string(SupportMesh)):
+		featurePrefix = SupportMesh
 	}
-	return getConformanceProfileForName(conformanceProfileName)
+
+	matchingConformanceProfiles := sets.New[*ConformanceProfile]()
+	for _, profileName := range conformanceProfiles.UnsortedList() {
+		conformanceProfile, ok := conformanceProfileMap[profileName]
+		if !ok {
+			return nil, fmt.Errorf("Conformance profile not found for t")
+		}
+		if conformanceProfile.CoreFeatures.Has(featurePrefix) {
+			matchingConformanceProfiles.Insert(&conformanceProfile)
+		}
+	}
+
+	return matchingConformanceProfiles, nil
 }
