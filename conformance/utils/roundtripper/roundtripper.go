@@ -163,7 +163,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		fmt.Printf("Sending Request:\n%s\n\n", formatDump(dump, "< "))
 	}
 
-	resp, err := client.Do(req)
+	resp, err := client.Do(req) // nolint:bodyclose
 	if err != nil {
 		return nil, nil, err
 	}

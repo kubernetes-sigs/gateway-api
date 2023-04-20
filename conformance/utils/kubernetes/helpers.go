@@ -82,11 +82,11 @@ func GWCMustHaveAcceptedConditionAny(t *testing.T, c client.Client, timeoutConfi
 func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwcName, expectedStatus string) string {
 	t.Helper()
 
-	var controllerName string
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.GWCMustBeAccepted, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	var controllerName string
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.GWCMustBeAccepted, true, func(ctx context.Context) (bool, error) {
 		gwc := &v1beta1.GatewayClass{}
 		err := c.Get(ctx, types.NamespacedName{Name: gwcName}, gwc)
 		if err != nil {
@@ -113,7 +113,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 func GatewayMustHaveLatestConditions(t *testing.T, timeoutConfig config.TimeoutConfig, gw *v1beta1.Gateway) {
 	t.Helper()
 
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.LatestObservedGenerationSet, func() (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(_ context.Context) (bool, error) {
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
 			t.Logf("Gateway %s/%s latest conditions not set yet: %v", gw.Namespace, gw.Name, err)
 			return false, nil
@@ -188,10 +188,10 @@ func FilterStaleConditions(obj metav1.Object, conditions []metav1.Condition) []m
 func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
 	t.Helper()
 
-	waitErr := wait.PollImmediate(1*time.Second, timeoutConfig.NamespacesMustBeReady, func() (bool, error) {
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		defer cancel()
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
+	waitErr := wait.PollUntilContextTimeout(ctx, 1*time.Second, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
 		for _, ns := range namespaces {
 			gwList := &v1beta1.GatewayList{}
 			err := c.List(ctx, gwList, client.InNamespace(ns))
