@@ -126,6 +126,10 @@ feature and any relevant API features, e.g:
 go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
 ```
 
+If the mesh you are testing requires labels on namespaces that host mesh workloads,
+for example, to enable sidecar injection, you can use the `-mesh-namespace-labels`
+flag to pass one or more `name=value` labels to set on mesh namespaces.
+
 #### Excluding Tests
 
 The `Gateway` and `ReferenceGrant` features are enabled by default.
