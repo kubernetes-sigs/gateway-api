@@ -33,8 +33,10 @@ var (
 	repeatableGRPCRouteFilters = []gatewayv1a2.GRPCRouteFilterType{
 		gatewayv1a2.GRPCRouteFilterExtensionRef,
 	}
-	validServiceName = `^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
-	validMethodName  = `^[A-Za-z_][A-Za-z_0-9]*$`
+	validServiceName      = `^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
+	validServiceNameRegex = regexp.MustCompile(validServiceName)
+	validMethodName       = `^[A-Za-z_][A-Za-z_0-9]*$`
+	validMethodNameRegex  = regexp.MustCompile(validMethodName)
 )
 
 // ValidateGRPCRoute validates GRPCRoute according to the Gateway API specification.
@@ -76,27 +78,15 @@ func validateRuleMatches(matches []gatewayv1a2.GRPCRouteMatch, path *field.Path)
 				errs = append(errs, field.Required(path.Index(i).Child("method"), "one or both of `service` or `method` must be specified"))
 			}
 			// GRPCRoute method matcher admits two types: Exact and RegularExpression.
-			// If not specified, the match will be treated as type Exact
+			// If not specified, the match will be treated as type Exact (also the default value for this field).
 			if m.Method.Type == nil || *m.Method.Type == gatewayv1a2.GRPCMethodMatchExact {
-				if m.Method.Service != nil {
-					r, err := regexp.Compile(validServiceName)
-					if err != nil {
-						errs = append(errs, field.InternalError(path.Index(i).Child("method"),
-							fmt.Errorf("could not compile service name matching regex: %w", err)))
-					} else if !r.MatchString(*m.Method.Service) {
-						errs = append(errs, field.Invalid(path.Index(i).Child("method"), *m.Method.Service,
-							fmt.Sprintf("must only contain valid characters (matching %s)", validServiceName)))
-					}
+				if m.Method.Service != nil && !validServiceNameRegex.MatchString(*m.Method.Service) {
+					errs = append(errs, field.Invalid(path.Index(i).Child("method"), *m.Method.Service,
+						fmt.Sprintf("must only contain valid characters (matching %s)", validServiceName)))
 				}
-				if m.Method.Method != nil {
-					r, err := regexp.Compile(validMethodName)
-					if err != nil {
-						errs = append(errs, field.InternalError(path.Index(i).Child("method"),
-							fmt.Errorf("could not compile method name matching regex: %w", err)))
-					} else if !r.MatchString(*m.Method.Method) {
-						errs = append(errs, field.Invalid(path.Index(i).Child("method"), *m.Method.Method,
-							fmt.Sprintf("must only contain valid characters (matching %s)", validMethodName)))
-					}
+				if m.Method.Method != nil && !validMethodNameRegex.MatchString(*m.Method.Method) {
+					errs = append(errs, field.Invalid(path.Index(i).Child("method"), *m.Method.Method,
+						fmt.Sprintf("must only contain valid characters (matching %s)", validMethodName)))
 				}
 			}
 		}
