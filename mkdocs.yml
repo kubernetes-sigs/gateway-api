@@ -58,6 +58,7 @@ nav:
     - Simple Gateway: guides/simple-gateway.md
     - HTTP routing: guides/http-routing.md
     - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
+    - HTTP header modifier: guides/http-header-modifier.md
     - HTTP traffic splitting: guides/traffic-splitting.md
     - Cross-Namespace routing: guides/multiple-ns.md
     - TLS: guides/tls.md

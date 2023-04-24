@@ -1,7 +1,7 @@
 # HTTP Header Modifiers
 
-[HTTPRoute resources](/api-types/httproute) can issue modify the headers of HTTP requests, as well as their responses from clients. 
-There are two types of [filters](/api-types/httproute#filters-optional): `RequestHeaderModifier` and `ResponseHeaderModifier`.
+[HTTPRoute resources](/api-types/httproute) can modify the headers of HTTP requests and the HTTP responses from clients. 
+There are two types of [filters](/api-types/httproute#filters-optional) available to meet these requirements: `RequestHeaderModifier` and `ResponseHeaderModifier`.
 
 This guide shows how to use these features.
 
@@ -11,28 +11,17 @@ Note that these features are compatible. HTTP headers of the incoming requests a
 
 HTTP header modification is the process of adding, removing, or modifying HTTP headers in incoming requests. 
 
-To configure HTTP header modification, you define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
+To configure HTTP header modification, define a Gateway object with one or more HTTP filters. Each filter specifies a specific modification to make to incoming requests, such as adding a custom header or modifying an existing header.
 
-To add a header, use a filter of the type `RequestHeaderModifier`, with the `add` action and the name and value of the header:
+To add a header to a HTTP request, use a filter of the type `RequestHeaderModifier`, with the `add` action and the name and value of the header:
 
 ```yaml
 {% include 'standard/http-request-header-add.yaml' %}
 ```
 
-The HTTP header will be updated accordingly. For example, when making a `curl` request processed by the Gateway with the filter configuration above, the request headers would:
+To edit an existing header, use the `set` action and specify the value of the header to be modified and the new header value to be set.
 
-```
-Request Headers:
-        accept=*/*  
-        my-header-name=my-header-value  
-        user-agent=curl/7.81.0  
-        x-forwarded-proto=http  
-        x-request-id=5ea1a402-f847-4fd5-b165-5a4324a2ffaa
-```
-
-To edit an existing header, use the `set` action and 
-
-```
+```yaml
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
@@ -41,34 +30,22 @@ To edit an existing header, use the `set` action and
             value: my-new-header-value
 ```
 
-Headers can also be removed, by using the `remove` keyword and an array of headers to remove. 
+Headers can also be removed, by using the `remove` keyword and a list of header names. 
 
 ```yaml
-{% include 'standard/http-request-header-remove.yaml' %}
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        remove: ["x-request-id"]
 ```
 
-Using the example above would remove the `x-request-id` header from the HTTP request:
-
-```
-Request Headers:
-        accept=*/*  
-        host=172.18.255.200  
-        user-agent=curl/7.81.0  
-        x-forwarded-proto=http 
-```
-
-Finally, setting the header value would require the operator to use the `set` action and the name of the header to be modified, alongside its new value: 
-
-
-```yaml
-{% include 'standard/http-request-header-set.yaml' %}
-```
+Using the example above would remove the `x-request-id` header from the HTTP request.
 
 ### HTTP Response Header Modifier
 
 !!! info "Experimental Channel"
 
-    The `Path` field described below is currently only included in the
+    The `ResponseHeaderModifier` filter described below is currently only included in the
     "Experimental" channel of Gateway API. Starting in v0.7.0, this
     feature will graduate to the "Standard" channel.
 
@@ -81,5 +58,14 @@ Modifying the HTTP header response leverages a very similar syntax to the one us
 Headers can be added, edited and removed. Multiple headers can be added, as shown in this example below:
 
 ```yaml
-{% include 'experimental/http-response-header.yaml' %}
+    filters:
+    - type: ResponseHeaderModifier
+      responseHeaderModifier:
+        add:
+        - name: X-Header-Add-1
+          value: header-add-1
+        - name: X-Header-Add-2
+          value: header-add-2
+        - name: X-Header-Add-3
+          value: header-add-3
 ```

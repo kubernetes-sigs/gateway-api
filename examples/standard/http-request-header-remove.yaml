@@ -1,4 +1,3 @@
----
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
@@ -18,4 +17,3 @@ spec:
     backendRefs:
       - name: echo
         port: 8080
-EOF
