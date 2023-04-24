@@ -31,9 +31,3 @@ var (
 	ExemptFeatures             = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
 	EnableAllSupportedFeatures = flag.Bool("all-features", false, "Whether to enable all supported features for conformance tests")
 )
-
-// Mesh specific flags
-var (
-	MeshOnly               = flag.Bool("mesh-only", false, "Whether to run mesh conformance tests only")
-	MeshImplementationName = flag.String("mesh-implementation-name", "", "Name of the mesh implementation being tested")
-)

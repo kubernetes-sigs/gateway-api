@@ -28,7 +28,9 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
@@ -42,24 +44,29 @@ func TestConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes client: %v", err)
 	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
+	}
+
 	v1alpha2.AddToScheme(client.Scheme())
 	v1beta1.AddToScheme(client.Scheme())
 
 	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := parseSupportedFeatures(*flags.ExemptFeatures)
-	for feature := range exemptFeatures {
-		supportedFeatures.Delete(feature)
-	}
 
 	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
 		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
 		Client:                     client,
+		RESTClient:                 clientset.CoreV1().RESTClient().(*rest.RESTClient),
+		RestConfig:                 cfg,
 		GatewayClassName:           *flags.GatewayClassName,
 		Debug:                      *flags.ShowDebug,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
 		SupportedFeatures:          supportedFeatures,
+		ExemptFeatures:             exemptFeatures,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 	})
 	cSuite.Setup(t)
@@ -70,6 +77,9 @@ func TestConformance(t *testing.T) {
 // parseSupportedFeatures parses flag arguments and converts the string to
 // sets.Set[suite.SupportedFeature]
 func parseSupportedFeatures(f string) sets.Set[suite.SupportedFeature] {
+	if f == "" {
+		return nil
+	}
 	res := sets.Set[suite.SupportedFeature]{}
 	for _, value := range strings.Split(f, ",") {
 		res.Insert(suite.SupportedFeature(value))

@@ -74,6 +74,7 @@ type Options struct {
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
 	SupportedFeatures          sets.Set[SupportedFeature]
+	ExemptFeatures             sets.Set[SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -100,6 +101,10 @@ func New(s Options) *ConformanceTestSuite {
 		for feature := range StandardCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}
+	}
+
+	for feature := range s.ExemptFeatures {
+		s.SupportedFeatures.Delete(feature)
 	}
 
 	if s.FS == nil {
@@ -140,14 +145,14 @@ func New(s Options) *ConformanceTestSuite {
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T) {
+	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
+	suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
+
+	suite.Applier.GatewayClass = suite.GatewayClassName
+	suite.Applier.ControllerName = suite.ControllerName
+	suite.Applier.FS = suite.FS
+
 	if suite.SupportedFeatures.Has(SupportGateway) {
-		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
-
-		suite.Applier.GatewayClass = suite.GatewayClassName
-		suite.Applier.ControllerName = suite.ControllerName
-		suite.Applier.FS = suite.FS
-
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
 
