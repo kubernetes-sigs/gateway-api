@@ -126,6 +126,20 @@ feature and any relevant API features, e.g:
 go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
 ```
 
+#### Excluding Tests
+
+The `Gateway` and `ReferenceGrant` features are enabled by default.
+You do not need to explicty list them using the `-supported-features` flag.
+However, if you don't want to run them, you will need to disable them using
+the `--exempt-features` flag. For example, to run only the `Mesh` tests,
+and nothing else:
+
+```shell
+go test ./conformance/... -args \
+    -supported-features=Mesh \
+    -exempt-features=Gateway,ReferenceGrant
+```
+
 #### Suite Level Options
 
 When running tests of any kind you may not want the test suite to cleanup the
