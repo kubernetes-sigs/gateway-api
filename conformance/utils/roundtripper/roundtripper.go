@@ -23,6 +23,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -48,7 +49,6 @@ type Request struct {
 	CertPem          []byte
 	KeyPem           []byte
 	Server           string
-	CustomDialer     http.RoundTripper
 }
 
 // CapturedRequest contains request metadata captured from an echoserver
@@ -85,8 +85,9 @@ type CapturedResponse struct {
 // DefaultRoundTripper is the default implementation of a RoundTripper. It will
 // be used if a custom implementation is not specified.
 type DefaultRoundTripper struct {
-	Debug         bool
-	TimeoutConfig config.TimeoutConfig
+	Debug             bool
+	TimeoutConfig     config.TimeoutConfig
+	CustomDialContext func(context.Context, string, string) (net.Conn, error)
 }
 
 // CaptureRoundTrip makes a request with the provided parameters and returns the
@@ -102,13 +103,15 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		}
 	}
 
-	transport := request.CustomDialer
-	if transport == nil {
-		var err error
-		transport, err = defaultTransport(request)
+	transport := &http.Transport{
+		DialContext: d.CustomDialContext,
+	}
+	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
+		tlsConfig, err := tlsClientConfig(request.Server, request.CertPem, request.KeyPem)
 		if err != nil {
 			return nil, nil, err
 		}
+		transport.TLSClientConfig = tlsConfig
 	}
 	client.Transport = transport
 
@@ -199,16 +202,7 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	return cReq, cRes, nil
 }
 
-func defaultTransport(request Request) (http.RoundTripper, error) {
-	// Setup TLS transport if there are CertPem, KeyPem, and Server in the request
-	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
-		return tlsTransport(request.Server, request.CertPem, request.KeyPem)
-	}
-
-	return http.DefaultTransport, nil
-}
-
-func tlsTransport(server string, certPem []byte, keyPem []byte) (http.RoundTripper, error) {
+func tlsClientConfig(server string, certPem []byte, keyPem []byte) (*tls.Config, error) {
 	// Create a certificate from the provided cert and key
 	cert, err := tls.X509KeyPair(certPem, keyPem)
 	if err != nil {
@@ -225,15 +219,13 @@ func tlsTransport(server string, certPem []byte, keyPem []byte) (http.RoundTripp
 		return nil, fmt.Errorf("unexpected error, server name required for TLS")
 	}
 
-	// Create the Transport for this provided host, cert, and trusted CA
-	return &http.Transport{
-		// Disable G402: TLS MinVersion too low. (gosec)
-		// #nosec G402
-		TLSClientConfig: &tls.Config{
-			Certificates: []tls.Certificate{cert},
-			ServerName:   server,
-			RootCAs:      certPool,
-		},
+	// Create the tls Config for this provided host, cert, and trusted CA
+	// Disable G402: TLS MinVersion too low. (gosec)
+	// #nosec G402
+	return &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		ServerName:   server,
+		RootCAs:      certPool,
 	}, nil
 }
 
