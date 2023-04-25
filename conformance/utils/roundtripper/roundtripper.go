@@ -48,6 +48,7 @@ type Request struct {
 	CertPem          []byte
 	KeyPem           []byte
 	Server           string
+	CustomDialer     http.RoundTripper
 }
 
 // CapturedRequest contains request metadata captured from an echoserver
@@ -93,7 +94,6 @@ type DefaultRoundTripper struct {
 // there is an error running the function but not if an HTTP error status code
 // is received.
 func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedRequest, *CapturedResponse, error) {
-	cReq := &CapturedRequest{}
 	client := &http.Client{}
 
 	if request.UnfollowRedirect {
@@ -102,35 +102,15 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		}
 	}
 
-	// Setup TLS transport if there are CertPem, KeyPem, and Server in the request
-	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
-		// Create a certificate from the provided cert and key
-		cert, err := tls.X509KeyPair(request.CertPem, request.KeyPem)
+	transport := request.CustomDialer
+	if transport == nil {
+		var err error
+		transport, err = defaultTransport(request)
 		if err != nil {
-			return nil, nil, fmt.Errorf("unexpected error creating cert: %w", err)
-		}
-
-		// Add the provided cert as a trusted CA
-		certPool := x509.NewCertPool()
-		if !certPool.AppendCertsFromPEM(request.CertPem) {
-			return nil, nil, fmt.Errorf("unexpected error adding trusted CA: %w", err)
-		}
-
-		if request.Server == "" {
-			return nil, nil, fmt.Errorf("unexpected error, server name required for TLS")
-		}
-
-		// Create the Transport for this provided host, cert, and trusted CA
-		client.Transport = &http.Transport{
-			// Disable G402: TLS MinVersion too low. (gosec)
-			// #nosec G402
-			TLSClientConfig: &tls.Config{
-				Certificates: []tls.Certificate{cert},
-				ServerName:   request.Server,
-				RootCAs:      certPool,
-			},
+			return nil, nil, err
 		}
 	}
+	client.Transport = transport
 
 	method := "GET"
 	if request.Method != "" {
@@ -181,6 +161,8 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		fmt.Printf("Received Response:\n%s\n\n", formatDump(dump, "< "))
 	}
 
+	cReq := &CapturedRequest{}
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, nil, err
@@ -215,6 +197,44 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 	}
 
 	return cReq, cRes, nil
+}
+
+func defaultTransport(request Request) (http.RoundTripper, error) {
+	// Setup TLS transport if there are CertPem, KeyPem, and Server in the request
+	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
+		return tlsTransport(request.Server, request.CertPem, request.KeyPem)
+	}
+
+	return http.DefaultTransport, nil
+}
+
+func tlsTransport(server string, certPem []byte, keyPem []byte) (http.RoundTripper, error) {
+	// Create a certificate from the provided cert and key
+	cert, err := tls.X509KeyPair(certPem, keyPem)
+	if err != nil {
+		return nil, fmt.Errorf("unexpected error creating cert: %w", err)
+	}
+
+	// Add the provided cert as a trusted CA
+	certPool := x509.NewCertPool()
+	if !certPool.AppendCertsFromPEM(certPem) {
+		return nil, fmt.Errorf("unexpected error adding trusted CA: %w", err)
+	}
+
+	if server == "" {
+		return nil, fmt.Errorf("unexpected error, server name required for TLS")
+	}
+
+	// Create the Transport for this provided host, cert, and trusted CA
+	return &http.Transport{
+		// Disable G402: TLS MinVersion too low. (gosec)
+		// #nosec G402
+		TLSClientConfig: &tls.Config{
+			Certificates: []tls.Certificate{cert},
+			ServerName:   server,
+			RootCAs:      certPool,
+		},
+	}, nil
 }
 
 // IsRedirect returns true if a given status code is a redirect code.
