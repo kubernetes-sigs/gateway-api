@@ -4,18 +4,18 @@ metadata:
   name: header-http-echo
 spec:
   parentRefs:
-  - name: acme-gw
+    - name: acme-gw
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /edit-a-request-header
-    filters:
-    - type: RequestHeaderModifier
-      requestHeaderModifier:
-        set:
-        - name: my-header-name
-          value: my-new-header-value
-    backendRefs:
-      - name: echo
-        port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /edit-a-request-header
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            set:
+              - name: my-header-name
+                value: my-new-header-value
+      backendRefs:
+        - name: echo
+          port: 8080

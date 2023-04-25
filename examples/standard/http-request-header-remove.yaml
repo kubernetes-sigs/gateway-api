@@ -4,16 +4,17 @@ metadata:
   name: header-http-echo
 spec:
   parentRefs:
-  - name: acme-gw
+    - name: acme-gw
   rules:
-  - matches:
-    - path:
-        type: PathPrefix
-        value: /remove-a-request-header
-    filters:
-    - type: RequestHeaderModifier
-      requestHeaderModifier:
-        remove: ["x-request-id"]
-    backendRefs:
-      - name: echo
-        port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /remove-a-request-header
+      filters:
+        - type: RequestHeaderModifier
+          requestHeaderModifier:
+            remove:
+              - x-request-id
+      backendRefs:
+        - name: echo
+          port: 8080
