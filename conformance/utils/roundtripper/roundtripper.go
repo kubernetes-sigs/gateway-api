@@ -163,13 +163,11 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		fmt.Printf("Sending Request:\n%s\n\n", formatDump(dump, "< "))
 	}
 
-	resp, err := client.Do(req) // nolint:bodyclose
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, nil, err
 	}
-	defer func(Body io.ReadCloser) {
-		_ = Body.Close()
-	}(resp.Body)
+	defer resp.Body.Close()
 
 	if d.Debug {
 		var dump []byte
