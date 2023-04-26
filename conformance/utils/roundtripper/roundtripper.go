@@ -51,6 +51,20 @@ type Request struct {
 	CustomDialer     http.RoundTripper
 }
 
+// String returns a printable version of Request for logging. Note that the
+// CertPem and KeyPem are truncated.
+func (r Request) String() string {
+	return fmt.Sprintf("{URL: %+v, Host: %v, Protocol: %v, Method: %v, Headers: %v, UnfollowRedirect: %v, Server: %v, CertPem: <truncated>, KeyPem: <truncated>}",
+		r.URL,
+		r.Host,
+		r.Protocol,
+		r.Method,
+		r.Headers,
+		r.UnfollowRedirect,
+		r.Server,
+	)
+}
+
 // CapturedRequest contains request metadata captured from an echoserver
 // response.
 type CapturedRequest struct {
