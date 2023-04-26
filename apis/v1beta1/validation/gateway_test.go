@@ -247,6 +247,40 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: nil,
 		},
+		"ip address and hostname in addresses are valid": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+				}
+			},
+			expectErrsOnFields: nil,
+		},
+		"ip address and hostname in addresses are invalid": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4:8080",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "*foo/bar",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "12:34:56::",
+					},
+				}
+			},
+			expectErrsOnFields: []string{"spec.addresses[0]", "spec.addresses[1]", "spec.addresses[2]"},
+		},
 	}
 
 	for name, tc := range testCases {
