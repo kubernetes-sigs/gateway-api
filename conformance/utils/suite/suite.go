@@ -49,6 +49,7 @@ type ConformanceTestSuite struct {
 	Applier           kubernetes.Applier
 	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
+	ListenerConfig    config.ListenerConfig
 	SkipTests         sets.Set[string]
 	FS                embed.FS
 }
@@ -73,6 +74,7 @@ type Options struct {
 	ExemptFeatures             sets.Set[SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
+	ListenerConfig             config.ListenerConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
@@ -83,6 +85,7 @@ type Options struct {
 // New returns a new ConformanceTestSuite.
 func New(s Options) *ConformanceTestSuite {
 	config.SetupTimeoutConfig(&s.TimeoutConfig)
+	config.SetupListenerConfig(&s.ListenerConfig)
 
 	roundTripper := s.RoundTripper
 	if roundTripper == nil {
@@ -90,7 +93,7 @@ func New(s Options) *ConformanceTestSuite {
 	}
 
 	switch {
-	case s.EnableAllSupportedFeatures == true:
+	case s.EnableAllSupportedFeatures:
 		s.SupportedFeatures = AllFeatures
 	case s.SupportedFeatures == nil:
 		s.SupportedFeatures = StandardCoreFeatures
@@ -124,6 +127,7 @@ func New(s Options) *ConformanceTestSuite {
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
+		ListenerConfig:    s.ListenerConfig,
 		SkipTests:         sets.New(s.SkipTests...),
 		FS:                *s.FS,
 	}

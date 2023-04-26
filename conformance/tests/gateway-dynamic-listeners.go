@@ -51,12 +51,13 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 
 		// Ephemeral port range
 		const (
-			portStart    = 49152
-			portEnd      = 65535
 			portCount    = 10
 			tlsPortCount = 5
 		)
 		var (
+			portStart = s.ListenerConfig.DynamicPortRange.Start
+			portEnd   = s.ListenerConfig.DynamicPortRange.End
+
 			gwNN       = types.NamespacedName{Name: "gateway-dynamic-listener", Namespace: "gateway-conformance-infra"}
 			namespaces = []string{"gateway-conformance-infra"}
 			certNN     = types.NamespacedName{Name: "tls-wildcard-hostname", Namespace: gwNN.Namespace}
