@@ -154,15 +154,15 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 
 ### Envoy Gateway
 
-[Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The
-[v0.2][eg-02] release includes support for most `v1beta1` Gateway API features and passes core conformance tests
-included in the v0.5.1 release. Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
+[Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
+APIs and fields of the Gateway API are outlined [here][eg-supported]. 
+Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
 few simple steps.
 
 [eg-home]:https://gateway.envoyproxy.io/
 [envoy-org]:https://github.com/envoyproxy
-[eg-02]:https://gateway.envoyproxy.io/v0.2.0/releases/v0.2.html
-[eg-quickstart]:https://gateway.envoyproxy.io/v0.2.0/user/quickstart.html
+[eg-supported]: https://gateway.envoyproxy.io/v0.4.0/design/gatewayapi-support.html
+[eg-quickstart]:https://gateway.envoyproxy.io/v0.4.0/user/quickstart.html
 
 ### Flomesh Service Mesh (FSM)
 
