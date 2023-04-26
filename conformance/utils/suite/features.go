@@ -155,7 +155,7 @@ var HTTPExtendedFeatures = sets.New(
 	SupportHTTPRouteHostRewrite,
 	SupportHTTPRoutePathRewrite,
 	SupportHTTPRouteRequestMirror,
-).Insert(HTTPCoreFeatures.UnsortedList()...)
+)
 
 // -----------------------------------------------------------------------------
 // Features - TLSRoute Conformance (Core)
@@ -198,6 +198,7 @@ var MeshCoreFeatures = sets.New(
 var AllFeatures = sets.New[SupportedFeature]().
 	Insert(StandardExtendedFeatures.UnsortedList()...).
 	Insert(ExperimentalExtendedFeatures.UnsortedList()...).
+	Insert(HTTPCoreFeatures.UnsortedList()...).
 	Insert(HTTPExtendedFeatures.UnsortedList()...).
 	Insert(TLSCoreFeatures.UnsortedList()...).
 	Insert(MeshCoreFeatures.UnsortedList()...)

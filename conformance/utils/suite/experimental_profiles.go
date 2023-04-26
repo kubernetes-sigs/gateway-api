@@ -71,16 +71,7 @@ var (
 			SupportReferenceGrant,
 			SupportHTTPRoute,
 		),
-		ExtendedFeatures: sets.New(
-			SupportHTTPRouteQueryParamMatching,
-			SupportHTTPRouteMethodMatching,
-			SupportHTTPResponseHeaderModification,
-			SupportHTTPRoutePortRedirect,
-			SupportHTTPRouteSchemeRedirect,
-			SupportHTTPRoutePathRedirect,
-			SupportHTTPRouteHostRewrite,
-			SupportHTTPRoutePathRewrite,
-		),
+		ExtendedFeatures: HTTPExtendedFeatures,
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS
