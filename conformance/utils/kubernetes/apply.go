@@ -114,11 +114,6 @@ func (a Applier) prepareNamespace(t *testing.T, uObj *unstructured.Unstructured)
 
 	// SetNestedStringMap converts nil to an empty map
 	if labels != nil {
-		if labels["gateway-conformance"] == "mesh" {
-			for k, v := range a.MeshNamespaceLabels {
-				labels[k] = v
-			}
-		}
 		err = unstructured.SetNestedStringMap(uObj.Object, labels, "metadata", "labels")
 	}
 	require.NoErrorf(t, err, "error setting labels on Namespace %s", uObj.GetName())

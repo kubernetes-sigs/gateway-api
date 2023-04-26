@@ -127,8 +127,8 @@ go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
 ```
 
 If the mesh you are testing requires labels on namespaces that host mesh workloads,
-for example, to enable sidecar injection, you can use the `-mesh-namespace-labels`
-flag to pass one or more `name=value` labels to set on mesh namespaces.
+for example, to enable sidecar injection, you can use the `-namespace-labels`
+flag to pass one or more `name=value` labels to set on the test namespaces.
 
 #### Excluding Tests
 
