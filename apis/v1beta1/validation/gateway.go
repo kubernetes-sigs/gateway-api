@@ -126,7 +126,7 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 // must be unique within the Gateway
 func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	nameMap := map[gatewayv1b1.SectionName]struct{}{}
+	nameMap := make(map[gatewayv1b1.SectionName]struct{}, len(listeners))
 	for i, c := range listeners {
 		if _, found := nameMap[c.Name]; found {
 			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
