@@ -45,7 +45,8 @@ var (
 		gatewayv1b1.TLSProtocolType:   {},
 	}
 
-	validHostnameAddress = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
+	validHostnameAddress   = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
+	validHostnameRegexp, _ = regexp.Compile(validHostnameAddress)
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -163,22 +164,30 @@ func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.
 	return errs
 }
 
-// validateGatewayAddresses validates whether required fields of addresses are set according
+// validateGatewayAddresses validates whether fields of addresses are set according
 // to the Gateway API specification.
 func validateGatewayAddresses(addresses []gatewayv1b1.GatewayAddress, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
+	ipAddrSet, hostnameAddrSet := sets.Set[string]{}, sets.Set[string]{}
 	for i, address := range addresses {
 		if address.Type != nil {
 			if *address.Type == gatewayv1b1.IPAddressType {
 				if _, err := netip.ParseAddr(address.Value); err != nil {
 					errs = append(errs, field.Invalid(path.Index(i), address.Value, fmt.Sprintln("invalid ip address")))
 				}
+				if ipAddrSet.Has(address.Value) {
+					errs = append(errs, field.Duplicate(path.Index(i), address.Value))
+				} else {
+					ipAddrSet.Insert(address.Value)
+				}
 			} else if *address.Type == gatewayv1b1.HostnameAddressType {
-				r, err := regexp.Compile(validHostnameAddress)
-				if err != nil {
-					errs = append(errs, field.InternalError(path.Index(i), fmt.Errorf("could not compile hostname matching regex: %w", err)))
-				} else if !r.MatchString(address.Value) {
+				if !validHostnameRegexp.MatchString(address.Value) {
 					errs = append(errs, field.Invalid(path.Index(i), address.Value, fmt.Sprintf("must only contain valid characters (matching %s)", validHostnameAddress)))
+				}
+				if hostnameAddrSet.Has(address.Value) {
+					errs = append(errs, field.Duplicate(path.Index(i), address.Value))
+				} else {
+					hostnameAddrSet.Insert(address.Value)
 				}
 			}
 		}

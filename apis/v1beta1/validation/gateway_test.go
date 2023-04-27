@@ -281,6 +281,29 @@ func TestValidateGateway(t *testing.T) {
 			},
 			expectErrsOnFields: []string{"spec.addresses[0]", "spec.addresses[1]", "spec.addresses[2]"},
 		},
+		"duplicate ip address or hostname": {
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+				}
+			},
+			expectErrsOnFields: []string{"spec.addresses[1]", "spec.addresses[3]"},
+		},
 	}
 
 	for name, tc := range testCases {
