@@ -45,7 +45,7 @@ var (
 		gatewayv1b1.TLSProtocolType:   {},
 	}
 
-	validHostnameAddress   = `^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$`
+	validHostnameAddress   = `^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
 	validHostnameRegexp, _ = regexp.Compile(validHostnameAddress)
 )
 
