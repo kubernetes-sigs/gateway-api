@@ -53,11 +53,13 @@ spec:
             properties:
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match. \n Valid values
+                  for Hostnames are determined by RFC 1123 definition of a hostname
+                  with 2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
+                  may be prefixed with a wildcard label (`*.`). The wildcard label
+                  must appear by itself as the first label. \n If a hostname is specified
                   by both the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
@@ -1948,11 +1950,13 @@ spec:
             properties:
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match. \n Valid values
+                  for Hostnames are determined by RFC 1123 definition of a hostname
+                  with 2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname
+                  may be prefixed with a wildcard label (`*.`). The wildcard label
+                  must appear by itself as the first label. \n If a hostname is specified
                   by both the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
