@@ -56,9 +56,13 @@ type HTTPRouteList struct {
 type HTTPRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname that should match against the HTTP
-	// Host header to select a HTTPRoute to process the request. This matches
-	// the RFC 1123 definition of a hostname with 2 notable exceptions:
+	// Hostnames defines a set of hostname that should match against the HTTP Host
+	// header to select a HTTPRoute used to process the request. Implementations
+	// MUST ignore any port value specified in the HTTP Host header while
+	// performing a match.
+	//
+	// Valid values for Hostnames are determined by RFC 1123 definition of a
+	// hostname with 2 notable exceptions:
 	//
 	// 1. IPs are not allowed.
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
