@@ -45,8 +45,8 @@ var (
 		gatewayv1b1.TLSProtocolType:   {},
 	}
 
-	validHostnameAddress   = `^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
-	validHostnameRegexp, _ = regexp.Compile(validHostnameAddress)
+	validHostnameAddress = `^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+	validHostnameRegexp  = regexp.MustCompile(validHostnameAddress)
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
