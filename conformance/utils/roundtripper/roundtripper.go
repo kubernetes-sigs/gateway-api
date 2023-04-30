@@ -28,6 +28,7 @@ import (
 	"net/url"
 	"regexp"
 
+	"golang.org/x/net/http2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
@@ -49,6 +50,7 @@ type Request struct {
 	KeyPem           []byte
 	Server           string
 	CustomDialer     http.RoundTripper
+	HTTP2Transport   http.RoundTripper
 }
 
 // String returns a printable version of Request for logging. Note that the
@@ -214,9 +216,23 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 }
 
 func defaultTransport(request Request) (http.RoundTripper, error) {
+	// Use the provided HTTP2Transport if it's not nil
+	if request.HTTP2Transport != nil {
+		return request.HTTP2Transport, nil
+	}
+
 	// Setup TLS transport if there are CertPem, KeyPem, and Server in the request
 	if request.Server != "" && len(request.CertPem) != 0 && len(request.KeyPem) != 0 {
 		return tlsTransport(request.Server, request.CertPem, request.KeyPem)
+	}
+
+	// Create an HTTP/2 transport if required
+	if request.Protocol == "http2" {
+		transport := &http.Transport{}
+		if err := http2.ConfigureTransport(transport); err != nil {
+			return nil, err
+		}
+		return transport, nil
 	}
 
 	return http.DefaultTransport, nil
