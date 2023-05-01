@@ -22,7 +22,7 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly CLUSTER_NAME="verify-gateway-api"
-readonly ADMISSION_WEBHOOK_VERSION="v0.7.0-rc1"
+readonly LOCAL_IMAGE="registry.k8s.io/gateway-api/admission-server:latest"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
@@ -60,13 +60,24 @@ resources:
   - 0-namespace.yaml
   - certificate_config.yaml
   - admission_webhook.yaml
-images:
-  - name: gcr.io/k8s-staging-gateway-api/admission-server:${ADMISSION_WEBHOOK_VERSION}
-    newTag: latest
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: ${LOCAL_IMAGE}
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: IfNotPresent
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: gateway-api-admission-server
 EOF
 
 # Install webhook
-docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
+docker build -t ${LOCAL_IMAGE} .
+kind load docker-image ${LOCAL_IMAGE} --name "${CLUSTER_NAME}"
 kubectl apply -k config/webhook/
 
 # Wait for webhook to be ready
