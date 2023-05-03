@@ -16,15 +16,22 @@ limitations under the License.
 
 package config
 
+// DynamicPortRange specifies the starting and ending port of a
+// range
 type DynamicPortRange struct {
 	Start int
 	End   int
 }
 
+// ListenerConfig allow conformance test runners to configure
 type ListenerConfig struct {
 	DynamicPortRange DynamicPortRange
 }
 
+// DefaultListenerConfig returns a [ListenerConfig] where the [DynamicPortRange]
+// defaults to the suggested IANA [dynamic port range] (49152-65535)
+//
+// [dynamic port range]: https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
 func DefaultListenerConfig() ListenerConfig {
 	return ListenerConfig{
 		DynamicPortRange: DynamicPortRange{
@@ -33,6 +40,8 @@ func DefaultListenerConfig() ListenerConfig {
 		},
 	}
 }
+
+// SetupListenerConfig will apply defaults to the passed [ListenerConfig]
 func SetupListenerConfig(c *ListenerConfig) {
 	defaultConfig := DefaultListenerConfig()
 
