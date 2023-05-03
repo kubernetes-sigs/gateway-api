@@ -76,7 +76,7 @@ patches:
 EOF
 
 # Install webhook
-docker build -t ${LOCAL_IMAGE} .
+docker build -t ${LOCAL_IMAGE} -f docker/Dockerfile.webhook .
 kind load docker-image ${LOCAL_IMAGE} --name "${CLUSTER_NAME}"
 kubectl apply -k config/webhook/
 

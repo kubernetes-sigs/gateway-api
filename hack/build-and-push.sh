@@ -78,4 +78,15 @@ docker buildx build \
     --build-arg "TAG=${BINARY_TAG}" \
     --platform ${BUILDX_PLATFORMS} \
     --push \
+    -f docker/Dockerfile.webhook \
+    .
+
+echo "Building and pushing echo-server image...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/echo-server:${GIT_TAG} \
+    -t ${REGISTRY}/echo-server:${VERSION_TAG} \
+    --platform ${BUILDX_PLATFORMS} \
+    --push \
+    -f docker/Dockerfile.echo \
     .
