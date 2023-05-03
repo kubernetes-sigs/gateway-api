@@ -32,6 +32,7 @@ spec:
         args:
         - --tcp=9090
         - --port=80
+        - --port=8080
         - --grpc=7070
         - --port=443
         - --tls=443
@@ -50,12 +51,12 @@ spec:
   ports:
   - name: http
     port: 80
+  - name: http-alt
+    port: 8080
   - name: https
     port: 443
   - name: tcp
     port: 9090
-  - name: tcp-sf
-    port: 9091
   - name: grpc
     port: 7070
 ---
@@ -84,6 +85,7 @@ spec:
         args:
         - --tcp=9090
         - --port=80
+        - --port=8080
         - --grpc=7070
         - --port=443
         - --tls=443
@@ -102,6 +104,8 @@ spec:
   ports:
   - name: http
     port: 80
+  - name: http-alt
+    port: 8080
   - name: https
     port: 443
   - name: tcp
@@ -120,11 +124,11 @@ spec:
   ports:
   - name: http
     port: 80
+  - name: http-alt
+    port: 8080
   - name: https
     port: 443
   - name: tcp
     port: 9090
-  - name: tcp-sf
-    port: 9091
   - name: grpc
     port: 7070
