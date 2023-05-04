@@ -24,7 +24,6 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -62,13 +61,6 @@ type Options struct {
 	BaseManifests    string
 	MeshManifests    string
 	NamespaceLabels  map[string]string
-	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
-	// manifests to a valid, unique port. There must be as many
-	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
-	// For example, given two Gateways, each with 2 listeners, there should be
-	// four ValidUniqueListenerPorts.
-	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts []v1beta1.PortNumber
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -122,8 +114,7 @@ func New(s Options) *ConformanceTestSuite {
 		BaseManifests:    s.BaseManifests,
 		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels:          s.NamespaceLabels,
-			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
+			NamespaceLabels: s.NamespaceLabels,
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
