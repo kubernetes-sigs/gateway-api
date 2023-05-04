@@ -34,11 +34,11 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestMirror",
 	Description: "An HTTPRoute with request mirror filter",
 	Manifests:   []string{"tests/httproute-request-mirror.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteRequestMirror,
-	},
+	// Features: []suite.SupportedFeature{
+	// 	suite.SupportGateway,
+	// 	suite.SupportHTTPRoute,
+	// 	suite.SupportHTTPRouteRequestMirror,
+	// },
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "request-mirror", Namespace: ns}
@@ -56,7 +56,7 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 					},
 				},
 				Backend:    "infra-backend-v1",
-				MirroredTo: "mirrored-backend-1",
+				MirroredTo: "infra-backend-v2",
 				Namespace:  ns,
 			},
 		}
