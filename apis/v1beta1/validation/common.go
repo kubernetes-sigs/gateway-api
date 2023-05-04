@@ -35,10 +35,14 @@ func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Pa
 		namespace gatewayv1b1.Namespace
 		kind      gatewayv1b1.Kind
 	}
-	parentRefsSectionMap := make(map[sameKindParentRefs][]gatewayv1b1.SectionName)
+	type parentQualifier struct {
+		section gatewayv1b1.SectionName
+		port    gatewayv1b1.PortNumber
+	}
+	parentRefsSectionMap := make(map[sameKindParentRefs]sets.Set[parentQualifier])
 	for i, p := range parentRefs {
 		targetParentRefs := sameKindParentRefs{name: p.Name, namespace: *new(gatewayv1b1.Namespace), kind: *new(gatewayv1b1.Kind)}
-		targetSection := new(gatewayv1b1.SectionName)
+		pq := parentQualifier{}
 		if p.Namespace != nil {
 			targetParentRefs.namespace = *p.Namespace
 		}
@@ -46,19 +50,33 @@ func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Pa
 			targetParentRefs.kind = *p.Kind
 		}
 		if p.SectionName != nil {
-			targetSection = p.SectionName
+			pq.section = *p.SectionName
+		}
+		if p.Port != nil {
+			pq.port = *p.Port
 		}
 		if s, ok := parentRefsSectionMap[targetParentRefs]; ok {
-			if len(s[0]) == 0 || len(*targetSection) == 0 {
-				errs = append(errs, field.Required(path.Child("parentRefs"), "sectionNames must be specified when more than one parentRef refers to the same parent"))
+			if s.UnsortedList()[0] == (parentQualifier{}) || pq == (parentQualifier{}) {
+				errs = append(errs, field.Required(path.Child("parentRefs"), "sectionNames or port must be specified when more than one parentRef refers to the same parent"))
 				return errs
 			}
-			if sets.New(s...).Has(*targetSection) {
-				errs = append(errs, field.Invalid(path.Index(i).Child("parentRefs").Child("sectionName"), targetSection, "must be unique when ParentRefs includes 2 or more references to the same parent"))
+			if s.Has(pq) {
+				fieldPath := path.Index(i).Child("parentRefs")
+				var val any
+				if len(pq.section) > 0 {
+					fieldPath = fieldPath.Child("sectionName")
+					val = pq.section
+				} else {
+					fieldPath = fieldPath.Child("port")
+					val = pq.port
+				}
+				errs = append(errs, field.Invalid(fieldPath, val, "must be unique when ParentRefs includes 2 or more references to the same parent"))
 				return errs
 			}
+			parentRefsSectionMap[targetParentRefs].Insert(pq)
+		} else {
+			parentRefsSectionMap[targetParentRefs] = sets.New(pq)
 		}
-		parentRefsSectionMap[targetParentRefs] = append(parentRefsSectionMap[targetParentRefs], *targetSection)
 	}
 	return errs
 }
