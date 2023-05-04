@@ -249,6 +249,23 @@ func TestValidateParentRefs(t *testing.T) {
 			},
 		},
 		err: "Required value: sectionNames or port must be specified",
+	}, {
+		name: "valid ParentRefs with multiple same port references to different section of a  parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Port:        ptrTo(gatewayv1b1.PortNumber(80)),
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Port:        ptrTo(gatewayv1b1.PortNumber(80)),
+				SectionName: &sectionB,
+			},
+		},
+		err: "",
 	}}
 
 	for _, tc := range tests {
