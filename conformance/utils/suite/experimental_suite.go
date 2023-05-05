@@ -41,9 +41,14 @@ import (
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
 // conformance tests.
+// This is experimental for now and can be used as an alternative to the
+// ConformanceTestSuite. Once this won't be experimental any longer,
+// the two of them will be merged.
 type ExperimentalConformanceTestSuite struct {
 	ConformanceTestSuite
 
+	// implementation contains the details of the implementation, such as
+	// organization, project, etc.
 	implementation confv1a1.Implementation
 
 	// conformanceProfiles is a compiled list of profiles to check
@@ -77,7 +82,7 @@ type ExperimentalConformanceOptions struct {
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
-// NewExperimentalConformanceTestSuite returns a new ExperimentalConformanceTestSuite.
+// NewExperimentalConformanceTestSuite is a helper to use for creating a new ExperimentalConformanceTestSuite.
 func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*ExperimentalConformanceTestSuite, error) {
 	config.SetupTimeoutConfig(&s.TimeoutConfig)
 
