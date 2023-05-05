@@ -57,7 +57,7 @@ func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Pa
 		}
 		if s, ok := parentRefsSectionMap[targetParentRefs]; ok {
 			if s.UnsortedList()[0] == (parentQualifier{}) || pq == (parentQualifier{}) {
-				errs = append(errs, field.Required(path.Child("parentRefs"), "sectionNames or port must be specified when more than one parentRef refers to the same parent"))
+				errs = append(errs, field.Required(path.Child("parentRefs"), "sectionNames or ports must be specified when more than one parentRef refers to the same parent"))
 				return errs
 			}
 			if s.Has(pq) {
