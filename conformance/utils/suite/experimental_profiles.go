@@ -21,7 +21,6 @@ package suite
 
 import (
 	"fmt"
-	"strings"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 )
@@ -118,36 +117,20 @@ func getConformanceProfileForName(name ConformanceProfileName) (ConformanceProfi
 	return profile, nil
 }
 
-// getConformanceProfilesForTest retrieves the ConformanceProfiles a test belongs to
-// given the name of the test.
-//
-// TODO: this is a hack right now using the name of the test itself to determine
-// what profile a test belongs to. If we take this past the
-// Prototyping/Provisional phase we should look into associating profiles more
-// directly with the test (perhaps ON the tests like features).
-func getConformanceProfilesForTest(name string, conformanceProfiles sets.Set[ConformanceProfileName]) (sets.Set[*ConformanceProfile], error) {
-	var featurePrefix SupportedFeature
-	switch {
-	case strings.HasPrefix(name, string(SupportGatewayClassObservedGenerationBump)):
-		featurePrefix = SupportGatewayClassObservedGenerationBump
-	case strings.HasPrefix(name, string(SupportGateway)):
-		featurePrefix = SupportGateway
-	case strings.HasPrefix(name, string(SupportHTTPRoute)):
-		featurePrefix = SupportHTTPRoute
-	case strings.HasPrefix(name, string(SupportTLSRoute)):
-		featurePrefix = SupportTLSRoute
-	case strings.HasPrefix(name, string(SupportMesh)):
-		featurePrefix = SupportMesh
-	}
-
+// getConformanceProfilesForTest retrieves the ConformanceProfiles a test belongs to.
+func getConformanceProfilesForTest(test ConformanceTest, conformanceProfiles sets.Set[ConformanceProfileName]) (sets.Set[*ConformanceProfile], error) {
 	matchingConformanceProfiles := sets.New[*ConformanceProfile]()
-	for _, profileName := range conformanceProfiles.UnsortedList() {
-		conformanceProfile, ok := conformanceProfileMap[profileName]
-		if !ok {
-			return nil, fmt.Errorf("Conformance profile not found for t")
+	for _, conformanceProfileName := range conformanceProfiles.UnsortedList() {
+		cp := conformanceProfileMap[conformanceProfileName]
+		hasAllFeatures := true
+		for _, feature := range test.Features {
+			if !cp.CoreFeatures.Has(feature) && !cp.ExtendedFeatures.Has(feature) {
+				hasAllFeatures = false
+				break
+			}
 		}
-		if conformanceProfile.CoreFeatures.Has(featurePrefix) {
-			matchingConformanceProfiles.Insert(&conformanceProfile)
+		if hasAllFeatures {
+			matchingConformanceProfiles.Insert(&cp)
 		}
 	}
 

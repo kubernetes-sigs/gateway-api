@@ -257,7 +257,7 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 
 	profileReports := newReports()
 	for _, testResult := range suite.results {
-		conformanceProfiles, err := getConformanceProfilesForTest(testResult.test.ShortName, suite.conformanceProfiles)
+		conformanceProfiles, err := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles)
 		if err != nil {
 			return nil, err
 		}
