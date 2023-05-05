@@ -133,7 +133,7 @@ func TestValidateParentRefs(t *testing.T) {
 				Name: "example",
 			},
 		},
-		err: "sectionNames or port must be specified",
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs due to more same section names to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -158,7 +158,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		err: "sectionNames or port must be specified",
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs when one ParentRef section name not set to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -173,7 +173,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		err: "sectionNames or port must be specified",
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs when next ParentRef section name not set to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -188,7 +188,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: nil,
 			},
 		},
-		err: "sectionNames or port must be specified",
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "valid ParentRefs with multiple port references to the same parent",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -248,7 +248,7 @@ func TestValidateParentRefs(t *testing.T) {
 				Port:      nil,
 			},
 		},
-		err: "Required value: sectionNames or port must be specified",
+		err: "Required value: sectionNames or ports must be specified",
 	}, {
 		name: "valid ParentRefs with multiple same port references to different section of a  parent",
 		parentRefs: []gatewayv1b1.ParentReference{
