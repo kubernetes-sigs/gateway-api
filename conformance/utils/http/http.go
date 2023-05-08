@@ -18,6 +18,7 @@ package http
 
 import (
 	"fmt"
+	"net"
 	"net/url"
 	"strings"
 	"testing"
@@ -107,14 +108,15 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 		expected.Response.StatusCode = 200
 	}
 
-	t.Logf("Making %s request to %s://%s%s", expected.Request.Method, scheme, gwAddr, expected.Request.Path)
-
 	path, query, _ := strings.Cut(expected.Request.Path, "?")
+	reqURL := url.URL{Scheme: scheme, Host: calculateHost(gwAddr, scheme), Path: path, RawQuery: query}
+
+	t.Logf("Making %s request to %s", expected.Request.Method, reqURL.String())
 
 	req := roundtripper.Request{
 		Method:           expected.Request.Method,
 		Host:             expected.Request.Host,
-		URL:              url.URL{Scheme: scheme, Host: gwAddr, Path: path, RawQuery: query},
+		URL:              reqURL,
 		Protocol:         protocol,
 		Headers:          map[string][]string{},
 		UnfollowRedirect: expected.Request.UnfollowRedirect,
@@ -133,6 +135,25 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 	req.Headers["X-Echo-Set-Header"] = []string{strings.Join(backendSetHeaders, ",")}
 
 	return req
+}
+
+// calculateHost will calculate the Host header as per [HTTP spec]. To
+// summarize, host will not include any port if it is implied from the scheme. In
+// case of any error, the input gwAddr will be returned as the default.
+//
+// [HTTP spec]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23
+func calculateHost(gwAddr, scheme string) string {
+	host, port, err := net.SplitHostPort(gwAddr)
+	if err != nil {
+		return gwAddr
+	}
+	if strings.ToLower(scheme) == "http" && port == "80" {
+		return host
+	}
+	if strings.ToLower(scheme) == "https" && port == "443" {
+		return host
+	}
+	return host + ":" + port
 }
 
 // AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
