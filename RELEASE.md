@@ -99,12 +99,11 @@ Gateway API follows the standard kubernetes image promotion process described [h
    file under [kubernetes/k8s.io](https://github.com/kubernetes/k8s.io)
    repository and add the image digest along with the new tag under the correct
    component.
+   1. Currently, the following images are included: `admission-server`, `echo-server`
 3. Create a PR with the above changes.
 4. Image will get promoted by [automated prow jobs][kubernetes-image-promotion]
    once the PR merges
 
-
 [release]: https://github.com/kubernetes-sigs/gateway-api/releases
 [gateway-api-team]: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
 [kubernetes-image-promotion]: https://github.com/kubernetes/k8s.io/tree/main/registry.k8s.io#image-promoter
-
