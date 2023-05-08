@@ -855,6 +855,9 @@ type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location` header in
 	// the response. When empty, the scheme of the request is used.
 	//
+	// Scheme redirects can affect the port of the redirect, for more information,
+	// refer to the documentation for the port field of this filter.
+	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
 	//
@@ -889,7 +892,15 @@ type HTTPRequestRedirectFilter struct {
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	//
-	// When empty, the Gateway Listener port is used.
+	// If no port is specified, the redirect port MUST be derived using the
+	// following rules:
+	//
+	// * If redirect scheme is not-empty, the redirect port MUST be the well-known
+	//   port associated with the redirect scheme. Specifically "http" to port 80
+	//   and "https" to port 443. If the redirect scheme does not have a
+	//   well-known port, the listener port of the Gateway SHOULD be used.
+	// * If redirect scheme is empty, the redirect port MUST be the Gateway
+	//   Listener port.
 	//
 	// Implementations SHOULD NOT add the port number in the 'Location'
 	// header in the following cases:
