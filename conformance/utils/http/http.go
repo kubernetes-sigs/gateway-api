@@ -204,8 +204,8 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 			return false
 		}
 
-		if err := CompareRequest(&req, cReq, cRes, expected); err != nil {
-			t.Logf("Response expectation failed for request: %v  not ready yet: %v (after %v)", req, err, elapsed)
+		if err := CompareRequest(t, &req, cReq, cRes, expected); err != nil {
+			t.Logf("Response expectation failed for request: %+v  not ready yet: %v (after %v)", req, err, elapsed)
 			return false
 		}
 
@@ -214,7 +214,7 @@ func WaitForConsistentResponse(t *testing.T, r roundtripper.RoundTripper, req ro
 	t.Logf("Request passed")
 }
 
-func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
+func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.CapturedRequest, cRes *roundtripper.CapturedResponse, expected ExpectedResponse) error {
 	if expected.Response.StatusCode != cRes.StatusCode {
 		return fmt.Errorf("expected status code to be %d, got %d", expected.Response.StatusCode, cRes.StatusCode)
 	}
@@ -318,19 +318,33 @@ func CompareRequest(req *roundtripper.Request, cReq *roundtripper.CapturedReques
 		setRedirectRequestDefaults(req, cRes, &expected)
 
 		if expected.RedirectRequest.Host != cRes.RedirectRequest.Host {
-			return fmt.Errorf("expected redirected hostname to be %s, got %s", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
+			return fmt.Errorf("expected redirected hostname to be %q, got %q", expected.RedirectRequest.Host, cRes.RedirectRequest.Host)
 		}
 
-		if expected.RedirectRequest.Port != cRes.RedirectRequest.Port {
-			return fmt.Errorf("expected redirected port to be %s, got %s", expected.RedirectRequest.Port, cRes.RedirectRequest.Port)
+		gotPort := cRes.RedirectRequest.Port
+		if expected.RedirectRequest.Port == "" {
+			// If the test didn't specify any expected redirect port, we'll try to use
+			// the scheme to determine sensible defaults for the port. Well known
+			// schemes like "http" and "https" MAY skip setting any port.
+			if strings.ToLower(cRes.RedirectRequest.Scheme) == "http" && gotPort != "80" && gotPort != "" {
+				return fmt.Errorf("for http scheme, expected redirected port to be 80 or not set, got %q", gotPort)
+			}
+			if strings.ToLower(cRes.RedirectRequest.Scheme) == "https" && gotPort != "443" && gotPort != "" {
+				return fmt.Errorf("for https scheme, expected redirected port to be 443 or not set, got %q", gotPort)
+			}
+			t.Logf("Can't validate redirectPort for unrecognized scheme %v", cRes.RedirectRequest.Scheme)
+		} else if expected.RedirectRequest.Port != gotPort {
+			// An expected port was specified in the tests but it didn't match with
+			// gotPort.
+			return fmt.Errorf("expected redirected port to be %q, got %q", expected.RedirectRequest.Port, gotPort)
 		}
 
 		if expected.RedirectRequest.Scheme != cRes.RedirectRequest.Scheme {
-			return fmt.Errorf("expected redirected scheme to be %s, got %s", expected.RedirectRequest.Scheme, cRes.RedirectRequest.Scheme)
+			return fmt.Errorf("expected redirected scheme to be %q, got %q", expected.RedirectRequest.Scheme, cRes.RedirectRequest.Scheme)
 		}
 
 		if expected.RedirectRequest.Path != cRes.RedirectRequest.Path {
-			return fmt.Errorf("expected redirected path to be %s, got %s", expected.RedirectRequest.Path, cRes.RedirectRequest.Path)
+			return fmt.Errorf("expected redirected path to be %q, got %q", expected.RedirectRequest.Path, cRes.RedirectRequest.Path)
 		}
 	}
 	return nil
@@ -364,10 +378,6 @@ func setRedirectRequestDefaults(req *roundtripper.Request, cRes *roundtripper.Ca
 	// In that case we are setting it to the one we got from the response because we do not know the ip/host of the gateway.
 	if expected.RedirectRequest.Host == "" {
 		expected.RedirectRequest.Host = cRes.RedirectRequest.Host
-	}
-
-	if expected.RedirectRequest.Port == "" {
-		expected.RedirectRequest.Port = req.URL.Port()
 	}
 
 	if expected.RedirectRequest.Scheme == "" {
