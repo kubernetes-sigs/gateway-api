@@ -27,7 +27,7 @@ spec:
     spec:
       containers:
       - name: echo
-        image: gcr.io/istio-release/app:1.17.1
+        image: gcr.io/k8s-staging-gateway-api/echo-server:v20230505-v0.7.0-rc1-10-g497e67da
         imagePullPolicy: IfNotPresent
         args:
         - --tcp=9090
@@ -79,7 +79,7 @@ spec:
     spec:
       containers:
       - name: echo
-        image: gcr.io/istio-release/app:1.17.1
+        image: gcr.io/k8s-staging-gateway-api/echo-server:v20230505-v0.7.0-rc1-10-g497e67da
         imagePullPolicy: IfNotPresent
         args:
         - --tcp=9090
