@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.7.0-rc2](#v070-rc2)
 - [v0.7.0-rc1](#v070-rc1)
 - [v0.6.2](#v062)
 - [v0.6.1](#v061)
@@ -23,6 +24,31 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.7.0-rc2
+
+We expect this to be our final release candidate before launching v0.7.0. This
+release candidate includes a variety of clarifications and conformance updates.
+The changelog below represents the changes since v0.7.0-rc1.
+
+## Changes by Kind
+
+### Spec Clarification
+
+- Port redirect when empty will depend on the configured Redirect scheme (#1880,
+  @gauravkghildiyal)
+
+### Conformance
+
+- Remove a test that only covered redirect status without any other changes.
+  (#2007, @robscott)
+- Port redirect when empty will depend on the configured Redirect scheme (#1880,
+  @gauravkghildiyal)
+
+### Validation Fixes
+
+* Webhook: Port is now considered when validating that ParentRefs are unique
+  (#1995, @howardjohn)
 
 # v0.7.0-rc1
 
