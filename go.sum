@@ -277,8 +277,8 @@ k8s.io/kube-openapi v0.0.0-20230308215209-15aac26d736a h1:gmovKNur38vgoWfGtP5QOG
 k8s.io/kube-openapi v0.0.0-20230308215209-15aac26d736a/go.mod h1:y5VtZWM9sHHc2ZodIH/6SHzXj+TPU5USoA8lcIeKEKY=
 k8s.io/utils v0.0.0-20230209194617-a36077c30491 h1:r0BAOLElQnnFhE/ApUsg3iHdVYYPBjNSSOMowRZxxsY=
 k8s.io/utils v0.0.0-20230209194617-a36077c30491/go.mod h1:OLgZIPagt7ERELqWJFomSt595RzquPNLL48iOWgYOg0=
-sigs.k8s.io/controller-runtime v0.13.1-0.20230503134813-2e57de78ba00 h1:YH3MkxYjWpPpfW475fnRbUmFigCmXPsmeMfrSmD2Gwg=
-sigs.k8s.io/controller-runtime v0.13.1-0.20230503134813-2e57de78ba00/go.mod h1:HwJkiRLqH09+JkVyIIwQyu/u/X1DsZhUq+lrgqRt23M=
+sigs.k8s.io/controller-runtime v0.15.0-alpha.0 h1:ukmgReObs7FEUNBcn2NLxn/DiEQ8g1yC8YvpX0HGiyE=
+sigs.k8s.io/controller-runtime v0.15.0-alpha.0/go.mod h1:icJQ1mtZAutJ9iOzS2V2VJQCBVV2ir+xahBeTHCCZGs=
 sigs.k8s.io/controller-tools v0.11.4 h1:jqXJ/Xb6yBgbgcBbw1YoC3rC+Bt1XZWiLjj0ZHv/GrU=
 sigs.k8s.io/controller-tools v0.11.4/go.mod h1:qcfX7jfcfYD/b7lAhvqAyTbt/px4GpvN88WKLFFv7p8=
 sigs.k8s.io/json v0.0.0-20221116044647-bc3834ca7abd h1:EDPBXCAspyGV4jQlpZSudPeMmr1bNJefnuqLsRAsHZo=

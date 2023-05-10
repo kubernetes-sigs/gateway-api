@@ -13,7 +13,7 @@ require (
 	k8s.io/code-generator v0.27.1
 	k8s.io/klog/v2 v2.100.1
 	k8s.io/utils v0.0.0-20230209194617-a36077c30491
-	sigs.k8s.io/controller-runtime v0.13.1-0.20230503134813-2e57de78ba00
+	sigs.k8s.io/controller-runtime v0.15.0-alpha.0
 	sigs.k8s.io/controller-tools v0.11.4
 	sigs.k8s.io/yaml v1.3.0
 )
