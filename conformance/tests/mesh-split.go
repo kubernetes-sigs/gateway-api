@@ -66,7 +66,7 @@ var MeshTrafficSplit = suite.ConformanceTest{
 			// reuse issues across parallel tests.
 			tc := cases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
-				client.SendRequest(t, tc)
+				client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
 			})
 		}
 	},
