@@ -28,7 +28,7 @@ that is declarative at the affected resource level.
 It's a sunny Wednesday afternoon, and the lead microservices developer for
 Evil Genius Cupcakes is windsurfing. Work has been eating Jane alive for the
 past two and a half weeks, but after successfully deploying version 3.6.0 of
-the `baker` service that morning, she escaped early to try to unwind a bit.
+the `baker` service this morning, she's escaped early to try to unwind a bit.
 
 Her shoulders are just starting to unknot when her phone pings with a text
 from Julian, down in the NOC. Waterproof phones are a blessing, but also a
@@ -39,17 +39,17 @@ on everything in the `baker` namespace are crazy high after your last rollout,
 and `baker` itself has a weirdly high load. Sorry to interrupt you on the lake
 but can you take a look? Thanks!!_
 
-Jane stares at the phone for a long moment, heart sinking, then slowly tacks
-back to shore to dry off and grab her laptop.
+Jane stares at the phone for a long moment, heart sinking, then sighs and
+turns back to shore.
 
-What she finds when she logs in is strange. `baker` is taking a _lot_ of load,
-almost 4x what’s being reported by its usual clients, and its clients report
-that calls are taking much longer than they’d expect them to. She doublechecks
-the Deployment, the Service, and all the HTTPRoutes around `baker`; everything
+What she finds when dries off and grabs her laptop is strange. `baker` does
+seem to be taking much more load than its clients are sending, and its clients
+report much higher latencies than they’d expect. She doublechecks the
+Deployment, the Service, and all the HTTPRoutes around `baker`; everything
 looks good. `baker`’s logs show her mostly failed requests... with a lot of
 duplicates? Jane checks her HTTPRoute again, though she's pretty sure you
 can't configure retries there, and finds nothing. But it definitely looks like
-a client is retrying when it shouldn’t be.
+clients are retrying when they shouldn’t be.
 
 She pings Julian.
 
@@ -74,18 +74,6 @@ She types `kubectl get retrypolicy -n baker` and gets a permission error.
 
 Minutes pass while both look at logs.
 
-**Jane**: _OK, it’s definitely retrying. Nearly every request fails the first
-few times, gets retried, and then finally succeeds?_
-
-**Julian**: _Are you sure? I don’t see the `mixer` client making duplicate requests..._
-
-**Jane**: _Check both logs for request ID
-6E69546E-3CD8-4BED-9CE7-45CD3BF4B889. `mixer` sends that once, but `baker`
-shows it arriving four times in quick succession. Only the fourth one
-succeeds. That has to be retries._
-
-Another pause.
-
 **Julian**: _I’m an idiot. There’s a RetryPolicy for the whole namespace –
 sorry, too many policies in the dashboard and I missed it. Deleting that since
 you don’t want retries._
@@ -93,9 +81,8 @@ you don’t want retries._
 **Jane**: _Are you sure that’s a good–_
 
 Jane’s phone shrills while she’s typing, and she drops it. When she picks it
-up again she sees a stack of alerts. Quickly flipping through them, she feels
-the blood drain from her face: there’s one for every single service in the
-`baker` namespace.
+up again she sees a stack of alerts. She goes pale as she quickly flips
+through them: there’s one for every single service in the `baker` namespace.
 
 **Jane**: _PUT IT BACK!!_
 
@@ -107,20 +94,19 @@ the blood drain from her face: there’s one for every single service in the
 fail a lot, but they seem OK because there are retries across the whole
 namespace?_ 🤔
 
-Jane’s jaw drops.
+Jane's blood runs cold.
 
-**Jane**: _You’re saying that ALL of our services are broken??!_
+**Julian**: _Yeah. Looking a little closer, I think your `baker` rollout this
+morning would have failed without those retries._ 😕
 
-**Julian**: _That’s what it looks like. Guessing your `baker` rollout would
-have failed without retries turned on._
-
-There is a pause while Jane thinks through increasingly unpleasant possibilities.
+There is a pause while Jane's mind races through increasingly unpleasant
+possibilities.
 
 **Jane**: _I don't even know where to start here. How long did that
 RetryPolicy go in? Is it the only thing like it?_
 
-**Julian**: _I didn’t look closely before deleting it, but I think it said a
-few months ago. And there are lots of different kinds of policy and lots of
+**Julian**: _Didn’t look closely before deleting it, but I think it said a few
+months ago. And there are lots of different kinds of policy and lots of
 individual policies, hang on a minute..._
 
 **Julian**: _Looks like about 47 for your chunk of the world, a couple hundred
@@ -132,7 +118,7 @@ can’t even_ look _at these things._ 😕
 **Julian**: _That's gonna take awhile. Our tooling to show us which policies
 bind to a given workload doesn't go the other direction._
 
-**Jane**: _...wait. You have to_ build tools _to figure out basic configuration??_
+**Jane**: _...wait. You have to_ build tools _to know if retries are turned on??_
 
 Pause.
 
@@ -149,8 +135,10 @@ sits looking out over the lake as the deployment progresses.
 
 Jane sighs.
 
-**Jane**: _Wish I could. Wind’s died down, though, and the sun is almost gone.
-May as well head home._
+**Jane**: _Wish I could. Wind’s died down, though, and it'll be dark soon.
+Just gonna head home._
+
+**Julian**: _Ouch. Sorry to hear that._ 😐
 
 One more look out at the lake.
 
