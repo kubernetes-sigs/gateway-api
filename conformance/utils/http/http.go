@@ -159,6 +159,8 @@ func calculateHost(gwAddr, scheme string) string {
 func ipv6SafeHost(host string) string {
 	// We assume that host is a literal IPv6 address if host has
 	// colons.
+	// Per https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.2.
+	// This is like net.JoinHostPort, but we don't need a port.
 	if strings.Contains(host, ":") {
 		return "[" + host + "]"
 	}
