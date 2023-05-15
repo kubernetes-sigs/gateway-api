@@ -148,12 +148,21 @@ func calculateHost(gwAddr, scheme string) string {
 		return gwAddr
 	}
 	if strings.ToLower(scheme) == "http" && port == "80" {
-		return host
+		return ipv6SafeHost(host)
 	}
 	if strings.ToLower(scheme) == "https" && port == "443" {
-		return host
+		return ipv6SafeHost(host)
 	}
-	return host + ":" + port
+	return gwAddr
+}
+
+func ipv6SafeHost(host string) string {
+	// We assume that host is a literal IPv6 address if host has
+	// colons.
+	if strings.Contains(host, ":") {
+		return "[" + host + "]"
+	}
+	return host
 }
 
 // AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
