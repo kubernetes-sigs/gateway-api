@@ -169,7 +169,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeForbidden,
 					Field:    "spec.listeners[0].tls.certificateRefs",
-					Detail:   "should be set and not empty when TLSModeType is Terminate\n",
+					Detail:   "should be set and not empty when TLSModeType is Terminate",
 					BadValue: "",
 				},
 			},
@@ -187,7 +187,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeForbidden,
 					Field:    "spec.listeners[0].tls.certificateRefs",
-					Detail:   "should be set and not empty when TLSModeType is Terminate\n",
+					Detail:   "should be set and not empty when TLSModeType is Terminate",
 					BadValue: "",
 				},
 			},
@@ -209,7 +209,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeDuplicate,
 					Field:    "spec.listeners[1].name",
-					BadValue: "must be unique within the Gateway\n",
+					BadValue: "must be unique within the Gateway",
 				},
 			},
 		},
@@ -233,7 +233,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeDuplicate,
 					Field:    "spec.listeners[1]",
-					BadValue: "combination of port, protocol, and hostname must be unique for each listener\n",
+					BadValue: "combination of port, protocol, and hostname must be unique for each listener",
 				},
 			},
 		},
@@ -254,7 +254,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeDuplicate,
 					Field:    "spec.listeners[1]",
-					BadValue: "combination of port, protocol, and hostname must be unique for each listener\n",
+					BadValue: "combination of port, protocol, and hostname must be unique for each listener",
 				},
 			},
 		},
@@ -363,7 +363,7 @@ func TestValidateGateway(t *testing.T) {
 				{
 					Type:     field.ErrorTypeInvalid,
 					Field:    "spec.addresses[0]",
-					Detail:   "invalid ip address\n",
+					Detail:   "invalid ip address",
 					BadValue: "1.2.3.4:8080",
 				},
 				{
