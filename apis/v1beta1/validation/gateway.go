@@ -121,7 +121,7 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 	for i, c := range listeners {
 		if isProtocolInSubset(c.Protocol, protocolsTLSRequired) && c.TLS != nil {
 			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
-				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
+				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), "should be set and not empty when TLSModeType is Terminate"))
 			}
 		}
 	}
@@ -135,7 +135,7 @@ func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) f
 	nameMap := make(map[gatewayv1b1.SectionName]struct{}, len(listeners))
 	for i, c := range listeners {
 		if _, found := nameMap[c.Name]; found {
-			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), fmt.Sprintln("must be unique within the Gateway")))
+			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), "must be unique within the Gateway"))
 		}
 		nameMap[c.Name] = struct{}{}
 	}
@@ -156,7 +156,7 @@ func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.
 		port := listener.Port
 		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
 		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
-			errs = append(errs, field.Duplicate(path.Index(i), fmt.Sprintln("combination of port, protocol, and hostname must be unique for each listener")))
+			errs = append(errs, field.Duplicate(path.Index(i), "combination of port, protocol, and hostname must be unique for each listener"))
 		} else {
 			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
 		}
@@ -173,7 +173,7 @@ func validateGatewayAddresses(addresses []gatewayv1b1.GatewayAddress, path *fiel
 		if address.Type != nil {
 			if *address.Type == gatewayv1b1.IPAddressType {
 				if _, err := netip.ParseAddr(address.Value); err != nil {
-					errs = append(errs, field.Invalid(path.Index(i), address.Value, fmt.Sprintln("invalid ip address")))
+					errs = append(errs, field.Invalid(path.Index(i), address.Value, "invalid ip address"))
 				}
 				if ipAddrSet.Has(address.Value) {
 					errs = append(errs, field.Duplicate(path.Index(i), address.Value))
