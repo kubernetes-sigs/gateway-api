@@ -25,40 +25,51 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, MeshTrafficSplit)
+	ConformanceTests = append(ConformanceTests, MeshFrontendHostname)
 }
 
-var MeshTrafficSplit = suite.ConformanceTest{
-	ShortName:   "MeshTrafficSplit",
-	Description: "A mesh client can send traffic to a Service which is split between two versions",
+var MeshFrontendHostname = suite.ConformanceTest{
+	ShortName:   "MeshFrontendHostname",
+	Description: "Mesh parentRef matches Service IP (not Host)",
 	Features: []suite.SupportedFeature{
 		suite.SupportMesh,
 	},
-	Manifests: []string{"tests/mesh-split.yaml"},
+	Manifests: []string{"tests/mesh-frontend.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 		cases := []http.ExpectedResponse{
 			{
+				TestCaseName: "Send to service with wrong hostname",
 				Request: http.Request{
-					Host:   "echo",
+					Host: "echo-v2",
+					Headers: map[string]string{
+						"Host": "echo-v1",
+					},
 					Method: "GET",
-					Path:   "/v1",
 				},
 				Response: http.Response{
 					StatusCode: 200,
-				},
-				Backend: "echo-v1",
-			},
-			{
-				Request: http.Request{
-					Host:   "echo",
-					Method: "GET",
-					Path:   "/v2",
-				},
-				Response: http.Response{
-					StatusCode: 200,
+					// Make sure the route actually did something
+					Headers: map[string]string{
+						"X-Header-Set": "set",
+					},
 				},
 				Backend: "echo-v2",
+			},
+			{
+				TestCaseName: "Send to other service with matching hostname",
+				Request: http.Request{
+					Host: "echo-v1",
+					Headers: map[string]string{
+						"Host": "echo-v2",
+					},
+					Method: "GET",
+				},
+				Response: http.Response{
+					StatusCode:    200,
+					AbsentHeaders: []string{"X-Header-Set"},
+				},
+				Backend: "echo-v1",
 			},
 		}
 		for i := range cases {
