@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2023 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ func init() {
 
 var MeshFrontendHostname = suite.ConformanceTest{
 	ShortName:   "MeshFrontendHostname",
-	Description: "Mesh rules frontend applies to IP not Host",
+	Description: "Mesh parentRef matches Service IP (not Host)",
 	Features: []suite.SupportedFeature{
 		suite.SupportMesh,
 	},

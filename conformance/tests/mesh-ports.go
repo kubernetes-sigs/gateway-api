@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2023 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -30,16 +30,18 @@ func init() {
 
 var MeshPorts = suite.ConformanceTest{
 	ShortName:   "MeshPorts",
-	Description: "A mesh route can optional configure 'port' in parentRef",
+	Description: "A mesh route can optionally configure 'port' in parentRef",
 	Features: []suite.SupportedFeature{
 		suite.SupportMesh,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPResponseHeaderModification,
 	},
 	Manifests: []string{"tests/mesh-ports.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
 		cases := []http.ExpectedResponse{
 			{
-				TestCaseName: "Explicit port send to port",
+				TestCaseName: "Explicit port set, send to that port",
 				Request: http.Request{
 					Host:   "echo-v1",
 					Method: "GET",
@@ -54,7 +56,7 @@ var MeshPorts = suite.ConformanceTest{
 				Backend: "echo-v1",
 			},
 			{
-				TestCaseName: "Explicit port send to excluded port",
+				TestCaseName: "Explicit port, send to an excluded port",
 				Request: http.Request{
 					Host:   "echo-v1:8080",
 					Method: "GET",
@@ -67,7 +69,7 @@ var MeshPorts = suite.ConformanceTest{
 				Backend: "echo-v1",
 			},
 			{
-				TestCaseName: "All ports",
+				TestCaseName: "No port set",
 				Request: http.Request{
 					Host:   "echo-v2",
 					Method: "GET",
@@ -81,7 +83,7 @@ var MeshPorts = suite.ConformanceTest{
 				Backend: "echo-v2",
 			},
 			{
-				TestCaseName: "All ports",
+				TestCaseName: "No port set",
 				Request: http.Request{
 					Host:   "echo-v2:8080",
 					Method: "GET",
