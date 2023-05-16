@@ -732,15 +732,17 @@ const (
 )
 
 const (
-	// This condition indicates that, even though the listener is
-	// syntactically and semantically valid, the controller is not able
-	// to configure it on the underlying Gateway infrastructure.
+	// This condition indicates that the listener is syntactically and
+	// semantically valid, and that all features used in the listener's spec are
+	// supported.
 	//
-	// A Listener is specified as a logical requirement, but needs to be
-	// configured on a network endpoint (i.e. address and port) by a
-	// controller. The controller may be unable to attach the Listener
-	// if it specifies an unsupported requirement, or prerequisite
-	// resources are not available.
+	// In general, a Listener will be marked as Accepted when the supplied
+	// configuration will generate at least some data plane configuration.
+	//
+	// For example, a Listener with an unsupported protocol will never generate
+	// any data plane config, and so will have Accepted set to `false.`
+	// Conversely, a Listener that does not have any Routes will be able to
+	// generate data plane config, and so will have Accepted set to `true`.
 	//
 	// Possible reasons for this condition to be True are:
 	//
