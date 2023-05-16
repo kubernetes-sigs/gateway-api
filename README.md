@@ -5,8 +5,8 @@ the specification and Custom Resource Definitions (CRDs).
 
 ## Status
 
-The latest supported version is `v1beta1` as released by the [v0.6.2
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.6.2) of
+The latest supported version is `v1beta1` as released by the [v0.7.0
+release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.7.0) of
 this project.
 
 This version of the API is has beta level support for the following resources:
@@ -33,9 +33,9 @@ to understand the API and the use-cases it targets.
 
 ### Getting started
 
-Once you have a good understanding of the API at a higher-level, check out 
-[getting started][getting-started] to install your first Gateway controller and try out 
-one of the guides. 
+Once you have a good understanding of the API at a higher-level, check out
+[getting started][getting-started] to install your first Gateway controller and try out
+one of the guides.
 
 ### References
 
