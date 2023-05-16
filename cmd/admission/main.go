@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"k8s.io/klog/v2"
 
@@ -70,7 +71,8 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr: ":8443",
+		Addr:              ":8443",
+		ReadHeaderTimeout: 10 * time.Second, // for Potential Slowloris Attack (G112)
 		// Require at least TLS12 to satisfy golint G402.
 		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{certs}},
 	}
