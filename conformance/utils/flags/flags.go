@@ -30,4 +30,5 @@ var (
 	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites")
 	ExemptFeatures             = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
 	EnableAllSupportedFeatures = flag.Bool("all-features", false, "Whether to enable all supported features for conformance tests")
+	NamespaceLabels            = flag.String("namespace-labels", "", "Comma-separated list of name=value labels to add to test namespaces")
 )
