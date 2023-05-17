@@ -60,15 +60,6 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 			Namespace: ns,
 		}, {
 			Request: http.Request{
-				Path:             "/status-code-301",
-				UnfollowRedirect: true,
-			},
-			Response: http.Response{
-				StatusCode: 301,
-			},
-			Namespace: ns,
-		}, {
-			Request: http.Request{
 				Path:             "/host-and-status",
 				UnfollowRedirect: true,
 			},

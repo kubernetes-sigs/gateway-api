@@ -25,38 +25,46 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, MeshTrafficSplit)
+	ConformanceTests = append(ConformanceTests, MeshFrontend)
 }
 
-var MeshTrafficSplit = suite.ConformanceTest{
-	ShortName:   "MeshTrafficSplit",
-	Description: "A mesh client can send traffic to a Service which is split between two versions",
+var MeshFrontend = suite.ConformanceTest{
+	ShortName:   "MeshFrontend",
+	Description: "Mesh rules should only apply to the associated frontend",
 	Features: []suite.SupportedFeature{
 		suite.SupportMesh,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPResponseHeaderModification,
 	},
-	Manifests: []string{"tests/mesh-split.yaml"},
+	Manifests: []string{"tests/mesh-frontend.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		client := echo.ConnectToApp(t, s, echo.MeshAppEchoV1)
+		v2 := echo.ConnectToApp(t, s, echo.MeshAppEchoV2)
 		cases := []http.ExpectedResponse{
 			{
+				TestCaseName: "Send to service",
 				Request: http.Request{
-					Host:   "echo",
+					Host:   "echo-v2",
 					Method: "GET",
-					Path:   "/v1",
 				},
 				Response: http.Response{
 					StatusCode: 200,
+					// Make sure the route actually did something
+					Headers: map[string]string{
+						"X-Header-Set": "set",
+					},
 				},
-				Backend: "echo-v1",
+				Backend: "echo-v2",
 			},
 			{
+				TestCaseName: "Send to pod IP",
 				Request: http.Request{
-					Host:   "echo",
+					Host:   v2.Address,
 					Method: "GET",
-					Path:   "/v2",
 				},
 				Response: http.Response{
-					StatusCode: 200,
+					StatusCode:    200,
+					AbsentHeaders: []string{"X-Header-Set"},
 				},
 				Backend: "echo-v2",
 			},
