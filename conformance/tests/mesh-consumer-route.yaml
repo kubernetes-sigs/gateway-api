@@ -15,3 +15,6 @@ spec:
         set:
         - name: X-Header-Set
           value: set
+    backendRefs:
+    - name: echo-v1
+      port: 80

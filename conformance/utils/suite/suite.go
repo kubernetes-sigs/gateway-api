@@ -174,6 +174,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 		namespaces := []string{
 			"gateway-conformance-mesh",
+			"gateway-conformance-mesh-consumer",
 			"gateway-conformance-app-backend",
 			"gateway-conformance-web-backend",
 		}

@@ -41,6 +41,7 @@ var MeshConsumerRoute = suite.ConformanceTest{
 		consumerClient := echo.ConnectToAppInNamespace(t, s, echo.MeshAppEchoV1, "gateway-conformance-mesh-consumer")
 		consumerCases := []http.ExpectedResponse{
 			{
+				TestCaseName: "request from consumer route's namespace modified by HTTPRoute",
 				Request: http.Request{
 					Host:   "echo-v1.gateway-conformance-mesh",
 					Method: "GET",
@@ -58,6 +59,7 @@ var MeshConsumerRoute = suite.ConformanceTest{
 		producerClient := echo.ConnectToAppInNamespace(t, s, echo.MeshAppEchoV1, "gateway-conformance-mesh")
 		producerCases := []http.ExpectedResponse{
 			{
+				TestCaseName: "request not from consumer route's namespace not modified by HTTPRoute",
 				Request: http.Request{
 					Host:   "echo-v1.gateway-conformance-mesh",
 					Method: "GET",
