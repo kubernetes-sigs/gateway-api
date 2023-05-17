@@ -52,6 +52,9 @@ type ExpectedResponse struct {
 	Backend   string
 	Namespace string
 
+	// MirroredTo is the destination pod of the mirrored request.
+	MirroredTo string
+
 	// User Given TestCase name
 	TestCaseName string
 }
