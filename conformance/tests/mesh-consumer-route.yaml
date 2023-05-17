@@ -17,4 +17,5 @@ spec:
           value: set
     backendRefs:
     - name: echo-v1
+      namespace: gateway-conformance-mesh
       port: 80
