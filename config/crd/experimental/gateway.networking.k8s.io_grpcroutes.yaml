@@ -501,7 +501,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -708,11 +709,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -966,11 +967,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
