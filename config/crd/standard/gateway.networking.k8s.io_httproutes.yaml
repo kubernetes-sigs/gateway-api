@@ -1706,11 +1706,21 @@ spec:
                         to indicate whether the route has been accepted or rejected
                         by the Gateway, and why. \n A Route MUST be considered \"Accepted\"
                         if at least one of the Route's rules is implemented by the
-                        Gateway. \n There are a number of cases where the \"Accepted\"
-                        condition may not be set due to lack of controller visibility,
-                        that includes when: \n * The Route refers to a non-existent
-                        parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the controller
+                        Gateway. An \"Accepted\" Route may include some rules that
+                        are invalid (e.g. include unsupported configuration values,
+                        unsupported combinations of Filters, etc.) and MUST have the
+                        \"PartiallyInvalid\" error condition set to \"True\" to reflect
+                        this. \n If no Route rules are implementable by the Gateway,
+                        the \"Accepted\" condition MUST be set with status \"False\".
+                        The reason accompanying this condition may vary depending
+                        on the source of the configuration invalidity. For example
+                        if caused by an unsupported value the controller MUST set
+                        the \"Accepted\" condition with status \"False\" and reason
+                        \"UnsupportedValue\". \n There are a number of cases where
+                        the \"Accepted\" condition may not be set due to lack of controller
+                        visibility, that includes when: \n * The Route refers to a
+                        non-existent parent. * The Route is of a type that the controller
+                        does not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of
@@ -3575,11 +3585,21 @@ spec:
                         to indicate whether the route has been accepted or rejected
                         by the Gateway, and why. \n A Route MUST be considered \"Accepted\"
                         if at least one of the Route's rules is implemented by the
-                        Gateway. \n There are a number of cases where the \"Accepted\"
-                        condition may not be set due to lack of controller visibility,
-                        that includes when: \n * The Route refers to a non-existent
-                        parent. * The Route is of a type that the controller does
-                        not support. * The Route is in a namespace the controller
+                        Gateway. An \"Accepted\" Route may include some rules that
+                        are invalid (e.g. include unsupported configuration values,
+                        unsupported combinations of Filters, etc.) and MUST have the
+                        \"PartiallyInvalid\" error condition set to \"True\" to reflect
+                        this. \n If no Route rules are implementable by the Gateway,
+                        the \"Accepted\" condition MUST be set with status \"False\".
+                        The reason accompanying this condition may vary depending
+                        on the source of the configuration invalidity. For example
+                        if caused by an unsupported value the controller MUST set
+                        the \"Accepted\" condition with status \"False\" and reason
+                        \"UnsupportedValue\". \n There are a number of cases where
+                        the \"Accepted\" condition may not be set due to lack of controller
+                        visibility, that includes when: \n * The Route refers to a
+                        non-existent parent. * The Route is of a type that the controller
+                        does not support. * The Route is in a namespace the controller
                         does not have access to."
                       items:
                         description: "Condition contains details for one aspect of

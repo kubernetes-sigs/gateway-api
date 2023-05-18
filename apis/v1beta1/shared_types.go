@@ -290,10 +290,15 @@ const (
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 
 	// This condition indicates whether configuration present in a Route is
-	// partially invalid. This may occur in the form of a combination of
-	// incompatible filters present in an individual route rule that an
-	// implementation wishes to call out. Controllers should only add this
-	// condition with status true when such an error is present.
+	// partially invalid. This may occur when matches or filters in a routing
+	// rule has any of the following errors:
+	//
+	// * an unsupported value;
+	// * an incompatible set of filters;
+	// * an unpermitted reference in an ExtensionRef filter.
+	//
+	// Controllers should only add this condition with status true when
+	// such an error is present.
 	//
 	// Possible reasons for this condition to be true are:
 	//
@@ -348,7 +353,16 @@ type RouteParentStatus struct {
 	// Gateway, and why.
 	//
 	// A Route MUST be considered "Accepted" if at least one of the Route's
-	// rules is implemented by the Gateway.
+	// rules is implemented by the Gateway. An "Accepted" Route may include some
+	// rules that are invalid (e.g. include unsupported configuration values,
+	// unsupported combinations of Filters, etc.) and MUST have the "PartiallyInvalid"
+	// error condition set to "True" to reflect this.
+	//
+	// If no Route rules are implementable by the Gateway, the "Accepted" condition
+	// MUST be set with status "False". The reason accompanying this condition may
+	// vary depending on the source of the configuration invalidity. For example if
+	// caused by an unsupported value the controller MUST set the "Accepted" condition
+	// with status "False" and reason "UnsupportedValue".
 	//
 	// There are a number of cases where the "Accepted" condition may not be set
 	// due to lack of controller visibility, that includes when:
