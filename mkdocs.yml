@@ -88,12 +88,12 @@ nav:
         - geps/gep-1709.md
       - Experimental:
         - geps/gep-1748.md
-        - geps/gep-1323.md
         - geps/gep-1016.md
         - geps/gep-957.md
         - geps/gep-713.md
       - Standard:
         - geps/gep-1364.md
+        - geps/gep-1323.md
         - geps/gep-922.md
         - geps/gep-917.md
         - geps/gep-851.md
