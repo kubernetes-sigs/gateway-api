@@ -118,7 +118,7 @@ var HTTPRouteMethodMatching = suite.ConformanceTest{
 			},
 			{
 				Request:   http.Request{Headers: map[string]string{"version": "four"}, Path: "/", Method: "PATCH"},
-				Backend:   "infra-backend-v3",
+				Backend:   "infra-backend-v2",
 				Namespace: ns,
 			},
 		}...)

@@ -158,12 +158,13 @@ type HTTPRouteRule struct {
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize matches based on the following criteria, continuing on
 	// ties. Across all rules specified on applicable Routes, precedence must be
-	// given to the match with the largest number of:
+	// given to the match having:
 	//
-	// * Characters in a matching "Exact" path match
-	// * Characters in a matching "Prefix" path match
-	// * Header matches.
-	// * Query param matches.
+	// * "Exact" path match.
+	// * "Prefix" path match with largest number of characters.
+	// * Method match.
+	// * Largest number of header matches.
+	// * Largest number of query param matches.
 	//
 	// Note: The precedence of RegularExpression path matches are implementation-specific.
 	//
