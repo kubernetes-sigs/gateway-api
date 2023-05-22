@@ -139,11 +139,13 @@ var HTTPRouteQueryParamMatching = suite.ConformanceTest{
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
 			},
-			{
-				Request:   http.Request{Headers: map[string]string{"version": "four"}, Path: "/?animal=hydra"},
-				Backend:   "infra-backend-v3",
-				Namespace: ns,
-			},
+			// TODO(#1993): Possibly re-enable the test when the matching priorities are
+			// solidified.
+			// {
+			// 	Request:   http.Request{Headers: map[string]string{"version": "four"}, Path: "/?animal=hydra"},
+			// 	Backend:   "infra-backend-v3",
+			// 	Namespace: ns,
+			// },
 		}...)
 
 		for i := range testCases {
