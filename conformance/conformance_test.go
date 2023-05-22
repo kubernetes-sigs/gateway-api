@@ -59,9 +59,12 @@ func TestConformance(t *testing.T) {
 		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
-		Client:                     client,
-		RESTClient:                 clientset.CoreV1().RESTClient().(*rest.RESTClient),
-		RestConfig:                 cfg,
+		Client:     client,
+		RESTClient: clientset.CoreV1().RESTClient().(*rest.RESTClient),
+		RestConfig: cfg,
+		// This clientset is needed in addition to the client only because
+		// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
+		Clientset:                  clientset,
 		GatewayClassName:           *flags.GatewayClassName,
 		Debug:                      *flags.ShowDebug,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
