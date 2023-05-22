@@ -586,8 +586,8 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of Routes
-                        that have been successfully attached to this Listener.
+                      description: AttachedRoutes represents the total number of accepted
+                        Routes that have been successfully attached to this Listener.
                       format: int32
                       type: integer
                     conditions:
@@ -1289,8 +1289,8 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of Routes
-                        that have been successfully attached to this Listener.
+                      description: AttachedRoutes represents the total number of accepted
+                        Routes that have been successfully attached to this Listener.
                       format: int32
                       type: integer
                     conditions:
