@@ -273,7 +273,9 @@ type HTTPRouteRule struct {
 type PathMatchType string
 
 const (
-	// Matches the URL path exactly and with case sensitivity.
+	// Matches the URL path exactly and with case sensitivity. This means that
+	// an exact path match on `/abc` will only match requests to `/abc`, NOT
+	// `/abc/`, `/Abc`, or `/abcd`.
 	PathMatchExact PathMatchType = "Exact"
 
 	// Matches based on a URL path prefix split by `/`. Matching is
