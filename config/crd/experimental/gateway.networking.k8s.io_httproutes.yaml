@@ -1509,21 +1509,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -3431,21 +3431,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
