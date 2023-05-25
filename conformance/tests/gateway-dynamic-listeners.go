@@ -82,6 +82,13 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 				AttachedRoutes: 1,
 			}}
 		)
+		if portEnd < portStart {
+			t.Fatal("DynamicPortRange.Start must be less than DynamicPortRange.End")
+		}
+
+		if portEnd-portStart < portCount {
+			t.Fatal("DynamicPortRange input requires at least 10 ports")
+		}
 
 		for i := 0; i < portCount; i++ {
 			port := nextPort(portStart, portEnd, ports)
