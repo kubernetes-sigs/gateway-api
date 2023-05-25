@@ -43,8 +43,11 @@ func init() {
 }
 
 var GatewayListenerDynamicPorts = suite.ConformanceTest{
-	ShortName:   "GatewayListenerDynamicPorts",
-	Features:    []suite.SupportedFeature{suite.SupportGatewayListenerDynamicPorts},
+	ShortName: "GatewayListenerDynamicPorts",
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportGatewayListenerDynamicPorts,
+	},
 	Description: "A Gateway in the gateway-conformance-infra namespace should handle adding and removing listeners with arbitrary ports",
 	Manifests:   []string{"tests/gateway-dynamic-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
