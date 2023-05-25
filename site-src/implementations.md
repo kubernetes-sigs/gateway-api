@@ -312,7 +312,7 @@ In this section you will find specific links to blog posts, documentation and ot
 
 [Flagger][flagger] is a progressive delivery tool that automates the release process for applications running on Kubernetes.
 
-Flagger can be used to automate canary deployments and A/B testing using Gateway API. It currently supports the `v1alpha2` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
+Flagger can be used to automate canary deployments and A/B testing using Gateway API. It supports both the `v1alpha2` and `v1beta1` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
 
 [flagger]:https://flagger.app
 [flagger-tutorial]:https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery
