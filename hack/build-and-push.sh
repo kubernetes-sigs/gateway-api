@@ -81,6 +81,18 @@ docker buildx build \
     -f docker/Dockerfile.webhook \
     .
 
+echo "Building and pushing certification image...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/certification:${GIT_TAG} \
+    -t ${REGISTRY}/certification:${VERSION_TAG} \
+    --build-arg "COMMIT=${COMMIT}" \
+    --build-arg "TAG=${BINARY_TAG}" \
+    --platform ${BUILDX_PLATFORMS} \
+    --push \
+    -f docker/Dockerfile.certification \
+    .
+
 echo "Building and pushing echo-server image...${BUILDX_PLATFORMS}"
 
 docker buildx build \
