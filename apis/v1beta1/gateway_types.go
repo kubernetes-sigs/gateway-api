@@ -70,7 +70,8 @@ type GatewaySpec struct {
 	// At least one Listener MUST be specified.
 	//
 	// Each listener in a Gateway must have a unique combination of Hostname,
-	// Port, and Protocol. Combinations that are considered Core are:
+	// Port, and Protocol. Below combinations are considered Core and MUST be
+	// supported:
 	//
 	// 1. Port: 80, Protocol: HTTP
 	// 2. Port: 443, Protocol: HTTPS
