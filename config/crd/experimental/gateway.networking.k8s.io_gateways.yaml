@@ -108,6 +108,9 @@ spec:
                   logical endpoints that are bound on this Gateway's addresses. At
                   least one Listener MUST be specified. \n Each listener in a Gateway
                   must have a unique combination of Hostname, Port, and Protocol.
+                  Below combinations are considered Core and MUST be supported: \n
+                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Port
+                  and protocol combinations not in this list are considered Extended.
                   \n An implementation MAY group Listeners by Port and then collapse
                   each group of Listeners into a single Listener if the implementation
                   determines that the Listeners in the group are \"compatible\". An
@@ -811,6 +814,9 @@ spec:
                   logical endpoints that are bound on this Gateway's addresses. At
                   least one Listener MUST be specified. \n Each listener in a Gateway
                   must have a unique combination of Hostname, Port, and Protocol.
+                  Below combinations are considered Core and MUST be supported: \n
+                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Port
+                  and protocol combinations not in this list are considered Extended.
                   \n An implementation MAY group Listeners by Port and then collapse
                   each group of Listeners into a single Listener if the implementation
                   determines that the Listeners in the group are \"compatible\". An
