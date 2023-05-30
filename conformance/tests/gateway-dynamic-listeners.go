@@ -146,6 +146,10 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
 					Reason: "", //any reason
+				}, {
+					Type:   string(v1beta1.ListenerConditionResolvedRefs),
+					Status: metav1.ConditionTrue,
+					Reason: "", //any reason
 				}},
 				AttachedRoutes: 1,
 			})
