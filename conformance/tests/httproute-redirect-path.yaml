@@ -71,3 +71,24 @@ spec:
           type: ReplaceFullPath
           replaceFullPath: /replacement-full
         statusCode: 301
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /full-path-and-header-modifiers
+    filters:
+    - type: RequestHeaderModifier
+      requestHeaderModifier:
+        set:
+        - name: X-Header-Set
+          value: set-overwrites-values
+        add:
+          - name: X-Header-Add
+            value: add-appends-values
+        remove:
+          - X-Header-Remove
+    - type: RequestRedirect
+      requestRedirect:
+        path:
+          type: ReplaceFullPath
+          replaceFullPath: /replacement-full
+        statusCode: 301

@@ -121,6 +121,31 @@ var HTTPRouteRedirectPath = suite.ConformanceTest{
 				Path: "/replacement-full",
 			},
 			Namespace: ns,
+		}, {
+			Request: http.Request{
+				Path:             "/full-path-and-header-modifiers",
+				UnfollowRedirect: true,
+				Headers: map[string]string{
+					"X-Header-Remove": "val",
+				},
+			},
+			Response: http.Response{
+				StatusCode: 301,
+			},
+			ExpectedRequest: &http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/full-path-and-header-modifiers",
+					Headers: map[string]string{
+						"X-Header-Add": "add-appends-values",
+						"X-Header-Set": "set-overwrites-values",
+					},
+				},
+				AbsentHeaders: []string{"X-Header-Remove"},
+			},
+			RedirectRequest: &roundtripper.RedirectRequest{
+				Path: "/replacement-full",
+			},
+			Namespace: ns,
 		},
 		}
 		for i := range testCases {
