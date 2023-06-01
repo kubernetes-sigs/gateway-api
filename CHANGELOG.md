@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.7.1](#v071)
 - [v0.7.0](#v070)
 - [v0.7.0-rc2](#v070-rc2)
 - [v0.7.0-rc1](#v070-rc1)
@@ -25,6 +26,40 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.7.1
+
+This is a patch release that includes small fixes, clarifications, and
+conformance tests as a follow up to the v0.7.0 release.
+
+## Changes by Kind
+
+### Conformance Tests
+
+- Fixed an issues causing conformance tests to fail when using IPv6 addresses.
+  (#2024, @howardjohn)
+- HTTPRoute connectivity is in now enforced in conformance tests if a relevant
+  ReferenceGrant gets deleted. (#1853, @pmalek)
+- New: Conformance tests for HTTP request mirroring. (#1912, @liorlieberman)
+- Fixes to port and scheme redirect tests: Tests now send HTTPS requests with
+  consistent SNI and Host, Gateway now has the correct SANs. (#2039, @sunjaybhatia)
+- TLSRoute test now waits for namespaces to be ready. (#2067, @skriss)
+
+### Validating Webhook
+
+- Webhook config works with "restricted" Pod Security level. (#2016, @jcpunk)
+
+### Clarifications
+
+- HTTPRoute Method matching precedence has been clarified. (#2054,
+  @gauravkghildiyal)
+- Implementations MUST ignore any port value specified in the HTTP Host header
+  while performing a match against HTTPRoute.Hostnames. (#1980,
+  @gauravkghildiyal)
+- HTTPRoute: Clarified that exact path matches are truly exact, both trailing
+  slashes and capitalization are meaningful. (#2055, @robscott)
+- Gateway: Clarified that AttachedRoutes should only consider Routes that have
+  been accepted. (#2050, @mlavacca)
 
 # v0.7.0
 
