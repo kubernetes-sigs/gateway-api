@@ -90,17 +90,6 @@ func makeRequest(r http.Request) []string {
 	return args
 }
 
-func (m *MeshPod) SendRequest(t *testing.T, exp http.ExpectedResponse) {
-	resp, err := m.request(makeRequest(exp.Request))
-	if err != nil {
-		t.Fatalf("Got error: %v", err)
-	}
-	t.Logf("Got resp %v", resp)
-	if err := compareRequest(exp, resp); err != nil {
-		t.Fatalf("expectations failed: %v", err)
-	}
-}
-
 func compareRequest(exp http.ExpectedResponse, resp Response) error {
 	want := exp.Response
 	if fmt.Sprint(want.StatusCode) != resp.Code {

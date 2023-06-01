@@ -51,14 +51,17 @@ spec:
   ports:
   - name: http
     port: 80
+    appProtocol: http
   - name: http-alt
     port: 8080
+    appProtocol: http
   - name: https
     port: 443
   - name: tcp
     port: 9090
   - name: grpc
     port: 7070
+    appProtocol: grpc
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -104,14 +107,17 @@ spec:
   ports:
   - name: http
     port: 80
+    appProtocol: http
   - name: http-alt
     port: 8080
+    appProtocol: http
   - name: https
     port: 443
   - name: tcp
     port: 9090
   - name: grpc
     port: 7070
+    appProtocol: grpc
 ---
 apiVersion: v1
 kind: Service
@@ -124,11 +130,14 @@ spec:
   ports:
   - name: http
     port: 80
+    appProtocol: http
   - name: http-alt
     port: 8080
+    appProtocol: http
   - name: https
     port: 443
   - name: tcp
     port: 9090
   - name: grpc
     port: 7070
+    appProtocol: grpc
