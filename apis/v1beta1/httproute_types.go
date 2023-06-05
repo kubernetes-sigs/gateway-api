@@ -59,7 +59,8 @@ type HTTPRouteSpec struct {
 	// Hostnames defines a set of hostname that should match against the HTTP Host
 	// header to select a HTTPRoute used to process the request. Implementations
 	// MUST ignore any port value specified in the HTTP Host header while
-	// performing a match.
+	// performing a match and (absent of any applicable header modification
+	// configuration) MUST forward this header unmodified to the backend.
 	//
 	// Valid values for Hostnames are determined by RFC 1123 definition of a
 	// hostname with 2 notable exceptions:
