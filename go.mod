@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/lithammer/dedent v1.1.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	k8s.io/api v0.27.2
 	k8s.io/apiextensions-apiserver v0.27.2
 	k8s.io/apimachinery v0.27.2
