@@ -13,8 +13,8 @@ Within Gateway API, release channels are used to indicate the stability of a
 field or resource. The "standard" channel of the API includes fields and
 resources that have graduated to "beta". The "experimental" channel of the API
 includes everything in the "standard" channel, along with experimental fields
-and resources that may still be changed in breaking ways or removed altogether.
-For more information on this concept, refer to our
+and resources that may still be changed in breaking ways **or removed
+altogether**. For more information on this concept, refer to our
 [versioning](/concepts/versioning) documentation.
 
 ## 2. Support Levels
