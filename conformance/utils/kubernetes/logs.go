@@ -50,12 +50,12 @@ func DumpEchoLogs(ns, name string, c client.Client, cs *clientset.Clientset) ([]
 		req := cs.CoreV1().Pods(ns).GetLogs(pod.Name, podLogOptions)
 		logStream, err := req.Stream(context.TODO())
 		if err != nil {
-			continue
+			return nil, err
 		}
 		defer logStream.Close()
 		logBytes, err := io.ReadAll(logStream)
 		if err != nil {
-			continue
+			return nil, err
 		}
 		logs = append(logs, logBytes)
 	}
