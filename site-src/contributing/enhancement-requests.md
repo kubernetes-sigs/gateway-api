@@ -10,17 +10,6 @@ Enhancements provides the basis of a community roadmap. Enhancements may be
 filed by anyone, but require approval from a maintainer to accept the
 enhancement into the project.
 
-## Quick start
-
-1. Create an [Issue][issue] and select "Enhancement Request".
-2. Follow the instructions in the enhancement request template and submit the
-   Issue.
-3. (depending on size of change) Start a [draft Gateway Enhancement Proposal
-   (GEP)][gep]
-
-[issue]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
-[gep]: /geps/overview
-
 ## What is Considered an Enhancement?
 
 An enhancement is generally anything that:
@@ -48,6 +37,20 @@ Create an enhancement once you have:
 - Identified community members who agree to work on and maintain the enhancement.
 - Enhancements may take several releases to complete.
 - A prototype in your own fork (optional)
+
+## How to Create a New Enhancement
+
+Once you've circulated your idea and received feedback from the maintainers
+that creating a [Gateway Enhancement Proposal (GEP)][gep] is a good next step:
+
+- create an [Issue][issue] and select "Enhancement Request"
+- follow the instructions in the enhancement request template and submit the
+  Issue.
+- create an initial pull request to add your GEP. Follow the directions in the
+  [GEP documentation][gep].
+
+[issue]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
+[gep]: /geps/overview
 
 ## Why are Enhancements Tracked
 
