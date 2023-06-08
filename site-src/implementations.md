@@ -31,6 +31,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
+- [Knative][24] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -55,6 +56,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [21]:#stunner
 [22]:#argo-rollouts
 [23]:#amazon-elastic-kubernetes-service
+[24]:#knative
 
 ## Implementations
 
@@ -332,3 +334,10 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 [argo-rollouts]:https://argo-rollouts.readthedocs.io/en/stable/
 [argo-rollouts-plugin]:https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/
+
+### Knative
+
+[Knative][knative] is a serverless platform built on Kubernetes.  Knative Serving provides a simple API for running stateless containers with automatic management of URLs, traffic splitting between revisions, request-based autoscaling (including scale to zero), and automatic TLS provisioning.  Knative Serving supports multiple HTTP routers through a plugin architecture, including a [gateway API plugin][knative-net-gateway-api] which is currently in alpha as not all Knative features are supported.
+
+[knative]:https://knative.dev/
+[knative-net-gateway-api]:https://github.com/knative-sandbox/net-gateway-api
