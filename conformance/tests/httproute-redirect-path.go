@@ -121,7 +121,8 @@ var HTTPRouteRedirectPath = suite.ConformanceTest{
 				Path: "/replacement-full",
 			},
 			Namespace: ns,
-		}}
+		},
+		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable
 			// reuse issues across parallel tests.
