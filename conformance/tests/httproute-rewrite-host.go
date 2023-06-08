@@ -73,6 +73,27 @@ var HTTPRouteRewriteHost = suite.ConformanceTest{
 				},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path: "/rewrite-host-and-modify-headers",
+					Host: "rewrite.example",
+					Headers: map[string]string{
+						"X-Header-Remove": "val",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Path: "/rewrite-host-and-modify-headers",
+						Host: "test.example.org",
+						Headers: map[string]string{
+							"X-Header-Add": "add-appends-values",
+							"X-Header-Set": "set-overwrites-values",
+						},
+					},
+					AbsentHeaders: []string{"X-Header-Remove"},
+				},
+				Backend:   "infra-backend-v2",
+				Namespace: ns,
 			},
 		}
 		for i := range testCases {
