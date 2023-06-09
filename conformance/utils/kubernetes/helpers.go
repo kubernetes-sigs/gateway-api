@@ -512,6 +512,31 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have listeners matching expectations")
 }
 
+// GatewayStatusMustHaveAddresses waits for the specified Gateway to have addresses
+// in status that match the expected addresses. This will cause the test to halt
+// if the specified timeout is exceeded.
+func GatewayStatusMustHaveAddresses(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName, addresses []v1beta1.GatewayAddress) {
+	t.Helper()
+
+	var actual []v1beta1.GatewayAddress
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayStatusMustHaveAddresses, true, func(ctx context.Context) (bool, error) {
+		gw := &v1beta1.Gateway{}
+		err := client.Get(ctx, gwNN, gw)
+		if err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+			t.Log("Gateway", err)
+			return false, nil
+		}
+
+		actual = gw.Status.Addresses
+		return addressesMatch(t, addresses, actual), nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have addresses matching expectations")
+}
+
 // HTTPRouteMustHaveCondition checks that the supplied HTTPRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
@@ -678,6 +703,34 @@ func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) boo
 	return true
 }
 
+func addressesMatch(t *testing.T, expected, actual []v1beta1.GatewayAddress) bool {
+	t.Helper()
+
+	// The actual addresses may differ from the addresses in the Spec, but it should
+	// always contain those addresses.
+	if len(expected) > len(actual) {
+		t.Logf("Gateway status addresses should be smaller than %d, got %d", len(actual), len(expected))
+		return false
+	}
+
+	for _, eAddress := range expected {
+		matched := false
+		for i := range actual {
+			if *actual[i].Type == *eAddress.Type && actual[i].Value == eAddress.Value {
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			t.Logf("Expected status for address %s with type %s to be present", eAddress.Value, *eAddress.Type)
+			return false
+		}
+	}
+
+	t.Logf("Gateway status addresses matched expectations")
+	return true
+}
+
 func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 	t.Helper()
 
@@ -734,4 +787,8 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 
 	t.Logf("%s was not in conditions list", condName)
 	return false
+}
+
+func PtrTo[T any](a T) *T {
+	return &a
 }

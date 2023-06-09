@@ -319,3 +319,99 @@ func Test_listenersMatch(t *testing.T) {
 		})
 	}
 }
+
+func Test_addressesMatch(t *testing.T) {
+	tests := []struct {
+		name     string
+		expected []v1beta1.GatewayAddress
+		actual   []v1beta1.GatewayAddress
+		want     bool
+	}{
+		{
+			name: "addresses do not match if actual addresses is smaller than the expected one",
+			expected: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "12:34:56::",
+				},
+			},
+			actual: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+			},
+			want: false,
+		},
+		{
+			name: "addresses do not match if actual addresses is empty",
+			expected: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+			},
+			actual: []v1beta1.GatewayAddress{},
+			want:   false,
+		},
+		{
+			name: "addresses matched when expected and actual are equal",
+			expected: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+				{
+					Type:  PtrTo(v1beta1.HostnameAddressType),
+					Value: "test.com",
+				},
+			},
+			actual: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+				{
+					Type:  PtrTo(v1beta1.HostnameAddressType),
+					Value: "test.com",
+				},
+			},
+			want: true,
+		},
+		{
+			name: "address do not match if one expected address is not showing up",
+			expected: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.HostnameAddressType),
+					Value: "test.com",
+				},
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+			},
+			actual: []v1beta1.GatewayAddress{
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "1.2.3.4",
+				},
+				{
+					Type:  PtrTo(v1beta1.IPAddressType),
+					Value: "5.6.7.8",
+				},
+			},
+			want: false,
+		},
+	}
+
+	for _, test := range tests {
+		test := test
+		t.Run(test.name, func(t *testing.T) {
+			assert.Equal(t, test.want, addressesMatch(t, test.expected, test.actual))
+		})
+	}
+}
