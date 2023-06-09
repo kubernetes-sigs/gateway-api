@@ -65,6 +65,7 @@ against them. At this stage, the GEP should be targeting the "Implementable"
 stage.
 
 ### 4. Implement the GEP as "Experimental"
+
 With the GEP marked as "Implementable", it is time to actually make those
 proposed changes in our API. In some cases, these changes will be documentation
 only, but in most cases, some API changes will also be required. It is important
@@ -72,11 +73,46 @@ that every new feature of the API is marked as "Experimental" when it is
 introduced. Within the API, we use `<gateway:experimental>` tags to denote
 experimental fields.
 
-Before these changes are released, they will also need to be documented.
-GEPs that have not been both implemented and documented before a release
-cut off will be excluded from the release.
+Some other requirements must be met before marking a GEP `Experimental`:
+
+- the graduation criteria to reach `Standard` MUST be filled out
+- a proposed probationary period (see next section) must be included in the GEP
+  and approved by maintainers.
+
+Before changes are released they MUST be documented. GEPs that have not been
+both implemented and documented before a release cut off will be excluded from
+the release.
+
+#### Probationary Period
+
+Any GEP in the `Experimental` phase is automatically under a "probationary
+period" where it will come up for re-assessment if its graduation criteria are
+not met within a given time period. GEPs that wish to move into `Experimental`
+status MUST document a proposed period (6 months is the suggested default) that
+MUST be approved by maintainers. Maintainers MAY select an alternative time
+duration for a probationary period if deemed appropriate, and will document
+their reasoning.
+
+> **Rationale**: This probationary period exists to avoid GEPs getting "stale"
+> and to provide guidance to implementations about how relevant features should
+> be used, given that they are not guaranteed to become supported.
+
+At the end of a probationary period if the GEP has not been able to resolve
+its graduation criteria it will move to "Rejected" status. In extenuating
+circumstances an extension of that period may be accepted by approval from
+maintainers. GEPs which are `Rejected` in this way are removed from the
+experimental CRDs and more or less put on hold. GEPs may be allowed to move back
+into `Experimental` status from `Rejected` for another probationary period if a
+new strategy for achieving their graduation criteria can be established. Any
+such plan to take a GEP "off the shelf" must be reviewed and accepted by the
+maintainers.
+
+> **Warning**: It is extremely important** that projects which implement
+> `Experimental` features clearly document that these features may be removed in
+> future releases.
 
 ### 5. Graduate the GEP to "Standard"
+
 Once this feature has met the [graduation criteria](/concepts/versioning/#graduation-criteria), it is
 time to graduate it to the "Standard" channel of the API. Depending on the feature, this may include
 any of the following:
@@ -111,7 +147,8 @@ meeting before merging. Most GEPS will proceed through the following states:
 * **Implementable:** The goals and implementation details described by this GEP
   have consensus but have not been fully implemented yet.
 * **Experimental:** This GEP has been implemented and is part of the
-  "Experimental" release channel. Breaking changes are still possible.
+  "Experimental" release channel. Breaking changes are still possible, up to
+  and including complete removal and moving to `Rejected`.
 * **Standard:** This GEP has been implemented and is part of the
   "Standard" release channel. It should be quite stable.
 
@@ -162,6 +199,15 @@ What is out of scope: see [text from KEP][kep-when-to-use]. Examples:
     practical tests and experiments which are intended to help us learn and
     iterate on the GEP. These can include distributing content, but not under
     any release channel.
+* Q: Should I implement support for `Experimental` channel features?
+  * A: Ultimately one of the main ways to get something into `Standard` is for
+    it to mature through the `Experimental` phase, so we really _need_ people
+    to implement these features and provide feedback in order to have progress.
+    That said, the graduation of a feature past `Experimental` is not a forgone
+    conclusion. Before implementing an experimental feature, you should:
+
+    * Clearly document that support for the feature is experimental and may disappear in the future.
+    * Have a plan in place for how you would handle the removal of this feature from the API.
 
 [kep]: https://github.com/kubernetes/enhancements
 [kep-when-to-use]: https://github.com/kubernetes/enhancements/tree/master/keps#do-i-have-to-use-the-kep-process
