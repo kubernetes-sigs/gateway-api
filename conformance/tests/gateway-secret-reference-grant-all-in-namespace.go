@@ -53,7 +53,7 @@ var GatewaySecretReferenceGrantAllInNamespace = suite.ConformanceTest{
 					{
 						Type:   string(v1beta1.ListenerConditionProgrammed),
 						Status: metav1.ConditionTrue,
-						Reason: string(v1beta1.ListenerConditionProgrammed),
+						Reason: string(v1beta1.ListenerReasonProgrammed),
 					},
 				},
 				AttachedRoutes: 0,
