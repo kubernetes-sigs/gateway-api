@@ -8,7 +8,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 - [Acnodal EPIC][1] (public preview)
 - [Amazon Elastic Kubernetes Service][23] (alpha)
-- [Apache APISIX][2] (alpha)
+- [Apache APISIX][2] (beta)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
@@ -81,7 +81,7 @@ Documentation can be found at [EPIC Application & API Gateway Service][epic]
 
 [Apache APISIX][apisix] is a dynamic, real-time, high-performance API Gateway. APISIX provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
 
-APISIX currently supports Gateway API `v1alpha2` version of the specification for its [Apache APISIX Ingress Controller][apisix-1].
+APISIX currently supports Gateway API `v1beta1` version of the specification for its [Apache APISIX Ingress Controller][apisix-1].
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
