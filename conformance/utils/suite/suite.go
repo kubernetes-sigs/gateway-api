@@ -171,9 +171,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	if suite.SupportedFeatures.Has(SupportMesh) {
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
-		t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
+		t.Logf("Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
 		namespaces := []string{
 			"gateway-conformance-mesh",
+			"gateway-conformance-mesh-consumer",
 			"gateway-conformance-app-backend",
 			"gateway-conformance-web-backend",
 		}

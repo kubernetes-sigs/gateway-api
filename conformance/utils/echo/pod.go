@@ -149,9 +149,10 @@ func (m *MeshPod) request(args []string) (Response, error) {
 }
 
 func ConnectToApp(t *testing.T, s *suite.ConformanceTestSuite, app MeshApplication) MeshPod {
-	// hardcoded, for now
-	ns := "gateway-conformance-mesh"
+	return ConnectToAppInNamespace(t, s, app, "gateway-conformance-mesh")
+}
 
+func ConnectToAppInNamespace(t *testing.T, s *suite.ConformanceTestSuite, app MeshApplication, ns string) MeshPod {
 	lbls, _ := klabels.Parse(string(app))
 
 	podsList := v1.PodList{}
