@@ -74,12 +74,12 @@ spec:
         - name: X-Header-Set
           value: set-overwrites-values
         add:
-          - name: X-Header-Add
-            value: header-val-1
-          - name: X-Header-Add-Append
-            value: header-val-2
+        - name: X-Header-Add
+          value: header-val-1
+        - name: X-Header-Add-Append
+          value: header-val-2
         remove:
-          - X-Header-Remove
+        - X-Header-Remove
     backendRefs:
     - name: infra-backend-v1
       port: 8080

@@ -46,7 +46,7 @@ spec:
             - name: X-Header-Add-Append
               value: header-val-2
             remove:
-              - X-Header-Remove
+            - X-Header-Remove
       backendRefs:
         - name: infra-backend-v2
           port: 8080
