@@ -844,13 +844,28 @@ type HTTPPathModifier struct {
 
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
-	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	// to "/foo/bar" with a prefix match of "/foo" and a ReplacePrefixMatch
+	// of "/xyz" would be modified to "/xyz/bar".
 	//
 	// Note that this matches the behavior of the PathPrefix match type. This
 	// matches full path elements. A path element refers to the list of labels
 	// in the path split by the `/` separator. When specified, a trailing `/` is
 	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
 	// match the prefix `/abc`, but the path `/abcd` would not.
+	//
+	// Request Path | Prefix Match | Replace Prefix | Modified Path
+	// -------------|--------------|----------------|----------
+	// /foo/bar     | /foo         | /xyz           | /xyz/bar
+	// /foo/bar     | /foo         | /xyz/          | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz           | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz/          | /xyz/bar
+	// /foo         | /foo         | /xyz           | /xyz
+	// /foo/        | /foo         | /xyz           | /xyz/
+	// /foo/bar     | /foo         | <empty string> | /bar
+	// /foo/        | /foo         | <empty string> | /
+	// /foo         | /foo         | <empty string> | /
+	// /foo/        | /foo         | /              | /
+	// /foo         | /foo         | /              | /
 	//
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
