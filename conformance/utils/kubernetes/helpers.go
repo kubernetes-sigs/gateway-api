@@ -220,7 +220,8 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			}
 			for _, pod := range podList.Items {
 				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
-					pod.Status.Phase != v1.PodSucceeded {
+					pod.Status.Phase != v1.PodSucceeded &&
+					pod.DeletionTimestamp == nil {
 					t.Logf("%s/%s Pod not ready yet", ns, pod.Name)
 					return false, nil
 				}
