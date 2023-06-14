@@ -78,7 +78,8 @@ var HTTPRouteRewriteHost = suite.ConformanceTest{
 					Path: "/rewrite-host-and-modify-headers",
 					Host: "rewrite.example",
 					Headers: map[string]string{
-						"X-Header-Remove": "val",
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
@@ -86,8 +87,9 @@ var HTTPRouteRewriteHost = suite.ConformanceTest{
 						Path: "/rewrite-host-and-modify-headers",
 						Host: "test.example.org",
 						Headers: map[string]string{
-							"X-Header-Add": "add-appends-values",
-							"X-Header-Set": "set-overwrites-values",
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
 						},
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},

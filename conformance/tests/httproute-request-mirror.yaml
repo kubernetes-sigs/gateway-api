@@ -34,7 +34,9 @@ spec:
           value: set-overwrites-values
         add:
           - name: X-Header-Add
-            value: add-appends-values
+            value: header-val-1
+          - name: X-Header-Add-Append
+            value: header-val-2
         remove:
           - X-Header-Remove
     - type: RequestMirror

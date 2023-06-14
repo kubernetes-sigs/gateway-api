@@ -172,7 +172,8 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 			Request: http.Request{
 				Path: "/response-and-request-header-modifiers",
 				Headers: map[string]string{
-					"X-Header-Remove": "val",
+					"X-Header-Remove":     "remove-val",
+					"X-Header-Add-Append": "append-val-1",
 				},
 			},
 			BackendSetResponseHeaders: map[string]string{
@@ -180,14 +181,15 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 				"X-Header-Add-2":    "add-val-2",
 				"X-Header-Remove-2": "remove-val-2",
 				"Another-Header":    "another-header-val",
-				"X-Header-Remove-1": "val",
+				"X-Header-Remove-1": "remove-val-1",
 			},
 			ExpectedRequest: &http.ExpectedRequest{
 				Request: http.Request{
 					Path: "/response-and-request-header-modifiers",
 					Headers: map[string]string{
-						"X-Header-Add": "add-appends-values",
-						"X-Header-Set": "set-overwrites-values",
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Set":        "set-overwrites-values",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
 					},
 				},
 				AbsentHeaders: []string{"X-Header-Remove"},
@@ -198,7 +200,6 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"X-Header-Set-2": "header-set-2",
 					"X-Header-Add-1": "header-add-1",
 					"X-Header-Add-2": "add-val-2,header-add-2",
-					"X-Header-Add-3": "header-add-3",
 					"Another-Header": "another-header-val",
 				},
 				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},

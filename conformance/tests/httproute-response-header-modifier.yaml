@@ -113,8 +113,6 @@ spec:
           value: header-add-1
         - name: X-Header-Add-2
           value: header-add-2
-        - name: X-Header-Add-3
-          value: header-add-3
         remove:
         - X-Header-Remove-1
         - X-Header-Remove-2
@@ -125,7 +123,9 @@ spec:
           value: set-overwrites-values
         add:
           - name: X-Header-Add
-            value: add-appends-values
+            value: header-val-1
+          - name: X-Header-Add-Append
+            value: header-val-2
         remove:
           - X-Header-Remove
     backendRefs:
