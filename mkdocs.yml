@@ -3,6 +3,10 @@ repo_url: https://github.com/kubernetes-sigs/gateway-api
 repo_name: kubernetes-sigs/gateway-api
 site_dir: site
 docs_dir: site-src
+hooks:
+- hack/mkdocs-copy-geps.py
+watch:
+- geps
 theme:
   name: material
   icon:
