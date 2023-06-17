@@ -27,6 +27,7 @@ aliases:
 
   gateway-api-conformance-reviewers:
     - arkodg
+    - LiorLieberman
     - michaelbeaumont
     - mlavacca
     - sunjayBhatia
