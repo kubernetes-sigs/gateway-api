@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeTCPRoutes struct {
 	ns   string
 }
 
-var tcproutesResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "tcproutes"}
+var tcproutesResource = v1alpha2.SchemeGroupVersion.WithResource("tcproutes")
 
-var tcproutesKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "TCPRoute"}
+var tcproutesKind = v1alpha2.SchemeGroupVersion.WithKind("TCPRoute")
 
 // Get takes name of the tCPRoute, and returns the corresponding tCPRoute object, and an error if there is any.
 func (c *FakeTCPRoutes) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.TCPRoute, err error) {

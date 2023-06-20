@@ -18,13 +18,14 @@ package suite
 
 import (
 	"embed"
+	"strings"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -35,6 +36,7 @@ import (
 // conformance tests.
 type ConformanceTestSuite struct {
 	Client            client.Client
+	Clientset         *clientset.Clientset
 	RESTClient        *rest.RESTClient
 	RestConfig        *rest.Config
 	RoundTripper      roundtripper.RoundTripper
@@ -54,6 +56,7 @@ type ConformanceTestSuite struct {
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
 	Client           client.Client
+	Clientset        *clientset.Clientset
 	RESTClient       *rest.RESTClient
 	RestConfig       *rest.Config
 	GatewayClassName string
@@ -62,13 +65,6 @@ type Options struct {
 	BaseManifests    string
 	MeshManifests    string
 	NamespaceLabels  map[string]string
-	// ValidUniqueListenerPorts maps each listener port of each Gateway in the
-	// manifests to a valid, unique port. There must be as many
-	// ValidUniqueListenerPorts as there are listeners in the set of manifests.
-	// For example, given two Gateways, each with 2 listeners, there should be
-	// four ValidUniqueListenerPorts.
-	// If empty or nil, ports are not modified.
-	ValidUniqueListenerPorts []v1beta1.PortNumber
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -113,6 +109,7 @@ func New(s Options) *ConformanceTestSuite {
 
 	suite := &ConformanceTestSuite{
 		Client:           s.Client,
+		Clientset:        s.Clientset,
 		RESTClient:       s.RESTClient,
 		RestConfig:       s.RestConfig,
 		RoundTripper:     roundTripper,
@@ -122,8 +119,7 @@ func New(s Options) *ConformanceTestSuite {
 		BaseManifests:    s.BaseManifests,
 		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels:          s.NamespaceLabels,
-			ValidUniqueListenerPorts: s.ValidUniqueListenerPorts,
+			NamespaceLabels: s.NamespaceLabels,
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
@@ -159,7 +155,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		t.Logf("Test Setup: Applying programmatic resources")
 		secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-validity-checks-certificate", []string{"*"})
+		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-validity-checks-certificate", []string{"*", "*.org"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
@@ -175,9 +171,10 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	if suite.SupportedFeatures.Has(SupportMesh) {
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
-		t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
+		t.Logf("Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
 		namespaces := []string{
 			"gateway-conformance-mesh",
+			"gateway-conformance-mesh-consumer",
 			"gateway-conformance-app-backend",
 			"gateway-conformance-web-backend",
 		}
@@ -222,8 +219,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 	// check that the test should not be skipped
 	if suite.SkipTests.Has(test.ShortName) {
-		t.Logf("Skipping %s", test.ShortName)
-		return
+		t.Skipf("Skipping %s: test explicitly skipped", test.ShortName)
 	}
 
 	for _, manifestLocation := range test.Manifests {
@@ -232,4 +228,33 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	test.Test(t, suite)
+}
+
+// ParseSupportedFeatures parses flag arguments and converts the string to
+// sets.Set[suite.SupportedFeature]
+func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
+	if f == "" {
+		return nil
+	}
+	res := sets.Set[SupportedFeature]{}
+	for _, value := range strings.Split(f, ",") {
+		res.Insert(SupportedFeature(value))
+	}
+	return res
+}
+
+// ParseNamespaceLables parses flag arguments and converts the string to
+// map[string]string containing label key/value pairs.
+func ParseNamespaceLabels(f string) map[string]string {
+	if f == "" {
+		return nil
+	}
+	res := map[string]string{}
+	for _, kv := range strings.Split(f, ",") {
+		parts := strings.Split(kv, "=")
+		if len(parts) == 2 {
+			res[parts[0]] = parts[1]
+		}
+	}
+	return res
 }

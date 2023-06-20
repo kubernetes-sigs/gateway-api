@@ -8,7 +8,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 
 - [Acnodal EPIC][1] (public preview)
 - [Amazon Elastic Kubernetes Service][23] (alpha)
-- [Apache APISIX][2] (alpha)
+- [Apache APISIX][2] (beta)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
@@ -31,6 +31,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
+- [Knative][24] (alpha)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -55,6 +56,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [21]:#stunner
 [22]:#argo-rollouts
 [23]:#amazon-elastic-kubernetes-service
+[24]:#knative
 
 ## Implementations
 
@@ -79,7 +81,7 @@ Documentation can be found at [EPIC Application & API Gateway Service][epic]
 
 [Apache APISIX][apisix] is a dynamic, real-time, high-performance API Gateway. APISIX provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
 
-APISIX currently supports Gateway API `v1alpha2` version of the specification for its [Apache APISIX Ingress Controller][apisix-1].
+APISIX currently supports Gateway API `v1beta1` version of the specification for its [Apache APISIX Ingress Controller][apisix-1].
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
@@ -125,9 +127,9 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour implements Gateway API v0.5.1, supporting the v1alpha2 and v1beta1 API versions.
-All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute), plus ReferenceGrant and TLSRoute, are supported.
-Contour's implementation passes all Gateway API conformance tests included in the v0.5.1 release.
+Contour [v1.25.0][contour-release] implements Gateway API v0.6.2, supporting the v1alpha2 and v1beta1 API versions.
+All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus TLSRoute and GRPCRoute, are supported.
+Contour's implementation passes all core and most extended Gateway API conformance tests included in the v0.6.2 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
@@ -136,6 +138,7 @@ For help and support with Contour's implementation, [create an issue][contour-is
 _Some "extended" functionality is not implemented yet, [contributions welcome!][contour-contrib]._
 
 [contour]:https://projectcontour.io
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.25.0
 [contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
 [contour-guide]:https://projectcontour.io/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
@@ -311,7 +314,7 @@ In this section you will find specific links to blog posts, documentation and ot
 
 [Flagger][flagger] is a progressive delivery tool that automates the release process for applications running on Kubernetes.
 
-Flagger can be used to automate canary deployments and A/B testing using Gateway API. It currently supports the `v1alpha2` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
+Flagger can be used to automate canary deployments and A/B testing using Gateway API. It supports both the `v1alpha2` and `v1beta1` spec of Gateway API. You can refer to [this tutorial][flagger-tutorial] to use Flagger with any implementation of Gateway API.
 
 [flagger]:https://flagger.app
 [flagger-tutorial]:https://docs.flagger.app/tutorials/gatewayapi-progressive-delivery
@@ -331,3 +334,10 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 [argo-rollouts]:https://argo-rollouts.readthedocs.io/en/stable/
 [argo-rollouts-plugin]:https://github.com/argoproj-labs/rollouts-gatewayapi-trafficrouter-plugin/
+
+### Knative
+
+[Knative][knative] is a serverless platform built on Kubernetes.  Knative Serving provides a simple API for running stateless containers with automatic management of URLs, traffic splitting between revisions, request-based autoscaling (including scale to zero), and automatic TLS provisioning.  Knative Serving supports multiple HTTP routers through a plugin architecture, including a [gateway API plugin][knative-net-gateway-api] which is currently in alpha as not all Knative features are supported.
+
+[knative]:https://knative.dev/
+[knative-net-gateway-api]:https://github.com/knative-sandbox/net-gateway-api

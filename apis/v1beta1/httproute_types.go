@@ -56,9 +56,14 @@ type HTTPRouteList struct {
 type HTTPRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname that should match against the HTTP
-	// Host header to select a HTTPRoute to process the request. This matches
-	// the RFC 1123 definition of a hostname with 2 notable exceptions:
+	// Hostnames defines a set of hostname that should match against the HTTP Host
+	// header to select a HTTPRoute used to process the request. Implementations
+	// MUST ignore any port value specified in the HTTP Host header while
+	// performing a match and (absent of any applicable header modification
+	// configuration) MUST forward this header unmodified to the backend.
+	//
+	// Valid values for Hostnames are determined by RFC 1123 definition of a
+	// hostname with 2 notable exceptions:
 	//
 	// 1. IPs are not allowed.
 	// 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard
@@ -154,12 +159,13 @@ type HTTPRouteRule struct {
 	// Proxy or Load Balancer routing configuration generated from HTTPRoutes
 	// MUST prioritize matches based on the following criteria, continuing on
 	// ties. Across all rules specified on applicable Routes, precedence must be
-	// given to the match with the largest number of:
+	// given to the match having:
 	//
-	// * Characters in a matching "Exact" path match
-	// * Characters in a matching "Prefix" path match
-	// * Header matches.
-	// * Query param matches.
+	// * "Exact" path match.
+	// * "Prefix" path match with largest number of characters.
+	// * Method match.
+	// * Largest number of header matches.
+	// * Largest number of query param matches.
 	//
 	// Note: The precedence of RegularExpression path matches are implementation-specific.
 	//
@@ -269,7 +275,9 @@ type HTTPRouteRule struct {
 type PathMatchType string
 
 const (
-	// Matches the URL path exactly and with case sensitivity.
+	// Matches the URL path exactly and with case sensitivity. This means that
+	// an exact path match on `/abc` will only match requests to `/abc`, NOT
+	// `/abc/`, `/Abc`, or `/abcd`.
 	PathMatchExact PathMatchType = "Exact"
 
 	// Matches based on a URL path prefix split by `/`. Matching is
@@ -836,13 +844,28 @@ type HTTPPathModifier struct {
 
 	// ReplacePrefixMatch specifies the value with which to replace the prefix
 	// match of a request during a rewrite or redirect. For example, a request
-	// to "/foo/bar" with a prefix match of "/foo" would be modified to "/bar".
+	// to "/foo/bar" with a prefix match of "/foo" and a ReplacePrefixMatch
+	// of "/xyz" would be modified to "/xyz/bar".
 	//
 	// Note that this matches the behavior of the PathPrefix match type. This
 	// matches full path elements. A path element refers to the list of labels
 	// in the path split by the `/` separator. When specified, a trailing `/` is
 	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
 	// match the prefix `/abc`, but the path `/abcd` would not.
+	//
+	// Request Path | Prefix Match | Replace Prefix | Modified Path
+	// -------------|--------------|----------------|----------
+	// /foo/bar     | /foo         | /xyz           | /xyz/bar
+	// /foo/bar     | /foo         | /xyz/          | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz           | /xyz/bar
+	// /foo/bar     | /foo/        | /xyz/          | /xyz/bar
+	// /foo         | /foo         | /xyz           | /xyz
+	// /foo/        | /foo         | /xyz           | /xyz/
+	// /foo/bar     | /foo         | <empty string> | /bar
+	// /foo/        | /foo         | <empty string> | /
+	// /foo         | /foo         | <empty string> | /
+	// /foo/        | /foo         | /              | /
+	// /foo         | /foo         | /              | /
 	//
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
@@ -854,6 +877,9 @@ type HTTPPathModifier struct {
 type HTTPRequestRedirectFilter struct {
 	// Scheme is the scheme to be used in the value of the `Location` header in
 	// the response. When empty, the scheme of the request is used.
+	//
+	// Scheme redirects can affect the port of the redirect, for more information,
+	// refer to the documentation for the port field of this filter.
 	//
 	// Note that values may be added to this enum, implementations
 	// must ensure that unknown values will not cause a crash.
@@ -889,7 +915,15 @@ type HTTPRequestRedirectFilter struct {
 	// Port is the port to be used in the value of the `Location`
 	// header in the response.
 	//
-	// When empty, the Gateway Listener port is used.
+	// If no port is specified, the redirect port MUST be derived using the
+	// following rules:
+	//
+	// * If redirect scheme is not-empty, the redirect port MUST be the well-known
+	//   port associated with the redirect scheme. Specifically "http" to port 80
+	//   and "https" to port 443. If the redirect scheme does not have a
+	//   well-known port, the listener port of the Gateway SHOULD be used.
+	// * If redirect scheme is empty, the redirect port MUST be the Gateway
+	//   Listener port.
 	//
 	// Implementations SHOULD NOT add the port number in the 'Location'
 	// header in the following cases:

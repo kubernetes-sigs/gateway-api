@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -36,9 +35,9 @@ type FakeReferenceGrants struct {
 	ns   string
 }
 
-var referencegrantsResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "referencegrants"}
+var referencegrantsResource = v1alpha2.SchemeGroupVersion.WithResource("referencegrants")
 
-var referencegrantsKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "ReferenceGrant"}
+var referencegrantsKind = v1alpha2.SchemeGroupVersion.WithKind("ReferenceGrant")
 
 // Get takes name of the referenceGrant, and returns the corresponding referenceGrant object, and an error if there is any.
 func (c *FakeReferenceGrants) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.ReferenceGrant, err error) {

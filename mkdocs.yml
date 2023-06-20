@@ -3,6 +3,10 @@ repo_url: https://github.com/kubernetes-sigs/gateway-api
 repo_name: kubernetes-sigs/gateway-api
 site_dir: site
 docs_dir: site-src
+hooks:
+- hack/mkdocs-copy-geps.py
+watch:
+- geps
 theme:
   name: material
   icon:
@@ -78,22 +82,26 @@ nav:
       - Overview: geps/overview.md
       - Declined:
         - geps/gep-735.md
+        - geps/gep-1282.md
       - Provisional:
         - geps/gep-1324.md
-        - geps/gep-1282.md
+        - geps/gep-1619.md
+        - geps/gep-1897.md
+        - geps/gep-1867.md
       - Prototyping:
         - geps/gep-1709.md
       - Implementable:
         - geps/gep-1742.md
+        - geps/gep-1686.md
         - geps/gep-1426.md
       - Experimental:
         - geps/gep-1748.md
-        - geps/gep-1323.md
         - geps/gep-1016.md
         - geps/gep-957.md
         - geps/gep-713.md
       - Standard:
         - geps/gep-1364.md
+        - geps/gep-1323.md
         - geps/gep-922.md
         - geps/gep-917.md
         - geps/gep-851.md

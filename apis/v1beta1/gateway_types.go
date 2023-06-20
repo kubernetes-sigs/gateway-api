@@ -70,7 +70,13 @@ type GatewaySpec struct {
 	// At least one Listener MUST be specified.
 	//
 	// Each listener in a Gateway must have a unique combination of Hostname,
-	// Port, and Protocol.
+	// Port, and Protocol. Below combinations are considered Core and MUST be
+	// supported:
+	//
+	// 1. Port: 80, Protocol: HTTP
+	// 2. Port: 443, Protocol: HTTPS
+	//
+	// Port and protocol combinations not in this list are considered Extended.
 	//
 	// An implementation MAY group Listeners by Port and then collapse each
 	// group of Listeners into a single Listener if the implementation
@@ -674,7 +680,7 @@ type ListenerStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
-	// AttachedRoutes represents the total number of Routes that have been
+	// AttachedRoutes represents the total number of accepted Routes that have been
 	// successfully attached to this Listener.
 	AttachedRoutes int32 `json:"attachedRoutes"`
 
@@ -732,15 +738,17 @@ const (
 )
 
 const (
-	// This condition indicates that, even though the listener is
-	// syntactically and semantically valid, the controller is not able
-	// to configure it on the underlying Gateway infrastructure.
+	// This condition indicates that the listener is syntactically and
+	// semantically valid, and that all features used in the listener's spec are
+	// supported.
 	//
-	// A Listener is specified as a logical requirement, but needs to be
-	// configured on a network endpoint (i.e. address and port) by a
-	// controller. The controller may be unable to attach the Listener
-	// if it specifies an unsupported requirement, or prerequisite
-	// resources are not available.
+	// In general, a Listener will be marked as Accepted when the supplied
+	// configuration will generate at least some data plane configuration.
+	//
+	// For example, a Listener with an unsupported protocol will never generate
+	// any data plane config, and so will have Accepted set to `false.`
+	// Conversely, a Listener that does not have any Routes will be able to
+	// generate data plane config, and so will have Accepted set to `true`.
 	//
 	// Possible reasons for this condition to be True are:
 	//

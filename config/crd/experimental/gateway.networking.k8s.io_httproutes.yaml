@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1923
-    gateway.networking.k8s.io/bundle-version: v0.7.0-rc1
+    gateway.networking.k8s.io/bundle-version: v0.7.1-dev
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: httproutes.gateway.networking.k8s.io
@@ -53,12 +53,16 @@ spec:
             properties:
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
-                  by both the Listener and HTTPRoute, there must be at least one intersecting
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match and (absent of
+                  any applicable header modification configuration) MUST forward this
+                  header unmodified to the backend. \n Valid values for Hostnames
+                  are determined by RFC 1123 definition of a hostname with 2 notable
+                  exceptions: \n 1. IPs are not allowed. 2. A hostname may be prefixed
+                  with a wildcard label (`*.`). The wildcard label must appear by
+                  itself as the first label. \n If a hostname is specified by both
+                  the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
                   HTTPRoutes that have either not specified any hostnames, or have
@@ -485,7 +489,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -547,8 +552,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -556,7 +562,23 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n Request Path | Prefix Match | Replace
+                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -580,8 +602,17 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementations SHOULD NOT
+                                        response. \n If no port is specified, the
+                                        redirect port MUST be derived using the following
+                                        rules: \n * If redirect scheme is not-empty,
+                                        the redirect port MUST be the well-known port
+                                        associated with the redirect scheme. Specifically
+                                        \"http\" to port 80 and \"https\" to port
+                                        443. If the redirect scheme does not have
+                                        a well-known port, the listener port of the
+                                        Gateway SHOULD be used. * If redirect scheme
+                                        is empty, the redirect port MUST be the Gateway
+                                        Listener port. \n Implementations SHOULD NOT
                                         add the port number in the 'Location' header
                                         in the following cases: \n * A Location header
                                         that will use HTTP (whether that is determined
@@ -598,8 +629,11 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Note that values may be added
-                                        to this enum, implementations must ensure
+                                        is used. \n Scheme redirects can affect the
+                                        port of the redirect, for more information,
+                                        refer to the documentation for the port field
+                                        of this filter. \n Note that values may be
+                                        added to this enum, implementations must ensure
                                         that unknown values will not cause a crash.
                                         \n Unknown values here must result in the
                                         implementation setting the Accepted Condition
@@ -800,8 +834,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -809,7 +844,23 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n Request Path | Prefix Match | Replace
+                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -869,11 +920,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1133,11 +1184,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1192,7 +1244,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -1200,7 +1253,21 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1221,16 +1288,24 @@ spec:
                                 type: object
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementations
-                                  SHOULD NOT add the port number in the 'Location'
-                                  header in the following cases: \n * A Location header
-                                  that will use HTTP (whether that is determined via
-                                  the Listener protocol or the Scheme field) _and_
-                                  use port 80. * A Location header that will use HTTPS
-                                  (whether that is determined via the Listener protocol
-                                  or the Scheme field) _and_ use port 443. \n Support:
-                                  Extended"
+                                  of the `Location` header in the response. \n If
+                                  no port is specified, the redirect port MUST be
+                                  derived using the following rules: \n * If redirect
+                                  scheme is not-empty, the redirect port MUST be the
+                                  well-known port associated with the redirect scheme.
+                                  Specifically \"http\" to port 80 and \"https\" to
+                                  port 443. If the redirect scheme does not have a
+                                  well-known port, the listener port of the Gateway
+                                  SHOULD be used. * If redirect scheme is empty, the
+                                  redirect port MUST be the Gateway Listener port.
+                                  \n Implementations SHOULD NOT add the port number
+                                  in the 'Location' header in the following cases:
+                                  \n * A Location header that will use HTTP (whether
+                                  that is determined via the Listener protocol or
+                                  the Scheme field) _and_ use port 80. * A Location
+                                  header that will use HTTPS (whether that is determined
+                                  via the Listener protocol or the Scheme field) _and_
+                                  use port 443. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -1239,7 +1314,10 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Note that values may be added to this enum, implementations
+                                  Scheme redirects can affect the port of the redirect,
+                                  for more information, refer to the documentation
+                                  for the port field of this filter. \n Note that
+                                  values may be added to this enum, implementations
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Accepted Condition for
@@ -1428,7 +1506,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -1436,7 +1515,21 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1482,21 +1575,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -1912,7 +2005,7 @@ spec:
         required:
         - spec
         type: object
-    served: true
+    served: false
     storage: false
     subresources:
       status: {}
@@ -1948,12 +2041,16 @@ spec:
             properties:
               hostnames:
                 description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
-                  by both the Listener and HTTPRoute, there must be at least one intersecting
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match and (absent of
+                  any applicable header modification configuration) MUST forward this
+                  header unmodified to the backend. \n Valid values for Hostnames
+                  are determined by RFC 1123 definition of a hostname with 2 notable
+                  exceptions: \n 1. IPs are not allowed. 2. A hostname may be prefixed
+                  with a wildcard label (`*.`). The wildcard label must appear by
+                  itself as the first label. \n If a hostname is specified by both
+                  the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
                   HTTPRoutes that have either not specified any hostnames, or have
@@ -2380,7 +2477,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -2442,8 +2540,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -2451,7 +2550,23 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n Request Path | Prefix Match | Replace
+                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2475,8 +2590,17 @@ spec:
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementations SHOULD NOT
+                                        response. \n If no port is specified, the
+                                        redirect port MUST be derived using the following
+                                        rules: \n * If redirect scheme is not-empty,
+                                        the redirect port MUST be the well-known port
+                                        associated with the redirect scheme. Specifically
+                                        \"http\" to port 80 and \"https\" to port
+                                        443. If the redirect scheme does not have
+                                        a well-known port, the listener port of the
+                                        Gateway SHOULD be used. * If redirect scheme
+                                        is empty, the redirect port MUST be the Gateway
+                                        Listener port. \n Implementations SHOULD NOT
                                         add the port number in the 'Location' header
                                         in the following cases: \n * A Location header
                                         that will use HTTP (whether that is determined
@@ -2493,8 +2617,11 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Note that values may be added
-                                        to this enum, implementations must ensure
+                                        is used. \n Scheme redirects can affect the
+                                        port of the redirect, for more information,
+                                        refer to the documentation for the port field
+                                        of this filter. \n Note that values may be
+                                        added to this enum, implementations must ensure
                                         that unknown values will not cause a crash.
                                         \n Unknown values here must result in the
                                         implementation setting the Accepted Condition
@@ -2695,8 +2822,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -2704,7 +2832,23 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n Request Path | Prefix Match | Replace
+                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2764,11 +2908,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -3028,11 +3172,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -3087,7 +3232,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -3095,7 +3241,21 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3116,16 +3276,24 @@ spec:
                                 type: object
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementations
-                                  SHOULD NOT add the port number in the 'Location'
-                                  header in the following cases: \n * A Location header
-                                  that will use HTTP (whether that is determined via
-                                  the Listener protocol or the Scheme field) _and_
-                                  use port 80. * A Location header that will use HTTPS
-                                  (whether that is determined via the Listener protocol
-                                  or the Scheme field) _and_ use port 443. \n Support:
-                                  Extended"
+                                  of the `Location` header in the response. \n If
+                                  no port is specified, the redirect port MUST be
+                                  derived using the following rules: \n * If redirect
+                                  scheme is not-empty, the redirect port MUST be the
+                                  well-known port associated with the redirect scheme.
+                                  Specifically \"http\" to port 80 and \"https\" to
+                                  port 443. If the redirect scheme does not have a
+                                  well-known port, the listener port of the Gateway
+                                  SHOULD be used. * If redirect scheme is empty, the
+                                  redirect port MUST be the Gateway Listener port.
+                                  \n Implementations SHOULD NOT add the port number
+                                  in the 'Location' header in the following cases:
+                                  \n * A Location header that will use HTTP (whether
+                                  that is determined via the Listener protocol or
+                                  the Scheme field) _and_ use port 80. * A Location
+                                  header that will use HTTPS (whether that is determined
+                                  via the Listener protocol or the Scheme field) _and_
+                                  use port 443. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -3134,7 +3302,10 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Note that values may be added to this enum, implementations
+                                  Scheme redirects can affect the port of the redirect,
+                                  for more information, refer to the documentation
+                                  for the port field of this filter. \n Note that
+                                  values may be added to this enum, implementations
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Accepted Condition for
@@ -3323,7 +3494,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -3331,7 +3503,21 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3377,21 +3563,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are

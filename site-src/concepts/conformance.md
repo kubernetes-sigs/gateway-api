@@ -13,8 +13,8 @@ Within Gateway API, release channels are used to indicate the stability of a
 field or resource. The "standard" channel of the API includes fields and
 resources that have graduated to "beta". The "experimental" channel of the API
 includes everything in the "standard" channel, along with experimental fields
-and resources that may still be changed in breaking ways or removed altogether.
-For more information on this concept, refer to our
+and resources that may still be changed in breaking ways **or removed
+altogether**. For more information on this concept, refer to our
 [versioning](/concepts/versioning) documentation.
 
 ## 2. Support Levels
@@ -125,6 +125,14 @@ feature and any relevant API features, e.g:
 ```shell
 go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
 ```
+
+#### Namespace Labels
+
+If labels are needed on namespaces used for testing, you can use
+the `-namespace-labels` flag to pass one or more `name=value` labels to
+set on the test namespaces. For mesh testing, this flag can be used if
+an implementation requires labels on namespaces that host mesh workloads,
+for example, to enable sidecar injection.
 
 #### Excluding Tests
 

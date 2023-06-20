@@ -3,7 +3,7 @@ kind: CustomResourceDefinition
 metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1923
-    gateway.networking.k8s.io/bundle-version: v0.7.0-rc1
+    gateway.networking.k8s.io/bundle-version: v0.7.1-dev
     gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: referencegrants.gateway.networking.k8s.io
@@ -24,6 +24,9 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
+    deprecated: true
+    deprecationWarning: The v1alpha2 version of ReferenceGrant has been deprecated
+      and will be removed in a future release of the API. Please upgrade to v1beta1.
     name: v1alpha2
     schema:
       openAPIV3Schema:
@@ -143,7 +146,7 @@ spec:
             type: object
         type: object
     served: true
-    storage: true
+    storage: false
     subresources: {}
   - additionalPrinterColumns:
     - jsonPath: .metadata.creationTimestamp
@@ -268,7 +271,7 @@ spec:
             type: object
         type: object
     served: true
-    storage: false
+    storage: true
     subresources: {}
 status:
   acceptedNames:
