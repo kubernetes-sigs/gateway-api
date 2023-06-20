@@ -82,11 +82,11 @@ nav:
       - Overview: geps/overview.md
       - Declined:
         - geps/gep-735.md
+        - geps/gep-1282.md
       - Provisional:
         - geps/gep-1742.md
         - geps/gep-1426.md
         - geps/gep-1324.md
-        - geps/gep-1282.md
         - geps/gep-1619.md
         - geps/gep-1897.md
       - Prototyping:
