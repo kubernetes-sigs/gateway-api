@@ -43,7 +43,6 @@ var GatewayModifyListeners = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/gateway-modify-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-
 		t.Run("should be able to add a listener that then becomes available for routing traffic", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-add-listener", Namespace: "gateway-conformance-infra"}
 			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
@@ -93,7 +92,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 					Conditions: []metav1.Condition{{
 						Type:   string(v1beta1.ListenerConditionAccepted),
 						Status: metav1.ConditionTrue,
-						Reason: "", //any reason
+						Reason: "", // any reason
 					}},
 					AttachedRoutes: 1,
 				},
@@ -106,7 +105,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 					Conditions: []metav1.Condition{{
 						Type:   string(v1beta1.ListenerConditionAccepted),
 						Status: metav1.ConditionTrue,
-						Reason: "", //any reason
+						Reason: "", // any reason
 					}},
 					AttachedRoutes: 1,
 				},
@@ -165,7 +164,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 					Conditions: []metav1.Condition{{
 						Type:   string(v1beta1.ListenerConditionAccepted),
 						Status: metav1.ConditionTrue,
-						Reason: "", //any reason
+						Reason: "", // any reason
 					}},
 					AttachedRoutes: 1,
 				},

@@ -89,11 +89,12 @@ func New(s Options) *ConformanceTestSuite {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
-	if s.EnableAllSupportedFeatures == true {
+	switch {
+	case s.EnableAllSupportedFeatures == true:
 		s.SupportedFeatures = AllFeatures
-	} else if s.SupportedFeatures == nil {
+	case s.SupportedFeatures == nil:
 		s.SupportedFeatures = StandardCoreFeatures
-	} else {
+	default:
 		for feature := range StandardCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}

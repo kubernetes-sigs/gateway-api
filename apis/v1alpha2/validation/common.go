@@ -23,11 +23,9 @@ import (
 	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
-var (
-	// validateParentRefs validates ParentRefs SectionName must be set and uique
-	// when ParentRefs includes 2 or more references to the same parent
-	validateParentRefs = gatewayvalidationv1b1.ValidateParentRefs
-)
+// validateParentRefs validates ParentRefs SectionName must be set and uique
+// when ParentRefs includes 2 or more references to the same parent
+var validateParentRefs = gatewayvalidationv1b1.ValidateParentRefs
 
 // validateBackendRefServicePort validates whether or not a port was specified
 // for a backendRef which refers to a corev1.Service, asserting that the port

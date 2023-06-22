@@ -356,7 +356,6 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 	var actual []v1beta1.RouteParentStatus
 	emptyChecked := false
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.HTTPRouteMustNotHaveParents, true, func(ctx context.Context) (bool, error) {
-
 		route := &v1beta1.HTTPRoute{}
 		err := client.Get(ctx, routeName, route)
 		if err != nil {
@@ -461,7 +460,6 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-
 			t.Logf("Route %s/%s expected ParentReference.Group to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Group, aParent.ParentRef.Group)
 			return false
 		}
@@ -529,7 +527,6 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 		var conditionFound bool
 		for _, parent := range parents {
 			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-
 				t.Logf("HTTPRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
 				return false, nil
 			}
