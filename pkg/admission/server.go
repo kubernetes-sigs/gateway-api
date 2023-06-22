@@ -151,7 +151,6 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleValidation(request admission.AdmissionRequest) (*admission.AdmissionResponse, error) {
-
 	var (
 		response     admission.AdmissionResponse
 		deserializer = codecs.UniversalDeserializer()

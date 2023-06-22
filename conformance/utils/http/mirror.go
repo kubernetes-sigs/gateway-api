@@ -53,7 +53,6 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset *client
 			}
 		}
 		return mirrored
-
 	}, 60*time.Second, time.Second, "Mirrored request log wasn't found")
 
 	t.Log("Mirrored request log found")

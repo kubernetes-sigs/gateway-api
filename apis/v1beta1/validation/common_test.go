@@ -25,7 +25,7 @@ import (
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-var path = *new(field.Path)
+var path = field.Path{}
 
 func TestValidateParentRefs(t *testing.T) {
 	namespace := gatewayv1b1.Namespace("example-namespace")
