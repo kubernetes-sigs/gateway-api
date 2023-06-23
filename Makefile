@@ -52,6 +52,7 @@ ROOT := $(abspath $(TOP))
 # Command-line flags passed to "go test" for the conformance
 # test. These are passed after the "-args" flag.
 CONFORMANCE_FLAGS ?=
+GO_TEST_FLAGS ?=
 
 all: generate vet fmt verify test
 
@@ -86,7 +87,7 @@ test:
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
-	go test -v ./conformance/... -args ${CONFORMANCE_FLAGS}
+	go test ${GO_TEST_FLAGS} -v ./conformance -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
