@@ -51,7 +51,6 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 	Description: "A Gateway in the gateway-conformance-infra namespace should handle adding and removing listeners with arbitrary ports",
 	Manifests:   []string{"tests/gateway-dynamic-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-
 		// Ephemeral port range
 		const (
 			portCount    = 10
@@ -77,7 +76,7 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}},
 				AttachedRoutes: 1,
 			}}
@@ -111,7 +110,7 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}},
 				AttachedRoutes: 1,
 			})
@@ -145,11 +144,11 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}, {
 					Type:   string(v1beta1.ListenerConditionResolvedRefs),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}},
 				AttachedRoutes: 1,
 			})
