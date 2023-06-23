@@ -39,16 +39,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewayListenerDynamicPorts)
+	ConformanceTests = append(ConformanceTests, GatewayListenerHTTPRouteDynamicPorts)
 }
 
-var GatewayListenerDynamicPorts = suite.ConformanceTest{
-	ShortName: "GatewayListenerDynamicPorts",
+var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
+	ShortName: "GatewayListenerHTTPRouteDynamicPorts",
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
-		suite.SupportGatewayListenerDynamicPorts,
+		suite.SupportHTTPRoute,
+		suite.SupportGatewayListenerHTTPRouteDynamicPorts,
 	},
-	Description: "A Gateway in the gateway-conformance-infra namespace should handle adding and removing listeners with arbitrary ports",
+	Description: "A Gateway and an HTTPRoute in the gateway-conformance-infra namespace should support adding and removing listeners with arbitrary ports",
 	Manifests:   []string{"tests/gateway-dynamic-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		// Ephemeral port range
@@ -67,17 +68,23 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 			listeners  = make([]v1beta1.Listener, 0, portCount)
 			same       = v1beta1.NamespacesFromSame
 
+			expectedConditions = []metav1.Condition{{
+				Type:   string(v1beta1.ListenerConditionAccepted),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
+			}, {
+				Type:   string(v1beta1.ListenerConditionProgrammed),
+				Status: metav1.ConditionTrue,
+				Reason: "", // any reason
+			}}
+
 			expectedListeners = []v1beta1.ListenerStatus{{
 				Name: "http",
 				SupportedKinds: []v1beta1.RouteGroupKind{{
 					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 					Kind:  v1beta1.Kind("HTTPRoute"),
 				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1beta1.ListenerConditionAccepted),
-					Status: metav1.ConditionTrue,
-					Reason: "", // any reason
-				}},
+				Conditions:     expectedConditions,
 				AttachedRoutes: 1,
 			}}
 		)
@@ -107,11 +114,7 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 					Kind:  v1beta1.Kind("HTTPRoute"),
 				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1beta1.ListenerConditionAccepted),
-					Status: metav1.ConditionTrue,
-					Reason: "", // any reason
-				}},
+				Conditions:     expectedConditions,
 				AttachedRoutes: 1,
 			})
 		}
@@ -141,15 +144,11 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 					Kind:  v1beta1.Kind("HTTPRoute"),
 				}},
-				Conditions: []metav1.Condition{{
-					Type:   string(v1beta1.ListenerConditionAccepted),
-					Status: metav1.ConditionTrue,
-					Reason: "", // any reason
-				}, {
+				Conditions: append([]metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionResolvedRefs),
 					Status: metav1.ConditionTrue,
 					Reason: "", // any reason
-				}},
+				}}, expectedConditions...),
 				AttachedRoutes: 1,
 			})
 		}
@@ -168,7 +167,6 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 
 			// verify that the implementation is tracking the most recent resource changes
 			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
-
 			mutate := original.DeepCopy()
 
 			mutate.Spec.Listeners = append(mutate.Spec.Listeners, listeners...)
@@ -183,10 +181,10 @@ var GatewayListenerDynamicPorts = suite.ConformanceTest{
 
 			for _, listener := range mutate.Spec.Listeners {
 				timeoutConfig := s.TimeoutConfig
-				if timeoutConfig.MaxTimeToConsistency < 2*time.Minute {
-					timeoutConfig.MaxTimeToConsistency = 2 * time.Minute
+				// TODO - It takes much longer for listeners to be consistent
+				if timeoutConfig.MaxTimeToConsistency < timeoutConfig.GatewayStatusMustHaveListeners {
+					timeoutConfig.MaxTimeToConsistency = timeoutConfig.GatewayStatusMustHaveListeners
 				}
-
 				host, _, err := net.SplitHostPort(gwAddr)
 				require.NoErrorf(t, err, "unable to split gateway address %q", gwAddr)
 
