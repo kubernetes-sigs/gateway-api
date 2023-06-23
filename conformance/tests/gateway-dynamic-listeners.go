@@ -23,7 +23,6 @@ import (
 	"net"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -158,7 +157,7 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 		require.NoErrorf(t, err, "error getting certificate: %v", err)
 
 		t.Run("should be able to add multiple HTTP listeners with dynamic ports that then becomes available for routing traffic", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 			defer cancel()
 
 			original := &v1beta1.Gateway{}
