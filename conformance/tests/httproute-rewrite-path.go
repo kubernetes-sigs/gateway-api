@@ -76,6 +76,7 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
@@ -97,6 +98,7 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
 					},
 				},
 				ExpectedRequest: &http.ExpectedRequest{
