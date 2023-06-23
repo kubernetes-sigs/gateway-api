@@ -70,7 +70,8 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 				},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				Request: http.Request{
 					Path: "/full/rewrite-path-and-modify-headers/test",
 					Headers: map[string]string{
@@ -92,7 +93,8 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 				},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,
-			}, {
+			},
+			{
 				Request: http.Request{
 					Path: "/prefix/rewrite-path-and-modify-headers/one",
 					Headers: map[string]string{
