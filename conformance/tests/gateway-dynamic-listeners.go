@@ -179,11 +179,6 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 			require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 			for _, listener := range mutate.Spec.Listeners {
-				timeoutConfig := s.TimeoutConfig
-				// TODO - It takes much longer for listeners to be consistent
-				if timeoutConfig.MaxTimeToConsistency < timeoutConfig.GatewayStatusMustHaveListeners {
-					timeoutConfig.MaxTimeToConsistency = timeoutConfig.GatewayStatusMustHaveListeners
-				}
 				host, _, err := net.SplitHostPort(gwAddr)
 				require.NoErrorf(t, err, "unable to split gateway address %q", gwAddr)
 
@@ -198,9 +193,9 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 				if listener.TLS != nil {
 					host := string(*listener.Hostname)
 					expectedResponse.Request.Host = host
-					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, timeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
+					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
 				} else {
-					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, timeoutConfig, addr, expectedResponse)
+					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, expectedResponse)
 				}
 
 			}
