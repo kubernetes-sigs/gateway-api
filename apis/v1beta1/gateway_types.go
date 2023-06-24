@@ -473,6 +473,21 @@ type GatewayAddress struct {
 	Value string `json:"value"`
 }
 
+// GatewayStatusAddress describes an address that is bound to a Gateway.
+type GatewayStatusAddress struct {
+	// Type of the address.
+	Type AddressType `json:"type"`
+
+	// Value of the address. The validity of the values will depend
+	// on the type and support by the controller.
+	//
+	// Examples: `1.2.3.4`, `128::1`, `my-ip-address`.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Value string `json:"value"`
+}
+
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
 	// Addresses lists the IP addresses that have actually been
@@ -482,7 +497,7 @@ type GatewayStatus struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	Addresses []GatewayAddress `json:"addresses,omitempty"`
+	Addresses []GatewayStatusAddress `json:"addresses,omitempty"`
 
 	// Conditions describe the current conditions of the Gateway.
 	//

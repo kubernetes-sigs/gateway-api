@@ -471,11 +471,10 @@ spec:
                   in the Spec, e.g. if the Gateway automatically assigns an address
                   from a reserved pool.
                 items:
-                  description: GatewayAddress describes an address that can be bound
+                  description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
                     type:
-                      default: IPAddress
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
@@ -489,6 +488,7 @@ spec:
                       minLength: 1
                       type: string
                   required:
+                  - type
                   - value
                   type: object
                 maxItems: 16
@@ -1177,11 +1177,10 @@ spec:
                   in the Spec, e.g. if the Gateway automatically assigns an address
                   from a reserved pool.
                 items:
-                  description: GatewayAddress describes an address that can be bound
+                  description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
                     type:
-                      default: IPAddress
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
@@ -1195,6 +1194,7 @@ spec:
                       minLength: 1
                       type: string
                   required:
+                  - type
                   - value
                   type: object
                 maxItems: 16
