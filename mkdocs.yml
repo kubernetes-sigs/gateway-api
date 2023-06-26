@@ -84,8 +84,6 @@ nav:
         - geps/gep-735.md
         - geps/gep-1282.md
       - Provisional:
-        - geps/gep-1742.md
-        - geps/gep-1426.md
         - geps/gep-1324.md
         - geps/gep-1619.md
         - geps/gep-1651.md
@@ -94,6 +92,7 @@ nav:
       - Prototyping:
         - geps/gep-1709.md
       - Implementable:
+        - geps/gep-1742.md
         - geps/gep-1686.md
         - geps/gep-1426.md
       - Experimental:
