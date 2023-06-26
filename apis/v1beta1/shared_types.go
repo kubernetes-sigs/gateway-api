@@ -21,9 +21,10 @@ import (
 )
 
 // ParentReference identifies an API object (usually a Gateway) that can be considered
-// a parent of this resource (usually a route). The only kind of parent resource
-// with "Core" support is Gateway. This API may be extended in the future to
-// support additional kinds of parent resources, such as HTTPRoute.
+// a parent of this resource (usually a route). The only kinds of parent resources
+// with "Core" support are Service (only for implementations supporting the Mesh
+// conformance profile) and Gateway. This API may be extended in the future to
+// support additional kinds of parent resources.
 //
 // The API object must be valid in the cluster; the Group and Kind must
 // be registered in the cluster for this reference to be valid.
@@ -43,6 +44,8 @@ type ParentReference struct {
 	//
 	// Support: Core (Gateway)
 	//
+	// Support: Core (Service - mesh conformance profile only)
+	//
 	// Support: Implementation-specific (Other Resources)
 	//
 	// +kubebuilder:default=Gateway
@@ -57,6 +60,13 @@ type ParentReference struct {
 	// allowed by something in the namespace they are referring to. For example:
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable any other kind of cross-namespace reference.
+	//
+	// ParentRefs from a Route to a Service in the same namespace are "producer"
+	// routes, which apply default routing rules to inbound connections from
+	// any namespace to the Service. ParentRefs from a Route to a Service in a
+	// different namespace are "consumer" routes, and these routing rules are
+	// only applied to outbound connections to the Service from the same
+	// namespace as the Route.
 	//
 	// Support: Core
 	//
@@ -73,6 +83,10 @@ type ParentReference struct {
 	//
 	// * Gateway: Listener Name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
+	// both specified values.
+	//
+	// * Service: Named port. When both Port (experimental) and SectionName
+	// are specified, the name and port of the selected port must match
 	// both specified values.
 	//
 	// Implementations MAY choose to support attaching Routes to other resources.
@@ -104,6 +118,10 @@ type ParentReference struct {
 	// and SectionName are specified, the name and port of the selected listener
 	// must match both specified values.
 	//
+	// When the parent resource is a Service, this targets a specific port in the
+	// Service spec. When both Port (experimental) and SectionName are specified,
+	// the name and port of the selected port must match both specified values.
+	//
 	// Implementations MAY choose to support other parent resources.
 	// Implementations supporting other types of parent resources MUST clearly
 	// document how/if Port is interpreted.
@@ -130,15 +148,19 @@ type CommonRouteSpec struct {
 	// to be attached to. Note that the referenced parent resource needs to
 	// allow this for the attachment to be complete. For Gateways, that means
 	// the Gateway needs to allow attachment from Routes of this kind and
-	// namespace.
+	// namespace. For Services, that means the Service must either be in the same
+	// namespace for a "producer" route, or the mesh implementation must support
+	// and allow "consumer" routes for the referenced Service.
 	//
-	// The only kind of parent resource with "Core" support is Gateway. This API
-	// may be extended in the future to support additional kinds of parent
+	// The only kinds of parent resources with "Core" support are Service (only
+	// for implementations supporting the Mesh conformance profile) and Gateway.
+	// This API may be extended in the future to support additional kinds of parent
 	// resources such as one of the route kinds.
 	//
 	// It is invalid to reference an identical parent more than once. It is
 	// valid to reference multiple distinct sections within the same parent
-	// resource, such as 2 Listeners within a Gateway.
+	// resource, such as two separate Listeners on the same Gateway or two separate
+	// ports on the same Service.
 	//
 	// It is possible to separately reference multiple distinct objects that may
 	// be collapsed by an implementation. For example, some implementations may
@@ -150,7 +172,14 @@ type CommonRouteSpec struct {
 	// rules. Cross-namespace references are only valid if they are explicitly
 	// allowed by something in the namespace they are referring to. For example,
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
-	// generic way to enable any other kind of cross-namespace reference.
+	// generic way to enable other kinds of cross-namespace reference.
+	//
+	// ParentRefs from a Route to a Service in the same namespace are "producer"
+	// routes, which apply default routing rules to inbound connections from
+	// any namespace to the Service. ParentRefs from a Route to a Service in a
+	// different namespace are "consumer" routes, and these routing rules are
+	// only applied to outbound connections to the Service from the same
+	// namespace as the Route.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=32
