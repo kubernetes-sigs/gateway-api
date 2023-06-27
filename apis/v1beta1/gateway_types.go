@@ -623,7 +623,7 @@ const (
 	//
 	// * The address is already in use.
 	// * The type of address is not supported by the implementation.
-	GatewaReasonUnsupportedAddress GatewayConditionReason = "UnsupportedAddress"
+	GatewayReasonUnsupportedAddress GatewayConditionReason = "UnsupportedAddress"
 )
 
 const (
