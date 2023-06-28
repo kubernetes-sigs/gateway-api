@@ -479,7 +479,7 @@ type GatewayStatusAddress struct {
 	//
 	// +optional
 	// +kubebuilder:default=IPAddress
-	Type AddressType `json:"type"`
+	Type *AddressType `json:"type,omitempty"`
 
 	// Value of the address. The validity of the values will depend
 	// on the type and support by the controller.

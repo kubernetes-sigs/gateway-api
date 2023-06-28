@@ -301,7 +301,7 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 
 		// TODO: Support more than IPAddress
 		for _, address := range gw.Status.Addresses {
-			if address.Type == v1beta1.IPAddressType {
+			if address.Type != nil && *address.Type == v1beta1.IPAddressType {
 				ipAddr = address.Value
 				return true, nil
 			}
