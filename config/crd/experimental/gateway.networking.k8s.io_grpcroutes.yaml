@@ -201,7 +201,7 @@ spec:
                         \n ParentRefs from a Route to a Service in the same namespace
                         are \"producer\" routes, which apply default routing rules
                         to inbound connections from any namespace to the Service.
-                        ParentRefs from a Route to a Service in a different namespace
+                        \n ParentRefs from a Route to a Service in a different namespace
                         are \"consumer\" routes, and these routing rules are only
                         applied to outbound connections to the Service from the same
                         namespace as the Route. \n Support: Core"
@@ -245,22 +245,19 @@ spec:
                         interpreted as the following: \n * Gateway: Listener Name.
                         When both Port (experimental) and SectionName are specified,
                         the name and port of the selected listener must match both
-                        specified values. \n * Service: Named port. When both Port
-                        (experimental) and SectionName are specified, the name and
-                        port of the selected port must match both specified values.
-                        \n Implementations MAY choose to support attaching Routes
-                        to other resources. If that is the case, they MUST clearly
-                        document how SectionName is interpreted. \n When unspecified
-                        (empty string), this will reference the entire resource. For
-                        the purpose of status, an attachment is considered successful
-                        if at least one section in the parent resource accepts it.
-                        For example, Gateway listeners can restrict which Routes can
-                        attach to them by Route kind, namespace, or hostname. If 1
-                        of 2 Gateway listeners accept attachment from the referencing
-                        Route, the Route MUST be considered successfully attached.
-                        If no Gateway listeners accept attachment from this Route,
-                        the Route MUST be considered detached from the Gateway. \n
-                        Support: Core"
+                        specified values. \n Implementations MAY choose to support
+                        attaching Routes to other resources. If that is the case,
+                        they MUST clearly document how SectionName is interpreted.
+                        \n When unspecified (empty string), this will reference the
+                        entire resource. For the purpose of status, an attachment
+                        is considered successful if at least one section in the parent
+                        resource accepts it. For example, Gateway listeners can restrict
+                        which Routes can attach to them by Route kind, namespace,
+                        or hostname. If 1 of 2 Gateway listeners accept attachment
+                        from the referencing Route, the Route MUST be considered successfully
+                        attached. If no Gateway listeners accept attachment from this
+                        Route, the Route MUST be considered detached from the Gateway.
+                        \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -1447,8 +1444,8 @@ spec:
                             reference. \n ParentRefs from a Route to a Service in
                             the same namespace are \"producer\" routes, which apply
                             default routing rules to inbound connections from any
-                            namespace to the Service. ParentRefs from a Route to a
-                            Service in a different namespace are \"consumer\" routes,
+                            namespace to the Service. \n ParentRefs from a Route to
+                            a Service in a different namespace are \"consumer\" routes,
                             and these routing rules are only applied to outbound connections
                             to the Service from the same namespace as the Route. \n
                             Support: Core"
@@ -1494,12 +1491,9 @@ spec:
                             is interpreted as the following: \n * Gateway: Listener
                             Name. When both Port (experimental) and SectionName are
                             specified, the name and port of the selected listener
-                            must match both specified values. \n * Service: Named
-                            port. When both Port (experimental) and SectionName are
-                            specified, the name and port of the selected port must
-                            match both specified values. \n Implementations MAY choose
-                            to support attaching Routes to other resources. If that
-                            is the case, they MUST clearly document how SectionName
+                            must match both specified values. \n Implementations MAY
+                            choose to support attaching Routes to other resources.
+                            If that is the case, they MUST clearly document how SectionName
                             is interpreted. \n When unspecified (empty string), this
                             will reference the entire resource. For the purpose of
                             status, an attachment is considered successful if at least
