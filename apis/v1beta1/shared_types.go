@@ -63,10 +63,11 @@ type ParentReference struct {
 	//
 	// ParentRefs from a Route to a Service in the same namespace are "producer"
 	// routes, which apply default routing rules to inbound connections from
-	// any namespace to the Service. ParentRefs from a Route to a Service in a
-	// different namespace are "consumer" routes, and these routing rules are
-	// only applied to outbound connections to the Service from the same
-	// namespace as the Route.
+	// any namespace to the Service.
+	//
+	// ParentRefs from a Route to a Service in a different namespace are
+	// "consumer" routes, and these routing rules are only applied to outbound
+	// connections to the Service from the same namespace as the Route.
 	//
 	// Support: Core
 	//
