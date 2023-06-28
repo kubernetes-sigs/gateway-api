@@ -183,6 +183,20 @@ const (
 
 // GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatus struct {
+	// Routabilities specifies a list of supported routabilities offered by
+	// the GatewayClass. The first entry in this list will be the default
+	// routability used when Gateways of this class are created.
+	//
+	// Implemenations MAY provide a pre-defined set of GatewayClasses that
+	// limit the routability choices of a Gateway.
+	//
+	// Implementations that support routability MUST populate this list with
+	// a subset of the pre-defined [GatewayRoutability] values or vendored
+	// prefix values.
+	//
+	// +optional
+	Routabilities []GatewayRoutability `json:"routabilities,omitempty"`
+
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	//
