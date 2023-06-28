@@ -85,10 +85,6 @@ type ParentReference struct {
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
 	//
-	// * Service: Port Name. When both Port (experimental) and SectionName
-	// are specified, the name and port of the selected port must match
-	// both specified values.
-	//
 	// Implementations MAY choose to support attaching Routes to other resources.
 	// If that is the case, they MUST clearly document how SectionName is
 	// interpreted.
