@@ -476,6 +476,9 @@ type GatewayAddress struct {
 // GatewayStatusAddress describes an address that is bound to a Gateway.
 type GatewayStatusAddress struct {
 	// Type of the address.
+	//
+	// +optional
+	// +kubebuilder:default=IPAddress
 	Type AddressType `json:"type"`
 
 	// Value of the address. The validity of the values will depend

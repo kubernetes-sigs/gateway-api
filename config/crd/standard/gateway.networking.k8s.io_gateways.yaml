@@ -475,6 +475,7 @@ spec:
                     to a Gateway.
                   properties:
                     type:
+                      default: IPAddress
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
@@ -488,7 +489,6 @@ spec:
                       minLength: 1
                       type: string
                   required:
-                  - type
                   - value
                   type: object
                 maxItems: 16
@@ -1181,6 +1181,7 @@ spec:
                     to a Gateway.
                   properties:
                     type:
+                      default: IPAddress
                       description: Type of the address.
                       maxLength: 253
                       minLength: 1
@@ -1194,7 +1195,6 @@ spec:
                       minLength: 1
                       type: string
                   required:
-                  - type
                   - value
                   type: object
                 maxItems: 16
