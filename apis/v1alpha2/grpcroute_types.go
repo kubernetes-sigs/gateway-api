@@ -225,6 +225,13 @@ type GRPCRouteRule struct {
 	//
 	// Specifying a core filter multiple times has unspecified or
 	// implementation-specific conformance.
+	//
+	// If an implementation can not support a combinations of filters, they must clearly
+	// document that limitation. In cases where incompatible or unsupported
+	// filters are specified and cause the `Accepted` condition to be set to status
+	// `False`, implementations may use the `IncompatibleFilters` reason to specify
+	// this configuration error.
+	//
 	// Support: Core
 	//
 	// +optional

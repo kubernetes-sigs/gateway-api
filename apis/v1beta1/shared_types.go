@@ -252,6 +252,11 @@ const (
 	// reconciled the route.
 	RouteReasonPending RouteConditionReason = "Pending"
 
+	// This reason is used with the "Accepted" condition when there
+	// are incompatible filters present on a route rule (for example if
+	// the URLRewrite and RequestRedirect are both present on an HTTPRoute).
+	RouteReasonIncompatibleFilters RouteConditionReason = "IncompatibleFilters"
+
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	//

@@ -764,7 +764,12 @@ spec:
                         are encouraged to support extended filters. - Implementation-specific
                         custom filters have no API guarantees across implementations.
                         \n Specifying a core filter multiple times has unspecified
-                        or implementation-specific conformance. Support: Core"
+                        or implementation-specific conformance. \n If an implementation
+                        can not support a combinations of filters, they must clearly
+                        document that limitation. In cases where incompatible or unsupported
+                        filters are specified and cause the `Accepted` condition to
+                        be set to status `False`, implementations may use the `IncompatibleFilters`
+                        reason to specify this configuration error. \n Support: Core"
                       items:
                         description: GRPCRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
