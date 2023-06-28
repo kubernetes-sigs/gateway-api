@@ -137,10 +137,11 @@ spec:
                   kinds of cross-namespace reference. \n ParentRefs from a Route to
                   a Service in the same namespace are \"producer\" routes, which apply
                   default routing rules to inbound connections from any namespace
-                  to the Service. ParentRefs from a Route to a Service in a different
+                  to the Service. \n ParentRefs from a Route to a Service in a different
                   namespace are \"consumer\" routes, and these routing rules are only
-                  applied to outbound connections to the Service from the same namespace
-                  as the Route."
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route."
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
@@ -190,8 +191,10 @@ spec:
                         to inbound connections from any namespace to the Service.
                         \n ParentRefs from a Route to a Service in a different namespace
                         are \"consumer\" routes, and these routing rules are only
-                        applied to outbound connections to the Service from the same
-                        namespace as the Route. \n Support: Core"
+                        applied to outbound connections originating from the same
+                        namespace as the Route, for which the intended destination
+                        of the connections are a Service targeted as a ParentRef of
+                        the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1963,8 +1966,10 @@ spec:
                             namespace to the Service. \n ParentRefs from a Route to
                             a Service in a different namespace are \"consumer\" routes,
                             and these routing rules are only applied to outbound connections
-                            to the Service from the same namespace as the Route. \n
-                            Support: Core"
+                            originating from the same namespace as the Route, for
+                            which the intended destination of the connections are
+                            a Service targeted as a ParentRef of the Route. \n Support:
+                            Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -2160,10 +2165,11 @@ spec:
                   kinds of cross-namespace reference. \n ParentRefs from a Route to
                   a Service in the same namespace are \"producer\" routes, which apply
                   default routing rules to inbound connections from any namespace
-                  to the Service. ParentRefs from a Route to a Service in a different
+                  to the Service. \n ParentRefs from a Route to a Service in a different
                   namespace are \"consumer\" routes, and these routing rules are only
-                  applied to outbound connections to the Service from the same namespace
-                  as the Route."
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route."
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
@@ -2213,8 +2219,10 @@ spec:
                         to inbound connections from any namespace to the Service.
                         \n ParentRefs from a Route to a Service in a different namespace
                         are \"consumer\" routes, and these routing rules are only
-                        applied to outbound connections to the Service from the same
-                        namespace as the Route. \n Support: Core"
+                        applied to outbound connections originating from the same
+                        namespace as the Route, for which the intended destination
+                        of the connections are a Service targeted as a ParentRef of
+                        the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -3986,8 +3994,10 @@ spec:
                             namespace to the Service. \n ParentRefs from a Route to
                             a Service in a different namespace are \"consumer\" routes,
                             and these routing rules are only applied to outbound connections
-                            to the Service from the same namespace as the Route. \n
-                            Support: Core"
+                            originating from the same namespace as the Route, for
+                            which the intended destination of the connections are
+                            a Service targeted as a ParentRef of the Route. \n Support:
+                            Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
