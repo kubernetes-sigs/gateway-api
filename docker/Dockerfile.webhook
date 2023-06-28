@@ -13,7 +13,7 @@
 # limitations under the License.
 
 ARG BUILDPLATFORM=linux/amd64
-FROM --platform=$BUILDPLATFORM golang:1.20 AS build-env
+FROM --platform=$BUILDPLATFORM golang:1.20.5 AS build-env
 RUN mkdir -p /go/src/sig.k8s.io/gateway-api
 WORKDIR /go/src/sig.k8s.io/gateway-api
 COPY  . .
