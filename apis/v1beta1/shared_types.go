@@ -85,7 +85,7 @@ type ParentReference struct {
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
 	//
-	// * Service: Named port. When both Port (experimental) and SectionName
+	// * Service: Port Name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected port must match
 	// both specified values.
 	//
