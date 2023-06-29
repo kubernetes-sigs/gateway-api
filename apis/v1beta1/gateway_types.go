@@ -121,6 +121,7 @@ type GatewaySpec struct {
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
 	//
+	// <gateway:experimental>
 	// +optional
 	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
@@ -155,27 +156,23 @@ type GatewaySpec struct {
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway
 type GatewayInfrastructure struct {
-	// Routability allows the Gateway to specify the accessibility of it's addresses. Setting
-	// this property will override the default value defined by the [GatewayClass]
+	// Routability allows the Gateway to specify the accessibility of its addresses. Setting
+	// this property will override the default value defined by the [GatewayClass].
 	//
 	// If the desired Gateway routability is incompatible with the [GatewayClass] implementations
 	// MUST set the condition `Accepted` to `False` with `Reason` set to `UnsupportedRoutability`.
 	//
-	// The default value of routability is implementation specific.
-	// It is RECOMMENDED that the default routability remains consistent for Gateways with the same
-	// gatewayClassName
+	// The default value of routability is implementation specific and MUST remain consistent for
+	// Gateways with the same gatewayClassName
 	//
-	// Implementations MAY leave this property unset and signal the default
-	// routability in the [GatewayStatus]
+	// Implementations MAY leave this property unset. The routability MUST appear in the [GatewayStatusAddress].
 	//
-	// Implementations MAY prevent end-users from updating the routability value of a Gateway.
-	// If updates are allowed the semantics and behavior will depend on the underlying implementation.
-	// If a Gateway is mutated but does not support the desired routability it MUST set the conditions
-	// `Accepted`, `Programmed` to `False` with `Reason` set to `UnsupportedRoutability`.
+	// Implementations MUST clearly document if they support updates to this field. The default
+	// expectation should be that changes to this field are not supported unless an implementation
+	// specifies otherwise.
 	//
-	// It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability.
-	// Kubernetes doesn't have a concept of 'Private' routability for Services. In the future this may
-	// change upstream.
+	// If a Gateway is mutated but does not support the desired routability it MUST set the `Accepted`
+	// and `Programmed` conditions to `False` with `Reason` set to `UnsupportedRoutability`.
 	//
 	// +optional
 	Routability *GatewayRoutability `json:"routability,omitempty"`
@@ -194,22 +191,27 @@ type GatewayRoutability string
 
 const (
 	// GatewayRoutabilityPublic means the Gateway's address MUST
-	// be routable on the public internet
+	// be routable on the public internet.
 	//
-	// Implementations MAY support this routability
+	// Support: Extended
 	GatewayRoutabilityPublic GatewayRoutability = "Public"
 
 	// GatewayRoutabilityPrivate means the Gateway's address MUST
-	// be routable inside a private network larger than a single
-	// cluster (ie. VPC) and MAY include the RFC1918 address space
+	// only be routable inside a private network larger than a single
+	// cluster (ie. VPC) and MAY include the RFC1918 address space.
 	//
-	// Implementations MAY support this routability
+	// It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability.
+	// Kubernetes doesn't have a concept of 'Private' routability for Services. In the future this may
+	// change upstream.
+	//
+	//
+	// Support: Extended
 	GatewayRoutabilityPrivate GatewayRoutability = "Private"
 
 	// GatewayRoutabilityCluster means the Gateway's address MUST
-	// be only be routable inside the [cluster's network]
+	// only be routable inside the [cluster's network].
 	//
-	// Implementations MAY support this routability
+	// Support: Extended
 	//
 	// [cluster's network]: https://kubernetes.io/docs/concepts/cluster-administration/networking/#how-to-implement-the-kubernetes-network-model
 	GatewayRoutabilityCluster GatewayRoutability = "Cluster"
@@ -564,6 +566,7 @@ type GatewayStatusAddress struct {
 	// Implementations that support Routability MUST populate this field
 	//
 	// +optional
+	// <gateway:experimental>
 	Routability *GatewayRoutability `json:"routability,omitempty"`
 }
 
@@ -579,8 +582,8 @@ type GatewayStatus struct {
 	//
 	// Implementations MAY add additional addresses in status, but they MUST be
 	// semantically less than the scope of the requested scope. For example if a
-	// user requests a `Cluster` routable Gateway then the list of addresses
-	// MUST NOT have a routability of `Public` or `Private`.
+	// user requests a `Private` routable Gateway then an additional address MAY
+	// have a routability of `Cluster` but MUST NOT include `Private`.
 	//
 	//
 	// +optional

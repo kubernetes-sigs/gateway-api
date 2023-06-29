@@ -190,11 +190,12 @@ type GatewayClassStatus struct {
 	// Implemenations MAY provide a pre-defined set of GatewayClasses that
 	// limit the routability choices of a Gateway.
 	//
-	// Implementations that support routability MUST populate this list with
-	// a subset of the pre-defined [GatewayRoutability] values or vendored
-	// prefix values.
+	// Implementations MUST populate this list with the [GatewayRoutability] values
+	// that are supported by this GatewayClass.
 	//
 	// +optional
+	// +kubebuilder:validation:MaxItems=8
+	// <gateway:experimental>
 	Routabilities []GatewayRoutability `json:"routabilities,omitempty"`
 
 	// Conditions is the current status from the controller for
