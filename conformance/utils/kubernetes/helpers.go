@@ -609,6 +609,39 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 	return gwAddr, hostnames
 }
 
+// TLSRouteMustHaveCondition checks that the supplied TLSRoute has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.TLSRouteMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		route := &v1alpha2.TLSRoute{}
+		err := client.Get(ctx, routeNN, route)
+		if err != nil {
+			return false, fmt.Errorf("error fetching TLSRoute: %w", err)
+		}
+
+		parents := route.Status.Parents
+		var conditionFound bool
+		for _, parent := range parents {
+			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
+				t.Logf("TLSRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
+				return false, nil
+			}
+
+			if parent.ParentRef.Name == v1beta1.ObjectName(gwNN.Name) && (parent.ParentRef.Namespace == nil || string(*parent.ParentRef.Namespace) == gwNN.Namespace) {
+				if findConditionInList(t, parent.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+					conditionFound = true
+				}
+			}
+		}
+
+		return conditionFound, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for TLSRoute status to have a Condition matching expectations")
+}
+
 // TODO(mikemorris): this and parentsMatch could possibly be rewritten as a generic function?
 func listenersMatch(t *testing.T, expected, actual []v1beta1.ListenerStatus) bool {
 	t.Helper()
