@@ -169,7 +169,7 @@ type GatewayInfrastructure struct {
 	// routability in the [GatewayStatus]
 	//
 	// Implementations MAY prevent end-users from updating the routability value of a Gateway.
-	// If updates are allowed the semantics and behaviour will depend on the underlying implementation.
+	// If updates are allowed the semantics and behavior will depend on the underlying implementation.
 	// If a Gateway is mutated but does not support the desired routability it MUST set the conditions
 	// `Accepted`, `Programmed` to `False` with `Reason` set to `UnsupportedRoutability`.
 	//
@@ -627,7 +627,7 @@ type GatewayConditionReason string
 
 const (
 	// This reason is used with "Programmed" and "Accepted" conditions when
-	// desired routability is not able to be fullfilled by the implementation
+	// desired routability is not able to be fulfilled by the implementation
 	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
 )
 

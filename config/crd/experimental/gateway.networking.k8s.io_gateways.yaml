@@ -119,7 +119,7 @@ spec:
                       \n Implementations MAY leave this property unset and signal
                       the default routability in the [GatewayStatus] \n Implementations
                       MAY prevent end-users from updating the routability value of
-                      a Gateway. If updates are allowed the semantics and behaviour
+                      a Gateway. If updates are allowed the semantics and behavior
                       will depend on the underlying implementation. If a Gateway is
                       mutated but does not support the desired routability it MUST
                       set the conditions `Accepted`, `Programmed` to `False` with
@@ -863,7 +863,7 @@ spec:
                       \n Implementations MAY leave this property unset and signal
                       the default routability in the [GatewayStatus] \n Implementations
                       MAY prevent end-users from updating the routability value of
-                      a Gateway. If updates are allowed the semantics and behaviour
+                      a Gateway. If updates are allowed the semantics and behavior
                       will depend on the underlying implementation. If a Gateway is
                       mutated but does not support the desired routability it MUST
                       set the conditions `Accepted`, `Programmed` to `False` with
