@@ -130,8 +130,10 @@ implementation-specific conformance.
 All filters are expected to be compatible with each other except for the
 URLRewrite and RequestRedirect filters, which may not be combined. If an
 implementation can not support other combinations of filters, they must clearly
-document that limitation. In all cases where incompatible or unsupported
-filters are specified, implementations MUST add a warning condition to status.
+document that limitation. In cases where incompatible or unsupported
+filters are specified and cause the `Accepted` condition to be set to status
+`False`, implementations may use the `IncompatibleFilters` reason to specify
+this configuration error.
 
 #### BackendRefs (optional)
 
