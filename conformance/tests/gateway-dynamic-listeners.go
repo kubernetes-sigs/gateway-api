@@ -22,7 +22,9 @@ import (
 	"math/rand"
 	"net"
 	"strconv"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -152,15 +154,38 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 			})
 		}
 
+		gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, gwNN)
+		require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+		host, _, err := net.SplitHostPort(gwAddr)
+		require.NoErrorf(t, err, "unable to split gateway address %q", gwAddr)
+
 		kubernetes.NamespacesMustBeReady(t, s.Client, s.TimeoutConfig, namespaces)
 		certBytes, keyBytes, err := GetTLSSecret(s.Client, certNN)
 		require.NoErrorf(t, err, "error getting certificate: %v", err)
 
-		t.Run("should be able to add multiple HTTP listeners with dynamic ports that then becomes available for routing traffic", func(t *testing.T) {
+		sendRequestToEachListener := func(t *testing.T, expectedResponse http.ExpectedResponse, listeners []v1beta1.Listener) {
+			for _, listener := range listeners {
+
+				addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
+
+				if listener.TLS != nil {
+					host := string(*listener.Hostname)
+					expectedResponse.Request.Host = host
+					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
+				} else {
+					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, expectedResponse)
+				}
+
+			}
+		}
+
+		original := &v1beta1.Gateway{}
+		mutate := &v1beta1.Gateway{}
+
+		t.Run("should be able to add multiple HTTP listeners with dynamic ports that then become available for routing traffic", func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 			defer cancel()
 
-			original := &v1beta1.Gateway{}
 			err := s.Client.Get(ctx, gwNN, original)
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
@@ -175,29 +200,65 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
 
-			gwAddr, err := kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, gwNN)
-			require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
+			expectedResponse := http.ExpectedResponse{
+				Namespace: gwNN.Namespace,
+				Request:   http.Request{Path: "/"},
+				Response:  http.Response{StatusCode: 200},
+			}
 
-			for _, listener := range mutate.Spec.Listeners {
-				host, _, err := net.SplitHostPort(gwAddr)
-				require.NoErrorf(t, err, "unable to split gateway address %q", gwAddr)
+			sendRequestToEachListener(t, expectedResponse, mutate.Spec.Listeners)
+		})
 
-				expectedResponse := http.ExpectedResponse{
-					Namespace: gwNN.Namespace,
-					Request:   http.Request{Path: "/"},
-					Response:  http.Response{StatusCode: 200},
-				}
+		t.Run("should be able to remove multiple HTTP listeners with dynamic ports", func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
+			defer cancel()
 
+			err = s.Client.Update(ctx, original)
+			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
+
+			expectedListeners = []v1beta1.ListenerStatus{{
+				Name: "http",
+				SupportedKinds: []v1beta1.RouteGroupKind{{
+					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+					Kind:  v1beta1.Kind("HTTPRoute"),
+				}},
+				Conditions:     expectedConditions,
+				AttachedRoutes: 1,
+			}}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
+
+			// Original listener should work
+			expectedResponse := http.ExpectedResponse{
+				Namespace: gwNN.Namespace,
+				Request:   http.Request{Path: "/"},
+				Response:  http.Response{StatusCode: 200},
+			}
+
+			sendRequestToEachListener(t, expectedResponse, original.Spec.Listeners)
+
+			// Remove the first listener
+			listeners := mutate.Spec.Listeners[1:]
+
+			for _, listener := range listeners {
 				addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
 
-				if listener.TLS != nil {
-					host := string(*listener.Hostname)
-					expectedResponse.Request.Host = host
-					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
-				} else {
-					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, expectedResponse)
+				// Listeners that were removed should stop working
+				dial := func(elapsed time.Duration) bool {
+					conn, err := net.Dial("tcp", addr)
+
+					if conn != nil {
+						conn.Close()
+						return false
+					}
+
+					if err != nil && strings.Contains(err.Error(), "connection refused") {
+						return true
+					}
+					return false
 				}
 
+				http.AwaitConvergence(t, s.TimeoutConfig.RequiredConsecutiveSuccesses, s.TimeoutConfig.MaxTimeToConsistency, dial)
 			}
 		})
 	},
