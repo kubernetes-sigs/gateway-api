@@ -187,6 +187,10 @@ type GatewayInfrastructure struct {
 //
 // Implementations can define custom routability values by specifying a vendor
 // prefix followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$`
 type GatewayRoutability string
 
 const (

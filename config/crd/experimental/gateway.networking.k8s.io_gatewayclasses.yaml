@@ -231,6 +231,9 @@ spec:
                     has a larger scope than [GatewayRoutabilityCluster]. \n Implementations
                     can define custom routability values by specifying a vendor prefix
                     followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."
+                  maxLength: 253
+                  minLength: 1
+                  pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                   type: string
                 maxItems: 8
                 type: array
@@ -450,6 +453,9 @@ spec:
                     has a larger scope than [GatewayRoutabilityCluster]. \n Implementations
                     can define custom routability values by specifying a vendor prefix
                     followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."
+                  maxLength: 253
+                  minLength: 1
+                  pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                   type: string
                 maxItems: 8
                 type: array

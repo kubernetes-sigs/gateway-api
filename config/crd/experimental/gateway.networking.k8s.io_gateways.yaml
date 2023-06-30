@@ -123,6 +123,9 @@ spec:
                       otherwise. \n If a Gateway is mutated but does not support the
                       desired routability it MUST set the `Accepted` and `Programmed`
                       conditions to `False` with `Reason` set to `UnsupportedRoutability`."
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                     type: string
                 type: object
               listeners:
@@ -507,6 +510,9 @@ spec:
                         address Predefined values are: 'Private', 'Public', Cluster
                         Other values MUST have a vendor prefix. \n Implementations
                         that support Routability MUST populate this field \n <gateway:experimental>"
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                       type: string
                     type:
                       default: IPAddress
@@ -863,6 +869,9 @@ spec:
                       otherwise. \n If a Gateway is mutated but does not support the
                       desired routability it MUST set the `Accepted` and `Programmed`
                       conditions to `False` with `Reason` set to `UnsupportedRoutability`."
+                    maxLength: 253
+                    minLength: 1
+                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                     type: string
                 type: object
               listeners:
@@ -1247,6 +1256,9 @@ spec:
                         address Predefined values are: 'Private', 'Public', Cluster
                         Other values MUST have a vendor prefix. \n Implementations
                         that support Routability MUST populate this field \n <gateway:experimental>"
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
                       type: string
                     type:
                       default: IPAddress
