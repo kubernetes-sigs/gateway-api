@@ -110,13 +110,13 @@ spec:
                   routability:
                     description: "Routability allows the Gateway to specify the accessibility
                       of its addresses. Setting this property will override the default
-                      value defined by the [GatewayClass]. \n If the desired Gateway
-                      routability is incompatible with the [GatewayClass] implementations
+                      value defined by the GatewayClass. \n If the desired Gateway
+                      routability is incompatible with the GatewayClass implementations
                       MUST set the condition `Accepted` to `False` with `Reason` set
                       to `UnsupportedRoutability`. \n The default value of routability
                       is implementation specific and MUST remain consistent for Gateways
                       with the same gatewayClassName \n Implementations MAY leave
-                      this property unset. The routability MUST appear in the [GatewayStatusAddress].
+                      this property unset. The routability MUST appear in the GatewayStatusAddress.
                       \n Implementations MUST clearly document if they support updates
                       to this field. The default expectation should be that changes
                       to this field are not supported unless an implementation specifies
@@ -494,7 +494,7 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support [GatewayRoutability]
+                  from a reserved pool. \n Implementations that support GatewayRoutability
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the
@@ -856,13 +856,13 @@ spec:
                   routability:
                     description: "Routability allows the Gateway to specify the accessibility
                       of its addresses. Setting this property will override the default
-                      value defined by the [GatewayClass]. \n If the desired Gateway
-                      routability is incompatible with the [GatewayClass] implementations
+                      value defined by the GatewayClass. \n If the desired Gateway
+                      routability is incompatible with the GatewayClass implementations
                       MUST set the condition `Accepted` to `False` with `Reason` set
                       to `UnsupportedRoutability`. \n The default value of routability
                       is implementation specific and MUST remain consistent for Gateways
                       with the same gatewayClassName \n Implementations MAY leave
-                      this property unset. The routability MUST appear in the [GatewayStatusAddress].
+                      this property unset. The routability MUST appear in the GatewayStatusAddress.
                       \n Implementations MUST clearly document if they support updates
                       to this field. The default expectation should be that changes
                       to this field are not supported unless an implementation specifies
@@ -1240,7 +1240,7 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support [GatewayRoutability]
+                  from a reserved pool. \n Implementations that support GatewayRoutability
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the

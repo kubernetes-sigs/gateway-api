@@ -469,7 +469,7 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support [GatewayRoutability]
+                  from a reserved pool. \n Implementations that support GatewayRoutability
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the
@@ -1181,7 +1181,7 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support [GatewayRoutability]
+                  from a reserved pool. \n Implementations that support GatewayRoutability
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the

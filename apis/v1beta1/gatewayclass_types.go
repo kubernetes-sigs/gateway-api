@@ -190,7 +190,7 @@ type GatewayClassStatus struct {
 	// Implemenations MAY provide a pre-defined set of GatewayClasses that
 	// limit the routability choices of a Gateway.
 	//
-	// Implementations MUST populate this list with the [GatewayRoutability] values
+	// Implementations MUST populate this list with the GatewayRoutability values
 	// that are supported by this GatewayClass.
 	//
 	// +optional

@@ -157,15 +157,15 @@ type GatewaySpec struct {
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway
 type GatewayInfrastructure struct {
 	// Routability allows the Gateway to specify the accessibility of its addresses. Setting
-	// this property will override the default value defined by the [GatewayClass].
+	// this property will override the default value defined by the GatewayClass.
 	//
-	// If the desired Gateway routability is incompatible with the [GatewayClass] implementations
+	// If the desired Gateway routability is incompatible with the GatewayClass implementations
 	// MUST set the condition `Accepted` to `False` with `Reason` set to `UnsupportedRoutability`.
 	//
 	// The default value of routability is implementation specific and MUST remain consistent for
 	// Gateways with the same gatewayClassName
 	//
-	// Implementations MAY leave this property unset. The routability MUST appear in the [GatewayStatusAddress].
+	// Implementations MAY leave this property unset. The routability MUST appear in the GatewayStatusAddress.
 	//
 	// Implementations MUST clearly document if they support updates to this field. The default
 	// expectation should be that changes to this field are not supported unless an implementation
@@ -181,9 +181,8 @@ type GatewayInfrastructure struct {
 // GatewayRoutablility represents the routability of a Gateway
 //
 // The pre-defined values listed in this package can be compared semantically.
-// [GatewayRoutabilityPublic] has a larger scope than [GatewayRoutabilityPrivate],
-// while [GatewayRoutabilityPrivate] has a larger scope than
-// [GatewayRoutabilityCluster].
+// `Public` has a larger scope than `Private`, while `Private` has a larger scope than
+// `Cluster`.
 //
 // Implementations can define custom routability values by specifying a vendor
 // prefix followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`.
@@ -581,7 +580,7 @@ type GatewayStatus struct {
 	// addresses in the Spec, e.g. if the Gateway automatically
 	// assigns an address from a reserved pool.
 	//
-	// Implementations that support [GatewayRoutability] MUST include an address
+	// Implementations that support GatewayRoutability MUST include an address
 	// that has the same routable semantics as defined in the Gateway spec.
 	//
 	// Implementations MAY add additional addresses in status, but they MUST be
