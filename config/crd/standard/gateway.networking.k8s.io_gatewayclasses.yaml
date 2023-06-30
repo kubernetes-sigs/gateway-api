@@ -215,24 +215,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              routabilities:
-                description: "Routabilities specifies a list of supported routabilities
-                  offered by the GatewayClass. The first entry in this list will be
-                  the default routability used when Gateways of this class are created.
-                  \n Implemenations MAY provide a pre-defined set of GatewayClasses
-                  that limit the routability choices of a Gateway. \n Implementations
-                  that support routability MUST populate this list with a subset of
-                  the pre-defined [GatewayRoutability] values or vendored prefix values."
-                items:
-                  description: "GatewayRoutablility represents the routability of
-                    a Gateway \n The pre-defined values listed in this package can
-                    be compared semantically. [GatewayRoutabilityPublic] has a larger
-                    scope than [GatewayRoutabilityPrivate], while [GatewayRoutabilityPrivate]
-                    has a larger scope than [GatewayRoutabilityCluster]. \n Implementations
-                    can define custom routability values by specifying a vendor prefix
-                    followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."
-                  type: string
-                type: array
             type: object
         required:
         - spec
@@ -433,24 +415,6 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
-              routabilities:
-                description: "Routabilities specifies a list of supported routabilities
-                  offered by the GatewayClass. The first entry in this list will be
-                  the default routability used when Gateways of this class are created.
-                  \n Implemenations MAY provide a pre-defined set of GatewayClasses
-                  that limit the routability choices of a Gateway. \n Implementations
-                  that support routability MUST populate this list with a subset of
-                  the pre-defined [GatewayRoutability] values or vendored prefix values."
-                items:
-                  description: "GatewayRoutablility represents the routability of
-                    a Gateway \n The pre-defined values listed in this package can
-                    be compared semantically. [GatewayRoutabilityPublic] has a larger
-                    scope than [GatewayRoutabilityPrivate], while [GatewayRoutabilityPrivate]
-                    has a larger scope than [GatewayRoutabilityCluster]. \n Implementations
-                    can define custom routability values by specifying a vendor prefix
-                    followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."
-                  type: string
-                type: array
             type: object
         required:
         - spec

@@ -104,29 +104,25 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: Infrastructure defines infrastructure level attributes
-                  about this Gateway instance.
+                description: "Infrastructure defines infrastructure level attributes
+                  about this Gateway instance. \n <gateway:experimental>"
                 properties:
                   routability:
                     description: "Routability allows the Gateway to specify the accessibility
-                      of it's addresses. Setting this property will override the default
-                      value defined by the [GatewayClass] \n If the desired Gateway
+                      of its addresses. Setting this property will override the default
+                      value defined by the [GatewayClass]. \n If the desired Gateway
                       routability is incompatible with the [GatewayClass] implementations
                       MUST set the condition `Accepted` to `False` with `Reason` set
                       to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific. It is RECOMMENDED that the default
-                      routability remains consistent for Gateways with the same gatewayClassName
-                      \n Implementations MAY leave this property unset and signal
-                      the default routability in the [GatewayStatus] \n Implementations
-                      MAY prevent end-users from updating the routability value of
-                      a Gateway. If updates are allowed the semantics and behavior
-                      will depend on the underlying implementation. If a Gateway is
-                      mutated but does not support the desired routability it MUST
-                      set the conditions `Accepted`, `Programmed` to `False` with
-                      `Reason` set to `UnsupportedRoutability`. \n It is RECOMMENDED
-                      that in-cluster gateways SHOULD NOT support 'Private' routability.
-                      Kubernetes doesn't have a concept of 'Private' routability for
-                      Services. In the future this may change upstream."
+                      is implementation specific and MUST remain consistent for Gateways
+                      with the same gatewayClassName \n Implementations MAY leave
+                      this property unset. The routability MUST appear in the [GatewayStatusAddress].
+                      \n Implementations MUST clearly document if they support updates
+                      to this field. The default expectation should be that changes
+                      to this field are not supported unless an implementation specifies
+                      otherwise. \n If a Gateway is mutated but does not support the
+                      desired routability it MUST set the `Accepted` and `Programmed`
+                      conditions to `False` with `Reason` set to `UnsupportedRoutability`."
                     type: string
                 type: object
               listeners:
@@ -499,9 +495,9 @@ spec:
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Cluster`
-                  routable Gateway then the list of addresses MUST NOT have a routability
-                  of `Public` or `Private`."
+                  scope of the requested scope. For example if a user requests a `Private`
+                  routable Gateway then an additional address MAY have a routability
+                  of `Cluster` but MUST NOT include `Private`."
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
@@ -510,7 +506,7 @@ spec:
                       description: "Routability specifies the routable bounds of this
                         address Predefined values are: 'Private', 'Public', Cluster
                         Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field"
+                        that support Routability MUST populate this field \n <gateway:experimental>"
                       type: string
                     type:
                       default: IPAddress
@@ -848,29 +844,25 @@ spec:
                 minLength: 1
                 type: string
               infrastructure:
-                description: Infrastructure defines infrastructure level attributes
-                  about this Gateway instance.
+                description: "Infrastructure defines infrastructure level attributes
+                  about this Gateway instance. \n <gateway:experimental>"
                 properties:
                   routability:
                     description: "Routability allows the Gateway to specify the accessibility
-                      of it's addresses. Setting this property will override the default
-                      value defined by the [GatewayClass] \n If the desired Gateway
+                      of its addresses. Setting this property will override the default
+                      value defined by the [GatewayClass]. \n If the desired Gateway
                       routability is incompatible with the [GatewayClass] implementations
                       MUST set the condition `Accepted` to `False` with `Reason` set
                       to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific. It is RECOMMENDED that the default
-                      routability remains consistent for Gateways with the same gatewayClassName
-                      \n Implementations MAY leave this property unset and signal
-                      the default routability in the [GatewayStatus] \n Implementations
-                      MAY prevent end-users from updating the routability value of
-                      a Gateway. If updates are allowed the semantics and behavior
-                      will depend on the underlying implementation. If a Gateway is
-                      mutated but does not support the desired routability it MUST
-                      set the conditions `Accepted`, `Programmed` to `False` with
-                      `Reason` set to `UnsupportedRoutability`. \n It is RECOMMENDED
-                      that in-cluster gateways SHOULD NOT support 'Private' routability.
-                      Kubernetes doesn't have a concept of 'Private' routability for
-                      Services. In the future this may change upstream."
+                      is implementation specific and MUST remain consistent for Gateways
+                      with the same gatewayClassName \n Implementations MAY leave
+                      this property unset. The routability MUST appear in the [GatewayStatusAddress].
+                      \n Implementations MUST clearly document if they support updates
+                      to this field. The default expectation should be that changes
+                      to this field are not supported unless an implementation specifies
+                      otherwise. \n If a Gateway is mutated but does not support the
+                      desired routability it MUST set the `Accepted` and `Programmed`
+                      conditions to `False` with `Reason` set to `UnsupportedRoutability`."
                     type: string
                 type: object
               listeners:
@@ -1243,9 +1235,9 @@ spec:
                   MUST include an address that has the same routable semantics as
                   defined in the Gateway spec. \n Implementations MAY add additional
                   addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Cluster`
-                  routable Gateway then the list of addresses MUST NOT have a routability
-                  of `Public` or `Private`."
+                  scope of the requested scope. For example if a user requests a `Private`
+                  routable Gateway then an additional address MAY have a routability
+                  of `Cluster` but MUST NOT include `Private`."
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
@@ -1254,7 +1246,7 @@ spec:
                       description: "Routability specifies the routable bounds of this
                         address Predefined values are: 'Private', 'Public', Cluster
                         Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field"
+                        that support Routability MUST populate this field \n <gateway:experimental>"
                       type: string
                     type:
                       default: IPAddress
