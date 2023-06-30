@@ -620,7 +620,7 @@ spec:
     name: we-love-retries
 ```
 
-This means that, for HTTPRoutes that use the `RetryFilter and do _NOT_ explicitly set this field to something
+This means that, for HTTPRoutes that use the `RetryFilter` and do _NOT_ explicitly set this field to something
 else, (in other words, they contain an empty list), then the field will be set to
 a list containing `501`, `502`, and `503`. (Notably, because of Go zero values, this
 would also occur if the user explicitly set the value to the empty list.)
