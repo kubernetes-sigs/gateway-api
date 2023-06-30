@@ -165,8 +165,6 @@ type GatewayInfrastructure struct {
 	// The default value of routability is implementation specific and MUST remain consistent for
 	// Gateways with the same gatewayClassName
 	//
-	// Implementations MAY leave this property unset.
-	//
 	// Implementations MUST clearly document if they support updates to this field. The default
 	// expectation should be that changes to this field are not supported unless an implementation
 	// specifies otherwise.
@@ -586,7 +584,6 @@ type GatewayStatus struct {
 	// semantically less than the scope of the requested scope. For example if a
 	// user requests a `Private` routable Gateway then an additional address MAY
 	// have a routability of `Cluster` but MUST NOT include `Private`.
-	//
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
