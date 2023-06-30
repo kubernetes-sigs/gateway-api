@@ -165,17 +165,14 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 
 		sendRequestToEachListener := func(t *testing.T, expectedResponse http.ExpectedResponse, listeners []v1beta1.Listener) {
 			for _, listener := range listeners {
-
 				addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
 
 				if listener.TLS != nil {
-					host := string(*listener.Hostname)
-					expectedResponse.Request.Host = host
+					expectedResponse.Request.Host = string(*listener.Hostname)
 					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
 				} else {
 					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, expectedResponse)
 				}
-
 			}
 		}
 
@@ -186,13 +183,12 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 			defer cancel()
 
-			err := s.Client.Get(ctx, gwNN, original)
+			err = s.Client.Get(ctx, gwNN, original)
 			require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 			// verify that the implementation is tracking the most recent resource changes
 			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
-			mutate := original.DeepCopy()
-
+			mutate = original.DeepCopy()
 			mutate.Spec.Listeners = append(mutate.Spec.Listeners, listeners...)
 
 			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
@@ -213,7 +209,7 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 			defer cancel()
 
-			err = s.Client.Update(ctx, original)
+			err = s.Client.Patch(ctx, original, client.MergeFrom(mutate))
 			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
 
 			expectedListeners = []v1beta1.ListenerStatus{{
