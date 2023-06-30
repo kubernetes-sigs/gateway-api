@@ -165,7 +165,7 @@ type GatewayInfrastructure struct {
 	// The default value of routability is implementation specific and MUST remain consistent for
 	// Gateways with the same gatewayClassName
 	//
-	// Implementations MAY leave this property unset. The routability MUST appear in the GatewayStatusAddress.
+	// Implementations MAY leave this property unset.
 	//
 	// Implementations MUST clearly document if they support updates to this field. The default
 	// expectation should be that changes to this field are not supported unless an implementation
@@ -206,7 +206,6 @@ const (
 	// It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability.
 	// Kubernetes doesn't have a concept of 'Private' routability for Services. In the future this may
 	// change upstream.
-	//
 	//
 	// Support: Extended
 	GatewayRoutabilityPrivate GatewayRoutability = "Private"

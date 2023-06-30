@@ -95,8 +95,8 @@ nav:
         - geps/gep-1686.md
         - geps/gep-1426.md
       - Experimental:
-        - geps/gep-1651.md
         - geps/gep-1748.md
+        - geps/gep-1651.md
         - geps/gep-1016.md
         - geps/gep-957.md
         - geps/gep-713.md
