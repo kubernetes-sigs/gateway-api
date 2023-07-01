@@ -168,8 +168,9 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 				addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
 
 				if listener.TLS != nil {
-					expectedResponse.Request.Host = string(*listener.Hostname)
-					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, host, expectedResponse)
+					listenerHost := string(*listener.Hostname)
+					expectedResponse.Request.Host = listenerHost
+					tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, certBytes, keyBytes, listenerHost, expectedResponse)
 				} else {
 					http.MakeRequestAndExpectEventuallyConsistentResponse(t, s.RoundTripper, s.TimeoutConfig, addr, expectedResponse)
 				}
@@ -177,86 +178,74 @@ var GatewayListenerHTTPRouteDynamicPorts = suite.ConformanceTest{
 		}
 
 		original := &v1beta1.Gateway{}
-		mutate := &v1beta1.Gateway{}
 
-		t.Run("should be able to add multiple HTTP listeners with dynamic ports that then become available for routing traffic", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
-			defer cancel()
+		t.Log("should be able to add multiple HTTP listeners with dynamic ports that then become available for routing traffic")
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
+		defer cancel()
 
-			err = s.Client.Get(ctx, gwNN, original)
-			require.NoErrorf(t, err, "error getting Gateway: %v", err)
+		err = s.Client.Get(ctx, gwNN, original)
+		require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
-			// verify that the implementation is tracking the most recent resource changes
-			kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
-			mutate = original.DeepCopy()
-			mutate.Spec.Listeners = append(mutate.Spec.Listeners, listeners...)
+		// verify that the implementation is tracking the most recent resource changes
+		kubernetes.GatewayMustHaveLatestConditions(t, s.TimeoutConfig, original)
+		mutate := original.DeepCopy()
+		mutate.Spec.Listeners = append(mutate.Spec.Listeners, listeners...)
 
-			err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
-			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
+		err = s.Client.Patch(ctx, mutate, client.MergeFrom(original))
+		require.NoErrorf(t, err, "error patching the Gateway: %v", err)
+		kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
+		successResponse := http.ExpectedResponse{
+			Namespace: gwNN.Namespace,
+			Request:   http.Request{Path: "/"},
+			Response:  http.Response{StatusCode: 200},
+		}
 
-			expectedResponse := http.ExpectedResponse{
-				Namespace: gwNN.Namespace,
-				Request:   http.Request{Path: "/"},
-				Response:  http.Response{StatusCode: 200},
-			}
+		sendRequestToEachListener(t, successResponse, mutate.Spec.Listeners)
 
-			sendRequestToEachListener(t, expectedResponse, mutate.Spec.Listeners)
-		})
+		t.Log("should be able to remove multiple HTTP listeners with dynamic ports")
+		ctx, cancel = context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
+		defer cancel()
 
-		t.Run("should be able to remove multiple HTTP listeners with dynamic ports", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
-			defer cancel()
+		err = s.Client.Get(ctx, gwNN, mutate)
+		require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
-			err = s.Client.Patch(ctx, original, client.MergeFrom(mutate))
-			require.NoErrorf(t, err, "error patching the Gateway: %v", err)
+		mutate.Spec.Listeners = original.Spec.Listeners
+		err = s.Client.Update(ctx, mutate)
+		require.NoErrorf(t, err, "error patching the Gateway: %v", err)
 
-			expectedListeners = []v1beta1.ListenerStatus{{
-				Name: "http",
-				SupportedKinds: []v1beta1.RouteGroupKind{{
-					Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
-					Kind:  v1beta1.Kind("HTTPRoute"),
-				}},
-				Conditions:     expectedConditions,
-				AttachedRoutes: 1,
-			}}
+		expectedListeners = []v1beta1.ListenerStatus{{
+			Name: "http",
+			SupportedKinds: []v1beta1.RouteGroupKind{{
+				Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+				Kind:  v1beta1.Kind("HTTPRoute"),
+			}},
+			Conditions:     expectedConditions,
+			AttachedRoutes: 1,
+		}}
 
-			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
+		kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, expectedListeners)
 
-			// Original listener should work
-			expectedResponse := http.ExpectedResponse{
-				Namespace: gwNN.Namespace,
-				Request:   http.Request{Path: "/"},
-				Response:  http.Response{StatusCode: 200},
-			}
+		// Original listener should work
+		sendRequestToEachListener(t, successResponse, original.Spec.Listeners)
 
-			sendRequestToEachListener(t, expectedResponse, original.Spec.Listeners)
+		for _, listener := range listeners {
+			addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
 
-			// Remove the first listener
-			listeners := mutate.Spec.Listeners[1:]
-
-			for _, listener := range listeners {
-				addr := net.JoinHostPort(host, strconv.Itoa(int(listener.Port)))
-
-				// Listeners that were removed should stop working
-				dial := func(elapsed time.Duration) bool {
-					conn, err := net.Dial("tcp", addr)
-
-					if conn != nil {
-						conn.Close()
-						return false
-					}
-
-					if err != nil && strings.Contains(err.Error(), "connection refused") {
-						return true
-					}
+			// Listeners that were removed should stop working
+			dial := func(elapsed time.Duration) bool {
+				conn, err := net.DialTimeout("tcp", addr, time.Second)
+				if conn != nil {
+					conn.Close()
 					return false
 				}
-
-				http.AwaitConvergence(t, s.TimeoutConfig.RequiredConsecutiveSuccesses, s.TimeoutConfig.MaxTimeToConsistency, dial)
+				if err != nil && strings.Contains(err.Error(), "connection refused") {
+					return true
+				}
+				return false
 			}
-		})
+			http.AwaitConvergence(t, s.TimeoutConfig.RequiredConsecutiveSuccesses, s.TimeoutConfig.MaxTimeToConsistency, dial)
+		}
 	},
 }
 
