@@ -335,6 +335,32 @@ func TestValidateHTTPRoute(t *testing.T) {
 			},
 		},
 	}, {
+		name:     "no backend ref with request redirect httpRoute filter",
+		errCount: 1,
+		rules: []gatewayv1b1.HTTPRouteRule{
+			{
+				Filters: []gatewayv1b1.HTTPRouteFilter{
+					{
+						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+							Scheme:     ptrTo("https"),
+							StatusCode: ptrTo(301),
+						},
+					},
+				},
+				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					{
+						BackendRef: gatewayv1b1.BackendRef{
+							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+								Name: testService,
+								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+							},
+						},
+					},
+				},
+			},
+		},
+	}, {
 		name:     "redirect path modifier with type mismatch",
 		errCount: 2,
 		rules: []gatewayv1b1.HTTPRouteRule{{
@@ -1049,7 +1075,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				StatusCode: new(int),
 			},
 		},
-		errCount: 0,
+		errCount: 1,
 	}, {
 		name: "invalid HTTPRouteFilterRequestRedirect type filter with non-matching field",
 		routeFilter: gatewayv1b1.HTTPRouteFilter{
