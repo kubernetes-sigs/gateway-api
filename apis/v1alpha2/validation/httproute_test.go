@@ -868,7 +868,7 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				StatusCode: new(int),
 			},
 		},
-		errCount: 0,
+		errCount: 1,
 	}, {
 		name: "invalid HTTPRouteFilterRequestRedirect type filter with non-matching field",
 		routeFilter: gatewayv1a2.HTTPRouteFilter{
