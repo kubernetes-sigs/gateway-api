@@ -46,11 +46,12 @@ type ParentReference struct {
 
 	// Kind is kind of the referent.
 	//
-	// Support: Core (Gateway)
+	// There are two kinds of parent resources with "Core" support:
 	//
-	// Support: Core (Service - mesh conformance profile only)
+	// * Gateway (Gateway conformance profile)
+	// * Service (Mesh conformance profile)
 	//
-	// Support: Implementation-specific (Other Resources)
+	// Support for other resources is Implementation-Specific.
 	//
 	// +kubebuilder:default=Gateway
 	// +optional
