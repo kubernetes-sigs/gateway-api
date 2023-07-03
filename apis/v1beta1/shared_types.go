@@ -21,10 +21,14 @@ import (
 )
 
 // ParentReference identifies an API object (usually a Gateway) that can be considered
-// a parent of this resource (usually a route). The only kinds of parent resources
-// with "Core" support are Service (only for implementations supporting the Mesh
-// conformance profile) and Gateway. This API may be extended in the future to
-// support additional kinds of parent resources.
+// a parent of this resource (usually a route). There are two kinds of parent resources
+// with "Core" support:
+//
+// * Gateway (Gateway conformance profile)
+// * Service (Mesh conformance profile)
+//
+// This API may be extended in the future to support additional kinds of parent
+// resources.
 //
 // The API object must be valid in the cluster; the Group and Kind must
 // be registered in the cluster for this reference to be valid.
