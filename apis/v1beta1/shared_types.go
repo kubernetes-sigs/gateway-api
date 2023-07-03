@@ -154,7 +154,10 @@ type CommonRouteSpec struct {
 	// the Gateway needs to allow attachment from Routes of this kind and
 	// namespace. For Services, that means the Service must either be in the same
 	// namespace for a "producer" route, or the mesh implementation must support
-	// and allow "consumer" routes for the referenced Service.
+	// and allow "consumer" routes for the referenced Service. ReferenceGrant is
+	// not applicable for governing ParentRefs to Services - it is not possible to
+	// create a "producer" route for a Service in a different namespace from the
+	// Route.
 	//
 	// There are two kinds of parent resources with "Core" support:
 	//
