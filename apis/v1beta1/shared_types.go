@@ -156,10 +156,13 @@ type CommonRouteSpec struct {
 	// namespace for a "producer" route, or the mesh implementation must support
 	// and allow "consumer" routes for the referenced Service.
 	//
-	// The only kinds of parent resources with "Core" support are Service (only
-	// for implementations supporting the Mesh conformance profile) and Gateway.
+	// There are two kinds of parent resources with "Core" support:
+	//
+	// * Gateway (Gateway conformance profile)
+	// * Service (Mesh conformance profile)
+	//
 	// This API may be extended in the future to support additional kinds of parent
-	// resources such as one of the route kinds.
+	// resources.
 	//
 	// It is invalid to reference an identical parent more than once. It is
 	// valid to reference multiple distinct sections within the same parent
