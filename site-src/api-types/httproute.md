@@ -1,5 +1,9 @@
 # HTTPRoute
 
+??? success "Standard Channel in v0.5.0+"
+
+    The `HTTPRoute` resource is Beta and part of the Standard Channel in `v0.5.0+`.
+
 [HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
 
