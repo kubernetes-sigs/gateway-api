@@ -335,32 +335,6 @@ func TestValidateHTTPRoute(t *testing.T) {
 			},
 		},
 	}, {
-		name:     "no backend ref with request redirect httpRoute filter",
-		errCount: 1,
-		rules: []gatewayv1b1.HTTPRouteRule{
-			{
-				Filters: []gatewayv1b1.HTTPRouteFilter{
-					{
-						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-							Scheme:     ptrTo("https"),
-							StatusCode: ptrTo(301),
-						},
-					},
-				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
-					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
-								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
-							},
-						},
-					},
-				},
-			},
-		},
-	}, {
 		name:     "redirect path modifier with type mismatch",
 		errCount: 2,
 		rules: []gatewayv1b1.HTTPRouteRule{{
@@ -1160,6 +1134,69 @@ func TestValidateHTTPRouteTypeMatchesField(t *testing.T) {
 				},
 			}
 			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}
+
+func TestValidateRequestRedirectFiltersWithNoBackendRef(t *testing.T) {
+	testService := gatewayv1b1.ObjectName("test-service")
+	tests := []struct {
+		name     string
+		rules    []gatewayv1b1.HTTPRouteRule
+		errCount int
+	}{{
+		name:     "backendref with request redirect httpRoute filter",
+		errCount: 1,
+		rules: []gatewayv1b1.HTTPRouteRule{
+			{
+				Filters: []gatewayv1b1.HTTPRouteFilter{
+					{
+						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+							Scheme:     ptrTo("https"),
+							StatusCode: ptrTo(301),
+						},
+					},
+				},
+				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					{
+						BackendRef: gatewayv1b1.BackendRef{
+							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+								Name: testService,
+								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+							},
+						},
+					},
+				},
+			},
+		},
+	}, {
+		name:     "request redirect without backendref in httpRoute filter",
+		errCount: 0,
+		rules: []gatewayv1b1.HTTPRouteRule{
+			{
+				Filters: []gatewayv1b1.HTTPRouteFilter{
+					{
+						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+							Scheme:     ptrTo("https"),
+							StatusCode: ptrTo(301),
+						},
+					},
+				},
+			},
+		},
+	},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			var errs field.ErrorList
+			route := gatewayv1b1.HTTPRoute{Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules}}
+			errs = ValidateHTTPRoute(&route)
 			if len(errs) != tc.errCount {
 				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
 			}

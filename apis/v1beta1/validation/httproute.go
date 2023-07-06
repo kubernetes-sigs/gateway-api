@@ -83,7 +83,7 @@ func validateRequestRedirectFiltersWithBackendRefs(rule gatewayv1b1.HTTPRouteRul
 	var errs field.ErrorList
 	for _, filter := range rule.Filters {
 		if filter.RequestRedirect != nil && len(rule.BackendRefs) > 0 {
-			errs = append(errs, field.Invalid(path.Child("filters"), filter, "RequestRedirect filter is not allowed with backendRefs"))
+			errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "RequestRedirect filter is not allowed with backendRefs"))
 		}
 	}
 	return errs
