@@ -261,3 +261,12 @@ func ParseNamespaceLabels(f string) map[string]string {
 	}
 	return res
 }
+
+// ParseSkipTests parses flag arguments and converts the string to
+// []string containing the tests to be skipped.
+func ParseSkipTests(t string) []string {
+	if t == "" {
+		return nil
+	}
+	return strings.Split(t, ",")
+}

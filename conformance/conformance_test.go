@@ -52,7 +52,7 @@ func TestConformance(t *testing.T) {
 
 	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
-
+	skipTests := suite.ParseSkipTests(*flags.SkipTests)
 	namespaceLabels := suite.ParseNamespaceLabels(*flags.NamespaceLabels)
 
 	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
@@ -72,6 +72,7 @@ func TestConformance(t *testing.T) {
 		ExemptFeatures:             exemptFeatures,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 		NamespaceLabels:            namespaceLabels,
+		SkipTests:                  skipTests,
 	})
 	cSuite.Setup(t)
 
