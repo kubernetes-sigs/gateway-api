@@ -154,3 +154,9 @@ INFO    -  Building documentation...
 [gateway-api.sigs.k8s.io]: https://gateway-api.sigs.k8s.io
 [Go environment]: https://golang.org/doc/install
 [Kubernetes]: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md
+
+## Conformance Tests
+
+To develop or run conformance tests, follow the [Conformance Test Guide].
+
+[Conformance Test Guide]: /concepts/conformance/#running-tests
