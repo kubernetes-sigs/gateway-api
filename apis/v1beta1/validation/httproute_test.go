@@ -1147,49 +1147,50 @@ func TestValidateRequestRedirectFiltersWithNoBackendRef(t *testing.T) {
 		name     string
 		rules    []gatewayv1b1.HTTPRouteRule
 		errCount int
-	}{{
-		name:     "backendref with request redirect httpRoute filter",
-		errCount: 1,
-		rules: []gatewayv1b1.HTTPRouteRule{
-			{
-				Filters: []gatewayv1b1.HTTPRouteFilter{
-					{
-						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-							Scheme:     ptrTo("https"),
-							StatusCode: ptrTo(301),
+	}{
+		{
+			name:     "backendref with request redirect httpRoute filter",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Filters: []gatewayv1b1.HTTPRouteFilter{
+						{
+							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+								Scheme:     ptrTo("https"),
+								StatusCode: ptrTo(301),
+							},
+						},
+					},
+					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+						{
+							BackendRef: gatewayv1b1.BackendRef{
+								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+									Name: testService,
+									Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								},
+							},
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
-					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
-								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+		}, {
+			name:     "request redirect without backendref in httpRoute filter",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Filters: []gatewayv1b1.HTTPRouteFilter{
+						{
+							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+								Scheme:     ptrTo("https"),
+								StatusCode: ptrTo(301),
 							},
 						},
 					},
 				},
 			},
 		},
-	}, {
-		name:     "request redirect without backendref in httpRoute filter",
-		errCount: 0,
-		rules: []gatewayv1b1.HTTPRouteRule{
-			{
-				Filters: []gatewayv1b1.HTTPRouteFilter{
-					{
-						Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-						RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-							Scheme:     ptrTo("https"),
-							StatusCode: ptrTo(301),
-						},
-					},
-				},
-			},
-		},
-	},
 	}
 
 	for _, tc := range tests {
