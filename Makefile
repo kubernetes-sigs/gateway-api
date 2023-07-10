@@ -90,9 +90,9 @@ conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -args ${CONFORMANCE_FLAGS}
 
 # Run experimental conformance tests against controller implementation
-.PHONY: experimental-conformance
-experimental-conformance:
-	go test ${GO_TEST_FLAGS} --tags experimental -v ./conformance/experimental_conformance_test.go -args ${CONFORMANCE_FLAGS}
+.PHONY: conformance.experimental
+conformance.experimental:
+	go test ${GO_TEST_FLAGS} --tags experimental -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install

@@ -24,10 +24,12 @@ import (
 	"testing"
 
 	"gopkg.in/yaml.v2"
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
@@ -36,81 +38,100 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
 
+var (
+	cfg                 *rest.Config
+	clientset           *kubernetes.Clientset
+	k8sClient           client.Client
+	supportedFeatures   sets.Set[suite.SupportedFeature]
+	exemptFeatures      sets.Set[suite.SupportedFeature]
+	namespaceLabels     map[string]string
+	implementation      *confv1a1.Implementation
+	conformanceProfiles sets.Set[suite.ConformanceProfileName]
+	skipTests           []string
+)
+
 func TestExperimentalConformance(t *testing.T) {
-	cfg, err := config.GetConfig()
+	var err error
+	cfg, err = config.GetConfig()
 	if err != nil {
 		t.Fatalf("Error loading Kubernetes config: %v", err)
 	}
-	client, err := client.New(cfg, client.Options{})
+	k8sClient, err = client.New(cfg, client.Options{})
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes client: %v", err)
 	}
-	clientset, err := kubernetes.NewForConfig(cfg)
+	clientset, err = kubernetes.NewForConfig(cfg)
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
 	}
 
-	v1alpha2.AddToScheme(client.Scheme())
-	v1beta1.AddToScheme(client.Scheme())
+	v1alpha2.AddToScheme(k8sClient.Scheme())
+	v1beta1.AddToScheme(k8sClient.Scheme())
 
 	// standard conformance flags
-	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
-	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
-	namespaceLabels := suite.ParseNamespaceLabels(*flags.NamespaceLabels)
+	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	exemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures)
+	skipTests = suite.ParseSkipTests(*flags.SkipTests)
+	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
 
 	// experimental conformance flags
-	implementation, err := suite.ParseImplementation(
-		*flags.ImplementationOrganization,
-		*flags.ImplementationProject,
-		*flags.ImplementationUrl,
-		*flags.ImplementationVersion,
-		*flags.ImplementationContact,
-	)
-	if err != nil {
-		t.Fatalf("Error parsing implementation's details: %v", err)
-	}
 	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 
-	// if some conformance profiles have been set, then run the experimental conformance suite...
 	if conformanceProfiles.Len() > 0 {
-		t.Logf("Running experimental conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
-			*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
-
-		cSuite, err := suite.NewExperimentalConformanceTestSuite(
-			suite.ExperimentalConformanceOptions{
-				Options: suite.Options{
-					Client:     client,
-					RESTClient: clientset.CoreV1().RESTClient().(*rest.RESTClient),
-					RestConfig: cfg,
-					// This clientset is needed in addition to the client only because
-					// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
-					Clientset:                  clientset,
-					GatewayClassName:           *flags.GatewayClassName,
-					Debug:                      *flags.ShowDebug,
-					CleanupBaseResources:       *flags.CleanupBaseResources,
-					SupportedFeatures:          supportedFeatures,
-					ExemptFeatures:             exemptFeatures,
-					EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
-					NamespaceLabels:            namespaceLabels,
-				},
-				Implementation:      *implementation,
-				ConformanceProfiles: conformanceProfiles,
-			})
+		// if some conformance profiles have been set, run the experimental conformance suite...
+		implementation, err = suite.ParseImplementation(
+			*flags.ImplementationOrganization,
+			*flags.ImplementationProject,
+			*flags.ImplementationUrl,
+			*flags.ImplementationVersion,
+			*flags.ImplementationContact,
+		)
 		if err != nil {
-			t.Fatalf("error creating experimental conformance test suite: %v", err)
+			t.Fatalf("Error parsing implementation's details: %v", err)
 		}
-
-		cSuite.Setup(t)
-		cSuite.Run(t, tests.ConformanceTests)
-		report, err := cSuite.Report()
-		if err != nil {
-			t.Fatalf("error generating conformance profile report: %v", err)
-		}
-		writeReport(t.Log, *report, *flags.ReportOutput)
-	} else { // ...otherwise run the standard conformance suite.
+		testExperimentalConformance(t)
+	} else {
+		// ...otherwise run the standard conformance suite.
 		t.Run("standard conformance tests", TestConformance)
 	}
+}
 
+func testExperimentalConformance(t *testing.T) {
+	t.Logf("Running experimental conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
+		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
+
+	cSuite, err := suite.NewExperimentalConformanceTestSuite(
+		suite.ExperimentalConformanceOptions{
+			Options: suite.Options{
+				Client:     k8sClient,
+				RESTClient: clientset.CoreV1().RESTClient().(*rest.RESTClient),
+				RestConfig: cfg,
+				// This clientset is needed in addition to the client only because
+				// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
+				Clientset:                  clientset,
+				GatewayClassName:           *flags.GatewayClassName,
+				Debug:                      *flags.ShowDebug,
+				CleanupBaseResources:       *flags.CleanupBaseResources,
+				SupportedFeatures:          supportedFeatures,
+				ExemptFeatures:             exemptFeatures,
+				EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+				NamespaceLabels:            namespaceLabels,
+				SkipTests:                  skipTests,
+			},
+			Implementation:      *implementation,
+			ConformanceProfiles: conformanceProfiles,
+		})
+	if err != nil {
+		t.Fatalf("error creating experimental conformance test suite: %v", err)
+	}
+
+	cSuite.Setup(t)
+	cSuite.Run(t, tests.ConformanceTests)
+	report, err := cSuite.Report()
+	if err != nil {
+		t.Fatalf("error generating conformance profile report: %v", err)
+	}
+	writeReport(t.Log, *report, *flags.ReportOutput)
 }
 
 func writeReport(log func(...any), report confv1a1.ConformanceReport, output string) error {
