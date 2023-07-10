@@ -43,12 +43,6 @@ Using the example above would remove the `x-request-id` header from the HTTP req
 
 ### HTTP Response Header Modifier
 
-!!! info "Experimental Channel"
-
-    The `ResponseHeaderModifier` filter described below is currently only included in the
-    "Experimental" channel of Gateway API. Starting in v0.7.0, this
-    feature will graduate to the "Standard" channel.
-
 Just like editing request headers can be useful, the same goes for response headers. For example, it allows teams to add/remove cookies for only a certain backend, which can help in identifying certain users that were redirected to that backend previously.
 
 Another potential use case could be when you have a frontend that needs to know whether it’s talking to a stable or a beta version of the backend server, in order to render different UI or adapt its response parsing accordingly.
