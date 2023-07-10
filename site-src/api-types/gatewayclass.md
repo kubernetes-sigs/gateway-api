@@ -1,5 +1,9 @@
 # GatewayClass
 
+??? success "Standard Channel in v0.5.0+"
+
+    The `GatewayClass` resource is Beta and part of the Standard Channel in `v0.5.0+`.
+
 [GatewayClass][gatewayclass] is cluster-scoped resource defined by the
 infrastructure provider. This resource represents a class of Gateways that can
 be instantiated.

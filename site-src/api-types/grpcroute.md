@@ -1,5 +1,9 @@
 # GRPCRoute
 
+??? example "Experimental Channel in v0.6.0+"
+
+    The `GRPCRoute` resource is Alpha and part of the Experimental Channel in `v0.6.0+`.
+
 !!! info "Experimental Channel"
 
     The `GRPCRoute` resource described below is currently only included in the
