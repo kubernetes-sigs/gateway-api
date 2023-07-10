@@ -855,6 +855,10 @@ type HTTPPathModifier struct {
 	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
 	// match the prefix `/abc`, but the path `/abcd` would not.
 	//
+	// ReplacePrefixMatch is only compatible with a `PathPrefix` HTTPRouteMatch.
+	// Using any other HTTPRouteMatch type on the same HTTPRouteRule will result in
+	// the implementation setting the Accepted Condition for the Route to `status: False`.
+	//
 	// Request Path | Prefix Match | Replace Prefix | Modified Path
 	// -------------|--------------|----------------|----------
 	// /foo/bar     | /foo         | /xyz           | /xyz/bar

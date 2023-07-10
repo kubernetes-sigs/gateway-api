@@ -563,8 +563,14 @@ spec:
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
                                             `/abc`, but the path `/abcd` would not.
-                                            \n Request Path | Prefix Match | Replace
-                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
                                             /foo/bar     | /foo         | /xyz           |
                                             /xyz/bar /foo/bar     | /foo         |
                                             /xyz/          | /xyz/bar /foo/bar     |
@@ -845,8 +851,14 @@ spec:
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
                                             `/abc`, but the path `/abcd` would not.
-                                            \n Request Path | Prefix Match | Replace
-                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
                                             /foo/bar     | /foo         | /xyz           |
                                             /xyz/bar /foo/bar     | /foo         |
                                             /xyz/          | /xyz/bar /foo/bar     |
@@ -1254,7 +1266,12 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n Request Path | Prefix
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
                                       Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
                                       /foo/bar     | /foo         | /xyz           |
                                       /xyz/bar /foo/bar     | /foo         | /xyz/
@@ -1516,7 +1533,12 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n Request Path | Prefix
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
                                       Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
                                       /foo/bar     | /foo         | /xyz           |
                                       /xyz/bar /foo/bar     | /foo         | /xyz/
@@ -2535,8 +2557,14 @@ spec:
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
                                             `/abc`, but the path `/abcd` would not.
-                                            \n Request Path | Prefix Match | Replace
-                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
                                             /foo/bar     | /foo         | /xyz           |
                                             /xyz/bar /foo/bar     | /foo         |
                                             /xyz/          | /xyz/bar /foo/bar     |
@@ -2817,8 +2845,14 @@ spec:
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
                                             `/abc`, but the path `/abcd` would not.
-                                            \n Request Path | Prefix Match | Replace
-                                            Prefix | Modified Path -------------|--------------|----------------|----------
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
                                             /foo/bar     | /foo         | /xyz           |
                                             /xyz/bar /foo/bar     | /foo         |
                                             /xyz/          | /xyz/bar /foo/bar     |
@@ -3226,7 +3260,12 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n Request Path | Prefix
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
                                       Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
                                       /foo/bar     | /foo         | /xyz           |
                                       /xyz/bar /foo/bar     | /foo         | /xyz/
@@ -3488,7 +3527,12 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not. \n Request Path | Prefix
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
                                       Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
                                       /foo/bar     | /foo         | /xyz           |
                                       /xyz/bar /foo/bar     | /foo         | /xyz/
