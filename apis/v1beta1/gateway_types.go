@@ -583,7 +583,7 @@ type GatewayStatus struct {
 	// Implementations MAY add additional addresses in status, but they MUST be
 	// semantically less than the scope of the requested scope. For example if a
 	// user requests a `Private` routable Gateway then an additional address MAY
-	// have a routability of `Cluster` but MUST NOT include `Private`.
+	// have a routability of `Cluster` but MUST NOT include `Public`.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
