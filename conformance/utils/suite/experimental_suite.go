@@ -311,9 +311,7 @@ func ParseImplementation(org, project, url, version, contact string) (*confv1a1.
 		return nil, errors.New("implementation's contact can not be empty")
 	}
 
-	// TODO: we may want to add validation for url
-	// TODO: we may want to add validation for version
-	// TODO: we may want to add validation for contact (e.g., @someone or someone@acme.org)
+	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
 
 	return &confv1a1.Implementation{
 		Organization: org,

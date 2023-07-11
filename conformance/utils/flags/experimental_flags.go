@@ -31,5 +31,5 @@ var (
 	ImplementationVersion      = flag.String("version", "", "Implementation's version to issue conformance to")
 	ImplementationContact      = flag.String("contact", "", "Comma-separated list of contact information for the maintainers")
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
-	ReportOutput               = flag.String("report-output", "STDOUT", "The file where to write the conformance report")
+	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 )

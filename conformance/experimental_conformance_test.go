@@ -40,8 +40,8 @@ import (
 
 var (
 	cfg                 *rest.Config
-	clientset           *kubernetes.Clientset
-	k8sClient           client.Client
+	k8sClientset        *kubernetes.Clientset
+	mgrClient           client.Client
 	supportedFeatures   sets.Set[suite.SupportedFeature]
 	exemptFeatures      sets.Set[suite.SupportedFeature]
 	namespaceLabels     map[string]string
@@ -56,17 +56,17 @@ func TestExperimentalConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error loading Kubernetes config: %v", err)
 	}
-	k8sClient, err = client.New(cfg, client.Options{})
+	mgrClient, err = client.New(cfg, client.Options{})
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes client: %v", err)
 	}
-	clientset, err = kubernetes.NewForConfig(cfg)
+	k8sClientset, err = kubernetes.NewForConfig(cfg)
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
 	}
 
-	v1alpha2.AddToScheme(k8sClient.Scheme())
-	v1beta1.AddToScheme(k8sClient.Scheme())
+	v1alpha2.AddToScheme(mgrClient.Scheme())
+	v1beta1.AddToScheme(mgrClient.Scheme())
 
 	// standard conformance flags
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
@@ -103,12 +103,12 @@ func testExperimentalConformance(t *testing.T) {
 	cSuite, err := suite.NewExperimentalConformanceTestSuite(
 		suite.ExperimentalConformanceOptions{
 			Options: suite.Options{
-				Client:     k8sClient,
-				RESTClient: clientset.CoreV1().RESTClient().(*rest.RESTClient),
+				Client:     mgrClient,
+				RESTClient: k8sClientset.CoreV1().RESTClient().(*rest.RESTClient),
 				RestConfig: cfg,
 				// This clientset is needed in addition to the client only because
 				// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
-				Clientset:                  clientset,
+				Clientset:                  k8sClientset,
 				GatewayClassName:           *flags.GatewayClassName,
 				Debug:                      *flags.ShowDebug,
 				CleanupBaseResources:       *flags.CleanupBaseResources,
@@ -141,7 +141,7 @@ func writeReport(log func(...any), report confv1a1.ConformanceReport, output str
 	}
 
 	if output != "" {
-		if err = os.WriteFile(output, rawReport, 0666); err != nil {
+		if err = os.WriteFile(output, rawReport, 0644); err != nil {
 			return err
 		}
 	}
