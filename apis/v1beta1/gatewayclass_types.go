@@ -187,7 +187,7 @@ type GatewayClassStatus struct {
 	// the GatewayClass. The first entry in this list will be the default
 	// routability used when Gateways of this class are created.
 	//
-	// Implemenations MAY provide a pre-defined set of GatewayClasses that
+	// Implementations MAY provide a pre-defined set of GatewayClasses that
 	// limit the routability choices of a Gateway.
 	//
 	// Implementations MUST populate this list with the GatewayRoutability values
