@@ -71,7 +71,8 @@ proposed changes in our API. In some cases, these changes will be documentation
 only, but in most cases, some API changes will also be required. It is important
 that every new feature of the API is marked as "Experimental" when it is
 introduced. Within the API, we use `<gateway:experimental>` tags to denote
-experimental fields.
+experimental fields. Within Golang packages (conformance tests, CLIs, e.t.c.) we
+use the `experimental` Golang build tag to denote experimental functionality.
 
 Some other requirements must be met before marking a GEP `Experimental`:
 
