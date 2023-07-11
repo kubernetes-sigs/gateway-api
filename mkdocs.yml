@@ -127,6 +127,8 @@ nav:
     - Contributor Ladder: contributing/contributor-ladder.md
   - Blog:
     - Index: blog/index.md
+    - 2023:
+      - blog/2023/welcome-gamma.md
     - 2022:
       - blog/2022/graduating-to-beta.md
     - 2021:

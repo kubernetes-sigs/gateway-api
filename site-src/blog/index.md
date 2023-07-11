@@ -1,5 +1,23 @@
 # Blog
 
+
+
+## [Gateway API: Welcome, GAMMA!]
+
+<small style="position:relative; top:-30px;">
+  :octicons-calendar-24: August 01, 2023 ·
+  :octicons-clock-24: 5 min read
+</small>
+
+We are thrilled to announce the v0.8.0 release of the Gateway API! With this
+release, the work the GAMMA initiative has been doing over the past year has
+reached [Experimental status][status], with two conformant implementations at
+present (Linkerd and Istio). We look forward to your feedback!
+
+[:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, GAMMA!]
+
+[Gateway API: Welcome, GAMMA!]:/blog/2023/0801-welcome-gamma
+
 ## [Gateway API Graduates to Beta]
 
 <small style="position:relative; top:-10px;">
