@@ -119,6 +119,12 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []Listener `json:"listeners"`
 
+	// Infrastructure defines infrastructure level attributes about this Gateway instance.
+	//
+	// <gateway:experimental>
+	// +optional
+	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
+
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
 	// requested address is invalid or unavailable, the implementation MUST
@@ -147,6 +153,69 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
 }
+
+// GatewayInfrastructure defines infrastructure level attributes about a Gateway
+type GatewayInfrastructure struct {
+	// Routability allows the Gateway to specify the accessibility of its addresses. Setting
+	// this property will override the default value defined by the GatewayClass.
+	//
+	// If the desired Gateway routability is incompatible with the GatewayClass implementations
+	// MUST set the condition `Accepted` to `False` with `Reason` set to `UnsupportedRoutability`.
+	//
+	// The default value of routability is implementation specific and MUST remain consistent for
+	// Gateways with the same gatewayClassName
+	//
+	// Implementations MUST clearly document if they support updates to this field. The default
+	// expectation should be that changes to this field are not supported unless an implementation
+	// specifies otherwise.
+	//
+	// If a Gateway is mutated but does not support the desired routability it MUST set the `Accepted`
+	// and `Programmed` conditions to `False` with `Reason` set to `UnsupportedRoutability`.
+	//
+	// +optional
+	Routability *GatewayRoutability `json:"routability,omitempty"`
+}
+
+// GatewayRoutablility represents the routability of a Gateway
+//
+// The pre-defined values listed in this package can be compared semantically.
+// `Public` has a larger scope than `Private`, while `Private` has a larger scope than
+// `Cluster`.
+//
+// Implementations can define custom routability values by specifying a vendor
+// prefix followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`.
+//
+// +kubebuilder:validation:MinLength=1
+// +kubebuilder:validation:MaxLength=253
+// +kubebuilder:validation:Pattern=`^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$`
+type GatewayRoutability string
+
+const (
+	// GatewayRoutabilityPublic means the Gateway's address MUST
+	// be routable on the public internet.
+	//
+	// Support: Extended
+	GatewayRoutabilityPublic GatewayRoutability = "Public"
+
+	// GatewayRoutabilityPrivate means the Gateway's address MUST
+	// only be routable inside a private network larger than a single
+	// cluster (ie. VPC) and MAY include the RFC1918 address space.
+	//
+	// It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability.
+	// Kubernetes doesn't have a concept of 'Private' routability for Services. In the future this may
+	// change upstream.
+	//
+	// Support: Extended
+	GatewayRoutabilityPrivate GatewayRoutability = "Private"
+
+	// GatewayRoutabilityCluster means the Gateway's address MUST
+	// only be routable inside the [cluster's network].
+	//
+	// Support: Extended
+	//
+	// [cluster's network]: https://kubernetes.io/docs/concepts/cluster-administration/networking/#how-to-implement-the-kubernetes-network-model
+	GatewayRoutabilityCluster GatewayRoutability = "Cluster"
+)
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
@@ -489,6 +558,16 @@ type GatewayStatusAddress struct {
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value"`
+
+	// Routability specifies the routable bounds of this address
+	// Predefined values are: 'Private', 'Public', Cluster
+	// Other values MUST have a vendor prefix.
+	//
+	// Implementations that support Routability MUST populate this field
+	//
+	// +optional
+	// <gateway:experimental>
+	Routability *GatewayRoutability `json:"routability,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway.
@@ -497,6 +576,14 @@ type GatewayStatus struct {
 	// bound to the Gateway. These addresses may differ from the
 	// addresses in the Spec, e.g. if the Gateway automatically
 	// assigns an address from a reserved pool.
+	//
+	// Implementations that support GatewayRoutability MUST include an address
+	// that has the same routable semantics as defined in the Gateway spec.
+	//
+	// Implementations MAY add additional addresses in status, but they MUST be
+	// semantically less than the scope of the requested scope. For example if a
+	// user requests a `Private` routable Gateway then an additional address MAY
+	// have a routability of `Cluster` but MUST NOT include `Public`.
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
@@ -590,6 +677,10 @@ const (
 	// express a range of circumstances, including (but not limited to) IPAM
 	// address exhaustion, address not yet allocated, or a named address not being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
+
+	// This reason is used with "Programmed" and "Accepted" conditions when
+	// desired routability is not able to be fulfilled by the implementation
+	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
 )
 
 const (

@@ -49,7 +49,7 @@ trap cleanup INT TERM
 res=0
 
 # Install kind
-(cd $GOPATH && go install sigs.k8s.io/kind@v0.17.0) || res=$?
+(cd $GOPATH && go install sigs.k8s.io/kind@v0.20.0) || res=$?
 
 # Create cluster
 KIND_CREATE_ATTEMPTED=true

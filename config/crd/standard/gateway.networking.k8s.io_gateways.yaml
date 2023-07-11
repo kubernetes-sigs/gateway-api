@@ -466,10 +466,16 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
+                description: "Addresses lists the IP addresses that have actually
+                  been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                  from a reserved pool. \n Implementations that support GatewayRoutability
+                  MUST include an address that has the same routable semantics as
+                  defined in the Gateway spec. \n Implementations MAY add additional
+                  addresses in status, but they MUST be semantically less than the
+                  scope of the requested scope. For example if a user requests a `Private`
+                  routable Gateway then an additional address MAY have a routability
+                  of `Cluster` but MUST NOT include `Public`."
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
@@ -1172,10 +1178,16 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
+                description: "Addresses lists the IP addresses that have actually
+                  been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                  from a reserved pool. \n Implementations that support GatewayRoutability
+                  MUST include an address that has the same routable semantics as
+                  defined in the Gateway spec. \n Implementations MAY add additional
+                  addresses in status, but they MUST be semantically less than the
+                  scope of the requested scope. For example if a user requests a `Private`
+                  routable Gateway then an additional address MAY have a routability
+                  of `Cluster` but MUST NOT include `Public`."
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
