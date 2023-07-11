@@ -1,7 +1,8 @@
 ---
 description: >
   We are excited to announce the v0.8.0 release of Gateway API, where the GAMMA
-  project has reached implementable!
+  initiative has now reached Experimental status, conformance profiles are supported,
+  and more!
 ---
 
 # Gateway API: Welcome, GAMMA!
@@ -110,7 +111,8 @@ a cluster to use the API.
 If you're specifically interested in helping to contribute to Gateway API, we
 would love to have you! Please feel free to [open a new issue][issue] on the
 repository, or join in the [discussions][disc]. Also check out the [community
-page][community] which includes links to the Slack channel and community meetings. We look forward to seeing you!!
+page][community] which includes links to the Slack channel and community
+meetings. We look forward to seeing you!!
 
 [status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
 [ch]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
