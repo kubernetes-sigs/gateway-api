@@ -628,12 +628,6 @@ type GatewayConditionType string
 type GatewayConditionReason string
 
 const (
-	// This reason is used with "Programmed" and "Accepted" conditions when
-	// desired routability is not able to be fulfilled by the implementation
-	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
-)
-
-const (
 	// This condition indicates whether a Gateway has generated some
 	// configuration that is assumed to be ready soon in the underlying data
 	// plane.
@@ -683,6 +677,10 @@ const (
 	// express a range of circumstances, including (but not limited to) IPAM
 	// address exhaustion, address not yet allocated, or a named address not being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
+
+	// This reason is used with "Programmed" and "Accepted" conditions when
+	// desired routability is not able to be fulfilled by the implementation
+	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
 )
 
 const (
