@@ -471,7 +471,7 @@ spec:
                   in the Spec, e.g. if the Gateway automatically assigns an address
                   from a reserved pool.
                 items:
-                  description: GatewayAddress describes an address that can be bound
+                  description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
                     type:
@@ -1177,7 +1177,7 @@ spec:
                   in the Spec, e.g. if the Gateway automatically assigns an address
                   from a reserved pool.
                 items:
-                  description: GatewayAddress describes an address that can be bound
+                  description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
                     type:
