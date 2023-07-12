@@ -228,7 +228,7 @@ spec:
                             from:
                               default: Same
                               description: "From indicates where Routes will be selected
-                                for this Gateway. Possible values are: * All: Routes
+                                for this Gateway. Possible values are: \n * All: Routes
                                 in all namespaces may be used by this Gateway. * Selector:
                                 Routes in namespaces selected by the selector may
                                 be used by this Gateway. * Same: Only Routes in the
@@ -973,7 +973,7 @@ spec:
                             from:
                               default: Same
                               description: "From indicates where Routes will be selected
-                                for this Gateway. Possible values are: * All: Routes
+                                for this Gateway. Possible values are: \n * All: Routes
                                 in all namespaces may be used by this Gateway. * Selector:
                                 Routes in namespaces selected by the selector may
                                 be used by this Gateway. * Same: Only Routes in the
