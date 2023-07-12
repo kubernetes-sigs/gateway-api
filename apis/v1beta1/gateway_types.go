@@ -491,6 +491,7 @@ const (
 type RouteNamespaces struct {
 	// From indicates where Routes will be selected for this Gateway. Possible
 	// values are:
+	//
 	// * All: Routes in all namespaces may be used by this Gateway.
 	// * Selector: Routes in namespaces selected by the selector may be used by
 	//   this Gateway.
