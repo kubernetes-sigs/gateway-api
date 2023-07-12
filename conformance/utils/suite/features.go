@@ -64,6 +64,8 @@ const (
 	//
 	//       See: https://github.com/kubernetes-sigs/gateway-api/issues/1780
 	SupportGatewayClassObservedGenerationBump SupportedFeature = "GatewayClassObservedGenerationBump"
+	// This option indicates that the Gateway can also use port 8080
+	SupportGatewayPort8080 SupportedFeature = "GatewayPort8080"
 )
 
 // StandardExtendedFeatures are extra generic features that implementations may
@@ -73,6 +75,7 @@ const (
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var StandardExtendedFeatures = sets.New(
 	SupportGatewayClassObservedGenerationBump,
+	SupportGatewayPort8080,
 ).Insert(StandardCoreFeatures.UnsortedList()...)
 
 // -----------------------------------------------------------------------------
