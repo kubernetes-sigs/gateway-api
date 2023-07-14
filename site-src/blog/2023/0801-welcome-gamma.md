@@ -1,8 +1,8 @@
 ---
 description: >
   We are excited to announce the v0.8.0 release of Gateway API, where the GAMMA
-  initiative has now reached Experimental status, conformance profiles are supported,
-  and more!
+  initiative has now reached Experimental status, Gateway and HTTPRoute gain
+  some new capabilities, conformance profiles are supported, and more!
 ---
 
 # Gateway API: Welcome, GAMMA!
@@ -106,8 +106,8 @@ The basic idea of conformance profiles is that we can define subsets of the
 Gateway API, and allow implementations to choose - and document! - which
 subsets they conform to. (SIG-Network-Policy is going to be using this concept
 as well.) GAMMA is adding a new profile, named `Mesh`, which checks only the
-mesh functionality as defined by GAMMA. At this point, Kuma 2.3, Linkerd 2.14, and
-Istio 1.16 are all conformant with the `Mesh` profile.
+mesh functionality as defined by GAMMA. At this point, Kuma 2.3, Linkerd 2.14,
+and Istio 1.16 are all conformant with the `Mesh` profile.
 
 ## What else is in Gateway API 0.8.0?
 
