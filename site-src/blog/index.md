@@ -11,8 +11,8 @@
 
 We are thrilled to announce the v0.8.0 release of the Gateway API! With this
 release, the work the GAMMA initiative has been doing over the past year has
-reached [Experimental status][status], with two conformant implementations at
-present (Linkerd and Istio). We look forward to your feedback!
+reached [Experimental status][status], and the Gateway and HTTPRoute resources
+gain some new capabilities. We look forward to your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, GAMMA!]
 

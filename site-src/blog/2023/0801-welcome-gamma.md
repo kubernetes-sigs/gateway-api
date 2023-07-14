@@ -14,11 +14,8 @@ description: >
 
 We are thrilled to announce the v0.8.0 release of the Gateway API! With this
 release, the work the GAMMA initiative has been doing over the past year has
-reached [Experimental status][status], with two conformant implementations at
-present (Linkerd and Istio). We look forward to your feedback!
-
-As [Experimental][status] features, you will find the GAMMA CRDs in the
-Gateway API [`experimental`][ch] channel.
+reached [Experimental status][status], and the Gateway and HTTPRoute resources
+gain some new capabilities. We look forward to your feedback!
 
 ## What is the GAMMA initiative?
 
@@ -48,6 +45,10 @@ allow the Gateway API can be used for service mesh. Of particular note:
   a _conformance profile_ for service meshes to be declared conformant with
   the Gateway API.
 
+Although these are [Experimental][status] APIs, note that they are available
+in the [`standard` release channel][ch], since the GAMMA initiative has not
+needed to introduce new resources or fields to date.
+
 ### How will mesh routing work when using the Gateway API?
 
 All the details are in
@@ -57,6 +58,39 @@ that is a Service, rather than just a Gateway. We anticipate future GEPs in
 this area as we gain more experience with service mesh use cases -- binding to
 a Service makes it possible to use the Gateway API with a service mesh, but
 there are several interesting use cases that remain difficult to cover.
+
+As an example, you might use an HTTPRoute to do an A-B test in the mesh as
+follows:
+
+```yaml
+  apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: HTTPRoute
+  metadata:
+    name: bar-route
+  spec:
+    parentRefs:
+      - name: demo-app
+          port: 5000
+          kind: Service
+    rules:
+    - matches:
+      - headers:
+        - type: Exact
+          name: env
+          value: v1
+      backendRefs:
+      - name: demo-app-v1
+        port: 5000
+    - backendRefs:
+      - name: demo-app-v2
+        port: 5000
+```
+
+Any request to port 5000 of the `demo-app` Service that has the header `env:
+v1` will be routed to `demo-app-v1`, while any request without that header
+will be routed to `demo-app-v2` -- and since this is being handled by the
+service mesh, not the ingress controller, the A/B test can happen anywhere in
+the application's call graph.
 
 ### How does Gateway API conformance work for a service mesh?
 
@@ -70,9 +104,10 @@ _conformance profiles_, as discussed in
 
 The basic idea of conformance profiles is that we can define subsets of the
 Gateway API, and allow implementations to choose - and document! - which
-subsets they conform to. GAMMA is adding a new profile, named `Mesh`, which
-checks only the mesh functionality as defined by GAMMA; SIG-Network-Policy is
-going to be using this concept as well.
+subsets they conform to. (SIG-Network-Policy is going to be using this concept
+as well.) GAMMA is adding a new profile, named `Mesh`, which checks only the
+mesh functionality as defined by GAMMA. At this point, Kuma 2.3, Linkerd 2.14, and
+Istio 1.16 are all conformant with the `Mesh` profile.
 
 ## What else is in Gateway API 0.8.0?
 
