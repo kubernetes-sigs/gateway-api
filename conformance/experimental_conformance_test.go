@@ -75,7 +75,7 @@ func TestExperimentalConformance(t *testing.T) {
 	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
 
 	// experimental conformance flags
-	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 
 	if conformanceProfiles.Len() > 0 {
 		// if some conformance profiles have been set, run the experimental conformance suite...
@@ -131,10 +131,10 @@ func testExperimentalConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error generating conformance profile report: %v", err)
 	}
-	writeReport(t.Log, *report, *flags.ReportOutput)
+	writeReport(t.Logf, *report, *flags.ReportOutput)
 }
 
-func writeReport(log func(...any), report confv1a1.ConformanceReport, output string) error {
+func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, output string) error {
 	rawReport, err := yaml.Marshal(report)
 	if err != nil {
 		return err
@@ -145,7 +145,7 @@ func writeReport(log func(...any), report confv1a1.ConformanceReport, output str
 			return err
 		}
 	}
-	log("Conformance report:\n %s", rawReport)
+	logf("Conformance report:\n %s", string(rawReport))
 
 	return nil
 }
