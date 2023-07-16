@@ -95,12 +95,12 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: udp
+    - name: http-unattached
       port: 8080
-      protocol: UDP
+      protocol: HTTP
       allowedRoutes:
         kinds:
-          - kind: UDPRoute
+          - kind: HTTPRoute
         namespaces:
           from: Selector
           selector:
@@ -132,6 +132,7 @@ spec:
     - kind: Gateway
       name: gateway-with-two-listeners-and-one-attached-route
       namespace: gateway-conformance-infra
+      sectionName: http
   rules:
     - backendRefs:
         - name: infra-backend-v1

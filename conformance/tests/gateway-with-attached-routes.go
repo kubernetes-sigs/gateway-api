@@ -77,14 +77,14 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})
 
-		t.Run("Gateway listener should not have the route attached if the route  is not allowed by the listener's protocol", func(t *testing.T) {
+		t.Run("Gateway listener should not have the route attached if the route is not allowed by the listener's protocol", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-with-two-listeners-and-one-attached-route", Namespace: "gateway-conformance-infra"}
 			listeners := []v1beta1.ListenerStatus{
 				{
-					Name: v1beta1.SectionName("udp"),
+					Name: v1beta1.SectionName("http-unattached"),
 					SupportedKinds: []v1beta1.RouteGroupKind{{
 						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
-						Kind:  v1beta1.Kind("UDPRoute"),
+						Kind:  v1beta1.Kind("HTTPRoute"),
 					}},
 					Conditions: []metav1.Condition{{
 						Type:   string(v1beta1.ListenerConditionAccepted),
