@@ -91,8 +91,8 @@ spec:
     - path:
         value: "/foo"
       headers:
-        values:
-          version: "2"
+      - name: "version"
+        value: "2"
     - path:
         value: "/v2/foo"
 ```
