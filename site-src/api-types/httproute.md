@@ -85,14 +85,16 @@ Take the following matches configuration as an example:
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 ...
-matches:
-  - path:
-      value: "/foo"
-    headers:
-      values:
-        version: "2"
-  - path:
-      value: "/v2/foo"
+spec:
+  rules:
+  - matches:
+    - path:
+        value: "/foo"
+      headers:
+      - name: "version"
+        value: "2"
+    - path:
+        value: "/v2/foo"
 ```
 
 For a request to match against this rule, it must satisfy EITHER of the
