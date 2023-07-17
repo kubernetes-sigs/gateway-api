@@ -150,7 +150,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 
 		suite.Applier.GatewayClass = suite.GatewayClassName
 		suite.Applier.ControllerName = suite.ControllerName
-		
+
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
 
