@@ -316,7 +316,7 @@ WSO2 APK implements the Gateway API, encompassing Gateway and HTTPRoute function
 For up-to-date information on the supported version and features of the Gateway API, please refer to the [APK Gateway documentation][apk-doc]. If you have any questions or would like to contribute, feel free to create [issues or pull requests][repo]. Join our [Discord channel][discord] to connect with us and engage in discussions.
 
 [wso2-apk]:https://apk.docs.wso2.com/en/latest/
-[apk-doc]:https://apk.docs.wso2.com/en/latest/create-api/create-api-overview/
+[apk-doc]:https://apk.docs.wso2.com/en/latest/catalogs/kubernetes-crds/
 [repo]:https://github.com/wso2/apk
 [discord]:https://discord.com/channels/955510916064092180/1113056079501332541
 
