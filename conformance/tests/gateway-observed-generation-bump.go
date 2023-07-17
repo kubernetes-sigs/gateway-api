@@ -39,6 +39,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
+		suite.SupportGatewayPort8080,
 	},
 	Manifests: []string{"tests/gateway-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
