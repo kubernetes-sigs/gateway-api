@@ -117,6 +117,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 								Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
 								ReplacePrefixMatch: ptrTo("bar"),
 							},
+						},
 					},
 				},
 			},
