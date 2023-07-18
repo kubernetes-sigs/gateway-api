@@ -23,12 +23,12 @@ import (
 	"os"
 	"testing"
 
-	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -145,7 +145,7 @@ func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, o
 			return err
 		}
 	}
-	logf("Conformance report:\n %s", string(rawReport))
+	logf("Conformance report:\n%s", string(rawReport))
 
 	return nil
 }
