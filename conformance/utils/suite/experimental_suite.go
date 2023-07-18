@@ -27,6 +27,7 @@ import (
 	"testing"
 	"time"
 
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -284,6 +285,10 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
 
 	return &confv1a1.ConformanceReport{
+		TypeMeta: v1.TypeMeta{
+			APIVersion: "gateway.networking.k8s.io/v1alpha1",
+			Kind:       "ConformanceReport",
+		},
 		Date:              time.Now().Format(time.RFC3339),
 		Implementation:    suite.implementation,
 		GatewayAPIVersion: "TODO",
