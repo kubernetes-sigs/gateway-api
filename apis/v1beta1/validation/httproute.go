@@ -32,6 +32,7 @@ var (
 	// repeated multiple times in a rule.
 	repeatableHTTPRouteFilters = []gatewayv1b1.HTTPRouteFilterType{
 		gatewayv1b1.HTTPRouteFilterExtensionRef,
+		gatewayv1b1.HTTPRouteFilterRequestMirror,
 	}
 
 	// Invalid path sequences and suffixes, primarily related to directory traversal
@@ -137,13 +138,14 @@ func validateHTTPRouteFilters(filters []gatewayv1b1.HTTPRouteFilter, matches []g
 		}
 		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
-	// custom filters don't have any validation
-	for _, key := range repeatableHTTPRouteFilters {
-		delete(counts, key)
-	}
 
 	if counts[gatewayv1b1.HTTPRouteFilterRequestRedirect] > 0 && counts[gatewayv1b1.HTTPRouteFilterURLRewrite] > 0 {
 		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "may specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both"))
+	}
+
+	// repeatableHTTPRouteFilters filters can be used more than once
+	for _, key := range repeatableHTTPRouteFilters {
+		delete(counts, key)
 	}
 
 	for filterType, count := range counts {
