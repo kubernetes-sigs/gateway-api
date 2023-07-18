@@ -29,10 +29,12 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [WSO2 APK][25] (pre-alpha)
 
 ## Integration Status
+
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
 - [argo-rollouts][22] (alpha)
 - [Knative][24] (alpha)
+- [Kuadrant][26] (work in progress)
 
 [1]:#acnodal-epic
 [2]:#apisix
@@ -59,6 +61,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [23]:#amazon-elastic-kubernetes-service
 [24]:#knative
 [25]:#wso2-apk
+[26]:#kuadrant
 
 ## Implementations
 
@@ -355,3 +358,16 @@ cert-manager can generate TLS certificates for Gateway resources. This is config
 
 [knative]:https://knative.dev/
 [knative-net-gateway-api]:https://github.com/knative-sandbox/net-gateway-api
+
+### Kuadrant
+
+[Kuadrant][kuadrant] is an open source multi cluster Gateway API controller that integrates with and provides policies to other Gateway API providers.
+
+Kuadrant supports Gateway API for defining gateways centrally and attaching policies such as DNS, TLS, Auth and Rate Limiting that apply to all gateway instances in a multi cluster environment.
+Kuadrant works with Istio as the underlying gateway provider, with plans to work with other gateway providers such as Envoy Gateway.
+
+For help and support with Kuadrant's implementation please feel free to [create an issue][kuadrant-issue-new] or ask for help in the [#kuadrant channel on Kubernetes slack][kuadrant-slack].
+
+[kuadrant]:https://kuadrant.io/
+[kuadrant-issue-new]:https://github.com/Kuadrant/multicluster-gateway-controller/issues/new
+[kuadrant-slack]:https://kubernetes.slack.com/archives/C05J0D0V525
