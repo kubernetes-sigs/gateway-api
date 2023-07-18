@@ -152,6 +152,9 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 
 	suite.ConformanceTestSuite = ConformanceTestSuite{
 		Client:           s.Client,
+		Clientset:        s.Clientset,
+		RESTClient:       s.RESTClient,
+		RestConfig:       s.RestConfig,
 		RoundTripper:     roundTripper,
 		GatewayClassName: s.GatewayClassName,
 		Debug:            s.Debug,
