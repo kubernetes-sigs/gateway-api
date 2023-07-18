@@ -29,7 +29,6 @@ import (
 
 func TestValidateHTTPRoute(t *testing.T) {
 	testService := gatewayv1a2.ObjectName("test-service")
-	specialService := gatewayv1a2.ObjectName("special-service")
 	pathPrefixMatchType := gatewayv1b1.PathMatchPathPrefix
 
 	tests := []struct {
@@ -173,7 +172,7 @@ func TestValidateHTTPRoute(t *testing.T) {
 		},
 	}, {
 		name:     "invalid httpRoute with multiple duplicate filters",
-		errCount: 1,
+		errCount: 2,
 		rules: []gatewayv1a2.HTTPRouteRule{
 			{
 				Matches: []gatewayv1a2.HTTPRouteMatch{
@@ -226,15 +225,6 @@ func TestValidateHTTPRoute(t *testing.T) {
 									Name:  "my-header",
 									Value: "bar",
 								},
-							},
-						},
-					},
-					{
-						Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
-						RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{
-							BackendRef: gatewayv1a2.BackendObjectReference{
-								Name: specialService,
-								Port: ptrTo(gatewayv1b1.PortNumber(8080)),
 							},
 						},
 					},

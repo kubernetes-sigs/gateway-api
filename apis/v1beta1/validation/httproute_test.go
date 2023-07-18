@@ -28,7 +28,6 @@ import (
 
 func TestValidateHTTPRoute(t *testing.T) {
 	testService := gatewayv1b1.ObjectName("test-service")
-	specialService := gatewayv1b1.ObjectName("special-service")
 	pathPrefixMatchType := gatewayv1b1.PathMatchPathPrefix
 
 	tests := []struct {
@@ -612,7 +611,7 @@ func TestValidateHTTPBackendUniqueFilters(t *testing.T) {
 		}},
 	}, {
 		name:     "valid httpRoute Rules duplicate mirror filter",
-		errCount: 2,
+		errCount: 0,
 		rules: []gatewayv1b1.HTTPRouteRule{{
 			BackendRefs: []gatewayv1b1.HTTPBackendRef{
 				{
