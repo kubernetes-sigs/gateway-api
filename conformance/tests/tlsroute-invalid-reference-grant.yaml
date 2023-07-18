@@ -111,7 +111,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - name: gateway-tlsroute
+    - name: gateway-tlsroute-referencegrant
   hostnames:
     - abc.example.com
   rules:
@@ -123,7 +123,7 @@ spec:
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
-  name: gateway-tlsroute
+  name: gateway-tlsroute-referencegrant
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
