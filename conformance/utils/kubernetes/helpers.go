@@ -106,20 +106,26 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 }
 
 // GatewayMustHaveLatestConditions waits until the specified Gateway has
-// the latest conditions to set.
-func GatewayMustHaveLatestConditions(t *testing.T, timeoutConfig config.TimeoutConfig, gw *v1beta1.Gateway) {
+// all conditions updated with the latest observed generation.
+func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(_ context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
+		gw := &v1beta1.Gateway{}
+		err := c.Get(ctx, gwNN, gw)
+		if err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Logf("Gateway %s/%s latest conditions not set yet: %v", gw.Namespace, gw.Name, err)
+			t.Logf("Gateway %s latest conditions not set yet: %v", gwNN.String(), err)
 			return false, nil
 		}
 
 		return true, nil
 	})
 
-	require.NoErrorf(t, waitErr, "error waiting for %s Gateway to have Latest ObservedGeneration to be set: %v", gw.Name, waitErr)
+	require.NoErrorf(t, waitErr, "error waiting for Gateway %s to have Latest ObservedGeneration to be set: %v", gwNN.String(), waitErr)
 }
 
 // GatewayClassMustHaveLatestConditions will fail the test if there are
