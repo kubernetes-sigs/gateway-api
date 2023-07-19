@@ -18,21 +18,16 @@ package tests
 
 import (
 	"context"
-	"fmt"
 	"regexp"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/apimachinery/pkg/util/wait"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
-	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -107,7 +102,7 @@ var GatewayUnsupportedRoutability = suite.ConformanceTest{
 	Description: "A Gateway should set Accepted condition to False when it doesn't support a routability",
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwn := types.NamespacedName{Name: "gateway-broken-routability", Namespace: "gateway-conformance-infra"}
-		GatewayMustHaveLatestConditions(t, s.TimeoutConfig, s.Client, gwn)
+		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwn)
 
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 		defer cancel()
@@ -164,7 +159,7 @@ var GatewayUnsupportedRoutabilityMutation = suite.ConformanceTest{
 		}
 		require.NoErrorf(t, err, "error updating Gateway: %v", err)
 
-		GatewayMustHaveLatestConditions(t, s.TimeoutConfig, s.Client, gwn)
+		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwn)
 
 		err = s.Client.Get(ctx, gwn, gw)
 		require.NoErrorf(t, err, "error getting Gateway: %v", err)
@@ -302,25 +297,4 @@ func validateAddresses(t *testing.T, addrs []v1beta1.GatewayStatusAddress, allow
 			t.Errorf("Unexpected routablity value: %q", addressRoutability)
 		}
 	}
-}
-
-func GatewayMustHaveLatestConditions(t *testing.T, timeoutConfig config.TimeoutConfig, c client.Client, gwName types.NamespacedName) {
-	t.Helper()
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
-		gw := &v1beta1.Gateway{}
-		err := c.Get(ctx, gwName, gw)
-		if err != nil {
-			t.Logf("error fetching Gateway: %v", err)
-			return false, fmt.Errorf("error fetching Gateway: %w", err)
-		}
-
-		if err := kubernetes.ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Logf("Gateway %s/%s latest conditions not set yet: %v", gw.Namespace, gw.Name, err)
-			return false, nil
-		}
-
-		return true, nil
-	})
-
-	require.NoErrorf(t, waitErr, "error waiting for %s Gateway to have Latest ObservedGeneration to be set: %v", gwName, waitErr)
 }
