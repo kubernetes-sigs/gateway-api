@@ -113,6 +113,10 @@ const (
 // See: https://github.com/kubernetes-sigs/gateway-api/issues/1891
 var ExperimentalExtendedFeatures = sets.New(
 	SupportRouteDestinationPortMatching,
+	SupportGatewayClassRoutability,
+	SupportGatewayPublicRoutability,
+	SupportGatewayPrivateRoutability,
+	SupportGatewayClusterRoutability,
 )
 
 // -----------------------------------------------------------------------------

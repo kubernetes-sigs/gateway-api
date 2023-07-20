@@ -224,9 +224,9 @@ spec:
                   MUST populate this list with the GatewayRoutability values that
                   are supported by this GatewayClass. \n <gateway:experimental>"
                 items:
-                  description: "GatewayRoutablility represents the routability of
-                    a Gateway \n The pre-defined values listed in this package can
-                    be compared semantically. `Public` has a larger scope than `Private`,
+                  description: "GatewayRoutability represents the routability of a
+                    Gateway \n The pre-defined values listed in this package can be
+                    compared semantically. `Public` has a larger scope than `Private`,
                     while `Private` has a larger scope than `Cluster`. \n Implementations
                     can define custom routability values by specifying a vendor prefix
                     followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."
@@ -445,9 +445,9 @@ spec:
                   MUST populate this list with the GatewayRoutability values that
                   are supported by this GatewayClass. \n <gateway:experimental>"
                 items:
-                  description: "GatewayRoutablility represents the routability of
-                    a Gateway \n The pre-defined values listed in this package can
-                    be compared semantically. `Public` has a larger scope than `Private`,
+                  description: "GatewayRoutability represents the routability of a
+                    Gateway \n The pre-defined values listed in this package can be
+                    compared semantically. `Public` has a larger scope than `Private`,
                     while `Private` has a larger scope than `Cluster`. \n Implementations
                     can define custom routability values by specifying a vendor prefix
                     followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`."

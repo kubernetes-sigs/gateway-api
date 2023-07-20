@@ -48,7 +48,7 @@ var GatewayClassRoutability = suite.ConformanceTest{
 		suite.SupportGatewayClassRoutability,
 	},
 	Manifests: []string{
-		"tests/routablity-default.yaml",
+		"tests/gateway-routability-default.yaml",
 	},
 	Description: "A GatewayClass MUST list routabilities in its status. The first entry should be the default value for Gateways",
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
@@ -62,9 +62,7 @@ var GatewayClassRoutability = suite.ConformanceTest{
 		err := s.Client.Get(ctx, className, gwc)
 		require.NoErrorf(t, err, "error getting GatewayClass: %v", err)
 
-		if len(gwc.Status.Routabilities) == 0 {
-			t.Error("A GatewayClass that supports routability MUST list them in Status.Routabilities")
-		}
+		require.NotEmpty(t, gwc.Status.Routabilities, "A GatewayClass that supports routability MUST list them in Status.Routabilities")
 
 		gwn := types.NamespacedName{Name: "gateway-default-routability", Namespace: "gateway-conformance-infra"}
 		//nolint:errcheck // the helper throws an error if it fails
@@ -79,17 +77,8 @@ var GatewayClassRoutability = suite.ConformanceTest{
 
 		expectedRoutability := gwc.Status.Routabilities[0]
 		actualRoutability := gw.Status.Addresses[0].Routability
-
-		if actualRoutability == nil {
-			t.Fatal("expected gateway address to have set the routability")
-		}
-
-		if expectedRoutability != *actualRoutability {
-			t.Fatalf("the first entry in the GatewayClass.Status.Routabilities %q should be the default routability - got: %q",
-				expectedRoutability,
-				*actualRoutability,
-			)
-		}
+		require.NotNil(t, actualRoutability, "expected gateway address to have set the routability")
+		require.Equal(t, expectedRoutability, *actualRoutability, "the first entry in the GatewayClass.Status.Routabilities should be the default routability")
 	},
 }
 
@@ -99,6 +88,9 @@ var GatewayUnsupportedRoutability = suite.ConformanceTest{
 		suite.SupportGateway,
 		suite.SupportGatewayClassRoutability,
 	},
+	Manifests: []string{
+		"tests/gateway-routability-broken.yaml",
+	},
 	Description: "A Gateway should set Accepted condition to False when it doesn't support a routability",
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		gwn := types.NamespacedName{Name: "gateway-broken-routability", Namespace: "gateway-conformance-infra"}
@@ -107,7 +99,7 @@ var GatewayUnsupportedRoutability = suite.ConformanceTest{
 		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
 		defer cancel()
 
-		gw := &v1beta1.GatewayClass{}
+		gw := &v1beta1.Gateway{}
 		err := s.Client.Get(ctx, gwn, gw)
 		require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
@@ -130,7 +122,7 @@ var GatewayUnsupportedRoutabilityMutation = suite.ConformanceTest{
 		suite.SupportGatewayClassRoutability,
 	},
 	Manifests: []string{
-		"tests/routablity-bad-mutation.yaml",
+		"tests/gateway-routability-bad-mutation.yaml",
 	},
 	Description: "Mutating a Gateway to an unsupported routability should set Accepted to False",
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
@@ -145,11 +137,11 @@ var GatewayUnsupportedRoutabilityMutation = suite.ConformanceTest{
 		err := s.Client.Get(ctx, gwn, gw)
 		require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
-		routablity := v1beta1.GatewayRoutability("a.bad.vendor.prefix/bad!!")
+		routability := v1beta1.GatewayRoutability("a.bad.vendor.prefix/bad!!")
 		if gw.Spec.Infrastructure == nil {
 			gw.Spec.Infrastructure = &v1beta1.GatewayInfrastructure{}
 		}
-		gw.Spec.Infrastructure.Routability = &routablity
+		gw.Spec.Infrastructure.Routability = &routability
 
 		err = s.Client.Update(ctx, gw)
 
@@ -185,7 +177,7 @@ var GatewayPublicRoutability = suite.ConformanceTest{
 	},
 	Description: "A Gateway supports Public routability",
 	Manifests: []string{
-		"tests/routability-public.yaml",
+		"tests/gateway-routability-public.yaml",
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		namespaces := []string{"gateway-conformance-infra"}
@@ -218,7 +210,7 @@ var GatewayPrivateRoutability = suite.ConformanceTest{
 	},
 	Description: "A Gateway supports Private routability",
 	Manifests: []string{
-		"tests/routability-private.yaml",
+		"tests/gateway-routability-private.yaml",
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		namespaces := []string{"gateway-conformance-infra"}
@@ -250,7 +242,7 @@ var GatewayClusterRoutability = suite.ConformanceTest{
 	},
 	Description: "A Gateway supports Cluster routability",
 	Manifests: []string{
-		"tests/routability-cluster.yaml",
+		"tests/gateway-routability-cluster.yaml",
 	},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		namespaces := []string{"gateway-conformance-infra"}
@@ -277,14 +269,10 @@ var vendorPrefixedRoutability = regexp.MustCompile(`^[a-z0-9]([-a-z0-9]*[a-z0-9]
 func validateAddresses(t *testing.T, addrs []v1beta1.GatewayStatusAddress, allowedEntries sets.Set[v1beta1.GatewayRoutability]) {
 	t.Helper()
 
-	if len(addrs) == 0 {
-		t.Fatal("A Gateway that supports routability must have addresses")
-	}
+	require.NotEmpty(t, addrs, "A Gateway that supports routability must have addresses")
 
 	for _, addr := range addrs {
-		if addr.Routability == nil {
-			t.Fatalf("expected GatewayStatusAddress '%v/%v' to have a non-nil routablity", addr.Type, addr.Value)
-		}
+		require.NotNilf(t, addr.Routability, "expected GatewayStatusAddress '%s/%s' to have a non-nil routability", *addr.Type, addr.Value)
 
 		addressRoutability := *addr.Routability
 
@@ -293,8 +281,6 @@ func validateAddresses(t *testing.T, addrs []v1beta1.GatewayStatusAddress, allow
 			continue
 		}
 
-		if !allowedEntries.Has(addressRoutability) {
-			t.Errorf("Unexpected routablity value: %q", addressRoutability)
-		}
+		require.Truef(t, allowedEntries.Has(addressRoutability), "Unexpected routability value: %q", addressRoutability)
 	}
 }
