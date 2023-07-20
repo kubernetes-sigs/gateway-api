@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	apierrs "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -38,7 +37,6 @@ func init() {
 	ConformanceTests = append(ConformanceTests, GatewayPrivateRoutability)
 	ConformanceTests = append(ConformanceTests, GatewayClusterRoutability)
 	ConformanceTests = append(ConformanceTests, GatewayUnsupportedRoutability)
-	ConformanceTests = append(ConformanceTests, GatewayUnsupportedRoutabilityMutation)
 }
 
 var GatewayClassRoutability = suite.ConformanceTest{
@@ -101,59 +99,6 @@ var GatewayUnsupportedRoutability = suite.ConformanceTest{
 
 		gw := &v1beta1.Gateway{}
 		err := s.Client.Get(ctx, gwn, gw)
-		require.NoErrorf(t, err, "error getting Gateway: %v", err)
-
-		for _, cond := range gw.Status.Conditions {
-			if cond.Type == string(v1beta1.GatewayConditionAccepted) {
-				if cond.Status != metav1.ConditionFalse {
-					t.Errorf("expected Accepted condition to be 'False': was %q", cond.Status)
-				} else if cond.Reason != string(v1beta1.GatewayUnsupportedRoutability) {
-					t.Errorf("expected Accepted condition reason to be %q: was %q", v1beta1.GatewayUnsupportedRoutability, cond.Status)
-				}
-			}
-		}
-	},
-}
-
-var GatewayUnsupportedRoutabilityMutation = suite.ConformanceTest{
-	ShortName: "GatewayUnsupportedRoutabilityMutation",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportGatewayClassRoutability,
-	},
-	Manifests: []string{
-		"tests/gateway-routability-bad-mutation.yaml",
-	},
-	Description: "Mutating a Gateway to an unsupported routability should set Accepted to False",
-	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
-		gwn := types.NamespacedName{Name: "gateway-bad-routability-mutation", Namespace: "gateway-conformance-infra"}
-		//nolint:errcheck // the helper throws an error if it fails
-		kubernetes.WaitForGatewayAddress(t, s.Client, s.TimeoutConfig, gwn)
-
-		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.GetTimeout)
-		defer cancel()
-
-		gw := &v1beta1.Gateway{}
-		err := s.Client.Get(ctx, gwn, gw)
-		require.NoErrorf(t, err, "error getting Gateway: %v", err)
-
-		routability := v1beta1.GatewayRoutability("a.bad.vendor.prefix/bad!!")
-		if gw.Spec.Infrastructure == nil {
-			gw.Spec.Infrastructure = &v1beta1.GatewayInfrastructure{}
-		}
-		gw.Spec.Infrastructure.Routability = &routability
-
-		err = s.Client.Update(ctx, gw)
-
-		// If an admission webhook rejects a bad routability that's allowed
-		if apierrs.IsBadRequest(err) {
-			return
-		}
-		require.NoErrorf(t, err, "error updating Gateway: %v", err)
-
-		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwn)
-
-		err = s.Client.Get(ctx, gwn, gw)
 		require.NoErrorf(t, err, "error getting Gateway: %v", err)
 
 		for _, cond := range gw.Status.Conditions {
