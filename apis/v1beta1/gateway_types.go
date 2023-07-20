@@ -176,7 +176,7 @@ type GatewayInfrastructure struct {
 	Routability *GatewayRoutability `json:"routability,omitempty"`
 }
 
-// GatewayRoutablility represents the routability of a Gateway
+// GatewayRoutability represents the routability of a Gateway
 //
 // The pre-defined values listed in this package can be compared semantically.
 // `Public` has a larger scope than `Private`, while `Private` has a larger scope than
