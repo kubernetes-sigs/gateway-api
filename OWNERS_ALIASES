@@ -35,3 +35,8 @@ aliases:
     - mlavacca
     - sunjayBhatia
     - xunzhuo
+
+  gateway-api-conformance-approvers:
+    - arkodg
+    - mlavacca
+    - sunjayBhatia
