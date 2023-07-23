@@ -57,7 +57,7 @@ spec:
       containers:
       - name: webhook
         image: registry.k8s.io/gateway-api/admission-server:v0.7.1
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         args:
         - -logtostderr
         - --tlsCertFile=/etc/certs/cert
