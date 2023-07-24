@@ -78,6 +78,8 @@ type GatewayClassSpec struct {
 	// This field is not mutable and cannot be empty.
 	//
 	// Support: Core
+	//
+	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
 	ControllerName GatewayController `json:"controllerName"`
 
 	// ParametersRef is a reference to a resource that contains the configuration

@@ -117,6 +117,11 @@ type GatewaySpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="tls must be set for protocols ['HTTPS', 'TLS']",rule="self.all(l, l.protocol in ['HTTPS', 'TLS'] ? has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="tls must be empty for protocols ['HTTP', 'TCP', 'UDP']",rule="self.all(l, l.protocol in ['HTTP', 'TCP', 'UDP'] ? !has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="hostname must be empty for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
+	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
+	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : true)))"
 	Listeners []Listener `json:"listeners"`
 
 	// Infrastructure defines infrastructure level attributes about this Gateway instance.
@@ -151,6 +156,8 @@ type GatewaySpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
+	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
 }
 
@@ -361,6 +368,8 @@ const (
 )
 
 // GatewayTLSConfig describes a TLS configuration.
+//
+// +kubebuilder:validation:XValidation:message="certificateRefs must be set and not empty when TLSModeType is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 : true"
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
@@ -526,6 +535,8 @@ type RouteGroupKind struct {
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
+//
+// +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches('^(\\\\*\\\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$'): true"
 type GatewayAddress struct {
 	// Type of the address.
 	//
