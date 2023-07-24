@@ -132,7 +132,9 @@ spec:
                 reason: Waiting
                 status: Unknown
                 type: Accepted
-            description: Status defines the current state of GatewayClass.
+            description: "Status defines the current state of GatewayClass. \n Implementations
+              MUST populate status on all GatewayClass resources which specify their
+              controller name."
             properties:
               conditions:
                 default:
@@ -353,7 +355,9 @@ spec:
                 reason: Waiting
                 status: Unknown
                 type: Accepted
-            description: Status defines the current state of GatewayClass.
+            description: "Status defines the current state of GatewayClass. \n Implementations
+              MUST populate status on all GatewayClass resources which specify their
+              controller name."
             properties:
               conditions:
                 default:
