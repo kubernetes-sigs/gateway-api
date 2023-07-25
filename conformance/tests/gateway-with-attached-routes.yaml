@@ -102,12 +102,7 @@ spec:
       kinds:
       - kind: HTTPRoute
       namespaces:
-        from: Selector
-        selector:
-          matchLabels:
-            # This label is added automatically as of K8s 1.22
-            # to all namespaces
-            kubernetes.io/metadata.name: gateway-conformance-infra
+        from: All
   - name: http
     port: 80
     protocol: HTTP
@@ -115,12 +110,7 @@ spec:
       kinds:
       - kind: HTTPRoute
       namespaces:
-        from: Selector
-        selector:
-          matchLabels:
-            # This label is added automatically as of K8s 1.22
-            # to all namespaces
-            kubernetes.io/metadata.name: gateway-conformance-infra
+        from: All
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
