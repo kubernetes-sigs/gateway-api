@@ -29,8 +29,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-
 	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -160,6 +158,7 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 		Debug:            s.Debug,
 		Cleanup:          s.CleanupBaseResources,
 		BaseManifests:    s.BaseManifests,
+		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
 			NamespaceLabels: s.NamespaceLabels,
 		},
@@ -173,6 +172,9 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 	if suite.BaseManifests == "" {
 		suite.BaseManifests = "base/manifests.yaml"
 	}
+	if suite.MeshManifests == "" {
+		suite.MeshManifests = "mesh/manifests.yaml"
+	}
 
 	return suite, nil
 }
@@ -184,33 +186,7 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ExperimentalConformanceTestSuite) Setup(t *testing.T) {
-	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-	suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
-
-	suite.Applier.GatewayClass = suite.GatewayClassName
-	suite.Applier.ControllerName = suite.ControllerName
-	suite.Applier.FS = suite.FS
-
-	t.Logf("Test Setup: Applying base manifests")
-	suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
-
-	t.Logf("Test Setup: Applying programmatic resources")
-	secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
-	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-	secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-validity-checks-certificate", []string{"*"})
-	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-	secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
-	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-	secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-app-backend", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
-	suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
-
-	t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
-	namespaces := []string{
-		"gateway-conformance-infra",
-		"gateway-conformance-app-backend",
-		"gateway-conformance-web-backend",
-	}
-	kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
+	suite.ConformanceTestSuite.Setup(t)
 }
 
 // Run runs the provided set of conformance tests.
