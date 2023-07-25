@@ -95,32 +95,32 @@ metadata:
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
-    - name: http-unattached
-      port: 8080
-      protocol: HTTP
-      allowedRoutes:
-        kinds:
-          - kind: HTTPRoute
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              # This label is added automatically as of K8s 1.22
-              # to all namespaces
-              kubernetes.io/metadata.name: gateway-conformance-infra
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        kinds:
-          - kind: HTTPRoute
-        namespaces:
-          from: Selector
-          selector:
-            matchLabels:
-              # This label is added automatically as of K8s 1.22
-              # to all namespaces
-              kubernetes.io/metadata.name: gateway-conformance-infra
+  - name: http-unattached
+    port: 8080
+    protocol: HTTP
+    allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            # This label is added automatically as of K8s 1.22
+            # to all namespaces
+            kubernetes.io/metadata.name: gateway-conformance-infra
+  - name: http
+    port: 80
+    protocol: HTTP
+    allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            # This label is added automatically as of K8s 1.22
+            # to all namespaces
+            kubernetes.io/metadata.name: gateway-conformance-infra
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
@@ -129,11 +129,11 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-    - kind: Gateway
-      name: gateway-with-two-listeners-and-one-attached-route
-      namespace: gateway-conformance-infra
-      sectionName: http
+  - kind: Gateway
+    name: gateway-with-two-listeners-and-one-attached-route
+    namespace: gateway-conformance-infra
+    sectionName: http
   rules:
-    - backendRefs:
-        - name: infra-backend-v1
-          port: 8080
+  - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
