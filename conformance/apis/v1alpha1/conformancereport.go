@@ -69,6 +69,8 @@ type Implementation struct {
 	// Github usernames (in the form of `@<username>`) or team names (in the
 	// form of `@<team>/<name>`), but when that's not possible it can be email
 	// addresses.
-	// It can also be a link to the issue creation page in the project's repository.
+	// It can also be a link to the issue creation page or support documentation for a project.
+	// Ideally this would be something like the issue creation page on a repository, but for projects
+	// without a publicly exposed repository a general support page URL can be provided.
 	Contact []string `json:"contact"`
 }
