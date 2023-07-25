@@ -7,13 +7,7 @@ implementation:
   url: github.com/kong/kubernetes-ingress-controller
   version: "2.10.3"
   contact:
-    - '@czeslavo'
-    - '@mflendrich'
-    - '@mlavacca'
-    - '@pmalek'
-    - '@rainest'
-    - '@programmer04'
-    - '@randmonkey'
+    - https://github.com/Kong/kubernetes-ingress-controller/issues/new/choose
 kind: ConformanceReport
 profileReports:
   - core:
