@@ -1,6 +1,6 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
 date: "2023-07-24T14:26:14-07:00"
-gatewayAPIVersion: TODO
+gatewayAPIVersion: 4c436290f2bfeaeaf0b1a367449e16de3e0addc4
 implementation:
   contact:
   - '@istio/maintainers'
