@@ -9,6 +9,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Acnodal EPIC][1] (public preview)
 - [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Apache APISIX][2] (beta)
+- [Azure Application Gateway for Containers][27] (preview)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
@@ -62,6 +63,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [24]:#knative
 [25]:#wso2-apk
 [26]:#kuadrant
+[27]:#azure-application-gateway-for-containers
 
 ## Implementations
 
@@ -90,6 +92,15 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 [apisix]:https://apisix.apache.org/
 [apisix-1]:https://github.com/apache/apisix-ingress-controller
+
+### Azure Application Gateway for Containers
+
+[Application Gateway for Containers][azure-application-gateway-for-containers] is a managed application (layer 7) load balancing solution, providing dynamic traffic management capabilities for workloads running in a Kubernetes cluster in Azure. Follow the [quickstart guide][azure-application-gateway-for-containers-quickstart-controller] to deploy the ALB controller and get started with Gateway API.
+
+Application Gateway for Containers implements `v1beta1` specification of Gateway API.
+
+[azure-application-gateway-for-containers]:https://aka.ms/appgwcontainers/docs
+[azure-application-gateway-for-containers-quickstart-controller]:https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
 
 ### BIG-IP Kubernetes Gateway
 
