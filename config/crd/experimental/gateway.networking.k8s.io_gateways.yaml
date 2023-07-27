@@ -73,10 +73,24 @@ spec:
                   manner, assigning an appropriate set of Addresses. \n The implementation
                   MUST bind all Listeners to every GatewayAddress that it assigns
                   to the Gateway and add a corresponding entry in GatewayStatus.Addresses.
-                  \n Support: Extended"
+                  \n Support: Extended \n "
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -500,13 +514,27 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
+                description: "Addresses lists the IP addresses that have actually
+                  been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                  from a reserved pool. \n "
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -525,6 +553,11 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                      true'
                 maxItems: 16
                 type: array
               conditions:
@@ -813,10 +846,24 @@ spec:
                   manner, assigning an appropriate set of Addresses. \n The implementation
                   MUST bind all Listeners to every GatewayAddress that it assigns
                   to the Gateway and add a corresponding entry in GatewayStatus.Addresses.
-                  \n Support: Extended"
+                  \n Support: Extended \n "
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -1240,13 +1287,27 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: Addresses lists the IP addresses that have actually been
-                  bound to the Gateway. These addresses may differ from the addresses
+                description: "Addresses lists the IP addresses that have actually
+                  been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool.
+                  from a reserved pool. \n "
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -1265,6 +1326,11 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                      true'
                 maxItems: 16
                 type: array
               conditions:

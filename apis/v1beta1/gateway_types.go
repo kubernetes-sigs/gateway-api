@@ -149,6 +149,7 @@ type GatewaySpec struct {
 	// Support: Extended
 	//
 	// +optional
+	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
@@ -486,6 +487,8 @@ type GatewayAddress struct {
 }
 
 // GatewayStatusAddress describes an address that is bound to a Gateway.
+//
+// +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches('^(\\\\*\\\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$'): true"
 type GatewayStatusAddress struct {
 	// Type of the address.
 	//
@@ -511,6 +514,7 @@ type GatewayStatus struct {
 	// assigns an address from a reserved pool.
 	//
 	// +optional
+	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayStatusAddress `json:"addresses,omitempty"`
 
