@@ -32,6 +32,7 @@ var (
 	// repeated multiple times in a rule.
 	repeatableHTTPRouteFilters = []gatewayv1b1.HTTPRouteFilterType{
 		gatewayv1b1.HTTPRouteFilterExtensionRef,
+		gatewayv1b1.HTTPRouteFilterRequestMirror,
 	}
 
 	// Invalid path sequences and suffixes, primarily related to directory traversal
@@ -55,6 +56,7 @@ func ValidateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 	var errs field.ErrorList
 	for i, rule := range spec.Rules {
 		errs = append(errs, validateHTTPRouteFilters(rule.Filters, rule.Matches, path.Child("rules").Index(i))...)
+		errs = append(errs, validateRequestRedirectFiltersWithBackendRefs(rule, path.Child("rules").Index(i))...)
 		for j, backendRef := range rule.BackendRefs {
 			errs = append(errs, validateHTTPRouteFilters(backendRef.Filters, rule.Matches, path.Child("rules").Index(i).Child("backendRefs").Index(j))...)
 		}
@@ -74,6 +76,17 @@ func ValidateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
 	errs = append(errs, ValidateParentRefs(spec.ParentRefs, path.Child("spec"))...)
+	return errs
+}
+
+// validateRequestRedirectFiltersWithBackendRefs validates that RequestRedirect filters are not used with backendRefs
+func validateRequestRedirectFiltersWithBackendRefs(rule gatewayv1b1.HTTPRouteRule, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	for _, filter := range rule.Filters {
+		if filter.RequestRedirect != nil && len(rule.BackendRefs) > 0 {
+			errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "RequestRedirect filter is not allowed with backendRefs"))
+		}
+	}
 	return errs
 }
 
@@ -125,13 +138,14 @@ func validateHTTPRouteFilters(filters []gatewayv1b1.HTTPRouteFilter, matches []g
 		}
 		errs = append(errs, validateHTTPRouteFilterTypeMatchesValue(filter, path.Index(i))...)
 	}
-	// custom filters don't have any validation
-	for _, key := range repeatableHTTPRouteFilters {
-		delete(counts, key)
-	}
 
 	if counts[gatewayv1b1.HTTPRouteFilterRequestRedirect] > 0 && counts[gatewayv1b1.HTTPRouteFilterURLRewrite] > 0 {
 		errs = append(errs, field.Invalid(path.Child("filters"), gatewayv1b1.HTTPRouteFilterRequestRedirect, "may specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both"))
+	}
+
+	// repeatableHTTPRouteFilters filters can be used more than once
+	for _, key := range repeatableHTTPRouteFilters {
+		delete(counts, key)
 	}
 
 	for filterType, count := range counts {

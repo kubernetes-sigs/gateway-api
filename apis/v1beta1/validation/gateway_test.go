@@ -237,7 +237,7 @@ func TestValidateGateway(t *testing.T) {
 				},
 			},
 		},
-		"combination of port and protocol are not unique for each listenr when hostnames not set": {
+		"combination of port and protocol are not unique for each listener when hostnames not set": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType

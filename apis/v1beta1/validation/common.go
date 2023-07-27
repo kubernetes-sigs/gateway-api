@@ -41,7 +41,7 @@ func ValidateParentRefs(parentRefs []gatewayv1b1.ParentReference, path *field.Pa
 	}
 	parentRefsSectionMap := make(map[sameKindParentRefs]sets.Set[parentQualifier])
 	for i, p := range parentRefs {
-		targetParentRefs := sameKindParentRefs{name: p.Name, namespace: *new(gatewayv1b1.Namespace), kind: *new(gatewayv1b1.Kind)}
+		targetParentRefs := sameKindParentRefs{name: p.Name, namespace: gatewayv1b1.Namespace(""), kind: gatewayv1b1.Kind("")}
 		pq := parentQualifier{}
 		if p.Namespace != nil {
 			targetParentRefs.namespace = *p.Namespace
