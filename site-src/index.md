@@ -24,13 +24,15 @@ mesh users prompted the creation of the [GAMMA initiative][gamma] to define
 how the Gateway API could also be used for inter-service or [_east/west_
 traffic][east/west traffic] within the same cluster.
 
+If you're familiar with the older [Ingress API], you can think of the Gateway
+API as analogous to a more-expressive next-generation version of that API.
+
 ## Gateway API for Ingress <a name="for-ingress"></a>
 
 When using the Gateway API to manage ingress traffic, the [Gateway] resource
-defines a point of access at which traffic from outside clients can be routed
-into the cluster ([north/south traffic]). (If you're familiar with the older
-[Ingress API], you can think of the Gateway API as analogous to a
-more-expressive next-generation version of that API.)
+defines a point of access at which traffic can be routed across multiple
+contexts -- for example, from outside the cluster to inside the cluster
+([north/south traffic]).
 
 Each Gateway is associated with a [GatewayClass], which describes the actual
 kind of [gateway controller] that will handle traffic for the Gateway;

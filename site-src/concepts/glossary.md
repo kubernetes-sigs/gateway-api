@@ -8,10 +8,9 @@ refining the specific consumer's use of the workload.
 ### Gateway Controller
 
 A _gateway controller_ is software that manages the infrastructure associated
-with routing traffic from outside the cluster to inside the cluster
-(north/south traffic), analogous to the earlier _ingress controller_ concept.
-Gateway controllers often, but not always, run in the cluster where they're
-managing infrastructure.
+with routing traffic across contexts using the Gateway API, analogous to the
+earlier _ingress controller_ concept. Gateway controllers often, but not
+always, run in the cluster where they're managing infrastructure.
 
 ### East/West traffic
 
