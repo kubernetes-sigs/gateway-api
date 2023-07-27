@@ -1,6 +1,6 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
 date: "2023-07-25T22:11:56Z"
-gatewayAPIVersion: TODO
+gatewayAPIVersion: "e9859d057b43d177176a9d3d6b15dbdd27fe7e46"
 implementation:
   contact:
   - '@projectcontour/maintainers'
