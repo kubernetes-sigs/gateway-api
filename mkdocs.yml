@@ -61,6 +61,7 @@ nav:
         Versioning: concepts/versioning.md
     - Implementations: implementations.md
     - FAQ: faq.md
+    - Glossary: concepts/glossary.md
   - Guides:
     - Getting started: guides/index.md
     - Simple Gateway: guides/simple-gateway.md

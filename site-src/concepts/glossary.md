@@ -17,6 +17,15 @@ managing infrastructure.
 
 Traffic from workload to workload within a cluster.
 
+### Endpoint routing
+
+_Endpoint routing_ is sending requests to a specific Service directly to one
+of the endpoints of the Service backend, bypassing routing decisions which
+might be made by the underlying network infrastructure. This is commonly
+necessary for advanced routing cases like sticky sessions, where the gateway
+will need to guarantee that every request for a specific session goes to the
+same endpoint.
+
 ### North/South traffic
 
 Traffic from outside a cluster to inside a cluster (and vice versa).
@@ -26,14 +35,6 @@ Traffic from outside a cluster to inside a cluster (and vice versa).
 A Route bound to a workload's Service by the creator of a given workload,
 defining what is acceptable use of the workload. Producer routes must always
 be in the same Namespace as their workload's Service.
-
-### Service mesh
-
-A _service mesh_ is software that manages infrastructure providing security,
-reliability, and observability for communications between workloads (east/west
-traffic). Service meshes generally work by intercepting communications between
-workloads at a very low level, often (though not always) by inserting proxies
-next to the workload's Pods.
 
 ### Service backend
 
@@ -47,21 +48,20 @@ The part of a Kubernetes Service resource that allocates a DNS record and a
 cluster IP. East/west traffic often - but not always - works by having
 workloads direct requests to a Service frontend.
 
+### Service mesh
+
+A _service mesh_ is software that manages infrastructure providing security,
+reliability, and observability for communications between workloads (east/west
+traffic). Service meshes generally work by intercepting communications between
+workloads at a very low level, often (though not always) by inserting proxies
+next to the workload's Pods.
+
 ### Service routing
 
 _Service routing_ is sending requests to a specific Service to the service
 frontend, allowing the underlying network infrastructure (usually `kube-proxy`
 or a [service mesh](#service-mesh)) to choose the specific endpoint to which
 the request is routed.
-
-### Endpoint routing
-
-_Endpoint routing_ is sending requests to a specific Service directly to one
-of the endpoints of the Service backend, bypassing routing decisions which
-might be made by the underlying network infrastructure. This is commonly
-necessary for advanced routing cases like sticky sessions, where the gateway
-will need to guarantee that every request for a specific session goes to the
-same endpoint.
 
 ### Workload
 
