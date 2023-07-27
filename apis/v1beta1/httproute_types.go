@@ -201,8 +201,8 @@ type HTTPRouteRule struct {
 	// - Implementation-specific custom filters have no API guarantees across
 	//   implementations.
 	//
-	// Specifying a core filter multiple times has unspecified or
-	// implementation-specific conformance.
+	// Specifying the same filter multiple times is not supported unless explicitly
+	// indicated in the filter.
 	//
 	// All filters are expected to be compatible with each other except for the
 	// URLRewrite and RequestRedirect filters, which may not be combined. If an
@@ -618,6 +618,10 @@ type HTTPRouteFilter struct {
 	// Requests are sent to the specified destination, but responses from
 	// that destination are ignored.
 	//
+	// This filter can be used multiple times within the same rule. Note that
+	// not all implementations will be able to support mirroring to multiple
+	// backends.
+	//
 	// Support: Extended
 	//
 	// +optional
@@ -642,6 +646,8 @@ type HTTPRouteFilter struct {
 	// "filter" behavior.  For example, resource "myroutefilter" in group
 	// "networking.example.net"). ExtensionRef MUST NOT be used for core and
 	// extended filters.
+	//
+	// This filter can be used multiple times within the same rule.
 	//
 	// Support: Implementation-specific
 	//

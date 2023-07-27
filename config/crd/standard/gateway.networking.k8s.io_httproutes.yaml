@@ -289,7 +289,8 @@ spec:
                                     extension to the \"filter\" behavior.  For example,
                                     resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
-                                    filters. \n Support: Implementation-specific"
+                                    filters. \n This filter can be used multiple times
+                                    within the same rule. \n Support: Implementation-specific"
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -427,7 +428,10 @@ spec:
                                   description: "RequestMirror defines a schema for
                                     a filter that mirrors requests. Requests are sent
                                     to the specified destination, but responses from
-                                    that destination are ignored. \n Support: Extended"
+                                    that destination are ignored. \n This filter can
+                                    be used multiple times within the same rule. Note
+                                    that not all implementations will be able to support
+                                    mirroring to multiple backends. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
@@ -986,9 +990,9 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
-                        a core filter multiple times has unspecified or implementation-specific
-                        conformance. \n All filters are expected to be compatible
-                        with each other except for the URLRewrite and RequestRedirect
+                        the same filter multiple times is not supported unless explicitly
+                        indicated in the filter. \n All filters are expected to be
+                        compatible with each other except for the URLRewrite and RequestRedirect
                         filters, which may not be combined. If an implementation can
                         not support other combinations of filters, they must clearly
                         document that limitation. In cases where incompatible or unsupported
@@ -1010,7 +1014,8 @@ spec:
                               extension to the \"filter\" behavior.  For example,
                               resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
-                              filters. \n Support: Implementation-specific"
+                              filters. \n This filter can be used multiple times within
+                              the same rule. \n Support: Implementation-specific"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -1140,7 +1145,10 @@ spec:
                             description: "RequestMirror defines a schema for a filter
                               that mirrors requests. Requests are sent to the specified
                               destination, but responses from that destination are
-                              ignored. \n Support: Extended"
+                              ignored. \n This filter can be used multiple times within
+                              the same rule. Note that not all implementations will
+                              be able to support mirroring to multiple backends. \n
+                              Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
@@ -2283,7 +2291,8 @@ spec:
                                     extension to the \"filter\" behavior.  For example,
                                     resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
-                                    filters. \n Support: Implementation-specific"
+                                    filters. \n This filter can be used multiple times
+                                    within the same rule. \n Support: Implementation-specific"
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -2421,7 +2430,10 @@ spec:
                                   description: "RequestMirror defines a schema for
                                     a filter that mirrors requests. Requests are sent
                                     to the specified destination, but responses from
-                                    that destination are ignored. \n Support: Extended"
+                                    that destination are ignored. \n This filter can
+                                    be used multiple times within the same rule. Note
+                                    that not all implementations will be able to support
+                                    mirroring to multiple backends. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
@@ -2980,9 +2992,9 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
-                        a core filter multiple times has unspecified or implementation-specific
-                        conformance. \n All filters are expected to be compatible
-                        with each other except for the URLRewrite and RequestRedirect
+                        the same filter multiple times is not supported unless explicitly
+                        indicated in the filter. \n All filters are expected to be
+                        compatible with each other except for the URLRewrite and RequestRedirect
                         filters, which may not be combined. If an implementation can
                         not support other combinations of filters, they must clearly
                         document that limitation. In cases where incompatible or unsupported
@@ -3004,7 +3016,8 @@ spec:
                               extension to the \"filter\" behavior.  For example,
                               resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
-                              filters. \n Support: Implementation-specific"
+                              filters. \n This filter can be used multiple times within
+                              the same rule. \n Support: Implementation-specific"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -3134,7 +3147,10 @@ spec:
                             description: "RequestMirror defines a schema for a filter
                               that mirrors requests. Requests are sent to the specified
                               destination, but responses from that destination are
-                              ignored. \n Support: Extended"
+                              ignored. \n This filter can be used multiple times within
+                              the same rule. Note that not all implementations will
+                              be able to support mirroring to multiple backends. \n
+                              Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
