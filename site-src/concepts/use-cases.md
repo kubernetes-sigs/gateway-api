@@ -22,12 +22,17 @@ they all have distinct concerns that we need to consider separately.)
 - [Basic north/south use case](#basic-northsouth-use-case)
 - [Multiple applications behind a single
   Gateway](#multiple-applications-behind-a-single-gateway)
-- [Basic east/west use case](#basic-eastwest-use-case)
-- [Gateway and mesh use case](#gateway-and-mesh-use-case)
+- [Basic east/west use case](#basic-eastwest-use-case) -- **experimental**
+- [Gateway and mesh use case](#gateway-and-mesh-use-case) -- **experimental**
 
 [role and personas]:/concepts/roles-and-personas
 
 ## Basic [north/south] use case
+
+??? success "Standard Channel in v0.8.0+"
+
+    The [north/south] use case is fully supported by the Standard Channel
+    in `v0.8.0+`.
 
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
@@ -82,6 +87,11 @@ rollouts](/guides/traffic-splitting)).
 
 ## Multiple applications behind a single Gateway
 
+??? success "Standard Channel in v0.8.0+"
+
+    The [north/south] use case is fully supported by the Standard Channel
+    in `v0.8.0+`.
+
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:
 Ana and her team are managing a storefront application in the `store`
@@ -112,6 +122,12 @@ that Charlie and Ian are handling.
 
 ## Basic [east/west] use case
 
+!!! danger "Experimental in v0.8.0"
+
+    The [GAMMA initiative][gamma] work for supporting service mesh use cases
+    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
+    not recommend it in production at this point.
+
 In this scenario, Ana has built a workload which is already running in a
 cluster with a [GAMMA]-compliant [service mesh]. She wants to use the mesh to
 protect her workload by rejecting calls to her workload with incorrect
@@ -138,6 +154,12 @@ bottlenecks in requests to Charlie or Ian.
 [service mesh]:/concepts/glossary#service-mesh
 
 ## Gateway and mesh use case
+
+!!! danger "Experimental in v0.8.0"
+
+    The [GAMMA initiative][gamma] work for supporting service mesh use cases
+    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
+    not recommend it in production at this point.
 
 This is effectively a combination of the [multiple applications behind a
 single Gateway](#multiple-applications-behind-a-single-gateway) and [basic

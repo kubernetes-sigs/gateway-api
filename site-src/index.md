@@ -49,6 +49,12 @@ instances (represented by Gateway resources), in the same cluster.
 
 ## Gateway API for Service Mesh (the [GAMMA initiative][gamma]) <a name="for-service-mesh"></a>
 
+!!! danger "Experimental in v0.8.0"
+
+    The [GAMMA initiative][gamma] work for supporting service mesh use cases
+    is _experimental_ in v0.8.0. It is possible that it will change; we do
+    not recommend it for production work at this point.
+
 Things are a bit different when using the Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
 cluster, the [Gateway] and [GatewayClass] resources are not used; instead,
@@ -57,9 +63,14 @@ Service resources][mesh-attachment], permitting the mesh to manage traffic
 from any traffic directed to that Service while preserving the role-oriented
 nature of the Gateway API.
 
-This use case is still rather new, and should be expected to evolve fairly
-quickly. One particular area that has rapidly become critical for GAMMA is the
-definition of the different [facets of the Service resource][service-facets].
+To date, GAMMA has been able to support mesh functionality with fairly minimal
+changes to the Gateway API. One particular area that has rapidly become
+critical for GAMMA, though, is the definition of the different [facets of the
+Service resource][service-facets].
+
+In Gateway API v0.8.0, GAMMA support for service mesh is **experimental**. We
+encourage working with it and providing feedback, but you **must** be prepared
+for change in the GAMMA APIs.
 
 [gamma]:/contributing/gamma/
 [service-mesh]:/concepts/glossary#service-mesh
