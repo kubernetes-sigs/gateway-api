@@ -57,7 +57,6 @@ type ConformanceTestSuite struct {
 type Options struct {
 	Client           client.Client
 	Clientset        clientset.Interface
-	RESTClient       *rest.RESTClient
 	RestConfig       *rest.Config
 	GatewayClassName string
 	Debug            bool
@@ -111,7 +110,6 @@ func New(s Options) *ConformanceTestSuite {
 	suite := &ConformanceTestSuite{
 		Client:           s.Client,
 		Clientset:        s.Clientset,
-		RESTClient:       s.RESTClient,
 		RestConfig:       s.RestConfig,
 		RoundTripper:     roundTripper,
 		GatewayClassName: s.GatewayClassName,

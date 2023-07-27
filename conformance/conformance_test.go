@@ -28,7 +28,6 @@ import (
 
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
-	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 )
@@ -60,7 +59,6 @@ func TestConformance(t *testing.T) {
 
 	cSuite := suite.New(suite.Options{
 		Client:     client,
-		RESTClient: clientset.CoreV1().RESTClient().(*rest.RESTClient),
 		RestConfig: cfg,
 		// This clientset is needed in addition to the client only because
 		// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
