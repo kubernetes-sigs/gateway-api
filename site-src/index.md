@@ -52,8 +52,8 @@ instances (represented by Gateway resources), in the same cluster.
 !!! danger "Experimental in v0.8.0"
 
     The [GAMMA initiative][gamma] work for supporting service mesh use cases
-    is _experimental_ in v0.8.0. It is possible that it will change; we do
-    not recommend it for production work at this point.
+    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
+    not recommend it in production at this point.
 
 Things are a bit different when using the Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
