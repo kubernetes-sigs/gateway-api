@@ -95,8 +95,20 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                      true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: IPAddress values must be unique
+                  rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
+                - message: Hostname values must be unique
+                  rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name
                   of a GatewayClass resource.
@@ -459,6 +471,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs must be set and not empty when TLSModeType
+                          is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 : true'
                   required:
                   - name
                   - port
@@ -470,6 +487,23 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: tls must be set for protocols ['HTTPS', 'TLS']
+                  rule: 'self.all(l, l.protocol in [''HTTPS'', ''TLS''] ? has(l.tls)
+                    : true)'
+                - message: tls must be empty for protocols ['HTTP', 'TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
+                    !has(l.tls) : true)'
+                - message: hostname must be empty for protocols ['TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
+                    || l.hostname == '''') : true)'
+                - message: Listener name must be unique within the Gateway
+                  rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
+                - message: Combination of port, protocol and hostname must be unique
+                    for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
+                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
+                    == l2.hostname : true)))'
             required:
             - gatewayClassName
             - listeners
@@ -840,8 +874,20 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                      true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: IPAddress values must be unique
+                  rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
+                - message: Hostname values must be unique
+                  rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name
                   of a GatewayClass resource.
@@ -1204,6 +1250,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs must be set and not empty when TLSModeType
+                          is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 : true'
                   required:
                   - name
                   - port
@@ -1215,6 +1266,23 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: tls must be set for protocols ['HTTPS', 'TLS']
+                  rule: 'self.all(l, l.protocol in [''HTTPS'', ''TLS''] ? has(l.tls)
+                    : true)'
+                - message: tls must be empty for protocols ['HTTP', 'TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
+                    !has(l.tls) : true)'
+                - message: hostname must be empty for protocols ['TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
+                    || l.hostname == '''') : true)'
+                - message: Listener name must be unique within the Gateway
+                  rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
+                - message: Combination of port, protocol and hostname must be unique
+                    for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
+                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
+                    == l2.hostname : true)))'
             required:
             - gatewayClassName
             - listeners
