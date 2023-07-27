@@ -42,7 +42,7 @@ type MeshPod struct {
 	Name      string
 	Namespace string
 	Address   string
-	rc        *rest.RESTClient
+	rc        rest.Interface
 	rcfg      *rest.Config
 }
 
@@ -171,7 +171,7 @@ func ConnectToAppInNamespace(t *testing.T, s *suite.ConformanceTestSuite, app Me
 		Name:      podName,
 		Namespace: podNamespace,
 		Address:   pod.Status.PodIP,
-		rc:        s.RESTClient,
+		rc:        s.Clientset.CoreV1().RESTClient(),
 		rcfg:      s.RestConfig,
 	}
 }
