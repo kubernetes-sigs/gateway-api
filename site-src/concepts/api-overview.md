@@ -330,9 +330,20 @@ important:
     only affect requests from workloads in the same Namespace as the Route.
 
     There is ongoing [GAMMA] work around the relationship between producer
-    routes and consumer routes. Note also that it is not currently possible to
-    define multiple consumer routes for the same Service in the same
-    Namespace.
+    routes and consumer routes.
+
+One important note about Routes bound to Services is that multiple Routes for
+the same Service in a single Namespace - whether producer routes or consumer
+routes - will be combined according to the [Route merging rules]. As such, it
+is not currently possible to define distinct consumer routes for multiple
+consumers in the same Namespace.
+
+For example, if the `blender` workload and the `mixer` workload both live in
+the `foodprep` Namespace, and both call the `oven` workload using the same
+Service, it is not currently possible for `blender` and `mixer` to use
+HTTPRoutes to set different timeouts for their calls to the `oven` workload.
+`blender` and `mixer` would need to be moved into separate Namespaces to allow
+this.
 
 [Ana]:/concepts/roles-and-personas#ana
 [producer route]:/concepts/glossary#producer-route
@@ -354,10 +365,12 @@ at least one of the Routes will be rejected.
 
 ### Request flow
 
-A typical [east/west] API request flow is:
+A typical [east/west] API request flow when a [GAMMA]-compliant mesh is in use
+looks like:
 
 1. A client workload makes a request to <http://foo.ns.service.cluster.local>.
-2. The data plane locates the Service matching `foo` in Namespace `ns`.
+2. The mesh data plane intercepts the request and identifies it as traffic for
+   the Service `foo` in Namespace `ns`.
 3. The data plane locates Routes associated with the `foo` Service.
 4. If the request does not match any Route, it is rejected.
 5. The data plane uses the `backendRefs` of the highest-priority matching
