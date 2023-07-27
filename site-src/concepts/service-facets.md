@@ -5,8 +5,9 @@ often realize. When you create a Service, typically the cluster machinery will:
 
 - Allocate a cluster-wide IP address for the Service itself (its _cluster IP_);
 - Allocate a DNS name for the Service, resolving to the cluster IP (its _DNS name_);
-- Allocates separate cluster-wide IP addresses for each Pod matched by the
-  Service's selector (the _endpoint IPs_); and
+- Collect the separate cluster-wide IP addresses assigned to each Pod matched
+  by the Service's selector (the _endpoint IPs_) into the Service's Endpoints
+  or EndpointSlices.
 - Configure the network such that traffic to the cluster IP will be
   load-balanced across all the endpoint IPs.
 

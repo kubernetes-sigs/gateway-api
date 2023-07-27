@@ -41,7 +41,9 @@ wheelhouse.
 2. Charlie goes to Ian and requests a cluster.
 
 3. Ian provisions a cluster running a gateway controller with a [GatewayClass]
-   resource named `basic-gateway-class`. The gateway controller manages XXX.
+   resource named `basic-gateway-class`. The gateway controller manages the
+   infrastructure associated with routing traffic from outside the cluster to
+   inside the cluster.
 
 4. Ian gives Charlie credentials to the new cluster, and tells Charlie that
    they can use GatewayClass `basic-gateway-class` to set things up.

@@ -371,10 +371,18 @@ looks like:
 1. A client workload makes a request to <http://foo.ns.service.cluster.local>.
 2. The mesh data plane intercepts the request and identifies it as traffic for
    the Service `foo` in Namespace `ns`.
-3. The data plane locates Routes associated with the `foo` Service.
-4. If the request does not match any Route, it is rejected.
-5. The data plane uses the `backendRefs` of the highest-priority matching
-   Route to select a destination workload.
+3. The data plane locates Routes associated with the `foo` Service, then:
+
+    a. If there are no associated Routes, the request is always allowed, and
+       the `foo` workload itself is considered the destination workload.
+
+    b. If there are associated Routes and the request matches at least one of
+       them, the `backendRefs` of the highest-priority matching Route are used
+       to select the destination workload.
+
+    c. If there are associated Routes, but the request matches none of them,
+       the request is rejected.
+
 6. The data plane routes the request on to the destination workload (most
    likely using [endpoint routing], but it is allowed to use [Service
    routing]).

@@ -7,10 +7,11 @@ refining the specific consumer's use of the workload.
 
 ### Gateway Controller
 
-A _gateway controller_ is software that runs on a cluster to manage the
-infrastructure associated with routing traffic from outside the cluster to
-inside the cluster (north/south traffic), analogous to the earlier _ingress
-controller_ concept.
+A _gateway controller_ is software that manages the infrastructure associated
+with routing traffic from outside the cluster to inside the cluster
+(north/south traffic), analogous to the earlier _ingress controller_ concept.
+Gateway controllers often, but not always, run in the cluster where they're
+managing infrastructure.
 
 ### East/West traffic
 
@@ -28,9 +29,11 @@ be in the same Namespace as their workload's Service.
 
 ### Service mesh
 
-A _service mesh_ is software that runs on a cluster to manage infrastructure
-providing security, reliability, and observability for communications between
-workloads (east/west traffic).
+A _service mesh_ is software that manages infrastructure providing security,
+reliability, and observability for communications between workloads (east/west
+traffic). Service meshes generally work by intercepting communications between
+workloads at a very low level, often (though not always) by inserting proxies
+next to the workload's Pods.
 
 ### Service backend
 
