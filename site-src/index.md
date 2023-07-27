@@ -29,8 +29,8 @@ traffic][east/west traffic] within the same cluster.
 When using the Gateway API to manage ingress traffic, the [Gateway] resource
 defines a point of access at which traffic from outside clients can be routed
 into the cluster ([north/south traffic]). (If you're familiar with the older
-Ingress resource, you can think of a Gateway as analogous to a
-more-expressive, updated Ingress.)
+[Ingress API], you can think of the Gateway API as analogous to a more-expressive
+next-generation version of that API.)
 
 Each Gateway is associated with a [GatewayClass], which describes the actual
 kind of [gateway controller] that will handle traffic for the Gateway;
@@ -41,6 +41,7 @@ nature of the Gateway API, as well as allowing for multiple kinds of gateway
 controllers (represented by GatewayClass resources), each with multiple
 instances (represented by Gateway resources), in the same cluster.
 
+[Ingress API]:https://kubernetes.io/docs/concepts/services-networking/ingress/
 [north/south traffic]:/concepts/glossary#northsouth-traffic
 [east/west traffic]:/concepts/glossary#eastwest-traffic
 [gateway controller]:/concepts/glossary#gateway-controller
@@ -115,7 +116,7 @@ functions).
 supports associating routing resources with Service resources, to configure
 service meshes as well as ingress controllers.
 
-## Why does a role-oriented API matter? <a name="role-oriented"></a>
+## Why does a role-oriented API matter?
 
 Whether it’s roads, power, data centers, or Kubernetes clusters,
 infrastructure is built to be shared. However, shared infrastructure raises a

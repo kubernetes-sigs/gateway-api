@@ -30,21 +30,21 @@ multiple roles, as discussed below.
 
 The Gateway API defines three roles and personas:
 
-* <a name="ian">**Ian**</a> (he/him) is an _infrastructure provider_,
+* **Ian**<a name="ian"></a> (he/him) is an _infrastructure provider_,
   responsible for the care and feeding of a set of infrastructure that permits
   multiple isolated clusters to serve multiple tenants. He is not beholden to
   any single tenant; rather, he worries about all of them collectively. Ian
   will often work for a cloud provider (AWS, Azure, GCP, ...) or for a PaaS
   provider.
 
-* <a name="charlie">**Charlie**</a> (they/them) is a _cluster operator_,
+* **Charlie**<a name="charlie"></a> (they/them) is a _cluster operator_,
   responsible for managing clusters to ensure that they meet the needs of
   their several users. Charlie will typically be concerned with policies,
   network access, application permissions, etc. Again, they are beholden to no
   single user of any cluster; rather, they need to make sure that the clusters
   serve all users as needed.
 
-* <a name="ana">**Ana**</a> (she/her) is an _application developer_,
+* **Ana**<a name="ana"></a> (she/her) is an _application developer_,
   responsible for creating and managing an application running in a cluster.
   From the Gateway API's point of view, Ana will need to manage configuration
   (e.g. timeouts, request matching/filter) and Service composition (e.g. path
