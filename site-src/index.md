@@ -29,8 +29,8 @@ traffic][east/west traffic] within the same cluster.
 When using the Gateway API to manage ingress traffic, the [Gateway] resource
 defines a point of access at which traffic from outside clients can be routed
 into the cluster ([north/south traffic]). (If you're familiar with the older
-[Ingress API], you can think of the Gateway API as analogous to a more-expressive
-next-generation version of that API.)
+[Ingress API], you can think of the Gateway API as analogous to a
+more-expressive next-generation version of that API.)
 
 Each Gateway is associated with a [GatewayClass], which describes the actual
 kind of [gateway controller] that will handle traffic for the Gateway;
