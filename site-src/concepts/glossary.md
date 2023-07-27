@@ -65,5 +65,6 @@ same endpoint.
 
 ### Workload
 
-An instance of computation that provides a function within a cluster. A
-workload usually comprises a Service, some Pods, and often a Deployment.
+An instance of computation that provides a function within a cluster,
+comprising the Pods providing the compute, and the
+Deployment/Job/ReplicaSet/etc which owns those Pods.
