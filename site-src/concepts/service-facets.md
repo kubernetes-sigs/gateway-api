@@ -42,7 +42,7 @@ endpoint routing can be more predictable when using the Gateway API for both
 formalize guidance for this use case.
 
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
-[north/south]:/concepts/glossary#north-south-traffic
-[east/west traffic]:/concepts/glossary#east-west-traffic
+[north/south]:/concepts/glossary#northsouth-traffic
+[east/west traffic]:/concepts/glossary#eastwest-traffic
 [gamma]:/contributing/gamma/
 [Ana]:/concepts/roles-and-personas#ana

@@ -19,10 +19,10 @@ they all have distinct concerns that we need to consider separately.)
 
 ## The Use Cases
 
-- [Basic north/south use case](#basic-north-south-use-case)
+- [Basic north/south use case](#basic-northsouth-use-case)
 - [Multiple applications behind a single
   Gateway](#multiple-applications-behind-a-single-gateway)
-- [Basic east/west use case](#basic-east-west-use-case)
+- [Basic east/west use case](#basic-eastwest-use-case)
 - [Gateway and mesh use case](#gateway-and-mesh-use-case)
 
 [role and personas]:/concepts/roles-and-personas
@@ -76,12 +76,12 @@ Ana and her colleagues control over the application's [routing
 logic](/guides/http-routing) and rollout plans (e.g. [traffic splitting
 rollouts](/guides/traffic-splitting)).
 
-[north/south]:/concepts/glossary#north-south-traffic
+[north/south]:/concepts/glossary#northsouth-traffic
 
 ## Multiple applications behind a single Gateway
 
 This is remarkably similar to the [basic north/south use
-case](#basic-north-south-use-case), but there are multiple application teams:
+case](#basic-northsouth-use-case), but there are multiple application teams:
 Ana and her team are managing a storefront application in the `store`
 Namespace, while Allison and her team are managing a website in the `site`
 Namespace.
@@ -131,15 +131,15 @@ In this case, the separation of concerns across roles allows Ana to take
 advantage of the service mesh, with custom routing logic, without any
 bottlenecks in requests to Charlie or Ian.
 
-[east/west]:/concepts/glossary#east-west-traffic
+[east/west]:/concepts/glossary#eastwest-traffic
 [GAMMA]:/contributing/gamma/
 [service mesh]:/concepts/glossary#service-mesh
 
 ## Gateway and mesh use case
 
-This is effectively a combination of the `multiple applications behind a
+This is effectively a combination of the [multiple applications behind a
 single Gateway](#multiple-applications-behind-a-single-gateway) and [basic
-east/west](#basic-east-west-use-case) use cases:
+east/west](#basic-eastwest-use-case) use cases:
 
 - Charlie and Ian will provision a cluster, a [GatewayClass], and a [Gateway].
 

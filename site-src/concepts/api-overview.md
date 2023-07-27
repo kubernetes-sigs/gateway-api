@@ -295,7 +295,7 @@ reverse proxy is:
 6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
    `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
 
-[north/south]:/concepts/glossary#north-south-traffic
+[north/south]:/concepts/glossary#northsouth-traffic
 
 ### TLS Configuration
 
@@ -335,10 +335,11 @@ important:
     Namespace.
 
 [Ana]:/concepts/roles-and-personas#ana
-[producer route]:/concepts/glossary#provider-route
+[producer route]:/concepts/glossary#producer-route
 [consumer route]:/concepts/glossary#consumer-route
 [GAMMA]:/contributing/gamma
 [service mesh]:/concepts/glossary#service-mesh
+[Route merging rules]:/api-types/httproute#merging
 
 ### How it Works
 
@@ -365,7 +366,7 @@ A typical [east/west] API request flow is:
    likely using [endpoint routing], but it is allowed to use [Service
    routing]).
 
-[east/west]:/concepts/glossary#east-west-traffic
+[east/west]:/concepts/glossary#eastwest-traffic
 [endpoint routing]:/concepts/glossary#endpoint-routing
 [Service routing]:/concepts/glossary#service-routing
 

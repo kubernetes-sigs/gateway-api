@@ -62,7 +62,7 @@ definition of the different [facets of the Service resource][service-facets].
 
 [gamma]:/contributing/gamma/
 [service-mesh]:/concepts/glossary#service-mesh
-[service-facets]:/concepts/service-facets.md
+[service-facets]:/concepts/service-facets
 [mesh-attachment]:/concepts/api-overview#attaching-routes-to-services
 
 ## Getting started
