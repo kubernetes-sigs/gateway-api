@@ -7,7 +7,7 @@ This document provides an overview of Gateway API.
 There are 3 primary roles in Gateway API, as described in [roles and personas]:
 
 - **Ian** (he/him): Infrastructure Provider
-- **Charlie** (they/them): Cluster Operator
+- **Chihiro** (they/them): Cluster Operator
 - **Ana** (she/her): Application Developer
 
 [roles and personas]:/concepts/roles-and-personas
@@ -176,7 +176,7 @@ different relationships that Gateways and Routes can have:
 
 ### Example
 
-[Charlie] has deployed a Gateway `shared-gw` in the `infra` Namespace to be
+[Chihiro] has deployed a Gateway `shared-gw` in the `infra` Namespace to be
 used by different application teams for exposing their applications outside
 the cluster. Teams A and B (in Namespaces `A` and `B` respectively) attach
 their Routes to this Gateway. They are unaware of each other and as long as
@@ -190,7 +190,7 @@ Namespace.
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
 ![route binding](/images/gateway-route-binding.png)
 
-[Charlie]:/concepts/roles-and-personas#charlie
+[Chihiro]:/concepts/roles-and-personas#Chihiro
 
 ### How it Works
 

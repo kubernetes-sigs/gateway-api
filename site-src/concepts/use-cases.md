@@ -7,14 +7,15 @@ examples that can be helpful to demonstrate how the API can be used.
 
 In all cases, it's very important to bear in mind the [roles and personas]
 used in the Gateway API. The use cases presented here are deliberately
-described in terms of [Ana], [Charlie], and [Ian]: they are the ones for whom the
-API must be usable. (It's also important to remember that even though these
-roles might be filled by the same person, especially in smaller organizations,
-they all have distinct concerns that we need to consider separately.)
+described in terms of [Ana], [Chihiro], and [Ian]: they are the ones for whom
+the API must be usable. (It's also important to remember that even though
+these roles might be filled by the same person, especially in smaller
+organizations, they all have distinct concerns that we need to consider
+separately.)
 
 [roles and personas]:/concepts/roles-and-personas
 [Ana]:/concepts/roles-and-personas#ana
-[Charlie]:/concepts/roles-and-personas#charlie
+[Chihiro]:/concepts/roles-and-personas#chihiro
 [Ian]:/concepts/roles-and-personas#ian
 
 ## The Use Cases
@@ -39,21 +40,21 @@ Kubernetes. Her application will be used by clients outside the cluster, and
 while Ana has created the application, setting up the cluster is not in her
 wheelhouse.
 
-1. Ana goes to Charlie to ask them to set up a cluster. Ana tells Charlie that
+1. Ana goes to Chihiro to ask them to set up a cluster. Ana tells Chihiro that
    her clients will expect her APIs to be available using URLs rooted at
    `https://ana.application.com/`.
 
-2. Charlie goes to Ian and requests a cluster.
+2. Chihiro goes to Ian and requests a cluster.
 
 3. Ian provisions a cluster running a gateway controller with a [GatewayClass]
    resource named `basic-gateway-class`. The gateway controller manages the
    infrastructure associated with routing traffic from outside the cluster to
    inside the cluster.
 
-4. Ian gives Charlie credentials to the new cluster, and tells Charlie that
+4. Ian gives Chihiro credentials to the new cluster, and tells Chihiro that
    they can use GatewayClass `basic-gateway-class` to set things up.
 
-5. Charlie applies a [Gateway] named `ana-gateway` to the cluster, telling it
+5. Chihiro applies a [Gateway] named `ana-gateway` to the cluster, telling it
    to listen on port 443 for TLS traffic, and providing it a TLS certificate
    with a Subject CN of `ana.application.com`. They associate this Gateway with the `basic-gateway-class` GatewayClass.
 
@@ -63,10 +64,10 @@ wheelhouse.
    443, and starts watching for routing resources associated with
    `ana-gateway`.
 
-7. Charlie gets the IP address of `ana-gateway` and creates a DNS record
+7. Chihiro gets the IP address of `ana-gateway` and creates a DNS record
    outside the cluster for `ana.application.com` to match.
 
-8. Charlie tells Ana that she's good to go, using the Gateway named
+8. Chihiro tells Ana that she's good to go, using the Gateway named
    `ana-gateway`.
 
 9. Ana writes and applies [HTTPRoute] resources to configure which URL paths
@@ -77,7 +78,7 @@ wheelhouse.
 10. At this point, when requests arrive at the load balancer, they are routed
     to Ana's application according to her routing specification.
 
-This allows Charlie to enforce centralized policies [such as
+This allows Chihiro to enforce centralized policies [such as
 TLS](/guides/tls#downstream-tls) at the Gateway, while simultaneously allowing
 Ana and her colleagues control over the application's [routing
 logic](/guides/http-routing) and rollout plans (e.g. [traffic splitting
@@ -98,20 +99,20 @@ Ana and her team are managing a storefront application in the `store`
 Namespace, while Allison and her team are managing a website in the `site`
 Namespace.
 
-- Ian and Charlie work together to provide a cluster, `GatewayClass`, and
+- Ian and Chihiro work together to provide a cluster, `GatewayClass`, and
   `Gateway`, as above.
 
 - Ana and Allison independently deploy workloads and HTTPRoutes bound to the
   same `Gateway` resource.
 
-Again, this separation of concerns allows Charlie to enforce centralized
+Again, this separation of concerns allows Chihiro to enforce centralized
 policies [such as TLS](/guides/tls#downstream-tls) can be enforced at the
 Gateway. Meanwhile, Ana and Allison run their applications [in their own
 Namespaces](/guides/multiple-ns), but attach their Routes to the same shared
 Gateway, allowing them to independently control their [routing
 logic](/guides/http-routing), [traffic splitting
 rollout](/guides/traffic-splitting), etc., while not worrying about the things
-that Charlie and Ian are handling.
+that Chihiro and Ian are handling.
 
 [HTTPRoute]:/api-types/httproute
 [GatewayClass]:/api-types/gatewayclass
@@ -134,7 +135,7 @@ protect her workload by rejecting calls to her workload with incorrect
 URL paths, and by enforcing timeouts whenever anyone makes a request of her
 workload.
 
-- Charlie and Ian have already provided a cluster with a running service mesh.
+- Chihiro and Ian have already provided a cluster with a running service mesh.
   Ana doesn't need to make any requests of them.
 
 - Ana writes an HTTPRoute that defines acceptable routes and timeouts and has
@@ -147,7 +148,7 @@ workload.
 
 In this case, the separation of concerns across roles allows Ana to take
 advantage of the service mesh, with custom routing logic, without any
-bottlenecks in requests to Charlie or Ian.
+bottlenecks in requests to Chihiro or Ian.
 
 [east/west]:/concepts/glossary#eastwest-traffic
 [GAMMA]:/concepts/gamma/
@@ -165,7 +166,7 @@ This is effectively a combination of the [multiple applications behind a
 single Gateway](#multiple-applications-behind-a-single-gateway) and [basic
 east/west](#basic-eastwest-use-case) use cases:
 
-- Charlie and Ian will provision a cluster, a [GatewayClass], and a [Gateway].
+- Chihiro and Ian will provision a cluster, a [GatewayClass], and a [Gateway].
 
 - Ana and Allison will deploy their applications in the appropriate
   Namespaces.
@@ -175,7 +176,7 @@ east/west](#basic-eastwest-use-case) use cases:
 There are two very important changes in this scenario, though, since a mesh is
 involved:
 
-1. If Charlie has deployed a [gateway controller] that defaults to [Service
+1. If Chihiro has deployed a [gateway controller] that defaults to [Service
    routing], they will probably need to reconfigure it for [endpoint routing].
    (This is an ongoing area of work for [GAMMA], but the expectation is that
    endpoint routing will be recommended.)
@@ -186,7 +187,7 @@ involved:
    HTTPRoutes that bind to both the Gateway and a Service.
 
 As always, the ultimate point of separating concerns in this way is that it
-permits Charlie to enforce centralized policies [such as
+permits Chihiro to enforce centralized policies [such as
 TLS](/guides/tls#downstream-tls) at the Gateway, while allowing Ana and
 Allison to retain independent control of [routing
 logic](/guides/http-routing), [traffic splitting

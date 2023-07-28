@@ -152,9 +152,9 @@ The roles used for the Gateway API's design are defined by three personas:
   to serve multiple tenants. He is not beholden to any single tenant; rather,
   he worries about all of them collectively.
 
-- **Charlie** (they/them) is a _cluster operator_. Their role is to manage a
+- **Chihiro** (they/them) is a _cluster operator_. Their role is to manage a
   single cluster, ensuring that it meets the needs of its several users.
-  Again, Charlie is beholden to no single user of their cluster; they need to
+  Again, Chihiro is beholden to no single user of their cluster; they need to
   make sure that the cluster serves all of them as needed.
 
 - **Ana** (she/her) is an _application developer_. Ana is in a unique position
@@ -166,7 +166,7 @@ The roles used for the Gateway API's design are defined by three personas:
 (These three are discussed in more detail in [Roles and
 Personas](/concepts/roles-and-personas).)
 
-It should be clear that while Ana, Charlie, and Ian do not necessarily see
+It should be clear that while Ana, Chihiro, and Ian do not necessarily see
 eye-to-eye about everything, they need to work together to keep things running
 smoothly. This is the core challenge of the Gateway API in a nutshell.
 
@@ -178,7 +178,7 @@ and implementations while remaining a portable and standard API.
 
 The use cases presented are deliberately cast in terms of the roles presented
 above. Ultimately the Gateway API is meant for use by humans, which means that
-it must fit the uses to which each of Ana, Charlie, and Ian will put it.
+it must fit the uses to which each of Ana, Chihiro, and Ian will put it.
 
 [use-cases]:/concepts/use-cases
 

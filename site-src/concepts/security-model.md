@@ -18,7 +18,7 @@ Gateway API has 3 primary API resources:
 There are 3 primary roles in Gateway API, as described in [roles and personas]:
 
 - **Ian** (he/him): Infrastructure Provider
-- **Charlie** (they/them): Cluster Operator
+- **Chihiro** (they/them): Cluster Operator
 - **Ana** (she/her): Application Developer
 
 [roles and personas]:/concepts/roles-and-personas

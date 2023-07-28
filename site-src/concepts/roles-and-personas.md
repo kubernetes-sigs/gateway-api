@@ -37,9 +37,9 @@ The Gateway API defines three roles and personas:
   will often work for a cloud provider (AWS, Azure, GCP, ...) or for a PaaS
   provider.
 
-* **Charlie**<a name="charlie"></a> (they/them) is a _cluster operator_,
+* **Chihiro**<a name="Chihiro"></a> (they/them) is a _cluster operator_,
   responsible for managing clusters to ensure that they meet the needs of
-  their several users. Charlie will typically be concerned with policies,
+  their several users. Chihiro will typically be concerned with policies,
   network access, application permissions, etc. Again, they are beholden to no
   single user of any cluster; rather, they need to make sure that the clusters
   serve all users as needed.
@@ -60,7 +60,7 @@ Depending on the environment, multiple roles can map to the same user:
   and may actually happen in a small startup running Kubernetes on bare metal.
 
 - A more typical small startup would use clusters from a cloud provider. In
-  this situation, Ana and Charlie may be embodied in the same person, with Ian
+  this situation, Ana and Chihiro may be embodied in the same person, with Ian
   being an employee (or automated process!) within the cloud provider.
 
 - In a much larger organization, we would expect each persona above to be
