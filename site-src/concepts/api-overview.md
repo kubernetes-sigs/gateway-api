@@ -311,97 +311,19 @@ Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
     is _experimental_ in `v0.8.0`. It is possible that it will change; we do
     not recommend it in production at this point.
 
+    In particular, binding Routes directly to Services seems to be the current
+    best choice for configuring mesh routing, but it is still **experimental**
+    and thus **subject to change**.
+
 When using the Gateway API to configure a [service mesh], the Route will
 attach directly to a Service, representing configuration meant to be applied
 to any traffic directed to the Service. How and which Routes attach to a given
-Service is controlled by the Routes themselves (working with Kubernetes RBAC).
+Service is controlled by the Routes themselves (working with Kubernetes RBAC),
+as covered in the [GAMMA routing documentation].
 
-!!! danger inline end "Experimental in v0.8.0"
-
-    Binding Routes directly to Services seems to be the current best choice
-    for configuring mesh routing, but it is still **experimental** and thus
-    **subject to change**.
-
-The relationship between the Route's Namespace and the Service's Namespace is
-important:
-
-- Same Namespace <a name="producer-routes"></a>
-
-    A Route in the same Namespace as its Service is called a [producer route]
-    since it is typically created by the creator of the workload in order to
-    define acceptable usage of the workload (for example, [Ana] would deploy
-    both the workload and the Route). All requests from any client of the
-    workload, from any Namespace, will be affected by this Route.
-
-- Different Namespaces <a name="consumer-routes"></a>
-
-    A Route in a different Namespace than its Service is called a [consumer
-    route]. Typically, this is a Route meant to refine how a consumer of a
-    given workload makes request of that workload (for example, configuring
-    custom timeouts for that consumer's use of the workload). This Route will
-    only affect requests from workloads in the same Namespace as the Route.
-
-    There is ongoing [GAMMA] work around the relationship between producer
-    routes and consumer routes.
-
-One important note about Routes bound to Services is that multiple Routes for
-the same Service in a single Namespace - whether producer routes or consumer
-routes - will be combined according to the [Route merging rules]. As such, it
-is not currently possible to define distinct consumer routes for multiple
-consumers in the same Namespace.
-
-For example, if the `blender` workload and the `mixer` workload both live in
-the `foodprep` Namespace, and both call the `oven` workload using the same
-Service, it is not currently possible for `blender` and `mixer` to use
-HTTPRoutes to set different timeouts for their calls to the `oven` workload.
-`blender` and `mixer` would need to be moved into separate Namespaces to allow
-this.
-
-[Ana]:/concepts/roles-and-personas#ana
-[producer route]:/concepts/glossary#producer-route
-[consumer route]:/concepts/glossary#consumer-route
-[GAMMA]:/contributing/gamma
+[GAMMA]:/concepts/gamma
+[GAMMA routing documentation]:/concepts/gamma#gateway-api-for-mesh
 [service mesh]:/concepts/glossary#service-mesh
-[Route merging rules]:/api-types/httproute#merging
-
-### How it Works
-
-To attach a Route to a Service, the Route needs an entry in its `parentRefs`
-field referencing the Service. If the Route and the Service are in the same
-Namespace, the Route is a [producer route](#producer-routes); otherwise, it is
-a [consumer route](#consumer-routes). It is not currently possible to define
-multiple consumer routes for the same Service in the same Namespace.
-
-When one or more Routes are attached to a Service, requests that do not match
-at least one of the Routes will be rejected.
-
-### Request flow
-
-A typical [east/west] API request flow when a [GAMMA]-compliant mesh is in use
-looks like:
-
-1. A client workload makes a request to <http://foo.ns.service.cluster.local>.
-2. The mesh data plane intercepts the request and identifies it as traffic for
-   the Service `foo` in Namespace `ns`.
-3. The data plane locates Routes associated with the `foo` Service, then:
-
-    a. If there are no associated Routes, the request is always allowed, and
-       the `foo` workload itself is considered the destination workload.
-
-    b. If there are associated Routes and the request matches at least one of
-       them, the `backendRefs` of the highest-priority matching Route are used
-       to select the destination workload.
-
-    c. If there are associated Routes, but the request matches none of them,
-       the request is rejected.
-
-6. The data plane routes the request on to the destination workload (most
-   likely using [endpoint routing], but it is allowed to use [Service
-   routing]).
-
-[east/west]:/concepts/glossary#eastwest-traffic
-[endpoint routing]:/concepts/glossary#endpoint-routing
-[Service routing]:/concepts/glossary#service-routing
 
 ## Extension points
 

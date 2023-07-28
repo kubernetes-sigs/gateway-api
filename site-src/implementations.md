@@ -72,7 +72,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [27]:#azure-application-gateway-for-containers
 [28]:#linkerd
 
-[gamma]:/contributing/gamma/
+[gamma]:/concepts/gamma/
 
 ## Implementations
 
@@ -252,8 +252,8 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 A light-weight minimal install of Istio can be used to provide a Beta-quality
 implementation of the Kubernetes Gateway API for cluster ingress traffic
-control. For service mesh users, Istio 1.16 and later support the GAMMA
-initiative's experimental Gateway API [support for east-west traffic
+control. For service mesh users, Istio 1.16 and later support the [GAMMA
+initiative's][gamma] experimental Gateway API [support for east-west traffic
 management][gamma] within the mesh.
 
 Much of Istio's documentation, including all of the [ingress tasks][istio-1] and several mesh-internal traffic management tasks, already includes parallel instructions for
@@ -289,8 +289,8 @@ For help and support with Kong's implementations please feel free to [create an 
 
 Kuma is actively working on an implementation of Gateway API specification for the Kuma builtin Gateway. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma builtin gateway using the Gateway API.
 
-Kuma 2.3 and later support the GAMMA initiative's experimental Gateway API
-[support for east-west traffic management][gamma] within the mesh.
+Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
+Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 [kuma]:https://kuma.io
 [kuma-1]:https://kuma.io/docs/latest/explore/gateway-api/
@@ -302,8 +302,8 @@ It is the only major mesh not based on Envoy, instead relying on a
 purpose-built Rust micro-proxy to bring security, observability, and
 reliability to Kubernetes, without the complexity.
 
-Linkerd 2.14 and later support the GAMMA initiative's experimental Gateway API
-[support for east-west traffic management][gamma] within the mesh.
+Linkerd 2.14 and later support the [GAMMA initiative's][gamma] experimental
+Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 [linkerd]:https://linkerd.io/
 [linkerd-mesh]:https://buoyant.io/service-mesh-manifesto

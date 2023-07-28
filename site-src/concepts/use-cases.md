@@ -150,7 +150,7 @@ advantage of the service mesh, with custom routing logic, without any
 bottlenecks in requests to Charlie or Ian.
 
 [east/west]:/concepts/glossary#eastwest-traffic
-[GAMMA]:/contributing/gamma/
+[GAMMA]:/concepts/gamma/
 [service mesh]:/concepts/glossary#service-mesh
 
 ## Gateway and mesh use case

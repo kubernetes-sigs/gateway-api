@@ -146,7 +146,7 @@ possible integration.
 We are pleased to announce that the service mesh community, including
 representatives from Cilium Service Mesh, Consul, Istio, Kuma, Linkerd, NGINX
 Service Mesh and Open Service Mesh, is coming together to form the [GAMMA
-Initiative](https://gateway-api.sigs.k8s.io/contributing/gamma/), a dedicated
+Initiative](https://gateway-api.sigs.k8s.io/concepts/gamma/), a dedicated
 workstream within the Gateway API subproject focused on Gateway API for Mesh
 Management and Administration.
 
@@ -169,7 +169,7 @@ As we continue to mature the API for production use cases, here are some of the 
 - [Route delegation][pr1085]
 - Layer 4 API maturity: Graduating [TCPRoute][tcpr], [UDPRoute][udpr] and
   [TLSRoute][tlsr] to beta
-- [GAMMA Initiative](https://gateway-api.sigs.k8s.io/contributing/gamma/) - Gateway API for Service Mesh
+- [GAMMA Initiative](https://gateway-api.sigs.k8s.io/concepts/gamma/) - Gateway API for Service Mesh
 
 If there's something on this list you want to get involved in, or there's
 something not on this list that you want to advocate for to get on the roadmap

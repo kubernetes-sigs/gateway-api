@@ -28,6 +28,7 @@ plugins:
       redirect_maps:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
+        'contributing/gamma.md': 'concepts/gamma.md#contributing'
   - mermaid2
 markdown_extensions:
   - admonition
@@ -52,6 +53,7 @@ nav:
     - Introduction: index.md
     - Concepts:
         API Overview: concepts/api-overview.md
+        GAMMA: concepts/gamma.md
         Conformance: concepts/conformance.md
         Implementation Guidelines: concepts/guidelines.md
         Roles and Personas: concepts/roles-and-personas.md

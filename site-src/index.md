@@ -65,19 +65,19 @@ Service resources][mesh-attachment], permitting the mesh to manage traffic
 from any traffic directed to that Service while preserving the role-oriented
 nature of the Gateway API.
 
-To date, GAMMA has been able to support mesh functionality with fairly minimal
-changes to the Gateway API. One particular area that has rapidly become
-critical for GAMMA, though, is the definition of the different [facets of the
-Service resource][service-facets].
+To date, [GAMMA][gamma] has been able to support mesh functionality with
+fairly minimal changes to the Gateway API. One particular area that has
+rapidly become critical for GAMMA, though, is the definition of the different
+[facets of the Service resource][service-facets].
 
 In Gateway API v0.8.0, GAMMA support for service mesh is **experimental**. We
 encourage working with it and providing feedback, but you **must** be prepared
 for change in the GAMMA APIs.
 
-[gamma]:/contributing/gamma/
+[gamma]:/concepts/gamma/
 [service-mesh]:/concepts/glossary#service-mesh
 [service-facets]:/concepts/service-facets
-[mesh-attachment]:/concepts/api-overview#attaching-routes-to-services
+[mesh-attachment]:/concepts/gamma#gateway-api-for-mesh
 
 ## Getting started
 
@@ -125,9 +125,9 @@ resources and also different types of backends. This allows the API to be
 flexible in supporting various protocols (like HTTP and gRPC) and
 various backend targets (like Kubernetes Services, storage buckets, or
 functions).
-- **Service mesh support** with the GAMMA initiative - The Gateway API
-supports associating routing resources with Service resources, to configure
-service meshes as well as ingress controllers.
+- Experimental **Service mesh support** with the [GAMMA initiative][gamma] -
+The Gateway API supports associating routing resources with Service resources,
+to configure service meshes as well as ingress controllers.
 
 ## Why does a role-oriented API matter?
 

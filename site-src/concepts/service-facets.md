@@ -39,11 +39,11 @@ should be directed to the Service's frontend or its backend:
 
 While Service routing may be the most direct fit for [Ana]'s sense of routing,
 endpoint routing can be more predictable when using the Gateway API for both
-[north/south] and [east/west traffic]. The GAMMA initiative is working to
+[north/south] and [east/west traffic]. The [GAMMA initiative][gamma] is working to
 formalize guidance for this use case.
 
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [north/south]:/concepts/glossary#northsouth-traffic
 [east/west traffic]:/concepts/glossary#eastwest-traffic
-[gamma]:/contributing/gamma/
+[gamma]:/concepts/gamma/
 [Ana]:/concepts/roles-and-personas#ana
