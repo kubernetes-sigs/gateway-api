@@ -177,7 +177,7 @@ type GatewayInfrastructure struct {
 	// specifies otherwise.
 	//
 	// If a Gateway is mutated but does not support the desired routability it MUST set the `Accepted`
-	// and `Programmed` conditions to `False` with `Reason` set to `UnsupportedRoutability`.
+	// condition to `False` with `Reason` set to `UnsupportedRoutability`.
 	//
 	// +optional
 	Routability *GatewayRoutability `json:"routability,omitempty"`
@@ -690,7 +690,7 @@ const (
 	// address exhaustion, address not yet allocated, or a named address not being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 
-	// This reason is used with "Programmed" and "Accepted" conditions when
+	// This reason is used with the "Accepted" conditions when
 	// desired routability is not able to be fulfilled by the implementation
 	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
 )
@@ -712,6 +712,7 @@ const (
 	// * "NotReconciled"
 	// * "UnsupportedAddress"
 	// * "ListenersNotValid"
+	// * "UnsupportedRoutability"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//

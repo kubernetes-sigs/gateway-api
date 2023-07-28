@@ -132,8 +132,8 @@ spec:
                       expectation should be that changes to this field are not supported
                       unless an implementation specifies otherwise. \n If a Gateway
                       is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
+                      set the `Accepted` condition to `False` with `Reason` set to
+                      `UnsupportedRoutability`."
                     maxLength: 253
                     minLength: 1
                     pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
@@ -911,8 +911,8 @@ spec:
                       expectation should be that changes to this field are not supported
                       unless an implementation specifies otherwise. \n If a Gateway
                       is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
+                      set the `Accepted` condition to `False` with `Reason` set to
+                      `UnsupportedRoutability`."
                     maxLength: 253
                     minLength: 1
                     pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
