@@ -53,8 +53,11 @@ nav:
     - Concepts:
         API Overview: concepts/api-overview.md
         Conformance: concepts/conformance.md
-        Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
+        Roles and Personas: concepts/roles-and-personas.md
+        Service Facets: concepts/service-facets.md
+        Security Model: concepts/security-model.md
+        Use Cases: concepts/use-cases.md
         Versioning: concepts/versioning.md
     - Implementations: implementations.md
     - FAQ: faq.md
@@ -112,6 +115,7 @@ nav:
         - geps/gep-724.md
         - geps/gep-718.md
         - geps/gep-709.md
+      - Glossary: concepts/glossary.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md

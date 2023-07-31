@@ -18,7 +18,7 @@ the spec, there will be no further need for a separate initiative.
 
 ## Meeting mechanics
 
-GAMMA meetings will occur weekly on Tuesdays for 1 hour, alternating between 3pm
+GAMMA meetings will occur every two weeks on Tuesdays for 1 hour, alternating between 3pm
 PT and 8am PT slots to try to be as time-zone inclusive as possible. Meetings
 will be moderated by the [GAMMA
 leads](https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L23)

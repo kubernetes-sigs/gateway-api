@@ -4,16 +4,13 @@ This document provides an overview of Gateway API.
 
 ## Roles and personas
 
-There are 3 primary roles in Gateway API:
+There are 3 primary roles in Gateway API, as described in [roles and personas]:
 
-- Infrastructure Provider
-- Cluster Operator
-- Application Developer
+- **Ian** (he/him): Infrastructure Provider
+- **Charlie** (they/them): Cluster Operator
+- **Ana** (she/her): Application Developer
 
-There could be a fourth role of Application Admin in some use cases.
-
-Please refer to the [roles and personas](/concepts/security-model#roles-and-personas)
-section in the Security model for details.
+[roles and personas]:/concepts/roles-and-personas
 
 ## Resource model
 
@@ -152,7 +149,7 @@ to configure that with existing Gateway API resources, but implementations may
 provide custom configuration for this until there is a standardized approach
 defined by Gateway API.
 
-### Attaching Routes to Gateways
+## Attaching Routes to Gateways
 
 !!! note
     This section has changed significantly between v1alpha1 and v1alpha2. This
@@ -179,19 +176,21 @@ different relationships that Gateways and Routes can have:
 
 ### Example
 
-A Kubernetes cluster admin has deployed a Gateway `shared-gw` in the `Infra`
-Namespace to be used by different application teams for exposing their
-applications outside the cluster. Teams A and B (in Namespaces `A` and `B`
-respectively) attach their Routes to this Gateway. They are unaware of each
-other and as long as their Route rules do not conflict with each other they
-can continue operating in isolation. Team C has special networking needs
-(perhaps performance, security, or criticality) and they need a dedicated
-Gateway to proxy their application to the outside world. Team C deploys their
-own Gateway `dedicated-gw`  in the `C` Namespace that can only be used by apps
-in the `C` Namespace.
+[Charlie] has deployed a Gateway `shared-gw` in the `infra` Namespace to be
+used by different application teams for exposing their applications outside
+the cluster. Teams A and B (in Namespaces `A` and `B` respectively) attach
+their Routes to this Gateway. They are unaware of each other and as long as
+their Route rules do not conflict with each other they can continue operating
+in isolation. Team C has special networking needs (perhaps performance,
+security, or criticality) and they need a dedicated Gateway to proxy their
+application to the outside world. Team C deploys their own Gateway
+`dedicated-gw`  in the `C` Namespace that can only be used by apps in the `C`
+Namespace.
 
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
 ![route binding](/images/gateway-route-binding.png)
+
+[Charlie]:/concepts/roles-and-personas#charlie
 
 ### How it Works
 
@@ -279,28 +278,96 @@ relationships between the different resources:
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
 ![schema](/images/schema-uml.svg)
 
-## Request flow
+### Request flow
 
-A typical client/gateway API request flow for a gateway implemented using a
+A typical [north/south] API request flow for a gateway implemented using a
 reverse proxy is:
 
- 1. A client makes a request to <http://foo.example.com>.
- 2. DNS resolves the name to a `Gateway` address.
- 3. The reverse proxy receives the request on a `Listener` and uses the [Host
- header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
- `HTTPRoute`.
- 4. Optionally, the reverse proxy can perform request header and/or path
- matching based on `match` rules of the `HTTPRoute`.
- 5. Optionally, the reverse proxy can modify the request, i.e. add/remove
- headers, based on `filter` rules of the `HTTPRoute`.
- 6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
- `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
+1. A client makes a request to <http://foo.example.com>.
+2. DNS resolves the name to a `Gateway` address.
+3. The reverse proxy receives the request on a `Listener` and uses the [Host
+   header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
+   `HTTPRoute`.
+4. Optionally, the reverse proxy can perform request header and/or path
+   matching based on `match` rules of the `HTTPRoute`.
+5. Optionally, the reverse proxy can modify the request, i.e. add/remove
+   headers, based on `filter` rules of the `HTTPRoute`.
+6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
+   `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
 
-## TLS Configuration
+[north/south]:/concepts/glossary#north-south-traffic
+
+### TLS Configuration
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
 Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
+
+## Attaching Routes to Services
+
+When using the Gateway API to configure a [service mesh], the Route will
+attach directly to a Service, representing configuration meant to be applied
+to any traffic directed to the Service. How and which Routes attach to a given
+Service is controlled by the Routes themselves (working with Kubernetes RBAC).
+
+The relationship between the Route's Namespace and the Service's Namespace is
+important:
+
+- Same Namespace <a name="producer-routes"></a>
+
+    A Route in the same Namespace as its Service is called a [producer route]
+    since it is typically created by the creator of the workload in order to
+    define acceptable usage of the workload (for example, [Ana] would deploy
+    both the workload and the Route). All requests from any client of the
+    workload, from any Namespace, will be affected by this Route.
+
+- Different Namespaces <a name="consumer-routes"></a>
+
+    A Route in a different Namespace than its Service is called a [consumer
+    route]. Typically, this is a Route meant to refine how a consumer of a
+    given workload makes request of that workload (for example, configuring
+    custom timeouts for that consumer's use of the workload). This Route will
+    only affect requests from workloads in the same Namespace as the Route.
+
+    There is ongoing [GAMMA] work around the relationship between producer
+    routes and consumer routes. Note also that it is not currently possible to
+    define multiple consumer routes for the same Service in the same
+    Namespace.
+
+[Ana]:/concepts/roles-and-personas#ana
+[producer route]:/concepts/glossary#provider-route
+[consumer route]:/concepts/glossary#consumer-route
+[GAMMA]:/contributing/gamma
+[service mesh]:/concepts/glossary#service-mesh
+
+### How it Works
+
+To attach a Route to a Service, the Route needs an entry in its `parentRefs`
+field referencing the Service. If the Route and the Service are in the same
+Namespace, the Route is a [producer route](#producer-routes); otherwise, it is
+a [consumer route](#consumer-routes). It is not currently possible to define
+multiple consumer routes for the same Service in the same Namespace.
+
+When one or more Routes are attached to a Service, requests that do not match
+at least one of the Routes will be rejected.
+
+### Request flow
+
+A typical [east/west] API request flow is:
+
+1. A client workload makes a request to <http://foo.ns.service.cluster.local>.
+2. The data plane locates the Service matching `foo` in Namespace `ns`.
+3. The data plane locates Routes associated with the `foo` Service.
+4. If the request does not match any Route, it is rejected.
+5. The data plane uses the `backendRefs` of the highest-priority matching
+   Route to select a destination workload.
+6. The data plane routes the request on to the destination workload (most
+   likely using [endpoint routing], but it is allowed to use [Service
+   routing]).
+
+[east/west]:/concepts/glossary#east-west-traffic
+[endpoint routing]:/concepts/glossary#endpoint-routing
+[Service routing]:/concepts/glossary#service-routing
 
 ## Extension points
 
