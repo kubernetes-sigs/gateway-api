@@ -126,7 +126,7 @@ performance, and avoid the operational complexity of sidecars. Cilium also
 supports the sidecar proxy model, offering choice to users. As of [Cilium 1.13][cilium113blog],
 Cilium supports Gateway API, passing conformance for v0.5.1.
 
-Cilium is open source and is a CNCF incubation project. 
+Cilium is open source and is a CNCF incubation project.
 
 If you have questions about Cilium Service Mesh the #service-mesh channel on
 [Cilium Slack][cilium-slack] is a good place to start. For contributing to the development
@@ -174,7 +174,7 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 ### Envoy Gateway
 
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
-APIs and fields of the Gateway API are outlined [here][eg-supported]. 
+APIs and fields of the Gateway API are outlined [here][eg-supported].
 Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
 few simple steps.
 
@@ -227,7 +227,7 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 
 ### HashiCorp Consul
 
-[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deployment can span bare metal, VM and container environments.  
+[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deployment can span bare metal, VM and container environments.
 
 Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and Consul CRDs provide a Kubernetes native workflow to manage traffic patterns and permissions in the mesh. [Consul API Gateway][consul-api-gw-doocs] supports Gatewway API for managing North-South traffic.
 

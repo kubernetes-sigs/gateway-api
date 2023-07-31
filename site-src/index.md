@@ -2,17 +2,17 @@
 
 Gateway API is an open source project managed by the [SIG-NETWORK][sig-network]
 community. It is an API (collection of resources) that model service networking
-in Kubernetes. These resources - `GatewayClass`, `Gateway`, `HTTPRoute`, 
-`TCPRoute`, `Service`, etc - aim to evolve Kubernetes service networking through 
-expressive, extensible, and role-oriented interfaces that are implemented by 
-many vendors and have broad industry support. 
+in Kubernetes. These resources - `GatewayClass`, `Gateway`, `HTTPRoute`,
+`TCPRoute`, `Service`, etc - aim to evolve Kubernetes service networking through
+expressive, extensible, and role-oriented interfaces that are implemented by
+many vendors and have broad industry support.
 
 ![Gateway API Model](./images/api-model.png)
 
 ## Getting started
 
-Whether you are a user interested in using the Gateway API or an implementer 
-interested in conforming to the API, the following resources will help give 
+Whether you are a user interested in using the Gateway API or an implementer
+interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
@@ -23,39 +23,39 @@ you the necessary background:
 
 
 ## Gateway API concepts
-The following design goals drive the concepts of the Gateway API. These 
+The following design goals drive the concepts of the Gateway API. These
 demonstrate how Gateway aims to improve upon current standards like Ingress.
 
 
-- **Role-oriented** - Gateway is composed of API resources which model 
-organizational roles that use and configure Kubernetes service networking. 
+- **Role-oriented** - Gateway is composed of API resources which model
+organizational roles that use and configure Kubernetes service networking.
 - **Portable** - This isn't an improvement but rather something
 that should stay the same. Just as Ingress is a universal specification with
 [numerous implementations](https://kubernetes.io/docs/concepts/services-networking/ingress-controllers/),
 Gateway API is designed to be a portable specification supported by many
 implementations.
-- **Expressive** - Gateway API resources support core functionality for things 
-like header-based matching, traffic weighting, and other capabilities that 
+- **Expressive** - Gateway API resources support core functionality for things
+like header-based matching, traffic weighting, and other capabilities that
 were only possible in Ingress through custom annotations.
-- **Extensible** - Gateway API allows for custom resources to be linked at 
+- **Extensible** - Gateway API allows for custom resources to be linked at
 various layers of the API. This makes granular customization possible at the
 appropriate places within the API structure.
 
 Some other notable capabilities include:
 
-- **GatewayClasses** - GatewayClasses formalize types of load balancing 
-implementations. These classes make it easy and explicit for users to 
-understand what kind of capabilities are available via the Kubernetes resource 
+- **GatewayClasses** - GatewayClasses formalize types of load balancing
+implementations. These classes make it easy and explicit for users to
+understand what kind of capabilities are available via the Kubernetes resource
 model.
 - **Shared Gateways and cross-Namespace support** - They allow the sharing of
 load balancers and VIPs by permitting independent Route resources to attach to
 the same Gateway. This allows teams (even across Namespaces) to share
 infrastructure safely without direct coordination.
-- **Typed Routes and typed backends** - The Gateway API supports typed Route 
-resources and also different types of backends. This allows the API to be 
+- **Typed Routes and typed backends** - The Gateway API supports typed Route
+resources and also different types of backends. This allows the API to be
 flexible in supporting various protocols (like HTTP and gRPC) and
 various backend targets (like Kubernetes Services, storage buckets, or
-functions). 
+functions).
 
 
 ## Why does a role-oriented API matter?
@@ -63,7 +63,7 @@ functions).
 Whether it’s roads, power, data centers, or Kubernetes clusters,
 infrastructure is built to be shared. However, shared infrastructure raises a
 common challenge - how to provide flexibility to users of the infrastructure
-while maintaining control by owners of the infrastructure? 
+while maintaining control by owners of the infrastructure?
 
 The Gateway API accomplishes this through a role-oriented design for
 Kubernetes service networking that strikes a balance between distributed
