@@ -1,0 +1,22 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: backend-request-timeout
+spec:
+  parentRefs:
+  - name: same-namespace
+  rules:
+  - matches:
+    - path:
+        type: Exact
+        value: /delay/1
+    backendRefs:
+    - name: infra-backend-delay
+      port: 8000
+    timeouts:
+      backendRequest: 500ms
+  - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+    timeouts:
+      backendRequest: 500ms

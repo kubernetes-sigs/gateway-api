@@ -257,6 +257,16 @@ func IsRedirect(statusCode int) bool {
 	return false
 }
 
+// IsTimeoutError returns true if a given status code is a timeout error code.
+func IsTimeoutError(statusCode int) bool {
+	switch statusCode {
+	case http.StatusRequestTimeout,
+		http.StatusGatewayTimeout:
+		return true
+	}
+	return false
+}
+
 var startLineRegex = regexp.MustCompile(`(?m)^`)
 
 func formatDump(data []byte, prefix string) string {

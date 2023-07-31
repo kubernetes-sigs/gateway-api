@@ -224,6 +224,53 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  name: infra-backend-delay
+  namespace: gateway-conformance-infra
+spec:
+  selector:
+    app: infra-backend-delay
+  ports:
+  - protocol: HTTP
+    port: 8000
+    targetPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infra-backend-delay
+  namespace: gateway-conformance-infra
+  labels:
+    app: infra-backend-delay
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: infra-backend-delay
+  template:
+    metadata:
+      labels:
+        app: infra-backend-delay
+    spec:
+      containers:
+      - name: infra-backend-delay
+        # TODO: can we enhance echo server to support a delayed response and use it here instead of httpbin?
+        image: docker.io/kong/httpbin
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          requests:
+            cpu: 10m
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: tls-backend
   namespace: gateway-conformance-infra
 spec:
