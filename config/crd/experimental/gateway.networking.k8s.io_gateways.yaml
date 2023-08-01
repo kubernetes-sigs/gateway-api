@@ -115,30 +115,6 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
-              infrastructure:
-                description: "Infrastructure defines infrastructure level attributes
-                  about this Gateway instance. \n <gateway:experimental>"
-                properties:
-                  routability:
-                    description: "Routability allows the Gateway to specify the accessibility
-                      of its addresses. Setting this property will override the default
-                      value defined by the GatewayClass. \n If the desired Gateway
-                      routability is incompatible with the GatewayClass implementations
-                      MUST set the condition `Accepted` to `False` with `Reason` set
-                      to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific and MUST remain consistent for Gateways
-                      with the same gatewayClassName \n Implementations MUST clearly
-                      document if they support updates to this field. The default
-                      expectation should be that changes to this field are not supported
-                      unless an implementation specifies otherwise. \n If a Gateway
-                      is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
-                    maxLength: 253
-                    minLength: 1
-                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                    type: string
-                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
@@ -524,29 +500,14 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: "Addresses lists the IP addresses that have actually
-                  been bound to the Gateway. These addresses may differ from the addresses
+                description: Addresses lists the IP addresses that have actually been
+                  bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support GatewayRoutability
-                  MUST include an address that has the same routable semantics as
-                  defined in the Gateway spec. \n Implementations MAY add additional
-                  addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Private`
-                  routable Gateway then an additional address MAY have a routability
-                  of `Cluster` but MUST NOT include `Public`."
+                  from a reserved pool.
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
-                    routability:
-                      description: "Routability specifies the routable bounds of this
-                        address Predefined values are: 'Private', 'Public', Cluster
-                        Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field \n <gateway:experimental>"
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                      type: string
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -894,30 +855,6 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
-              infrastructure:
-                description: "Infrastructure defines infrastructure level attributes
-                  about this Gateway instance. \n <gateway:experimental>"
-                properties:
-                  routability:
-                    description: "Routability allows the Gateway to specify the accessibility
-                      of its addresses. Setting this property will override the default
-                      value defined by the GatewayClass. \n If the desired Gateway
-                      routability is incompatible with the GatewayClass implementations
-                      MUST set the condition `Accepted` to `False` with `Reason` set
-                      to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific and MUST remain consistent for Gateways
-                      with the same gatewayClassName \n Implementations MUST clearly
-                      document if they support updates to this field. The default
-                      expectation should be that changes to this field are not supported
-                      unless an implementation specifies otherwise. \n If a Gateway
-                      is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
-                    maxLength: 253
-                    minLength: 1
-                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                    type: string
-                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
@@ -1303,29 +1240,14 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: "Addresses lists the IP addresses that have actually
-                  been bound to the Gateway. These addresses may differ from the addresses
+                description: Addresses lists the IP addresses that have actually been
+                  bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support GatewayRoutability
-                  MUST include an address that has the same routable semantics as
-                  defined in the Gateway spec. \n Implementations MAY add additional
-                  addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Private`
-                  routable Gateway then an additional address MAY have a routability
-                  of `Cluster` but MUST NOT include `Public`."
+                  from a reserved pool.
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
                   properties:
-                    routability:
-                      description: "Routability specifies the routable bounds of this
-                        address Predefined values are: 'Private', 'Public', Cluster
-                        Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field \n <gateway:experimental>"
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                      type: string
                     type:
                       default: IPAddress
                       description: Type of the address.

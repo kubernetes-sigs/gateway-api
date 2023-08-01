@@ -188,21 +188,6 @@ const (
 
 // GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatus struct {
-	// Routabilities specifies a list of supported routabilities offered by
-	// the GatewayClass. The first entry in this list will be the default
-	// routability used when Gateways of this class are created.
-	//
-	// Implementations MAY provide a pre-defined set of GatewayClasses that
-	// limit the routability choices of a Gateway.
-	//
-	// Implementations MUST populate this list with the GatewayRoutability values
-	// that are supported by this GatewayClass.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	// <gateway:experimental>
-	Routabilities []GatewayRoutability `json:"routabilities,omitempty"`
-
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	//
