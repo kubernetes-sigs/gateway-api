@@ -253,7 +253,7 @@ func TestValidateGRPCRoute(t *testing.T) {
 						},
 					}, {
 						Type: "RequestHeaderModifier",
-						RequestHeaderModifier: &gatewayv1a2.HTTPRequesHTTPHeaderFiltertMirrorFilter{
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
 							Add: []gatewayv1a2.HTTPHeader{
 								{
 									Name:  "my-header",
