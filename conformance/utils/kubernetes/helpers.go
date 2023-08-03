@@ -303,6 +303,11 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 						Status: metav1.ConditionTrue,
 						Reason: string(v1beta1.RouteReasonAccepted),
 					},
+					{
+						Type:   string(v1beta1.ListenerConditionResolvedRefs),
+						Status: metav1.ConditionTrue,
+						Reason: "", // any reason
+					},
 				},
 			})
 		}
