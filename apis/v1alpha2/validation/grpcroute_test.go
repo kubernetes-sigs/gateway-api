@@ -236,10 +236,38 @@ func TestValidateGRPCRoute(t *testing.T) {
 					}},
 				},
 			},
+		},
+		{
+			name: "invalid GRPCRoute with duplicate RequestHeaderModifier filters",
+			rules: []gatewayv1a2.GRPCRouteRule{
+				{
+					Filters: []gatewayv1a2.GRPCRouteFilter{{
+						Type: "RequestHeaderModifier",
+						RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
+							Set: []gatewayv1a2.HTTPHeader{
+								{
+									Name:  "special-header",
+									Value: "foo",
+								},
+							},
+						},
+					}, {
+						Type: "RequestHeaderModifier",
+						RequestHeaderModifier: &gatewayv1a2.HTTPRequesHTTPHeaderFiltertMirrorFilter{
+							Add: []gatewayv1a2.HTTPHeader{
+								{
+									Name:  "my-header",
+									Value: "bar",
+								},
+							}, 
+						},
+					}},
+				},
+			},
 			errs: field.ErrorList{
 				{
 					Type:     field.ErrorTypeInvalid,
-					BadValue: "RequestMirror",
+					BadValue: "RequestHeaderModifier",
 					Field:    "spec.rules[0].filters",
 					Detail:   "cannot be used multiple times in the same rule",
 				},
@@ -305,8 +333,8 @@ func TestValidateGRPCBackendUniqueFilters(t *testing.T) {
 			},
 		}},
 	}, {
-		name:     "invalid grpcRoute Rules duplicate mirror filter",
-		errCount: 1,
+		name:     "valid grpcRoute Rules duplicate mirror filter",
+		errCount: 0,
 		rules: []gatewayv1a2.GRPCRouteRule{{
 			BackendRefs: []gatewayv1a2.GRPCBackendRef{
 				{
