@@ -259,7 +259,7 @@ func TestValidateGRPCRoute(t *testing.T) {
 									Name:  "my-header",
 									Value: "bar",
 								},
-							}, 
+							},
 						},
 					}},
 				},
