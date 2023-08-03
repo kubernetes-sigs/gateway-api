@@ -48,9 +48,10 @@ func TestValidateGateway(t *testing.T) {
 	}
 
 	testCases := []struct {
-		desc       string
-		mutate     func(gw *gatewayv1b1.Gateway)
-		wantErrors []string
+		desc         string
+		mutate       func(gw *gatewayv1b1.Gateway)
+		mutateStatus func(gw *gatewayv1b1.Gateway)
+		wantErrors   []string
 	}{
 		{
 			desc: "tls config present with http protocol",
@@ -173,7 +174,7 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"hostname must be empty for protocols ['TCP', 'UDP']"},
 		},
 		{
-			desc: "certificatedRefs not set with https protocol and TLS terminate mode",
+			desc: "certificateRefs not set with https protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				tlsMode := gatewayv1b1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1b1.Listener{
@@ -190,7 +191,7 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"certificateRefs must be set and not empty when TLSModeType is Terminate"},
 		},
 		{
-			desc: "certificatedRefs not set with tls protocol and TLS terminate mode",
+			desc: "certificateRefs not set with tls protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				tlsMode := gatewayv1b1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1b1.Listener{
@@ -207,7 +208,7 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"certificateRefs must be set and not empty when TLSModeType is Terminate"},
 		},
 		{
-			desc: "certificatedRefs set with tls protocol and TLS terminate mode",
+			desc: "certificateRefs set with tls protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				tlsMode := gatewayv1b1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1b1.Listener{
@@ -399,10 +400,6 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
 					{
-						// TODO(gauravkghildiyal): Figure out a sensible way to check
-						// validity of IP addresses. Admission webhook uses golang IP
-						// parsing which may not be directly translateable to regex matching
-						// in CEL. At the moment, this value will not result in an error.
 						Type:  ptrTo(gatewayv1b1.IPAddressType),
 						Value: "1.2.3.4:8080",
 					},
@@ -416,7 +413,46 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)"},
+			wantErrors: []string{"Invalid value: \"1.2.3.4:8080\": spec.addresses[0].value in body must be of type ipv4"},
+		},
+		{
+			desc: "ip address and hostname in status addresses are valid",
+			mutateStatus: func(gw *gatewayv1b1.Gateway) {
+				gw.Status.Addresses = []gatewayv1b1.GatewayStatusAddress{
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1111:2222:3333:4444::",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "foo.bar",
+					},
+				}
+			},
+		},
+		{
+			desc: "ip address and hostname in status addresses are invalid",
+			mutateStatus: func(gw *gatewayv1b1.Gateway) {
+				gw.Status.Addresses = []gatewayv1b1.GatewayStatusAddress{
+					{
+						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Value: "1.2.3.4:8080",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "*foo/bar",
+					},
+					{
+						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Value: "12:34:56::",
+					},
+				}
+			},
+			wantErrors: []string{"Invalid value: \"1.2.3.4:8080\": spec.addresses[0].value in body must be of type ipv4"},
 		},
 		{
 			desc: "duplicate ip address or hostname",
@@ -446,14 +482,21 @@ func TestValidateGateway(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			gwc := baseGateway.DeepCopy()
-			gwc.Name = fmt.Sprintf("foo-%v", time.Now().UnixNano())
+			gw := baseGateway.DeepCopy()
+			gw.Name = fmt.Sprintf("foo-%v", time.Now().UnixNano())
 
-			tc.mutate(gwc)
-			err := k8sClient.Create(ctx, gwc)
+			if tc.mutate != nil {
+				tc.mutate(gw)
+			}
+			err := k8sClient.Create(ctx, gw)
+
+			if tc.mutateStatus != nil {
+				tc.mutateStatus(gw)
+				err = k8sClient.Status().Update(ctx, gw)
+			}
 
 			if (len(tc.wantErrors) != 0) != (err != nil) {
-				t.Fatalf("Unexpected error while creating Gateway; got err=\n%v\n;want error=%v", err, tc.wantErrors != nil)
+				t.Fatalf("Unexpected response while creating Gateway; got err=\n%v\n;want error=%v", err, tc.wantErrors != nil)
 			}
 
 			var missingErrorStrings []string
@@ -463,7 +506,7 @@ func TestValidateGateway(t *testing.T) {
 				}
 			}
 			if len(missingErrorStrings) != 0 {
-				t.Errorf("Unexpected error while creating Gateway; got err=\n%v\n;missing strings within error=%q", err, missingErrorStrings)
+				t.Errorf("Unexpected response while creating Gateway; got err=\n%v\n;missing strings within error=%q", err, missingErrorStrings)
 			}
 		})
 	}

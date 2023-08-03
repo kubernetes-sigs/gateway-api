@@ -93,6 +93,7 @@ func main() {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
 			}
+
 			log.Printf("generating %s CRD for %v\n", channel, groupKind)
 
 			parser.NeedCRDFor(groupKind, nil)
@@ -111,7 +112,7 @@ func main() {
 
 			channelCrd := crdRaw.DeepCopy()
 			for _, version := range channelCrd.Spec.Versions {
-				version.Schema.OpenAPIV3Schema.Properties = channelTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
+				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
 			}
 
 			conv, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)
@@ -133,9 +134,37 @@ func main() {
 	}
 }
 
-func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
+// Custom Gateway API Tweaks for tags prefixed with `<gateway:` that get past
+// the limitations of Kubebuilder annotations.
+func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
 	for name := range props {
 		jsonProps, _ := props[name]
+
+		if strings.Contains(jsonProps.Description, "<gateway:validateIPAddress>") {
+			jsonProps.Items.Schema.OneOf = []apiext.JSONSchemaProps{{
+				Properties: map[string]apiext.JSONSchemaProps{
+					"type": {
+						Enum: []apiext.JSON{{Raw: []byte("\"IPAddress\"")}},
+					},
+					"value": {
+						AnyOf: []apiext.JSONSchemaProps{{
+							Format: "ipv4",
+						}, {
+							Format: "ipv6",
+						}},
+					},
+				},
+			}, {
+				Properties: map[string]apiext.JSONSchemaProps{
+					"type": {
+						Not: &apiext.JSONSchemaProps{
+							Enum: []apiext.JSON{{Raw: []byte("\"IPAddress\"")}},
+						},
+					},
+				},
+			}}
+		}
+
 		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
 			delete(props, name)
 			continue
@@ -158,13 +187,13 @@ func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			}
 		}
 
-		experimentalRe := regexp.MustCompile(`<gateway:experimental:.*>`)
-		jsonProps.Description = experimentalRe.ReplaceAllLiteralString(jsonProps.Description, "")
+		gatewayRe := regexp.MustCompile(`<gateway:.*>`)
+		jsonProps.Description = gatewayRe.ReplaceAllLiteralString(jsonProps.Description, "")
 
 		if len(jsonProps.Properties) > 0 {
-			jsonProps.Properties = channelTweaks(channel, jsonProps.Properties)
+			jsonProps.Properties = gatewayTweaks(channel, jsonProps.Properties)
 		} else if jsonProps.Items != nil && jsonProps.Items.Schema != nil {
-			jsonProps.Items.Schema.Properties = channelTweaks(channel, jsonProps.Items.Schema.Properties)
+			jsonProps.Items.Schema.Properties = gatewayTweaks(channel, jsonProps.Items.Schema.Properties)
 		}
 		props[name] = jsonProps
 	}

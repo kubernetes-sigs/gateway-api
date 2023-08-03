@@ -228,7 +228,7 @@ spec:
                         Route, the Route MUST be considered successfully attached.
                         If no Gateway listeners accept attachment from this Route,
                         the Route MUST be considered detached from the Gateway. \n
-                        Support: Extended \n <gateway:experimental>"
+                        Support: Extended \n "
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -2037,7 +2037,7 @@ spec:
                             the Route MUST be considered successfully attached. If
                             no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
-                            \n Support: Extended \n <gateway:experimental>"
+                            \n Support: Extended \n "
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -2292,7 +2292,7 @@ spec:
                         Route, the Route MUST be considered successfully attached.
                         If no Gateway listeners accept attachment from this Route,
                         the Route MUST be considered detached from the Gateway. \n
-                        Support: Extended \n <gateway:experimental>"
+                        Support: Extended \n "
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -4101,7 +4101,7 @@ spec:
                             the Route MUST be considered successfully attached. If
                             no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
-                            \n Support: Extended \n <gateway:experimental>"
+                            \n Support: Extended \n "
                           format: int32
                           maximum: 65535
                           minimum: 1

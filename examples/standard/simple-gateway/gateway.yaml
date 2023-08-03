@@ -7,7 +7,7 @@ metadata:
   name: prod-web
 spec:
   gatewayClassName: acme-lb
-  listeners:  
+  listeners:
   - protocol: HTTP
     port: 80
     name: prod-web-gw
