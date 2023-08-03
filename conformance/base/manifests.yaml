@@ -231,8 +231,7 @@ spec:
     app: infra-backend-delay
   ports:
   - protocol: HTTP
-    port: 8000
-    targetPort: 80
+    port: 8080
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -253,20 +252,10 @@ spec:
     spec:
       containers:
       - name: infra-backend-delay
-        # TODO: can we enhance echo server to support a delayed response and use it here instead of httpbin?
-        image: docker.io/kong/httpbin
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: NAMESPACE
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.namespace
-        resources:
-          requests:
-            cpu: 10m
+        image: gcr.io/k8s-staging-gateway-api/echo-server:v20230505-v0.7.0-rc1-10-g497e67da
+        imagePullPolicy: IfNotPresent
+        args:
+        - --port=8080
 ---
 apiVersion: v1
 kind: Service

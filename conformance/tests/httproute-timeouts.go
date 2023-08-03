@@ -49,11 +49,10 @@ var HTTPRouteTimeoutRequest = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				Request:   http.Request{Path: "/echo"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
+				Request:  http.Request{Path: "/"},
+				Response: http.Response{StatusCode: 200},
 			}, {
-				Request:  http.Request{Path: "/delay/1"},
+				Request:  http.Request{Path: "/?delay=1s"},
 				Response: http.Response{StatusCode: 504},
 			},
 		}
@@ -88,11 +87,10 @@ var HTTPRouteTimeoutBackendRequest = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				Request:   http.Request{Path: "/echo"},
-				Backend:   "infra-backend-v1",
-				Namespace: ns,
+				Request:  http.Request{Path: "/"},
+				Response: http.Response{StatusCode: 200},
 			}, {
-				Request:  http.Request{Path: "/delay/1"},
+				Request:  http.Request{Path: "/?delay=1s"},
 				Response: http.Response{StatusCode: 504},
 			},
 		}

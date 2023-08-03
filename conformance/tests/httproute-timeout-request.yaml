@@ -6,17 +6,8 @@ spec:
   parentRefs:
   - name: same-namespace
   rules:
-  - matches:
-    - path:
-        type: Exact
-        value: /delay/1
-    backendRefs:
-    - name: infra-backend-delay
-      port: 8000
-    timeouts:
-      request: 500ms
   - backendRefs:
-    - name: infra-backend-v1
+    - name: infra-backend-delay
       port: 8080
     timeouts:
       request: 500ms
