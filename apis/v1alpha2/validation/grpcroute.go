@@ -166,7 +166,7 @@ func validateGRPCRouteFilters(filters []gatewayv1a2.GRPCRouteFilter, path *field
 		}
 		errs = append(errs, validateGRPCRouteFilterType(filter, path.Index(i))...)
 	}
-	// repeatableHTTPRouteFilters filters can be used more than once
+	// repeatableGRPCRouteFilters filters can be used more than once
 	for _, key := range repeatableGRPCRouteFilters {
 		delete(counts, key)
 	}
