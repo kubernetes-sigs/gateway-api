@@ -4,7 +4,7 @@ This document tracks downstream implementations and integrations of Gateway API 
 
 Implementors and integrators of Gateway API are encouraged to update this document with status information about their implementations, the versions they cover, and documentation to help users get started.
 
-## Implementation Status
+## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1] (public preview)
 - [Amazon Elastic Kubernetes Service][23] (alpha)
@@ -29,7 +29,13 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Traefik][13] (alpha)
 - [WSO2 APK][25] (pre-alpha)
 
-## Integration Status
+## Service Mesh Implementation Status <a name="meshes"></a>
+
+- [Istio][9] (experimental)
+- [Kuma][11] (experimental)
+- [Linkerd][28] (experimental)
+
+## Integrations <a name="integrations"></a>
 
 - [Flagger][14] (public preview)
 - [cert-manager][15] (alpha)
@@ -64,6 +70,9 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [25]:#wso2-apk
 [26]:#kuadrant
 [27]:#azure-application-gateway-for-containers
+[28]:#linkerd
+
+[gamma]:/concepts/gamma/
 
 ## Implementations
 
@@ -126,7 +135,7 @@ performance, and avoid the operational complexity of sidecars. Cilium also
 supports the sidecar proxy model, offering choice to users. As of [Cilium 1.13][cilium113blog],
 Cilium supports Gateway API, passing conformance for v0.5.1.
 
-Cilium is open source and is a CNCF incubation project. 
+Cilium is open source and is a CNCF incubation project.
 
 If you have questions about Cilium Service Mesh the #service-mesh channel on
 [Cilium Slack][cilium-slack] is a good place to start. For contributing to the development
@@ -174,7 +183,7 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 ### Envoy Gateway
 
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
-APIs and fields of the Gateway API are outlined [here][eg-supported]. 
+APIs and fields of the Gateway API are outlined [here][eg-supported].
 Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
 few simple steps.
 
@@ -227,7 +236,7 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 
 ### HashiCorp Consul
 
-[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deployment can span bare metal, VM and container environments.  
+[Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deployment can span bare metal, VM and container environments.
 
 Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and Consul CRDs provide a Kubernetes native workflow to manage traffic patterns and permissions in the mesh. [Consul API Gateway][consul-api-gw-doocs] supports Gatewway API for managing North-South traffic.
 
@@ -239,18 +248,20 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[Istio][istio] is an open source [service mesh][mesh] and gateway implementation.
+[Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
-A light-weight minimal install of Istio can be used to provide a Beta-quality implementation of the Kubernetes Gateway API for cluster ingress traffic control. For service mesh users,
-the Istio implementation also lets you start trying out the experimental Gateway API [support for east-west traffic management][gamma] within the mesh.
+A light-weight minimal install of Istio can be used to provide a Beta-quality
+implementation of the Kubernetes Gateway API for cluster ingress traffic
+control. For service mesh users, Istio 1.16 and later support the [GAMMA
+initiative's][gamma] experimental Gateway API [support for east-west traffic
+management][gamma] within the mesh.
 
 Much of Istio's documentation, including all of the [ingress tasks][istio-1] and several mesh-internal traffic management tasks, already includes parallel instructions for
 configuring traffic using either the Gateway API or the Istio configuration API.
 Check out the [Gateway API task][istio-2] for more information about the Gateway API implementation in Istio.
 
 [istio]:https://istio.io
-[mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
-[gamma]:https://gateway-api.sigs.k8s.io/contributing/gamma/
+[istio-mesh]:https://istio.io/latest/docs/concepts/what-is-istio/#what-is-a-service-mesh
 [istio-1]:https://istio.io/latest/docs/tasks/traffic-management/ingress/
 [istio-2]:https://istio.io/latest/docs/tasks/traffic-management/ingress/gateway-api/
 
@@ -278,8 +289,24 @@ For help and support with Kong's implementations please feel free to [create an 
 
 Kuma is actively working on an implementation of Gateway API specification for the Kuma builtin Gateway. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma builtin gateway using the Gateway API.
 
+Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
+Gateway API [support for east-west traffic management][gamma] within the mesh.
+
 [kuma]:https://kuma.io
 [kuma-1]:https://kuma.io/docs/latest/explore/gateway-api/
+
+### Linkerd
+
+[Linkerd][linkerd] is the first CNCF graduated [service mesh][linkerd-mesh].
+It is the only major mesh not based on Envoy, instead relying on a
+purpose-built Rust micro-proxy to bring security, observability, and
+reliability to Kubernetes, without the complexity.
+
+Linkerd 2.14 and later support the [GAMMA initiative's][gamma] experimental
+Gateway API [support for east-west traffic management][gamma] within the mesh.
+
+[linkerd]:https://linkerd.io/
+[linkerd-mesh]:https://buoyant.io/service-mesh-manifesto
 
 ### LiteSpeed Ingress Controller
 

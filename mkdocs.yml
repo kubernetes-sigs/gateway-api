@@ -28,6 +28,7 @@ plugins:
       redirect_maps:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
+        'contributing/gamma.md': 'concepts/gamma.md#contributing'
   - mermaid2
 markdown_extensions:
   - admonition
@@ -52,12 +53,17 @@ nav:
     - Introduction: index.md
     - Concepts:
         API Overview: concepts/api-overview.md
+        GAMMA: concepts/gamma.md
         Conformance: concepts/conformance.md
-        Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
+        Roles and Personas: concepts/roles-and-personas.md
+        Service Facets: concepts/service-facets.md
+        Security Model: concepts/security-model.md
+        Use Cases: concepts/use-cases.md
         Versioning: concepts/versioning.md
     - Implementations: implementations.md
     - FAQ: faq.md
+    - Glossary: concepts/glossary.md
   - Guides:
     - Getting started: guides/index.md
     - Simple Gateway: guides/simple-gateway.md
@@ -112,6 +118,7 @@ nav:
         - geps/gep-724.md
         - geps/gep-718.md
         - geps/gep-709.md
+      - Glossary: concepts/glossary.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
