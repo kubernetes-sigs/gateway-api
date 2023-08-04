@@ -56,7 +56,7 @@ type HTTPRouteList struct {
 type HTTPRouteSpec struct {
 	CommonRouteSpec `json:",inline"`
 
-	// Hostnames defines a set of hostname that should match against the HTTP Host
+	// Hostnames defines a set of hostnames that should match against the HTTP Host
 	// header to select a HTTPRoute used to process the request. Implementations
 	// MUST ignore any port value specified in the HTTP Host header while
 	// performing a match and (absent of any applicable header modification
@@ -866,9 +866,9 @@ const (
 
 // HTTPPathModifier defines configuration for path modifiers.
 //
-// +kubebuilder:validation:XValidation:message="replaceFullPath must be set when type is set to 'ReplaceFullPath'",rule="self.type == 'ReplaceFullPath' ? has(self.replaceFullPath) : true"
+// +kubebuilder:validation:XValidation:message="replaceFullPath must be specified when type is set to 'ReplaceFullPath'",rule="self.type == 'ReplaceFullPath' ? has(self.replaceFullPath) : true"
 // +kubebuilder:validation:XValidation:message="type must be 'ReplaceFullPath' when replaceFullPath is set",rule="has(self.replaceFullPath) ? self.type == 'ReplaceFullPath' : true"
-// +kubebuilder:validation:XValidation:message="replacePrefixMatch must be set when type is set to 'ReplacePrefixMatch'",rule="self.type == 'ReplacePrefixMatch' ? has(self.replacePrefixMatch) : true"
+// +kubebuilder:validation:XValidation:message="replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'",rule="self.type == 'ReplacePrefixMatch' ? has(self.replacePrefixMatch) : true"
 // +kubebuilder:validation:XValidation:message="type must be 'ReplacePrefixMatch' when replacePrefixMatch is set",rule="has(self.replacePrefixMatch) ? self.type == 'ReplacePrefixMatch' : true"
 type HTTPPathModifier struct {
 	// Type defines the type of path modifier. Additional types may be

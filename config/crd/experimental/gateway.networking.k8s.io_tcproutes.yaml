@@ -57,38 +57,39 @@ spec:
                   a \"producer\" route for a Service in a different namespace from
                   the Route. \n There are two kinds of parent resources with \"Core\"
                   support: \n * Gateway (Gateway conformance profile) * Service (Mesh
-                  conformance profile) \n This API may be extended in the future to
-                  support additional kinds of parent resources. \n It is invalid to
-                  reference an identical parent more than once. It is valid to reference
-                  multiple distinct sections within the same parent resource, such
-                  as two separate Listeners on the same Gateway or two separate ports
-                  on the same Service. \n It is possible to separately reference multiple
-                  distinct objects that may be collapsed by an implementation. For
-                  example, some implementations may choose to merge compatible Gateway
-                  Listeners together. If that is the case, the list of routes attached
-                  to those resources should also be merged. \n Note that for ParentRefs
-                  that cross namespace boundaries, there are specific rules. Cross-namespace
-                  references are only valid if they are explicitly allowed by something
-                  in the namespace they are referring to. For example, Gateway has
-                  the AllowedRoutes field, and ReferenceGrant provides a generic way
-                  to enable other kinds of cross-namespace reference. \n ParentRefs
-                  from a Route to a Service in the same namespace are \"producer\"
-                  routes, which apply default routing rules to inbound connections
-                  from any namespace to the Service. \n ParentRefs from a Route to
-                  a Service in a different namespace are \"consumer\" routes, and
-                  these routing rules are only applied to outbound connections originating
-                  from the same namespace as the Route, for which the intended destination
-                  of the connections are a Service targeted as a ParentRef of the
-                  Route."
+                  conformance profile, experimental, ClusterIP Services only) \n This
+                  API may be extended in the future to support additional kinds of
+                  parent resources. \n It is invalid to reference an identical parent
+                  more than once. It is valid to reference multiple distinct sections
+                  within the same parent resource, such as two separate Listeners
+                  on the same Gateway or two separate ports on the same Service. \n
+                  It is possible to separately reference multiple distinct objects
+                  that may be collapsed by an implementation. For example, some implementations
+                  may choose to merge compatible Gateway Listeners together. If that
+                  is the case, the list of routes attached to those resources should
+                  also be merged. \n Note that for ParentRefs that cross namespace
+                  boundaries, there are specific rules. Cross-namespace references
+                  are only valid if they are explicitly allowed by something in the
+                  namespace they are referring to. For example, Gateway has the AllowedRoutes
+                  field, and ReferenceGrant provides a generic way to enable other
+                  kinds of cross-namespace reference. \n ParentRefs from a Route to
+                  a Service in the same namespace are \"producer\" routes, which apply
+                  default routing rules to inbound connections from any namespace
+                  to the Service. \n ParentRefs from a Route to a Service in a different
+                  namespace are \"consumer\" routes, and these routing rules are only
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route."
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
                     a route). There are two kinds of parent resources with \"Core\"
                     support: \n * Gateway (Gateway conformance profile) * Service
-                    (Mesh conformance profile) \n This API may be extended in the
-                    future to support additional kinds of parent resources. \n The
-                    API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid."
+                    (Mesh conformance profile, experimental, ClusterIP Services only)
+                    \n This API may be extended in the future to support additional
+                    kinds of parent resources. \n The API object must be valid in
+                    the cluster; the Group and Kind must be registered in the cluster
+                    for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -105,7 +106,8 @@ spec:
                       description: "Kind is kind of the referent. \n There are two
                         kinds of parent resources with \"Core\" support: \n * Gateway
                         (Gateway conformance profile) * Service (Mesh conformance
-                        profile) \n Support for other resources is Implementation-Specific."
+                        profile, experimental, ClusterIP Services only) \n Support
+                        for other resources is Implementation-Specific."
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -174,19 +176,23 @@ spec:
                         interpreted as the following: \n * Gateway: Listener Name.
                         When both Port (experimental) and SectionName are specified,
                         the name and port of the selected listener must match both
-                        specified values. \n Implementations MAY choose to support
-                        attaching Routes to other resources. If that is the case,
-                        they MUST clearly document how SectionName is interpreted.
-                        \n When unspecified (empty string), this will reference the
-                        entire resource. For the purpose of status, an attachment
-                        is considered successful if at least one section in the parent
-                        resource accepts it. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Core"
+                        specified values. * Service: Port Name. When both Port (experimental)
+                        and SectionName are specified, the name and port of the selected
+                        listener must match both specified values. Note that attaching
+                        Routes to Services as Parents is part of experimental Mesh
+                        support and is not supported for any other purpose. \n Implementations
+                        MAY choose to support attaching Routes to other resources.
+                        If that is the case, they MUST clearly document how SectionName
+                        is interpreted. \n When unspecified (empty string), this will
+                        reference the entire resource. For the purpose of status,
+                        an attachment is considered successful if at least one section
+                        in the parent resource accepts it. For example, Gateway listeners
+                        can restrict which Routes can attach to them by Route kind,
+                        namespace, or hostname. If 1 of 2 Gateway listeners accept
+                        attachment from the referencing Route, the Route MUST be considered
+                        successfully attached. If no Gateway listeners accept attachment
+                        from this Route, the Route MUST be considered detached from
+                        the Gateway. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -457,8 +463,8 @@ spec:
                           description: "Kind is kind of the referent. \n There are
                             two kinds of parent resources with \"Core\" support: \n
                             * Gateway (Gateway conformance profile) * Service (Mesh
-                            conformance profile) \n Support for other resources is
-                            Implementation-Specific."
+                            conformance profile, experimental, ClusterIP Services
+                            only) \n Support for other resources is Implementation-Specific."
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -530,8 +536,13 @@ spec:
                             is interpreted as the following: \n * Gateway: Listener
                             Name. When both Port (experimental) and SectionName are
                             specified, the name and port of the selected listener
-                            must match both specified values. \n Implementations MAY
-                            choose to support attaching Routes to other resources.
+                            must match both specified values. * Service: Port Name.
+                            When both Port (experimental) and SectionName are specified,
+                            the name and port of the selected listener must match
+                            both specified values. Note that attaching Routes to Services
+                            as Parents is part of experimental Mesh support and is
+                            not supported for any other purpose. \n Implementations
+                            MAY choose to support attaching Routes to other resources.
                             If that is the case, they MUST clearly document how SectionName
                             is interpreted. \n When unspecified (empty string), this
                             will reference the entire resource. For the purpose of
