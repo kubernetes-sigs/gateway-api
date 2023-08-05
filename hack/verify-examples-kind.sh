@@ -35,7 +35,7 @@ cleanup() {
     return
   fi
 
-  rm config/webhook/kustomization.yaml
+  rm -f config/webhook/kustomization.yaml
 
   if [ "${KIND_CREATE_ATTEMPTED:-}" = true ]; then
     kind delete cluster --name "${CLUSTER_NAME}" || true
@@ -43,7 +43,7 @@ cleanup() {
   CLEANED_UP=true
 }
 
-trap cleanup INT TERM
+trap cleanup INT TERM EXIT
 
 # For exit code
 res=0
@@ -53,7 +53,19 @@ res=0
 
 # Create cluster
 KIND_CREATE_ATTEMPTED=true
-kind create cluster --name "${CLUSTER_NAME}" || res=$?
+kind create cluster --name "${CLUSTER_NAME}"
+
+# Verify CEL validations before installing webhook.
+for CHANNEL in experimental standard; do
+  # Install CRDs.
+  kubectl apply -f "config/crd/${CHANNEL}/gateway*.yaml"
+
+  # Run tests.
+  go test -timeout=120s -count=1 sigs.k8s.io/gateway-api/hack/cel-validation
+
+  # Delete CRDs to reset environment.
+  kubectl delete -f "config/crd/${CHANNEL}/gateway*.yaml"
+done
 
 cat <<EOF >config/webhook/kustomization.yaml
 resources:
