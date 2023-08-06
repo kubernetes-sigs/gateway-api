@@ -104,7 +104,6 @@ func testExperimentalConformance(t *testing.T) {
 		suite.ExperimentalConformanceOptions{
 			Options: suite.Options{
 				Client:     mgrClient,
-				RESTClient: k8sClientset.CoreV1().RESTClient().(*rest.RESTClient),
 				RestConfig: cfg,
 				// This clientset is needed in addition to the client only because
 				// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
