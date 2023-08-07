@@ -452,7 +452,7 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"Invalid value: \"1.2.3.4:8080\": spec.addresses[0].value in body must be of type ipv4"},
+			wantErrors: []string{"Invalid value: \"1.2.3.4:8080\": status.addresses[0].value in body must be of type ipv4"},
 		},
 		{
 			desc: "duplicate ip address or hostname",
