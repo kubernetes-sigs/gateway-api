@@ -1308,8 +1308,8 @@ func TestHTTPPathModifier(t *testing.T) {
 			},
 		},
 		{
-			name:       "replaceFullPath must be set when type is set to 'ReplaceFullPath'",
-			wantErrors: []string{"replaceFullPath must be set when type is set to 'ReplaceFullPath'"},
+			name:       "replaceFullPath must be specified when type is set to 'ReplaceFullPath'",
+			wantErrors: []string{"replaceFullPath must be specified when type is set to 'ReplaceFullPath'"},
 			pathModifier: gatewayv1b1.HTTPPathModifier{
 				Type: gatewayv1b1.FullPathHTTPPathModifier,
 			},
@@ -1329,8 +1329,8 @@ func TestHTTPPathModifier(t *testing.T) {
 			},
 		},
 		{
-			name:       "replacePrefixMatch must be set when type is set to 'ReplacePrefixMatch'",
-			wantErrors: []string{"replacePrefixMatch must be set when type is set to 'ReplacePrefixMatch'"},
+			name:       "replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'",
+			wantErrors: []string{"replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'"},
 			pathModifier: gatewayv1b1.HTTPPathModifier{
 				Type: gatewayv1b1.PrefixMatchHTTPPathModifier,
 			},

@@ -70,13 +70,20 @@ type GatewaySpec struct {
 	// At least one Listener MUST be specified.
 	//
 	// Each listener in a Gateway must have a unique combination of Hostname,
-	// Port, and Protocol. Below combinations are considered Core and MUST be
-	// supported:
+	// Port, and Protocol.
+	//
+	// Within the HTTP Conformance Profile, the below combinations of port and
+	// protocol are considered Core and MUST be supported:
 	//
 	// 1. Port: 80, Protocol: HTTP
 	// 2. Port: 443, Protocol: HTTPS
 	//
-	// Port and protocol combinations not in this list are considered Extended.
+	// Within the TLS Conformance Profile, the below combinations of port and
+	// protocol are considered Core and MUST be supported:
+	//
+	// 1. Port: 443, Protocol: TLS
+	//
+	// Port and protocol combinations not listed above are considered Extended.
 	//
 	// An implementation MAY group Listeners by Port and then collapse each
 	// group of Listeners into a single Listener if the implementation
@@ -117,9 +124,9 @@ type GatewaySpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
-	// +kubebuilder:validation:XValidation:message="tls must be set for protocols ['HTTPS', 'TLS']",rule="self.all(l, l.protocol in ['HTTPS', 'TLS'] ? has(l.tls) : true)"
-	// +kubebuilder:validation:XValidation:message="tls must be empty for protocols ['HTTP', 'TCP', 'UDP']",rule="self.all(l, l.protocol in ['HTTP', 'TCP', 'UDP'] ? !has(l.tls) : true)"
-	// +kubebuilder:validation:XValidation:message="hostname must be empty for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
+	// +kubebuilder:validation:XValidation:message="tls must be specified for protocols ['HTTPS', 'TLS']",rule="self.all(l, l.protocol in ['HTTPS', 'TLS'] ? has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']",rule="self.all(l, l.protocol in ['HTTP', 'TCP', 'UDP'] ? !has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="hostname must not be specified for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
 	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
 	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : true)))"
 	Listeners []Listener `json:"listeners"`
@@ -301,7 +308,7 @@ const (
 
 // GatewayTLSConfig describes a TLS configuration.
 //
-// +kubebuilder:validation:XValidation:message="certificateRefs must be set and not empty when TLSModeType is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 : true"
+// +kubebuilder:validation:XValidation:message="certificateRefs must be specified when TLSModeType is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 : true"
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
