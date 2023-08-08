@@ -1378,7 +1378,7 @@ func validateHTTPRoute(t *testing.T, route *gatewayv1b1.HTTPRoute, wantErrors []
 	err := k8sClient.Create(ctx, route)
 
 	if (len(wantErrors) != 0) != (err != nil) {
-		t.Fatalf("Unexpected response while creating HTTPRoute %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, wantErrors != nil)
+		t.Fatalf("Unexpected response while creating HTTPRoute %q; got err=\n%v\n;want error=%v", fmt.Sprintf("%v/%v", route.Namespace, route.Name), err, wantErrors)
 	}
 
 	var missingErrorStrings []string

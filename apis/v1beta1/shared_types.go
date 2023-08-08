@@ -201,6 +201,8 @@ type CommonRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=32
+	// <gateway:standard:validation:XValidation:message="sectionName must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && ((!has(p1.__namespace__) && !has(p2.__namespace__)) || (!has(p1.__namespace__) && p2.__namespace__ == '') || (p1.__namespace__ == '' && !has(p2.__namespace__)) || (p1.__namespace__ == p2.__namespace__)) && p1.name == p2.name && ((!has(p1.sectionName) && !has(p2.sectionName)) || (!has(p1.sectionName) && p2.sectionName == '') || (p1.sectionName == '' && !has(p2.sectionName)) || (p1.sectionName == p2.sectionName))))">
+	// <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && ((!has(p1.__namespace__) && !has(p2.__namespace__)) || (!has(p1.__namespace__) && p2.__namespace__ == '') || (p1.__namespace__ == '' && !has(p2.__namespace__)) || (p1.__namespace__ == p2.__namespace__)) && p1.name == p2.name && ((!has(p1.sectionName) && !has(p2.sectionName)) || (!has(p1.sectionName) && p2.sectionName == '') || (p1.sectionName == '' && !has(p2.sectionName)) || (p1.sectionName == p2.sectionName)) && ((!has(p1.port) && !has(p2.port)) || (!has(p1.port) && p2.port == 0) || (p1.port == 0 && !has(p2.port)) || (p1.port == p2.port))))">
 	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
 }
 
