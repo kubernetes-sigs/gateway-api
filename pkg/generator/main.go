@@ -175,16 +175,42 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			jsonProps.Type = "string"
 		}
 
-		if channel == "experimental" && strings.Contains(jsonProps.Description, "<gateway:experimental:validation:") {
-			validationRe := regexp.MustCompile(`<gateway:experimental:validation:Enum=([A-Za-z;]*)>`)
-			match := validationRe.FindStringSubmatch(jsonProps.Description)
-			if len(match) != 2 {
-				log.Fatalf("Invalid gateway:experimental:validation tag for %s", name)
+		validationPrefix := fmt.Sprintf("<gateway:%s:validation:", channel)
+		numExpressions := strings.Count(jsonProps.Description, validationPrefix)
+		numValid := 0
+		if numExpressions > 0 {
+			enumRe := regexp.MustCompile(validationPrefix + "Enum=([A-Za-z;]*)>")
+			enumMatches := enumRe.FindAllStringSubmatch(jsonProps.Description, 64)
+			for _, enumMatch := range enumMatches {
+				if len(enumMatch) != 2 {
+					log.Fatalf("Invalid %s Enum tag for %s", validationPrefix, name)
+				}
+
+				numValid++
+				jsonProps.Enum = []apiext.JSON{}
+				for _, val := range strings.Split(enumMatch[1], ";") {
+					jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
+				}
 			}
-			jsonProps.Enum = []apiext.JSON{}
-			for _, val := range strings.Split(match[1], ";") {
-				jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
+
+			celRe := regexp.MustCompile(validationPrefix + "XValidation:message=\"([^\"]*)\",rule=\"([^\"]*)\">")
+			celMatches := celRe.FindAllStringSubmatch(jsonProps.Description, 64)
+			for _, celMatch := range celMatches {
+				if len(celMatch) != 3 {
+					log.Fatalf("Invalid %s CEL tag for %s", validationPrefix, name)
+				}
+
+				numValid++
+				jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
+					Message: celMatch[1],
+					Rule:    celMatch[2],
+				})
 			}
+		}
+
+		if numValid < numExpressions {
+			fmt.Printf("Description: %s\n", jsonProps.Description)
+			log.Fatalf("Found %d Gateway validation expressions, but only %d were valid", numExpressions, numValid)
 		}
 
 		gatewayRe := regexp.MustCompile(`<gateway:.*>`)
