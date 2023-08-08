@@ -92,20 +92,20 @@ and thus these versions are no longer supported by Gateway API.
 
 ### API Version Changes
 As we prepare for a v1.0 release that will graduate Gateway, GatewayClass, and
-HTTPRoute to v1, we are continuing the process of moving away from v1alpha2 for
-resources that have graduated to v1beta1. The following changes are included in
-this release:
+HTTPRoute to the `v1` API Version from `v1beta1`, we are continuing the process
+of moving away from `v1alpha2` for resources that have graduated to `v1beta1`.
+The following changes are included in this release:
 
-- v1alpha2 of Gateway, GatewayClass, and HTTPRoute is no longer served
-- v1alpha2 of ReferenceGrant is deprecrated
-- v1beta1 is now the storage version for ReferenceGrant
+- `v1alpha2` of Gateway, GatewayClass, and HTTPRoute is no longer served
+- `v1alpha2` of ReferenceGrant is deprecrated
+- `v1beta1` is now the storage version for ReferenceGrant
 
 Those changes mean that:
 
-- Users and implementations that were reading or writing from v1alpha2 of
-  Gateway, GatewayClass, or HTTPRoute MUST upgrade to use v1beta1.
-- Users and implementations that were reading or writing from v1alpha2 of
-  ReferenceGrant SHOULD upgrade to use v1beta1.
+- Users and implementations that were reading or writing from `v1alpha2` of
+  Gateway, GatewayClass, or HTTPRoute MUST upgrade to use `v1beta1`.
+- Users and implementations that were reading or writing from `v1alpha2` of
+  ReferenceGrant SHOULD upgrade to use `v1beta1`.
 
 For more information, refer to
 [#2069](https://github.com/kubernetes-sigs/gateway-api/pull/2069).
