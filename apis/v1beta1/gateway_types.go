@@ -85,38 +85,52 @@ type GatewaySpec struct {
 	//
 	// Port and protocol combinations not listed above are considered Extended.
 	//
-	// An implementation MAY group Listeners by Port and then collapse each
-	// group of Listeners into a single Listener if the implementation
-	// determines that the Listeners in the group are "compatible". An
-	// implementation MAY also group together and collapse compatible
-	// Listeners belonging to different Gateways.
+	// A Gateway's Listeners are considered "compatible" if:
 	//
-	// For example, an implementation might consider Listeners to be
-	// compatible with each other if all of the following conditions are
-	// met:
+	// 1. The implementation can serve them in compliance with the Addresses
+	//    requirement that all Listeners are available on all assigned
+	//    addresses.
+	// 2. No Listeners sharing the same Port share the same Hostname value,
+	//    including the empty value, if this would prevent the implementation
+	//    from matching an inbound request to a specific Listener.
 	//
-	// 1. Either each Listener within the group specifies the "HTTP"
-	//    Protocol or each Listener within the group specifies either
-	//    the "HTTPS" or "TLS" Protocol.
+	// Compatible combinations in Extended support are expected to vary across
+	// implementations. A combination that is compatible for one implementation
+	// may not be compatible for another.
 	//
-	// 2. Each Listener within the group specifies a Hostname that is unique
-	//    within the group.
+	// If this field specifies multiple Listeners that are not compatible, the
+	// implementation MUST raise a true "Conflicted" condition in the Listener
+	// Status.
 	//
-	// 3. As a special case, one Listener within a group may omit Hostname,
-	//    in which case this Listener matches when no other Listener
-	//    matches.
+	// Implementations MAY choose to still accept a Gateway with conflicted
+	// Listeners if they accept a partial Listener set that contains no
+	// incompatible Listeners. They MUST set a "ListenersNotValid" condition
+	// the Gateway Status when the Gateway contains incompatible Listeners
+	// whether or not they accept the Gateway.
 	//
-	// If the implementation does collapse compatible Listeners, the
-	// hostname provided in the incoming client request MUST be
-	// matched to a Listener to find the correct set of Routes.
-	// The incoming hostname MUST be matched using the Hostname
-	// field for each Listener in order of most to least specific.
-	// That is, exact matches must be processed before wildcard
+	// For example, the following Listener scenarios may be compatible
+	// depending on implementation capabilities:
+	//
+	// 1. Multiple Listeners with the same Port that all use the "HTTP"
+	//    Protocol that all have unique Hostname values.
+	// 2. Multiple Listeners with the same Port that use either the "HTTPS" or
+	//    "TLS" Protocol that all have unique Hostname values.
+	// 3. A mixture of "TCP" and "UDP" Protocol Listeners, where no Listener
+	//    with the same Protocol has the same Port value.
+	//
+	// An implementation that cannot serve both TCP and UDP listens on the same
+	// address, or cannot mix HTTPS and generic TLS listens on the same port
+	// would not consider those cases compatible.
+	//
+	// Implementations using the Hostname value to select between same-Port
+	// Listeners MUST match inbound request hostnames from the most specific
+	// to least specific Hostname values to find the correct set of Routes.
+	// Exact matches must be processed before wildcard matches, and wildcard
+	// matches must be processed before fallback (empty Hostname value)
 	// matches.
 	//
-	// If this field specifies multiple Listeners that have the same
-	// Port value but are not compatible, the implementation must raise
-	// a "Conflicted" condition in the Listener status.
+	// Implementations MAY collapse separate Gateways onto a single set of
+	// Addresses if the Listeners across all Gateways are compatible.
 	//
 	// Support: Core
 	//
