@@ -8,7 +8,7 @@ description: >
 # Gateway API: Welcome, GAMMA!
 
 <small style="position:relative; top:-30px;">
-  :octicons-calendar-24: August 01, 2023 ·
+  :octicons-calendar-24: August 09, 2023 ·
   :octicons-clock-24: 5 min read
 </small>
 
@@ -21,18 +21,18 @@ gain some new capabilities. We look forward to your feedback!
 
 Almost from the point where the Gateway API was itself implementable,
 questions have been raised about how it could be used for configuring service
-meshes. The GAMMA initiative, started in 2022, is a dedicated vendor-neutral
-workstream within the Gateway API, working on examining how best to fit the
-service mesh into the framework of the Gateway API resources, without
-requiring users of the Gateway API to relearn everything they understand about
-the Gateway API itself.
+meshes. The [GAMMA initiative][gamma], started in 2022, is a dedicated
+vendor-neutral workstream within the Gateway API, working on examining how
+best to fit the service mesh into the framework of the Gateway API resources,
+without requiring users of the Gateway API to relearn everything they
+understand about the Gateway API itself.
 
 Over the last year, GAMMA has dug deeply into the challenges and possible
 solutions around using the Gateway API for service mesh. The end result is a
 small number of [enhancement
 proposals](https://gateway-api.sigs.k8s.io/v1beta1/contributing/gep/) that
 subsume many hours of thought and debate, and provide a minimum viable path to
-allow the Gateway API can be used for service mesh. Of particular note:
+allow the Gateway API to be used for service mesh. Of particular note:
 
 - [GEP-1324](https://gateway-api.sigs.k8s.io/geps/gep-1324/) provides an
   overview of the GAMMA goals and some important definitions. This GEP is well
@@ -51,13 +51,13 @@ needed to introduce new resources or fields to date.
 
 ### How will mesh routing work when using the Gateway API?
 
-All the details are in
-[GEP-1426](https://gateway-api.sigs.k8s.io/geps/gep-1426/), but the short
-version for Gateway API 0.8.0 is that an HTTPRoute can now have a `parentRef`
-that is a Service, rather than just a Gateway. We anticipate future GEPs in
-this area as we gain more experience with service mesh use cases -- binding to
-a Service makes it possible to use the Gateway API with a service mesh, but
-there are several interesting use cases that remain difficult to cover.
+You can find all the details in the [Gateway API Mesh routing
+documentation][mesh-routing] and [GEP-1426], but the short version for Gateway
+API v0.8.0 is that an HTTPRoute can now have a `parentRef` that is a Service,
+rather than just a Gateway. We anticipate future GEPs in this area as we gain
+more experience with service mesh use cases -- binding to a Service makes it
+possible to use the Gateway API with a service mesh, but there are several
+interesting use cases that remain difficult to cover.
 
 As an example, you might use an HTTPRoute to do an A-B test in the mesh as
 follows:
@@ -106,25 +106,22 @@ The basic idea of conformance profiles is that we can define subsets of the
 Gateway API, and allow implementations to choose - and document! - which
 subsets they conform to. (SIG-Network-Policy is going to be using this concept
 as well.) GAMMA is adding a new profile, named `Mesh`, which checks only the
-mesh functionality as defined by GAMMA. At this point, Kuma 2.3+, Linkerd
-2.14+, and Istio 1.16+ are all conformant with the `Mesh` profile.
+mesh functionality as defined by GAMMA. At this point, Kuma 2.3+ and Istio
+1.16+ are conformant with the `Mesh` profile, with `Mesh` conformance also
+planned in the near future for an upcoming Linkerd release.
 
-## What else is in Gateway API 0.8.0?
+## What else is in Gateway API v0.8.0?
 
-In addition to GAMMA becoming experimental, Gateway API 0.8.0 also includes a
-way to configure routing scope for a given Gateway (see
-[GEP-1651](https://gateway-api.sigs.k8s.io/geps/gep-1651/) and updates the
-HTTPRoute resource to include native configuration for timeouts (see
-[GEP-1742](https://gateway-api.sigs.k8s.io/geps/gep-1742/).
-
-Additionally, we have (by necessity) taken a hard look at some
-[Experimental][status] GEPs which have been lingering long enough that
-projects have come to rely on them in production use. This is a bit of a
-breakdown of the GEP process; in order to prevent it happening in the future,
-we have changed the GEP process such that reaching [Experimental][status]
-_requires_ that a GEP include both the graduation criteria by which the GEP
-will become [Standard][status], and a probationary period after which the GEP
-will be dropped if does not meet its graduation criteria.
+In addition to GAMMA becoming experimental, the most significant change in
+v0.8.0 is that we have (by necessity) taken a hard look at the process around
+[Experimental][status] GEPs. Some of these GEPs have been lingering long
+enough that projects have come to rely on them in production use, which is a
+bit of a breakdown of the GEP process. In order to prevent it happening in the
+future, we have changed the GEP process such that reaching
+[Experimental][status] _requires_ that a GEP include both the graduation
+criteria by which the GEP will become [Standard][status], and a probationary
+period after which the GEP will be dropped if does not meet its graduation
+criteria.
 
 For an exhaustive list of changes included in the `v0.8.0` release, please see
 the [v0.8.0 release
@@ -149,14 +146,16 @@ repository, or join in the [discussions][disc]. Also check out the [community
 page][community] which includes links to the Slack channel and community
 meetings. We look forward to seeing you!!
 
-[status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
-[ch]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
+[gamma]:/concepts/gamma/
+[status]:/geps/overview/#status
+[ch]:/concepts/versioning/#release-channels-eg-experimental-standard
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
-[concepts]:https://gateway-api.sigs.k8s.io/concepts/api-overview/
-[guides]:https://gateway-api.sigs.k8s.io/guides/getting-started/
-[impl]:https://gateway-api.sigs.k8s.io/implementations/
-[install-crds]:https://gateway-api.sigs.k8s.io/guides/getting-started/#install-the-crds
+[concepts]:/concepts/api-overview/
+[guides]:/guides/getting-started/
+[impl]:/implementations/
+[install-crds]:/guides/getting-started/#install-the-crds
 [issue]:https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [disc]:https://github.com/kubernetes-sigs/gateway-api/discussions
-[community]:https://gateway-api.sigs.k8s.io/contributing/community/
-
+[community]:/contributing/community/
+[mesh-routing]:/concepts/gamma/#how-the-gateway-api-works-for-service-mesh
+[GEP-1426]:/geps/gep-1426/

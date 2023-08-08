@@ -4,8 +4,8 @@
 
 ## [Gateway API: Welcome, GAMMA!]
 
-<small style="position:relative; top:-30px;">
-  :octicons-calendar-24: August 01, 2023 ·
+<small style="position:relative; top:-10px;">
+  :octicons-calendar-24: August 23, 2023 ·
   :octicons-clock-24: 5 min read
 </small>
 
@@ -16,7 +16,8 @@ gain some new capabilities. We look forward to your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, GAMMA!]
 
-[Gateway API: Welcome, GAMMA!]:/blog/2023/0801-welcome-gamma
+[status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
+[Gateway API: Welcome, GAMMA!]:/blog/2023/0823-welcome-gamma
 
 ## [Gateway API Graduates to Beta]
 
