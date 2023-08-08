@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.8.0-rc1](#v080-rc1)
 - [v0.7.1](#v071)
 - [v0.7.0](#v070)
 - [v0.7.0-rc2](#v070-rc2)
@@ -26,6 +27,146 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.8.0-rc1
+
+The working group expects that this release candidate is quite close to the final
+v0.8.0 release. However, breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but the working group does
+not recommend shipping products based on a release candidate API due to the
+possibility of incompatible changes prior to the final release.
+
+## Major Themes
+
+### GAMMA (Service Mesh)
+Service mesh support per the GAMMA initiative has moved to **experimental** in
+`v0.8.0`. As an experimental API, **it is still possible that this will
+change**; the working group does not recommend shipping products based on any
+experimental API.
+
+When using the Gateway API to configure a service mesh, the Gateway and
+GatewayClass resources are not used (as there will typically only be one mesh
+in the cluster) and, instead, individual route resources are associated
+directly with Service resources. This permits configuring mesh routing while
+preserving the Gateway API's overall semantics.
+
+We encourage service mesh implementers and users to try this new support and
+we welcome feedback! Once again, though, the working group does not recommend
+shipping products based on this or any other experimental API. due to the
+possibility of incompatible changes prior to the final release.
+
+### CEL Validation
+This release marks the beginning of a transition from webhook validation to CEL
+validation that is built into the CRDs. That will mean different things
+depending on the version of Kubernetes you're using:
+
+#### Kubernetes 1.25+
+CEL validation is fully supported. Most validation is now covered by the
+validating webhook, but unfortunately not quite everything.
+
+**Standard Channel:** All but one validation has been translated from the
+webhook to CEL. Currently the CRDs only have a case-sensitive uniqueness check
+for header names in header modifier filters. The webhook validation is more
+thorough, ensuring that the uniqueness is case-insensitive. Unfortunately that
+is not possible to represent with CEL today. There is more information in
+[#2277](https://github.com/kubernetes-sigs/gateway-api/issues/2277).
+
+**Experimental Channel:** TCPRoute, TLSRoute, and UDPRoute are fully covered by
+CEL validation. GRPCRoute still has some significant gaps in CEL validation that
+will be covered in a future release.
+
+#### Kubernetes 1.23 and 1.24
+CEL validation is not supported, but Gateway API v0.8.0 CRDs can still be
+installed. When you upgrade to Kubernetes 1.25+, the validation included in
+these CRDs will automatically take effect. We recommend continuing to install
+the validating webhook on these Kubernetes versions.
+
+#### Kubernetes 1.22 and older
+Unfortunately Gateway API v0.8.0 is not supported on these Kubernetes versions.
+Gateway API v0.8.0 CRDs include CEL validation and cannot be installed on these
+versions of Kubernetes. Note that Gateway API only commits to providing support
+for the [5 most recent versions of
+Kubernetes](https://gateway-api.sigs.k8s.io/concepts/versioning/#supported-versions),
+and thus these versions are no longer supported by Gateway API.
+
+### API Version Changes
+As we prepare for a v1.0 release that will graduate Gateway, GatewayClass, and
+HTTPRoute to the `v1` API Version from `v1beta1`, we are continuing the process
+of moving away from `v1alpha2` for resources that have graduated to `v1beta1`.
+The following changes are included in this release:
+
+- `v1alpha2` of Gateway, GatewayClass, and HTTPRoute is no longer served
+- `v1alpha2` of ReferenceGrant is deprecrated
+- `v1beta1` is now the storage version for ReferenceGrant
+
+Those changes mean that:
+
+- Users and implementations that were reading or writing from `v1alpha2` of
+  Gateway, GatewayClass, or HTTPRoute MUST upgrade to use `v1beta1`.
+- Users and implementations that were reading or writing from `v1alpha2` of
+  ReferenceGrant SHOULD upgrade to use `v1beta1`.
+
+For more information, refer to
+[#2069](https://github.com/kubernetes-sigs/gateway-api/pull/2069).
+
+## Other Changes
+
+### Status
+- Add IncompatibleFilters reason for implementations to specify when a route is
+  invalid due to an invalid combination of route filters. (#2150, @sunjayBhatia)
+
+### Spec Clarifications
+
+- HTTPRoute Method matching precedence has been clarified (#2054,
+  @gauravkghildiyal)
+- Clarify that implementations must not modify HTTP Host header. Adds
+  specificity alongside spec that port in Host header must be ignored when
+  matching on host. (#2092, @sunjayBhatia)
+- Fix typo: rename GatewaReasonUnsupportedAddress ->
+  GatewayReasonUnsupportedAddress (#2149, @panslava)
+- HTTPRoute: Clarified that exact path matches are truly exact, both trailing
+  slashes and capitalization are meaningful. (#2055, @robscott)
+- Implementations MUST ignore any port value specified in the HTTP Host header
+  while performing a match against HTTPRoute.Hostnames (#1980,
+  @gauravkghildiyal)
+
+### Conformance
+
+- Add conformance tests against accepting invalid ReferenceGrants in HTTPRoute
+  and TLSRoute (#2076, @meyskens)
+- Fixed an issues causing conformance tests to fail when using IPv6 addresses
+  (#2024, @howardjohn)
+- HTTPRoute connectivity is in now enforced in conformance tests if a relevant
+  ReferenceGrant gets deleted. (#1853, @pmalek)
+- The `--skip-tests` flag has been added to the conformance CLI to enable tests
+  opt-out when using it. (#2170, @mlavacca)
+- The experimental conformance profile suite can now be added as a stand-alone
+  cli and by means of `go test`. (#2066, @mlavacca)
+- GEPs now must have a Conformance Details section that specifies the feature's
+  name for conformance purposes. (#2115, @youngnick)
+
+### Webhook
+
+- Changed default imagePullPolicy for gateway-api-admission-server to
+  IfNotPresent. (#2215, @networkhermit)
+- Webhook config works with PodAdmission restricted (#2016, @jcpunk)
+
+### Documentation
+
+- Adds support for ParentRef targeting a Kubernetes Service resource for mesh
+  implementations. (#2146, @mikemorris)
+- Clarify wording on website around Gateway API vs API Gateway (#2191,
+  @david-martin)
+- GEP-1282, Backend Properties, has been declined. (#2132, @youngnick)
+- Added missing GEPs. (#2114, @levikobi)
+
+### Bug Fixes
+
+- Added the missing ReferenceGrant resource the kustomization.yaml for the
+  standard channel (#2084, @howardjohn)
+- Webhook validation now ensures that BackendRefs can not be specified in the
+  same HTTPRoute rule as a Redirect filter (#2161, @slayer321)
 
 # v0.7.1
 
