@@ -142,6 +142,10 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 		}
 	}
 
+	for feature := range s.ExemptFeatures {
+		s.SupportedFeatures.Delete(feature)
+	}
+
 	if s.FS == nil {
 		s.FS = &conformance.Manifests
 	}
