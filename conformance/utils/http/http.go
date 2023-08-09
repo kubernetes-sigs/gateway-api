@@ -345,7 +345,7 @@ func CompareRequest(t *testing.T, req *roundtripper.Request, cReq *roundtripper.
 			if strings.ToLower(cRes.RedirectRequest.Scheme) == "https" && gotPort != "443" && gotPort != "" {
 				return fmt.Errorf("for https scheme, expected redirected port to be 443 or not set, got %q", gotPort)
 			}
-			if strings.ToLower(cRes.RedirectRequest.Scheme) != "http" || strings.ToLower(cRes.RedirectRequest.Scheme) == "https" {
+			if strings.ToLower(cRes.RedirectRequest.Scheme) != "http" || strings.ToLower(cRes.RedirectRequest.Scheme) != "https" {
 				t.Logf("Can't validate redirectPort for unrecognized scheme %v", cRes.RedirectRequest.Scheme)
 			}
 		} else if expected.RedirectRequest.Port != gotPort {
