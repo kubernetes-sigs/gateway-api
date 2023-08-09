@@ -207,14 +207,14 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 				})
 			}
 		}
-		startTag := "<experimental:description:start>"
-		endTag := "<experimental:description:end>"
+		startTag := "<experimental:description>"
+		endTag := "</experimental:description>"
 		regexPattern := startTag + `(?s:(.*?))` + endTag
-		if channel == "standard" && strings.Contains(jsonProps.Description, "<experimental:description:start>") {
+		if channel == "standard" && strings.Contains(jsonProps.Description, "<experimental:description>") {
 			re := regexp.MustCompile(regexPattern)
 			match := re.FindStringSubmatch(jsonProps.Description)
 			if len(match) != 2 {
-				log.Fatalf("Invalid <experimental:description:start> tag for %s", name)
+				log.Fatalf("Invalid <experimental:description> tag for %s", name)
 			}
 			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "")
 			jsonProps.Description = modifiedDescription
