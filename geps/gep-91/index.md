@@ -35,18 +35,20 @@ type ClientValidationContext struct {
     // the Certificate Authorities that can be used to
     // as a trusted anchor to validate the certificates presented by the client.
     //
-	// A single CACertificateRef to a Kubernetes ConfigMap with a key called `ca.crt`
+    // A single CACertificateRef to a Kubernetes ConfigMap with a key called `ca.crt`
     // has "Core" support.
-	// Implementations MAY choose to support attaching multiple certificates to
-	// a Listener, but this behavior is implementation-specific.
-	//
-	// References to a resource in different namespace are invalid.
-	// When invalid, "ResolvedRefs" condition MUST be set to False for this listener with the
-	// "RefNotPermitted" reason.
+    // Implementations MAY choose to support attaching multiple certificates to
+    // a Listener, but this behavior is implementation-specific.
+    //
+    // References to a resource in different namespace are invalid UNLESS there
+    // is a ReferenceGrant in the target namespace that allows the certificate
+    // to be attached. If a ReferenceGrant does not allow this reference, the
+    // "ResolvedRefs" condition MUST be set to False for this listener with the
+    // "RefNotPermitted" reason.
     //
     // +kubebuilder:validation:MaxItems=64
     // +optional
-    CACertificateRefs []LocalObjectReference `json:”caCertificateRefs,omitempty”`
+    CACertificateRefs []corev1.ObjectReference `json:”caCertificateRefs,omitempty”`
 }
 
 ```
