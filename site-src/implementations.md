@@ -132,8 +132,8 @@ solution for Kubernetes and other networking environments. It includes [Cilium
 Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
 be run in [sidecarless mode][cilium-sidecarless] to dramatically improve
 performance, and avoid the operational complexity of sidecars. Cilium also
-supports the sidecar proxy model, offering choice to users. As of [Cilium 1.13][cilium113blog],
-Cilium supports Gateway API, passing conformance for v0.5.1.
+supports the sidecar proxy model, offering choice to users. As of [Cilium 1.14][cilium114blog],
+Cilium supports Gateway API, passing conformance for v0.7.1.
 
 Cilium is open source and is a CNCF incubation project.
 
@@ -144,7 +144,7 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium]:https://cilium.io
 [cilium-service-mesh]:https://docs.cilium.io/en/stable/gettingstarted/#service-mesh
 [cilium-sidecarless]:https://isovalent.com/blog/post/cilium-service-mesh/
-[cilium113blog]:https://isovalent.com/blog/post/cilium-release-113/
+[cilium114blog]:https://isovalent.com/blog/post/cilium-release-114/
 [cilium-slack]:https://cilium.io/slack
 [cilium-meeting]:https://github.com/cilium/cilium#weekly-developer-meeting
 
