@@ -14,7 +14,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
-- [Envoy Gateway][18] (alpha)
+- [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (work in progress)
 - [Gloo Edge 2.0][5] (work in progress)
 - [Google Kubernetes Engine][6] (GA)
@@ -189,8 +189,8 @@ few simple steps.
 
 [eg-home]:https://gateway.envoyproxy.io/
 [envoy-org]:https://github.com/envoyproxy
-[eg-supported]: https://gateway.envoyproxy.io/v0.4.0/design/gatewayapi-support.html
-[eg-quickstart]:https://gateway.envoyproxy.io/v0.4.0/user/quickstart.html
+[eg-supported]: https://gateway.envoyproxy.io/v0.5.0/user/gatewayapi-support.html
+[eg-quickstart]:https://gateway.envoyproxy.io/v0.5.0/user/quickstart.html
 
 ### Flomesh Service Mesh (FSM)
 
