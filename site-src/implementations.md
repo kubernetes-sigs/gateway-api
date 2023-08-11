@@ -127,6 +127,8 @@ We are actively supporting various features of the Gateway API. For compatibilit
 
 ### Cilium
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/cilium-cilium.yaml)
+
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
 Service Mesh][cilium-service-mesh], a highly efficient mesh data plane that can
@@ -149,6 +151,8 @@ effort, check out the #development channel or join our [weekly developer meeting
 [cilium-meeting]:https://github.com/cilium/cilium#weekly-developer-meeting
 
 ### Contour
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/projectcontour-contour.yaml)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
@@ -248,6 +252,8 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/istio.io-istio.yaml)
+
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
 A light-weight minimal install of Istio can be used to provide a Beta-quality
@@ -267,6 +273,8 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 
 ### Kong
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kong-kubernetes-ingress-controller.yaml)
+
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
 Kong supports Gateway API in the [Kong Kubernetes Ingress Controller (KIC)][kic], see the [Gateway API Guide][kong-gw-guide] for usage information.
@@ -284,6 +292,8 @@ For help and support with Kong's implementations please feel free to [create an 
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
 
 ### Kuma
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kumahq-kuma.yaml)
 
 [Kuma][kuma] is an open source service mesh.
 
@@ -317,6 +327,8 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 - Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
 
 ### NGINX Kubernetes Gateway
+
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-NGinx Kubernetes Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/nginxinc-nginx-kubernetes-gateway.yaml)
 
 [NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
 
