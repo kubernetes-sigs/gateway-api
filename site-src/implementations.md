@@ -348,6 +348,12 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 [traefik]:https://traefik.io
 [traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
 
+### Tyk
+
+[Tyk Gateway](https://github.com/TykTechnologies/tyk) is a cloud-native, open source, API Gateway. 
+
+The [Tyk.io](https://tyk.io) team is working towards an implementation of the Gateway API. You can track progress of this project [here](https://github.com/TykTechnologies/tyk-operator/tree/master/docs/gatewayapi.md).
+
 ### WSO2 APK
 
 [WSO2 APK][wso2-apk] is a purpose-built API management solution tailored for Kubernetes environments, delivering seamless integration, flexibility, and scalability to organizations in managing their APIs.
