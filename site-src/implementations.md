@@ -27,6 +27,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [NGINX Kubernetes Gateway][12]
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
+- [Tyk][29] (work in progress)
 - [WSO2 APK][25] (pre-alpha)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
@@ -71,6 +72,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [26]:#kuadrant
 [27]:#azure-application-gateway-for-containers
 [28]:#linkerd
+[29]:#tyk
 
 [gamma]:/concepts/gamma/
 
@@ -350,9 +352,13 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 
 ### Tyk
 
-[Tyk Gateway](https://github.com/TykTechnologies/tyk) is a cloud-native, open source, API Gateway. 
+[Tyk Gateway][tyk-gateway] is a cloud-native, open source, API Gateway. 
 
-The [Tyk.io](https://tyk.io) team is working towards an implementation of the Gateway API. You can track progress of this project [here](https://github.com/TykTechnologies/tyk-operator/tree/master/docs/gatewayapi.md).
+The [Tyk.io][tyk] team is working towards an implementation of the Gateway API. You can track progress of this project [here][tyk-operator].
+
+[tyk]:https://tyk.io
+[tyk-gateway]:https://github.com/TykTechnologies/tyk
+[tyk-operator]:https://github.com/TykTechnologies/tyk-operator
 
 ### WSO2 APK
 
