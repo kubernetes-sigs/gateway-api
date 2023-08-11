@@ -90,7 +90,7 @@ func New(s Options) *ConformanceTestSuite {
 	}
 
 	switch {
-	case s.EnableAllSupportedFeatures == true:
+	case s.EnableAllSupportedFeatures:
 		s.SupportedFeatures = AllFeatures
 	case s.SupportedFeatures == nil:
 		s.SupportedFeatures = GatewayCoreFeatures

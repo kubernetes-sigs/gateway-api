@@ -20,7 +20,6 @@ limitations under the License.
 package conformance_test
 
 import (
-	"os"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -28,7 +27,6 @@ import (
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
-	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -122,6 +120,7 @@ func testExperimentalConformance(t *testing.T) {
 			},
 			Implementation:      *implementation,
 			ConformanceProfiles: conformanceProfiles,
+			ReportOutput:        *flags.ReportOutput,
 		})
 	if err != nil {
 		t.Fatalf("error creating experimental conformance test suite: %v", err)
@@ -129,25 +128,8 @@ func testExperimentalConformance(t *testing.T) {
 
 	cSuite.Setup(t)
 	cSuite.Run(t, tests.ConformanceTests)
-	report, err := cSuite.Report()
+	_, err = cSuite.Report(t)
 	if err != nil {
 		t.Fatalf("error generating conformance profile report: %v", err)
 	}
-	writeReport(t.Logf, *report, *flags.ReportOutput)
-}
-
-func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, output string) error {
-	rawReport, err := yaml.Marshal(report)
-	if err != nil {
-		return err
-	}
-
-	if output != "" {
-		if err = os.WriteFile(output, rawReport, 0644); err != nil {
-			return err
-		}
-	}
-	logf("Conformance report:\n%s", string(rawReport))
-
-	return nil
 }

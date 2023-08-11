@@ -22,6 +22,7 @@ package suite
 import (
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"sync"
 	"testing"
@@ -34,6 +35,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/yaml"
 )
 
 // -----------------------------------------------------------------------------
@@ -71,6 +73,9 @@ type ExperimentalConformanceTestSuite struct {
 	// marked as not supported, and is used for reporting the test results.
 	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
 
+	// ReportOutput is the file where to write the conformance report.
+	ReportOutput string
+
 	// lock is a mutex to help ensure thread safety of the test suite object.
 	lock sync.RWMutex
 }
@@ -78,6 +83,9 @@ type ExperimentalConformanceTestSuite struct {
 // Options can be used to initialize a ConformanceTestSuite.
 type ExperimentalConformanceOptions struct {
 	Options
+
+	// ReportOutput is the file where to write the conformance report.
+	ReportOutput string
 
 	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
@@ -176,6 +184,8 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 		suite.MeshManifests = "mesh/manifests.yaml"
 	}
 
+	suite.ReportOutput = s.ReportOutput
+
 	return suite, nil
 }
 
@@ -196,7 +206,7 @@ func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []Conform
 	suite.lock.Lock()
 	if suite.running {
 		suite.lock.Unlock()
-		return fmt.Errorf("can't run the test suite multiple times in parallel: the test suite is already running.")
+		return errors.New("can't run the test suite multiple times in parallel: the test suite is already running")
 	}
 
 	// if the test suite is not currently running, reset reporting and start a
@@ -241,7 +251,7 @@ func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []Conform
 
 // Report emits a ConformanceReport for the previously completed test run.
 // If no run completed prior to running the report, and error is emitted.
-func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceReport, error) {
+func (suite *ExperimentalConformanceTestSuite) Report(t *testing.T) (*confv1a1.ConformanceReport, error) {
 	suite.lock.RLock()
 	if suite.running {
 		suite.lock.RUnlock()
@@ -263,7 +273,7 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
 
-	return &confv1a1.ConformanceReport{
+	report := &confv1a1.ConformanceReport{
 		TypeMeta: v1.TypeMeta{
 			APIVersion: "gateway.networking.k8s.io/v1alpha1",
 			Kind:       "ConformanceReport",
@@ -272,7 +282,20 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 		Implementation:    suite.implementation,
 		GatewayAPIVersion: "TODO",
 		ProfileReports:    profileReports.list(),
-	}, nil
+	}
+
+	rawReport, err := yaml.Marshal(report)
+	if err != nil {
+		return nil, err
+	}
+	if suite.ReportOutput != "" {
+		if err = os.WriteFile(suite.ReportOutput, rawReport, 0644); err != nil {
+			return nil, err
+		}
+	}
+	t.Logf("Conformance report:\n%s", string(rawReport))
+
+	return report, nil
 }
 
 // ParseImplementation parses implementation-specific flag arguments and
