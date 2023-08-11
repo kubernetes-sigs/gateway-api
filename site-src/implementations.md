@@ -328,7 +328,7 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 ### NGINX Kubernetes Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-NGinx Kubernetes Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/nginxinc-nginx-kubernetes-gateway.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-NGINX Kubernetes Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/nginxinc-nginx-kubernetes-gateway.yaml)
 
 [NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
 
