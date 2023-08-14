@@ -72,11 +72,11 @@ spec:
       - kind: Secret
         group: ""
         name: foo-example-com-cert
-    clientValidation:
-      caCertificateRefs:
-      - kind: ConfigMap
-        group: ""
-        name: foo-example-com-ca-cert
+      clientValidation:
+        caCertificateRefs:
+        - kind: ConfigMap
+          group: ""
+          name: foo-example-com-ca-cert
 ```
 
 ## References
