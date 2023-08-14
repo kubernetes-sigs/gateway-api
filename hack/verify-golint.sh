@@ -26,6 +26,6 @@ cd "${KUBE_ROOT}"
 # See configuration file in ${KUBE_ROOT}/.golangci.yml.
 mkdir -p cache
 
-docker run --rm -v $(pwd)/cache:/cache -v $(pwd):/app --security-opt="label=disable" -e GOLANGCI_LINT_CACHE=/cache -w /app "golangci/golangci-lint:$VERSION" golangci-lint run
+docker run --rm -v $(pwd)/cache:/cache -v $(pwd):/app --security-opt="label=disable" -e GOLANGCI_LINT_CACHE=/cache -e GOFLAGS="-buildvcs=false"  -w /app "golangci/golangci-lint:$VERSION" golangci-lint run
 
 # ex: ts=2 sw=2 et filetype=sh
