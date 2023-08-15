@@ -150,30 +150,32 @@ spec:
                   are expected to vary across implementations. A combination that
                   is compatible for one implementation may not be compatible for another.
                   \n If this field specifies multiple Listeners that are not compatible,
-                  the implementation MUST raise a true \"Conflicted\" condition in
-                  the Listener Status. \n Implementations MAY choose to still accept
-                  a Gateway with conflicted Listeners if they accept a partial Listener
-                  set that contains no incompatible Listeners. They MUST set a \"ListenersNotValid\"
-                  condition the Gateway Status when the Gateway contains incompatible
-                  Listeners whether or not they accept the Gateway. \n For example,
-                  the following Listener scenarios may be compatible depending on
-                  implementation capabilities: \n 1. Multiple Listeners with the same
-                  Port that all use the \"HTTP\" Protocol that all have unique Hostname
-                  values. 2. Multiple Listeners with the same Port that use either
-                  the \"HTTPS\" or \"TLS\" Protocol that all have unique Hostname
-                  values. 3. A mixture of \"TCP\" and \"UDP\" Protocol Listeners,
-                  where no Listener with the same Protocol has the same Port value.
-                  \n An implementation that cannot serve both TCP and UDP listens
-                  on the same address, or cannot mix HTTPS and generic TLS listens
-                  on the same port would not consider those cases compatible. \n Implementations
-                  using the Hostname value to select between same-Port Listeners MUST
-                  match inbound request hostnames from the most specific to least
-                  specific Hostname values to find the correct set of Routes. Exact
-                  matches must be processed before wildcard matches, and wildcard
-                  matches must be processed before fallback (empty Hostname value)
-                  matches. \n Implementations MAY collapse separate Gateways onto
-                  a single set of Addresses if the Listeners across all Gateways are
-                  compatible. \n Support: Core"
+                  the implementation MUST set the \"Conflicted\" condition in the
+                  Listener Status to \"True\". \n Implementations MAY choose to still
+                  accept a Gateway with conflicted Listeners if they accept a partial
+                  Listener set that contains no incompatible Listeners. They MUST
+                  set a \"ListenersNotValid\" condition the Gateway Status when the
+                  Gateway contains incompatible Listeners whether or not they accept
+                  the Gateway. \n For example, the following Listener scenarios may
+                  be compatible depending on implementation capabilities: \n 1. Multiple
+                  Listeners with the same Port that all use the \"HTTP\" Protocol
+                  that all have unique Hostname values. 2. Multiple Listeners with
+                  the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
+                  that all have unique Hostname values. 3. A mixture of \"TCP\" and
+                  \"UDP\" Protocol Listeners, where no Listener with the same Protocol
+                  has the same Port value. \n An implementation that cannot serve
+                  both TCP and UDP listeners on the same address, or cannot mix HTTPS
+                  and generic TLS listens on the same port would not consider those
+                  cases compatible. \n Implementations using the Hostname value to
+                  select between same-Port Listeners MUST match inbound request hostnames
+                  from the most specific to least specific Hostname values to find
+                  the correct set of Routes. Exact matches must be processed before
+                  wildcard matches, and wildcard matches must be processed before
+                  fallback (empty Hostname value) matches. For example, `\"foo.example.com\"`
+                  takes precedence over `\"*.example.com\"`, and `\"*.example.com\"`
+                  takes precedence over `\"\"`. \n Implementations MAY collapse separate
+                  Gateways onto a single set of Addresses if the Listeners across
+                  all Gateways are compatible. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
@@ -940,30 +942,32 @@ spec:
                   are expected to vary across implementations. A combination that
                   is compatible for one implementation may not be compatible for another.
                   \n If this field specifies multiple Listeners that are not compatible,
-                  the implementation MUST raise a true \"Conflicted\" condition in
-                  the Listener Status. \n Implementations MAY choose to still accept
-                  a Gateway with conflicted Listeners if they accept a partial Listener
-                  set that contains no incompatible Listeners. They MUST set a \"ListenersNotValid\"
-                  condition the Gateway Status when the Gateway contains incompatible
-                  Listeners whether or not they accept the Gateway. \n For example,
-                  the following Listener scenarios may be compatible depending on
-                  implementation capabilities: \n 1. Multiple Listeners with the same
-                  Port that all use the \"HTTP\" Protocol that all have unique Hostname
-                  values. 2. Multiple Listeners with the same Port that use either
-                  the \"HTTPS\" or \"TLS\" Protocol that all have unique Hostname
-                  values. 3. A mixture of \"TCP\" and \"UDP\" Protocol Listeners,
-                  where no Listener with the same Protocol has the same Port value.
-                  \n An implementation that cannot serve both TCP and UDP listens
-                  on the same address, or cannot mix HTTPS and generic TLS listens
-                  on the same port would not consider those cases compatible. \n Implementations
-                  using the Hostname value to select between same-Port Listeners MUST
-                  match inbound request hostnames from the most specific to least
-                  specific Hostname values to find the correct set of Routes. Exact
-                  matches must be processed before wildcard matches, and wildcard
-                  matches must be processed before fallback (empty Hostname value)
-                  matches. \n Implementations MAY collapse separate Gateways onto
-                  a single set of Addresses if the Listeners across all Gateways are
-                  compatible. \n Support: Core"
+                  the implementation MUST set the \"Conflicted\" condition in the
+                  Listener Status to \"True\". \n Implementations MAY choose to still
+                  accept a Gateway with conflicted Listeners if they accept a partial
+                  Listener set that contains no incompatible Listeners. They MUST
+                  set a \"ListenersNotValid\" condition the Gateway Status when the
+                  Gateway contains incompatible Listeners whether or not they accept
+                  the Gateway. \n For example, the following Listener scenarios may
+                  be compatible depending on implementation capabilities: \n 1. Multiple
+                  Listeners with the same Port that all use the \"HTTP\" Protocol
+                  that all have unique Hostname values. 2. Multiple Listeners with
+                  the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
+                  that all have unique Hostname values. 3. A mixture of \"TCP\" and
+                  \"UDP\" Protocol Listeners, where no Listener with the same Protocol
+                  has the same Port value. \n An implementation that cannot serve
+                  both TCP and UDP listeners on the same address, or cannot mix HTTPS
+                  and generic TLS listens on the same port would not consider those
+                  cases compatible. \n Implementations using the Hostname value to
+                  select between same-Port Listeners MUST match inbound request hostnames
+                  from the most specific to least specific Hostname values to find
+                  the correct set of Routes. Exact matches must be processed before
+                  wildcard matches, and wildcard matches must be processed before
+                  fallback (empty Hostname value) matches. For example, `\"foo.example.com\"`
+                  takes precedence over `\"*.example.com\"`, and `\"*.example.com\"`
+                  takes precedence over `\"\"`. \n Implementations MAY collapse separate
+                  Gateways onto a single set of Addresses if the Listeners across
+                  all Gateways are compatible. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
