@@ -396,6 +396,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -769,6 +770,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -1226,6 +1228,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -1574,6 +1577,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -2714,6 +2718,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -3087,6 +3092,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -3544,6 +3550,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -3892,6 +3899,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n

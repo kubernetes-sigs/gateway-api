@@ -839,6 +839,7 @@ type HTTPHeaderFilter struct {
 	//   my-header2: bar
 	//
 	// +optional
+	// +listType=set
 	// +kubebuilder:validation:MaxItems=16
 	Remove []string `json:"remove,omitempty"`
 }
