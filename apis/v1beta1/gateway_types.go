@@ -99,8 +99,8 @@ type GatewaySpec struct {
 	// may not be compatible for another.
 	//
 	// If this field specifies multiple Listeners that are not compatible, the
-	// implementation MUST raise a true "Conflicted" condition in the Listener
-	// Status.
+	// implementation MUST set the "Conflicted" condition in the Listener
+	// Status to "True".
 	//
 	// Implementations MAY choose to still accept a Gateway with conflicted
 	// Listeners if they accept a partial Listener set that contains no
@@ -118,7 +118,7 @@ type GatewaySpec struct {
 	// 3. A mixture of "TCP" and "UDP" Protocol Listeners, where no Listener
 	//    with the same Protocol has the same Port value.
 	//
-	// An implementation that cannot serve both TCP and UDP listens on the same
+	// An implementation that cannot serve both TCP and UDP listeners on the same
 	// address, or cannot mix HTTPS and generic TLS listens on the same port
 	// would not consider those cases compatible.
 	//
