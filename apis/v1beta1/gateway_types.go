@@ -127,7 +127,8 @@ type GatewaySpec struct {
 	// to least specific Hostname values to find the correct set of Routes.
 	// Exact matches must be processed before wildcard matches, and wildcard
 	// matches must be processed before fallback (empty Hostname value)
-	// matches.
+	// matches. For example, `"foo.example.com"` takes precedence over
+	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
 	//
 	// Implementations MAY collapse separate Gateways onto a single set of
 	// Addresses if the Listeners across all Gateways are compatible.
