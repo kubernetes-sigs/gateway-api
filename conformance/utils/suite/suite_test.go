@@ -47,7 +47,7 @@ func TestParseSupportedFeatures(t *testing.T) {
 	}
 }
 
-func TestParseNamespaceLabels(t *testing.T) {
+func TestParseKeyValuePairs(t *testing.T) {
 	flags := []string{
 		"",
 		"a=b",
@@ -61,7 +61,7 @@ func TestParseNamespaceLabels(t *testing.T) {
 
 	for i, f := range flags {
 		expect := labels[i]
-		got := ParseNamespaceLabels(f)
+		got := ParseKeyValuePairs(f)
 		if !reflect.DeepEqual(got, expect) {
 			t.Errorf("Unexpected labels from flags '%s', expected: %v, got: %v", f, expect, got)
 		}

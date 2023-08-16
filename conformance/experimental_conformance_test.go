@@ -39,15 +39,16 @@ import (
 )
 
 var (
-	cfg                 *rest.Config
-	k8sClientset        *kubernetes.Clientset
-	mgrClient           client.Client
-	supportedFeatures   sets.Set[suite.SupportedFeature]
-	exemptFeatures      sets.Set[suite.SupportedFeature]
-	namespaceLabels     map[string]string
-	implementation      *confv1a1.Implementation
-	conformanceProfiles sets.Set[suite.ConformanceProfileName]
-	skipTests           []string
+	cfg                  *rest.Config
+	k8sClientset         *kubernetes.Clientset
+	mgrClient            client.Client
+	supportedFeatures    sets.Set[suite.SupportedFeature]
+	exemptFeatures       sets.Set[suite.SupportedFeature]
+	namespaceLabels      map[string]string
+	namespaceAnnotations map[string]string
+	implementation       *confv1a1.Implementation
+	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
+	skipTests            []string
 )
 
 func TestExperimentalConformance(t *testing.T) {
@@ -72,7 +73,8 @@ func TestExperimentalConformance(t *testing.T) {
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests = suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
+	namespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels)
+	namespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 
 	// experimental conformance flags
 	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
@@ -115,6 +117,7 @@ func testExperimentalConformance(t *testing.T) {
 				ExemptFeatures:             exemptFeatures,
 				EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 				NamespaceLabels:            namespaceLabels,
+				NamespaceAnnotations:       namespaceAnnotations,
 				SkipTests:                  skipTests,
 			},
 			Implementation:      *implementation,
