@@ -126,13 +126,24 @@ feature and any relevant API features, e.g:
 go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
 ```
 
-#### Namespace Labels
+#### Namespace Labels and Annotations
 
-If labels are needed on namespaces used for testing, you can use
-the `-namespace-labels` flag to pass one or more `name=value` labels to
-set on the test namespaces. For mesh testing, this flag can be used if
-an implementation requires labels on namespaces that host mesh workloads,
-for example, to enable sidecar injection.
+If labels are needed on namespaces used for testing, you can use the
+`-namespace-labels` flag to pass one or more `name=value` labels to set on the
+test namespaces. Likewise, `-namespace-annotations` can be used to specify
+annotations to be applied to the test namespaces. For mesh testing, this flag
+can be used if an implementation requires labels on namespaces that host mesh
+workloads, for example, to enable sidecar injection.
+
+As an example, when testing Linkerd, you might run
+
+```shell
+go test ./conformance/... -args \
+   ...
+   -namespace-annotations=linkerd.io/inject=enabled
+```
+
+so that the test namespaces are correctly injected into the mesh.
 
 #### Excluding Tests
 
