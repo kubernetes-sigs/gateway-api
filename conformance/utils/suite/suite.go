@@ -182,7 +182,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 			"gateway-conformance-app-backend",
 			"gateway-conformance-web-backend",
 		}
-		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
+		kubernetes.MeshNamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
 }
 
