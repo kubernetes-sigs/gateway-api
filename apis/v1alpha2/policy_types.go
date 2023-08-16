@@ -43,7 +43,6 @@ type PolicyTargetReference struct {
 	// unspecified, this targets the entire resource. In the following
 	// resources, SectionName is interpreted as the following:
 	// * Gateway: Listener Name
-	// * Route: Rule Name
 	// * Service: Port Name
 	//
 	// +optional
