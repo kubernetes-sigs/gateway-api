@@ -22,9 +22,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"testing"
 	"strings"
+	"testing"
 	"time"
+
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -175,7 +176,7 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1a2.GRPCRouteMatch{
 						{
 							Method: &gatewayv1a2.GRPCMethodMatch{
-								Type:  ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
+								Type:    ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
 								Service: ptrTo("helloworld.Greeter"),
 							},
 						},
@@ -201,7 +202,7 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1a2.GRPCRouteMatch{
 						{
 							Method: &gatewayv1a2.GRPCMethodMatch{
-								Type:  ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
+								Type:   ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
 								Method: ptrTo("SayHello"),
 							},
 						},
@@ -228,7 +229,7 @@ func TestGRPCRouteRule(t *testing.T) {
 					Matches: []gatewayv1a2.GRPCRouteMatch{
 						{
 							Method: &gatewayv1a2.GRPCMethodMatch{
-								Type:  ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
+								Type:    ptrTo(gatewayv1a2.GRPCMethodMatchType("Exact")),
 								Service: ptrTo("helloworld.Greeter"),
 							},
 						},
@@ -293,6 +294,121 @@ func TestGRPCRouteRule(t *testing.T) {
 				Spec: gatewayv1a2.GRPCRouteSpec{Rules: tc.rules},
 			}
 			validateGRPCRoute(t, route, tc.wantErrors)
+		})
+	}
+}
+
+func TestGRPCMethodMatch(t *testing.T) {
+	tests := []struct {
+		name       string
+		method     gatewayv1a2.GRPCMethodMatch
+		wantErrors []string
+	}{
+		{
+			name: "valid GRPCRoute with 1 service in GRPCMethodMatch field",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Service: ptrTo("foo.Test.Example"),
+			},
+		},
+		{
+			name: "valid GRPCRoute with 1 method in GRPCMethodMatch field",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Method: ptrTo("Login"),
+			},
+		},
+		{
+			name: "invalid GRPCRoute missing service or method in GRPCMethodMatch field",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Service: nil,
+				Method:  nil,
+			},
+			wantErrors: []string{"One or both of 'service' or 'method"},
+		},
+		{
+			name: "GRPCRoute uses regex in service and method with undefined match type",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Service: ptrTo(".*"),
+				Method:  ptrTo(".*"),
+			},
+			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)", "method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
+		},
+		{
+			name: "GRPCRoute uses regex in service and method with match type Exact",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+				Service: ptrTo(".*"),
+				Method:  ptrTo(".*"),
+			},
+			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)", "method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
+		},
+		{
+			name: "GRPCRoute uses regex in method with undefined match type",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Method: ptrTo(".*"),
+			},
+			wantErrors: []string{"method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)"},
+		},
+		{
+			name: "GRPCRoute uses regex in service with match type Exact",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+				Service: ptrTo(".*"),
+			},
+			wantErrors: []string{"service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)"},
+		},
+		{
+			name: "GRPCRoute uses regex in service and method with match type RegularExpression",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Type:    ptrTo(gatewayv1a2.GRPCMethodMatchRegularExpression),
+				Service: ptrTo(".*"),
+				Method:  ptrTo(".*"),
+			},
+		},
+		{
+			name: "GRPCRoute uses valid service and method with undefined match type",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Service: ptrTo("foo.Test.Example"),
+				Method:  ptrTo("Login"),
+			},
+		},
+		{
+			name: "GRPCRoute uses valid service and method with match type Exact",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+				Service: ptrTo("foo.Test.Example"),
+				Method:  ptrTo("Login"),
+			},
+		},
+		{
+			name: "GRPCRoute uses a valid service with a leading dot when match type is Exact",
+			method: gatewayv1a2.GRPCMethodMatch{
+				Type:    ptrTo(gatewayv1a2.GRPCMethodMatchExact),
+				Service: ptrTo(".foo.Test.Example"),
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1a2.GRPCRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1a2.GRPCRouteSpec{
+					Rules: []gatewayv1a2.GRPCRouteRule{
+						{
+							Matches: []gatewayv1a2.GRPCRouteMatch{
+								{
+									Method: &tc.method,
+								},
+							},
+						},
+					},
+				},
+			}
+			validateGRPCRoute(t, &route, tc.wantErrors)
 		})
 	}
 }

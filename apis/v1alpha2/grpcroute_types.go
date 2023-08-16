@@ -147,7 +147,6 @@ type GRPCRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:default={{matches: {{method: {type: "Exact"}}}}}
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
@@ -313,6 +312,10 @@ type GRPCRouteMatch struct {
 // request service and/or method.
 //
 // At least one of Service and Method MUST be a non-empty string.
+//
+// +kubebuilder:validation:XValidation:message="One or both of 'service' or 'method' must be specified",rule="has(self.type) ? has(self.service) || has(self.method) : true"
+// +kubebuilder:validation:XValidation:message="service must only contain valid characters (matching ^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.service) ? self.service.matches(r\"\"\"^(?i)\\.?[a-z_][a-z_0-9]*(\\.[a-z_][a-z_0-9]*)*$\"\"\"): true"
+// +kubebuilder:validation:XValidation:message="method must only contain valid characters (matching ^[A-Za-z_][A-Za-z_0-9]*$)",rule="(!has(self.type) || self.type == 'Exact') && has(self.method) ? self.method.matches(r\"\"\"^[A-Za-z_][A-Za-z_0-9]*$\"\"\"): true"
 type GRPCMethodMatch struct {
 	// Type specifies how to match against the service and/or method.
 	// Support: Core (Exact with service and method specified)

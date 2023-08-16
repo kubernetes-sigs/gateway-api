@@ -293,10 +293,6 @@ spec:
                     && ((!has(p1.port) && !has(p2.port)) || (!has(p1.port) && p2.port
                     == 0) || (p1.port == 0 && !has(p2.port)) || (p1.port == p2.port))))
               rules:
-                default:
-                - matches:
-                  - method:
-                      type: Exact
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
                   description: GRPCRouteRule defines the semantics for matching a
@@ -1398,6 +1394,21 @@ spec:
                                 - RegularExpression
                                 type: string
                             type: object
+                            x-kubernetes-validations:
+                            - message: One or both of 'service' or 'method' must be
+                                specified
+                              rule: 'has(self.type) ? has(self.service) || has(self.method)
+                                : true'
+                            - message: service must only contain valid characters
+                                (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                              rule: '(!has(self.type) || self.type == ''Exact'') &&
+                                has(self.service) ? self.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""):
+                                true'
+                            - message: method must only contain valid characters (matching
+                                ^[A-Za-z_][A-Za-z_0-9]*$)
+                              rule: '(!has(self.type) || self.type == ''Exact'') &&
+                                has(self.method) ? self.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""):
+                                true'
                         type: object
                       maxItems: 8
                       type: array
