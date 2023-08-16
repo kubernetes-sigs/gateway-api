@@ -55,15 +55,16 @@ type ConformanceTestSuite struct {
 
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
-	Client           client.Client
-	Clientset        clientset.Interface
-	RestConfig       *rest.Config
-	GatewayClassName string
-	Debug            bool
-	RoundTripper     roundtripper.RoundTripper
-	BaseManifests    string
-	MeshManifests    string
-	NamespaceLabels  map[string]string
+	Client               client.Client
+	Clientset            clientset.Interface
+	RestConfig           *rest.Config
+	GatewayClassName     string
+	Debug                bool
+	RoundTripper         roundtripper.RoundTripper
+	BaseManifests        string
+	MeshManifests        string
+	NamespaceLabels      map[string]string
+	NamespaceAnnotations map[string]string
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -118,7 +119,8 @@ func New(s Options) *ConformanceTestSuite {
 		BaseManifests:    s.BaseManifests,
 		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels: s.NamespaceLabels,
+			NamespaceLabels:      s.NamespaceLabels,
+			NamespaceAnnotations: s.NamespaceAnnotations,
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
@@ -248,6 +250,22 @@ func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
 // ParseNamespaceLables parses flag arguments and converts the string to
 // map[string]string containing label key/value pairs.
 func ParseNamespaceLabels(f string) map[string]string {
+	if f == "" {
+		return nil
+	}
+	res := map[string]string{}
+	for _, kv := range strings.Split(f, ",") {
+		parts := strings.Split(kv, "=")
+		if len(parts) == 2 {
+			res[parts[0]] = parts[1]
+		}
+	}
+	return res
+}
+
+// ParseNamespaceAnnotations parses flag arguments and converts the string to
+// map[string]string containing annotation key/value pairs.
+func ParseNamespaceAnnotations(f string) map[string]string {
 	if f == "" {
 		return nil
 	}
