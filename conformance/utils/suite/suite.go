@@ -247,7 +247,7 @@ func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
 	return res
 }
 
-// ParseNamespaceLables parses flag arguments and converts the string to
+// ParseNamespaceLabels parses flag arguments and converts the string to
 // map[string]string containing label key/value pairs.
 func ParseNamespaceLabels(f string) map[string]string {
 	if f == "" {
