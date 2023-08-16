@@ -247,25 +247,9 @@ func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
 	return res
 }
 
-// ParseNamespaceLabels parses flag arguments and converts the string to
+// ParseKeyValuePairs parses flag arguments and converts the string to
 // map[string]string containing label key/value pairs.
-func ParseNamespaceLabels(f string) map[string]string {
-	if f == "" {
-		return nil
-	}
-	res := map[string]string{}
-	for _, kv := range strings.Split(f, ",") {
-		parts := strings.Split(kv, "=")
-		if len(parts) == 2 {
-			res[parts[0]] = parts[1]
-		}
-	}
-	return res
-}
-
-// ParseNamespaceAnnotations parses flag arguments and converts the string to
-// map[string]string containing annotation key/value pairs.
-func ParseNamespaceAnnotations(f string) map[string]string {
+func ParseKeyValuePairs(f string) map[string]string {
 	if f == "" {
 		return nil
 	}

@@ -73,8 +73,8 @@ func TestExperimentalConformance(t *testing.T) {
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests = suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
-	namespaceAnnotations = suite.ParseNamespaceAnnotations(*flags.NamespaceAnnotations)
+	namespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels)
+	namespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 
 	// experimental conformance flags
 	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
