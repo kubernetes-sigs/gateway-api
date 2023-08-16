@@ -40,7 +40,7 @@ type PolicyTargetReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 
 	// SectionName is the name of a section within the target resource. When
-	// unspecified, this targets the entire resource. In the following
+	// unspecified, this targetRef targets the entire resource. In the following
 	// resources, SectionName is interpreted as the following:
 	// * Gateway: Listener Name
 	// * Service: Port Name
