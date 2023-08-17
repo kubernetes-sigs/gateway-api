@@ -484,25 +484,28 @@ spec:
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
-                                        where mirrored requests are sent. \n If the
-                                        referent cannot be found, this BackendRef
-                                        is invalid and must be dropped from the Gateway.
-                                        The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Route status is set to `status:
-                                        False` and not configure this backend in the
-                                        underlying implementation. \n If there is
-                                        a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferenceGrant,
-                                        the controller must ensure the \"ResolvedRefs\"
-                                        \ condition on the Route is set to `status:
-                                        False`, with the \"RefNotPermitted\" reason
-                                        and not configure this backend in the underlying
-                                        implementation. \n In either error case, the
-                                        Message of the `ResolvedRefs` Condition should
-                                        be used to provide more detail about the problem.
-                                        \n Support: Extended for Kubernetes Service
-                                        \n Support: Implementation-specific for any
-                                        other resource"
+                                        where mirrored requests are sent. \n Mirrored
+                                        requests must be sent only to a single destination
+                                        endpoint within this BackendRef, irrespective
+                                        of how many endpoints are present within this
+                                        BackendRef. \n If the referent cannot be found,
+                                        this BackendRef is invalid and must be dropped
+                                        from the Gateway. The controller must ensure
+                                        the \"ResolvedRefs\" condition on the Route
+                                        status is set to `status: False` and not configure
+                                        this backend in the underlying implementation.
+                                        \n If there is a cross-namespace reference
+                                        to an *existing* object that is not allowed
+                                        by a ReferenceGrant, the controller must ensure
+                                        the \"ResolvedRefs\"  condition on the Route
+                                        is set to `status: False`, with the \"RefNotPermitted\"
+                                        reason and not configure this backend in the
+                                        underlying implementation. \n In either error
+                                        case, the Message of the `ResolvedRefs` Condition
+                                        should be used to provide more detail about
+                                        the problem. \n Support: Extended for Kubernetes
+                                        Service \n Support: Implementation-specific
+                                        for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -1310,23 +1313,26 @@ spec:
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
-                                  mirrored requests are sent. \n If the referent cannot
-                                  be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure
-                                  the \"ResolvedRefs\" condition on the Route status
-                                  is set to `status: False` and not configure this
-                                  backend in the underlying implementation. \n If
-                                  there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferenceGrant,
-                                  the controller must ensure the \"ResolvedRefs\"
-                                  \ condition on the Route is set to `status: False`,
-                                  with the \"RefNotPermitted\" reason and not configure
-                                  this backend in the underlying implementation. \n
-                                  In either error case, the Message of the `ResolvedRefs`
-                                  Condition should be used to provide more detail
-                                  about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Implementation-specific for
-                                  any other resource"
+                                  mirrored requests are sent. \n Mirrored requests
+                                  must be sent only to a single destination endpoint
+                                  within this BackendRef, irrespective of how many
+                                  endpoints are present within this BackendRef. \n
+                                  If the referent cannot be found, this BackendRef
+                                  is invalid and must be dropped from the Gateway.
+                                  The controller must ensure the \"ResolvedRefs\"
+                                  condition on the Route status is set to `status:
+                                  False` and not configure this backend in the underlying
+                                  implementation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not allowed
+                                  by a ReferenceGrant, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Route is
+                                  set to `status: False`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service \n Support: Implementation-specific
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -2864,25 +2870,28 @@ spec:
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
-                                        where mirrored requests are sent. \n If the
-                                        referent cannot be found, this BackendRef
-                                        is invalid and must be dropped from the Gateway.
-                                        The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Route status is set to `status:
-                                        False` and not configure this backend in the
-                                        underlying implementation. \n If there is
-                                        a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferenceGrant,
-                                        the controller must ensure the \"ResolvedRefs\"
-                                        \ condition on the Route is set to `status:
-                                        False`, with the \"RefNotPermitted\" reason
-                                        and not configure this backend in the underlying
-                                        implementation. \n In either error case, the
-                                        Message of the `ResolvedRefs` Condition should
-                                        be used to provide more detail about the problem.
-                                        \n Support: Extended for Kubernetes Service
-                                        \n Support: Implementation-specific for any
-                                        other resource"
+                                        where mirrored requests are sent. \n Mirrored
+                                        requests must be sent only to a single destination
+                                        endpoint within this BackendRef, irrespective
+                                        of how many endpoints are present within this
+                                        BackendRef. \n If the referent cannot be found,
+                                        this BackendRef is invalid and must be dropped
+                                        from the Gateway. The controller must ensure
+                                        the \"ResolvedRefs\" condition on the Route
+                                        status is set to `status: False` and not configure
+                                        this backend in the underlying implementation.
+                                        \n If there is a cross-namespace reference
+                                        to an *existing* object that is not allowed
+                                        by a ReferenceGrant, the controller must ensure
+                                        the \"ResolvedRefs\"  condition on the Route
+                                        is set to `status: False`, with the \"RefNotPermitted\"
+                                        reason and not configure this backend in the
+                                        underlying implementation. \n In either error
+                                        case, the Message of the `ResolvedRefs` Condition
+                                        should be used to provide more detail about
+                                        the problem. \n Support: Extended for Kubernetes
+                                        Service \n Support: Implementation-specific
+                                        for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -3690,23 +3699,26 @@ spec:
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
-                                  mirrored requests are sent. \n If the referent cannot
-                                  be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure
-                                  the \"ResolvedRefs\" condition on the Route status
-                                  is set to `status: False` and not configure this
-                                  backend in the underlying implementation. \n If
-                                  there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferenceGrant,
-                                  the controller must ensure the \"ResolvedRefs\"
-                                  \ condition on the Route is set to `status: False`,
-                                  with the \"RefNotPermitted\" reason and not configure
-                                  this backend in the underlying implementation. \n
-                                  In either error case, the Message of the `ResolvedRefs`
-                                  Condition should be used to provide more detail
-                                  about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Implementation-specific for
-                                  any other resource"
+                                  mirrored requests are sent. \n Mirrored requests
+                                  must be sent only to a single destination endpoint
+                                  within this BackendRef, irrespective of how many
+                                  endpoints are present within this BackendRef. \n
+                                  If the referent cannot be found, this BackendRef
+                                  is invalid and must be dropped from the Gateway.
+                                  The controller must ensure the \"ResolvedRefs\"
+                                  condition on the Route status is set to `status:
+                                  False` and not configure this backend in the underlying
+                                  implementation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not allowed
+                                  by a ReferenceGrant, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Route is
+                                  set to `status: False`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service \n Support: Implementation-specific
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
