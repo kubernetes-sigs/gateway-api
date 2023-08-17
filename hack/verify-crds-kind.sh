@@ -61,7 +61,7 @@ for CHANNEL in experimental standard; do
   kubectl apply -f "config/crd/${CHANNEL}/gateway*.yaml"
 
   # Run tests.
-  go test -timeout=120s -count=1 --tags ${CHANNEL} sigs.k8s.io/gateway-api/pkg/test/cel
+  go test -v -timeout=120s -count=1 --tags ${CHANNEL} sigs.k8s.io/gateway-api/pkg/test/cel
 
   # Delete CRDs to reset environment.
   kubectl delete -f "config/crd/${CHANNEL}/gateway*.yaml"
