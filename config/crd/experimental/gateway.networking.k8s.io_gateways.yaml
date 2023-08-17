@@ -112,7 +112,7 @@ spec:
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
                       ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
-                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
                       true'
                 maxItems: 16
                 type: array
@@ -561,7 +561,7 @@ spec:
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
                       ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
-                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
                       true'
                 maxItems: 16
                 type: array
@@ -890,7 +890,7 @@ spec:
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
                       ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
-                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
                       true'
                 maxItems: 16
                 type: array
@@ -1339,7 +1339,7 @@ spec:
                   x-kubernetes-validations:
                   - message: Hostname value must only contain valid characters (matching
                       ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
-                    rule: 'self.type == ''Hostname'' ? self.value.matches(''^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$''):
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
                       true'
                 maxItems: 16
                 type: array
