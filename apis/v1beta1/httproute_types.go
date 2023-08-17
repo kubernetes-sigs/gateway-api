@@ -223,10 +223,10 @@ type HTTPRouteRule struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
-	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'RequestHeaderModifier') ? self.exists_one(f, f.type == 'RequestHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'ResponseHeaderModifier') ? self.exists_one(f, f.type == 'ResponseHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.exists(f, f.type == 'RequestRedirect') ? self.exists_one(f, f.type == 'RequestRedirect') : true"
-	// +kubebuilder:validation:XValidation:message="URLRewrite filter cannot be repeated",rule="self.exists(f, f.type == 'URLRewrite') ? self.exists_one(f, f.type == 'URLRewrite') : true"
+	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.filter(f, f.type == 'RequestRedirect').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="URLRewrite filter cannot be repeated",rule="self.filter(f, f.type == 'URLRewrite').size() <= 1"
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
@@ -1098,10 +1098,10 @@ type HTTPBackendRef struct {
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
 	// +kubebuilder:validation:XValidation:message="May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both",rule="!(self.exists(f, f.type == 'RequestRedirect') && self.exists(f, f.type == 'URLRewrite'))"
-	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'RequestHeaderModifier') ? self.exists_one(f, f.type == 'RequestHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'ResponseHeaderModifier') ? self.exists_one(f, f.type == 'ResponseHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.exists(f, f.type == 'RequestRedirect') ? self.exists_one(f, f.type == 'RequestRedirect') : true"
-	// +kubebuilder:validation:XValidation:message="URLRewrite filter cannot be repeated",rule="self.exists(f, f.type == 'URLRewrite') ? self.exists_one(f, f.type == 'URLRewrite') : true"
+	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="RequestRedirect filter cannot be repeated",rule="self.filter(f, f.type == 'RequestRedirect').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="URLRewrite filter cannot be repeated",rule="self.filter(f, f.type == 'URLRewrite').size() <= 1"
 	Filters []HTTPRouteFilter `json:"filters,omitempty"`
 }
 

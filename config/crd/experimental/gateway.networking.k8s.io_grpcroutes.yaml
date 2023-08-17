@@ -763,13 +763,11 @@ spec:
                             type: array
                             x-kubernetes-validations:
                             - message: RequestHeaderModifier filter cannot be repeated
-                              rule: 'self.exists(f, f.type == ''RequestHeaderModifier'')
-                                ? self.exists_one(f, f.type == ''RequestHeaderModifier'')
-                                : true'
+                              rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                                <= 1
                             - message: ResponseHeaderModifier filter cannot be repeated
-                              rule: 'self.exists(f, f.type == ''ResponseHeaderModifier'')
-                                ? self.exists_one(f, f.type == ''ResponseHeaderModifier'')
-                                : true'
+                              rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                                <= 1
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
@@ -1274,13 +1272,11 @@ spec:
                       type: array
                       x-kubernetes-validations:
                       - message: RequestHeaderModifier filter cannot be repeated
-                        rule: 'self.exists(f, f.type == ''RequestHeaderModifier'')
-                          ? self.exists_one(f, f.type == ''RequestHeaderModifier'')
-                          : true'
+                        rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                          <= 1
                       - message: ResponseHeaderModifier filter cannot be repeated
-                        rule: 'self.exists(f, f.type == ''ResponseHeaderModifier'')
-                          ? self.exists_one(f, f.type == ''ResponseHeaderModifier'')
-                          : true'
+                        rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                          <= 1
                     matches:
                       description: "Matches define conditions used for matching the
                         rule against incoming gRPC requests. Each match is independent,
