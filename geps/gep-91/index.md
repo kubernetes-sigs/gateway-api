@@ -1,7 +1,7 @@
 # GEP-91: Client Certificate Validation for TLS terminating at the Gateway Listener
 
 * Issue: [#91](https://github.com/kubernetes-sigs/gateway-api/issues/91)
-* Status: Provisional
+* Status: Implementable 
 
 (See definitions in [GEP Status][/contributing/gep#status].)
 
