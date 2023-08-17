@@ -235,8 +235,8 @@ type GRPCRouteRule struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'RequestHeaderModifier') ? self.exists_one(f, f.type == 'RequestHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'ResponseHeaderModifier') ? self.exists_one(f, f.type == 'ResponseHeaderModifier') : true"
+	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
 	Filters []GRPCRouteFilter `json:"filters,omitempty"`
 
 	// BackendRefs defines the backend(s) where matching requests should be
@@ -593,7 +593,7 @@ type GRPCBackendRef struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
-	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'RequestHeaderModifier') ? self.exists_one(f, f.type == 'RequestHeaderModifier') : true"
-	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.exists(f, f.type == 'ResponseHeaderModifier') ? self.exists_one(f, f.type == 'ResponseHeaderModifier') : true"
+	// +kubebuilder:validation:XValidation:message="RequestHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'RequestHeaderModifier').size() <= 1"
+	// +kubebuilder:validation:XValidation:message="ResponseHeaderModifier filter cannot be repeated",rule="self.filter(f, f.type == 'ResponseHeaderModifier').size() <= 1"
 	Filters []GRPCRouteFilter `json:"filters,omitempty"`
 }
