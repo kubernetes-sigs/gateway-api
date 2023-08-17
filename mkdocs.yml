@@ -92,34 +92,34 @@ nav:
         - geps/gep-1282.md
       - Provisional:
         - geps/gep-1619.md
-        - geps/gep-1897.md
         - geps/gep-1867.md
+        - geps/gep-1897.md
         - geps/gep-2162.md
       - Implementable:
         - geps/gep-1742.md
       - Experimental:
+        - geps/gep-713.md
+        - geps/gep-957.md
+        - geps/gep-1016.md
         - geps/gep-1324.md
         - geps/gep-1426.md
-        - geps/gep-1686.md
-        - geps/gep-1748.md
         - geps/gep-1651.md
-        - geps/gep-1016.md
-        - geps/gep-957.md
-        - geps/gep-713.md
+        - geps/gep-1686.md
         - geps/gep-1709.md
+        - geps/gep-1748.md
         - geps/gep-2257.md
       - Standard:
-        - geps/gep-1364.md
-        - geps/gep-1323.md
-        - geps/gep-922.md
-        - geps/gep-917.md
-        - geps/gep-851.md
-        - geps/gep-820.md
-        - geps/gep-746.md
-        - geps/gep-726.md
-        - geps/gep-724.md
-        - geps/gep-718.md
         - geps/gep-709.md
+        - geps/gep-718.md
+        - geps/gep-724.md
+        - geps/gep-726.md
+        - geps/gep-746.md
+        - geps/gep-820.md
+        - geps/gep-851.md
+        - geps/gep-917.md
+        - geps/gep-922.md
+        - geps/gep-1323.md
+        - geps/gep-1364.md
       - Glossary: concepts/glossary.md
   - Contributing:
     - How to Get Involved: contributing/index.md
