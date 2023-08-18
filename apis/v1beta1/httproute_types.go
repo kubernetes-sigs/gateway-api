@@ -1035,6 +1035,10 @@ type HTTPURLRewriteFilter struct {
 type HTTPRequestMirrorFilter struct {
 	// BackendRef references a resource where mirrored requests are sent.
 	//
+	// Mirrored requests must be sent only to a single destination endpoint
+	// within this BackendRef, irrespective of how many endpoints are present
+	// within this BackendRef.
+	//
 	// If the referent cannot be found, this BackendRef is invalid and must be
 	// dropped from the Gateway. The controller must ensure the "ResolvedRefs"
 	// condition on the Route status is set to `status: False` and not configure
