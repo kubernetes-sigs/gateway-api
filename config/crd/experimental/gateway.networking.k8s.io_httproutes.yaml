@@ -1985,49 +1985,48 @@ spec:
                             x-kubernetes-validations:
                             - message: value must be an absolute path and start with
                                 '/' when type one of ['Exact', 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? self.value.startsWith(''/'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.startsWith(''/'')
+                                : true'
                             - message: must not contain '//' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''//'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''//'')
+                                : true'
                             - message: must not contain '/./' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''/./'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/./'')
+                                : true'
                             - message: must not contain '/../' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''/../'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/../'')
+                                : true'
                             - message: must not contain '%2f' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''%2f'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2f'')
+                                : true'
                             - message: must not contain '%2F' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''%2F'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2F'')
+                                : true'
                             - message: must not contain '#' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''#'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''#'')
+                                : true'
                             - message: must not end with '/..' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.endsWith(''/..'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/..'')
+                                : true'
                             - message: must not end with '/.' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.endsWith(''/.'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
+                                : true'
                             - message: type must be one of ['Exact', 'PathPrefix',
                                 'RegularExpression']
-                              rule: self.type == 'Exact' || self.type == 'PathPrefix'
-                                || self.type == 'RegularExpression'
+                              rule: self.type in ['Exact','PathPrefix'] || self.type
+                                == 'RegularExpression'
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
                                 : true'
                           queryParams:
                             description: "QueryParams specifies HTTP query parameter
@@ -4365,49 +4364,48 @@ spec:
                             x-kubernetes-validations:
                             - message: value must be an absolute path and start with
                                 '/' when type one of ['Exact', 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? self.value.startsWith(''/'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.startsWith(''/'')
+                                : true'
                             - message: must not contain '//' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''//'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''//'')
+                                : true'
                             - message: must not contain '/./' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''/./'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/./'')
+                                : true'
                             - message: must not contain '/../' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''/../'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/../'')
+                                : true'
                             - message: must not contain '%2f' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''%2f'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2f'')
+                                : true'
                             - message: must not contain '%2F' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''%2F'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2F'')
+                                : true'
                             - message: must not contain '#' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.contains(''#'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''#'')
+                                : true'
                             - message: must not end with '/..' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.endsWith(''/..'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/..'')
+                                : true'
                             - message: must not end with '/.' when type one of ['Exact',
                                 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? !self.value.endsWith(''/.'') : true'
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
+                                : true'
                             - message: type must be one of ['Exact', 'PathPrefix',
                                 'RegularExpression']
-                              rule: self.type == 'Exact' || self.type == 'PathPrefix'
-                                || self.type == 'RegularExpression'
+                              rule: self.type in ['Exact','PathPrefix'] || self.type
+                                == 'RegularExpression'
                             - message: must only contain valid characters (matching
                                 ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
                                 for types ['Exact', 'PathPrefix']
-                              rule: '(self.type == ''Exact'' || self.type == ''PathPrefix'')
-                                ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
                                 : true'
                           queryParams:
                             description: "QueryParams specifies HTTP query parameter
