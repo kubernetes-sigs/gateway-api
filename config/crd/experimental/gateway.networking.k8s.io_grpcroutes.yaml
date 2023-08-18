@@ -48,7 +48,7 @@ spec:
           If the implementation does not support this, then it MUST set the \"Accepted\"
           condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\".
           Implementations MAY also accept HTTP/2 connections with an upgrade from
-          HTTP/1, i.e. without prior knowledge. \n Support: Extended"
+          HTTP/1, i.e. without prior knowledge."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
