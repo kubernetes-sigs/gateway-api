@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -70,7 +67,7 @@ var (
 			SupportReferenceGrant,
 			SupportHTTPRoute,
 		),
-		ExtendedFeatures: HTTPExtendedFeatures,
+		ExtendedFeatures: HTTPRouteExtendedFeatures,
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS

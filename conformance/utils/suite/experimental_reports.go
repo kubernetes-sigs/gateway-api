@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -21,6 +18,7 @@ package suite
 
 import (
 	"k8s.io/apimachinery/pkg/util/sets"
+
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 )
 
