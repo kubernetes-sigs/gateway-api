@@ -8,7 +8,7 @@ livereload==2.6.3
 Markdown==3.3.7
 MarkupSafe==2.1.3
 mkdocs==1.5.2
-mkdocs-awesome-pages-plugin==2.9.1
+mkdocs-awesome-pages-plugin==2.9.2
 mkdocs-macros-plugin==1.0.4
 mkdocs-material==9.1.21
 mkdocs-material-extensions==1.1.1
