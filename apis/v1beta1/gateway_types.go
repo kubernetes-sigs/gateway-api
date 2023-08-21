@@ -130,8 +130,8 @@ type GatewaySpec struct {
 	// matches. For example, `"foo.example.com"` takes precedence over
 	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
 	//
-	// Implementations MAY collapse separate Gateways onto a single set of
-	// Addresses if the Listeners across all Gateways are compatible.
+	// Implementations MAY merge separate Gateways onto a single set of
+	// Addresses if all Listeners across all Gateways are compatible.
 	//
 	// Support: Core
 	//
