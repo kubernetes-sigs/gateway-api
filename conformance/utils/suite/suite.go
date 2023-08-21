@@ -93,9 +93,9 @@ func New(s Options) *ConformanceTestSuite {
 	case s.EnableAllSupportedFeatures == true:
 		s.SupportedFeatures = AllFeatures
 	case s.SupportedFeatures == nil:
-		s.SupportedFeatures = StandardCoreFeatures
+		s.SupportedFeatures = GatewayCoreFeatures
 	default:
-		for feature := range StandardCoreFeatures {
+		for feature := range GatewayCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}
 	}
