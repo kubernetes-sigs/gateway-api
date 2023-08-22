@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.8.0-rc2](#v080-rc2)
 - [v0.8.0-rc1](#v080-rc1)
 - [v0.7.1](#v071)
 - [v0.7.0](#v070)
@@ -27,6 +28,43 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.8.0-rc2
+
+The working group expects that this release candidate is quite close to the final
+v0.8.0 release. However, breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but the working group does
+not recommend shipping products based on a release candidate API due to the
+possibility of incompatible changes prior to the final release. The following
+represents the changes since v0.8.0-rc1:
+
+## Changes by Kind
+
+### Validation
+
+- Add CEL validation for GRPCRoute. (#2305, @gnossen)
+- HTTPRoute and GRPCRoute CRDs now provide built-in validation that ensures the
+  uniqueness of names in Header Modifier "Remove" lists. (#2306, @robscott)
+
+### Bug Fixes
+
+- GRPCRoute: The default match has been removed as it was invalid (it only
+  specified a type of "Exact" without a corresponding Service or Method). Note
+  that the match type still defaults to "Exact". (#2311, @gauravkghildiyal)
+
+### Spec Clarifications
+
+- RequestMirrorFilter: Enhanced the doc string to be explicit about sending the
+  mirrored request to a single destination endpoint within the backendRef
+  specified. (#2317, @arkodg)
+- Resources no longer have support levels, implementations can choose to support
+  whichever set of resources they want (#2323, @robscott)
+
+### Conformance
+
+- Better support mesh-only conformance testing (#2312, @kflynn)
+- SupportedFeatures have been restructured to be per-resource (#2323, @robscott)
 
 # v0.8.0-rc1
 

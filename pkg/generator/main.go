@@ -35,7 +35,7 @@ const (
 	channelAnnotation       = "gateway.networking.k8s.io/channel"
 
 	// These values must be updated during the release process
-	bundleVersion = "v0.8.0-rc1"
+	bundleVersion = "v0.8.0-rc2"
 	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2245"
 )
 
