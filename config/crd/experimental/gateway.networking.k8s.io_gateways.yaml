@@ -330,6 +330,15 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
+                    nodeport:
+                      description: "NodePort is the network port on each node where
+                        external traffic will be exposed. Multiple listeners may use
+                        the same node port, subject to the Listener compatibility
+                        rules. \n Support: Core"
+                      format: int32
+                      maximum: 65535
+                      minimum: 1
+                      type: integer
                     port:
                       description: "Port is the network port. Multiple listeners may
                         use the same port, subject to the Listener compatibility rules.
@@ -494,11 +503,11 @@ spec:
                     || l.hostname == '''') : true)'
                 - message: Listener name must be unique within the Gateway
                   rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
-                - message: Combination of port, protocol and hostname must be unique
-                    for each listener
-                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
-                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
-                    == l2.hostname : true)))'
+                - message: Combination of port, nodeport, protocol and hostname must
+                    be unique for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.nodeport
+                    == l2.nodeport && l1.protocol == l2.protocol && (has(l1.hostname)
+                    && has(l2.hostname) ? l1.hostname == l2.hostname : true)))'
             required:
             - gatewayClassName
             - listeners
@@ -1108,6 +1117,15 @@ spec:
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
+                    nodeport:
+                      description: "NodePort is the network port on each node where
+                        external traffic will be exposed. Multiple listeners may use
+                        the same node port, subject to the Listener compatibility
+                        rules. \n Support: Core"
+                      format: int32
+                      maximum: 65535
+                      minimum: 1
+                      type: integer
                     port:
                       description: "Port is the network port. Multiple listeners may
                         use the same port, subject to the Listener compatibility rules.
@@ -1272,11 +1290,11 @@ spec:
                     || l.hostname == '''') : true)'
                 - message: Listener name must be unique within the Gateway
                   rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
-                - message: Combination of port, protocol and hostname must be unique
-                    for each listener
-                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
-                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
-                    == l2.hostname : true)))'
+                - message: Combination of port, nodeport, protocol and hostname must
+                    be unique for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.nodeport
+                    == l2.nodeport && l1.protocol == l2.protocol && (has(l1.hostname)
+                    && has(l2.hostname) ? l1.hostname == l2.hostname : true)))'
             required:
             - gatewayClassName
             - listeners
