@@ -20,6 +20,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net"
 	"strings"
 	"testing"
 	"time"
@@ -56,12 +57,12 @@ const (
 func (m *MeshPod) MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, exp http.ExpectedResponse, timeoutConfig config.TimeoutConfig) {
 	t.Helper()
 
-	req := makeRequest(exp.Request)
-
 	http.AwaitConvergence(t, timeoutConfig.RequiredConsecutiveSuccesses, timeoutConfig.MaxTimeToConsistency, func(elapsed time.Duration) bool {
-		resp, err := m.request(makeRequest(exp.Request))
+		req := makeRequest(exp.Request)
+
+		resp, err := m.request(req)
 		if err != nil {
-			t.Logf("Request failed, not ready yet: %v (after %v)", err.Error(), elapsed)
+			t.Logf("Request %v failed, not ready yet: %v (after %v)", req, err.Error(), elapsed)
 			return false
 		}
 		t.Logf("Got resp %v", resp)
@@ -80,7 +81,8 @@ func makeRequest(r http.Request) []string {
 	if protocol == "" {
 		protocol = "http"
 	}
-	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, r.Host, r.Path)}
+	host := calculateHost(r.Host, protocol)
+	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
 	if r.Method != "" {
 		args = append(args, "--method="+r.Method)
 	}
@@ -109,6 +111,32 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 		return fmt.Errorf("expected pod name to start with %s, got %s", exp.Backend, resp.Hostname)
 	}
 	return nil
+}
+
+// copied from conformance/http to get the ipv6 matching
+func calculateHost(reqHost, scheme string) string {
+	host, port, err := net.SplitHostPort(reqHost)
+	if err != nil {
+		return reqHost
+	}
+	if strings.ToLower(scheme) == "http" && port == "80" {
+		return ipv6SafeHost(host)
+	}
+	if strings.ToLower(scheme) == "https" && port == "443" {
+		return ipv6SafeHost(host)
+	}
+	return reqHost
+}
+
+func ipv6SafeHost(host string) string {
+	// We assume that host is a literal IPv6 address if host has
+	// colons.
+	// Per https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.2.
+	// This is like net.JoinHostPort, but we don't need a port.
+	if strings.Contains(host, ":") {
+		return "[" + host + "]"
+	}
+	return host
 }
 
 func (m *MeshPod) request(args []string) (Response, error) {
