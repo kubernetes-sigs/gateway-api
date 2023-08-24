@@ -232,13 +232,13 @@ following mechanisms:
 2. **Namespaces:** The `allowedRoutes.namespaces` field on a listener can be
    used to restrict where Routes may be attached from. The `namespaces.from`
    field supports the following values:
-    * `SameNamespace` is the default option. Only Routes in the same namespace
+    * `Same` is the default option. Only Routes in the same namespace
       as this Gateway may be attached.
     * `All` will allow Routes from all Namespaces to be attached.
     * `Selector` means that Routes from a subset of Namespaces selected by a
       Namespace label selector may be attached to this Gateway. When `Selector`
       is used, the `namespaces.selector` field must be used to specify label
-      selectors. This field is not supported with `All` or `SameNamespace`.
+      selectors. This field is not supported with `All` or `Same`.
 3. **Kinds:** The `allowedRoutes.kinds` field on a listener can be used to
    restrict the kinds of Routes that may be attached.
 
