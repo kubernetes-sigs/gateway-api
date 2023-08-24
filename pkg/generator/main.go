@@ -218,7 +218,6 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			}
 			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "")
 			jsonProps.Description = modifiedDescription
-
 		} else {
 			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, startTag, "")
 			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, endTag, "")
