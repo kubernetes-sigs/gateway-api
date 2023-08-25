@@ -172,13 +172,34 @@ type CommonRouteSpec struct {
 	// This API may be extended in the future to support additional kinds of parent
 	// resources.
 	//
-	// It is invalid to reference an identical parent more than once. It is
-	// valid to reference multiple distinct sections within the same parent
-	// resource, such as two separate Listeners on the same Gateway or two separate
-	// ports on the same Service.
+	// ParentRefs must be _distinct_. This means either that:
+	//
+	// * They select different objects.  If this is the case, then parentRef
+	//   entries are distinct. In terms of fields, this means that the
+	//   multi-part key defined by `group`, `kind`, `namespace`, and `name` must be
+	//   unique across all parentRef entries in the Route.
+	// * They do not select different objects, but for each optional field used,
+	//   each ParentRef that selects the same object must set the same set of
+	//   optional fields to different values. If one ParentRef sets a
+	//   combination of optional fields, all must set the same combination.
+	//
+	// Some examples:
+	//
+	// * If one ParentRef sets `sectionName`, all ParentRefs referencing the same
+	//   object must also set `sectionName`.
+	// * If one ParentRef sets `port`, all ParentRefs referencing the same
+	//   object must also set `port`.
+	// * If one ParentRef sets `sectionName` and `port`, all ParentRefs referencing
+	//   the same object must also set `sectionName` and `port`.
+	//
+	// It is invalid to reference non-distinct ParentRefs in the same Route object.
+	// In this case, the Route must have the `Accepted` Condition set to `false`,
+	// with a Reason of `ParentsNotDistinct`. Note that _all_ ParentRefs must be
+	// distinct - having one distinct ParentRef and two indistinct ParentRefs
+	// must result in the entire Route being marked not `Accepted`, for example.
 	//
 	// It is possible to separately reference multiple distinct objects that may
-	// be collapsed by an implementation. For example, some implementations may
+	// be merged by an implementation. For example, some implementations may
 	// choose to merge compatible Gateway Listeners together. If that is the
 	// case, the list of routes attached to those resources should also be
 	// merged.
@@ -265,6 +286,7 @@ const (
 	// * "NotAllowedByListeners"
 	// * "NoMatchingListenerHostname"
 	// * "NoMatchingParent"
+	// * "ParentsNotDistinct"
 	// * "UnsupportedValue"
 	//
 	// Possible reasons for this condition to be Unknown are:
@@ -294,6 +316,11 @@ const (
 	// a Route ParentRef specifies a Port and/or SectionName that does not
 	// match any Listeners in the Gateway.
 	RouteReasonNoMatchingParent RouteConditionReason = "NoMatchingParent"
+
+	// This reason is used with the "Accepted" condition when there are
+	// multiple ParentRefs that are not distinct. See the ParentRef
+	// definition for the definition of distinct.
+	RouteReasonParentsNotDistinct RouteConditionReason = "ParentsNotDistinct"
 
 	// This reason is used with the "Accepted" condition when a value for an Enum
 	// is not recognized.
