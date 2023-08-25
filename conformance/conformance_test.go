@@ -18,7 +18,6 @@ limitations under the License.
 package conformance_test
 
 import (
-	"strings"
 	"testing"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -27,7 +26,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 
-	"k8s.io/apimachinery/pkg/util/sets"
+	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -42,36 +41,40 @@ func TestConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error initializing Kubernetes client: %v", err)
 	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
+	}
+
 	v1alpha2.AddToScheme(client.Scheme())
 	v1beta1.AddToScheme(client.Scheme())
 
-	supportedFeatures := parseSupportedFeatures(*flags.SupportedFeatures)
-	exemptFeatures := parseSupportedFeatures(*flags.ExemptFeatures)
-	for feature := range exemptFeatures {
-		supportedFeatures.Delete(feature)
-	}
+	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
+	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
+	skipTests := suite.ParseSkipTests(*flags.SkipTests)
+	namespaceLabels := suite.ParseKeyValuePairs(*flags.NamespaceLabels)
+	namespaceAnnotations := suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 
 	t.Logf("Running conformance tests with %s GatewayClass\n cleanup: %t\n debug: %t\n enable all features: %t \n supported features: [%v]\n exempt features: [%v]",
 		*flags.GatewayClassName, *flags.CleanupBaseResources, *flags.ShowDebug, *flags.EnableAllSupportedFeatures, *flags.SupportedFeatures, *flags.ExemptFeatures)
 
 	cSuite := suite.New(suite.Options{
-		Client:                     client,
+		Client:     client,
+		RestConfig: cfg,
+		// This clientset is needed in addition to the client only because
+		// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
+		Clientset:                  clientset,
 		GatewayClassName:           *flags.GatewayClassName,
 		Debug:                      *flags.ShowDebug,
 		CleanupBaseResources:       *flags.CleanupBaseResources,
 		SupportedFeatures:          supportedFeatures,
+		ExemptFeatures:             exemptFeatures,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
+		NamespaceLabels:            namespaceLabels,
+		NamespaceAnnotations:       namespaceAnnotations,
+		SkipTests:                  skipTests,
 	})
 	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
-}
 
-// parseSupportedFeatures parses flag arguments and converts the string to
-// sets.Set[suite.SupportedFeature]
-func parseSupportedFeatures(f string) sets.Set[suite.SupportedFeature] {
-	res := sets.Set[suite.SupportedFeature]{}
-	for _, value := range strings.Split(f, ",") {
-		res.Insert(suite.SupportedFeature(value))
-	}
-	return res
+	cSuite.Run(t, tests.ConformanceTests)
 }

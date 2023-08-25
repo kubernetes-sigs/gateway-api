@@ -35,8 +35,10 @@ func init() {
 }
 
 var GatewayClassObservedGenerationBump = suite.ConformanceTest{
-	ShortName:   "GatewayClassObservedGenerationBump",
-	Features:    []suite.SupportedFeature{suite.SupportGatewayClassObservedGenerationBump},
+	ShortName: "GatewayClassObservedGenerationBump",
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+	},
 	Description: "A GatewayClass should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
 	Manifests:   []string{"tests/gatewayclass-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {

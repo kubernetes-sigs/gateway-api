@@ -34,7 +34,11 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRewritePath",
 	Description: "An HTTPRoute with path rewrite filter",
 	Manifests:   []string{"tests/httproute-rewrite-path.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRoutePathRewrite},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRoutePathRewrite,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "rewrite-path", Namespace: ns}
@@ -63,6 +67,52 @@ var HTTPRouteRewritePath = suite.ConformanceTest{
 					Request: http.Request{
 						Path: "/one",
 					},
+				},
+				Backend:   "infra-backend-v1",
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Path: "/full/rewrite-path-and-modify-headers/test",
+					Headers: map[string]string{
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Path: "/test",
+						Headers: map[string]string{
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
+						},
+					},
+					AbsentHeaders: []string{"X-Header-Remove"},
+				},
+				Backend:   "infra-backend-v1",
+				Namespace: ns,
+			},
+			{
+				Request: http.Request{
+					Path: "/prefix/rewrite-path-and-modify-headers/one",
+					Headers: map[string]string{
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
+						"X-Header-Set":        "set-val",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Path: "/prefix/one",
+						Headers: map[string]string{
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
+						},
+					},
+					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 				Backend:   "infra-backend-v1",
 				Namespace: ns,

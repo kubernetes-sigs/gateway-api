@@ -3,6 +3,10 @@ repo_url: https://github.com/kubernetes-sigs/gateway-api
 repo_name: kubernetes-sigs/gateway-api
 site_dir: site
 docs_dir: site-src
+hooks:
+- hack/mkdocs-copy-geps.py
+watch:
+- geps
 theme:
   name: material
   icon:
@@ -24,6 +28,7 @@ plugins:
       redirect_maps:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
+        'contributing/gamma.md': 'concepts/gamma.md#contributing'
   - mermaid2
 markdown_extensions:
   - admonition
@@ -31,6 +36,7 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.details
   - pymdownx.highlight
   - pymdownx.inlinehilite
   - pymdownx.superfences:
@@ -47,17 +53,23 @@ nav:
     - Introduction: index.md
     - Concepts:
         API Overview: concepts/api-overview.md
+        GAMMA: concepts/gamma.md
         Conformance: concepts/conformance.md
-        Security Model: concepts/security-model.md
         Implementation Guidelines: concepts/guidelines.md
+        Roles and Personas: concepts/roles-and-personas.md
+        Service Facets: concepts/service-facets.md
+        Security Model: concepts/security-model.md
+        Use Cases: concepts/use-cases.md
         Versioning: concepts/versioning.md
     - Implementations: implementations.md
     - FAQ: faq.md
+    - Glossary: concepts/glossary.md
   - Guides:
     - Getting started: guides/index.md
     - Simple Gateway: guides/simple-gateway.md
     - HTTP routing: guides/http-routing.md
     - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
+    - HTTP header modifier: guides/http-header-modifier.md
     - HTTP traffic splitting: guides/traffic-splitting.md
     - Cross-Namespace routing: guides/multiple-ns.md
     - TLS: guides/tls.md
@@ -77,34 +89,42 @@ nav:
       - Overview: geps/overview.md
       - Declined:
         - geps/gep-735.md
-      - Provisional:
-        - geps/gep-1742.md
-        - geps/gep-1426.md
-        - geps/gep-1324.md
         - geps/gep-1282.md
-      - Prototyping:
-        - geps/gep-1709.md
+      - Provisional:
+        - geps/gep-1324.md
+        - geps/gep-1619.md
+        - geps/gep-1897.md
+        - geps/gep-1867.md
+      - Implementable:
+        - geps/gep-1742.md
+        - geps/gep-1686.md
+        - geps/gep-1426.md
       - Experimental:
-        - geps/gep-1323.md
+        - geps/gep-1748.md
+        - geps/gep-1651.md
         - geps/gep-1016.md
         - geps/gep-957.md
-        - geps/gep-726.md
         - geps/gep-713.md
+        - geps/gep-1709.md
+        - geps/gep-2257.md
       - Standard:
         - geps/gep-1364.md
+        - geps/gep-1323.md
         - geps/gep-922.md
         - geps/gep-917.md
         - geps/gep-851.md
         - geps/gep-820.md
         - geps/gep-746.md
+        - geps/gep-726.md
         - geps/gep-724.md
         - geps/gep-718.md
         - geps/gep-709.md
+      - Glossary: concepts/glossary.md
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
     - Enhancement Requests: contributing/enhancement-requests.md
-    - GAMMA: contributing/gamma.md
+    - Contributor Ladder: contributing/contributor-ladder.md
   - Blog:
     - Index: blog/index.md
     - 2022:

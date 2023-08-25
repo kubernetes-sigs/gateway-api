@@ -235,7 +235,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "invalid v1alpha2 HTTPRoute resource with two request mirror filters",
+				name: "valid v1alpha2 HTTPRoute resource with two request mirror filters",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
 						"apiVersion": "` + apiVersion + `",
@@ -301,11 +301,8 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				wantRespCode: http.StatusOK,
 				wantSuccessResponse: admission.AdmissionResponse{
 					UID:     "7313cd05-eddc-4150-b88c-971a0d53b2ab",
-					Allowed: false,
-					Result: &metav1.Status{
-						Code:    400,
-						Message: "spec.rules[0].filters: Invalid value: \"RequestMirror\": cannot be used multiple times in the same rule",
-					},
+					Allowed: true,
+					Result:  &metav1.Status{},
 				},
 			},
 			{

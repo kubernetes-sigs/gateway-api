@@ -17,10 +17,14 @@ limitations under the License.
 package tests
 
 import (
+	"context"
 	"testing"
 
+	"github.com/stretchr/testify/require"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -33,8 +37,12 @@ func init() {
 var HTTPRouteReferenceGrant = suite.ConformanceTest{
 	ShortName:   "HTTPRouteReferenceGrant",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace, with a backendRef in the gateway-conformance-web-backend namespace, should attach to Gateway in the gateway-conformance-infra namespace",
-	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
-	Manifests:   []string{"tests/httproute-reference-grant.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportReferenceGrant,
+	},
+	Manifests: []string{"tests/httproute-reference-grant.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "reference-grant", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
@@ -50,6 +58,26 @@ var HTTPRouteReferenceGrant = suite.ConformanceTest{
 				Response:  http.Response{StatusCode: 200},
 				Backend:   "web-backend",
 				Namespace: "gateway-conformance-web-backend",
+			})
+		})
+
+		ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.DeleteTimeout)
+		defer cancel()
+		rg := v1beta1.ReferenceGrant{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "reference-grant",
+				Namespace: "gateway-conformance-web-backend",
+			},
+		}
+		require.NoError(t, suite.Client.Delete(ctx, &rg))
+
+		t.Run("Simple HTTP request should return 500 after deleting the relevant reference grant", func(t *testing.T) {
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
+				Request: http.Request{
+					Method: "GET",
+					Path:   "/",
+				},
+				Response: http.Response{StatusCode: 500},
 			})
 		})
 	},

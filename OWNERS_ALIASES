@@ -15,12 +15,28 @@ aliases:
     - shaneutt
     - youngnick
 
-  gateway-api-mesh-leads:
-    - howardjohn
-    - keithmattix
-    - mikemorris
-
   emeritus-gateway-api-maintainers:
     - danehans
     - hbagdi
     - jpeach
+
+  gateway-api-mesh-leads:
+    - howardjohn
+    - keithmattix
+    - kflynn
+
+  emeritus-gateway-api-mesh-leads:
+    - mikemorris
+
+  gateway-api-conformance-reviewers:
+    - arkodg
+    - LiorLieberman
+    - michaelbeaumont
+    - mlavacca
+    - sunjayBhatia
+    - xunzhuo
+
+  gateway-api-conformance-approvers:
+    - arkodg
+    - mlavacca
+    - sunjayBhatia

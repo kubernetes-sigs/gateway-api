@@ -22,7 +22,7 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly CLUSTER_NAME="verify-gateway-api"
-readonly ADMISSION_WEBHOOK_VERSION="v0.6.2"
+readonly LOCAL_IMAGE="registry.k8s.io/gateway-api/admission-server:latest"
 
 export KUBECONFIG="${GOPATH}/.kubeconfig"
 export GOFLAGS GO111MODULE GOPATH
@@ -35,7 +35,7 @@ cleanup() {
     return
   fi
 
-  rm config/webhook/kustomization.yaml
+  rm -f config/webhook/kustomization.yaml
 
   if [ "${KIND_CREATE_ATTEMPTED:-}" = true ]; then
     kind delete cluster --name "${CLUSTER_NAME}" || true
@@ -43,30 +43,53 @@ cleanup() {
   CLEANED_UP=true
 }
 
-trap cleanup INT TERM
+trap cleanup INT TERM EXIT
 
 # For exit code
 res=0
 
 # Install kind
-(cd $GOPATH && go install sigs.k8s.io/kind@v0.17.0) || res=$?
+(cd $GOPATH && go install sigs.k8s.io/kind@v0.20.0) || res=$?
 
 # Create cluster
 KIND_CREATE_ATTEMPTED=true
-kind create cluster --name "${CLUSTER_NAME}" || res=$?
+kind create cluster --name "${CLUSTER_NAME}"
+
+# Verify CEL validations before installing webhook.
+for CHANNEL in experimental standard; do
+  # Install CRDs.
+  kubectl apply -f "config/crd/${CHANNEL}/gateway*.yaml"
+
+  # Run tests.
+  go test -v -timeout=120s -count=1 --tags ${CHANNEL} sigs.k8s.io/gateway-api/pkg/test/cel
+
+  # Delete CRDs to reset environment.
+  kubectl delete -f "config/crd/${CHANNEL}/gateway*.yaml"
+done
 
 cat <<EOF >config/webhook/kustomization.yaml
 resources:
   - 0-namespace.yaml
   - certificate_config.yaml
   - admission_webhook.yaml
-images:
-  - name: gcr.io/k8s-staging-gateway-api/admission-server:${ADMISSION_WEBHOOK_VERSION}
-    newTag: latest
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/image
+        value: ${LOCAL_IMAGE}
+      - op: replace
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: IfNotPresent
+    target:
+      group: apps
+      version: v1
+      kind: Deployment
+      name: gateway-api-admission-server
 EOF
 
 # Install webhook
-docker build -t gcr.io/k8s-staging-gateway-api/admission-server:latest .
+docker build -t ${LOCAL_IMAGE} -f docker/Dockerfile.webhook .
+kind load docker-image ${LOCAL_IMAGE} --name "${CLUSTER_NAME}"
 kubectl apply -k config/webhook/
 
 # Wait for webhook to be ready

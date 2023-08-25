@@ -33,8 +33,12 @@ func init() {
 var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 	ShortName:   "HTTPRouteResponseHeaderModifier",
 	Description: "An HTTPRoute has response header modifier filters applied correctly",
-	Features:    []suite.SupportedFeature{suite.SupportHTTPResponseHeaderModification},
-	Manifests:   []string{"tests/httproute-response-header-modifier.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPResponseHeaderModification,
+	},
+	Manifests: []string{"tests/httproute-response-header-modifier.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "response-header-modifier", Namespace: ns}
@@ -161,6 +165,48 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 					"Another-Header":    "another-header-val",
 				},
 				AbsentHeaders: []string{"x-header-remove", "X-Header-Remove"},
+			},
+			Backend:   "infra-backend-v1",
+			Namespace: ns,
+		}, {
+			Request: http.Request{
+				Path: "/response-and-request-header-modifiers",
+				Headers: map[string]string{
+					"X-Header-Remove":     "remove-val",
+					"X-Header-Add-Append": "append-val-1",
+					"X-Header-Echo":       "echo",
+				},
+			},
+			BackendSetResponseHeaders: map[string]string{
+				"X-Header-Set-2":    "set-val-2",
+				"X-Header-Add-2":    "add-val-2",
+				"X-Header-Remove-2": "remove-val-2",
+				"Another-Header":    "another-header-val",
+				"X-Header-Remove-1": "remove-val-1",
+				"X-Header-Echo":     "echo",
+			},
+			ExpectedRequest: &http.ExpectedRequest{
+				Request: http.Request{
+					Path: "/response-and-request-header-modifiers",
+					Headers: map[string]string{
+						"X-Header-Add":        "header-val-1",
+						"X-Header-Set":        "set-overwrites-values",
+						"X-Header-Add-Append": "append-val-1,header-val-2",
+						"X-Header-Echo":       "echo",
+					},
+				},
+				AbsentHeaders: []string{"X-Header-Remove"},
+			},
+			Response: http.Response{
+				Headers: map[string]string{
+					"X-Header-Set-1": "header-set-1",
+					"X-Header-Set-2": "header-set-2",
+					"X-Header-Add-1": "header-add-1",
+					"X-Header-Add-2": "add-val-2,header-add-2",
+					"Another-Header": "another-header-val",
+					"X-Header-Echo":  "echo",
+				},
+				AbsentHeaders: []string{"X-Header-Remove-1", "X-Header-Remove-2"},
 			},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,

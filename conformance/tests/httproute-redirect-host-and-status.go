@@ -34,7 +34,11 @@ func init() {
 var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRedirectHostAndStatus",
 	Description: "An HTTPRoute with hostname and statusCode redirect filters",
-	Manifests:   []string{"tests/httproute-redirect-host-and-status.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-redirect-host-and-status.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "redirect-host-and-status", Namespace: ns}
@@ -42,40 +46,32 @@ var HTTPRouteRedirectHostAndStatus = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
-		testCases := []http.ExpectedResponse{{
-			Request: http.Request{
-				Path:             "/hostname-redirect",
-				UnfollowRedirect: true,
+		testCases := []http.ExpectedResponse{
+			{
+				Request: http.Request{
+					Path:             "/hostname-redirect",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 302,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path:             "/host-and-status",
+					UnfollowRedirect: true,
+				},
+				Response: http.Response{
+					StatusCode: 301,
+				},
+				RedirectRequest: &roundtripper.RedirectRequest{
+					Host: "example.org",
+				},
+				Namespace: ns,
 			},
-			Response: http.Response{
-				StatusCode: 302,
-			},
-			RedirectRequest: &roundtripper.RedirectRequest{
-				Host: "example.org",
-			},
-			Namespace: ns,
-		}, {
-			Request: http.Request{
-				Path:             "/status-code-301",
-				UnfollowRedirect: true,
-			},
-			Response: http.Response{
-				StatusCode: 301,
-			},
-			Namespace: ns,
-		}, {
-			Request: http.Request{
-				Path:             "/host-and-status",
-				UnfollowRedirect: true,
-			},
-			Response: http.Response{
-				StatusCode: 301,
-			},
-			RedirectRequest: &roundtripper.RedirectRequest{
-				Host: "example.org",
-			},
-			Namespace: ns,
-		},
 		}
 		for i := range testCases {
 			// Declare tc here to avoid loop variable

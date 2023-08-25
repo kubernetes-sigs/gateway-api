@@ -33,7 +33,11 @@ func init() {
 var HTTPRouteRequestHeaderModifier = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRequestHeaderModifier",
 	Description: "An HTTPRoute has request header modifier filters applied correctly",
-	Manifests:   []string{"tests/httproute-request-header-modifier.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-request-header-modifier.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "request-header-modifier", Namespace: ns}

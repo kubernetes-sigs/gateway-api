@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1538
-    gateway.networking.k8s.io/bundle-version: v0.6.2
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2245
+    gateway.networking.k8s.io/bundle-version: v0.8.0-rc2
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: grpcroutes.gateway.networking.k8s.io
@@ -48,7 +48,7 @@ spec:
           If the implementation does not support this, then it MUST set the \"Accepted\"
           condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\".
           Implementations MAY also accept HTTP/2 connections with an upgrade from
-          HTTP/1, i.e. without prior knowledge. \n Support: Extended"
+          HTTP/1, i.e. without prior knowledge."
         properties:
           apiVersion:
             description: 'APIVersion defines the versioned schema of this representation
@@ -127,13 +127,21 @@ spec:
                   that a Route wants to be attached to. Note that the referenced parent
                   resource needs to allow this for the attachment to be complete.
                   For Gateways, that means the Gateway needs to allow attachment from
-                  Routes of this kind and namespace. \n The only kind of parent resource
-                  with \"Core\" support is Gateway. This API may be extended in the
-                  future to support additional kinds of parent resources such as one
-                  of the route kinds. \n It is invalid to reference an identical parent
+                  Routes of this kind and namespace. For Services, that means the
+                  Service must either be in the same namespace for a \"producer\"
+                  route, or the mesh implementation must support and allow \"consumer\"
+                  routes for the referenced Service. ReferenceGrant is not applicable
+                  for governing ParentRefs to Services - it is not possible to create
+                  a \"producer\" route for a Service in a different namespace from
+                  the Route. \n There are two kinds of parent resources with \"Core\"
+                  support: \n * Gateway (Gateway conformance profile) * Service (Mesh
+                  conformance profile, experimental, ClusterIP Services only) \n This
+                  API may be extended in the future to support additional kinds of
+                  parent resources. \n It is invalid to reference an identical parent
                   more than once. It is valid to reference multiple distinct sections
-                  within the same parent resource, such as 2 Listeners within a Gateway.
-                  \n It is possible to separately reference multiple distinct objects
+                  within the same parent resource, such as two separate Listeners
+                  on the same Gateway or two separate ports on the same Service. \n
+                  It is possible to separately reference multiple distinct objects
                   that may be collapsed by an implementation. For example, some implementations
                   may choose to merge compatible Gateway Listeners together. If that
                   is the case, the list of routes attached to those resources should
@@ -141,16 +149,25 @@ spec:
                   boundaries, there are specific rules. Cross-namespace references
                   are only valid if they are explicitly allowed by something in the
                   namespace they are referring to. For example, Gateway has the AllowedRoutes
-                  field, and ReferenceGrant provides a generic way to enable any other
-                  kind of cross-namespace reference."
+                  field, and ReferenceGrant provides a generic way to enable other
+                  kinds of cross-namespace reference. \n ParentRefs from a Route to
+                  a Service in the same namespace are \"producer\" routes, which apply
+                  default routing rules to inbound connections from any namespace
+                  to the Service. \n ParentRefs from a Route to a Service in a different
+                  namespace are \"consumer\" routes, and these routing rules are only
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route. \n "
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
-                    a route). The only kind of parent resource with \"Core\" support
-                    is Gateway. This API may be extended in the future to support
-                    additional kinds of parent resources, such as HTTPRoute. \n The
-                    API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid."
+                    a route). There are two kinds of parent resources with \"Core\"
+                    support: \n * Gateway (Gateway conformance profile) * Service
+                    (Mesh conformance profile, experimental, ClusterIP Services only)
+                    \n This API may be extended in the future to support additional
+                    kinds of parent resources. \n The API object must be valid in
+                    the cluster; the Group and Kind must be registered in the cluster
+                    for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -164,8 +181,11 @@ spec:
                       type: string
                     kind:
                       default: Gateway
-                      description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Implementation-specific (Other Resources)"
+                      description: "Kind is kind of the referent. \n There are two
+                        kinds of parent resources with \"Core\" support: \n * Gateway
+                        (Gateway conformance profile) * Service (Mesh conformance
+                        profile, experimental, ClusterIP Services only) \n Support
+                        for other resources is Implementation-Specific."
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -185,7 +205,15 @@ spec:
                         the namespace they are referring to. For example: Gateway
                         has the AllowedRoutes field, and ReferenceGrant provides a
                         generic way to enable any other kind of cross-namespace reference.
-                        \n Support: Core"
+                        \n ParentRefs from a Route to a Service in the same namespace
+                        are \"producer\" routes, which apply default routing rules
+                        to inbound connections from any namespace to the Service.
+                        \n ParentRefs from a Route to a Service in a different namespace
+                        are \"consumer\" routes, and these routing rules are only
+                        applied to outbound connections originating from the same
+                        namespace as the Route, for which the intended destination
+                        of the connections are a Service targeted as a ParentRef of
+                        the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -200,18 +228,22 @@ spec:
                         a Route must apply to a specific port as opposed to a listener(s)
                         whose port(s) may be changed. When both Port and SectionName
                         are specified, the name and port of the selected listener
-                        must match both specified values. \n Implementations MAY choose
-                        to support other parent resources. Implementations supporting
-                        other types of parent resources MUST clearly document how/if
-                        Port is interpreted. \n For the purpose of status, an attachment
-                        is considered successful as long as the parent resource accepts
-                        it partially. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Extended \n <gateway:experimental>"
+                        must match both specified values. \n When the parent resource
+                        is a Service, this targets a specific port in the Service
+                        spec. When both Port (experimental) and SectionName are specified,
+                        the name and port of the selected port must match both specified
+                        values. \n Implementations MAY choose to support other parent
+                        resources. Implementations supporting other types of parent
+                        resources MUST clearly document how/if Port is interpreted.
+                        \n For the purpose of status, an attachment is considered
+                        successful as long as the parent resource accepts it partially.
+                        For example, Gateway listeners can restrict which Routes can
+                        attach to them by Route kind, namespace, or hostname. If 1
+                        of 2 Gateway listeners accept attachment from the referencing
+                        Route, the Route MUST be considered successfully attached.
+                        If no Gateway listeners accept attachment from this Route,
+                        the Route MUST be considered detached from the Gateway. \n
+                        Support: Extended \n "
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -222,19 +254,23 @@ spec:
                         interpreted as the following: \n * Gateway: Listener Name.
                         When both Port (experimental) and SectionName are specified,
                         the name and port of the selected listener must match both
-                        specified values. \n Implementations MAY choose to support
-                        attaching Routes to other resources. If that is the case,
-                        they MUST clearly document how SectionName is interpreted.
-                        \n When unspecified (empty string), this will reference the
-                        entire resource. For the purpose of status, an attachment
-                        is considered successful if at least one section in the parent
-                        resource accepts it. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Core"
+                        specified values. * Service: Port Name. When both Port (experimental)
+                        and SectionName are specified, the name and port of the selected
+                        listener must match both specified values. Note that attaching
+                        Routes to Services as Parents is part of experimental Mesh
+                        support and is not supported for any other purpose. \n Implementations
+                        MAY choose to support attaching Routes to other resources.
+                        If that is the case, they MUST clearly document how SectionName
+                        is interpreted. \n When unspecified (empty string), this will
+                        reference the entire resource. For the purpose of status,
+                        an attachment is considered successful if at least one section
+                        in the parent resource accepts it. For example, Gateway listeners
+                        can restrict which Routes can attach to them by Route kind,
+                        namespace, or hostname. If 1 of 2 Gateway listeners accept
+                        attachment from the referencing Route, the Route MUST be considered
+                        successfully attached. If no Gateway listeners accept attachment
+                        from this Route, the Route MUST be considered detached from
+                        the Gateway. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -244,11 +280,33 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-validations:
+                - message: sectionName or port must be specified when parentRefs includes
+                    2 or more references to the same parent
+                  rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__)
+                    || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '''') ) || ( has(p1.__namespace__) && has(p2.__namespace__)
+                    && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName)
+                    || p1.sectionName == '''') && (!has(p2.sectionName) || p2.sectionName
+                    == '''') && (!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName
+                    != '''') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName)
+                    && p2.sectionName != '''') || (has(p2.port) && p2.port != 0) )
+                    ) ) ): true ))'
+                - message: sectionName or port must be unique when parentRefs includes
+                    2 or more references to the same parent
+                  rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
+                    || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
+                    p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName)
+                    || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName
+                    == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
+                    == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
+                    == p2.port))))
               rules:
-                default:
-                - matches:
-                  - method:
-                      type: Exact
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
                   description: GRPCRouteRule defines the semantics for matching a
@@ -301,7 +359,9 @@ spec:
                                     extension to the \"filter\" behavior.  For example,
                                     resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
-                                    filters. \n Support: Implementation-specific"
+                                    filters. \n Support: Implementation-specific \n
+                                    This filter can be used multiple times within
+                                    the same rule."
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -391,6 +451,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -439,29 +500,35 @@ spec:
                                   description: "RequestMirror defines a schema for
                                     a filter that mirrors requests. Requests are sent
                                     to the specified destination, but responses from
-                                    that destination are ignored. \n Support: Extended"
+                                    that destination are ignored. \n This filter can
+                                    be used multiple times within the same rule. Note
+                                    that not all implementations will be able to support
+                                    mirroring to multiple backends. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
-                                        where mirrored requests are sent. \n If the
-                                        referent cannot be found, this BackendRef
-                                        is invalid and must be dropped from the Gateway.
-                                        The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Route status is set to `status:
-                                        False` and not configure this backend in the
-                                        underlying implementation. \n If there is
-                                        a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferenceGrant,
-                                        the controller must ensure the \"ResolvedRefs\"
-                                        \ condition on the Route is set to `status:
-                                        False`, with the \"RefNotPermitted\" reason
-                                        and not configure this backend in the underlying
-                                        implementation. \n In either error case, the
-                                        Message of the `ResolvedRefs` Condition should
-                                        be used to provide more detail about the problem.
-                                        \n Support: Extended for Kubernetes Service
-                                        \n Support: Implementation-specific for any
-                                        other resource"
+                                        where mirrored requests are sent. \n Mirrored
+                                        requests must be sent only to a single destination
+                                        endpoint within this BackendRef, irrespective
+                                        of how many endpoints are present within this
+                                        BackendRef. \n If the referent cannot be found,
+                                        this BackendRef is invalid and must be dropped
+                                        from the Gateway. The controller must ensure
+                                        the \"ResolvedRefs\" condition on the Route
+                                        status is set to `status: False` and not configure
+                                        this backend in the underlying implementation.
+                                        \n If there is a cross-namespace reference
+                                        to an *existing* object that is not allowed
+                                        by a ReferenceGrant, the controller must ensure
+                                        the \"ResolvedRefs\"  condition on the Route
+                                        is set to `status: False`, with the \"RefNotPermitted\"
+                                        reason and not configure this backend in the
+                                        underlying implementation. \n In either error
+                                        case, the Message of the `ResolvedRefs` Condition
+                                        should be used to provide more detail about
+                                        the problem. \n Support: Extended for Kubernetes
+                                        Service \n Support: Implementation-specific
+                                        for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -501,7 +568,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -527,13 +595,17 @@ spec:
                                       required:
                                       - name
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: Must have port for Service reference
+                                        rule: '(size(self.group) == 0 && self.kind
+                                          == ''Service'') ? has(self.port) : true'
                                   required:
                                   - backendRef
                                   type: object
                                 responseHeaderModifier:
                                   description: "ResponseHeaderModifier defines a schema
                                     for a filter that modifies response headers. \n
-                                    Support: Extended \n <gateway:experimental>"
+                                    Support: Extended"
                                   properties:
                                     add:
                                       description: "Add adds the given header(s) (name,
@@ -593,6 +665,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -673,8 +746,45 @@ spec:
                               required:
                               - type
                               type: object
+                              x-kubernetes-validations:
+                              - message: filter.requestHeaderModifier must be nil
+                                  if the filter.type is not RequestHeaderModifier
+                                rule: '!(has(self.requestHeaderModifier) && self.type
+                                  != ''RequestHeaderModifier'')'
+                              - message: filter.requestHeaderModifier must be specified
+                                  for RequestHeaderModifier filter.type
+                                rule: '!(!has(self.requestHeaderModifier) && self.type
+                                  == ''RequestHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be nil
+                                  if the filter.type is not ResponseHeaderModifier
+                                rule: '!(has(self.responseHeaderModifier) && self.type
+                                  != ''ResponseHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be specified
+                                  for ResponseHeaderModifier filter.type
+                                rule: '!(!has(self.responseHeaderModifier) && self.type
+                                  == ''ResponseHeaderModifier'')'
+                              - message: filter.requestMirror must be nil if the filter.type
+                                  is not RequestMirror
+                                rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                              - message: filter.requestMirror must be specified for
+                                  RequestMirror filter.type
+                                rule: '!(!has(self.requestMirror) && self.type ==
+                                  ''RequestMirror'')'
+                              - message: filter.extensionRef must be nil if the filter.type
+                                  is not ExtensionRef
+                                rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                              - message: filter.extensionRef must be specified for
+                                  ExtensionRef filter.type
+                                rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-validations:
+                            - message: RequestHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                                <= 1
+                            - message: ResponseHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                                <= 1
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
@@ -708,11 +818,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -750,6 +860,10 @@ spec:
                         required:
                         - name
                         type: object
+                        x-kubernetes-validations:
+                        - message: Must have port for Service reference
+                          rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                            ? has(self.port) : true'
                       maxItems: 16
                       type: array
                     filters:
@@ -762,8 +876,13 @@ spec:
                         all implementations that support GRPCRoute. - Implementers
                         are encouraged to support extended filters. - Implementation-specific
                         custom filters have no API guarantees across implementations.
-                        \n Specifying a core filter multiple times has unspecified
-                        or implementation-specific conformance. Support: Core"
+                        \n Specifying the same filter multiple times is not supported
+                        unless explicitly indicated in the filter. \n If an implementation
+                        can not support a combination of filters, it must clearly
+                        document that limitation. In cases where incompatible or unsupported
+                        filters are specified and cause the `Accepted` condition to
+                        be set to status `False`, implementations may use the `IncompatibleFilters`
+                        reason to specify this configuration error. \n Support: Core"
                       items:
                         description: GRPCRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -779,7 +898,8 @@ spec:
                               extension to the \"filter\" behavior.  For example,
                               resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
-                              filters. \n Support: Implementation-specific"
+                              filters. \n Support: Implementation-specific \n This
+                              filter can be used multiple times within the same rule."
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -864,6 +984,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -909,27 +1030,33 @@ spec:
                             description: "RequestMirror defines a schema for a filter
                               that mirrors requests. Requests are sent to the specified
                               destination, but responses from that destination are
-                              ignored. \n Support: Extended"
+                              ignored. \n This filter can be used multiple times within
+                              the same rule. Note that not all implementations will
+                              be able to support mirroring to multiple backends. \n
+                              Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
-                                  mirrored requests are sent. \n If the referent cannot
-                                  be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure
-                                  the \"ResolvedRefs\" condition on the Route status
-                                  is set to `status: False` and not configure this
-                                  backend in the underlying implementation. \n If
-                                  there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferenceGrant,
-                                  the controller must ensure the \"ResolvedRefs\"
-                                  \ condition on the Route is set to `status: False`,
-                                  with the \"RefNotPermitted\" reason and not configure
-                                  this backend in the underlying implementation. \n
-                                  In either error case, the Message of the `ResolvedRefs`
-                                  Condition should be used to provide more detail
-                                  about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Implementation-specific for
-                                  any other resource"
+                                  mirrored requests are sent. \n Mirrored requests
+                                  must be sent only to a single destination endpoint
+                                  within this BackendRef, irrespective of how many
+                                  endpoints are present within this BackendRef. \n
+                                  If the referent cannot be found, this BackendRef
+                                  is invalid and must be dropped from the Gateway.
+                                  The controller must ensure the \"ResolvedRefs\"
+                                  condition on the Route status is set to `status:
+                                  False` and not configure this backend in the underlying
+                                  implementation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not allowed
+                                  by a ReferenceGrant, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Route is
+                                  set to `status: False`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service \n Support: Implementation-specific
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -966,11 +1093,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -990,13 +1118,17 @@ spec:
                                 required:
                                 - name
                                 type: object
+                                x-kubernetes-validations:
+                                - message: Must have port for Service reference
+                                  rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                                    ? has(self.port) : true'
                             required:
                             - backendRef
                             type: object
                           responseHeaderModifier:
                             description: "ResponseHeaderModifier defines a schema
                               for a filter that modifies response headers. \n Support:
-                              Extended \n <gateway:experimental>"
+                              Extended"
                             properties:
                               add:
                                 description: "Add adds the given header(s) (name,
@@ -1052,6 +1184,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -1126,8 +1259,44 @@ spec:
                         required:
                         - type
                         type: object
+                        x-kubernetes-validations:
+                        - message: filter.requestHeaderModifier must be nil if the
+                            filter.type is not RequestHeaderModifier
+                          rule: '!(has(self.requestHeaderModifier) && self.type !=
+                            ''RequestHeaderModifier'')'
+                        - message: filter.requestHeaderModifier must be specified
+                            for RequestHeaderModifier filter.type
+                          rule: '!(!has(self.requestHeaderModifier) && self.type ==
+                            ''RequestHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be nil if the
+                            filter.type is not ResponseHeaderModifier
+                          rule: '!(has(self.responseHeaderModifier) && self.type !=
+                            ''ResponseHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be specified
+                            for ResponseHeaderModifier filter.type
+                          rule: '!(!has(self.responseHeaderModifier) && self.type
+                            == ''ResponseHeaderModifier'')'
+                        - message: filter.requestMirror must be nil if the filter.type
+                            is not RequestMirror
+                          rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                        - message: filter.requestMirror must be specified for RequestMirror
+                            filter.type
+                          rule: '!(!has(self.requestMirror) && self.type == ''RequestMirror'')'
+                        - message: filter.extensionRef must be nil if the filter.type
+                            is not ExtensionRef
+                          rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                        - message: filter.extensionRef must be specified for ExtensionRef
+                            filter.type
+                          rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-validations:
+                      - message: RequestHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                          <= 1
+                      - message: ResponseHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                          <= 1
                     matches:
                       description: "Matches define conditions used for matching the
                         rule against incoming gRPC requests. Each match is independent,
@@ -1241,6 +1410,21 @@ spec:
                                 - RegularExpression
                                 type: string
                             type: object
+                            x-kubernetes-validations:
+                            - message: One or both of 'service' or 'method' must be
+                                specified
+                              rule: 'has(self.type) ? has(self.service) || has(self.method)
+                                : true'
+                            - message: service must only contain valid characters
+                                (matching ^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$)
+                              rule: '(!has(self.type) || self.type == ''Exact'') &&
+                                has(self.service) ? self.service.matches(r"""^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$"""):
+                                true'
+                            - message: method must only contain valid characters (matching
+                                ^[A-Za-z_][A-Za-z_0-9]*$)
+                              rule: '(!has(self.type) || self.type == ''Exact'') &&
+                                has(self.method) ? self.method.matches(r"""^[A-Za-z_][A-Za-z_0-9]*$"""):
+                                true'
                         type: object
                       maxItems: 8
                       type: array
@@ -1393,9 +1577,11 @@ spec:
                           type: string
                         kind:
                           default: Gateway
-                          description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Implementation-specific (Other
-                            Resources)"
+                          description: "Kind is kind of the referent. \n There are
+                            two kinds of parent resources with \"Core\" support: \n
+                            * Gateway (Gateway conformance profile) * Service (Mesh
+                            conformance profile, experimental, ClusterIP Services
+                            only) \n Support for other resources is Implementation-Specific."
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1415,7 +1601,16 @@ spec:
                             in the namespace they are referring to. For example: Gateway
                             has the AllowedRoutes field, and ReferenceGrant provides
                             a generic way to enable any other kind of cross-namespace
-                            reference. \n Support: Core"
+                            reference. \n ParentRefs from a Route to a Service in
+                            the same namespace are \"producer\" routes, which apply
+                            default routing rules to inbound connections from any
+                            namespace to the Service. \n ParentRefs from a Route to
+                            a Service in a different namespace are \"consumer\" routes,
+                            and these routing rules are only applied to outbound connections
+                            originating from the same namespace as the Route, for
+                            which the intended destination of the connections are
+                            a Service targeted as a ParentRef of the Route. \n Support:
+                            Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1431,8 +1626,12 @@ spec:
                             a specific port as opposed to a listener(s) whose port(s)
                             may be changed. When both Port and SectionName are specified,
                             the name and port of the selected listener must match
-                            both specified values. \n Implementations MAY choose to
-                            support other parent resources. Implementations supporting
+                            both specified values. \n When the parent resource is
+                            a Service, this targets a specific port in the Service
+                            spec. When both Port (experimental) and SectionName are
+                            specified, the name and port of the selected port must
+                            match both specified values. \n Implementations MAY choose
+                            to support other parent resources. Implementations supporting
                             other types of parent resources MUST clearly document
                             how/if Port is interpreted. \n For the purpose of status,
                             an attachment is considered successful as long as the
@@ -1443,7 +1642,7 @@ spec:
                             the Route MUST be considered successfully attached. If
                             no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
-                            \n Support: Extended \n <gateway:experimental>"
+                            \n Support: Extended \n "
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -1454,8 +1653,13 @@ spec:
                             is interpreted as the following: \n * Gateway: Listener
                             Name. When both Port (experimental) and SectionName are
                             specified, the name and port of the selected listener
-                            must match both specified values. \n Implementations MAY
-                            choose to support attaching Routes to other resources.
+                            must match both specified values. * Service: Port Name.
+                            When both Port (experimental) and SectionName are specified,
+                            the name and port of the selected listener must match
+                            both specified values. Note that attaching Routes to Services
+                            as Parents is part of experimental Mesh support and is
+                            not supported for any other purpose. \n Implementations
+                            MAY choose to support attaching Routes to other resources.
                             If that is the case, they MUST clearly document how SectionName
                             is interpreted. \n When unspecified (empty string), this
                             will reference the entire resource. For the purpose of

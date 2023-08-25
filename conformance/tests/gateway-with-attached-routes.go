@@ -28,13 +28,16 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GatewayWithAttachedRoutes)
+	ConformanceTests = append(ConformanceTests, GatewayWithAttachedRoutes, GatewayWithAttachedRoutesWithPort8080)
 }
 
 var GatewayWithAttachedRoutes = suite.ConformanceTest{
 	ShortName:   "GatewayWithAttachedRoutes",
 	Description: "A Gateway in the gateway-conformance-infra namespace should be attached to routes.",
-	Manifests:   []string{"tests/gateway-with-attached-routes.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+	},
+	Manifests: []string{"tests/gateway-with-attached-routes.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
 		t.Run("Gateway listener should have one valid http routes attached", func(t *testing.T) {
 			gwNN := types.NamespacedName{Name: "gateway-with-one-attached-route", Namespace: "gateway-conformance-infra"}
@@ -47,7 +50,7 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}},
 				AttachedRoutes: 1,
 			}}
@@ -66,10 +69,55 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 				Conditions: []metav1.Condition{{
 					Type:   string(v1beta1.ListenerConditionAccepted),
 					Status: metav1.ConditionTrue,
-					Reason: "", //any reason
+					Reason: "", // any reason
 				}},
 				AttachedRoutes: 2,
 			}}
+
+			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
+		})
+	},
+}
+
+var GatewayWithAttachedRoutesWithPort8080 = suite.ConformanceTest{
+	ShortName:   "GatewayWithAttachedRoutesWithPort8080",
+	Description: "A Gateway in the gateway-conformance-infra namespace should be attached to routes.",
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportGatewayPort8080,
+	},
+	Manifests: []string{"tests/gateway-with-attached-routes-with-port-8080.yaml"},
+	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
+		t.Run("Gateway listener should have attached route by specifying the sectionName", func(t *testing.T) {
+			gwNN := types.NamespacedName{Name: "gateway-with-two-listeners-and-one-attached-route", Namespace: "gateway-conformance-infra"}
+			listeners := []v1beta1.ListenerStatus{
+				{
+					Name: v1beta1.SectionName("http-unattached"),
+					SupportedKinds: []v1beta1.RouteGroupKind{{
+						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+						Kind:  v1beta1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{{
+						Type:   string(v1beta1.ListenerConditionAccepted),
+						Status: metav1.ConditionTrue,
+						Reason: "", // any reason
+					}},
+					AttachedRoutes: 0,
+				},
+				{
+					Name: v1beta1.SectionName("http"),
+					SupportedKinds: []v1beta1.RouteGroupKind{{
+						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
+						Kind:  v1beta1.Kind("HTTPRoute"),
+					}},
+					Conditions: []metav1.Condition{{
+						Type:   string(v1beta1.ListenerConditionAccepted),
+						Status: metav1.ConditionTrue,
+						Reason: "", // any reason
+					}},
+					AttachedRoutes: 1,
+				},
+			}
 
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 		})

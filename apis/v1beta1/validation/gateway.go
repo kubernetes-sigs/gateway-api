@@ -18,7 +18,10 @@ package validation
 
 import (
 	"fmt"
+	"net/netip"
+	"regexp"
 
+	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -41,6 +44,9 @@ var (
 		gatewayv1b1.HTTPSProtocolType: {},
 		gatewayv1b1.TLSProtocolType:   {},
 	}
+
+	validHostnameAddress = `^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
+	validHostnameRegexp  = regexp.MustCompile(validHostnameAddress)
 )
 
 // ValidateGateway validates gw according to the Gateway API specification.
@@ -59,6 +65,7 @@ func ValidateGateway(gw *gatewayv1b1.Gateway) field.ErrorList {
 func ValidateGatewaySpec(spec *gatewayv1b1.GatewaySpec, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
 	errs = append(errs, validateGatewayListeners(spec.Listeners, path.Child("listeners"))...)
+	errs = append(errs, validateGatewayAddresses(spec.Addresses, path.Child("addresses"))...)
 	return errs
 }
 
@@ -69,10 +76,12 @@ func validateGatewayListeners(listeners []gatewayv1b1.Listener, path *field.Path
 	errs = append(errs, ValidateListenerTLSConfig(listeners, path)...)
 	errs = append(errs, validateListenerHostname(listeners, path)...)
 	errs = append(errs, ValidateTLSCertificateRefs(listeners, path)...)
+	errs = append(errs, ValidateListenerNames(listeners, path)...)
+	errs = append(errs, validateHostnameProtocolPort(listeners, path)...)
 	return errs
 }
 
-// validateListenerTLSConfig validates TLS config must be set when protocol is HTTPS or TLS,
+// ValidateListenerTLSConfig validates TLS config must be set when protocol is HTTPS or TLS,
 // and TLS config shall not be present when protocol is HTTP, TCP or UDP
 func ValidateListenerTLSConfig(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
@@ -112,7 +121,74 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 	for i, c := range listeners {
 		if isProtocolInSubset(c.Protocol, protocolsTLSRequired) && c.TLS != nil {
 			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
-				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), fmt.Sprintln("should be set and not empty when TLSModeType is Terminate")))
+				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), "should be set and not empty when TLSModeType is Terminate"))
+			}
+		}
+	}
+	return errs
+}
+
+// ValidateListenerNames validates the names of the listeners
+// must be unique within the Gateway
+func ValidateListenerNames(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	nameMap := make(map[gatewayv1b1.SectionName]struct{}, len(listeners))
+	for i, c := range listeners {
+		if _, found := nameMap[c.Name]; found {
+			errs = append(errs, field.Duplicate(path.Index(i).Child("name"), "must be unique within the Gateway"))
+		}
+		nameMap[c.Name] = struct{}{}
+	}
+	return errs
+}
+
+// validateHostnameProtocolPort validates that the combination of port, protocol, and hostname are
+// unique for each listener.
+func validateHostnameProtocolPort(listeners []gatewayv1b1.Listener, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	hostnameProtocolPortSets := sets.Set[string]{}
+	for i, listener := range listeners {
+		hostname := new(gatewayv1b1.Hostname)
+		if listener.Hostname != nil {
+			hostname = listener.Hostname
+		}
+		protocol := listener.Protocol
+		port := listener.Port
+		hostnameProtocolPort := fmt.Sprintf("%s:%s:%d", *hostname, protocol, port)
+		if hostnameProtocolPortSets.Has(hostnameProtocolPort) {
+			errs = append(errs, field.Duplicate(path.Index(i), "combination of port, protocol, and hostname must be unique for each listener"))
+		} else {
+			hostnameProtocolPortSets.Insert(hostnameProtocolPort)
+		}
+	}
+	return errs
+}
+
+// validateGatewayAddresses validates whether fields of addresses are set according
+// to the Gateway API specification.
+func validateGatewayAddresses(addresses []gatewayv1b1.GatewayAddress, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	ipAddrSet, hostnameAddrSet := sets.Set[string]{}, sets.Set[string]{}
+	for i, address := range addresses {
+		if address.Type != nil {
+			if *address.Type == gatewayv1b1.IPAddressType {
+				if _, err := netip.ParseAddr(address.Value); err != nil {
+					errs = append(errs, field.Invalid(path.Index(i), address.Value, "invalid ip address"))
+				}
+				if ipAddrSet.Has(address.Value) {
+					errs = append(errs, field.Duplicate(path.Index(i), address.Value))
+				} else {
+					ipAddrSet.Insert(address.Value)
+				}
+			} else if *address.Type == gatewayv1b1.HostnameAddressType {
+				if !validHostnameRegexp.MatchString(address.Value) {
+					errs = append(errs, field.Invalid(path.Index(i), address.Value, fmt.Sprintf("must only contain valid characters (matching %s)", validHostnameAddress)))
+				}
+				if hostnameAddrSet.Has(address.Value) {
+					errs = append(errs, field.Duplicate(path.Index(i), address.Value))
+				} else {
+					hostnameAddrSet.Insert(address.Value)
+				}
 			}
 		}
 	}

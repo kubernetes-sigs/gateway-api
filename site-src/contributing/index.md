@@ -1,7 +1,9 @@
 # How to Get Involved
 
 This page contains links to all of the meeting notes, design docs and related
-discussions around the APIs.
+discussions around the APIs. If you're interested in working towards a formal
+role in the project, refer to the [Contributor
+Ladder](/contributing/contributor-ladder).
 
 ## Feedback and Questions
 
@@ -59,12 +61,12 @@ Being the main meeting for Gateway API, the topics can vary here and often this
 is where new topics and ideas are discussed. However if you're simply
 interested in the ingress use case, this is the common forum for that.
 
-### Mesh Meeting
+### Mesh Meeting (GAMMA)
 
-[GAMMA](/contributing/gamma/) is the initative within Gateway API to use the
+[GAMMA](/concepts/gamma/) is the initative within Gateway API to use the
 resources provided by Gateway API for service mesh use cases. Meetings happen
-weekly on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC) and 8AM
-Pacific Time (16:00 UTC):
+every other week on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
+and 8AM Pacific Time (16:00 UTC):
 
 * [Zoom link](https://zoom.us/j/96951309977)
 * Convert to your timezone: [3pm PT](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)/[8am PT](http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29)

@@ -38,7 +38,11 @@ func init() {
 var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "HTTPRouteObservedGenerationBump",
 	Description: "A HTTPRoute in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
-	Manifests:   []string{"tests/httproute-observed-generation-bump.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "observed-generation-bump", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}

@@ -1,6 +1,8 @@
 run:
   timeout: 10m
   issues-exit-code: 1
+  max-issues-per-linter: 0
+  max-same-issues: 0
   tests: true
   skip-dirs-use-default: true
   modules-download-mode: readonly
@@ -9,13 +11,20 @@ run:
 linters:
   fast: false
   enable:
-  - gofmt
-  - goimports
-  - revive
-  - govet
-  - gomodguard
-  - misspell
+  - errcheck
   - exportloopref
+  - gocritic
+  - gofumpt
+  - goimports
+  - gomodguard
+  - gosec
+  - govet
+  - misspell
+  - revive
+  - unconvert
+  - unparam
+  - unused
+  - whitespace
   disable:
   - scopelint
   disable-all: false

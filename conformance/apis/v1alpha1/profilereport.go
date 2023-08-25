@@ -19,12 +19,11 @@ limitations under the License.
 
 package v1alpha1
 
-// ConformanceProfile is the collection of support levels and features for a set
-// of conformance test results which indicates whether or not an implementation
-// is conformant, and what extra features (if any) it supports.
-type ConformanceProfile struct {
-	// Name indicates the name of the conformance profile (e.g. "HTTPRoute",
-	// "TCPRoute", "UDPRoute", e.t.c.).
+// ProfileReport is the generated report for the test results of a specific
+// named conformance profile.
+type ProfileReport struct {
+	// Name indicates the name of the conformance profile (e.g. "HTTP",
+	// "TLS", "Mesh", e.t.c.).
 	Name string `json:"name"`
 
 	// Core indicates the core support level which includes the set of tests
@@ -35,12 +34,12 @@ type ConformanceProfile struct {
 	// Extended indicates the extended support level which includes additional
 	// optional features which the implementation may choose to implement
 	// support for, but are not required.
-	Extended ExtendedStatus `json:"extended,omitempty"`
+	Extended *ExtendedStatus `json:"extended,omitempty"`
 }
 
 // ExtendedStatus shows the testing results for the extended support level.
 type ExtendedStatus struct {
-	Status `json:"status,inline"`
+	Status `json:",inline"`
 
 	// SupportedFeatures indicates which extended features were flagged as
 	// supported by the implementation and tests will be attempted for.
@@ -53,7 +52,7 @@ type ExtendedStatus struct {
 
 // Status includes details on the results of a test.
 type Status struct {
-	Result `json:"status"`
+	Result `json:"result"`
 
 	// Summary is a human-readable message intended for end-users to understand
 	// the overall status at a glance.
@@ -67,4 +66,8 @@ type Status struct {
 	// results as being partial and the implementation will not be considered
 	// conformant at any level.
 	SkippedTests []string `json:"skippedTests,omitempty"`
+
+	// FailedTests indicates which tests were failing during the execution of
+	// test suite.
+	FailedTests []string `json:"failedTests,omitempty"`
 }

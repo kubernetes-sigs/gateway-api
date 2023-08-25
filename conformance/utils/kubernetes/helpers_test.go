@@ -296,6 +296,20 @@ func Test_listenersMatch(t *testing.T) {
 			},
 			want: true,
 		},
+		{
+			name: "expected and actual can be in different orders",
+			expected: []v1beta1.ListenerStatus{
+				{Name: "listener-2"},
+				{Name: "listener-3"},
+				{Name: "listener-1"},
+			},
+			actual: []v1beta1.ListenerStatus{
+				{Name: "listener-1"},
+				{Name: "listener-2"},
+				{Name: "listener-3"},
+			},
+			want: true,
+		},
 	}
 
 	for _, test := range tests {

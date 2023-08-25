@@ -14,7 +14,7 @@ _THEN_
 - [Routing across Namespaces](/guides/multiple-ns)
 - [Configuring TLS](/guides/tls)
 - [TCP routing](/guides/tcp)
-- [gRPC routing](/guides/grpc)
+- [gRPC routing](/guides/grpc-routing)
 - [Migrating from Ingress](/guides/migrating-from-ingress)
 
 ## Installing a Gateway controller
@@ -36,18 +36,18 @@ channels with different levels of stability:
 ### Install Standard Channel
 
 The standard release channel includes all resources that have graduated to beta,
-including GatewayClass, Gateway, and HTTPRoute. To install this channel, run the
-following kubectl command:
+including GatewayClass, Gateway, ReferenceGrant, and HTTPRoute. To install this
+channel, run the following kubectl command:
 
 ```
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.6.2/standard-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.7.1/standard-install.yaml
 ```
 
 ### Install Experimental Channel
 
 The experimental release channel includes everything in the standard release
 channel plus some experimental resources and fields. This includes
-ReferencePolicy, TCPRoute, TLSRoute, and UDPRoute. 
+TCPRoute, TLSRoute, UDPRoute and GRPCRoute.
 
 Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
@@ -58,7 +58,7 @@ documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/).
 To install the experimental channel, run the following kubectl command:
 
 ```
-kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.6.2/experimental-install.yaml
+kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v0.7.1/experimental-install.yaml
 ```
 
 ### Cleanup

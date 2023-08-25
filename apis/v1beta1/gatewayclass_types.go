@@ -42,7 +42,7 @@ import (
 // If implementations choose to propagate GatewayClass changes to existing
 // Gateways, that MUST be clearly documented by the implementation.
 //
-// Whenever one or more Gateways are using a GatewayClass, implementations MUST
+// Whenever one or more Gateways are using a GatewayClass, implementations SHOULD
 // add the `gateway-exists-finalizer.gateway.networking.k8s.io` finalizer on the
 // associated GatewayClass. This ensures that a GatewayClass associated with a
 // Gateway is not deleted while in use.
@@ -56,6 +56,9 @@ type GatewayClass struct {
 	Spec GatewayClassSpec `json:"spec"`
 
 	// Status defines the current state of GatewayClass.
+	//
+	// Implementations MUST populate status on all GatewayClass resources which
+	// specify their controller name.
 	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
@@ -78,6 +81,8 @@ type GatewayClassSpec struct {
 	// This field is not mutable and cannot be empty.
 	//
 	// Support: Core
+	//
+	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
 	ControllerName GatewayController `json:"controllerName"`
 
 	// ParametersRef is a reference to a resource that contains the configuration

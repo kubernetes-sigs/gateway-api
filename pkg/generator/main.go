@@ -35,8 +35,8 @@ const (
 	channelAnnotation       = "gateway.networking.k8s.io/channel"
 
 	// These values must be updated during the release process
-	bundleVersion = "v0.6.2"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/1538"
+	bundleVersion = "v0.8.0-rc2"
+	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2245"
 )
 
 var standardKinds = map[string]bool{
@@ -93,6 +93,7 @@ func main() {
 			if channel == "standard" && !standardKinds[groupKind.Kind] {
 				continue
 			}
+
 			log.Printf("generating %s CRD for %v\n", channel, groupKind)
 
 			parser.NeedCRDFor(groupKind, nil)
@@ -111,7 +112,7 @@ func main() {
 
 			channelCrd := crdRaw.DeepCopy()
 			for _, version := range channelCrd.Spec.Versions {
-				version.Schema.OpenAPIV3Schema.Properties = channelTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
+				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
 			}
 
 			conv, err := crd.AsVersion(*channelCrd, apiext.SchemeGroupVersion)
@@ -133,9 +134,37 @@ func main() {
 	}
 }
 
-func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
+// Custom Gateway API Tweaks for tags prefixed with `<gateway:` that get past
+// the limitations of Kubebuilder annotations.
+func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[string]apiext.JSONSchemaProps {
 	for name := range props {
 		jsonProps, _ := props[name]
+
+		if strings.Contains(jsonProps.Description, "<gateway:validateIPAddress>") {
+			jsonProps.Items.Schema.OneOf = []apiext.JSONSchemaProps{{
+				Properties: map[string]apiext.JSONSchemaProps{
+					"type": {
+						Enum: []apiext.JSON{{Raw: []byte("\"IPAddress\"")}},
+					},
+					"value": {
+						AnyOf: []apiext.JSONSchemaProps{{
+							Format: "ipv4",
+						}, {
+							Format: "ipv6",
+						}},
+					},
+				},
+			}, {
+				Properties: map[string]apiext.JSONSchemaProps{
+					"type": {
+						Not: &apiext.JSONSchemaProps{
+							Enum: []apiext.JSON{{Raw: []byte("\"IPAddress\"")}},
+						},
+					},
+				},
+			}}
+		}
+
 		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
 			delete(props, name)
 			continue
@@ -146,25 +175,51 @@ func channelTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			jsonProps.Type = "string"
 		}
 
-		if channel == "experimental" && strings.Contains(jsonProps.Description, "<gateway:experimental:validation:") {
-			validationRe := regexp.MustCompile(`<gateway:experimental:validation:Enum=([A-Za-z;]*)>`)
-			match := validationRe.FindStringSubmatch(jsonProps.Description)
-			if len(match) != 2 {
-				log.Fatalf("Invalid gateway:experimental:validation tag for %s", name)
+		validationPrefix := fmt.Sprintf("<gateway:%s:validation:", channel)
+		numExpressions := strings.Count(jsonProps.Description, validationPrefix)
+		numValid := 0
+		if numExpressions > 0 {
+			enumRe := regexp.MustCompile(validationPrefix + "Enum=([A-Za-z;]*)>")
+			enumMatches := enumRe.FindAllStringSubmatch(jsonProps.Description, 64)
+			for _, enumMatch := range enumMatches {
+				if len(enumMatch) != 2 {
+					log.Fatalf("Invalid %s Enum tag for %s", validationPrefix, name)
+				}
+
+				numValid++
+				jsonProps.Enum = []apiext.JSON{}
+				for _, val := range strings.Split(enumMatch[1], ";") {
+					jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
+				}
 			}
-			jsonProps.Enum = []apiext.JSON{}
-			for _, val := range strings.Split(match[1], ";") {
-				jsonProps.Enum = append(jsonProps.Enum, apiext.JSON{Raw: []byte("\"" + val + "\"")})
+
+			celRe := regexp.MustCompile(validationPrefix + "XValidation:message=\"([^\"]*)\",rule=\"([^\"]*)\">")
+			celMatches := celRe.FindAllStringSubmatch(jsonProps.Description, 64)
+			for _, celMatch := range celMatches {
+				if len(celMatch) != 3 {
+					log.Fatalf("Invalid %s CEL tag for %s", validationPrefix, name)
+				}
+
+				numValid++
+				jsonProps.XValidations = append(jsonProps.XValidations, apiext.ValidationRule{
+					Message: celMatch[1],
+					Rule:    celMatch[2],
+				})
 			}
 		}
 
-		experimentalRe := regexp.MustCompile(`<gateway:experimental:.*>`)
-		jsonProps.Description = experimentalRe.ReplaceAllLiteralString(jsonProps.Description, "")
+		if numValid < numExpressions {
+			fmt.Printf("Description: %s\n", jsonProps.Description)
+			log.Fatalf("Found %d Gateway validation expressions, but only %d were valid", numExpressions, numValid)
+		}
+
+		gatewayRe := regexp.MustCompile(`<gateway:.*>`)
+		jsonProps.Description = gatewayRe.ReplaceAllLiteralString(jsonProps.Description, "")
 
 		if len(jsonProps.Properties) > 0 {
-			jsonProps.Properties = channelTweaks(channel, jsonProps.Properties)
+			jsonProps.Properties = gatewayTweaks(channel, jsonProps.Properties)
 		} else if jsonProps.Items != nil && jsonProps.Items.Schema != nil {
-			jsonProps.Items.Schema.Properties = channelTweaks(channel, jsonProps.Items.Schema.Properties)
+			jsonProps.Items.Schema.Properties = gatewayTweaks(channel, jsonProps.Items.Schema.Properties)
 		}
 		props[name] = jsonProps
 	}

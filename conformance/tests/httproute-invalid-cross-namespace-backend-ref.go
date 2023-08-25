@@ -35,8 +35,12 @@ func init() {
 var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidCrossNamespaceBackendRef",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set a ResolvedRefs status False with reason RefNotPermitted when attempting to bind to a Gateway in the same namespace if the route has a BackendRef Service in the gateway-conformance-web-backend namespace and a ReferenceGrant granting permission to route to that Service does not exist",
-	Features:    []suite.SupportedFeature{suite.SupportReferenceGrant},
-	Manifests:   []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportReferenceGrant,
+	},
+	Manifests: []string{"tests/httproute-invalid-cross-namespace-backend-ref.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "invalid-cross-namespace-backend-ref", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
@@ -45,7 +49,6 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
 		t.Run("HTTPRoute with a cross-namespace BackendRef and no ReferenceGrant has a ResolvedRefs Condition with status False and Reason RefNotPermitted", func(t *testing.T) {
-
 			resolvedRefsCond := metav1.Condition{
 				Type:   string(v1beta1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
@@ -64,6 +67,5 @@ var HTTPRouteInvalidCrossNamespaceBackendRef = suite.ConformanceTest{
 				Response: http.Response{StatusCode: 500},
 			})
 		})
-
 	},
 }

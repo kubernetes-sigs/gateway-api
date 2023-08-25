@@ -34,7 +34,11 @@ var HTTPRouteRewriteHost = suite.ConformanceTest{
 	ShortName:   "HTTPRouteRewriteHost",
 	Description: "An HTTPRoute with hostname rewrite filter",
 	Manifests:   []string{"tests/httproute-rewrite-host.yaml"},
-	Features:    []suite.SupportedFeature{suite.SupportHTTPRouteHostRewrite},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteHostRewrite,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "rewrite-host", Namespace: ns}
@@ -66,6 +70,29 @@ var HTTPRouteRewriteHost = suite.ConformanceTest{
 						Path: "/two",
 						Host: "example.org",
 					},
+				},
+				Backend:   "infra-backend-v2",
+				Namespace: ns,
+			}, {
+				Request: http.Request{
+					Path: "/rewrite-host-and-modify-headers",
+					Host: "rewrite.example",
+					Headers: map[string]string{
+						"X-Header-Remove":     "remove-val",
+						"X-Header-Add-Append": "append-val-1",
+					},
+				},
+				ExpectedRequest: &http.ExpectedRequest{
+					Request: http.Request{
+						Path: "/rewrite-host-and-modify-headers",
+						Host: "test.example.org",
+						Headers: map[string]string{
+							"X-Header-Add":        "header-val-1",
+							"X-Header-Add-Append": "append-val-1,header-val-2",
+							"X-Header-Set":        "set-overwrites-values",
+						},
+					},
+					AbsentHeaders: []string{"X-Header-Remove"},
 				},
 				Backend:   "infra-backend-v2",
 				Namespace: ns,

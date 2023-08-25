@@ -34,7 +34,11 @@ func init() {
 var HTTPRouteInvalidParentRefNotMatchingSectionName = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidParentRefNotMatchingSectionName",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set the Accepted status to False with reason NoMatchingParent when attempting to bind to a Gateway that does not have a matching SectionName.",
-	Manifests:   []string{"tests/httproute-invalid-parentref-not-matching-section-name.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-invalid-parentref-not-matching-section-name.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "httproute-listener-not-matching-section-name", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}

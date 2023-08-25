@@ -37,9 +37,9 @@ type ConformanceReport struct {
 	// test report was made for.
 	GatewayAPIVersion string `json:"gatewayAPIVersion"`
 
-	// Profiles is a list of the conformance profiles that were enabled for
-	// this test run.
-	Profiles []ConformanceProfile `json:"profiles"`
+	// ProfileReports is a list of the individual reports for each conformance
+	// profile that was enabled for a test run.
+	ProfileReports []ProfileReport `json:"profiles"`
 }
 
 // Implementation provides metadata information on the downstream
@@ -69,5 +69,9 @@ type Implementation struct {
 	// Github usernames (in the form of `@<username>`) or team names (in the
 	// form of `@<team>/<name>`), but when that's not possible it can be email
 	// addresses.
+	// Rather than Github usernames or email addresses you can provide a URL to the relevant
+	// support pages for the project. Ideally this would be something like the issue creation page
+	// on a repository, but for projects without a publicly exposed repository a general support 
+	// page URL can be provided.
 	Contact []string `json:"contact"`
 }

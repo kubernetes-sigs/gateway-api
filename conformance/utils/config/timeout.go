@@ -51,6 +51,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	HTTPRouteMustHaveCondition time.Duration
 
+	// TLSRouteMustHaveCondition represents the maximum time for an TLSRoute to have the supplied Condition.
+	// Max value for conformant implementation: None
+	TLSRouteMustHaveCondition time.Duration
+
 	// RouteMustHaveParents represents the maximum time for an xRoute to have parents in status that match the expected parents.
 	// Max value for conformant implementation: None
 	RouteMustHaveParents time.Duration
@@ -74,6 +78,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	RequestTimeout time.Duration
 
+	// LatestObservedGenerationSet represents the maximum time for an ObservedGeneration to bump.
+	// Max value for conformant implementation: None
+	LatestObservedGenerationSet time.Duration
+
 	// RequiredConsecutiveSuccesses is the number of requests that must succeed in a row
 	// to consider a response "consistent" before making additional assertions on the response body.
 	// If this number is not reached within MaxTimeToConsistency, the test will fail.
@@ -91,11 +99,13 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		GWCMustBeAccepted:              180 * time.Second,
 		HTTPRouteMustNotHaveParents:    60 * time.Second,
 		HTTPRouteMustHaveCondition:     60 * time.Second,
+		TLSRouteMustHaveCondition:      60 * time.Second,
 		RouteMustHaveParents:           60 * time.Second,
 		ManifestFetchTimeout:           10 * time.Second,
 		MaxTimeToConsistency:           30 * time.Second,
 		NamespacesMustBeReady:          300 * time.Second,
 		RequestTimeout:                 10 * time.Second,
+		LatestObservedGenerationSet:    60 * time.Second,
 		RequiredConsecutiveSuccesses:   3,
 	}
 }
@@ -140,5 +150,11 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.RequestTimeout == 0 {
 		timeoutConfig.RequestTimeout = defaultTimeoutConfig.RequestTimeout
+	}
+	if timeoutConfig.LatestObservedGenerationSet == 0 {
+		timeoutConfig.LatestObservedGenerationSet = defaultTimeoutConfig.LatestObservedGenerationSet
+	}
+	if timeoutConfig.TLSRouteMustHaveCondition == 0 {
+		timeoutConfig.TLSRouteMustHaveCondition = defaultTimeoutConfig.TLSRouteMustHaveCondition
 	}
 }

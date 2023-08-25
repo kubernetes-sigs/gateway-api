@@ -33,7 +33,11 @@ func init() {
 var HTTPRouteHeaderMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteHeaderMatching",
 	Description: "A single HTTPRoute with header matching for different backends",
-	Manifests:   []string{"tests/httproute-header-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-header-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "header-matching", Namespace: ns}

@@ -34,8 +34,12 @@ func init() {
 var HTTPRouteInvalidParentRefNotMatchingListenerPort = suite.ConformanceTest{
 	ShortName:   "HTTPRouteInvalidParentRefNotMatchingListenerPort",
 	Description: "A single HTTPRoute in the gateway-conformance-infra namespace should set the Accepted status to False with reason NoMatchingParent when attempting to bind to a Gateway that does not have a matching ListenerPort.",
-	Features:    []suite.SupportedFeature{suite.SupportRouteDestinationPortMatching},
-	Manifests:   []string{"tests/httproute-invalid-parentref-not-matching-listener-port.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportRouteDestinationPortMatching,
+	},
+	Manifests: []string{"tests/httproute-invalid-parentref-not-matching-listener-port.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		routeNN := types.NamespacedName{Name: "httproute-listener-not-matching-route-port", Namespace: "gateway-conformance-infra"}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}

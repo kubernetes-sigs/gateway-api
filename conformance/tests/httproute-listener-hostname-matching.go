@@ -33,7 +33,11 @@ func init() {
 var HTTPRouteListenerHostnameMatching = suite.ConformanceTest{
 	ShortName:   "HTTPRouteListenerHostnameMatching",
 	Description: "Multiple HTTP listeners with the same port and different hostnames, each with a different HTTPRoute",
-	Manifests:   []string{"tests/httproute-listener-hostname-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+	},
+	Manifests: []string{"tests/httproute-listener-hostname-matching.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 

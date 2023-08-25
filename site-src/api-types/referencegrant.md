@@ -1,5 +1,9 @@
 # ReferenceGrant
 
+??? success "Standard Channel in v0.6.0+"
+
+    The `ReferenceGrant` resource is Beta and part of the Standard Channel in `v0.6.0+`.
+
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
     to "ReferenceGrant" to avoid any confusion with policy attachment.
@@ -94,7 +98,7 @@ When communicating the status of a cross-namespace reference, implementations
 MUST NOT expose information about the existence of a resource in another
 namespace unless a ReferenceGrant exists allowing the reference to occur. This
 means that if a cross-namespace reference is made without a ReferenceGrant to a
-resource that doesn't exist. Any status conditions or warning messages need to
+resource that doesn't exist, any status conditions or warning messages need to
 focus on the fact that a ReferenceGrant does not exist to allow this reference.
 No hints should be provided about whether or not the referenced resource exists.
 

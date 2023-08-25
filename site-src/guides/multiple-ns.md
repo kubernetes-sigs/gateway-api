@@ -22,8 +22,7 @@ are their goals and how they use Gateway API resources to accomplish them:
 isolate access and  configuration across their apps as much as possible to
 minimize access and failure domains. They use separate HTTPRoutes attached to
 the same Gateway to isolate routing configurations, such as canary rollouts,
-and still share the same but share the same IP address, port, DNS domain, and
-TLS certificate.
+but still share the same IP address, port, DNS domain, and TLS certificate.
 - The store team has a single Service called _store_ that they have deployed
 in the `store-ns` Namespace which also needs to be exposed behind the same IP
 address and domain.
@@ -44,7 +43,7 @@ The logical relationship between the Gateway API resources looks like this:
 attach to Gateways and program their routing rules. It is especially relevant
 when there are Routes across Namespaces that share one or more Gateways.
 Gateway and Route attachment is bidirectional - attachment can only succeed if
-the Gateway owner and Route owner owner both agree to the relationship. This
+the Gateway owner and Route owner both agree to the relationship. This
 bi-directional relationship exists for two reasons:
 
 - Route owners don't want to overexpose their applications through paths they 

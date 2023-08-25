@@ -36,7 +36,7 @@ then
     for yaml in `ls config/webhook/*.yaml`
     do
         echo Replacing in $yaml
-        sed -i -E "s/admission-server:[a-z0-9\.-]+/admission-server:${BASE_REF}/g" $yaml
+        sed -i -E "s/image:.+admission-server:[a-z0-9\.-]+/image: registry.k8s.io\/gateway-api\/admission-server:${BASE_REF}/g" $yaml
     done
 else
     echo "No version requested with BASE_REF, nothing to do."
