@@ -150,7 +150,7 @@ func New(s Options) *ConformanceTestSuite {
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
-	if s.EnableAllSupportedFeatures == true {
+	if s.EnableAllSupportedFeatures {
 		s.SupportedFeatures = AllFeatures
 	} else if s.SupportedFeatures == nil {
 		s.SupportedFeatures = StandardCoreFeatures
