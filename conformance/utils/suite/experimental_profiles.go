@@ -70,7 +70,7 @@ var (
 			SupportReferenceGrant,
 			SupportHTTPRoute,
 		),
-		ExtendedFeatures: HTTPExtendedFeatures,
+		ExtendedFeatures: HTTPRouteExtendedFeatures,
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS

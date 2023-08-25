@@ -120,7 +120,7 @@ const (
 	SupportHTTPRouteRequestMirror SupportedFeature = "HTTPRouteRequestMirror"
 )
 
-// HTTPExtendedFeatures includes all the supported features for HTTPRoute
+// HTTPRouteExtendedFeatures includes all the supported features for HTTPRoute
 // conformance and can be used to opt-in to run all HTTPRoute tests, including
 // extended features.
 var HTTPRouteExtendedFeatures = sets.New(
