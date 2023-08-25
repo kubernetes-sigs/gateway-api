@@ -81,7 +81,7 @@ func TestExperimentalConformance(t *testing.T) {
 		implementation, err = suite.ParseImplementation(
 			*flags.ImplementationOrganization,
 			*flags.ImplementationProject,
-			*flags.ImplementationUrl,
+			*flags.ImplementationURL,
 			*flags.ImplementationVersion,
 			*flags.ImplementationContact,
 		)
@@ -140,7 +140,7 @@ func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, o
 	}
 
 	if output != "" {
-		if err = os.WriteFile(output, rawReport, 0644); err != nil {
+		if err = os.WriteFile(output, rawReport, 0o600); err != nil {
 			return err
 		}
 	}

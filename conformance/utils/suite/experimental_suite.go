@@ -194,7 +194,7 @@ func (suite *ExperimentalConformanceTestSuite) Run(t *testing.T, tests []Conform
 	suite.lock.Lock()
 	if suite.running {
 		suite.lock.Unlock()
-		return fmt.Errorf("can't run the test suite multiple times in parallel: the test suite is already running.")
+		return fmt.Errorf("can't run the test suite multiple times in parallel: the test suite is already running")
 	}
 
 	// if the test suite is not currently running, reset reporting and start a
@@ -249,11 +249,7 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 
 	profileReports := newReports()
 	for _, testResult := range suite.results {
-		conformanceProfiles, err := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles)
-		if err != nil {
-			return nil, err
-		}
-
+		conformanceProfiles := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles)
 		for _, profile := range conformanceProfiles.UnsortedList() {
 			profileReports.addTestResults(*profile, testResult)
 		}
@@ -288,7 +284,7 @@ func ParseImplementation(org, project, url, version, contact string) (*confv1a1.
 	if version == "" {
 		return nil, errors.New("implementation's version can not be empty")
 	}
-	contacts := strings.SplitN(contact, ",", -1)
+	contacts := strings.Split(contact, ",")
 	if len(contacts) == 0 {
 		return nil, errors.New("implementation's contact can not be empty")
 	}
