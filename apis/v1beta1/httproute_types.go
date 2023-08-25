@@ -263,6 +263,53 @@ type HTTPRouteRule struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
+
+	// Timeouts defines the timeouts that can be configured for an HTTP request.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+}
+
+// HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
+// Timeout values are formatted like 1h/1m/1s/1ms as parsed by Golang time.ParseDuration
+// and MUST BE >= 1ms or 0 to disable (no timeout).
+type HTTPRouteTimeouts struct {
+	// Request specifies the duration for processing an HTTP client request after which the
+	// gateway will time out if unable to send a response.
+	//
+	// For example, setting this field to the value `10s` in an HTTPRoute will cause
+	// a timeout if a client request is taking longer than 10 seconds to complete.
+	//
+	// This timeout is intended to cover as close to the whole request-response transaction
+	// as possible although an implementation MAY choose to start the timeout after the entire
+	// request stream has been received instead of immediately after the transaction is
+	// initiated by the client.
+	//
+	// When this field is unspecified, request timeout behavior is implementation-dependent.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Request *Duration `json:"request,omitempty"`
+
+	// BackendRequest specifies a timeout for an individual request from the gateway
+	// to a backend service. This covers the time from when the request first starts being
+	// sent from the gateway to when the full response has been received from the backend.
+	//
+	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
+	// may result in more than one call from the gateway to the destination backend service,
+	// for example, if automatic retries are supported.
+	//
+	// Because the Request timeout encompasses the BackendRequest timeout,
+	// the value of BackendRequest defaults to and must be <= the value of Request timeout.
+	//
+	// Support: Extended
+	//
+	// +optional
+	BackendRequest *Duration `json:"backendRequest,omitempty"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.

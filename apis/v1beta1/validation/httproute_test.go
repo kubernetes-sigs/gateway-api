@@ -1176,3 +1176,67 @@ func TestValidateRequestRedirectFiltersWithNoBackendRef(t *testing.T) {
 		})
 	}
 }
+
+func toDuration(durationString string) *gatewayv1b1.Duration {
+	return (*gatewayv1b1.Duration)(&durationString)
+}
+
+func TestValidateHTTPTimeouts(t *testing.T) {
+	tests := []struct {
+		name     string
+		rules    []gatewayv1b1.HTTPRouteRule
+		errCount int
+	}{
+		{
+			name:     "valid httpRoute Rules timeouts",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("1ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules timeout set to 0 (disabled)",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0ms"),
+					},
+				},
+			},
+		}, {
+			name:     "invalid httpRoute Rules timeout",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("500us"),
+					},
+				},
+			},
+		}, {
+			name:     "invalid httpRoute Rules backendRequest timeout cannot be longer than request timeout",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1ms"),
+						BackendRequest: toDuration("2ms"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1b1.HTTPRoute{Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules}}
+			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}

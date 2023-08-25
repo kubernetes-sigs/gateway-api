@@ -610,6 +610,11 @@ type AddressType string
 // +k8s:deepcopy-gen=false
 type HeaderName string
 
+// A duration is a ...
+//
+// +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
+type Duration string
+
 const (
 	// A textual representation of a numeric IP address. IPv4
 	// addresses must be in dotted-decimal form. IPv6 addresses
