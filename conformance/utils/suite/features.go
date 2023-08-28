@@ -118,6 +118,9 @@ const (
 
 	// This option indicates support for HTTPRoute request mirror (extended conformance).
 	SupportHTTPRouteRequestMirror SupportedFeature = "HTTPRouteRequestMirror"
+
+	// This option indicates support for HTTPRoute request with multiple mirrors (extended conformance).
+	SupportHTTPRouteRequestMirrors SupportedFeature = "HTTPRouteRequestMirrors"
 )
 
 // HTTPRouteExtendedFeatures includes all the supported features for HTTPRoute

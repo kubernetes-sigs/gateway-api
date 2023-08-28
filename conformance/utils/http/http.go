@@ -52,8 +52,8 @@ type ExpectedResponse struct {
 	Backend   string
 	Namespace string
 
-	// MirroredTo is the destination pod of the mirrored request.
-	MirroredTo string
+	// MirroredTo is the destination BackendRefs of the mirrored request.
+	MirroredTo []BackendRef
 
 	// User Given TestCase name
 	TestCaseName string
@@ -85,6 +85,11 @@ type Response struct {
 	StatusCode    int
 	Headers       map[string]string
 	AbsentHeaders []string
+}
+
+type BackendRef struct {
+	Name      string
+	Namespace string
 }
 
 // MakeRequestAndExpectEventuallyConsistentResponse makes a request with the given parameters,
