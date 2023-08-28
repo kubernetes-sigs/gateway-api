@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -118,7 +115,7 @@ func getConformanceProfileForName(name ConformanceProfileName) (ConformanceProfi
 }
 
 // getConformanceProfilesForTest retrieves the ConformanceProfiles a test belongs to.
-func getConformanceProfilesForTest(test ConformanceTest, conformanceProfiles sets.Set[ConformanceProfileName]) (sets.Set[*ConformanceProfile], error) {
+func getConformanceProfilesForTest(test ConformanceTest, conformanceProfiles sets.Set[ConformanceProfileName]) sets.Set[*ConformanceProfile] {
 	matchingConformanceProfiles := sets.New[*ConformanceProfile]()
 	for _, conformanceProfileName := range conformanceProfiles.UnsortedList() {
 		cp := conformanceProfileMap[conformanceProfileName]
@@ -134,5 +131,5 @@ func getConformanceProfilesForTest(test ConformanceTest, conformanceProfiles set
 		}
 	}
 
-	return matchingConformanceProfiles, nil
+	return matchingConformanceProfiles
 }
