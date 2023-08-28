@@ -59,10 +59,10 @@ follows:
     name: bar-route
   spec:
     parentRefs:
-      - group: ""
-        kind: Service
-        name: demo-app
-        port: 5000
+    - group: ""
+      kind: Service
+      name: demo-app
+      port: 5000
     rules:
     - matches:
       - headers:
