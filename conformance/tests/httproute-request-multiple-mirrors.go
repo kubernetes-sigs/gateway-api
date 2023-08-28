@@ -27,21 +27,22 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirror)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirrors)
 }
 
-var HTTPRouteRequestMirror = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestMirror",
-	Description: "An HTTPRoute with request mirror filter",
-	Manifests:   []string{"tests/httproute-request-mirror.yaml"},
+var HTTPRouteRequestMirrors = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRequestMirrors",
+	Description: "An HTTPRoute with multiple request mirror filters",
+	Manifests:   []string{"tests/httproute-request-multiple-mirrors.yaml"},
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportHTTPRouteRequestMirror,
+		suite.SupportHTTPRouteRequestMirrors,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-mirror", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "request-multiple-mirrors", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
@@ -56,13 +57,18 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 					},
 				},
 				Backend: "infra-backend-v1",
-				MirroredTo: []http.BackendRef{{
-					Name:      "infra-backend-v2",
-					Namespace: ns,
-				}},
+				MirroredTo: []http.BackendRef{
+					{
+						Name:      "infra-backend-v2",
+						Namespace: ns,
+					},
+					{
+						Name:      "infra-backend-v3",
+						Namespace: "another-namespace",
+					},
+				},
 				Namespace: ns,
-			},
-			{
+			}, {
 				Request: http.Request{
 					Path: "/mirror-and-modify-headers",
 					Headers: map[string]string{
@@ -83,10 +89,16 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 				},
 				Namespace: ns,
 				Backend:   "infra-backend-v1",
-				MirroredTo: []http.BackendRef{{
-					Name:      "infra-backend-v2",
-					Namespace: ns,
-				}},
+				MirroredTo: []http.BackendRef{
+					{
+						Name:      "infra-backend-v2",
+						Namespace: ns,
+					},
+					{
+						Name:      "infra-backend-v3",
+						Namespace: "another-namespace",
+					},
+				},
 			},
 		}
 		for i := range testCases {
