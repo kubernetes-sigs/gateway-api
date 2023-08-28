@@ -2,7 +2,7 @@
 
 
 
-## [Gateway API: Welcome, GAMMA!]
+## [Gateway API: Welcome, Service Mesh Users!]
 
 <small style="position:relative; top:-10px;">
   :octicons-calendar-24: August 29, 2023 ·
@@ -17,7 +17,7 @@ capabilities. We look forward to your feedback!
 [:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, Service Mesh Users!]
 
 [status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
-[Gateway API: Welcome, GAMMA!]:/blog/2023/0829-welcome-gamma
+[Gateway API: Welcome, Service Mesh Users!]:/blog/2023/0829-welcome-mesh
 
 ## [Gateway API Graduates to Beta]
 
