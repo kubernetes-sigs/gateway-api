@@ -5,7 +5,7 @@
 ## [Gateway API: Welcome, GAMMA!]
 
 <small style="position:relative; top:-10px;">
-  :octicons-calendar-24: August 23, 2023 ·
+  :octicons-calendar-24: August 29, 2023 ·
   :octicons-clock-24: 5 min read
 </small>
 
@@ -14,7 +14,7 @@ release, Gateway API support for service mesh has reached [Experimental
 status][status], and the Gateway and HTTPRoute resources gain some new
 capabilities. We look forward to your feedback!
 
-[:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, GAMMA!]
+[:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, Service Mesh Users!]
 
 [status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
 [Gateway API: Welcome, GAMMA!]:/blog/2023/0829-welcome-gamma
