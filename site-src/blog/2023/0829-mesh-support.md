@@ -14,9 +14,8 @@ description: >
 
 We are thrilled to announce the v0.8.0 release of Gateway API! With this
 release, Gateway API support for service mesh has reached [Experimental
-status][status], we've introduced CEL validation and a `Mesh` conformance
-profile, and we've made some changes to the GEP process. We look forward to
-your feedback!
+status][status], and we've also made some smaller additions such as CEL
+validation. We look forward to your feedback!
 
 We're especially delighted to announce that Kuma 2.3+, Linkerd 2.14+, and
 Istio 1.16+ are all fully-conformant implementations of the Gateway API
@@ -182,9 +181,9 @@ meetings. We look forward to seeing you!!
 - [GEP-1686] builds on the work of [GEP-1709] to define a _conformance
   profile_ for service meshes to be declared conformant with the Gateway API.
 
-Although these are [Experimental][status] APIs, note that they are available
-in the [`standard` release channel][ch], since the GAMMA initiative has not
-needed to introduce new resources or fields to date.
+Although these are [Experimental][status] patterns, note that they are
+available in the [`standard` release channel][ch], since the GAMMA initiative
+has not needed to introduce new resources or fields to date.
 
 [gamma]:/concepts/gamma/
 [status]:/geps/overview/#status
@@ -192,7 +191,7 @@ needed to introduce new resources or fields to date.
 [cel]:https://kubernetes.io/docs/reference/using-api/cel/
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:/concepts/api-overview/
-[geps]:https://gateway-api.sigs.k8s.io/v1beta1/contributing/gep/
+[geps]:/contributing/enhancement-requests/
 [guides]:/guides/getting-started/
 [impl]:/implementations/
 [install-crds]:/guides/getting-started/#install-the-crds
@@ -205,6 +204,6 @@ needed to introduce new resources or fields to date.
 [GEP-1686]:/geps/gep-1686/
 [GEP-1709]:/geps/gep-1709/
 [issue 2277]:https://github.com/kubernetes-sigs/gateway-api/issues/2277
-[supported-versions]:https://gateway-api.sigs.k8s.io/concepts/versioning/#supported-versions
+[supported-versions]:/concepts/versioning/#supported-versions
 [v0.8.0 release notes]:https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.8.0
-[versioning docs]:https://gateway-api.sigs.k8s.io/concepts/versioning/
+[versioning docs]:/concepts/versioning/
