@@ -17,6 +17,10 @@ release, Gateway API support for service mesh has reached [Experimental
 status][status], and the Gateway and HTTPRoute resources gain some new
 capabilities. We look forward to your feedback!
 
+We're especially delighted to announce that Kuma 2.3+, Linkerd 2.14+, and
+Istio 1.16+ are all fully-conformant implementations of the Gateway API
+service mesh support.
+
 ## Why add Service Mesh support to Gateway API?
 
 While the initial focus of Gateway API was always ingress (north-south)
