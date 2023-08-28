@@ -2,7 +2,7 @@
 
 
 
-## [Gateway API: Welcome, Service Mesh Users!]
+## [Gateway API: Introducing Service Mesh Support!]
 
 <small style="position:relative; top:-10px;">
   :octicons-calendar-24: August 29, 2023 ·
@@ -15,10 +15,10 @@ status][status], we've introduced CEL validation and a `Mesh` conformance
 profile, and we've made some changes to the GEP process. We look forward to
 your feedback!
 
-[:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, Service Mesh Users!]
+[:octicons-arrow-right-24: Continue reading][Gateway API: Introducing Service Mesh Support!]
 
 [status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
-[Gateway API: Welcome, Service Mesh Users!]:/blog/2023/0829-welcome-mesh
+[Gateway API: Introducing Service Mesh Support!]:/blog/2023/0829-mesh-support
 
 ## [Gateway API Graduates to Beta]
 

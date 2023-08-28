@@ -5,7 +5,7 @@ description: >
   validation and a Mesh conformance profile, and more!
 ---
 
-# Gateway API: Welcome, Service Mesh Users!
+# Gateway API v0.8.0: Introducing Service Mesh Support!
 
 <small style="position:relative; top:-30px;">
   :octicons-calendar-24: August 29, 2023 ·
@@ -22,7 +22,7 @@ We're especially delighted to announce that Kuma 2.3+, Linkerd 2.14+, and
 Istio 1.16+ are all fully-conformant implementations of the Gateway API
 service mesh support.
 
-## Why add Service Mesh support to Gateway API?
+## Why add service mesh support to Gateway API?
 
 While the initial focus of Gateway API was always ingress (north-south)
 traffic, it was clear almost from the beginning that the same basic routing
@@ -35,10 +35,9 @@ API.
 
 Over the last year, GAMMA has dug deeply into the challenges and possible
 solutions around using the Gateway API for service mesh. The end result is a
-small number of [enhancement
-proposals](https://gateway-api.sigs.k8s.io/v1beta1/contributing/gep/) that
-subsume many hours of thought and debate, and provide a minimum viable path to
-allow the Gateway API to be used for service mesh.
+small number of [enhancement proposals][geps] that subsume many hours of
+thought and debate, and provide a minimum viable path to allow the Gateway API
+to be used for service mesh.
 
 ### How will mesh routing work when using the Gateway API?
 
@@ -84,7 +83,7 @@ will be routed to `demo-app-v2` -- and since this is being handled by the
 service mesh, not the ingress controller, the A/B test can happen anywhere in
 the application's call graph.
 
-## How do I know this will be truly portable?
+### How do I know this will be truly portable?
 
 Gateway API has been investing heavily in conformance tests across all
 features it supports, and mesh is no exception. One of the challenges that the
@@ -193,6 +192,7 @@ needed to introduce new resources or fields to date.
 [cel]:https://kubernetes.io/docs/reference/using-api/cel/
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:/concepts/api-overview/
+[geps]:https://gateway-api.sigs.k8s.io/v1beta1/contributing/gep/
 [guides]:/guides/getting-started/
 [impl]:/implementations/
 [install-crds]:/guides/getting-started/#install-the-crds
