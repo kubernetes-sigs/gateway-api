@@ -1,8 +1,8 @@
 ---
 description: >
-  We are excited to announce the v0.8.0 release of Gateway API, where the GAMMA
-  initiative has now reached Experimental status, Gateway and HTTPRoute gain
-  some new capabilities, conformance profiles are supported, and more!
+  We are excited to announce the v0.8.0 release of Gateway API, where service
+  mesh support has has now reached Experimental status, we've introduced CEL
+  validation and a Mesh conformance profile, and more!
 ---
 
 # Gateway API: Welcome, Service Mesh Users!
@@ -14,8 +14,9 @@ description: >
 
 We are thrilled to announce the v0.8.0 release of Gateway API! With this
 release, Gateway API support for service mesh has reached [Experimental
-status][status], and the Gateway and HTTPRoute resources gain some new
-capabilities. We look forward to your feedback!
+status][status], we've introduced CEL validation and a `Mesh` conformance
+profile, and we've made some changes to the GEP process. We look forward to
+your feedback!
 
 We're especially delighted to announce that Kuma 2.3+, Linkerd 2.14+, and
 Istio 1.16+ are all fully-conformant implementations of the Gateway API
@@ -87,17 +88,18 @@ the application's call graph.
 
 Gateway API has been investing heavily in conformance tests across all
 features it supports, and mesh is no exception. One of the challenges that the
-GAMMA initiative ran into is that these tests strongly tied to the idea that a
-given implementation provides an ingress controller. Many service meshes
-don't, and requiring a GAMMA-conformant mesh to also implement an ingress
-controller seemed impractical at best. This resulted in work restarting on
-Gateway API _conformance profiles_, as discussed in [GEP-1709].
+GAMMA initiative ran into is that many of these tests were strongly tied to
+the idea that a given implementation provides an ingress controller. Many
+service meshes don't, and requiring a GAMMA-conformant mesh to also implement
+an ingress controller seemed impractical at best. This resulted in work
+restarting on Gateway API _conformance profiles_, as discussed in [GEP-1709].
 
 The basic idea of conformance profiles is that we can define subsets of the
 Gateway API, and allow implementations to choose (and document) which subsets
-they conform to. GAMMA is adding a new profile, named `Mesh`, which checks only
-the mesh functionality as defined by GAMMA. At this point, Kuma 2.3+, Linkerd
-2.14+, and Istio 1.16+ are all conformant with the `Mesh` profile.
+they conform to. GAMMA is adding a new profile, named `Mesh` and described in
+[GEP-1686], which checks only the mesh functionality as defined by GAMMA. At
+this point, Kuma 2.3+, Linkerd 2.14+, and Istio 1.16+ are all conformant with
+the `Mesh` profile.
 
 ## What else is in Gateway API v0.8.0?
 
@@ -108,9 +110,9 @@ main changes related to this: CEL validation and GEP process changes.
 ### CEL Validation
 
 The first major change is that Gateway API v0.8.0 is the start of a transition
-from webhook validation to CEL validation using information built into the
-CRDs. That will mean different things depending on the version of Kubernetes
-you're using:
+from webhook validation to [CEL validation][cel] using information built into
+the CRDs. That will mean different things depending on the version of
+Kubernetes you're using:
 
 #### Kubernetes 1.25+
 
@@ -188,6 +190,7 @@ needed to introduce new resources or fields to date.
 [gamma]:/concepts/gamma/
 [status]:/geps/overview/#status
 [ch]:/concepts/versioning/#release-channels-eg-experimental-standard
+[cel]:https://kubernetes.io/docs/reference/using-api/cel/
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 [concepts]:/concepts/api-overview/
 [guides]:/guides/getting-started/

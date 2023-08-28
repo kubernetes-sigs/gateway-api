@@ -9,10 +9,11 @@
   :octicons-clock-24: 5 min read
 </small>
 
-We are thrilled to announce the v0.8.0 release of the Gateway API! With this
+We are thrilled to announce the v0.8.0 release of Gateway API! With this
 release, Gateway API support for service mesh has reached [Experimental
-status][status], and the Gateway and HTTPRoute resources gain some new
-capabilities. We look forward to your feedback!
+status][status], we've introduced CEL validation and a `Mesh` conformance
+profile, and we've made some changes to the GEP process. We look forward to
+your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, Service Mesh Users!]
 
