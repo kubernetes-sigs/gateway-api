@@ -10,14 +10,14 @@
 </small>
 
 We are thrilled to announce the v0.8.0 release of the Gateway API! With this
-release, the work the GAMMA initiative has been doing over the past year has
-reached [Experimental status][status], and the Gateway and HTTPRoute resources
-gain some new capabilities. We look forward to your feedback!
+release, Gateway API support for service mesh has reached [Experimental
+status][status], and the Gateway and HTTPRoute resources gain some new
+capabilities. We look forward to your feedback!
 
 [:octicons-arrow-right-24: Continue reading][Gateway API: Welcome, GAMMA!]
 
 [status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
-[Gateway API: Welcome, GAMMA!]:/blog/2023/0823-welcome-gamma
+[Gateway API: Welcome, GAMMA!]:/blog/2023/0829-welcome-gamma
 
 ## [Gateway API Graduates to Beta]
 
