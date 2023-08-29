@@ -70,7 +70,7 @@ var HTTPRouteRequestMirrors = suite.ConformanceTest{
 				Namespace: ns,
 			}, {
 				Request: http.Request{
-					Path: "/mirror-and-modify-headers",
+					Path: "/mirror-and-modify-request-headers",
 					Headers: map[string]string{
 						"X-Header-Remove":     "remove-val",
 						"X-Header-Add-Append": "append-val-1",
@@ -78,7 +78,7 @@ var HTTPRouteRequestMirrors = suite.ConformanceTest{
 				},
 				ExpectedRequest: &http.ExpectedRequest{
 					Request: http.Request{
-						Path: "/mirror-and-modify-headers",
+						Path: "/mirror-and-modify-request-headers",
 						Headers: map[string]string{
 							"X-Header-Add":        "header-val-1",
 							"X-Header-Add-Append": "append-val-1,header-val-2",
