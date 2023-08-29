@@ -91,15 +91,15 @@ nav:
         - geps/gep-735.md
         - geps/gep-1282.md
       - Provisional:
-        - geps/gep-1324.md
         - geps/gep-1619.md
         - geps/gep-1897.md
         - geps/gep-1867.md
       - Implementable:
         - geps/gep-1742.md
-        - geps/gep-1686.md
-        - geps/gep-1426.md
       - Experimental:
+        - geps/gep-1324.md
+        - geps/gep-1426.md
+        - geps/gep-1686.md
         - geps/gep-1748.md
         - geps/gep-1651.md
         - geps/gep-1016.md
@@ -127,6 +127,8 @@ nav:
     - Contributor Ladder: contributing/contributor-ladder.md
   - Blog:
     - Index: blog/index.md
+    - 2023:
+      - blog/2023/0829-mesh-support.md
     - 2022:
       - blog/2022/graduating-to-beta.md
     - 2021:

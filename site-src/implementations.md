@@ -364,7 +364,7 @@ Traefik is currently working on implementing UDP, and ReferenceGrant. Status upd
 
 ### Tyk
 
-[Tyk Gateway][tyk-gateway] is a cloud-native, open source, API Gateway. 
+[Tyk Gateway][tyk-gateway] is a cloud-native, open source, API Gateway.
 
 The [Tyk.io][tyk] team is working towards an implementation of the Gateway API. You can track progress of this project [here][tyk-operator].
 
