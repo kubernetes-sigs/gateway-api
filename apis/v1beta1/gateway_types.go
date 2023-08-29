@@ -90,9 +90,11 @@ type GatewaySpec struct {
 	// 1. The implementation can serve them in compliance with the Addresses
 	//    requirement that all Listeners are available on all assigned
 	//    addresses.
-	// 2. No Listeners sharing the same Port share the same Hostname value,
-	//    including the empty value, if this would prevent the implementation
-	//    from matching an inbound request to a specific Listener.
+	// 2. The implementation can match inbound requests to a single distinct
+	//    Listener. When multiple Listeners share values for fields (for
+	//    example, two Listeners with the same Port value), the implementation
+	//    can can match requests to only one of the Listeners using other
+	//    Listener fields.
 	//
 	// Compatible combinations in Extended support are expected to vary across
 	// implementations. A combination that is compatible for one implementation

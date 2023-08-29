@@ -143,24 +143,25 @@ spec:
                   above are considered Extended. \n A Gateway's Listeners are considered
                   \"compatible\" if: \n 1. The implementation can serve them in compliance
                   with the Addresses requirement that all Listeners are available
-                  on all assigned addresses. 2. No Listeners sharing the same Port
-                  share the same Hostname value, including the empty value, if this
-                  would prevent the implementation from matching an inbound request
-                  to a specific Listener. \n Compatible combinations in Extended support
-                  are expected to vary across implementations. A combination that
-                  is compatible for one implementation may not be compatible for another.
-                  \n If this field specifies multiple Listeners that are not compatible,
-                  the implementation MUST set the \"Conflicted\" condition in the
-                  Listener Status to \"True\". \n Implementations MAY choose to still
-                  accept a Gateway with conflicted Listeners if they accept a partial
-                  Listener set that contains no incompatible Listeners. They MUST
-                  set a \"ListenersNotValid\" condition the Gateway Status when the
-                  Gateway contains incompatible Listeners whether or not they accept
-                  the Gateway. \n For example, the following Listener scenarios may
-                  be compatible depending on implementation capabilities: \n 1. Multiple
-                  Listeners with the same Port that all use the \"HTTP\" Protocol
-                  that all have unique Hostname values. 2. Multiple Listeners with
-                  the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
+                  on all assigned addresses. 2. The implementation can match inbound
+                  requests to a single distinct Listener. When multiple Listeners
+                  share values for fields (for example, two Listeners with the same
+                  Port value), the implementation can can match requests to only one
+                  of the Listeners using other Listener fields. \n Compatible combinations
+                  in Extended support are expected to vary across implementations.
+                  A combination that is compatible for one implementation may not
+                  be compatible for another. \n If this field specifies multiple Listeners
+                  that are not compatible, the implementation MUST set the \"Conflicted\"
+                  condition in the Listener Status to \"True\". \n Implementations
+                  MAY choose to still accept a Gateway with conflicted Listeners if
+                  they accept a partial Listener set that contains no incompatible
+                  Listeners. They MUST set a \"ListenersNotValid\" condition the Gateway
+                  Status when the Gateway contains incompatible Listeners whether
+                  or not they accept the Gateway. \n For example, the following Listener
+                  scenarios may be compatible depending on implementation capabilities:
+                  \n 1. Multiple Listeners with the same Port that all use the \"HTTP\"
+                  Protocol that all have unique Hostname values. 2. Multiple Listeners
+                  with the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
                   that all have unique Hostname values. 3. A mixture of \"TCP\" and
                   \"UDP\" Protocol Listeners, where no Listener with the same Protocol
                   has the same Port value. \n An implementation that cannot serve
@@ -935,24 +936,25 @@ spec:
                   above are considered Extended. \n A Gateway's Listeners are considered
                   \"compatible\" if: \n 1. The implementation can serve them in compliance
                   with the Addresses requirement that all Listeners are available
-                  on all assigned addresses. 2. No Listeners sharing the same Port
-                  share the same Hostname value, including the empty value, if this
-                  would prevent the implementation from matching an inbound request
-                  to a specific Listener. \n Compatible combinations in Extended support
-                  are expected to vary across implementations. A combination that
-                  is compatible for one implementation may not be compatible for another.
-                  \n If this field specifies multiple Listeners that are not compatible,
-                  the implementation MUST set the \"Conflicted\" condition in the
-                  Listener Status to \"True\". \n Implementations MAY choose to still
-                  accept a Gateway with conflicted Listeners if they accept a partial
-                  Listener set that contains no incompatible Listeners. They MUST
-                  set a \"ListenersNotValid\" condition the Gateway Status when the
-                  Gateway contains incompatible Listeners whether or not they accept
-                  the Gateway. \n For example, the following Listener scenarios may
-                  be compatible depending on implementation capabilities: \n 1. Multiple
-                  Listeners with the same Port that all use the \"HTTP\" Protocol
-                  that all have unique Hostname values. 2. Multiple Listeners with
-                  the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
+                  on all assigned addresses. 2. The implementation can match inbound
+                  requests to a single distinct Listener. When multiple Listeners
+                  share values for fields (for example, two Listeners with the same
+                  Port value), the implementation can can match requests to only one
+                  of the Listeners using other Listener fields. \n Compatible combinations
+                  in Extended support are expected to vary across implementations.
+                  A combination that is compatible for one implementation may not
+                  be compatible for another. \n If this field specifies multiple Listeners
+                  that are not compatible, the implementation MUST set the \"Conflicted\"
+                  condition in the Listener Status to \"True\". \n Implementations
+                  MAY choose to still accept a Gateway with conflicted Listeners if
+                  they accept a partial Listener set that contains no incompatible
+                  Listeners. They MUST set a \"ListenersNotValid\" condition the Gateway
+                  Status when the Gateway contains incompatible Listeners whether
+                  or not they accept the Gateway. \n For example, the following Listener
+                  scenarios may be compatible depending on implementation capabilities:
+                  \n 1. Multiple Listeners with the same Port that all use the \"HTTP\"
+                  Protocol that all have unique Hostname values. 2. Multiple Listeners
+                  with the same Port that use either the \"HTTPS\" or \"TLS\" Protocol
                   that all have unique Hostname values. 3. A mixture of \"TCP\" and
                   \"UDP\" Protocol Listeners, where no Listener with the same Protocol
                   has the same Port value. \n An implementation that cannot serve
