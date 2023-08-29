@@ -132,6 +132,13 @@ type GatewaySpec struct {
 	// matches. For example, `"foo.example.com"` takes precedence over
 	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
 	//
+	// Implementations SHOULD NOT match requests to less specific Listeners if
+	// they exhaust attached routes on a more specific Listener. For example, a
+	// request for `subdomain.example.com/path` SHOULD NOT match an HTTPRoute
+	// attached to a Listener with Hostname `*.example.com` if there is a
+	// Listener with with Hostname `subdomain.example.com`, even if no routes
+	// on the second Listener match.
+	//
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
