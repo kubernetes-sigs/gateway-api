@@ -72,9 +72,6 @@ sleep 8
 ## Check using example YAMLs as well
 ## with _only_ CEL validation
 
-# Used to hold error lines, if there are any, so they can all be reported at
-# once later.
-ERRORLOG=""
 
 for CHANNEL in experimental standard; do
   ##### Test valid CRD apply and that invalid examples are invalid.
@@ -109,12 +106,13 @@ for CHANNEL in experimental standard; do
           ! ("$KUBECTL_OUTPUT" =~ "Invalid value") \
           ]]; then
       res=2
-      ERRORLOG+=$(cat<<EOF
+      cat<<EOF
 
 Error: Example $file in channel $CHANNEL failed in an unexpected way with CEL validation.
 $KUBECTL_OUTPUT
 EOF
-)
+    else
+    echo "Example $file in channel $CHANNEL failed as expected with CEL validation."
     fi
 
   done
@@ -192,23 +190,18 @@ for CHANNEL in experimental standard; do
           ! ("$KUBECTL_OUTPUT" =~ "Invalid value") \
           ]]; then
       res=2
-      ERRORLOG+=$(cat<<EOF
+      cat<<EOF
 
-Error: Example $file in channel $CHANNEL failed in an unexpected way with the webhook.
+Error: Example $file in channel $CHANNEL failed in an unexpected way with webhook validation.
 $KUBECTL_OUTPUT
 EOF
-)
+    else
+    echo "Example $file in channel $CHANNEL failed as expected with webhook validation."
     fi
 
   done
   kubectl delete -f "config/crd/${CHANNEL}/gateway*.yaml" || res=$?
 done
-
-
-# Print the errorlog if it's nonempty.
-if [[ $ERRORLOG != "" ]]; then
-  echo "$ERRORLOG"
-fi
 
 # We've trapped EXIT with cleanup(), so just exit with what we've got.
 exit $res
