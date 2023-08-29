@@ -31,9 +31,9 @@ import (
 )
 
 func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clientset.Interface, mirrorPods []BackendRef, path string) {
-	for _, mirrorPod := range mirrorPods {
+	for i, mirrorPod := range mirrorPods {
 		if mirrorPod.Name == "" {
-			t.Fatalf("MirroredTo wasn't provided in the testcase, this test should only check http request mirror.")
+			t.Fatalf("Mirrored BackendRef[%d].Name wasn't provided in the testcase, this test should only check http request mirror.", i)
 		}
 	}
 
@@ -49,10 +49,10 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 				mirrorLogRegexp := regexp.MustCompile(fmt.Sprintf("Echoing back request made to \\%s to client", path))
 
 				t.Log("Searching for the mirrored request log")
-				t.Logf("Reading \"%s/%s\" logs", mirrorPod.Namespace, mirrorPod.Name)
+				t.Logf(`Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 				logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset)
 				if err != nil {
-					t.Logf("could not read \"%s/%s\" logs: %v", mirrorPod.Namespace, mirrorPod.Name, err)
+					t.Logf(`could not read "%s/%s" logs: %v`, mirrorPod.Namespace, mirrorPod.Name, err)
 					return false
 				}
 
@@ -63,11 +63,11 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 					}
 				}
 				return mirrored
-			}, 60*time.Second, time.Second, fmt.Sprintf("Couldn't find mirrored request in \"%s/%s\" logs", mirrorPod.Namespace, mirrorPod.Name))
+			}, 60*time.Second, time.Second, fmt.Sprintf(`Couldn't find mirrored request in "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name))
 		}(mirrorPod)
 	}
 
 	wg.Wait()
 
-	t.Log("Mirrored request log found")
+	t.Log("Found mirrored request log in all desired backends")
 }

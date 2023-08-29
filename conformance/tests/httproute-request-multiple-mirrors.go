@@ -27,18 +27,18 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirrors)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMultipleMirrors)
 }
 
-var HTTPRouteRequestMirrors = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestMirrors",
+var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRequestMultipleMirrors",
 	Description: "An HTTPRoute with multiple request mirror filters",
 	Manifests:   []string{"tests/httproute-request-multiple-mirrors.yaml"},
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportHTTPRouteRequestMirror,
-		suite.SupportHTTPRouteRequestMirrors,
+		suite.SupportHTTPRouteRequestMultipleMirrors,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
