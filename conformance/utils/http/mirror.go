@@ -52,7 +52,7 @@ func ExpectMirroredRequest(t *testing.T, client client.Client, clientset clients
 				t.Logf(`Reading "%s/%s" logs`, mirrorPod.Namespace, mirrorPod.Name)
 				logs, err := kubernetes.DumpEchoLogs(mirrorPod.Namespace, mirrorPod.Name, client, clientset)
 				if err != nil {
-					t.Logf(`could not read "%s/%s" logs: %v`, mirrorPod.Namespace, mirrorPod.Name, err)
+					t.Logf(`Couldn't read "%s/%s" logs: %v`, mirrorPod.Namespace, mirrorPod.Name, err)
 					return false
 				}
 
