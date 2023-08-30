@@ -40,11 +40,10 @@ type PolicyTargetReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// DirectPolicyTargetReference identifies an API object to apply direct policy to. This
-// should be used as part of Policy resources that can target Gateway API
-// resources. For more information on how this policy attachment model works,
-// and a sample Policy resource, refer to the policy attachment documentation
-// for Gateway API.
+// DirectPolicyTargetReference identifies an API object to apply direct policy to.
+// This should be used as part of Policy resources that can target single resources.
+// For more information on how this policy attachment model works, and a sample
+// Policy resource, refer to the policy attachment documentation for Gateway API.
 //
 // Note: This should be used for direct policy attachment only.
 // <gateway:experimental>
