@@ -71,30 +71,6 @@ and 8AM Pacific Time (16:00 UTC):
 * [Zoom link](https://zoom.us/j/96951309977)
 * Convert to your timezone: [3pm PT](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)/[8am PT](http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29)
 
-### Code Jam Meeting
-
-The Gateway API "Code Jam" is less of a meeting and more of a hangout to discuss
-and pair on Gateway API and technologies relevant to the project. This is an
-open agenda meeting (feel free to bring your topics) where the following kinds
-of activities (focusing on Gateway API related things) are encouraged:
-
-- Brainstorming
-- Code pairing
-- Demos
-- Getting help
-
-This meeting puts an emphasis on being fun and laid back: If you're looking to
-build further consensus and progress a [GEP][geps] then the _main_ meeting is
-likely the place you'll want to bring your topic. However, if you're working on
-adding [conformance tests][conformance] to your downstream implementation and
-having some trouble and want some help getting things working, this meeting is a
-good place for that kind of topic.
-
-* [Zoom link](https://zoom.us/j/96900767253)
-* [8:30am PT](http://www.thetimezoneconverter.com/?t=08:30&tz=PT%20%28Pacific%20Time%29)
-
-[geps]:https://gateway-api.sigs.k8s.io/geps/overview/
-
 ### Meeting Notes and Recordings
 
 Meeting agendas and notes are maintained in the [meeting notes
