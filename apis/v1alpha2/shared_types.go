@@ -344,7 +344,7 @@ type AddressType = v1beta1.AddressType
 // in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
 //
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
-type Duration v1beta1.Duration
+type Duration = v1beta1.Duration
 
 const (
 	// A textual representation of a numeric IP address. IPv4

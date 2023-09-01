@@ -2149,14 +2149,6 @@ spec:
                           type: string
                       type: object
                       x-kubernetes-validations:
-                      - message: request timeout value must be greater than or equal
-                          to 1ms
-                        rule: '!(has(self.request) && duration(self.request) != duration(''0s'')
-                          && duration(self.request) < duration(''1ms''))'
-                      - message: backendRequest timeout value must be greater than
-                          or equal to 1ms
-                        rule: '!(has(self.backendRequest) && duration(self.backendRequest)
-                          != duration(''0s'') && duration(self.backendRequest) < duration(''1ms''))'
                       - message: backendRequest timeout cannot be longer than request
                           timeout
                         rule: '!(has(self.request) && has(self.backendRequest) &&
@@ -4597,14 +4589,6 @@ spec:
                           type: string
                       type: object
                       x-kubernetes-validations:
-                      - message: request timeout value must be greater than or equal
-                          to 1ms
-                        rule: '!(has(self.request) && duration(self.request) != duration(''0s'')
-                          && duration(self.request) < duration(''1ms''))'
-                      - message: backendRequest timeout value must be greater than
-                          or equal to 1ms
-                        rule: '!(has(self.backendRequest) && duration(self.backendRequest)
-                          != duration(''0s'') && duration(self.backendRequest) < duration(''1ms''))'
                       - message: backendRequest timeout cannot be longer than request
                           timeout
                         rule: '!(has(self.request) && has(self.backendRequest) &&

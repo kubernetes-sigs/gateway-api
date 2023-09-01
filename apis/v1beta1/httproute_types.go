@@ -277,8 +277,6 @@ type HTTPRouteRule struct {
 // Timeout values are formatted like 1h/1m/1s/1ms, as specified in GEP-2257,
 // and MUST BE >= 1ms or "0s" to disable (no timeout).
 //
-// +kubebuilder:validation:XValidation:message="request timeout value must be greater than or equal to 1ms",rule="!(has(self.request) && duration(self.request) != duration('0s') && duration(self.request) < duration('1ms'))"
-// +kubebuilder:validation:XValidation:message="backendRequest timeout value must be greater than or equal to 1ms",rule="!(has(self.backendRequest) && duration(self.backendRequest) != duration('0s') && duration(self.backendRequest) < duration('1ms'))"
 // +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {
 	// Request specifies the duration for processing an HTTP client request after which the
