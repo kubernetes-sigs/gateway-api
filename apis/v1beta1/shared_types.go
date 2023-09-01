@@ -610,7 +610,8 @@ type AddressType string
 // +k8s:deepcopy-gen=false
 type HeaderName string
 
-// A duration is a ...
+// Duration is a string value representing a duration in time. The format is as specified
+// in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
 //
 // +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration string

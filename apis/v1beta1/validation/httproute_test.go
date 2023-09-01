@@ -1203,7 +1203,7 @@ func TestValidateHTTPTimeouts(t *testing.T) {
 			rules: []gatewayv1b1.HTTPRouteRule{
 				{
 					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
-						Request: toDuration("0ms"),
+						Request: toDuration("0s"),
 					},
 				},
 			},

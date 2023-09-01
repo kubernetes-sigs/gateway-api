@@ -274,14 +274,19 @@ type HTTPRouteRule struct {
 }
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
-// Timeout values are formatted like 1h/1m/1s/1ms as parsed by Golang time.ParseDuration
-// and MUST BE >= 1ms or 0 to disable (no timeout).
+// Timeout values are formatted like 1h/1m/1s/1ms, as specified in GEP-2257,
+// and MUST BE >= 1ms or "0s" to disable (no timeout).
+//
+// +kubebuilder:validation:XValidation:message="request timeout value must be greater than or equal to 1ms",rule="!(has(self.request) && duration(self.request) != duration('0s') && duration(self.request) < duration('1ms'))"
+// +kubebuilder:validation:XValidation:message="backendRequest timeout value must be greater than or equal to 1ms",rule="!(has(self.backendRequest) && duration(self.backendRequest) != duration('0s') && duration(self.backendRequest) < duration('1ms'))"
+// +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {
 	// Request specifies the duration for processing an HTTP client request after which the
 	// gateway will time out if unable to send a response.
 	//
-	// For example, setting this field to the value `10s` in an HTTPRoute will cause
-	// a timeout if a client request is taking longer than 10 seconds to complete.
+	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
+	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
+	// to complete.
 	//
 	// This timeout is intended to cover as close to the whole request-response transaction
 	// as possible although an implementation MAY choose to start the timeout after the entire
@@ -303,8 +308,8 @@ type HTTPRouteTimeouts struct {
 	// may result in more than one call from the gateway to the destination backend service,
 	// for example, if automatic retries are supported.
 	//
-	// Because the Request timeout encompasses the BackendRequest timeout,
-	// the value of BackendRequest defaults to and must be <= the value of Request timeout.
+	// Because the Request timeout encompasses the BackendRequest timeout, the value of
+	// BackendRequest must be <= the value of Request timeout.
 	//
 	// Support: Extended
 	//
