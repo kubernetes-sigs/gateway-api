@@ -121,6 +121,10 @@ func calculateHost(t *testing.T, reqHost, scheme string) string {
 		reqHost = "[" + reqHost + "]"
 		host, port, err = net.SplitHostPort(reqHost)
 	}
+	// If there's no port, we're ok with that
+	if strings.Contains(err.Error(), "missing port in address") {
+		return reqHost
+	}
 	if err != nil {
 		t.Logf("Failed to parse host %q: %v", reqHost, err)
 		return reqHost
