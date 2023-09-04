@@ -118,7 +118,8 @@ func calculateHost(t *testing.T, reqHost, scheme string) string {
 	if strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
 		// Assume caller won't add a port without brackets
-		host, port, err = net.SplitHostPort("[" + reqHost + "]")
+		reqHost = "[" + reqHost + "]"
+		host, port, err = net.SplitHostPort(reqHost)
 	}
 	if err != nil {
 		t.Logf("Failed to parse host %q: %v", reqHost, err)
