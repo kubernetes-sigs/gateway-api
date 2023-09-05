@@ -115,15 +115,11 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 
 func calculateHost(t *testing.T, reqHost, scheme string) string {
 	host, port, err := net.SplitHostPort(reqHost)
-	if strings.Contains(err.Error(), "too many colons in address") {
+	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
 		// Assume caller won't add a port without brackets
 		reqHost = "[" + reqHost + "]"
 		host, port, err = net.SplitHostPort(reqHost)
-	}
-	// If there's no port, we're ok with that
-	if strings.Contains(err.Error(), "missing port in address") {
-		return reqHost
 	}
 	if err != nil {
 		t.Logf("Failed to parse host %q: %v", reqHost, err)
