@@ -93,7 +93,7 @@ for CHANNEL in experimental standard; do
   # This lets us check the output in a cleaner way than a grep pipeline.
   for file in $(find hack/invalid-examples -name "*.yaml"); do
     # Don't check alpha resources in Standard checks
-    if [[ "$file" =~ "v1alpha2" && "$CHANNEL" == "standard" ]]; then
+    if [[ "$file" =~ "experimental" && "$CHANNEL" == "standard" ]]; then
       continue
     fi
 
@@ -177,7 +177,7 @@ for CHANNEL in experimental standard; do
 
   for file in $(find hack/invalid-examples -name "*.yaml"); do
     # Don't check alpha resources in Standard checks
-    if [[ "$file" =~ "v1alpha2" && "$CHANNEL" == "standard" ]]; then
+    if [[ "$file" =~ "experimental" && "$CHANNEL" == "standard" ]]; then
       continue
     fi
 
