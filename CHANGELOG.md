@@ -354,7 +354,6 @@ For more information, refer to
   while performing a match against HTTPRoute.Hostnames (#1980,
   @gauravkghildiyal)
 
-
 ### Conformance
 
 - Add conformance tests against accepting invalid ReferenceGrants in HTTPRoute
