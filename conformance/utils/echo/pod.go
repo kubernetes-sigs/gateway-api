@@ -114,7 +114,7 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 }
 
 func calculateHost(t *testing.T, reqHost, scheme string) string {
-	host, port, err := net.SplitHostPort(reqHost)
+	host, port, err := net.SplitHostPort(reqHost) // note: this will strip brackets of an IPv6 address
 	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
 		// Assume caller won't add a port without brackets
@@ -126,12 +126,23 @@ func calculateHost(t *testing.T, reqHost, scheme string) string {
 		return reqHost
 	}
 	if strings.ToLower(scheme) == "http" && port == "80" {
-		return host
+		return ipv6SafeHost(host)
 	}
 	if strings.ToLower(scheme) == "https" && port == "443" {
-		return host
+		return ipv6SafeHost(host)
 	}
 	return reqHost
+}
+
+func ipv6SafeHost(host string) string {
+	// We assume that host is a literal IPv6 address if host has
+	// colons.
+	// Per https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.2.
+	// This is like net.JoinHostPort, but we don't need a port.
+	if strings.Contains(host, ":") {
+		return "[" + host + "]"
+	}
+	return host
 }
 
 func (m *MeshPod) request(args []string) (Response, error) {
