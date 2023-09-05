@@ -106,6 +106,11 @@ Those changes mean that:
 For more information, refer to
 [#2069](https://github.com/kubernetes-sigs/gateway-api/pull/2069).
 
+### Multiple RequestMirror filters in the same HTTPRoute or GRPCRoute Rule
+Gateway API now supports multiple RequestMirror filters within the same rule.
+This enables implementations to mirror a request to multiple backends which
+was not supported before. (#2199, #2256, @Liorlieberman)
+
 ### Supported Features and Conformance Levels
 Gateway API conformance tests have a concept of "Supported Features".
 Implementations state which features they support, and then all the tests
@@ -160,6 +165,7 @@ For more information refer to
 - Implementations MUST ignore any port value specified in the HTTP Host header
   while performing a match against HTTPRoute.Hostnames (#1980,
   @gauravkghildiyal)
+- Clarify support for using the same filter multiple times within the same HTTP or GRPC rule (#2199, #2256, @Liorlieberman)
 
 ### Conformance
 
