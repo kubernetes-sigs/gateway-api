@@ -16,11 +16,11 @@ limitations under the License.
 
 package v1alpha2
 
-// PolicyTargetReference identifies an API object to apply policy to. This
-// should be used as part of Policy resources that can target Gateway API
-// resources. For more information on how this policy attachment model works,
-// and a sample Policy resource, refer to the policy attachment documentation
-// for Gateway API.
+// PolicyTargetReference identifies an API object to apply a direct or
+// inherited policy to. This should be used as part of Policy resources
+// that can target Gateway API resources. For more information on how this
+// policy attachment model works, and a sample Policy resource, refer to
+// the policy attachment documentation for Gateway API.
 type PolicyTargetReference struct {
 	// Group is the group of the target resource.
 	Group Group `json:"group"`
@@ -40,19 +40,21 @@ type PolicyTargetReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// DirectPolicyTargetReference identifies an API object to apply direct policy to.
+// DirectPolicyTargetReference identifies an API object to apply a direct policy to.
 // This should be used as part of Policy resources that can target single resources.
 // For more information on how this policy attachment model works, and a sample
 // Policy resource, refer to the policy attachment documentation for Gateway API.
 //
-// Note: This should be used for direct policy attachment only.
-// <gateway:experimental>
+// Note: This should only be used for direct policy attachment when references
+// to SectionName are actually needed. In all other cases, PolicyTargetReference
+// should be used.
 type DirectPolicyTargetReference struct {
 	PolicyTargetReference `json:",inline"`
 
 	// SectionName is the name of a section within the target resource. When
 	// unspecified, this targetRef targets the entire resource. In the following
 	// resources, SectionName is interpreted as the following:
+	//
 	// * Gateway: Listener Name
 	// * Service: Port Name
 	//
