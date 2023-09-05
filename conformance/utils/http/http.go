@@ -145,25 +145,36 @@ func MakeRequest(t *testing.T, expected *ExpectedResponse, gwAddr, protocol, sch
 // case of any error, the input gwAddr will be returned as the default.
 //
 // [HTTP spec]: https://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.23
-func calculateHost(t *testing.T, reqHost, scheme string) string {
-	host, port, err := net.SplitHostPort(reqHost)
+func calculateHost(t *testing.T, gwAddr, scheme string) string {
+	host, port, err := net.SplitHostPort(gwAddr) // note: this will strip brackets of an IPv6 address
 	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
 		// This is an IPv6 address; assume it's valid ipv6
 		// Assume caller won't add a port without brackets
-		reqHost = "[" + reqHost + "]"
-		host, port, err = net.SplitHostPort(reqHost)
+		gwAddr = "[" + gwAddr + "]"
+		host, port, err = net.SplitHostPort(gwAddr)
 	}
 	if err != nil {
-		t.Logf("Failed to parse host %q: %v", reqHost, err)
-		return reqHost
+		t.Logf("Failed to parse host %q: %v", gwAddr, err)
+		return gwAddr
 	}
 	if strings.ToLower(scheme) == "http" && port == "80" {
-		return host
+		return ipv6SafeHost(host)
 	}
 	if strings.ToLower(scheme) == "https" && port == "443" {
-		return host
+		return ipv6SafeHost(host)
 	}
-	return reqHost
+	return gwAddr
+}
+
+func ipv6SafeHost(host string) string {
+	// We assume that host is a literal IPv6 address if host has
+	// colons.
+	// Per https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.2.
+	// This is like net.JoinHostPort, but we don't need a port.
+	if strings.Contains(host, ":") {
+		return "[" + host + "]"
+	}
+	return host
 }
 
 // AwaitConvergence runs the given function until it returns 'true' `threshold` times in a row.
