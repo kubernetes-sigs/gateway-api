@@ -86,7 +86,7 @@ func main() {
 		defer wg.Done()
 		err := server.ListenAndServeTLS("", "")
 		if errors.Is(err, http.ErrServerClosed) {
-			klog.Fatalf("admission-webhook-server stopped: %v", err)
+			klog.Errorf("admission-webhook-server stopped: %v", err)
 		}
 	}()
 	klog.Info("admission webhook server started and listening on :8443")
@@ -98,7 +98,7 @@ func main() {
 
 	klog.Info("admission webhook received kill signal")
 	if err := server.Shutdown(context.Background()); err != nil {
-		klog.Fatalf("server shutdown failed:%+v", err)
+		klog.Errorf("server shutdown failed:%+v", err)
 	}
 	wg.Wait()
 }
