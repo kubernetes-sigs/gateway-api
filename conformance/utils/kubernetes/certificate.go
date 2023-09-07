@@ -54,7 +54,7 @@ func MustCreateSelfSignedCertSecret(t *testing.T, namespace, secretName string, 
 	data := map[string][]byte{
 		corev1.TLSCertKey:       serverCert.Bytes(),
 		corev1.TLSPrivateKeyKey: serverKey.Bytes(),
-	} 
+	}
 
 	newSecret := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
