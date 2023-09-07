@@ -10,7 +10,7 @@ spec:
   rules:
   - matches:
     - method:
-      - service: ../
+        service: ../
     backendRefs:
     - name: bar-svc
       port: 50051
