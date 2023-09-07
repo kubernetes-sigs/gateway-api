@@ -352,6 +352,25 @@ func TestValidateGateway(t *testing.T) {
 			},
 		},
 		{
+			desc: "one omitted hostname is unique when protocol and port are the same",
+			mutate: func(gw *gatewayv1b1.Gateway) {
+				hostnameFoo := gatewayv1b1.Hostname("foo.com")
+				gw.Spec.Listeners = []gatewayv1b1.Listener{
+					{
+						Name:     gatewayv1b1.SectionName("foo"),
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     gatewayv1b1.PortNumber(80),
+						Hostname: &hostnameFoo,
+					},
+					{
+						Name:     gatewayv1b1.SectionName("bar"),
+						Protocol: gatewayv1b1.HTTPProtocolType,
+						Port:     gatewayv1b1.PortNumber(80),
+					},
+				}
+			},
+		},
+		{
 			desc: "protocol is unique when port and hostname are the same",
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostnameFoo := gatewayv1b1.Hostname("foo.com")
