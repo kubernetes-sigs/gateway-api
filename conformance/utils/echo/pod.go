@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"net"
 	"strings"
 	"testing"
 	"time"
@@ -81,7 +80,7 @@ func makeRequest(t *testing.T, r http.Request) []string {
 	if protocol == "" {
 		protocol = "http"
 	}
-	host := calculateHost(t, r.Host, protocol)
+	host := http.CalculateHost(t, r.Host, protocol)
 	args := []string{"client", fmt.Sprintf("%s://%s%s", protocol, host, r.Path)}
 	if r.Method != "" {
 		args = append(args, "--method="+r.Method)
@@ -111,38 +110,6 @@ func compareRequest(exp http.ExpectedResponse, resp Response) error {
 		return fmt.Errorf("expected pod name to start with %s, got %s", exp.Backend, resp.Hostname)
 	}
 	return nil
-}
-
-func calculateHost(t *testing.T, reqHost, scheme string) string {
-	host, port, err := net.SplitHostPort(reqHost) // note: this will strip brackets of an IPv6 address
-	if err != nil && strings.Contains(err.Error(), "too many colons in address") {
-		// This is an IPv6 address; assume it's valid ipv6
-		// Assume caller won't add a port without brackets
-		reqHost = "[" + reqHost + "]"
-		host, port, err = net.SplitHostPort(reqHost)
-	}
-	if err != nil {
-		t.Logf("Failed to parse host %q: %v", reqHost, err)
-		return reqHost
-	}
-	if strings.ToLower(scheme) == "http" && port == "80" {
-		return ipv6SafeHost(host)
-	}
-	if strings.ToLower(scheme) == "https" && port == "443" {
-		return ipv6SafeHost(host)
-	}
-	return reqHost
-}
-
-func ipv6SafeHost(host string) string {
-	// We assume that host is a literal IPv6 address if host has
-	// colons.
-	// Per https://datatracker.ietf.org/doc/html/rfc3986#section-3.2.2.
-	// This is like net.JoinHostPort, but we don't need a port.
-	if strings.Contains(host, ":") {
-		return "[" + host + "]"
-	}
-	return host
 }
 
 func (m *MeshPod) request(args []string) (Response, error) {
