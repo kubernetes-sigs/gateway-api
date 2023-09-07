@@ -40,15 +40,16 @@ type PolicyTargetReference struct {
 	Namespace *Namespace `json:"namespace,omitempty"`
 }
 
-// DirectPolicyTargetReference identifies an API object to apply a direct policy to.
-// This should be used as part of Policy resources that can target single resources.
-// For more information on how this policy attachment model works, and a sample
-// Policy resource, refer to the policy attachment documentation for Gateway API.
+// PolicyTargetReferenceWithSectionName identifies an API object to apply a direct
+// policy to. This should be used as part of Policy resources that can target
+// single resources. For more information on how this policy attachment mode
+// works, and a sample Policy resource, refer to the policy attachment documentation
+// for Gateway API.
 //
 // Note: This should only be used for direct policy attachment when references
 // to SectionName are actually needed. In all other cases, PolicyTargetReference
 // should be used.
-type DirectPolicyTargetReference struct {
+type PolicyTargetReferenceWithSectionName struct {
 	PolicyTargetReference `json:",inline"`
 
 	// SectionName is the name of a section within the target resource. When
