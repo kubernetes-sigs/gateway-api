@@ -1467,6 +1467,17 @@ func TestHTTPRouteTimeouts(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "valid timeout request infinite greater than backend request 1ms",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("0s"),
+						BackendRequest: toDuration("1ms"),
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
