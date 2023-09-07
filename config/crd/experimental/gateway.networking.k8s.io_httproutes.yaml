@@ -2119,31 +2119,32 @@ spec:
                       properties:
                         backendRequest:
                           description: "BackendRequest specifies a timeout for an
-                            individual request from the gateway to a backend service.
-                            This covers the time from when the request first starts
-                            being sent from the gateway to when the full response
-                            has been received from the backend. \n An entire client
-                            HTTP transaction with a gateway, covered by the Request
-                            timeout, may result in more than one call from the gateway
-                            to the destination backend service, for example, if automatic
-                            retries are supported. \n Because the Request timeout
-                            encompasses the BackendRequest timeout, the value of BackendRequest
-                            must be <= the value of Request timeout. \n Support: Extended"
+                            individual request from the gateway to a backend. This
+                            covers the time from when the request first starts being
+                            sent from the gateway to when the full response has been
+                            received from the backend. \n An entire client HTTP transaction
+                            with a gateway, covered by the Request timeout, may result
+                            in more than one call from the gateway to the destination
+                            backend, for example, if automatic retries are supported.
+                            \n Because the Request timeout encompasses the BackendRequest
+                            timeout, the value of BackendRequest must be <= the value
+                            of Request timeout. \n Support: Extended"
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         request:
-                          description: "Request specifies the duration for processing
-                            an HTTP client request after which the gateway will time
-                            out if unable to send a response. \n For example, setting
-                            the `rules.timeouts.request` field to the value `10s`
-                            in an `HTTPRoute` will cause a timeout if a client request
-                            is taking longer than 10 seconds to complete. \n This
-                            timeout is intended to cover as close to the whole request-response
-                            transaction as possible although an implementation MAY
-                            choose to start the timeout after the entire request stream
-                            has been received instead of immediately after the transaction
-                            is initiated by the client. \n When this field is unspecified,
-                            request timeout behavior is implementation-dependent.
+                          description: "Request specifies the maximum duration for
+                            a Gateway to respond to a HTTP request. If the Gateway
+                            has not been able to respond before this deadline is met,
+                            the Gateway MUST return a timeout error. \n For example,
+                            setting the `rules.timeouts.request` field to the value
+                            `10s` in an `HTTPRoute` will cause a timeout if a client
+                            request is taking longer than 10 seconds to complete.
+                            \n This timeout is intended to cover as close to the whole
+                            request-response transaction as possible although an implementation
+                            MAY choose to start the timeout after the entire request
+                            stream has been received instead of immediately after
+                            the transaction is initiated by the client. \n When this
+                            field is unspecified, request timeout behavior is implementation-specific.
                             \n Support: Extended"
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
@@ -4559,31 +4560,32 @@ spec:
                       properties:
                         backendRequest:
                           description: "BackendRequest specifies a timeout for an
-                            individual request from the gateway to a backend service.
-                            This covers the time from when the request first starts
-                            being sent from the gateway to when the full response
-                            has been received from the backend. \n An entire client
-                            HTTP transaction with a gateway, covered by the Request
-                            timeout, may result in more than one call from the gateway
-                            to the destination backend service, for example, if automatic
-                            retries are supported. \n Because the Request timeout
-                            encompasses the BackendRequest timeout, the value of BackendRequest
-                            must be <= the value of Request timeout. \n Support: Extended"
+                            individual request from the gateway to a backend. This
+                            covers the time from when the request first starts being
+                            sent from the gateway to when the full response has been
+                            received from the backend. \n An entire client HTTP transaction
+                            with a gateway, covered by the Request timeout, may result
+                            in more than one call from the gateway to the destination
+                            backend, for example, if automatic retries are supported.
+                            \n Because the Request timeout encompasses the BackendRequest
+                            timeout, the value of BackendRequest must be <= the value
+                            of Request timeout. \n Support: Extended"
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string
                         request:
-                          description: "Request specifies the duration for processing
-                            an HTTP client request after which the gateway will time
-                            out if unable to send a response. \n For example, setting
-                            the `rules.timeouts.request` field to the value `10s`
-                            in an `HTTPRoute` will cause a timeout if a client request
-                            is taking longer than 10 seconds to complete. \n This
-                            timeout is intended to cover as close to the whole request-response
-                            transaction as possible although an implementation MAY
-                            choose to start the timeout after the entire request stream
-                            has been received instead of immediately after the transaction
-                            is initiated by the client. \n When this field is unspecified,
-                            request timeout behavior is implementation-dependent.
+                          description: "Request specifies the maximum duration for
+                            a Gateway to respond to a HTTP request. If the Gateway
+                            has not been able to respond before this deadline is met,
+                            the Gateway MUST return a timeout error. \n For example,
+                            setting the `rules.timeouts.request` field to the value
+                            `10s` in an `HTTPRoute` will cause a timeout if a client
+                            request is taking longer than 10 seconds to complete.
+                            \n This timeout is intended to cover as close to the whole
+                            request-response transaction as possible although an implementation
+                            MAY choose to start the timeout after the entire request
+                            stream has been received instead of immediately after
+                            the transaction is initiated by the client. \n When this
+                            field is unspecified, request timeout behavior is implementation-specific.
                             \n Support: Extended"
                           pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
                           type: string

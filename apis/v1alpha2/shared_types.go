@@ -342,8 +342,6 @@ type AddressType = v1beta1.AddressType
 
 // Duration is a string value representing a duration in time. The format is as specified
 // in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
-//
-// +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
 type Duration = v1beta1.Duration
 
 const (

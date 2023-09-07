@@ -42,9 +42,6 @@ var (
 
 	// All valid path characters per RFC-3986
 	validPathCharacters = "^(?:[A-Za-z0-9\\/\\-._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$"
-
-	// Minimum value of timeout fields
-	timeoutMinValue = time.Millisecond * 1
 )
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
@@ -358,32 +355,13 @@ func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field
 
 func validateHTTPRouteTimeouts(timeouts *gatewayv1b1.HTTPRouteTimeouts, path *field.Path) field.ErrorList {
 	var errs field.ErrorList
-	errorString := fmt.Sprintf("timeout value must be greater than or equal to %s", timeoutMinValue)
 	if timeouts.BackendRequest != nil {
-		backendTimeout, err := time.ParseDuration((string)(*timeouts.BackendRequest))
-		if err != nil {
-			errs = append(errs, field.Invalid(path.Child("backendRequest"), backendTimeout, err.Error()))
-		}
-		if backendTimeout < timeoutMinValue && backendTimeout != 0 {
-			errs = append(errs, field.Invalid(path.Child("backendRequest"), backendTimeout, errorString))
-		}
+		backendTimeout, _ := time.ParseDuration((string)(*timeouts.BackendRequest))
 		if timeouts.Request != nil {
-			timeout, err := time.ParseDuration((string)(*timeouts.Request))
-			if err != nil {
-				errs = append(errs, field.Invalid(path.Child("request"), timeout, err.Error()))
-			}
-			if backendTimeout > timeout && timeout != 0 {
+			timeout, _ := time.ParseDuration((string)(*timeouts.Request))
+			if backendTimeout > timeout {
 				errs = append(errs, field.Invalid(path.Child("backendRequest"), backendTimeout, "backendRequest timeout cannot be longer than request timeout"))
 			}
-		}
-	}
-	if timeouts.Request != nil {
-		timeout, err := time.ParseDuration((string)(*timeouts.Request))
-		if err != nil {
-			errs = append(errs, field.Invalid(path.Child("request"), timeout, err.Error()))
-		}
-		if timeout < timeoutMinValue && timeout != 0 {
-			errs = append(errs, field.Invalid(path.Child("request"), timeout, errorString))
 		}
 	}
 

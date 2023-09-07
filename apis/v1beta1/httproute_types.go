@@ -279,8 +279,8 @@ type HTTPRouteRule struct {
 //
 // +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {
-	// Request specifies the duration for processing an HTTP client request after which the
-	// gateway will time out if unable to send a response.
+	// Request specifies the maximum duration for a Gateway to respond to a HTTP request. If the Gateway
+	// has not been able to respond before this deadline is met, the Gateway MUST return a timeout error.
 	//
 	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
 	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
@@ -291,7 +291,7 @@ type HTTPRouteTimeouts struct {
 	// request stream has been received instead of immediately after the transaction is
 	// initiated by the client.
 	//
-	// When this field is unspecified, request timeout behavior is implementation-dependent.
+	// When this field is unspecified, request timeout behavior is implementation-specific.
 	//
 	// Support: Extended
 	//
@@ -299,11 +299,11 @@ type HTTPRouteTimeouts struct {
 	Request *Duration `json:"request,omitempty"`
 
 	// BackendRequest specifies a timeout for an individual request from the gateway
-	// to a backend service. This covers the time from when the request first starts being
+	// to a backend. This covers the time from when the request first starts being
 	// sent from the gateway to when the full response has been received from the backend.
 	//
 	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
-	// may result in more than one call from the gateway to the destination backend service,
+	// may result in more than one call from the gateway to the destination backend,
 	// for example, if automatic retries are supported.
 	//
 	// Because the Request timeout encompasses the BackendRequest timeout, the value of
