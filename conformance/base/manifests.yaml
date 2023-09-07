@@ -183,7 +183,7 @@ metadata:
 spec:
   selector:
     app: infra-backend-v3
-  ports:
+  ports: 
   - protocol: TCP
     port: 8080
     targetPort: 3000
@@ -496,3 +496,4 @@ spec:
         resources:
           requests:
             cpu: 10m
+

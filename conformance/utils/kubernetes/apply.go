@@ -137,32 +137,45 @@ func (a Applier) prepareResources(t *testing.T, decoder *yaml.YAMLOrJSONDecoder)
 }
 
 func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, resources []client.Object, cleanup bool) {
-	for _, resource := range resources {
-		resource := resource
+    fmt.Print("heyyy")
+    for _, resource := range resources {
+        resource := resource
 
-		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
-		defer cancel()
+        ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
+        defer cancel()
 
-		t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+        t.Logf("Creating/Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 
-		err := c.Create(ctx, resource)
-		if err != nil {
-			if !apierrors.IsAlreadyExists(err) {
-				require.NoError(t, err, "error creating resource")
-			}
-		}
+        // Check if the resource exists
+       existingResource := resource.DeepCopyObject().(client.Object)
+        err := c.Get(ctx, types.NamespacedName{Name: resource.GetName(), Namespace: resource.GetNamespace()}, existingResource)
+        if err != nil {
+            if !apierrors.IsNotFound(err) {
+                t.Logf("error checking resource: %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+                require.NoError(t, err, "error checking resource")
+            }
 
-		if cleanup {
-			t.Cleanup(func() {
-				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
-				defer cancel()
-				t.Logf("Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
-				err = c.Delete(ctx, resource)
-				require.NoErrorf(t, err, "error deleting resource")
-			})
-		}
-	}
+            // Resource doesn't exist, create it
+            err = c.Create(ctx, resource)
+            require.NoError(t, err, "error creating resource")
+        } else {
+            // Resource exists, update it
+            err = c.Update(ctx, resource)
+            require.NoError(t, err, "error updating resource")
+        }
+		
+        if cleanup {
+            t.Cleanup(func() {
+                ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
+                defer cancel()
+                t.Logf("Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+                err = c.Delete(ctx, resource)
+                require.NoErrorf(t, err, "error deleting resource")
+            })
+        }
+    }
 }
+
 
 // MustApplyWithCleanup creates or updates Kubernetes resources defined with the
 // provided YAML file and registers a cleanup function for resources it created.
@@ -172,7 +185,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 	require.NoError(t, err)
 
 	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
-
+ 
 	resources, err := a.prepareResources(t, decoder)
 	if err != nil {
 		t.Logf("manifest: %s", data.String())
