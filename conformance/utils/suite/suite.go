@@ -141,7 +141,7 @@ func New(s Options) *ConformanceTestSuite {
 
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
-func (suite *ConformanceTestSuite) Setup(t *testing.T) { 
+func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.Applier.FS = suite.FS
 
 	if suite.SupportedFeatures.Has(SupportGateway) {
@@ -156,8 +156,8 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 
 		t.Logf("Test Setup: Applying programmatic resources")
 		secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
-		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret},  suite.Cleanup)
-	
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-validity-checks-certificate", []string{"*", "*.org"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
