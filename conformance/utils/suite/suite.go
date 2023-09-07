@@ -146,7 +146,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 
 	if suite.SupportedFeatures.Has(SupportGateway) {
 		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, "nginx")
+		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
 		suite.Applier.GatewayClass = suite.GatewayClassName
 		suite.Applier.ControllerName = suite.ControllerName
