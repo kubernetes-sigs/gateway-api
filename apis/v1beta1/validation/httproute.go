@@ -359,7 +359,7 @@ func validateHTTPRouteTimeouts(timeouts *gatewayv1b1.HTTPRouteTimeouts, path *fi
 		backendTimeout, _ := time.ParseDuration((string)(*timeouts.BackendRequest))
 		if timeouts.Request != nil {
 			timeout, _ := time.ParseDuration((string)(*timeouts.Request))
-			if backendTimeout > timeout {
+			if backendTimeout > timeout && timeout != 0 {
 				errs = append(errs, field.Invalid(path.Child("backendRequest"), backendTimeout, "backendRequest timeout cannot be longer than request timeout"))
 			}
 		}
