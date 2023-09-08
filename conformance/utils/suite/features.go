@@ -99,7 +99,11 @@ const (
 	SupportHTTPRouteMethodMatching SupportedFeature = "HTTPRouteMethodMatching"
 
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
-	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
+	SupportHTTPRouteResponseHeaderModification SupportedFeature = "HTTPRouteResponseHeaderModification"
+
+	//TODO(liorlieberman) I think it is better not to have it and make everyone aligned before GA.
+	// This option is the same as above option but left just for backward compatibility
+	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPRouteResponseHeaderModification"
 
 	// This option indicates support for HTTPRoute port redirect (extended conformance).
 	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
@@ -126,7 +130,7 @@ const (
 var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteQueryParamMatching,
 	SupportHTTPRouteMethodMatching,
-	SupportHTTPResponseHeaderModification,
+	SupportHTTPRouteResponseHeaderModification,
 	SupportHTTPRoutePortRedirect,
 	SupportHTTPRouteSchemeRedirect,
 	SupportHTTPRoutePathRedirect,
@@ -169,6 +173,7 @@ var MeshCoreFeatures = sets.New(
 // Features - Experimental
 // -----------------------------------------------------------------------------
 
+// TODO(liorlieberman) get consensus about making experimental features per resource.
 const (
 	// This option indicates support for Destination Port matching.
 	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
