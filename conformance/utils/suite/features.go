@@ -81,7 +81,7 @@ const (
 	SupportHTTPRoute SupportedFeature = "HTTPRoute"
 )
 
-// HTTPCoreFeatures includes all SupportedFeatures needed to be conformant with
+// HTTPRouteCoreFeatures includes all SupportedFeatures needed to be conformant with
 // the HTTPRoute resource.
 var HTTPRouteCoreFeatures = sets.New(
 	SupportHTTPRoute,
@@ -99,7 +99,7 @@ const (
 	SupportHTTPRouteMethodMatching SupportedFeature = "HTTPRouteMethodMatching"
 
 	// This option indicates support for HTTPRoute response header modification (extended conformance).
-	SupportHTTPResponseHeaderModification SupportedFeature = "HTTPResponseHeaderModification"
+	SupportHTTPRouteResponseHeaderModification SupportedFeature = "HTTPRouteResponseHeaderModification"
 
 	// This option indicates support for HTTPRoute port redirect (extended conformance).
 	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
@@ -107,13 +107,13 @@ const (
 	// This option indicates support for HTTPRoute scheme redirect (extended conformance).
 	SupportHTTPRouteSchemeRedirect SupportedFeature = "HTTPRouteSchemeRedirect"
 
-	// This option indicates support for HTTPRoute path redirect (experimental conformance).
+	// This option indicates support for HTTPRoute path redirect (extended conformance).
 	SupportHTTPRoutePathRedirect SupportedFeature = "HTTPRoutePathRedirect"
 
-	// This option indicates support for HTTPRoute host rewrite (experimental conformance)
+	// This option indicates support for HTTPRoute host rewrite (extended conformance)
 	SupportHTTPRouteHostRewrite SupportedFeature = "HTTPRouteHostRewrite"
 
-	// This option indicates support for HTTPRoute path rewrite (experimental conformance)
+	// This option indicates support for HTTPRoute path rewrite (extended conformance)
 	SupportHTTPRoutePathRewrite SupportedFeature = "HTTPRoutePathRewrite"
 
 	// This option indicates support for HTTPRoute request mirror (extended conformance).
@@ -129,7 +129,7 @@ const (
 var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteQueryParamMatching,
 	SupportHTTPRouteMethodMatching,
-	SupportHTTPResponseHeaderModification,
+	SupportHTTPRouteResponseHeaderModification,
 	SupportHTTPRoutePortRedirect,
 	SupportHTTPRouteSchemeRedirect,
 	SupportHTTPRoutePathRedirect,
@@ -137,6 +137,22 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRoutePathRewrite,
 	SupportHTTPRouteRequestMirror,
 	SupportHTTPRouteRequestMultipleMirrors,
+)
+
+// -----------------------------------------------------------------------------
+// Features - HTTPRoute Conformance (Experimental)
+// -----------------------------------------------------------------------------
+
+const (
+	// This option indicates support for Destination Port matching.
+	SupportHTTPRouteDestinationPortMatching SupportedFeature = "HTTPRouteDestinationPortMatching"
+)
+
+// HTTPRouteExperimentalFeatures includes all the supported experimental features, currently only
+// available in our experimental release channel.
+// Implementations have the flexibility to opt-in for either specific features or the entire set.
+var HTTPRouteExperimentalFeatures = sets.New(
+	SupportHTTPRouteDestinationPortMatching,
 )
 
 // -----------------------------------------------------------------------------
@@ -170,21 +186,6 @@ var MeshCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
-// Features - Experimental
-// -----------------------------------------------------------------------------
-
-const (
-	// This option indicates support for Destination Port matching.
-	SupportRouteDestinationPortMatching SupportedFeature = "RouteDestinationPortMatching"
-)
-
-// ExperimentalFeatures are extra generic features that are currently only
-// available in our experimental release channel.
-var ExperimentalFeatures = sets.New(
-	SupportRouteDestinationPortMatching,
-)
-
-// -----------------------------------------------------------------------------
 // Features - Compilations
 // -----------------------------------------------------------------------------
 
@@ -197,6 +198,6 @@ var AllFeatures = sets.New[SupportedFeature]().
 	Insert(ReferenceGrantCoreFeatures.UnsortedList()...).
 	Insert(HTTPRouteCoreFeatures.UnsortedList()...).
 	Insert(HTTPRouteExtendedFeatures.UnsortedList()...).
+	Insert(HTTPRouteExperimentalFeatures.UnsortedList()...).
 	Insert(TLSRouteCoreFeatures.UnsortedList()...).
-	Insert(MeshCoreFeatures.UnsortedList()...).
-	Insert(ExperimentalFeatures.UnsortedList()...)
+	Insert(MeshCoreFeatures.UnsortedList()...)
