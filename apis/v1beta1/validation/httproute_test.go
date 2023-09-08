@@ -1227,7 +1227,7 @@ func TestValidateHTTPTimeouts(t *testing.T) {
 					},
 				},
 			},
-		}, {}, {}, {
+		}, {
 			name:     "valid httpRoute Rules timeout and backendRequest have the same value",
 			errCount: 0,
 			rules: []gatewayv1b1.HTTPRouteRule{
@@ -1246,6 +1246,39 @@ func TestValidateHTTPTimeouts(t *testing.T) {
 					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
 						Request:        toDuration("1ms"),
 						BackendRequest: toDuration("2ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules request timeout 1s and backendRequest timeout 200ms",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1s"),
+						BackendRequest: toDuration("200ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules request timeout 10s and backendRequest timeout 10s",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("10s"),
+						BackendRequest: toDuration("10s"),
+					},
+				},
+			},
+		}, {
+			name:     "invalid httpRoute Rules backendRequest timeout cannot be greater than request timeout",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("200ms"),
+						BackendRequest: toDuration("1s"),
 					},
 				},
 			},

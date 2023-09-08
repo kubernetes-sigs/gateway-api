@@ -274,8 +274,8 @@ type HTTPRouteRule struct {
 }
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
-// Timeout values are formatted like 1h/1m/1s/1ms, as specified in GEP-2257,
-// and MUST BE >= 1ms or "0s" to disable (no timeout).
+// Timeout values are represented with Gateway API Duration formatting.
+// Specifying a zero value such as "0s" is interpreted as no timeout.
 //
 // +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {

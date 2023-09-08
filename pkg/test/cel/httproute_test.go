@@ -1468,12 +1468,46 @@ func TestHTTPRouteTimeouts(t *testing.T) {
 			},
 		},
 		{
-			name: "valid timeout request infinite greater than backend request 1ms",
+			name: "valid timeout request infinite greater than backendRequest 1ms",
 			rules: []gatewayv1b1.HTTPRouteRule{
 				{
 					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
 						Request:        toDuration("0s"),
 						BackendRequest: toDuration("1ms"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request 1s greater than backendRequest 200ms",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1s"),
+						BackendRequest: toDuration("200ms"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request 10s equal backendRequest 10s",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("10s"),
+						BackendRequest: toDuration("10s"),
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid timeout request 200ms less than backendRequest 1s",
+			wantErrors: []string{"Invalid value: \"object\": backendRequest timeout cannot be longer than request timeout"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("200ms"),
+						BackendRequest: toDuration("1s"),
 					},
 				},
 			},
