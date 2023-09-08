@@ -154,15 +154,14 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 			t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 			err = c.Create(ctx, resource)
 			require.NoError(t, err, "error creating resource")
-		} else {
-			// Resource exists, update it
-			t.Logf("Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
-
-			resource.SetResourceVersion(existingResource.GetResourceVersion())
-
-			err = c.Update(ctx, resource)
-			require.NoError(t, err, "error updating resource")
 		}
+		// Resource exists, update it
+		t.Logf("Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+
+		resource.SetResourceVersion(existingResource.GetResourceVersion())
+
+		err = c.Update(ctx, resource)
+		require.NoError(t, err, "error updating resource")
 
 		if cleanup {
 			t.Cleanup(func() {
