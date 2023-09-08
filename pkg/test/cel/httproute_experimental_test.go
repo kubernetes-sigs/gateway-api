@@ -233,3 +233,139 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 		})
 	}
 }
+
+func toDuration(durationString string) *gatewayv1b1.Duration {
+	return (*gatewayv1b1.Duration)(&durationString)
+}
+
+func TestHTTPRouteTimeouts(t *testing.T) {
+	tests := []struct {
+		name       string
+		wantErrors []string
+		rules      []gatewayv1b1.HTTPRouteRule
+	}{
+		{
+			name:       "invalid timeout unit us is not supported",
+			wantErrors: []string{"Invalid value: \"100us\": spec.rules[0].timeouts.request in body should match '^([0-9]{1,5}(h|m|s|ms)){1,4}$'"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("100us"),
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid timeout unit ns is not supported",
+			wantErrors: []string{"Invalid value: \"500ns\": spec.rules[0].timeouts.request in body should match '^([0-9]{1,5}(h|m|s|ms)){1,4}$'"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("500ns"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request and backendRequest",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("4s"),
+						BackendRequest: toDuration("2s"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0s"),
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid timeout request day unit not supported",
+			wantErrors: []string{"Invalid value: \"1d\": spec.rules[0].timeouts.request in body should match '^([0-9]{1,5}(h|m|s|ms)){1,4}$'"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("1d"),
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid timeout request decimal not supported ",
+			wantErrors: []string{"Invalid value: \"0.5s\": spec.rules[0].timeouts.request in body should match '^([0-9]{1,5}(h|m|s|ms)){1,4}$'"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0.5s"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request infinite greater than backendRequest 1ms",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("0s"),
+						BackendRequest: toDuration("1ms"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request 1s greater than backendRequest 200ms",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1s"),
+						BackendRequest: toDuration("200ms"),
+					},
+				},
+			},
+		},
+		{
+			name: "valid timeout request 10s equal backendRequest 10s",
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("10s"),
+						BackendRequest: toDuration("10s"),
+					},
+				},
+			},
+		},
+		{
+			name:       "invalid timeout request 200ms less than backendRequest 1s",
+			wantErrors: []string{"Invalid value: \"object\": backendRequest timeout cannot be longer than request timeout"},
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("200ms"),
+						BackendRequest: toDuration("1s"),
+					},
+				},
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := &gatewayv1b1.HTTPRoute{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
+					Namespace: metav1.NamespaceDefault,
+				},
+				Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules},
+			}
+			validateHTTPRoute(t, route, tc.wantErrors)
+		})
+	}
+}
