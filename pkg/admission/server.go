@@ -107,7 +107,7 @@ func ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		http.Error(w, fmt.Sprintf("invalid method %s, only POST requests are allowed", r.Method), http.StatusMethodNotAllowed)
 		return
-	} 
+	}
 
 	if r.Body == nil {
 		http.Error(w, "admission review object is missing",
