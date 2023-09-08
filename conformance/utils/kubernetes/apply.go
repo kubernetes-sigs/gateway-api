@@ -143,22 +143,23 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
-		t.Logf("Creating/Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
-
 		// Check if the resource exists
 		existingResource := resource.DeepCopyObject().(client.Object)
 		err := c.Get(ctx, types.NamespacedName{Name: resource.GetName(), Namespace: resource.GetNamespace()}, existingResource)
 		if err != nil {
 			if !apierrors.IsNotFound(err) {
-				t.Logf("error checking resource: %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
-				require.NoError(t, err, "error checking resource")
+				require.NoError(t, err, "error getting resource")
 			}
 
-			// Resource doesn't exist, create it
+			t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 			err = c.Create(ctx, resource)
 			require.NoError(t, err, "error creating resource")
 		} else {
 			// Resource exists, update it
+			t.Logf("Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+
+			resource.SetResourceVersion(existingResource.GetResourceVersion())
+
 			err = c.Update(ctx, resource)
 			require.NoError(t, err, "error updating resource")
 		}
