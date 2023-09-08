@@ -22,7 +22,6 @@ package v1alpha2
 
 import (
 	"k8s.io/apimachinery/pkg/runtime"
-
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
