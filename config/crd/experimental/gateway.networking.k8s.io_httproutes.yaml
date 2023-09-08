@@ -2133,9 +2133,9 @@ spec:
                           type: string
                         request:
                           description: "Request specifies the maximum duration for
-                            a Gateway to respond to an HTTP request. If the Gateway
+                            a gateway to respond to an HTTP request. If the gateway
                             has not been able to respond before this deadline is met,
-                            the Gateway MUST return a timeout error. \n For example,
+                            the gateway MUST return a timeout error. \n For example,
                             setting the `rules.timeouts.request` field to the value
                             `10s` in an `HTTPRoute` will cause a timeout if a client
                             request is taking longer than 10 seconds to complete.
@@ -4574,9 +4574,9 @@ spec:
                           type: string
                         request:
                           description: "Request specifies the maximum duration for
-                            a Gateway to respond to an HTTP request. If the Gateway
+                            a gateway to respond to an HTTP request. If the gateway
                             has not been able to respond before this deadline is met,
-                            the Gateway MUST return a timeout error. \n For example,
+                            the gateway MUST return a timeout error. \n For example,
                             setting the `rules.timeouts.request` field to the value
                             `10s` in an `HTTPRoute` will cause a timeout if a client
                             request is taking longer than 10 seconds to complete.

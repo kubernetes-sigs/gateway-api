@@ -279,8 +279,8 @@ type HTTPRouteRule struct {
 //
 // +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {
-	// Request specifies the maximum duration for a Gateway to respond to an HTTP request.
-	// If the Gateway has not been able to respond before this deadline is met, the Gateway
+	// Request specifies the maximum duration for a gateway to respond to an HTTP request.
+	// If the gateway has not been able to respond before this deadline is met, the gateway
 	// MUST return a timeout error.
 	//
 	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
