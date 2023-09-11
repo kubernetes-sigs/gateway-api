@@ -164,9 +164,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 					require.NoErrorf(t, err, "error deleting resource")
 				})
 			}
-
 			continue
-
 		}
 		// Resource exists, update it
 		t.Logf("Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
