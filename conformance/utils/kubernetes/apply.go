@@ -154,6 +154,19 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 			t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 			err = c.Create(ctx, resource)
 			require.NoError(t, err, "error creating resource")
+
+			if cleanup {
+				t.Cleanup(func() {
+					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
+					defer cancel()
+					t.Logf("Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+					err = c.Delete(ctx, resource)
+					require.NoErrorf(t, err, "error deleting resource")
+				})
+			}
+
+			continue
+
 		}
 		// Resource exists, update it
 		t.Logf("Updating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
@@ -161,7 +174,6 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 		resource.SetResourceVersion(existingResource.GetResourceVersion())
 
 		err = c.Update(ctx, resource)
-		require.NoError(t, err, "error updating resource")
 
 		if cleanup {
 			t.Cleanup(func() {
@@ -172,6 +184,8 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 				require.NoErrorf(t, err, "error deleting resource")
 			})
 		}
+
+		require.NoErrorf(t, err, "error updating resource")
 	}
 }
 
