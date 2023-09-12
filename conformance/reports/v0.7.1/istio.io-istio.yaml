@@ -1,0 +1,56 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-07-24T14:26:14-07:00"
+gatewayAPIVersion: 4c436290f2bfeaeaf0b1a367449e16de3e0addc4 # making an exception to the version for this release, since this was the first release we started submitting reports for.
+implementation:
+  contact:
+  - '@istio/maintainers'
+  organization: istio.io
+  project: istio
+  url: istio.io
+  # Istio does not yet official support conformance profiles while it is experimental
+  version: https://github.com/istio/istio/pull/46148
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 28
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 9
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteMethodMatching
+    - HTTPRoutePortRedirect
+    - HTTPRouteRequestMirror
+    - HTTPResponseHeaderModification
+    - HTTPRoutePathRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRouteSchemeRedirect
+    - HTTPRoutePathRewrite
+  name: HTTP
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    summary: ""
+  name: TLS
+- core:
+    result: partial
+    skippedTests:
+    - MeshFrontendHostname
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 1
+    summary: ""
+  name: MESH

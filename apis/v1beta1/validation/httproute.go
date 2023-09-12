@@ -21,6 +21,7 @@ import (
 	"net/http"
 	"regexp"
 	"strings"
+	"time"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
@@ -72,6 +73,10 @@ func ValidateHTTPRouteSpec(spec *gatewayv1b1.HTTPRouteSpec, path *field.Path) fi
 			if len(m.QueryParams) > 0 {
 				errs = append(errs, validateHTTPQueryParamMatches(m.QueryParams, matchPath.Child("queryParams"))...)
 			}
+		}
+
+		if rule.Timeouts != nil {
+			errs = append(errs, validateHTTPRouteTimeouts(rule.Timeouts, path.Child("rules").Child("timeouts"))...)
 		}
 	}
 	errs = append(errs, validateHTTPRouteBackendServicePorts(spec.Rules, path.Child("rules"))...)
@@ -345,6 +350,21 @@ func validateHTTPHeaderModifier(filter gatewayv1b1.HTTPHeaderFilter, path *field
 			singleAction[strings.ToLower(name)] = true
 		}
 	}
+	return errs
+}
+
+func validateHTTPRouteTimeouts(timeouts *gatewayv1b1.HTTPRouteTimeouts, path *field.Path) field.ErrorList {
+	var errs field.ErrorList
+	if timeouts.BackendRequest != nil {
+		backendTimeout, _ := time.ParseDuration((string)(*timeouts.BackendRequest))
+		if timeouts.Request != nil {
+			timeout, _ := time.ParseDuration((string)(*timeouts.Request))
+			if backendTimeout > timeout && timeout != 0 {
+				errs = append(errs, field.Invalid(path.Child("backendRequest"), backendTimeout, "backendRequest timeout cannot be longer than request timeout"))
+			}
+		}
+	}
+
 	return errs
 }
 

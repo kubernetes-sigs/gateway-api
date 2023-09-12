@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -39,15 +36,16 @@ import (
 )
 
 var (
-	cfg                 *rest.Config
-	k8sClientset        *kubernetes.Clientset
-	mgrClient           client.Client
-	supportedFeatures   sets.Set[suite.SupportedFeature]
-	exemptFeatures      sets.Set[suite.SupportedFeature]
-	namespaceLabels     map[string]string
-	implementation      *confv1a1.Implementation
-	conformanceProfiles sets.Set[suite.ConformanceProfileName]
-	skipTests           []string
+	cfg                  *rest.Config
+	k8sClientset         *kubernetes.Clientset
+	mgrClient            client.Client
+	supportedFeatures    sets.Set[suite.SupportedFeature]
+	exemptFeatures       sets.Set[suite.SupportedFeature]
+	namespaceLabels      map[string]string
+	namespaceAnnotations map[string]string
+	implementation       *confv1a1.Implementation
+	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
+	skipTests            []string
 )
 
 func TestExperimentalConformance(t *testing.T) {
@@ -72,7 +70,8 @@ func TestExperimentalConformance(t *testing.T) {
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests = suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
+	namespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels)
+	namespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 
 	// experimental conformance flags
 	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
@@ -82,7 +81,7 @@ func TestExperimentalConformance(t *testing.T) {
 		implementation, err = suite.ParseImplementation(
 			*flags.ImplementationOrganization,
 			*flags.ImplementationProject,
-			*flags.ImplementationUrl,
+			*flags.ImplementationURL,
 			*flags.ImplementationVersion,
 			*flags.ImplementationContact,
 		)
@@ -104,7 +103,6 @@ func testExperimentalConformance(t *testing.T) {
 		suite.ExperimentalConformanceOptions{
 			Options: suite.Options{
 				Client:     mgrClient,
-				RESTClient: k8sClientset.CoreV1().RESTClient().(*rest.RESTClient),
 				RestConfig: cfg,
 				// This clientset is needed in addition to the client only because
 				// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
@@ -116,6 +114,7 @@ func testExperimentalConformance(t *testing.T) {
 				ExemptFeatures:             exemptFeatures,
 				EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 				NamespaceLabels:            namespaceLabels,
+				NamespaceAnnotations:       namespaceAnnotations,
 				SkipTests:                  skipTests,
 			},
 			Implementation:      *implementation,
@@ -141,7 +140,7 @@ func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, o
 	}
 
 	if output != "" {
-		if err = os.WriteFile(output, rawReport, 0644); err != nil {
+		if err = os.WriteFile(output, rawReport, 0o600); err != nil {
 			return err
 		}
 	}

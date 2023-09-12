@@ -166,7 +166,7 @@ Although less common, some GEPs may end up in one of the following states:
 
 ## Format
 
-GEPs should match the format of the template found in [GEP-696](/geps/gep-696.md).
+GEPs should match the format of the template found in [GEP-696](/geps/gep-696).
 
 ## Out of scope
 

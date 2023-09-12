@@ -4,16 +4,13 @@ This document provides an overview of Gateway API.
 
 ## Roles and personas
 
-There are 3 primary roles in Gateway API:
+There are 3 primary roles in Gateway API, as described in [roles and personas]:
 
-- Infrastructure Provider
-- Cluster Operator
-- Application Developer
+- **Ian** (he/him): Infrastructure Provider
+- **Chihiro** (they/them): Cluster Operator
+- **Ana** (she/her): Application Developer
 
-There could be a fourth role of Application Admin in some use cases.
-
-Please refer to the [roles and personas](/concepts/security-model#roles-and-personas)
-section in the Security model for details.
+[roles and personas]:/concepts/roles-and-personas
 
 ## Resource model
 
@@ -152,7 +149,7 @@ to configure that with existing Gateway API resources, but implementations may
 provide custom configuration for this until there is a standardized approach
 defined by Gateway API.
 
-### Attaching Routes to Gateways
+## Attaching Routes to Gateways
 
 !!! note
     This section has changed significantly between v1alpha1 and v1alpha2. This
@@ -179,19 +176,21 @@ different relationships that Gateways and Routes can have:
 
 ### Example
 
-A Kubernetes cluster admin has deployed a Gateway `shared-gw` in the `Infra`
-Namespace to be used by different application teams for exposing their
-applications outside the cluster. Teams A and B (in Namespaces `A` and `B`
-respectively) attach their Routes to this Gateway. They are unaware of each
-other and as long as their Route rules do not conflict with each other they
-can continue operating in isolation. Team C has special networking needs
-(perhaps performance, security, or criticality) and they need a dedicated
-Gateway to proxy their application to the outside world. Team C deploys their
-own Gateway `dedicated-gw`  in the `C` Namespace that can only be used by apps
-in the `C` Namespace.
+[Chihiro] has deployed a Gateway `shared-gw` in the `infra` Namespace to be
+used by different application teams for exposing their applications outside
+the cluster. Teams A and B (in Namespaces `A` and `B` respectively) attach
+their Routes to this Gateway. They are unaware of each other and as long as
+their Route rules do not conflict with each other they can continue operating
+in isolation. Team C has special networking needs (perhaps performance,
+security, or criticality) and they need a dedicated Gateway to proxy their
+application to the outside world. Team C deploys their own Gateway
+`dedicated-gw`  in the `C` Namespace that can only be used by apps in the `C`
+Namespace.
 
 <!-- source: https://docs.google.com/presentation/d/1neBkFDTZ__vRoDXIWvAcxk2Pb7-evdBT6ykw_frf9QQ/edit?usp=sharing -->
 ![route binding](/images/gateway-route-binding.png)
+
+[Chihiro]:/concepts/roles-and-personas#Chihiro
 
 ### How it Works
 
@@ -233,13 +232,13 @@ following mechanisms:
 2. **Namespaces:** The `allowedRoutes.namespaces` field on a listener can be
    used to restrict where Routes may be attached from. The `namespaces.from`
    field supports the following values:
-    * `SameNamespace` is the default option. Only Routes in the same namespace
+    * `Same` is the default option. Only Routes in the same namespace
       as this Gateway may be attached.
     * `All` will allow Routes from all Namespaces to be attached.
     * `Selector` means that Routes from a subset of Namespaces selected by a
       Namespace label selector may be attached to this Gateway. When `Selector`
       is used, the `namespaces.selector` field must be used to specify label
-      selectors. This field is not supported with `All` or `SameNamespace`.
+      selectors. This field is not supported with `All` or `Same`.
 3. **Kinds:** The `allowedRoutes.kinds` field on a listener can be used to
    restrict the kinds of Routes that may be attached.
 
@@ -279,28 +278,52 @@ relationships between the different resources:
 <!-- source: https://docs.google.com/document/d/1BxYbDovMwnEqe8lj8JwHo8YxHAt3oC7ezhlFsG_tyag/edit#heading=h.8du598fded3c -->
 ![schema](/images/schema-uml.svg)
 
-## Request flow
+### Request flow
 
-A typical client/gateway API request flow for a gateway implemented using a
+A typical [north/south] API request flow for a gateway implemented using a
 reverse proxy is:
 
- 1. A client makes a request to <http://foo.example.com>.
- 2. DNS resolves the name to a `Gateway` address.
- 3. The reverse proxy receives the request on a `Listener` and uses the [Host
- header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
- `HTTPRoute`.
- 4. Optionally, the reverse proxy can perform request header and/or path
- matching based on `match` rules of the `HTTPRoute`.
- 5. Optionally, the reverse proxy can modify the request, i.e. add/remove
- headers, based on `filter` rules of the `HTTPRoute`.
- 6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
- `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
+1. A client makes a request to <http://foo.example.com>.
+2. DNS resolves the name to a `Gateway` address.
+3. The reverse proxy receives the request on a `Listener` and uses the [Host
+   header](https://tools.ietf.org/html/rfc7230#section-5.4) to match an
+   `HTTPRoute`.
+4. Optionally, the reverse proxy can perform request header and/or path
+   matching based on `match` rules of the `HTTPRoute`.
+5. Optionally, the reverse proxy can modify the request, i.e. add/remove
+   headers, based on `filter` rules of the `HTTPRoute`.
+6. Lastly, the reverse proxy forwards the request to one or more objects, i.e.
+   `Service`, in the cluster based on `backendRefs` rules of the `HTTPRoute`.
 
-## TLS Configuration
+[north/south]:/concepts/glossary#northsouth-traffic
+
+### TLS Configuration
 
 TLS is configured on Gateway listeners, and may be referred to across namespaces.
 
 Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
+
+## Attaching Routes to Services
+
+!!! danger "Experimental in v0.8.0"
+
+    The [GAMMA initiative][gamma] work for supporting service mesh use cases
+    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
+    not recommend it in production at this point.
+
+    In particular, binding Routes directly to Services seems to be the current
+    best choice for configuring mesh routing, but it is still **experimental**
+    and thus **subject to change**.
+
+When using the Gateway API to configure a [service mesh], the Route will
+attach directly to a Service, representing configuration meant to be applied
+to any traffic directed to the Service. How and which Routes attach to a given
+Service is controlled by the Routes themselves (working with Kubernetes RBAC),
+as covered in the [GAMMA routing documentation].
+
+[GAMMA]:/concepts/gamma
+[GAMMA routing documentation]:/concepts/gamma#gateway-api-for-mesh
+[service mesh]:/concepts/glossary#service-mesh
 
 ## Extension points
 

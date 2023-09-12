@@ -32,6 +32,7 @@ var (
 	// repeated multiple times in a rule.
 	repeatableGRPCRouteFilters = []gatewayv1a2.GRPCRouteFilterType{
 		gatewayv1a2.GRPCRouteFilterExtensionRef,
+		gatewayv1a2.GRPCRouteFilterRequestMirror,
 	}
 	validServiceName      = `^(?i)\.?[a-z_][a-z_0-9]*(\.[a-z_][a-z_0-9]*)*$`
 	validServiceNameRegex = regexp.MustCompile(validServiceName)
@@ -165,7 +166,7 @@ func validateGRPCRouteFilters(filters []gatewayv1a2.GRPCRouteFilter, path *field
 		}
 		errs = append(errs, validateGRPCRouteFilterType(filter, path.Index(i))...)
 	}
-	// custom filters don't have any validation
+	// repeatableGRPCRouteFilters filters can be used more than once
 	for _, key := range repeatableGRPCRouteFilters {
 		delete(counts, key)
 	}
