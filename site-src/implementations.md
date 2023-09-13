@@ -188,6 +188,8 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 
 ### Envoy Gateway
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-EnvoyGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/envoy-gateway.yaml)
+
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
 APIs and fields of the Gateway API are outlined [here][eg-supported].
 Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
