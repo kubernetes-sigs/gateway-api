@@ -231,6 +231,20 @@ move on to [certification](#certification) to report the results.
 [go]:https://go.dev
 [lib]:https://pkg.go.dev/sigs.k8s.io/gateway-api@v0.6.2/conformance/utils/suite
 
+### Implementation mode
+
+The certification process runs against an implementation using a specific mode
+(e.g., `standard`, `enhanced`) that is defaulted to `standard`. The final
+report will contain such a mode in the modes field. Every certification report
+`modes` array contains only one element. Multiple reports can be merged into an
+omni-comprehensive one, as described [later](#multiple-reports-merge).
+
+### Implementation version
+
+Every report can specify multiple results, dependent on the tested version of the
+certifying implementation. Each certification run uses a specific version of the
+implementation, multiple certification processes can be merged as explained [later](#multiple-reports-merge).
+
 ### Gateway API version and channel
 
 The certification is related to a specific API version and a specific channel,
@@ -245,8 +259,8 @@ there are CRDs with different channels, the certification fails specifying that
 it's not possible to run the tests as there are different Gateway API channels
 installed in the cluster. If all the Gateway API `CRD`s have the same version
 and the same channel, the tests can be run and the detected version and channel
-will be set in the `GatewayAPIVersion` and `gatewayAPIChannel` fields of the
-final report. Furthermore, the suite must run all the experimental tests when
+will be set in the `apiVersion` and `apiVersionChannel` fields of
+the final report. Furthermore, the suite must run all the experimental tests when
 the channel is `experimental`, and the related features are enabled.
 
 In addition to the `CRD`s version, the suite needs to check its version in
@@ -265,6 +279,18 @@ new generator will be introduced in the project to generate the aforementioned
 VERSION file contains the semver of the latest release and is manually bumped at
 release time. The script hack/verify-all.sh will be updated to ensure the
 generated `.go` file is up to date with the VERSION file.
+
+### Multiple reports merge
+
+Every profile gives the possibility to specify multiple modes and
+implementation versions, but the testing process is related to a specific mode
+and a specific version. In order to produce reports with multiple modes and versions,
+a proper flag `merge-report-with` can be set when running the certification process.
+The flag value is taken, and if no file with such a name exists, it gets created
+and the report is written therein. If the file already exists, the suite merges
+the current report with the given one. By proceeding this way, it is possible to
+iteratively run multiple times the certification suite with different setups
+(modes and versions) and provide a unique report.
 
 ### Certification
 
@@ -288,53 +314,82 @@ implementation:
   organization: acme
   project: operator
   url: https://acme.com
-  version: v1.0.0
   contact:
   - @acme/maintainers
 date: "2023-02-28 20:29:41+00:00"
-gatewayAPIVersion: v0.7.0
-gatewayAPIChannel: standard
-profiles:
-  - name: tcp
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 4
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 6
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 8
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
+reportResult:
+  - implementationVersion: v1.0.0
+    apiVersion: v0.8.0
+    apiChannel: standard
+    reports:
+    - modes:
+      - standard
+      profiles:
+        - name: http
+          core:
+            result: success
+            summary: "all core functionality passed"
+            statistics:
+              passed: 20
+              skipped: 0
+              failed: 0
+          extended:
+            result: success
+            summary: "all extended features supported"
+            statistics:
+              passed: 8
+              skipped: 0
+              failed: 0
+            supportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            - ExtendedFeature3
+            - ExtendedFeature4
+            - ExtendedFeature5
+    - modes: 
+      - enhanced
+      profiles:
+        - name: tcp
+          core:
+            result: success
+            summary: "all core functionality passed"
+            statistics:
+              passed: 4
+              skipped: 0
+              failed: 0
+          extended:
+            result: skipped
+            summary: "some extended features supported"
+            statistics:
+              passed: 2
+              skipped: 0
+              failed: 0
+            supportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            unsupportedFeatures:
+            - ExtendedFeature3
+        - name: http
+          core:
+            result: success
+            summary: "all core functionality passed"
+            statistics:
+              passed: 20
+              skipped: 0
+              failed: 0
+          extended:
+            result: success
+            summary: "all extended features supported"
+            statistics:
+              passed: 8
+              skipped: 0
+              failed: 0
+            supportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            - ExtendedFeature3
+            - ExtendedFeature4
+            - ExtendedFeature5
 ```
 
 > **WARNING**: It is an important clarification that this is NOT a full
@@ -355,9 +410,12 @@ profiles:
 > regarding conformance, e.t.c.). Optionally, it can be an email address or
 > a support URL (e.g. Github new issue page).
 
-The above report describes an implementation that just released `v1` and has
-`Core` support for `TCP` functionality and fully supports both `Core` and
-`Extended` `HTTP` functionality.
+The above report describes an implementation that just released `v1`, uses gateway
+API `v0.8.0` `standard` channel, and has:
+
+* `HTTP` `core` and `extended` support in `standard` mode;
+* `HTTP` `core` and `extended` support in `enhanced` mode;
+* `TCP` `Core` support in `enhanced` mode.
 
 `ConformanceReports` can be stored as a list of reports in chronological order.
 The following shows previous releases of the `acme`/`operator` implementation and
@@ -370,144 +428,134 @@ implementation:
   organization: acme
   project: operator
   url: https://acme.com
-  version: v0.91.0
   contact:
   - @acme/maintainers
 date: "2022-09-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.2
-gatewayAPIChannel: standard
-profiles:
-  - name: tcp
-    core:
-      result: partial
-      summary: "some tests were manually skipped"
-      statistics:
-        passed: 2
-        skipped: 2
-        failed: 0
-      skippedTests:
-      - TCPRouteBasics
-      - UDPRouteBasics
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 4
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 5
-        skipped: 3
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      unsupportedFeatures:
-      - ExtendedFeature4
-      - ExtendedFeature5
----
-apiVersion: v1alpha1
-kind: ConformanceReport
-implementation:
-  organization: acme
-  project: operator
-  url: https://acmeorg.com
-  version: v0.90.0
-  contact:
-  - @acme/maintainers
-date: "2022-08-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.1
-gatewayAPIChannel: standard
-profiles:
-  - name: tcp
-    core:
-      result: failed
-      summary: "all tests are failing"
-      statistics:
-        passed: 0
-        skipped: 0
-        failed: 4
-      failedTests:
-      - TCPRouteExampleTest1
-      - TCPRouteExampleTest2
-      - TCPRouteExampleTest3
-      - TCPRouteExampleTest4
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 2
-        skipped: 6
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      unsupportedFeatures:
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
----
-apiVersion: v1alpha1
-kind: ConformanceReport
-implementation:
-  organization: acme
-  project: operator
-  url: https://acmeorg.com
-  version: v0.89.0
-  contact:
-  - @acme/maintainers
-date: "2022-07-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.0
-gatewayAPIChannel: standard
-profiles:
-  - name: http
-    core:
-      result: partial
-      summary: "some tests were skipped"
-      statistics:
-        passed: 16
-        skipped: 2
-        failed: 0
-      skippedTests:
-      - HTTPRouteTestExample1
-      - HTTPRouteTestExample2
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 8
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
+reportResult:
+  - implementationVersion: v0.91.0
+    apiVersion: v0.8.0
+    apiChannel: standard
+    reports:
+    - modes:
+      - standard
+      profiles:
+        - name: tcp
+          core:
+            result: partial
+            summary: "some tests were manually skipped"
+            statistics:
+              passed: 2
+              skipped: 2
+              failed: 0
+            skippedTests:
+            - TCPRouteBasics
+            - UDPRouteBasics
+          extended:
+            result: skipped
+            summary: "no extended features supported"
+            statistics:
+              passed: 0
+              skipped: 4
+              failed: 0
+            unsupportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            - ExtendedFeature3
+        - name: http
+          core:
+            result: success
+            summary: "all core functionality passed"
+            statistics:
+              passed: 20
+              skipped: 0
+              failed: 0
+          extended:
+            result: success
+            summary: "all extended features supported"
+            statistics:
+              passed: 5
+              skipped: 3
+              failed: 0
+            supportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            - ExtendedFeature3
+            unsupportedFeatures:
+            - ExtendedFeature4
+            - ExtendedFeature5
+  - implementationVersion: v0.90.0
+    apiVersion: v0.7.0
+    apiChannel: standard
+    reports:
+    - modes:
+      - standard
+      profiles:
+        - name: tcp
+          core:
+            result: failed
+            summary: "all tests are failing"
+            statistics:
+              passed: 0
+              skipped: 0
+              failed: 4
+            failedTests:
+            - TCPRouteExampleTest1
+            - TCPRouteExampleTest2
+            - TCPRouteExampleTest3
+            - TCPRouteExampleTest4
+        - name: http
+          core:
+            result: success
+            summary: "all core functionality passed"
+            statistics:
+              passed: 20
+              skipped: 0
+              failed: 0
+          extended:
+            result: skipped
+            summary: "no extended features supported"
+            statistics:
+              passed: 2
+              skipped: 6
+              failed: 0
+            supportedFeatures:
+            - ExtendedFeature1
+            unsupportedFeatures:
+            - ExtendedFeature2
+            - ExtendedFeature3
+            - ExtendedFeature4
+            - ExtendedFeature5
+  - implementationVersion: v0.89.0
+    apiVersion: v0.6.0
+    apiChannel: standard
+    reports:
+    - modes:
+      - standard
+      profiles:
+        - name: http
+          core:
+            result: partial
+            summary: "some tests were skipped"
+            statistics:
+              passed: 16
+              skipped: 2
+              failed: 0
+            skippedTests:
+            - HTTPRouteTestExample1
+            - HTTPRouteTestExample2
+          extended:
+            result: skipped
+            summary: "no extended features supported"
+            statistics:
+              passed: 0
+              skipped: 8
+              failed: 0
+            unsupportedFeatures:
+            - ExtendedFeature1
+            - ExtendedFeature2
+            - ExtendedFeature3
+            - ExtendedFeature4
+            - ExtendedFeature5
 ```
 
 > **NOTE**: In the above you can see the `acme` implementation's progression. In
@@ -520,7 +568,7 @@ profiles:
 > `Extended` features, and also started to get their `TCP` functionality to
 > partially pass.
 
-Implementers can submit their reports upstream by creating a pull request to
+Implementers can submit their report upstream by creating a pull request to
 the Gateway API repository and adding new reports to a file specific to their
 implementation's organization and project name:
 
@@ -646,4 +694,3 @@ The following are items that **MUST** be resolved to move this GEP to
 
 - https://github.com/kubernetes-sigs/gateway-api/issues/1709
 - https://github.com/kubernetes-sigs/gateway-api/issues/1329
-
