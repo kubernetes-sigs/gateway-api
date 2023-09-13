@@ -242,7 +242,7 @@ OR internal load balancer, and have different capabilities depending on the mode
 Every certification report `modes` array contains only one element. Reports can be merged
 into one another to provide a single report that accounts for multiple modes, given the same
 Gateway API version.
-omni-comprehensive one, as described [later](#multiple-reports-merge).
+omni-comprehensive one, as described [below](#multiple-reports-merge).
 
 ### Implementation version
 
