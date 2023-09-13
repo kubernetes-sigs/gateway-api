@@ -235,15 +235,20 @@ move on to [certification](#certification) to report the results.
 
 The certification process runs against an implementation using a specific mode
 (e.g., `standard`, `enhanced`) that is defaulted to `standard`. The final
-report will contain such a mode in the modes field. Every certification report
-`modes` array contains only one element. Multiple reports can be merged into an
+report will contain such a mode in the modes field. A "mode" is intended to capture
+situations where a Gateway API implementation may have different features and capabilities
+depending on how it is deployed (e.g. an implementation might be deployed with an external,
+OR internal load balancer, and have different capabilities depending on the mode chosen).
+Every certification report `modes` array contains only one element. Reports can be merged
+into one another to provide a single report that accounts for multiple modes, given the same
+Gateway API version.
 omni-comprehensive one, as described [later](#multiple-reports-merge).
 
 ### Implementation version
 
 Every report can specify multiple results, dependent on the tested version of the
-certifying implementation. Each certification run uses a specific version of the
-implementation, multiple certification processes can be merged as explained [later](#multiple-reports-merge).
+implementation being certified. Each certification run uses a specific version of the
+implementation, multiple certification processes can be merged as explained [below](#multiple-reports-merge).
 
 ### Gateway API version and channel
 
@@ -282,16 +287,20 @@ generated `.go` file is up to date with the VERSION file.
 
 ### Multiple reports merge
 
-Every profile gives the possibility to specify multiple modes and
-implementation versions, but the testing process is related to a specific mode
-and a specific version. In order to produce reports with multiple modes and versions,
-a proper flag `merge-report-with` can be set when running the certification process.
-The flag value is taken, and if no file with such a name exists, it gets created
+In order to produce a single report which contains reports from multiple test
+runs each testing against distinct _modes_,
+the flag `merge-report-with` can be set when running the certification process.
+The flag value is expected to be a file name. If no file with exists with the given name, it gets created
 and the report is written therein. If the file already exists, the suite merges
 the current report with the given one. By proceeding this way, it is possible to
 iteratively run multiple times the certification suite with different setups
 (modes and versions) and provide a unique report.
 
+> **Warning**: By default trying to merge a new report that contains a mode that already exists in the 
+> existing report specified by `merge-report-with` will result in an error, to avoid automatically deciding
+> which report is the one the user actually intended to provide and then deleting data. Implementors
+> will need to manually remove a mode from an existing report if they wish to override, or they can use
+> the `merge-report-overwrite-existing` flag to explicitly indicate this is what they want.
 ### Certification
 
 Implementations will be able to report their conformance testing results using
