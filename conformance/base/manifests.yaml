@@ -230,7 +230,7 @@ spec:
   selector:
     app: infra-backend-delay
   ports:
-  - protocol: HTTP
+  - protocol: TCP
     port: 8080
 ---
 apiVersion: apps/v1
