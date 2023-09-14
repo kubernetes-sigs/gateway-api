@@ -29,28 +29,19 @@ It is unlikely to require an enhancement if it:
 If you're unsure the proposed work requires an enhancement, file an issue
 and ask.
 
-## When to Create a New Enhancement
+## New Enhancement process
 
-Create an enhancement once you have:
+The new enhancement process is documented on the [GEP Overview][gep] page. Please
+see that page for all the details about how to log a new GEP, and the process
+it will follow on its journey towards Completed status.
 
-- Circulated your idea to see if there is interest.
-- Identified community members who agree to work on and maintain the enhancement.
-- Enhancements may take several releases to complete.
-- A prototype in your own fork (optional)
+In particular, please note that having a discussion of some form, usually both
+a [Github Discussion][discussion] and some discussion in our [community meetings][meetings]
+is the best way to ensure that your new GEP process will go as smoothly as possible.
 
-## How to Create a New Enhancement
-
-Once you've circulated your idea and received feedback from the maintainers
-that creating a [Gateway Enhancement Proposal (GEP)][gep] is a good next step:
-
-- create an [Issue][issue] and select "Enhancement Request"
-- follow the instructions in the enhancement request template and submit the
-  Issue.
-- create an initial pull request to add your GEP. Follow the directions in the
-  [GEP documentation][gep].
-
-[issue]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [gep]: /geps/overview
+[discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
+[meetings]: https://gateway-api.sigs.k8s.io/contributing/#meetings
 
 ## Why are Enhancements Tracked
 
