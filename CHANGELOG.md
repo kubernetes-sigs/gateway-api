@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v0.8.1](#v081)
 - [v0.8.0](#v080)
 - [v0.8.0-rc2](#v080-rc2)
 - [v0.8.0-rc1](#v080-rc1)
@@ -29,6 +30,23 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v0.8.1
+
+This is a patch release that includes small bug fixes and a new conformance test
+as a follow up to the v0.8.0 release.
+
+## Changes by Kind
+
+### Bug Fixes
+
+- Fix CEL validation not handling missing listener hostname correctly. (#2370,
+  @frankbu)
+- Fix IPv6 parsing in conformance tests (#2375, @keithmattix)
+
+### Conformance Tests
+
+- Add conformance test for multiple mirror filters. (#2359, @levikobi)
 
 # v0.8.0
 
