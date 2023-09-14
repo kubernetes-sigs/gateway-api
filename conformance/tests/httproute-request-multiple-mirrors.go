@@ -64,7 +64,7 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 					},
 					{
 						Name:      "infra-backend-v3",
-						Namespace: "another-namespace",
+						Namespace: ns,
 					},
 				},
 				Namespace: ns,
@@ -96,7 +96,7 @@ var HTTPRouteRequestMultipleMirrors = suite.ConformanceTest{
 					},
 					{
 						Name:      "infra-backend-v3",
-						Namespace: "another-namespace",
+						Namespace: ns,
 					},
 				},
 			},
