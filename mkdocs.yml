@@ -95,8 +95,8 @@ nav:
         - geps/gep-1867.md
         - geps/gep-1897.md
         - geps/gep-2162.md
-      - Implementable:
-        - geps/gep-1742.md
+      # - Implementable:
+      #   -
       - Experimental:
         - geps/gep-713.md
         - geps/gep-957.md
@@ -106,6 +106,7 @@ nav:
         - geps/gep-1651.md
         - geps/gep-1686.md
         - geps/gep-1709.md
+        - geps/gep-1742.md
         - geps/gep-1748.md
         - geps/gep-2257.md
       - Standard:
