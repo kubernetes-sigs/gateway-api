@@ -22,7 +22,7 @@ spec:
       requestMirror:
         backendRef:
           name: infra-backend-v3
-          namespace: another-namespace
+          namespace: gateway-conformance-infra
           port: 8080
     backendRefs:
     - name: infra-backend-v1
@@ -55,7 +55,7 @@ spec:
       requestMirror:
         backendRef:
           name: infra-backend-v3
-          namespace: another-namespace
+          namespace: gateway-conformance-infra
           port: 8080
     backendRefs:
     - name: infra-backend-v1
