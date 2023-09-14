@@ -233,22 +233,22 @@ move on to [certification](#certification) to report the results.
 
 ### Implementation mode
 
-The certification process runs against an implementation using a specific mode
-(e.g., `standard`, `enhanced`) that is defaulted to `standard`. The final
-report will contain such a mode in the modes field. A "mode" is intended to capture
-situations where a Gateway API implementation may have different features and capabilities
-depending on how it is deployed (e.g. an implementation might be deployed with an external,
-OR internal load balancer, and have different capabilities depending on the mode chosen).
-Every certification report `modes` array contains only one element. Reports can be merged
-into one another to provide a single report that accounts for multiple modes, given the same
-Gateway API version.
-omni-comprehensive one, as described [below](#multiple-reports-merge).
+The certification process runs against an implementation using a specific mode.
+The final report will contain such a mode in the modes field. A "mode" is intended
+to capture situations where a Gateway API implementation may have different features
+and capabilities depending on how it is deployed (e.g. an implementation might be
+deployed with an external, OR internal load balancer, and have different capabilities
+depending on the mode chosen). The modes are implementation-specific, and no upstream
+mode is defined, except for `standard`, the default one used in case no mode is specified.
+Every certification report `modes` array contains only one element. Reports can
+be merged into one another to provide a single report that accounts for multiple
+modes, given the same Gateway API version as described [below](#multiple-reports-merge).
 
 ### Implementation version
 
 Every report can specify multiple results, dependent on the tested version of the
-implementation being certified. Each certification run uses a specific version of the
-implementation, multiple certification processes can be merged as explained [below](#multiple-reports-merge).
+implementation being certified. Each certification run uses a specific version of
+the implementation, multiple certification processes can be merged as explained [below](#multiple-reports-merge).
 
 ### Gateway API version and channel
 
@@ -288,19 +288,22 @@ generated `.go` file is up to date with the VERSION file.
 ### Multiple reports merge
 
 In order to produce a single report which contains reports from multiple test
-runs each testing against distinct _modes_,
-the flag `merge-report-with` can be set when running the certification process.
-The flag value is expected to be a file name. If no file with exists with the given name, it gets created
-and the report is written therein. If the file already exists, the suite merges
-the current report with the given one. By proceeding this way, it is possible to
-iteratively run multiple times the certification suite with different setups
-(modes and versions) and provide a unique report.
+runs each testing against distinct _modes_, the flag `merge-report-with` can be
+set when running the certification process. The flag value is expected to be a file
+name. If no file with the given name exists, it gets created and the report is
+written therein. If the file already exists, the suite merges the current report
+with the given one. By proceeding this way, it is possible to iteratively run multiple
+times the certification suite with different setups (modes and versions) and provide
+a unique report.
 
-> **Warning**: By default trying to merge a new report that contains a mode that already exists in the 
-> existing report specified by `merge-report-with` will result in an error, to avoid automatically deciding
-> which report is the one the user actually intended to provide and then deleting data. Implementors
-> will need to manually remove a mode from an existing report if they wish to override, or they can use
-> the `merge-report-overwrite-existing` flag to explicitly indicate this is what they want.
+> **Warning**: By default trying to merge a new report that contains a mode that
+> already exists in the existing report specified by `merge-report-with` will result
+> in an error, to avoid automatically deciding which report is the one the user
+> actually intended to provide and then deleting data. Implementors will need to
+> manually remove a mode from an existing report if they wish to override, or they
+> can use the `merge-report-overwrite-existing` flag to explicitly indicate this
+> is what they want.
+
 ### Certification
 
 Implementations will be able to report their conformance testing results using
@@ -332,7 +335,7 @@ reportResult:
     apiChannel: standard
     reports:
     - modes:
-      - standard
+      - plain
       profiles:
         - name: http
           core:
@@ -356,7 +359,7 @@ reportResult:
             - ExtendedFeature4
             - ExtendedFeature5
     - modes: 
-      - enhanced
+      - with-the-lot
       profiles:
         - name: tcp
           core:
@@ -422,9 +425,9 @@ reportResult:
 The above report describes an implementation that just released `v1`, uses gateway
 API `v0.8.0` `standard` channel, and has:
 
-* `HTTP` `core` and `extended` support in `standard` mode;
-* `HTTP` `core` and `extended` support in `enhanced` mode;
-* `TCP` `Core` support in `enhanced` mode.
+* `HTTP` `core` and `extended` support in `plain` mode;
+* `HTTP` `core` and `extended` support in `with-the-lot` mode;
+* `TCP` `Core` support in `with-the-lot` mode.
 
 `ConformanceReports` can be stored as a list of reports in chronological order.
 The following shows previous releases of the `acme`/`operator` implementation and
@@ -446,7 +449,7 @@ reportResult:
     apiChannel: standard
     reports:
     - modes:
-      - standard
+      - plain
       profiles:
         - name: tcp
           core:
@@ -497,7 +500,7 @@ reportResult:
     apiChannel: standard
     reports:
     - modes:
-      - standard
+      - plain
       profiles:
         - name: tcp
           core:
@@ -539,7 +542,7 @@ reportResult:
     apiChannel: standard
     reports:
     - modes:
-      - standard
+      - plain
       profiles:
         - name: http
           core:
