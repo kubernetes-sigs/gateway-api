@@ -661,8 +661,23 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of accepted
+                      description: "AttachedRoutes represents the total number of
                         Routes that have been successfully attached to this Listener.
+                        \n Successful attachment of a Route to a Listener is based
+                        solely on the combination of the AllowedRoutes field on the
+                        corresponding Listener and the Route's ParentRefs field. A
+                        Route is successfully attached to a Listener when it is selected
+                        by the Listener's AllowedRoutes field AND the Route has a
+                        valid ParentRef selecting the whole Gateway resource or a
+                        specific Listener as a parent resource (more detail on attachment
+                        semantics can be found in the documentation on the various
+                        Route kinds ParentRefs fields). Listener or Route status does
+                        not impact successful attachment, i.e. the AttachedRoutes
+                        field count MUST be set for Listeners with condition Accepted:
+                        false and MUST count successfully attached Routes that may
+                        themselves have Accepted: false conditions. \n Uses for this
+                        field include troubleshooting Route attachment and measuring
+                        blast radius/impact of changes to a Listener."
                       format: int32
                       type: integer
                     conditions:
@@ -1439,8 +1454,23 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of accepted
+                      description: "AttachedRoutes represents the total number of
                         Routes that have been successfully attached to this Listener.
+                        \n Successful attachment of a Route to a Listener is based
+                        solely on the combination of the AllowedRoutes field on the
+                        corresponding Listener and the Route's ParentRefs field. A
+                        Route is successfully attached to a Listener when it is selected
+                        by the Listener's AllowedRoutes field AND the Route has a
+                        valid ParentRef selecting the whole Gateway resource or a
+                        specific Listener as a parent resource (more detail on attachment
+                        semantics can be found in the documentation on the various
+                        Route kinds ParentRefs fields). Listener or Route status does
+                        not impact successful attachment, i.e. the AttachedRoutes
+                        field count MUST be set for Listeners with condition Accepted:
+                        false and MUST count successfully attached Routes that may
+                        themselves have Accepted: false conditions. \n Uses for this
+                        field include troubleshooting Route attachment and measuring
+                        blast radius/impact of changes to a Listener."
                       format: int32
                       type: integer
                     conditions:
