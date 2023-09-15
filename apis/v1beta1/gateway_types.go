@@ -721,8 +721,23 @@ type ListenerStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
-	// AttachedRoutes represents the total number of accepted Routes that have been
+	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
+	//
+	// Successful attachment of a Route to a Listener is based solely on the
+	// combination of the AllowedRoutes field on the corresponding Listener
+	// and the Route's ParentRefs field. A Route is successfully attached to
+	// a Listener when it is selected by the Listener's AllowedRoutes field
+	// AND the Route has a valid ParentRef selecting the whole Gateway
+	// resource or a specific Listener as a parent resource (more detail on
+	// attachment semantics can be found in the documentation on the various
+	// Route kinds ParentRefs fields). Listener or Route status does not impact
+	// successful attachment, i.e. the AttachedRoutes field count MUST be set
+	// for Listeners with condition Accepted: false and MUST count successfully
+	// attached Routes that may themselves have Accepted: false conditions.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
 	AttachedRoutes int32 `json:"attachedRoutes"`
 
 	// Conditions describe the current condition of this listener.
