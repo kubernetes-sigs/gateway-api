@@ -1,0 +1,45 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-09-07T11:58:27Z"
+gatewayAPIVersion: v0.8.0
+implementation:
+  contact:
+    - "@kumahq/kuma-maintainers"
+  organization: kumahq
+  project: kuma
+  url: https://github.com/kumahq/kuma
+  version: 2.4.1
+kind: ConformanceReport
+profiles:
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 29
+        Skipped: 0
+      summary: ""
+    extended:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 9
+        Skipped: 0
+      summary: ""
+      supportedFeatures:
+        - HTTPRouteRequestMirror
+        - HTTPResponseHeaderModification
+        - HTTPRoutePortRedirect
+        - HTTPRouteQueryParamMatching
+        - HTTPRouteMethodMatching
+        - HTTPRoutePathRedirect
+        - HTTPRouteHostRewrite
+        - HTTPRouteSchemeRedirect
+        - HTTPRoutePathRewrite
+    name: HTTP
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 2
+        Skipped: 0
+      summary: ""
+    name: MESH
