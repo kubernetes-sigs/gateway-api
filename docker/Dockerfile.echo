@@ -1,0 +1,2 @@
+# TODO(https://github.com/kubernetes-sigs/gateway-api/issues/1895): build it ourselves
+FROM gcr.io/istio-release/app:1.17.1

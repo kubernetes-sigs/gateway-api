@@ -14,6 +14,10 @@
    https://git.k8s.io/community/contributors/guide/pull-requests.md#best-practices-for-faster-reviews
 5. If the PR is unfinished, see how to mark it:
    https://git.k8s.io/community/contributors/guide/pull-requests.md#marking-unfinished-pull-requests
+6. If this PR includes a new GEP please make sure you've followed the process
+   outlined in our GEP overview, as this will help the community to ensure the
+   best chance of positive outcomes for your proposal:
+   https://gateway-api.sigs.k8s.io/geps/overview/#process
 -->
 
 **What type of PR is this?**

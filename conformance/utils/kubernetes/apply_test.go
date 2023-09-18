@@ -24,7 +24,6 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/util/yaml"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	_ "sigs.k8s.io/gateway-api/conformance/utils/flags"
 )
 
@@ -105,7 +104,7 @@ metadata:
 			},
 		}},
 	}, {
-		name:    "no listener ports given",
+		name:    "setting the gatewayClassName",
 		applier: Applier{},
 		given: `
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -136,119 +135,6 @@ spec:
 							"name":     "http",
 							"port":     int64(80),
 							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
-								},
-							},
-						},
-					},
-				},
-			},
-		}},
-	}, {
-		name: "multiple gateways each with multiple listeners",
-		applier: Applier{
-			ValidUniqueListenerPorts: []v1beta1.PortNumber{8000, 8001, 8002, 8003},
-		},
-		given: `
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind:       Gateway
-metadata:
-  name: test
-spec:
-  gatewayClassName: {GATEWAY_CLASS_NAME}
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: https
-      port: 443
-      protocol: HTTPS
-      allowedRoutes:
-        namespaces:
-          from: Same
----
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind:       Gateway
-metadata:
-  name: test2
-spec:
-  gatewayClassName: {GATEWAY_CLASS_NAME}
-  listeners:
-    - name: http
-      port: 80
-      protocol: HTTP
-      allowedRoutes:
-        namespaces:
-          from: Same
-    - name: https
-      port: 443
-      protocol: HTTPS
-      allowedRoutes:
-        namespaces:
-          from: Same
-`,
-		expected: []unstructured.Unstructured{{
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
-					"name": "test",
-				},
-				"spec": map[string]interface{}{
-					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
-							"name":     "http",
-							"port":     int64(8000),
-							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
-								},
-							},
-						},
-						map[string]interface{}{
-							"name":     "https",
-							"port":     int64(8001),
-							"protocol": "HTTPS",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
-								},
-							},
-						},
-					},
-				},
-			},
-		}, {
-			Object: map[string]interface{}{
-				"apiVersion": "gateway.networking.k8s.io/v1beta1",
-				"kind":       "Gateway",
-				"metadata": map[string]interface{}{
-					"name": "test2",
-				},
-				"spec": map[string]interface{}{
-					"gatewayClassName": "test-class",
-					"listeners": []interface{}{
-						map[string]interface{}{
-							"name":     "http",
-							"port":     int64(8002),
-							"protocol": "HTTP",
-							"allowedRoutes": map[string]interface{}{
-								"namespaces": map[string]interface{}{
-									"from": "Same",
-								},
-							},
-						},
-						map[string]interface{}{
-							"name":     "https",
-							"port":     int64(8003),
-							"protocol": "HTTPS",
 							"allowedRoutes": map[string]interface{}{
 								"namespaces": map[string]interface{}{
 									"from": "Same",

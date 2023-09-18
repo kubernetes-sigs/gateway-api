@@ -32,7 +32,7 @@ spec:
     namespace: gateway-conformance-infra
   rules:
   - backendRefs:
-    - name: foo-svc
+    - name: infra-backend-v1
       port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -69,7 +69,7 @@ spec:
     namespace: gateway-conformance-infra
   rules:
   - backendRefs:
-    - name: foo-svc
+    - name: infra-backend-v1
       port: 8080
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -84,5 +84,5 @@ spec:
     namespace: gateway-conformance-infra
   rules:
   - backendRefs:
-    - name: foo-svc
+    - name: infra-backend-v1
       port: 8080

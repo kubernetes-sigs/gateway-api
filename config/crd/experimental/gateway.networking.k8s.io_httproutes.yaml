@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1538
-    gateway.networking.k8s.io/bundle-version: v0.6.2
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2245
+    gateway.networking.k8s.io/bundle-version: v0.8.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: httproutes.gateway.networking.k8s.io
@@ -52,13 +52,17 @@ spec:
             description: Spec defines the desired state of HTTPRoute.
             properties:
               hostnames:
-                description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
-                  by both the Listener and HTTPRoute, there must be at least one intersecting
+                description: "Hostnames defines a set of hostnames that should match
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match and (absent of
+                  any applicable header modification configuration) MUST forward this
+                  header unmodified to the backend. \n Valid values for Hostnames
+                  are determined by RFC 1123 definition of a hostname with 2 notable
+                  exceptions: \n 1. IPs are not allowed. 2. A hostname may be prefixed
+                  with a wildcard label (`*.`). The wildcard label must appear by
+                  itself as the first label. \n If a hostname is specified by both
+                  the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
                   HTTPRoutes that have either not specified any hostnames, or have
@@ -110,13 +114,21 @@ spec:
                   that a Route wants to be attached to. Note that the referenced parent
                   resource needs to allow this for the attachment to be complete.
                   For Gateways, that means the Gateway needs to allow attachment from
-                  Routes of this kind and namespace. \n The only kind of parent resource
-                  with \"Core\" support is Gateway. This API may be extended in the
-                  future to support additional kinds of parent resources such as one
-                  of the route kinds. \n It is invalid to reference an identical parent
+                  Routes of this kind and namespace. For Services, that means the
+                  Service must either be in the same namespace for a \"producer\"
+                  route, or the mesh implementation must support and allow \"consumer\"
+                  routes for the referenced Service. ReferenceGrant is not applicable
+                  for governing ParentRefs to Services - it is not possible to create
+                  a \"producer\" route for a Service in a different namespace from
+                  the Route. \n There are two kinds of parent resources with \"Core\"
+                  support: \n * Gateway (Gateway conformance profile) * Service (Mesh
+                  conformance profile, experimental, ClusterIP Services only) \n This
+                  API may be extended in the future to support additional kinds of
+                  parent resources. \n It is invalid to reference an identical parent
                   more than once. It is valid to reference multiple distinct sections
-                  within the same parent resource, such as 2 Listeners within a Gateway.
-                  \n It is possible to separately reference multiple distinct objects
+                  within the same parent resource, such as two separate Listeners
+                  on the same Gateway or two separate ports on the same Service. \n
+                  It is possible to separately reference multiple distinct objects
                   that may be collapsed by an implementation. For example, some implementations
                   may choose to merge compatible Gateway Listeners together. If that
                   is the case, the list of routes attached to those resources should
@@ -124,16 +136,25 @@ spec:
                   boundaries, there are specific rules. Cross-namespace references
                   are only valid if they are explicitly allowed by something in the
                   namespace they are referring to. For example, Gateway has the AllowedRoutes
-                  field, and ReferenceGrant provides a generic way to enable any other
-                  kind of cross-namespace reference."
+                  field, and ReferenceGrant provides a generic way to enable other
+                  kinds of cross-namespace reference. \n ParentRefs from a Route to
+                  a Service in the same namespace are \"producer\" routes, which apply
+                  default routing rules to inbound connections from any namespace
+                  to the Service. \n ParentRefs from a Route to a Service in a different
+                  namespace are \"consumer\" routes, and these routing rules are only
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route. \n "
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
-                    a route). The only kind of parent resource with \"Core\" support
-                    is Gateway. This API may be extended in the future to support
-                    additional kinds of parent resources, such as HTTPRoute. \n The
-                    API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid."
+                    a route). There are two kinds of parent resources with \"Core\"
+                    support: \n * Gateway (Gateway conformance profile) * Service
+                    (Mesh conformance profile, experimental, ClusterIP Services only)
+                    \n This API may be extended in the future to support additional
+                    kinds of parent resources. \n The API object must be valid in
+                    the cluster; the Group and Kind must be registered in the cluster
+                    for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -147,8 +168,11 @@ spec:
                       type: string
                     kind:
                       default: Gateway
-                      description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Implementation-specific (Other Resources)"
+                      description: "Kind is kind of the referent. \n There are two
+                        kinds of parent resources with \"Core\" support: \n * Gateway
+                        (Gateway conformance profile) * Service (Mesh conformance
+                        profile, experimental, ClusterIP Services only) \n Support
+                        for other resources is Implementation-Specific."
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -168,7 +192,15 @@ spec:
                         the namespace they are referring to. For example: Gateway
                         has the AllowedRoutes field, and ReferenceGrant provides a
                         generic way to enable any other kind of cross-namespace reference.
-                        \n Support: Core"
+                        \n ParentRefs from a Route to a Service in the same namespace
+                        are \"producer\" routes, which apply default routing rules
+                        to inbound connections from any namespace to the Service.
+                        \n ParentRefs from a Route to a Service in a different namespace
+                        are \"consumer\" routes, and these routing rules are only
+                        applied to outbound connections originating from the same
+                        namespace as the Route, for which the intended destination
+                        of the connections are a Service targeted as a ParentRef of
+                        the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -183,18 +215,22 @@ spec:
                         a Route must apply to a specific port as opposed to a listener(s)
                         whose port(s) may be changed. When both Port and SectionName
                         are specified, the name and port of the selected listener
-                        must match both specified values. \n Implementations MAY choose
-                        to support other parent resources. Implementations supporting
-                        other types of parent resources MUST clearly document how/if
-                        Port is interpreted. \n For the purpose of status, an attachment
-                        is considered successful as long as the parent resource accepts
-                        it partially. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Extended \n <gateway:experimental>"
+                        must match both specified values. \n When the parent resource
+                        is a Service, this targets a specific port in the Service
+                        spec. When both Port (experimental) and SectionName are specified,
+                        the name and port of the selected port must match both specified
+                        values. \n Implementations MAY choose to support other parent
+                        resources. Implementations supporting other types of parent
+                        resources MUST clearly document how/if Port is interpreted.
+                        \n For the purpose of status, an attachment is considered
+                        successful as long as the parent resource accepts it partially.
+                        For example, Gateway listeners can restrict which Routes can
+                        attach to them by Route kind, namespace, or hostname. If 1
+                        of 2 Gateway listeners accept attachment from the referencing
+                        Route, the Route MUST be considered successfully attached.
+                        If no Gateway listeners accept attachment from this Route,
+                        the Route MUST be considered detached from the Gateway. \n
+                        Support: Extended \n "
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -205,19 +241,23 @@ spec:
                         interpreted as the following: \n * Gateway: Listener Name.
                         When both Port (experimental) and SectionName are specified,
                         the name and port of the selected listener must match both
-                        specified values. \n Implementations MAY choose to support
-                        attaching Routes to other resources. If that is the case,
-                        they MUST clearly document how SectionName is interpreted.
-                        \n When unspecified (empty string), this will reference the
-                        entire resource. For the purpose of status, an attachment
-                        is considered successful if at least one section in the parent
-                        resource accepts it. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Core"
+                        specified values. * Service: Port Name. When both Port (experimental)
+                        and SectionName are specified, the name and port of the selected
+                        listener must match both specified values. Note that attaching
+                        Routes to Services as Parents is part of experimental Mesh
+                        support and is not supported for any other purpose. \n Implementations
+                        MAY choose to support attaching Routes to other resources.
+                        If that is the case, they MUST clearly document how SectionName
+                        is interpreted. \n When unspecified (empty string), this will
+                        reference the entire resource. For the purpose of status,
+                        an attachment is considered successful if at least one section
+                        in the parent resource accepts it. For example, Gateway listeners
+                        can restrict which Routes can attach to them by Route kind,
+                        namespace, or hostname. If 1 of 2 Gateway listeners accept
+                        attachment from the referencing Route, the Route MUST be considered
+                        successfully attached. If no Gateway listeners accept attachment
+                        from this Route, the Route MUST be considered detached from
+                        the Gateway. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -227,6 +267,32 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-validations:
+                - message: sectionName or port must be specified when parentRefs includes
+                    2 or more references to the same parent
+                  rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__)
+                    || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '''') ) || ( has(p1.__namespace__) && has(p2.__namespace__)
+                    && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName)
+                    || p1.sectionName == '''') && (!has(p2.sectionName) || p2.sectionName
+                    == '''') && (!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName
+                    != '''') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName)
+                    && p2.sectionName != '''') || (has(p2.port) && p2.port != 0) )
+                    ) ) ): true ))'
+                - message: sectionName or port must be unique when parentRefs includes
+                    2 or more references to the same parent
+                  rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
+                    || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
+                    p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName)
+                    || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName
+                    == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
+                    == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
+                    == p2.port))))
               rules:
                 default:
                 - matches:
@@ -256,7 +322,8 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
+                        \n Support: Core for Kubernetes Service \n Support: Extended
+                        for Kubernetes ServiceImport \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
@@ -284,7 +351,8 @@ spec:
                                     extension to the \"filter\" behavior.  For example,
                                     resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
-                                    filters. \n Support: Implementation-specific"
+                                    filters. \n This filter can be used multiple times
+                                    within the same rule. \n Support: Implementation-specific"
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -374,6 +442,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -422,29 +491,35 @@ spec:
                                   description: "RequestMirror defines a schema for
                                     a filter that mirrors requests. Requests are sent
                                     to the specified destination, but responses from
-                                    that destination are ignored. \n Support: Extended"
+                                    that destination are ignored. \n This filter can
+                                    be used multiple times within the same rule. Note
+                                    that not all implementations will be able to support
+                                    mirroring to multiple backends. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
-                                        where mirrored requests are sent. \n If the
-                                        referent cannot be found, this BackendRef
-                                        is invalid and must be dropped from the Gateway.
-                                        The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Route status is set to `status:
-                                        False` and not configure this backend in the
-                                        underlying implementation. \n If there is
-                                        a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferenceGrant,
-                                        the controller must ensure the \"ResolvedRefs\"
-                                        \ condition on the Route is set to `status:
-                                        False`, with the \"RefNotPermitted\" reason
-                                        and not configure this backend in the underlying
-                                        implementation. \n In either error case, the
-                                        Message of the `ResolvedRefs` Condition should
-                                        be used to provide more detail about the problem.
-                                        \n Support: Extended for Kubernetes Service
-                                        \n Support: Implementation-specific for any
-                                        other resource"
+                                        where mirrored requests are sent. \n Mirrored
+                                        requests must be sent only to a single destination
+                                        endpoint within this BackendRef, irrespective
+                                        of how many endpoints are present within this
+                                        BackendRef. \n If the referent cannot be found,
+                                        this BackendRef is invalid and must be dropped
+                                        from the Gateway. The controller must ensure
+                                        the \"ResolvedRefs\" condition on the Route
+                                        status is set to `status: False` and not configure
+                                        this backend in the underlying implementation.
+                                        \n If there is a cross-namespace reference
+                                        to an *existing* object that is not allowed
+                                        by a ReferenceGrant, the controller must ensure
+                                        the \"ResolvedRefs\"  condition on the Route
+                                        is set to `status: False`, with the \"RefNotPermitted\"
+                                        reason and not configure this backend in the
+                                        underlying implementation. \n In either error
+                                        case, the Message of the `ResolvedRefs` Condition
+                                        should be used to provide more detail about
+                                        the problem. \n Support: Extended for Kubernetes
+                                        Service \n Support: Implementation-specific
+                                        for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -484,7 +559,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -510,6 +586,10 @@ spec:
                                       required:
                                       - name
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: Must have port for Service reference
+                                        rule: '(size(self.group) == 0 && self.kind
+                                          == ''Service'') ? has(self.port) : true'
                                   required:
                                   - backendRef
                                   type: object
@@ -546,8 +626,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -555,7 +636,29 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -576,20 +679,45 @@ spec:
                                       required:
                                       - type
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: replaceFullPath must be specified
+                                          when type is set to 'ReplaceFullPath'
+                                        rule: 'self.type == ''ReplaceFullPath'' ?
+                                          has(self.replaceFullPath) : true'
+                                      - message: type must be 'ReplaceFullPath' when
+                                          replaceFullPath is set
+                                        rule: 'has(self.replaceFullPath) ? self.type
+                                          == ''ReplaceFullPath'' : true'
+                                      - message: replacePrefixMatch must be specified
+                                          when type is set to 'ReplacePrefixMatch'
+                                        rule: 'self.type == ''ReplacePrefixMatch''
+                                          ? has(self.replacePrefixMatch) : true'
+                                      - message: type must be 'ReplacePrefixMatch'
+                                          when replacePrefixMatch is set
+                                        rule: 'has(self.replacePrefixMatch) ? self.type
+                                          == ''ReplacePrefixMatch'' : true'
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementers should _not_
-                                        include the port number in the 'Location'
-                                        header in the following cases: \n * a Location
-                                        header that will use HTTP (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 80. * a Location
-                                        header that will use HTTPS (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 443. \n Support:
-                                        Extended"
+                                        response. \n If no port is specified, the
+                                        redirect port MUST be derived using the following
+                                        rules: \n * If redirect scheme is not-empty,
+                                        the redirect port MUST be the well-known port
+                                        associated with the redirect scheme. Specifically
+                                        \"http\" to port 80 and \"https\" to port
+                                        443. If the redirect scheme does not have
+                                        a well-known port, the listener port of the
+                                        Gateway SHOULD be used. * If redirect scheme
+                                        is empty, the redirect port MUST be the Gateway
+                                        Listener port. \n Implementations SHOULD NOT
+                                        add the port number in the 'Location' header
+                                        in the following cases: \n * A Location header
+                                        that will use HTTP (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 80. * A Location header that
+                                        will use HTTPS (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 443. \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -598,8 +726,11 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Note that values may be added
-                                        to this enum, implementations must ensure
+                                        is used. \n Scheme redirects can affect the
+                                        port of the redirect, for more information,
+                                        refer to the documentation for the port field
+                                        of this filter. \n Note that values may be
+                                        added to this enum, implementations must ensure
                                         that unknown values will not cause a crash.
                                         \n Unknown values here must result in the
                                         implementation setting the Accepted Condition
@@ -688,6 +819,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -800,8 +932,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -809,7 +942,29 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -830,12 +985,94 @@ spec:
                                       required:
                                       - type
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: replaceFullPath must be specified
+                                          when type is set to 'ReplaceFullPath'
+                                        rule: 'self.type == ''ReplaceFullPath'' ?
+                                          has(self.replaceFullPath) : true'
+                                      - message: type must be 'ReplaceFullPath' when
+                                          replaceFullPath is set
+                                        rule: 'has(self.replaceFullPath) ? self.type
+                                          == ''ReplaceFullPath'' : true'
+                                      - message: replacePrefixMatch must be specified
+                                          when type is set to 'ReplacePrefixMatch'
+                                        rule: 'self.type == ''ReplacePrefixMatch''
+                                          ? has(self.replacePrefixMatch) : true'
+                                      - message: type must be 'ReplacePrefixMatch'
+                                          when replacePrefixMatch is set
+                                        rule: 'has(self.replacePrefixMatch) ? self.type
+                                          == ''ReplacePrefixMatch'' : true'
                                   type: object
                               required:
                               - type
                               type: object
+                              x-kubernetes-validations:
+                              - message: filter.requestHeaderModifier must be nil
+                                  if the filter.type is not RequestHeaderModifier
+                                rule: '!(has(self.requestHeaderModifier) && self.type
+                                  != ''RequestHeaderModifier'')'
+                              - message: filter.requestHeaderModifier must be specified
+                                  for RequestHeaderModifier filter.type
+                                rule: '!(!has(self.requestHeaderModifier) && self.type
+                                  == ''RequestHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be nil
+                                  if the filter.type is not ResponseHeaderModifier
+                                rule: '!(has(self.responseHeaderModifier) && self.type
+                                  != ''ResponseHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be specified
+                                  for ResponseHeaderModifier filter.type
+                                rule: '!(!has(self.responseHeaderModifier) && self.type
+                                  == ''ResponseHeaderModifier'')'
+                              - message: filter.requestMirror must be nil if the filter.type
+                                  is not RequestMirror
+                                rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                              - message: filter.requestMirror must be specified for
+                                  RequestMirror filter.type
+                                rule: '!(!has(self.requestMirror) && self.type ==
+                                  ''RequestMirror'')'
+                              - message: filter.requestRedirect must be nil if the
+                                  filter.type is not RequestRedirect
+                                rule: '!(has(self.requestRedirect) && self.type !=
+                                  ''RequestRedirect'')'
+                              - message: filter.requestRedirect must be specified
+                                  for RequestRedirect filter.type
+                                rule: '!(!has(self.requestRedirect) && self.type ==
+                                  ''RequestRedirect'')'
+                              - message: filter.urlRewrite must be nil if the filter.type
+                                  is not URLRewrite
+                                rule: '!(has(self.urlRewrite) && self.type != ''URLRewrite'')'
+                              - message: filter.urlRewrite must be specified for URLRewrite
+                                  filter.type
+                                rule: '!(!has(self.urlRewrite) && self.type == ''URLRewrite'')'
+                              - message: filter.extensionRef must be nil if the filter.type
+                                  is not ExtensionRef
+                                rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                              - message: filter.extensionRef must be specified for
+                                  ExtensionRef filter.type
+                                rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-validations:
+                            - message: May specify either httpRouteFilterRequestRedirect
+                                or httpRouteFilterRequestRewrite, but not both
+                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
+                                && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: May specify either httpRouteFilterRequestRedirect
+                                or httpRouteFilterRequestRewrite, but not both
+                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
+                                && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: RequestHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                                <= 1
+                            - message: ResponseHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                                <= 1
+                            - message: RequestRedirect filter cannot be repeated
+                              rule: self.filter(f, f.type == 'RequestRedirect').size()
+                                <= 1
+                            - message: URLRewrite filter cannot be repeated
+                              rule: self.filter(f, f.type == 'URLRewrite').size()
+                                <= 1
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
@@ -869,11 +1106,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -911,6 +1148,10 @@ spec:
                         required:
                         - name
                         type: object
+                        x-kubernetes-validations:
+                        - message: Must have port for Service reference
+                          rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                            ? has(self.port) : true'
                       maxItems: 16
                       type: array
                     filters:
@@ -923,14 +1164,15 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
-                        a core filter multiple times has unspecified or implementation-specific
-                        conformance. \n All filters are expected to be compatible
-                        with each other except for the URLRewrite and RequestRedirect
+                        the same filter multiple times is not supported unless explicitly
+                        indicated in the filter. \n All filters are expected to be
+                        compatible with each other except for the URLRewrite and RequestRedirect
                         filters, which may not be combined. If an implementation can
                         not support other combinations of filters, they must clearly
-                        document that limitation. In all cases where incompatible
-                        or unsupported filters are specified, implementations MUST
-                        add a warning condition to status. \n Support: Core"
+                        document that limitation. In cases where incompatible or unsupported
+                        filters are specified and cause the `Accepted` condition to
+                        be set to status `False`, implementations may use the `IncompatibleFilters`
+                        reason to specify this configuration error. \n Support: Core"
                       items:
                         description: HTTPRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -946,7 +1188,8 @@ spec:
                               extension to the \"filter\" behavior.  For example,
                               resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
-                              filters. \n Support: Implementation-specific"
+                              filters. \n This filter can be used multiple times within
+                              the same rule. \n Support: Implementation-specific"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -1031,6 +1274,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -1076,27 +1320,33 @@ spec:
                             description: "RequestMirror defines a schema for a filter
                               that mirrors requests. Requests are sent to the specified
                               destination, but responses from that destination are
-                              ignored. \n Support: Extended"
+                              ignored. \n This filter can be used multiple times within
+                              the same rule. Note that not all implementations will
+                              be able to support mirroring to multiple backends. \n
+                              Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
-                                  mirrored requests are sent. \n If the referent cannot
-                                  be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure
-                                  the \"ResolvedRefs\" condition on the Route status
-                                  is set to `status: False` and not configure this
-                                  backend in the underlying implementation. \n If
-                                  there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferenceGrant,
-                                  the controller must ensure the \"ResolvedRefs\"
-                                  \ condition on the Route is set to `status: False`,
-                                  with the \"RefNotPermitted\" reason and not configure
-                                  this backend in the underlying implementation. \n
-                                  In either error case, the Message of the `ResolvedRefs`
-                                  Condition should be used to provide more detail
-                                  about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Implementation-specific for
-                                  any other resource"
+                                  mirrored requests are sent. \n Mirrored requests
+                                  must be sent only to a single destination endpoint
+                                  within this BackendRef, irrespective of how many
+                                  endpoints are present within this BackendRef. \n
+                                  If the referent cannot be found, this BackendRef
+                                  is invalid and must be dropped from the Gateway.
+                                  The controller must ensure the \"ResolvedRefs\"
+                                  condition on the Route status is set to `status:
+                                  False` and not configure this backend in the underlying
+                                  implementation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not allowed
+                                  by a ReferenceGrant, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Route is
+                                  set to `status: False`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service \n Support: Implementation-specific
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -1133,11 +1383,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1157,6 +1408,10 @@ spec:
                                 required:
                                 - name
                                 type: object
+                                x-kubernetes-validations:
+                                - message: Must have port for Service reference
+                                  rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                                    ? has(self.port) : true'
                             required:
                             - backendRef
                             type: object
@@ -1192,7 +1447,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -1200,7 +1456,26 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1219,18 +1494,43 @@ spec:
                                 required:
                                 - type
                                 type: object
+                                x-kubernetes-validations:
+                                - message: replaceFullPath must be specified when
+                                    type is set to 'ReplaceFullPath'
+                                  rule: 'self.type == ''ReplaceFullPath'' ? has(self.replaceFullPath)
+                                    : true'
+                                - message: type must be 'ReplaceFullPath' when replaceFullPath
+                                    is set
+                                  rule: 'has(self.replaceFullPath) ? self.type ==
+                                    ''ReplaceFullPath'' : true'
+                                - message: replacePrefixMatch must be specified when
+                                    type is set to 'ReplacePrefixMatch'
+                                  rule: 'self.type == ''ReplacePrefixMatch'' ? has(self.replacePrefixMatch)
+                                    : true'
+                                - message: type must be 'ReplacePrefixMatch' when
+                                    replacePrefixMatch is set
+                                  rule: 'has(self.replacePrefixMatch) ? self.type
+                                    == ''ReplacePrefixMatch'' : true'
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementers
-                                  should _not_ include the port number in the 'Location'
-                                  header in the following cases: \n * a Location header
-                                  that will use HTTP (whether that is determined via
-                                  the Listener protocol or the Scheme field) _and_
-                                  use port 80. * a Location header that will use HTTPS
-                                  (whether that is determined via the Listener protocol
-                                  or the Scheme field) _and_ use port 443. \n Support:
-                                  Extended"
+                                  of the `Location` header in the response. \n If
+                                  no port is specified, the redirect port MUST be
+                                  derived using the following rules: \n * If redirect
+                                  scheme is not-empty, the redirect port MUST be the
+                                  well-known port associated with the redirect scheme.
+                                  Specifically \"http\" to port 80 and \"https\" to
+                                  port 443. If the redirect scheme does not have a
+                                  well-known port, the listener port of the Gateway
+                                  SHOULD be used. * If redirect scheme is empty, the
+                                  redirect port MUST be the Gateway Listener port.
+                                  \n Implementations SHOULD NOT add the port number
+                                  in the 'Location' header in the following cases:
+                                  \n * A Location header that will use HTTP (whether
+                                  that is determined via the Listener protocol or
+                                  the Scheme field) _and_ use port 80. * A Location
+                                  header that will use HTTPS (whether that is determined
+                                  via the Listener protocol or the Scheme field) _and_
+                                  use port 443. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -1239,7 +1539,10 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Note that values may be added to this enum, implementations
+                                  Scheme redirects can affect the port of the redirect,
+                                  for more information, refer to the documentation
+                                  for the port field of this filter. \n Note that
+                                  values may be added to this enum, implementations
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Accepted Condition for
@@ -1323,6 +1626,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -1428,7 +1732,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -1436,7 +1741,26 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -1455,12 +1779,86 @@ spec:
                                 required:
                                 - type
                                 type: object
+                                x-kubernetes-validations:
+                                - message: replaceFullPath must be specified when
+                                    type is set to 'ReplaceFullPath'
+                                  rule: 'self.type == ''ReplaceFullPath'' ? has(self.replaceFullPath)
+                                    : true'
+                                - message: type must be 'ReplaceFullPath' when replaceFullPath
+                                    is set
+                                  rule: 'has(self.replaceFullPath) ? self.type ==
+                                    ''ReplaceFullPath'' : true'
+                                - message: replacePrefixMatch must be specified when
+                                    type is set to 'ReplacePrefixMatch'
+                                  rule: 'self.type == ''ReplacePrefixMatch'' ? has(self.replacePrefixMatch)
+                                    : true'
+                                - message: type must be 'ReplacePrefixMatch' when
+                                    replacePrefixMatch is set
+                                  rule: 'has(self.replacePrefixMatch) ? self.type
+                                    == ''ReplacePrefixMatch'' : true'
                             type: object
                         required:
                         - type
                         type: object
+                        x-kubernetes-validations:
+                        - message: filter.requestHeaderModifier must be nil if the
+                            filter.type is not RequestHeaderModifier
+                          rule: '!(has(self.requestHeaderModifier) && self.type !=
+                            ''RequestHeaderModifier'')'
+                        - message: filter.requestHeaderModifier must be specified
+                            for RequestHeaderModifier filter.type
+                          rule: '!(!has(self.requestHeaderModifier) && self.type ==
+                            ''RequestHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be nil if the
+                            filter.type is not ResponseHeaderModifier
+                          rule: '!(has(self.responseHeaderModifier) && self.type !=
+                            ''ResponseHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be specified
+                            for ResponseHeaderModifier filter.type
+                          rule: '!(!has(self.responseHeaderModifier) && self.type
+                            == ''ResponseHeaderModifier'')'
+                        - message: filter.requestMirror must be nil if the filter.type
+                            is not RequestMirror
+                          rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                        - message: filter.requestMirror must be specified for RequestMirror
+                            filter.type
+                          rule: '!(!has(self.requestMirror) && self.type == ''RequestMirror'')'
+                        - message: filter.requestRedirect must be nil if the filter.type
+                            is not RequestRedirect
+                          rule: '!(has(self.requestRedirect) && self.type != ''RequestRedirect'')'
+                        - message: filter.requestRedirect must be specified for RequestRedirect
+                            filter.type
+                          rule: '!(!has(self.requestRedirect) && self.type == ''RequestRedirect'')'
+                        - message: filter.urlRewrite must be nil if the filter.type
+                            is not URLRewrite
+                          rule: '!(has(self.urlRewrite) && self.type != ''URLRewrite'')'
+                        - message: filter.urlRewrite must be specified for URLRewrite
+                            filter.type
+                          rule: '!(!has(self.urlRewrite) && self.type == ''URLRewrite'')'
+                        - message: filter.extensionRef must be nil if the filter.type
+                            is not ExtensionRef
+                          rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                        - message: filter.extensionRef must be specified for ExtensionRef
+                            filter.type
+                          rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-validations:
+                      - message: May specify either httpRouteFilterRequestRedirect
+                          or httpRouteFilterRequestRewrite, but not both
+                        rule: '!(self.exists(f, f.type == ''RequestRedirect'') &&
+                          self.exists(f, f.type == ''URLRewrite''))'
+                      - message: RequestHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                          <= 1
+                      - message: ResponseHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                          <= 1
+                      - message: RequestRedirect filter cannot be repeated
+                        rule: self.filter(f, f.type == 'RequestRedirect').size() <=
+                          1
+                      - message: URLRewrite filter cannot be repeated
+                        rule: self.filter(f, f.type == 'URLRewrite').size() <= 1
                     matches:
                       default:
                       - path:
@@ -1482,21 +1880,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -1604,6 +2002,52 @@ spec:
                                 maxLength: 1024
                                 type: string
                             type: object
+                            x-kubernetes-validations:
+                            - message: value must be an absolute path and start with
+                                '/' when type one of ['Exact', 'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.startsWith(''/'')
+                                : true'
+                            - message: must not contain '//' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''//'')
+                                : true'
+                            - message: must not contain '/./' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/./'')
+                                : true'
+                            - message: must not contain '/../' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/../'')
+                                : true'
+                            - message: must not contain '%2f' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2f'')
+                                : true'
+                            - message: must not contain '%2F' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2F'')
+                                : true'
+                            - message: must not contain '#' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''#'')
+                                : true'
+                            - message: must not end with '/..' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/..'')
+                                : true'
+                            - message: must not end with '/.' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
+                                : true'
+                            - message: type must be one of ['Exact', 'PathPrefix',
+                                'RegularExpression']
+                              rule: self.type in ['Exact','PathPrefix'] || self.type
+                                == 'RegularExpression'
+                            - message: must only contain valid characters (matching
+                                ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
+                                for types ['Exact', 'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
+                                : true'
                           queryParams:
                             description: "QueryParams specifies HTTP query parameter
                               matchers. Multiple match values are ANDed together,
@@ -1669,7 +2113,89 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    timeouts:
+                      description: "Timeouts defines the timeouts that can be configured
+                        for an HTTP request. \n Support: Extended \n "
+                      properties:
+                        backendRequest:
+                          description: "BackendRequest specifies a timeout for an
+                            individual request from the gateway to a backend. This
+                            covers the time from when the request first starts being
+                            sent from the gateway to when the full response has been
+                            received from the backend. \n An entire client HTTP transaction
+                            with a gateway, covered by the Request timeout, may result
+                            in more than one call from the gateway to the destination
+                            backend, for example, if automatic retries are supported.
+                            \n Because the Request timeout encompasses the BackendRequest
+                            timeout, the value of BackendRequest must be <= the value
+                            of Request timeout. \n Support: Extended"
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        request:
+                          description: "Request specifies the maximum duration for
+                            a gateway to respond to an HTTP request. If the gateway
+                            has not been able to respond before this deadline is met,
+                            the gateway MUST return a timeout error. \n For example,
+                            setting the `rules.timeouts.request` field to the value
+                            `10s` in an `HTTPRoute` will cause a timeout if a client
+                            request is taking longer than 10 seconds to complete.
+                            \n This timeout is intended to cover as close to the whole
+                            request-response transaction as possible although an implementation
+                            MAY choose to start the timeout after the entire request
+                            stream has been received instead of immediately after
+                            the transaction is initiated by the client. \n When this
+                            field is unspecified, request timeout behavior is implementation-specific.
+                            \n Support: Extended"
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                      type: object
+                      x-kubernetes-validations:
+                      - message: backendRequest timeout cannot be longer than request
+                          timeout
+                        rule: '!(has(self.request) && has(self.backendRequest) &&
+                          duration(self.request) != duration(''0s'') && duration(self.backendRequest)
+                          > duration(self.request))'
                   type: object
+                  x-kubernetes-validations:
+                  - message: RequestRedirect filter must not be used together with
+                      backendRefs
+                    rule: '(has(self.backendRefs) && size(self.backendRefs) > 0) ?
+                      (!has(self.filters) || self.filters.all(f, !has(f.requestRedirect))):
+                      true'
+                  - message: When using RequestRedirect filter with path.replacePrefixMatch,
+                      exactly one PathPrefix match must be specified
+                    rule: '(has(self.filters) && self.filters.exists_one(f, has(f.requestRedirect)
+                      && has(f.requestRedirect.path) && f.requestRedirect.path.type
+                      == ''ReplacePrefixMatch'' && has(f.requestRedirect.path.replacePrefixMatch)))
+                      ? ((size(self.matches) != 1 || !has(self.matches[0].path) ||
+                      self.matches[0].path.type != ''PathPrefix'') ? false : true)
+                      : true'
+                  - message: When using URLRewrite filter with path.replacePrefixMatch,
+                      exactly one PathPrefix match must be specified
+                    rule: '(has(self.filters) && self.filters.exists_one(f, has(f.urlRewrite)
+                      && has(f.urlRewrite.path) && f.urlRewrite.path.type == ''ReplacePrefixMatch''
+                      && has(f.urlRewrite.path.replacePrefixMatch))) ? ((size(self.matches)
+                      != 1 || !has(self.matches[0].path) || self.matches[0].path.type
+                      != ''PathPrefix'') ? false : true) : true'
+                  - message: Within backendRefs, when using RequestRedirect filter
+                      with path.replacePrefixMatch, exactly one PathPrefix match must
+                      be specified
+                    rule: '(has(self.backendRefs) && self.backendRefs.exists_one(b,
+                      (has(b.filters) && b.filters.exists_one(f, has(f.requestRedirect)
+                      && has(f.requestRedirect.path) && f.requestRedirect.path.type
+                      == ''ReplacePrefixMatch'' && has(f.requestRedirect.path.replacePrefixMatch)))
+                      )) ? ((size(self.matches) != 1 || !has(self.matches[0].path)
+                      || self.matches[0].path.type != ''PathPrefix'') ? false : true)
+                      : true'
+                  - message: Within backendRefs, When using URLRewrite filter with
+                      path.replacePrefixMatch, exactly one PathPrefix match must be
+                      specified
+                    rule: '(has(self.backendRefs) && self.backendRefs.exists_one(b,
+                      (has(b.filters) && b.filters.exists_one(f, has(f.urlRewrite)
+                      && has(f.urlRewrite.path) && f.urlRewrite.path.type == ''ReplacePrefixMatch''
+                      && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches)
+                      != 1 || !has(self.matches[0].path) || self.matches[0].path.type
+                      != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
             type: object
@@ -1818,9 +2344,11 @@ spec:
                           type: string
                         kind:
                           default: Gateway
-                          description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Implementation-specific (Other
-                            Resources)"
+                          description: "Kind is kind of the referent. \n There are
+                            two kinds of parent resources with \"Core\" support: \n
+                            * Gateway (Gateway conformance profile) * Service (Mesh
+                            conformance profile, experimental, ClusterIP Services
+                            only) \n Support for other resources is Implementation-Specific."
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -1840,7 +2368,16 @@ spec:
                             in the namespace they are referring to. For example: Gateway
                             has the AllowedRoutes field, and ReferenceGrant provides
                             a generic way to enable any other kind of cross-namespace
-                            reference. \n Support: Core"
+                            reference. \n ParentRefs from a Route to a Service in
+                            the same namespace are \"producer\" routes, which apply
+                            default routing rules to inbound connections from any
+                            namespace to the Service. \n ParentRefs from a Route to
+                            a Service in a different namespace are \"consumer\" routes,
+                            and these routing rules are only applied to outbound connections
+                            originating from the same namespace as the Route, for
+                            which the intended destination of the connections are
+                            a Service targeted as a ParentRef of the Route. \n Support:
+                            Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -1856,8 +2393,12 @@ spec:
                             a specific port as opposed to a listener(s) whose port(s)
                             may be changed. When both Port and SectionName are specified,
                             the name and port of the selected listener must match
-                            both specified values. \n Implementations MAY choose to
-                            support other parent resources. Implementations supporting
+                            both specified values. \n When the parent resource is
+                            a Service, this targets a specific port in the Service
+                            spec. When both Port (experimental) and SectionName are
+                            specified, the name and port of the selected port must
+                            match both specified values. \n Implementations MAY choose
+                            to support other parent resources. Implementations supporting
                             other types of parent resources MUST clearly document
                             how/if Port is interpreted. \n For the purpose of status,
                             an attachment is considered successful as long as the
@@ -1868,7 +2409,7 @@ spec:
                             the Route MUST be considered successfully attached. If
                             no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
-                            \n Support: Extended \n <gateway:experimental>"
+                            \n Support: Extended \n "
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -1879,8 +2420,13 @@ spec:
                             is interpreted as the following: \n * Gateway: Listener
                             Name. When both Port (experimental) and SectionName are
                             specified, the name and port of the selected listener
-                            must match both specified values. \n Implementations MAY
-                            choose to support attaching Routes to other resources.
+                            must match both specified values. * Service: Port Name.
+                            When both Port (experimental) and SectionName are specified,
+                            the name and port of the selected listener must match
+                            both specified values. Note that attaching Routes to Services
+                            as Parents is part of experimental Mesh support and is
+                            not supported for any other purpose. \n Implementations
+                            MAY choose to support attaching Routes to other resources.
                             If that is the case, they MUST clearly document how SectionName
                             is interpreted. \n When unspecified (empty string), this
                             will reference the entire resource. For the purpose of
@@ -1912,7 +2458,7 @@ spec:
         required:
         - spec
         type: object
-    served: true
+    served: false
     storage: false
     subresources:
       status: {}
@@ -1947,13 +2493,17 @@ spec:
             description: Spec defines the desired state of HTTPRoute.
             properties:
               hostnames:
-                description: "Hostnames defines a set of hostname that should match
-                  against the HTTP Host header to select a HTTPRoute to process the
-                  request. This matches the RFC 1123 definition of a hostname with
-                  2 notable exceptions: \n 1. IPs are not allowed. 2. A hostname may
-                  be prefixed with a wildcard label (`*.`). The wildcard label must
-                  appear by itself as the first label. \n If a hostname is specified
-                  by both the Listener and HTTPRoute, there must be at least one intersecting
+                description: "Hostnames defines a set of hostnames that should match
+                  against the HTTP Host header to select a HTTPRoute used to process
+                  the request. Implementations MUST ignore any port value specified
+                  in the HTTP Host header while performing a match and (absent of
+                  any applicable header modification configuration) MUST forward this
+                  header unmodified to the backend. \n Valid values for Hostnames
+                  are determined by RFC 1123 definition of a hostname with 2 notable
+                  exceptions: \n 1. IPs are not allowed. 2. A hostname may be prefixed
+                  with a wildcard label (`*.`). The wildcard label must appear by
+                  itself as the first label. \n If a hostname is specified by both
+                  the Listener and HTTPRoute, there must be at least one intersecting
                   hostname for the HTTPRoute to be attached to the Listener. For example:
                   \n * A Listener with `test.example.com` as the hostname matches
                   HTTPRoutes that have either not specified any hostnames, or have
@@ -2005,13 +2555,21 @@ spec:
                   that a Route wants to be attached to. Note that the referenced parent
                   resource needs to allow this for the attachment to be complete.
                   For Gateways, that means the Gateway needs to allow attachment from
-                  Routes of this kind and namespace. \n The only kind of parent resource
-                  with \"Core\" support is Gateway. This API may be extended in the
-                  future to support additional kinds of parent resources such as one
-                  of the route kinds. \n It is invalid to reference an identical parent
+                  Routes of this kind and namespace. For Services, that means the
+                  Service must either be in the same namespace for a \"producer\"
+                  route, or the mesh implementation must support and allow \"consumer\"
+                  routes for the referenced Service. ReferenceGrant is not applicable
+                  for governing ParentRefs to Services - it is not possible to create
+                  a \"producer\" route for a Service in a different namespace from
+                  the Route. \n There are two kinds of parent resources with \"Core\"
+                  support: \n * Gateway (Gateway conformance profile) * Service (Mesh
+                  conformance profile, experimental, ClusterIP Services only) \n This
+                  API may be extended in the future to support additional kinds of
+                  parent resources. \n It is invalid to reference an identical parent
                   more than once. It is valid to reference multiple distinct sections
-                  within the same parent resource, such as 2 Listeners within a Gateway.
-                  \n It is possible to separately reference multiple distinct objects
+                  within the same parent resource, such as two separate Listeners
+                  on the same Gateway or two separate ports on the same Service. \n
+                  It is possible to separately reference multiple distinct objects
                   that may be collapsed by an implementation. For example, some implementations
                   may choose to merge compatible Gateway Listeners together. If that
                   is the case, the list of routes attached to those resources should
@@ -2019,16 +2577,25 @@ spec:
                   boundaries, there are specific rules. Cross-namespace references
                   are only valid if they are explicitly allowed by something in the
                   namespace they are referring to. For example, Gateway has the AllowedRoutes
-                  field, and ReferenceGrant provides a generic way to enable any other
-                  kind of cross-namespace reference."
+                  field, and ReferenceGrant provides a generic way to enable other
+                  kinds of cross-namespace reference. \n ParentRefs from a Route to
+                  a Service in the same namespace are \"producer\" routes, which apply
+                  default routing rules to inbound connections from any namespace
+                  to the Service. \n ParentRefs from a Route to a Service in a different
+                  namespace are \"consumer\" routes, and these routing rules are only
+                  applied to outbound connections originating from the same namespace
+                  as the Route, for which the intended destination of the connections
+                  are a Service targeted as a ParentRef of the Route. \n "
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
-                    a route). The only kind of parent resource with \"Core\" support
-                    is Gateway. This API may be extended in the future to support
-                    additional kinds of parent resources, such as HTTPRoute. \n The
-                    API object must be valid in the cluster; the Group and Kind must
-                    be registered in the cluster for this reference to be valid."
+                    a route). There are two kinds of parent resources with \"Core\"
+                    support: \n * Gateway (Gateway conformance profile) * Service
+                    (Mesh conformance profile, experimental, ClusterIP Services only)
+                    \n This API may be extended in the future to support additional
+                    kinds of parent resources. \n The API object must be valid in
+                    the cluster; the Group and Kind must be registered in the cluster
+                    for this reference to be valid."
                   properties:
                     group:
                       default: gateway.networking.k8s.io
@@ -2042,8 +2609,11 @@ spec:
                       type: string
                     kind:
                       default: Gateway
-                      description: "Kind is kind of the referent. \n Support: Core
-                        (Gateway) \n Support: Implementation-specific (Other Resources)"
+                      description: "Kind is kind of the referent. \n There are two
+                        kinds of parent resources with \"Core\" support: \n * Gateway
+                        (Gateway conformance profile) * Service (Mesh conformance
+                        profile, experimental, ClusterIP Services only) \n Support
+                        for other resources is Implementation-Specific."
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -2063,7 +2633,15 @@ spec:
                         the namespace they are referring to. For example: Gateway
                         has the AllowedRoutes field, and ReferenceGrant provides a
                         generic way to enable any other kind of cross-namespace reference.
-                        \n Support: Core"
+                        \n ParentRefs from a Route to a Service in the same namespace
+                        are \"producer\" routes, which apply default routing rules
+                        to inbound connections from any namespace to the Service.
+                        \n ParentRefs from a Route to a Service in a different namespace
+                        are \"consumer\" routes, and these routing rules are only
+                        applied to outbound connections originating from the same
+                        namespace as the Route, for which the intended destination
+                        of the connections are a Service targeted as a ParentRef of
+                        the Route. \n Support: Core"
                       maxLength: 63
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -2078,18 +2656,22 @@ spec:
                         a Route must apply to a specific port as opposed to a listener(s)
                         whose port(s) may be changed. When both Port and SectionName
                         are specified, the name and port of the selected listener
-                        must match both specified values. \n Implementations MAY choose
-                        to support other parent resources. Implementations supporting
-                        other types of parent resources MUST clearly document how/if
-                        Port is interpreted. \n For the purpose of status, an attachment
-                        is considered successful as long as the parent resource accepts
-                        it partially. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Extended \n <gateway:experimental>"
+                        must match both specified values. \n When the parent resource
+                        is a Service, this targets a specific port in the Service
+                        spec. When both Port (experimental) and SectionName are specified,
+                        the name and port of the selected port must match both specified
+                        values. \n Implementations MAY choose to support other parent
+                        resources. Implementations supporting other types of parent
+                        resources MUST clearly document how/if Port is interpreted.
+                        \n For the purpose of status, an attachment is considered
+                        successful as long as the parent resource accepts it partially.
+                        For example, Gateway listeners can restrict which Routes can
+                        attach to them by Route kind, namespace, or hostname. If 1
+                        of 2 Gateway listeners accept attachment from the referencing
+                        Route, the Route MUST be considered successfully attached.
+                        If no Gateway listeners accept attachment from this Route,
+                        the Route MUST be considered detached from the Gateway. \n
+                        Support: Extended \n "
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -2100,19 +2682,23 @@ spec:
                         interpreted as the following: \n * Gateway: Listener Name.
                         When both Port (experimental) and SectionName are specified,
                         the name and port of the selected listener must match both
-                        specified values. \n Implementations MAY choose to support
-                        attaching Routes to other resources. If that is the case,
-                        they MUST clearly document how SectionName is interpreted.
-                        \n When unspecified (empty string), this will reference the
-                        entire resource. For the purpose of status, an attachment
-                        is considered successful if at least one section in the parent
-                        resource accepts it. For example, Gateway listeners can restrict
-                        which Routes can attach to them by Route kind, namespace,
-                        or hostname. If 1 of 2 Gateway listeners accept attachment
-                        from the referencing Route, the Route MUST be considered successfully
-                        attached. If no Gateway listeners accept attachment from this
-                        Route, the Route MUST be considered detached from the Gateway.
-                        \n Support: Core"
+                        specified values. * Service: Port Name. When both Port (experimental)
+                        and SectionName are specified, the name and port of the selected
+                        listener must match both specified values. Note that attaching
+                        Routes to Services as Parents is part of experimental Mesh
+                        support and is not supported for any other purpose. \n Implementations
+                        MAY choose to support attaching Routes to other resources.
+                        If that is the case, they MUST clearly document how SectionName
+                        is interpreted. \n When unspecified (empty string), this will
+                        reference the entire resource. For the purpose of status,
+                        an attachment is considered successful if at least one section
+                        in the parent resource accepts it. For example, Gateway listeners
+                        can restrict which Routes can attach to them by Route kind,
+                        namespace, or hostname. If 1 of 2 Gateway listeners accept
+                        attachment from the referencing Route, the Route MUST be considered
+                        successfully attached. If no Gateway listeners accept attachment
+                        from this Route, the Route MUST be considered detached from
+                        the Gateway. \n Support: Core"
                       maxLength: 253
                       minLength: 1
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
@@ -2122,6 +2708,32 @@ spec:
                   type: object
                 maxItems: 32
                 type: array
+                x-kubernetes-validations:
+                - message: sectionName or port must be specified when parentRefs includes
+                    2 or more references to the same parent
+                  rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__)
+                    || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '''') ) || ( has(p1.__namespace__) && has(p2.__namespace__)
+                    && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName)
+                    || p1.sectionName == '''') && (!has(p2.sectionName) || p2.sectionName
+                    == '''') && (!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName
+                    != '''') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName)
+                    && p2.sectionName != '''') || (has(p2.port) && p2.port != 0) )
+                    ) ) ): true ))'
+                - message: sectionName or port must be unique when parentRefs includes
+                    2 or more references to the same parent
+                  rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
+                    == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
+                    || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__
+                    == '')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
+                    p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName)
+                    || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName
+                    == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
+                    == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port)
+                    || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
+                    == p2.port))))
               rules:
                 default:
                 - matches:
@@ -2151,7 +2763,8 @@ spec:
                         \n For example, if two backends are specified with equal weights,
                         and one is invalid, 50 percent of traffic must receive a 500.
                         Implementations may choose how that 50 percent is determined.
-                        \n Support: Core for Kubernetes Service \n Support: Implementation-specific
+                        \n Support: Core for Kubernetes Service \n Support: Extended
+                        for Kubernetes ServiceImport \n Support: Implementation-specific
                         for any other resource \n Support for weight: Core"
                       items:
                         description: HTTPBackendRef defines how a HTTPRoute should
@@ -2179,7 +2792,8 @@ spec:
                                     extension to the \"filter\" behavior.  For example,
                                     resource \"myroutefilter\" in group \"networking.example.net\").
                                     ExtensionRef MUST NOT be used for core and extended
-                                    filters. \n Support: Implementation-specific"
+                                    filters. \n This filter can be used multiple times
+                                    within the same rule. \n Support: Implementation-specific"
                                   properties:
                                     group:
                                       description: Group is the group of the referent.
@@ -2269,6 +2883,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -2317,29 +2932,35 @@ spec:
                                   description: "RequestMirror defines a schema for
                                     a filter that mirrors requests. Requests are sent
                                     to the specified destination, but responses from
-                                    that destination are ignored. \n Support: Extended"
+                                    that destination are ignored. \n This filter can
+                                    be used multiple times within the same rule. Note
+                                    that not all implementations will be able to support
+                                    mirroring to multiple backends. \n Support: Extended"
                                   properties:
                                     backendRef:
                                       description: "BackendRef references a resource
-                                        where mirrored requests are sent. \n If the
-                                        referent cannot be found, this BackendRef
-                                        is invalid and must be dropped from the Gateway.
-                                        The controller must ensure the \"ResolvedRefs\"
-                                        condition on the Route status is set to `status:
-                                        False` and not configure this backend in the
-                                        underlying implementation. \n If there is
-                                        a cross-namespace reference to an *existing*
-                                        object that is not allowed by a ReferenceGrant,
-                                        the controller must ensure the \"ResolvedRefs\"
-                                        \ condition on the Route is set to `status:
-                                        False`, with the \"RefNotPermitted\" reason
-                                        and not configure this backend in the underlying
-                                        implementation. \n In either error case, the
-                                        Message of the `ResolvedRefs` Condition should
-                                        be used to provide more detail about the problem.
-                                        \n Support: Extended for Kubernetes Service
-                                        \n Support: Implementation-specific for any
-                                        other resource"
+                                        where mirrored requests are sent. \n Mirrored
+                                        requests must be sent only to a single destination
+                                        endpoint within this BackendRef, irrespective
+                                        of how many endpoints are present within this
+                                        BackendRef. \n If the referent cannot be found,
+                                        this BackendRef is invalid and must be dropped
+                                        from the Gateway. The controller must ensure
+                                        the \"ResolvedRefs\" condition on the Route
+                                        status is set to `status: False` and not configure
+                                        this backend in the underlying implementation.
+                                        \n If there is a cross-namespace reference
+                                        to an *existing* object that is not allowed
+                                        by a ReferenceGrant, the controller must ensure
+                                        the \"ResolvedRefs\"  condition on the Route
+                                        is set to `status: False`, with the \"RefNotPermitted\"
+                                        reason and not configure this backend in the
+                                        underlying implementation. \n In either error
+                                        case, the Message of the `ResolvedRefs` Condition
+                                        should be used to provide more detail about
+                                        the problem. \n Support: Extended for Kubernetes
+                                        Service \n Support: Implementation-specific
+                                        for any other resource"
                                       properties:
                                         group:
                                           default: ""
@@ -2379,7 +3000,8 @@ spec:
                                           description: "Namespace is the namespace
                                             of the backend. When unspecified, the
                                             local namespace is inferred. \n Note that
-                                            when a namespace is specified, a ReferenceGrant
+                                            when a namespace different than the local
+                                            namespace is specified, a ReferenceGrant
                                             object is required in the referent namespace
                                             to allow that namespace's owner to accept
                                             the reference. See the ReferenceGrant
@@ -2405,6 +3027,10 @@ spec:
                                       required:
                                       - name
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: Must have port for Service reference
+                                        rule: '(size(self.group) == 0 && self.kind
+                                          == ''Service'') ? has(self.port) : true'
                                   required:
                                   - backendRef
                                   type: object
@@ -2441,8 +3067,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -2450,7 +3077,29 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2471,20 +3120,45 @@ spec:
                                       required:
                                       - type
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: replaceFullPath must be specified
+                                          when type is set to 'ReplaceFullPath'
+                                        rule: 'self.type == ''ReplaceFullPath'' ?
+                                          has(self.replaceFullPath) : true'
+                                      - message: type must be 'ReplaceFullPath' when
+                                          replaceFullPath is set
+                                        rule: 'has(self.replaceFullPath) ? self.type
+                                          == ''ReplaceFullPath'' : true'
+                                      - message: replacePrefixMatch must be specified
+                                          when type is set to 'ReplacePrefixMatch'
+                                        rule: 'self.type == ''ReplacePrefixMatch''
+                                          ? has(self.replacePrefixMatch) : true'
+                                      - message: type must be 'ReplacePrefixMatch'
+                                          when replacePrefixMatch is set
+                                        rule: 'has(self.replacePrefixMatch) ? self.type
+                                          == ''ReplacePrefixMatch'' : true'
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
-                                        response. \n When empty, the Gateway Listener
-                                        port is used. \n Implementers should _not_
-                                        include the port number in the 'Location'
-                                        header in the following cases: \n * a Location
-                                        header that will use HTTP (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 80. * a Location
-                                        header that will use HTTPS (whether that is
-                                        determined via the Listener protocol or the
-                                        Scheme field) _and_ use port 443. \n Support:
-                                        Extended"
+                                        response. \n If no port is specified, the
+                                        redirect port MUST be derived using the following
+                                        rules: \n * If redirect scheme is not-empty,
+                                        the redirect port MUST be the well-known port
+                                        associated with the redirect scheme. Specifically
+                                        \"http\" to port 80 and \"https\" to port
+                                        443. If the redirect scheme does not have
+                                        a well-known port, the listener port of the
+                                        Gateway SHOULD be used. * If redirect scheme
+                                        is empty, the redirect port MUST be the Gateway
+                                        Listener port. \n Implementations SHOULD NOT
+                                        add the port number in the 'Location' header
+                                        in the following cases: \n * A Location header
+                                        that will use HTTP (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 80. * A Location header that
+                                        will use HTTPS (whether that is determined
+                                        via the Listener protocol or the Scheme field)
+                                        _and_ use port 443. \n Support: Extended"
                                       format: int32
                                       maximum: 65535
                                       minimum: 1
@@ -2493,8 +3167,11 @@ spec:
                                       description: "Scheme is the scheme to be used
                                         in the value of the `Location` header in the
                                         response. When empty, the scheme of the request
-                                        is used. \n Note that values may be added
-                                        to this enum, implementations must ensure
+                                        is used. \n Scheme redirects can affect the
+                                        port of the redirect, for more information,
+                                        refer to the documentation for the port field
+                                        of this filter. \n Note that values may be
+                                        added to this enum, implementations must ensure
                                         that unknown values will not cause a crash.
                                         \n Unknown values here must result in the
                                         implementation setting the Accepted Condition
@@ -2583,6 +3260,7 @@ spec:
                                         type: string
                                       maxItems: 16
                                       type: array
+                                      x-kubernetes-list-type: set
                                     set:
                                       description: "Set overwrites the request with
                                         the given header (name, value) before the
@@ -2695,8 +3373,9 @@ spec:
                                             the value with which to replace the prefix
                                             match of a request during a rewrite or
                                             redirect. For example, a request to \"/foo/bar\"
-                                            with a prefix match of \"/foo\" would
-                                            be modified to \"/bar\". \n Note that
+                                            with a prefix match of \"/foo\" and a
+                                            ReplacePrefixMatch of \"/xyz\" would be
+                                            modified to \"/xyz/bar\". \n Note that
                                             this matches the behavior of the PathPrefix
                                             match type. This matches full path elements.
                                             A path element refers to the list of labels
@@ -2704,7 +3383,29 @@ spec:
                                             When specified, a trailing `/` is ignored.
                                             For example, the paths `/abc`, `/abc/`,
                                             and `/abc/def` would all match the prefix
-                                            `/abc`, but the path `/abcd` would not."
+                                            `/abc`, but the path `/abcd` would not.
+                                            \n ReplacePrefixMatch is only compatible
+                                            with a `PathPrefix` HTTPRouteMatch. Using
+                                            any other HTTPRouteMatch type on the same
+                                            HTTPRouteRule will result in the implementation
+                                            setting the Accepted Condition for the
+                                            Route to `status: False`. \n Request Path
+                                            | Prefix Match | Replace Prefix | Modified
+                                            Path -------------|--------------|----------------|----------
+                                            /foo/bar     | /foo         | /xyz           |
+                                            /xyz/bar /foo/bar     | /foo         |
+                                            /xyz/          | /xyz/bar /foo/bar     |
+                                            /foo/        | /xyz           | /xyz/bar
+                                            /foo/bar     | /foo/        | /xyz/          |
+                                            /xyz/bar /foo         | /foo         |
+                                            /xyz           | /xyz /foo/        | /foo
+                                            \        | /xyz           | /xyz/ /foo/bar
+                                            \    | /foo         | <empty string> |
+                                            /bar /foo/        | /foo         | <empty
+                                            string> | / /foo         | /foo         |
+                                            <empty string> | / /foo/        | /foo
+                                            \        | /              | / /foo         |
+                                            /foo         | /              | /"
                                           maxLength: 1024
                                           type: string
                                         type:
@@ -2725,12 +3426,94 @@ spec:
                                       required:
                                       - type
                                       type: object
+                                      x-kubernetes-validations:
+                                      - message: replaceFullPath must be specified
+                                          when type is set to 'ReplaceFullPath'
+                                        rule: 'self.type == ''ReplaceFullPath'' ?
+                                          has(self.replaceFullPath) : true'
+                                      - message: type must be 'ReplaceFullPath' when
+                                          replaceFullPath is set
+                                        rule: 'has(self.replaceFullPath) ? self.type
+                                          == ''ReplaceFullPath'' : true'
+                                      - message: replacePrefixMatch must be specified
+                                          when type is set to 'ReplacePrefixMatch'
+                                        rule: 'self.type == ''ReplacePrefixMatch''
+                                          ? has(self.replacePrefixMatch) : true'
+                                      - message: type must be 'ReplacePrefixMatch'
+                                          when replacePrefixMatch is set
+                                        rule: 'has(self.replacePrefixMatch) ? self.type
+                                          == ''ReplacePrefixMatch'' : true'
                                   type: object
                               required:
                               - type
                               type: object
+                              x-kubernetes-validations:
+                              - message: filter.requestHeaderModifier must be nil
+                                  if the filter.type is not RequestHeaderModifier
+                                rule: '!(has(self.requestHeaderModifier) && self.type
+                                  != ''RequestHeaderModifier'')'
+                              - message: filter.requestHeaderModifier must be specified
+                                  for RequestHeaderModifier filter.type
+                                rule: '!(!has(self.requestHeaderModifier) && self.type
+                                  == ''RequestHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be nil
+                                  if the filter.type is not ResponseHeaderModifier
+                                rule: '!(has(self.responseHeaderModifier) && self.type
+                                  != ''ResponseHeaderModifier'')'
+                              - message: filter.responseHeaderModifier must be specified
+                                  for ResponseHeaderModifier filter.type
+                                rule: '!(!has(self.responseHeaderModifier) && self.type
+                                  == ''ResponseHeaderModifier'')'
+                              - message: filter.requestMirror must be nil if the filter.type
+                                  is not RequestMirror
+                                rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                              - message: filter.requestMirror must be specified for
+                                  RequestMirror filter.type
+                                rule: '!(!has(self.requestMirror) && self.type ==
+                                  ''RequestMirror'')'
+                              - message: filter.requestRedirect must be nil if the
+                                  filter.type is not RequestRedirect
+                                rule: '!(has(self.requestRedirect) && self.type !=
+                                  ''RequestRedirect'')'
+                              - message: filter.requestRedirect must be specified
+                                  for RequestRedirect filter.type
+                                rule: '!(!has(self.requestRedirect) && self.type ==
+                                  ''RequestRedirect'')'
+                              - message: filter.urlRewrite must be nil if the filter.type
+                                  is not URLRewrite
+                                rule: '!(has(self.urlRewrite) && self.type != ''URLRewrite'')'
+                              - message: filter.urlRewrite must be specified for URLRewrite
+                                  filter.type
+                                rule: '!(!has(self.urlRewrite) && self.type == ''URLRewrite'')'
+                              - message: filter.extensionRef must be nil if the filter.type
+                                  is not ExtensionRef
+                                rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                              - message: filter.extensionRef must be specified for
+                                  ExtensionRef filter.type
+                                rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                             maxItems: 16
                             type: array
+                            x-kubernetes-validations:
+                            - message: May specify either httpRouteFilterRequestRedirect
+                                or httpRouteFilterRequestRewrite, but not both
+                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
+                                && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: May specify either httpRouteFilterRequestRedirect
+                                or httpRouteFilterRequestRewrite, but not both
+                              rule: '!(self.exists(f, f.type == ''RequestRedirect'')
+                                && self.exists(f, f.type == ''URLRewrite''))'
+                            - message: RequestHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                                <= 1
+                            - message: ResponseHeaderModifier filter cannot be repeated
+                              rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                                <= 1
+                            - message: RequestRedirect filter cannot be repeated
+                              rule: self.filter(f, f.type == 'RequestRedirect').size()
+                                <= 1
+                            - message: URLRewrite filter cannot be repeated
+                              rule: self.filter(f, f.type == 'URLRewrite').size()
+                                <= 1
                           group:
                             default: ""
                             description: Group is the group of the referent. For example,
@@ -2764,11 +3547,11 @@ spec:
                           namespace:
                             description: "Namespace is the namespace of the backend.
                               When unspecified, the local namespace is inferred. \n
-                              Note that when a namespace is specified, a ReferenceGrant
-                              object is required in the referent namespace to allow
-                              that namespace's owner to accept the reference. See
-                              the ReferenceGrant documentation for details. \n Support:
-                              Core"
+                              Note that when a namespace different than the local
+                              namespace is specified, a ReferenceGrant object is required
+                              in the referent namespace to allow that namespace's
+                              owner to accept the reference. See the ReferenceGrant
+                              documentation for details. \n Support: Core"
                             maxLength: 63
                             minLength: 1
                             pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -2806,6 +3589,10 @@ spec:
                         required:
                         - name
                         type: object
+                        x-kubernetes-validations:
+                        - message: Must have port for Service reference
+                          rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                            ? has(self.port) : true'
                       maxItems: 16
                       type: array
                     filters:
@@ -2818,14 +3605,15 @@ spec:
                         all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
-                        a core filter multiple times has unspecified or implementation-specific
-                        conformance. \n All filters are expected to be compatible
-                        with each other except for the URLRewrite and RequestRedirect
+                        the same filter multiple times is not supported unless explicitly
+                        indicated in the filter. \n All filters are expected to be
+                        compatible with each other except for the URLRewrite and RequestRedirect
                         filters, which may not be combined. If an implementation can
                         not support other combinations of filters, they must clearly
-                        document that limitation. In all cases where incompatible
-                        or unsupported filters are specified, implementations MUST
-                        add a warning condition to status. \n Support: Core"
+                        document that limitation. In cases where incompatible or unsupported
+                        filters are specified and cause the `Accepted` condition to
+                        be set to status `False`, implementations may use the `IncompatibleFilters`
+                        reason to specify this configuration error. \n Support: Core"
                       items:
                         description: HTTPRouteFilter defines processing steps that
                           must be completed during the request or response lifecycle.
@@ -2841,7 +3629,8 @@ spec:
                               extension to the \"filter\" behavior.  For example,
                               resource \"myroutefilter\" in group \"networking.example.net\").
                               ExtensionRef MUST NOT be used for core and extended
-                              filters. \n Support: Implementation-specific"
+                              filters. \n This filter can be used multiple times within
+                              the same rule. \n Support: Implementation-specific"
                             properties:
                               group:
                                 description: Group is the group of the referent. For
@@ -2926,6 +3715,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -2971,27 +3761,33 @@ spec:
                             description: "RequestMirror defines a schema for a filter
                               that mirrors requests. Requests are sent to the specified
                               destination, but responses from that destination are
-                              ignored. \n Support: Extended"
+                              ignored. \n This filter can be used multiple times within
+                              the same rule. Note that not all implementations will
+                              be able to support mirroring to multiple backends. \n
+                              Support: Extended"
                             properties:
                               backendRef:
                                 description: "BackendRef references a resource where
-                                  mirrored requests are sent. \n If the referent cannot
-                                  be found, this BackendRef is invalid and must be
-                                  dropped from the Gateway. The controller must ensure
-                                  the \"ResolvedRefs\" condition on the Route status
-                                  is set to `status: False` and not configure this
-                                  backend in the underlying implementation. \n If
-                                  there is a cross-namespace reference to an *existing*
-                                  object that is not allowed by a ReferenceGrant,
-                                  the controller must ensure the \"ResolvedRefs\"
-                                  \ condition on the Route is set to `status: False`,
-                                  with the \"RefNotPermitted\" reason and not configure
-                                  this backend in the underlying implementation. \n
-                                  In either error case, the Message of the `ResolvedRefs`
-                                  Condition should be used to provide more detail
-                                  about the problem. \n Support: Extended for Kubernetes
-                                  Service \n Support: Implementation-specific for
-                                  any other resource"
+                                  mirrored requests are sent. \n Mirrored requests
+                                  must be sent only to a single destination endpoint
+                                  within this BackendRef, irrespective of how many
+                                  endpoints are present within this BackendRef. \n
+                                  If the referent cannot be found, this BackendRef
+                                  is invalid and must be dropped from the Gateway.
+                                  The controller must ensure the \"ResolvedRefs\"
+                                  condition on the Route status is set to `status:
+                                  False` and not configure this backend in the underlying
+                                  implementation. \n If there is a cross-namespace
+                                  reference to an *existing* object that is not allowed
+                                  by a ReferenceGrant, the controller must ensure
+                                  the \"ResolvedRefs\"  condition on the Route is
+                                  set to `status: False`, with the \"RefNotPermitted\"
+                                  reason and not configure this backend in the underlying
+                                  implementation. \n In either error case, the Message
+                                  of the `ResolvedRefs` Condition should be used to
+                                  provide more detail about the problem. \n Support:
+                                  Extended for Kubernetes Service \n Support: Implementation-specific
+                                  for any other resource"
                                 properties:
                                   group:
                                     default: ""
@@ -3028,11 +3824,12 @@ spec:
                                   namespace:
                                     description: "Namespace is the namespace of the
                                       backend. When unspecified, the local namespace
-                                      is inferred. \n Note that when a namespace is
-                                      specified, a ReferenceGrant object is required
-                                      in the referent namespace to allow that namespace's
-                                      owner to accept the reference. See the ReferenceGrant
-                                      documentation for details. \n Support: Core"
+                                      is inferred. \n Note that when a namespace different
+                                      than the local namespace is specified, a ReferenceGrant
+                                      object is required in the referent namespace
+                                      to allow that namespace's owner to accept the
+                                      reference. See the ReferenceGrant documentation
+                                      for details. \n Support: Core"
                                     maxLength: 63
                                     minLength: 1
                                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -3052,6 +3849,10 @@ spec:
                                 required:
                                 - name
                                 type: object
+                                x-kubernetes-validations:
+                                - message: Must have port for Service reference
+                                  rule: '(size(self.group) == 0 && self.kind == ''Service'')
+                                    ? has(self.port) : true'
                             required:
                             - backendRef
                             type: object
@@ -3087,7 +3888,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -3095,7 +3897,26 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3114,18 +3935,43 @@ spec:
                                 required:
                                 - type
                                 type: object
+                                x-kubernetes-validations:
+                                - message: replaceFullPath must be specified when
+                                    type is set to 'ReplaceFullPath'
+                                  rule: 'self.type == ''ReplaceFullPath'' ? has(self.replaceFullPath)
+                                    : true'
+                                - message: type must be 'ReplaceFullPath' when replaceFullPath
+                                    is set
+                                  rule: 'has(self.replaceFullPath) ? self.type ==
+                                    ''ReplaceFullPath'' : true'
+                                - message: replacePrefixMatch must be specified when
+                                    type is set to 'ReplacePrefixMatch'
+                                  rule: 'self.type == ''ReplacePrefixMatch'' ? has(self.replacePrefixMatch)
+                                    : true'
+                                - message: type must be 'ReplacePrefixMatch' when
+                                    replacePrefixMatch is set
+                                  rule: 'has(self.replacePrefixMatch) ? self.type
+                                    == ''ReplacePrefixMatch'' : true'
                               port:
                                 description: "Port is the port to be used in the value
-                                  of the `Location` header in the response. \n When
-                                  empty, the Gateway Listener port is used. \n Implementers
-                                  should _not_ include the port number in the 'Location'
-                                  header in the following cases: \n * a Location header
-                                  that will use HTTP (whether that is determined via
-                                  the Listener protocol or the Scheme field) _and_
-                                  use port 80. * a Location header that will use HTTPS
-                                  (whether that is determined via the Listener protocol
-                                  or the Scheme field) _and_ use port 443. \n Support:
-                                  Extended"
+                                  of the `Location` header in the response. \n If
+                                  no port is specified, the redirect port MUST be
+                                  derived using the following rules: \n * If redirect
+                                  scheme is not-empty, the redirect port MUST be the
+                                  well-known port associated with the redirect scheme.
+                                  Specifically \"http\" to port 80 and \"https\" to
+                                  port 443. If the redirect scheme does not have a
+                                  well-known port, the listener port of the Gateway
+                                  SHOULD be used. * If redirect scheme is empty, the
+                                  redirect port MUST be the Gateway Listener port.
+                                  \n Implementations SHOULD NOT add the port number
+                                  in the 'Location' header in the following cases:
+                                  \n * A Location header that will use HTTP (whether
+                                  that is determined via the Listener protocol or
+                                  the Scheme field) _and_ use port 80. * A Location
+                                  header that will use HTTPS (whether that is determined
+                                  via the Listener protocol or the Scheme field) _and_
+                                  use port 443. \n Support: Extended"
                                 format: int32
                                 maximum: 65535
                                 minimum: 1
@@ -3134,7 +3980,10 @@ spec:
                                 description: "Scheme is the scheme to be used in the
                                   value of the `Location` header in the response.
                                   When empty, the scheme of the request is used. \n
-                                  Note that values may be added to this enum, implementations
+                                  Scheme redirects can affect the port of the redirect,
+                                  for more information, refer to the documentation
+                                  for the port field of this filter. \n Note that
+                                  values may be added to this enum, implementations
                                   must ensure that unknown values will not cause a
                                   crash. \n Unknown values here must result in the
                                   implementation setting the Accepted Condition for
@@ -3218,6 +4067,7 @@ spec:
                                   type: string
                                 maxItems: 16
                                 type: array
+                                x-kubernetes-list-type: set
                               set:
                                 description: "Set overwrites the request with the
                                   given header (name, value) before the action. \n
@@ -3323,7 +4173,8 @@ spec:
                                       value with which to replace the prefix match
                                       of a request during a rewrite or redirect. For
                                       example, a request to \"/foo/bar\" with a prefix
-                                      match of \"/foo\" would be modified to \"/bar\".
+                                      match of \"/foo\" and a ReplacePrefixMatch of
+                                      \"/xyz\" would be modified to \"/xyz/bar\".
                                       \n Note that this matches the behavior of the
                                       PathPrefix match type. This matches full path
                                       elements. A path element refers to the list
@@ -3331,7 +4182,26 @@ spec:
                                       When specified, a trailing `/` is ignored. For
                                       example, the paths `/abc`, `/abc/`, and `/abc/def`
                                       would all match the prefix `/abc`, but the path
-                                      `/abcd` would not."
+                                      `/abcd` would not. \n ReplacePrefixMatch is
+                                      only compatible with a `PathPrefix` HTTPRouteMatch.
+                                      Using any other HTTPRouteMatch type on the same
+                                      HTTPRouteRule will result in the implementation
+                                      setting the Accepted Condition for the Route
+                                      to `status: False`. \n Request Path | Prefix
+                                      Match | Replace Prefix | Modified Path -------------|--------------|----------------|----------
+                                      /foo/bar     | /foo         | /xyz           |
+                                      /xyz/bar /foo/bar     | /foo         | /xyz/
+                                      \         | /xyz/bar /foo/bar     | /foo/        |
+                                      /xyz           | /xyz/bar /foo/bar     | /foo/
+                                      \       | /xyz/          | /xyz/bar /foo         |
+                                      /foo         | /xyz           | /xyz /foo/        |
+                                      /foo         | /xyz           | /xyz/ /foo/bar
+                                      \    | /foo         | <empty string> | /bar
+                                      /foo/        | /foo         | <empty string>
+                                      | / /foo         | /foo         | <empty string>
+                                      | / /foo/        | /foo         | /              |
+                                      / /foo         | /foo         | /              |
+                                      /"
                                     maxLength: 1024
                                     type: string
                                   type:
@@ -3350,12 +4220,86 @@ spec:
                                 required:
                                 - type
                                 type: object
+                                x-kubernetes-validations:
+                                - message: replaceFullPath must be specified when
+                                    type is set to 'ReplaceFullPath'
+                                  rule: 'self.type == ''ReplaceFullPath'' ? has(self.replaceFullPath)
+                                    : true'
+                                - message: type must be 'ReplaceFullPath' when replaceFullPath
+                                    is set
+                                  rule: 'has(self.replaceFullPath) ? self.type ==
+                                    ''ReplaceFullPath'' : true'
+                                - message: replacePrefixMatch must be specified when
+                                    type is set to 'ReplacePrefixMatch'
+                                  rule: 'self.type == ''ReplacePrefixMatch'' ? has(self.replacePrefixMatch)
+                                    : true'
+                                - message: type must be 'ReplacePrefixMatch' when
+                                    replacePrefixMatch is set
+                                  rule: 'has(self.replacePrefixMatch) ? self.type
+                                    == ''ReplacePrefixMatch'' : true'
                             type: object
                         required:
                         - type
                         type: object
+                        x-kubernetes-validations:
+                        - message: filter.requestHeaderModifier must be nil if the
+                            filter.type is not RequestHeaderModifier
+                          rule: '!(has(self.requestHeaderModifier) && self.type !=
+                            ''RequestHeaderModifier'')'
+                        - message: filter.requestHeaderModifier must be specified
+                            for RequestHeaderModifier filter.type
+                          rule: '!(!has(self.requestHeaderModifier) && self.type ==
+                            ''RequestHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be nil if the
+                            filter.type is not ResponseHeaderModifier
+                          rule: '!(has(self.responseHeaderModifier) && self.type !=
+                            ''ResponseHeaderModifier'')'
+                        - message: filter.responseHeaderModifier must be specified
+                            for ResponseHeaderModifier filter.type
+                          rule: '!(!has(self.responseHeaderModifier) && self.type
+                            == ''ResponseHeaderModifier'')'
+                        - message: filter.requestMirror must be nil if the filter.type
+                            is not RequestMirror
+                          rule: '!(has(self.requestMirror) && self.type != ''RequestMirror'')'
+                        - message: filter.requestMirror must be specified for RequestMirror
+                            filter.type
+                          rule: '!(!has(self.requestMirror) && self.type == ''RequestMirror'')'
+                        - message: filter.requestRedirect must be nil if the filter.type
+                            is not RequestRedirect
+                          rule: '!(has(self.requestRedirect) && self.type != ''RequestRedirect'')'
+                        - message: filter.requestRedirect must be specified for RequestRedirect
+                            filter.type
+                          rule: '!(!has(self.requestRedirect) && self.type == ''RequestRedirect'')'
+                        - message: filter.urlRewrite must be nil if the filter.type
+                            is not URLRewrite
+                          rule: '!(has(self.urlRewrite) && self.type != ''URLRewrite'')'
+                        - message: filter.urlRewrite must be specified for URLRewrite
+                            filter.type
+                          rule: '!(!has(self.urlRewrite) && self.type == ''URLRewrite'')'
+                        - message: filter.extensionRef must be nil if the filter.type
+                            is not ExtensionRef
+                          rule: '!(has(self.extensionRef) && self.type != ''ExtensionRef'')'
+                        - message: filter.extensionRef must be specified for ExtensionRef
+                            filter.type
+                          rule: '!(!has(self.extensionRef) && self.type == ''ExtensionRef'')'
                       maxItems: 16
                       type: array
+                      x-kubernetes-validations:
+                      - message: May specify either httpRouteFilterRequestRedirect
+                          or httpRouteFilterRequestRewrite, but not both
+                        rule: '!(self.exists(f, f.type == ''RequestRedirect'') &&
+                          self.exists(f, f.type == ''URLRewrite''))'
+                      - message: RequestHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'RequestHeaderModifier').size()
+                          <= 1
+                      - message: ResponseHeaderModifier filter cannot be repeated
+                        rule: self.filter(f, f.type == 'ResponseHeaderModifier').size()
+                          <= 1
+                      - message: RequestRedirect filter cannot be repeated
+                        rule: self.filter(f, f.type == 'RequestRedirect').size() <=
+                          1
+                      - message: URLRewrite filter cannot be repeated
+                        rule: self.filter(f, f.type == 'URLRewrite').size() <= 1
                     matches:
                       default:
                       - path:
@@ -3377,21 +4321,21 @@ spec:
                         request. \n Proxy or Load Balancer routing configuration generated
                         from HTTPRoutes MUST prioritize matches based on the following
                         criteria, continuing on ties. Across all rules specified on
-                        applicable Routes, precedence must be given to the match with
-                        the largest number of: \n * Characters in a matching \"Exact\"
-                        path match * Characters in a matching \"Prefix\" path match
-                        * Header matches. * Query param matches. \n Note: The precedence
-                        of RegularExpression path matches are implementation-specific.
-                        \n If ties still exist across multiple Routes, matching precedence
-                        MUST be determined in order of the following criteria, continuing
-                        on ties: \n * The oldest Route based on creation timestamp.
-                        * The Route appearing first in alphabetical order by \"{namespace}/{name}\".
-                        \n If ties still exist within an HTTPRoute, matching precedence
-                        MUST be granted to the FIRST matching rule (in list order)
-                        with a match meeting the above criteria. \n When no rules
-                        matching a request have been successfully attached to the
-                        parent a request is coming from, a HTTP 404 status code MUST
-                        be returned."
+                        applicable Routes, precedence must be given to the match having:
+                        \n * \"Exact\" path match. * \"Prefix\" path match with largest
+                        number of characters. * Method match. * Largest number of
+                        header matches. * Largest number of query param matches. \n
+                        Note: The precedence of RegularExpression path matches are
+                        implementation-specific. \n If ties still exist across multiple
+                        Routes, matching precedence MUST be determined in order of
+                        the following criteria, continuing on ties: \n * The oldest
+                        Route based on creation timestamp. * The Route appearing first
+                        in alphabetical order by \"{namespace}/{name}\". \n If ties
+                        still exist within an HTTPRoute, matching precedence MUST
+                        be granted to the FIRST matching rule (in list order) with
+                        a match meeting the above criteria. \n When no rules matching
+                        a request have been successfully attached to the parent a
+                        request is coming from, a HTTP 404 status code MUST be returned."
                       items:
                         description: "HTTPRouteMatch defines the predicate used to
                           match requests to a given action. Multiple match types are
@@ -3499,6 +4443,52 @@ spec:
                                 maxLength: 1024
                                 type: string
                             type: object
+                            x-kubernetes-validations:
+                            - message: value must be an absolute path and start with
+                                '/' when type one of ['Exact', 'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.startsWith(''/'')
+                                : true'
+                            - message: must not contain '//' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''//'')
+                                : true'
+                            - message: must not contain '/./' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/./'')
+                                : true'
+                            - message: must not contain '/../' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''/../'')
+                                : true'
+                            - message: must not contain '%2f' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2f'')
+                                : true'
+                            - message: must not contain '%2F' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''%2F'')
+                                : true'
+                            - message: must not contain '#' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.contains(''#'')
+                                : true'
+                            - message: must not end with '/..' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/..'')
+                                : true'
+                            - message: must not end with '/.' when type one of ['Exact',
+                                'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? !self.value.endsWith(''/.'')
+                                : true'
+                            - message: type must be one of ['Exact', 'PathPrefix',
+                                'RegularExpression']
+                              rule: self.type in ['Exact','PathPrefix'] || self.type
+                                == 'RegularExpression'
+                            - message: must only contain valid characters (matching
+                                ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$)
+                                for types ['Exact', 'PathPrefix']
+                              rule: '(self.type in [''Exact'',''PathPrefix'']) ? self.value.matches(r"""^(?:[-A-Za-z0-9/._~!$&''()*+,;=:@]|[%][0-9a-fA-F]{2})+$""")
+                                : true'
                           queryParams:
                             description: "QueryParams specifies HTTP query parameter
                               matchers. Multiple match values are ANDed together,
@@ -3564,7 +4554,89 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    timeouts:
+                      description: "Timeouts defines the timeouts that can be configured
+                        for an HTTP request. \n Support: Extended \n "
+                      properties:
+                        backendRequest:
+                          description: "BackendRequest specifies a timeout for an
+                            individual request from the gateway to a backend. This
+                            covers the time from when the request first starts being
+                            sent from the gateway to when the full response has been
+                            received from the backend. \n An entire client HTTP transaction
+                            with a gateway, covered by the Request timeout, may result
+                            in more than one call from the gateway to the destination
+                            backend, for example, if automatic retries are supported.
+                            \n Because the Request timeout encompasses the BackendRequest
+                            timeout, the value of BackendRequest must be <= the value
+                            of Request timeout. \n Support: Extended"
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        request:
+                          description: "Request specifies the maximum duration for
+                            a gateway to respond to an HTTP request. If the gateway
+                            has not been able to respond before this deadline is met,
+                            the gateway MUST return a timeout error. \n For example,
+                            setting the `rules.timeouts.request` field to the value
+                            `10s` in an `HTTPRoute` will cause a timeout if a client
+                            request is taking longer than 10 seconds to complete.
+                            \n This timeout is intended to cover as close to the whole
+                            request-response transaction as possible although an implementation
+                            MAY choose to start the timeout after the entire request
+                            stream has been received instead of immediately after
+                            the transaction is initiated by the client. \n When this
+                            field is unspecified, request timeout behavior is implementation-specific.
+                            \n Support: Extended"
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                      type: object
+                      x-kubernetes-validations:
+                      - message: backendRequest timeout cannot be longer than request
+                          timeout
+                        rule: '!(has(self.request) && has(self.backendRequest) &&
+                          duration(self.request) != duration(''0s'') && duration(self.backendRequest)
+                          > duration(self.request))'
                   type: object
+                  x-kubernetes-validations:
+                  - message: RequestRedirect filter must not be used together with
+                      backendRefs
+                    rule: '(has(self.backendRefs) && size(self.backendRefs) > 0) ?
+                      (!has(self.filters) || self.filters.all(f, !has(f.requestRedirect))):
+                      true'
+                  - message: When using RequestRedirect filter with path.replacePrefixMatch,
+                      exactly one PathPrefix match must be specified
+                    rule: '(has(self.filters) && self.filters.exists_one(f, has(f.requestRedirect)
+                      && has(f.requestRedirect.path) && f.requestRedirect.path.type
+                      == ''ReplacePrefixMatch'' && has(f.requestRedirect.path.replacePrefixMatch)))
+                      ? ((size(self.matches) != 1 || !has(self.matches[0].path) ||
+                      self.matches[0].path.type != ''PathPrefix'') ? false : true)
+                      : true'
+                  - message: When using URLRewrite filter with path.replacePrefixMatch,
+                      exactly one PathPrefix match must be specified
+                    rule: '(has(self.filters) && self.filters.exists_one(f, has(f.urlRewrite)
+                      && has(f.urlRewrite.path) && f.urlRewrite.path.type == ''ReplacePrefixMatch''
+                      && has(f.urlRewrite.path.replacePrefixMatch))) ? ((size(self.matches)
+                      != 1 || !has(self.matches[0].path) || self.matches[0].path.type
+                      != ''PathPrefix'') ? false : true) : true'
+                  - message: Within backendRefs, when using RequestRedirect filter
+                      with path.replacePrefixMatch, exactly one PathPrefix match must
+                      be specified
+                    rule: '(has(self.backendRefs) && self.backendRefs.exists_one(b,
+                      (has(b.filters) && b.filters.exists_one(f, has(f.requestRedirect)
+                      && has(f.requestRedirect.path) && f.requestRedirect.path.type
+                      == ''ReplacePrefixMatch'' && has(f.requestRedirect.path.replacePrefixMatch)))
+                      )) ? ((size(self.matches) != 1 || !has(self.matches[0].path)
+                      || self.matches[0].path.type != ''PathPrefix'') ? false : true)
+                      : true'
+                  - message: Within backendRefs, When using URLRewrite filter with
+                      path.replacePrefixMatch, exactly one PathPrefix match must be
+                      specified
+                    rule: '(has(self.backendRefs) && self.backendRefs.exists_one(b,
+                      (has(b.filters) && b.filters.exists_one(f, has(f.urlRewrite)
+                      && has(f.urlRewrite.path) && f.urlRewrite.path.type == ''ReplacePrefixMatch''
+                      && has(f.urlRewrite.path.replacePrefixMatch))) )) ? ((size(self.matches)
+                      != 1 || !has(self.matches[0].path) || self.matches[0].path.type
+                      != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
             type: object
@@ -3713,9 +4785,11 @@ spec:
                           type: string
                         kind:
                           default: Gateway
-                          description: "Kind is kind of the referent. \n Support:
-                            Core (Gateway) \n Support: Implementation-specific (Other
-                            Resources)"
+                          description: "Kind is kind of the referent. \n There are
+                            two kinds of parent resources with \"Core\" support: \n
+                            * Gateway (Gateway conformance profile) * Service (Mesh
+                            conformance profile, experimental, ClusterIP Services
+                            only) \n Support for other resources is Implementation-Specific."
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
@@ -3735,7 +4809,16 @@ spec:
                             in the namespace they are referring to. For example: Gateway
                             has the AllowedRoutes field, and ReferenceGrant provides
                             a generic way to enable any other kind of cross-namespace
-                            reference. \n Support: Core"
+                            reference. \n ParentRefs from a Route to a Service in
+                            the same namespace are \"producer\" routes, which apply
+                            default routing rules to inbound connections from any
+                            namespace to the Service. \n ParentRefs from a Route to
+                            a Service in a different namespace are \"consumer\" routes,
+                            and these routing rules are only applied to outbound connections
+                            originating from the same namespace as the Route, for
+                            which the intended destination of the connections are
+                            a Service targeted as a ParentRef of the Route. \n Support:
+                            Core"
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
@@ -3751,8 +4834,12 @@ spec:
                             a specific port as opposed to a listener(s) whose port(s)
                             may be changed. When both Port and SectionName are specified,
                             the name and port of the selected listener must match
-                            both specified values. \n Implementations MAY choose to
-                            support other parent resources. Implementations supporting
+                            both specified values. \n When the parent resource is
+                            a Service, this targets a specific port in the Service
+                            spec. When both Port (experimental) and SectionName are
+                            specified, the name and port of the selected port must
+                            match both specified values. \n Implementations MAY choose
+                            to support other parent resources. Implementations supporting
                             other types of parent resources MUST clearly document
                             how/if Port is interpreted. \n For the purpose of status,
                             an attachment is considered successful as long as the
@@ -3763,7 +4850,7 @@ spec:
                             the Route MUST be considered successfully attached. If
                             no Gateway listeners accept attachment from this Route,
                             the Route MUST be considered detached from the Gateway.
-                            \n Support: Extended \n <gateway:experimental>"
+                            \n Support: Extended \n "
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -3774,8 +4861,13 @@ spec:
                             is interpreted as the following: \n * Gateway: Listener
                             Name. When both Port (experimental) and SectionName are
                             specified, the name and port of the selected listener
-                            must match both specified values. \n Implementations MAY
-                            choose to support attaching Routes to other resources.
+                            must match both specified values. * Service: Port Name.
+                            When both Port (experimental) and SectionName are specified,
+                            the name and port of the selected listener must match
+                            both specified values. Note that attaching Routes to Services
+                            as Parents is part of experimental Mesh support and is
+                            not supported for any other purpose. \n Implementations
+                            MAY choose to support attaching Routes to other resources.
                             If that is the case, they MUST clearly document how SectionName
                             is interpreted. \n When unspecified (empty string), this
                             will reference the entire resource. For the purpose of

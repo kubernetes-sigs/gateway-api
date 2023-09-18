@@ -50,10 +50,10 @@ type PortNumber = v1beta1.PortNumber
 // BackendRef defines how a Route should forward a request to a Kubernetes
 // resource.
 //
-// Note that when a namespace is specified, a ReferenceGrant object
-// is required in the referent namespace to allow that namespace's
-// owner to accept the reference. See the ReferenceGrant documentation
-// for details.
+// Note that when a namespace different than the local namespace is specified, a
+// ReferenceGrant object is required in the referent namespace to allow that
+// namespace's owner to accept the reference. See the ReferenceGrant
+// documentation for details.
 // +k8s:deepcopy-gen=false
 type BackendRef = v1beta1.BackendRef
 
@@ -339,6 +339,10 @@ type AnnotationValue = v1beta1.AnnotationValue
 // +kubebuilder:validation:MaxLength=253
 // +kubebuilder:validation:Pattern=`^Hostname|IPAddress|NamedAddress|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-._~%!$&'()*+,;=:]+$`
 type AddressType = v1beta1.AddressType
+
+// Duration is a string value representing a duration in time. The format is as specified
+// in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
+type Duration = v1beta1.Duration
 
 const (
 	// A textual representation of a numeric IP address. IPv4

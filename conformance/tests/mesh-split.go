@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2023 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ var MeshTrafficSplit = suite.ConformanceTest{
 			// reuse issues across parallel tests.
 			tc := cases[i]
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
-				client.SendRequest(t, tc)
+				client.MakeRequestAndExpectEventuallyConsistentResponse(t, tc, s.TimeoutConfig)
 			})
 		}
 	},

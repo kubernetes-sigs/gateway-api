@@ -23,7 +23,6 @@ import (
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
-	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
@@ -35,9 +34,9 @@ type FakeGatewayClasses struct {
 	Fake *FakeGatewayV1alpha2
 }
 
-var gatewayclassesResource = schema.GroupVersionResource{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Resource: "gatewayclasses"}
+var gatewayclassesResource = v1alpha2.SchemeGroupVersion.WithResource("gatewayclasses")
 
-var gatewayclassesKind = schema.GroupVersionKind{Group: "gateway.networking.k8s.io", Version: "v1alpha2", Kind: "GatewayClass"}
+var gatewayclassesKind = v1alpha2.SchemeGroupVersion.WithKind("GatewayClass")
 
 // Get takes name of the gatewayClass, and returns the corresponding gatewayClass object, and an error if there is any.
 func (c *FakeGatewayClasses) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.GatewayClass, err error) {

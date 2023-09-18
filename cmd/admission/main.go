@@ -27,6 +27,7 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
 
 	"k8s.io/klog/v2"
 
@@ -70,7 +71,8 @@ func main() {
 	}
 
 	server := &http.Server{
-		Addr: ":8443",
+		Addr:              ":8443",
+		ReadHeaderTimeout: 10 * time.Second, // for Potential Slowloris Attack (G112)
 		// Require at least TLS12 to satisfy golint G402.
 		TLSConfig: &tls.Config{MinVersion: tls.VersionTLS12, Certificates: []tls.Certificate{certs}},
 	}
@@ -84,7 +86,7 @@ func main() {
 		defer wg.Done()
 		err := server.ListenAndServeTLS("", "")
 		if errors.Is(err, http.ErrServerClosed) {
-			klog.Fatalf("admission-webhook-server stopped: %v", err)
+			klog.Errorf("admission-webhook-server stopped: %v", err)
 		}
 	}()
 	klog.Info("admission webhook server started and listening on :8443")
@@ -96,7 +98,7 @@ func main() {
 
 	klog.Info("admission webhook received kill signal")
 	if err := server.Shutdown(context.Background()); err != nil {
-		klog.Fatalf("server shutdown failed:%+v", err)
+		klog.Errorf("server shutdown failed:%+v", err)
 	}
 	wg.Wait()
 }

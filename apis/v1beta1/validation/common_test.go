@@ -17,6 +17,7 @@ limitations under the License.
 package validation
 
 import (
+	"strings"
 	"testing"
 
 	"k8s.io/apimachinery/pkg/util/validation/field"
@@ -24,7 +25,7 @@ import (
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-var path = *new(field.Path)
+var path = field.Path{}
 
 func TestValidateParentRefs(t *testing.T) {
 	namespace := gatewayv1b1.Namespace("example-namespace")
@@ -36,7 +37,7 @@ func TestValidateParentRefs(t *testing.T) {
 	tests := []struct {
 		name       string
 		parentRefs []gatewayv1b1.ParentReference
-		errCount   int
+		err        string
 	}{{
 		name: "valid ParentRefs includes 1 reference",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -47,7 +48,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		errCount: 0,
+		err: "",
 	}, {
 		name: "valid ParentRefs includes 2 references",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -64,7 +65,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionB,
 			},
 		},
-		errCount: 0,
+		err: "",
 	}, {
 		name: "valid ParentRefs when different references have the same section name",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -81,7 +82,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		errCount: 0,
+		err: "",
 	}, {
 		name: "valid ParentRefs includes more references to the same parent",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -104,7 +105,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionC,
 			},
 		},
-		errCount: 0,
+		err: "",
 	}, {
 		name: "invalid ParentRefs due to the same section names to the same parentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -121,7 +122,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		errCount: 1,
+		err: "must be unique when ParentRefs",
 	}, {
 		name: "invalid ParentRefs due to section names not set to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -132,7 +133,7 @@ func TestValidateParentRefs(t *testing.T) {
 				Name: "example",
 			},
 		},
-		errCount: 1,
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs due to more same section names to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -157,7 +158,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		errCount: 1,
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs when one ParentRef section name not set to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -172,7 +173,7 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: &sectionA,
 			},
 		},
-		errCount: 1,
+		err: "sectionNames or ports must be specified",
 	}, {
 		name: "invalid ParentRefs when next ParentRef section name not set to the same ParentRefs",
 		parentRefs: []gatewayv1b1.ParentReference{
@@ -187,7 +188,84 @@ func TestValidateParentRefs(t *testing.T) {
 				SectionName: nil,
 			},
 		},
-		errCount: 1,
+		err: "sectionNames or ports must be specified",
+	}, {
+		name: "valid ParentRefs with multiple port references to the same parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(81)),
+			},
+		},
+		err: "",
+	}, {
+		name: "valid ParentRefs with multiple mixed references to the same parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				SectionName: &sectionA,
+			},
+		},
+		err: "",
+	}, {
+		name: "invalid ParentRefs due to same port references to the same parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+		},
+		err: "port: Invalid value: 80: must be unique when ParentRefs",
+	}, {
+		name: "invalid ParentRefs due to mixed port references to the same parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      ptrTo(gatewayv1b1.PortNumber(80)),
+			},
+			{
+				Name:      "example",
+				Namespace: &namespace,
+				Port:      nil,
+			},
+		},
+		err: "Required value: sectionNames or ports must be specified",
+	}, {
+		name: "valid ParentRefs with multiple same port references to different section of a  parent",
+		parentRefs: []gatewayv1b1.ParentReference{
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Port:        ptrTo(gatewayv1b1.PortNumber(80)),
+				SectionName: &sectionA,
+			},
+			{
+				Name:        "example",
+				Namespace:   &namespace,
+				Port:        ptrTo(gatewayv1b1.PortNumber(80)),
+				SectionName: &sectionB,
+			},
+		},
+		err: "",
 	}}
 
 	for _, tc := range tests {
@@ -196,8 +274,16 @@ func TestValidateParentRefs(t *testing.T) {
 				ParentRefs: tc.parentRefs,
 			}
 			errs := ValidateParentRefs(spec.ParentRefs, path.Child("spec"))
-			if len(errs) != tc.errCount {
-				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			if tc.err == "" {
+				if len(errs) != 0 {
+					t.Errorf("got %d errors, want none: %s", len(errs), errs)
+				}
+			} else {
+				if errs == nil {
+					t.Errorf("got no errors, want %q", tc.err)
+				} else if !strings.Contains(errs.ToAggregate().Error(), tc.err) {
+					t.Errorf("got %d errors, want %q: %s", len(errs), tc.err, errs)
+				}
 			}
 		})
 	}

@@ -28,12 +28,9 @@ var (
 	ShowDebug                  = flag.Bool("debug", false, "Whether to print debug logs")
 	CleanupBaseResources       = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
 	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites")
+	SkipTests                  = flag.String("skip-tests", "", "Comma-separated list of tests to skip")
 	ExemptFeatures             = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
 	EnableAllSupportedFeatures = flag.Bool("all-features", false, "Whether to enable all supported features for conformance tests")
-)
-
-// Mesh specific flags
-var (
-	MeshOnly               = flag.Bool("mesh-only", false, "Whether to run mesh conformance tests only")
-	MeshImplementationName = flag.String("mesh-implementation-name", "", "Name of the mesh implementation being tested")
+	NamespaceLabels            = flag.String("namespace-labels", "", "Comma-separated list of name=value labels to add to test namespaces")
+	NamespaceAnnotations       = flag.String("namespace-annotations", "", "Comma-separated list of name=value annotations to add to test namespaces")
 )

@@ -1,5 +1,9 @@
 # HTTPRoute
 
+??? success "Standard Channel in v0.5.0+"
+
+    The `HTTPRoute` resource is Beta and part of the Standard Channel in `v0.5.0+`.
+
 [HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
 
@@ -81,14 +85,16 @@ Take the following matches configuration as an example:
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 ...
-matches:
-  - path:
-      value: "/foo"
-    headers:
-      values:
-        version: "2"
-  - path:
-      value: "/v2/foo"
+spec:
+  rules:
+  - matches:
+    - path:
+        value: "/foo"
+      headers:
+      - name: "version"
+        value: "2"
+    - path:
+        value: "/v2/foo"
 ```
 
 For a request to match against this rule, it must satisfy EITHER of the
@@ -122,7 +128,7 @@ Conformance levels are defined by the filter type:
 
  - All "core" filters MUST be supported by implementations.
  - Implementers are encouraged to support "extended" filters.
- - "Custom" filters have no API guarantees across implementations.
+ - "Implementation-specific" filters have no API guarantees across implementations.
 
 Specifying a core filter multiple times has unspecified or 
 implementation-specific conformance.
@@ -130,8 +136,10 @@ implementation-specific conformance.
 All filters are expected to be compatible with each other except for the
 URLRewrite and RequestRedirect filters, which may not be combined. If an
 implementation can not support other combinations of filters, they must clearly
-document that limitation. In all cases where incompatible or unsupported
-filters are specified, implementations MUST add a warning condition to status.
+document that limitation. In cases where incompatible or unsupported
+filters are specified and cause the `Accepted` condition to be set to status
+`False`, implementations may use the `IncompatibleFilters` reason to specify
+this configuration error.
 
 #### BackendRefs (optional)
 
