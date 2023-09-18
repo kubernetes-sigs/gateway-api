@@ -22,7 +22,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (beta)
-- [Kuma][11] (alpha)
+- [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
 - [NGINX Kubernetes Gateway][12]
 - [STUNner][21] (beta)
@@ -301,11 +301,11 @@ For help and support with Kong's implementations please feel free to [create an 
 
 ### Kuma
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kumahq-kuma.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/kumahq-kuma.yaml)
 
 [Kuma][kuma] is an open source service mesh.
 
-Kuma is actively working on an implementation of Gateway API specification for the Kuma builtin Gateway. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma builtin gateway using the Gateway API.
+Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
 
 Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
 Gateway API [support for east-west traffic management][gamma] within the mesh.
