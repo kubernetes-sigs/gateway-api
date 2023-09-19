@@ -174,14 +174,9 @@ spec:
                   wildcard matches, and wildcard matches must be processed before
                   fallback (empty Hostname value) matches. For example, `\"foo.example.com\"`
                   takes precedence over `\"*.example.com\"`, and `\"*.example.com\"`
-                  takes precedence over `\"\"`. \n Implementations SHOULD NOT match
-                  requests to less specific Listeners if they exhaust attached routes
-                  on a more specific Listener. For example, a request for `subdomain.example.com/path`
-                  SHOULD NOT match an HTTPRoute attached to a Listener with Hostname
-                  `*.example.com` if there is a Listener with with Hostname `subdomain.example.com`,
-                  even if no routes on the second Listener match. \n Implementations
-                  MAY merge separate Gateways onto a single set of Addresses if all
-                  Listeners across all Gateways are compatible. \n Support: Core"
+                  takes precedence over `\"\"`. \n Implementations MAY merge separate
+                  Gateways onto a single set of Addresses if all Listeners across
+                  all Gateways are compatible. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
@@ -972,14 +967,9 @@ spec:
                   wildcard matches, and wildcard matches must be processed before
                   fallback (empty Hostname value) matches. For example, `\"foo.example.com\"`
                   takes precedence over `\"*.example.com\"`, and `\"*.example.com\"`
-                  takes precedence over `\"\"`. \n Implementations SHOULD NOT match
-                  requests to less specific Listeners if they exhaust attached routes
-                  on a more specific Listener. For example, a request for `subdomain.example.com/path`
-                  SHOULD NOT match an HTTPRoute attached to a Listener with Hostname
-                  `*.example.com` if there is a Listener with with Hostname `subdomain.example.com`,
-                  even if no routes on the second Listener match. \n Implementations
-                  MAY merge separate Gateways onto a single set of Addresses if all
-                  Listeners across all Gateways are compatible. \n Support: Core"
+                  takes precedence over `\"\"`. \n Implementations MAY merge separate
+                  Gateways onto a single set of Addresses if all Listeners across
+                  all Gateways are compatible. \n Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
