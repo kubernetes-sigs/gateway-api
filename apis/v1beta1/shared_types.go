@@ -66,6 +66,7 @@ type ParentReference struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable any other kind of cross-namespace reference.
 	//
+	// <gateway:experimental:description>
 	// ParentRefs from a Route to a Service in the same namespace are "producer"
 	// routes, which apply default routing rules to inbound connections from
 	// any namespace to the Service.
@@ -75,6 +76,7 @@ type ParentReference struct {
 	// connections originating from the same namespace as the Route, for which
 	// the intended destination of the connections are a Service targeted as a
 	// ParentRef of the Route.
+	// </gateway:experimental:description>
 	//
 	// Support: Core
 	//
@@ -127,9 +129,11 @@ type ParentReference struct {
 	// and SectionName are specified, the name and port of the selected listener
 	// must match both specified values.
 	//
+	// <gateway:experimental:description>
 	// When the parent resource is a Service, this targets a specific port in the
 	// Service spec. When both Port (experimental) and SectionName are specified,
 	// the name and port of the selected port must match both specified values.
+	// </gateway:experimental:description>
 	//
 	// Implementations MAY choose to support other parent resources.
 	// Implementations supporting other types of parent resources MUST clearly
@@ -167,8 +171,9 @@ type CommonRouteSpec struct {
 	// There are two kinds of parent resources with "Core" support:
 	//
 	// * Gateway (Gateway conformance profile)
+	// <gateway:experimental:description>
 	// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
-	//
+	// </gateway:experimental:description>
 	// This API may be extended in the future to support additional kinds of parent
 	// resources.
 	//
@@ -189,6 +194,7 @@ type CommonRouteSpec struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable other kinds of cross-namespace reference.
 	//
+	// <gateway:experimental:description>
 	// ParentRefs from a Route to a Service in the same namespace are "producer"
 	// routes, which apply default routing rules to inbound connections from
 	// any namespace to the Service.
@@ -198,6 +204,7 @@ type CommonRouteSpec struct {
 	// connections originating from the same namespace as the Route, for which
 	// the intended destination of the connections are a Service targeted as a
 	// ParentRef of the Route.
+	// </gateway:experimental:description>
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=32
