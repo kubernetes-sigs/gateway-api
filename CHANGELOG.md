@@ -31,6 +31,24 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
+# Unreleased
+
+## Other Changes
+
+- The condition reason `GatewayReasonUnsupportedAddress` for `Accepted` now ONLY
+  applies when an address type is provided for a `Gateway` which it does not
+  support.
+  (#2412 @shaneutt)
+- The condition reason `GatewayReasonAddressNotAssigned` for `Programmed` now
+  ONLY applies to problems with dynamic address allocation.
+  (#2412 @shaneutt)
+- The condition reason `GatewayReasonAddressNotUsable` for `Programmed` has been
+  added to deal with situations where a static address has been provided for a
+  Gateway which is of a supported type, and is syntatically valid, but for some
+  reason it can not be used for this Gateway (e.g. the address is already in use
+  on the network).
+  (#2412 @shaneutt)
+
 # v0.8.1
 
 This is a patch release that includes small bug fixes and a new conformance test
