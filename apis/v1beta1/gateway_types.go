@@ -510,7 +510,7 @@ type GatewayAddress struct {
 	Value string `json:"value"`
 }
 
-// GatewayStatusAddress describes an address that is bound to a Gateway.
+// GatewayStatusAddress describes a network address that is bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
 type GatewayStatusAddress struct {
