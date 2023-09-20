@@ -532,10 +532,15 @@ type GatewayStatusAddress struct {
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
-	// Addresses lists the IP addresses that have actually been
-	// bound to the Gateway. These addresses may differ from the
-	// addresses in the Spec, e.g. if the Gateway automatically
-	// assigns an address from a reserved pool.
+	// Addresses lists the network addresses that have been bound to the
+	// Gateway.
+	//
+	// This list may differ from the addresses provided in the spec under some
+	// conditions:
+	//
+	//   * no addresses are specified, all addresses are dynamically assigned
+	//   * a combination of specified and dynamic addresses are assigned
+	//   * a specified address was unusable (e.g. already in use)
 	//
 	// +optional
 	// <gateway:validateIPAddress>
