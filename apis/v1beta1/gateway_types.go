@@ -630,10 +630,18 @@ const (
 	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
 
-	// This reason is used with the "Programmed" condition when none of the requested
-	// addresses have been assigned to the Gateway. This reason can be used to
-	// express a range of circumstances, including (but not limited to) IPAM
-	// address exhaustion, address not yet allocated, or a named address not being found.
+	// This reason is used with the "Programmed" condition when the underlying
+	// implementation and network have yet to dynamically assign addresses for a
+	// Gateway.
+	//
+	// Some example situations where this reason can be used:
+	//
+	//   * IPAM address exhaustion
+	//   * Address not yet allocated
+	//
+	// When this reason is used the implementation SHOULD provide a clear
+	// message explaining the underlying problem, ideally with some hints as to
+	// what actions can be taken that might resolve the problem.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
 )
 
