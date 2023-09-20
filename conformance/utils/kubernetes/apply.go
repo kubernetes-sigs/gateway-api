@@ -344,8 +344,8 @@ func getContentsFromPathOrURL(fs embed.FS, location string, timeoutConfig config
 	return bytes.NewBuffer(b), nil
 }
 
-// convertGatewayAddrsToPrimitives converts a slice of Gateway addresses and
-// to a slice of primite types and then returns them as a []interface{} so that
+// convertGatewayAddrsToPrimitives converts a slice of Gateway addresses
+// to a slice of primitive types and then returns them as a []interface{} so that
 // they can be applied back to an unstructured Gateway.
 func convertGatewayAddrsToPrimitives(gwaddrs []v1beta1.GatewayAddress) (raw []interface{}) {
 	for _, addr := range gwaddrs {
