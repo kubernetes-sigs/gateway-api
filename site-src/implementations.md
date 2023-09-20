@@ -24,7 +24,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Kong][10] (beta)
 - [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
-- [NGINX Kubernetes Gateway][12]
+- [NGINX Gateway Fabric][12]
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
@@ -55,7 +55,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [9]:#istio
 [10]:#kong
 [11]:#kuma
-[12]:#nginx-kubernetes-gateway
+[12]:#nginx-gateway-fabric
 [13]:#traefik
 [14]:#flagger
 [15]:#cert-manager
@@ -334,19 +334,19 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 - [Gateway specific documentation](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
 - Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
 
-### NGINX Kubernetes Gateway
+### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-NGINX Kubernetes Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/nginxinc-nginx-kubernetes-gateway.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/nginxinc-nginx-gateway-fabric.yaml)
 
-[NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
+[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Gateway Fabric is currently under development and supports a subset of the Gateway API.
 
-If you have any suggestions or experience issues with NGINX Kubernetes Gateway, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-kubernetes-gateway channel on NGINX slack][nginx-slack].
+If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-gateway-fabric channel on NGINX slack][nginx-slack].
 
-[nginx-kubernetes-gateway]:https://github.com/nginxinc/nginx-kubernetes-gateway
+[nginx-gateway-fabric]:https://github.com/nginxinc/nginx-gateway-fabric
 [nginx]:https://nginx.org/
-[nginx-issue-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/issues/new
-[nginx-disc-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/discussions/new
-[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-kubernetes-gateway
+[nginx-issue-new]:https://github.com/nginxinc/nginx-gateway-fabric/issues/new
+[nginx-disc-new]:https://github.com/nginxinc/nginx-gateway-fabric/discussions/new
+[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
 
 ### STUNner
 
