@@ -39,6 +39,10 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	GatewayStatusMustHaveListeners time.Duration
 
+	// GatewayListenersMustHaveCondition represents the maximum time for a Gateway to have all listeners with a specific condition.
+	// Max value for conformant implementation: None
+	GatewayListenersMustHaveCondition time.Duration
+
 	// GWCMustBeAccepted represents the maximum time for a GatewayClass to have an Accepted condition set to true.
 	// Max value for conformant implementation: None
 	GWCMustBeAccepted time.Duration
@@ -91,22 +95,23 @@ type TimeoutConfig struct {
 // DefaultTimeoutConfig populates a TimeoutConfig with the default values.
 func DefaultTimeoutConfig() TimeoutConfig {
 	return TimeoutConfig{
-		CreateTimeout:                  60 * time.Second,
-		DeleteTimeout:                  10 * time.Second,
-		GetTimeout:                     10 * time.Second,
-		GatewayMustHaveAddress:         180 * time.Second,
-		GatewayStatusMustHaveListeners: 60 * time.Second,
-		GWCMustBeAccepted:              180 * time.Second,
-		HTTPRouteMustNotHaveParents:    60 * time.Second,
-		HTTPRouteMustHaveCondition:     60 * time.Second,
-		TLSRouteMustHaveCondition:      60 * time.Second,
-		RouteMustHaveParents:           60 * time.Second,
-		ManifestFetchTimeout:           10 * time.Second,
-		MaxTimeToConsistency:           30 * time.Second,
-		NamespacesMustBeReady:          300 * time.Second,
-		RequestTimeout:                 10 * time.Second,
-		LatestObservedGenerationSet:    60 * time.Second,
-		RequiredConsecutiveSuccesses:   3,
+		CreateTimeout:                     60 * time.Second,
+		DeleteTimeout:                     10 * time.Second,
+		GetTimeout:                        10 * time.Second,
+		GatewayMustHaveAddress:            180 * time.Second,
+		GatewayStatusMustHaveListeners:    60 * time.Second,
+		GatewayListenersMustHaveCondition: 60 * time.Second,
+		GWCMustBeAccepted:                 180 * time.Second,
+		HTTPRouteMustNotHaveParents:       60 * time.Second,
+		HTTPRouteMustHaveCondition:        60 * time.Second,
+		TLSRouteMustHaveCondition:         60 * time.Second,
+		RouteMustHaveParents:              60 * time.Second,
+		ManifestFetchTimeout:              10 * time.Second,
+		MaxTimeToConsistency:              30 * time.Second,
+		NamespacesMustBeReady:             300 * time.Second,
+		RequestTimeout:                    10 * time.Second,
+		LatestObservedGenerationSet:       60 * time.Second,
+		RequiredConsecutiveSuccesses:      3,
 	}
 }
 
@@ -126,6 +131,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.GatewayStatusMustHaveListeners == 0 {
 		timeoutConfig.GatewayStatusMustHaveListeners = defaultTimeoutConfig.GatewayStatusMustHaveListeners
+	}
+	if timeoutConfig.GatewayListenersMustHaveCondition == 0 {
+		timeoutConfig.GatewayListenersMustHaveCondition = defaultTimeoutConfig.GatewayListenersMustHaveCondition
 	}
 	if timeoutConfig.GWCMustBeAccepted == 0 {
 		timeoutConfig.GWCMustBeAccepted = defaultTimeoutConfig.GWCMustBeAccepted
