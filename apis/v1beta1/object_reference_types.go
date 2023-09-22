@@ -62,7 +62,7 @@ type SecretObjectReference struct {
 	// Name is the name of the referent.
 	Name ObjectName `json:"name"`
 
-	// Namespace is the namespace of the backend. When unspecified, the local
+	// Namespace is the namespace of the referenced object. When unspecified, the local
 	// namespace is inferred.
 	//
 	// Note that when a namespace different than the local namespace is specified,
