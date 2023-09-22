@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -39,7 +36,7 @@ type ProfileReport struct {
 
 // ExtendedStatus shows the testing results for the extended support level.
 type ExtendedStatus struct {
-	Status `json:"status,inline"`
+	Status `json:",inline"`
 
 	// SupportedFeatures indicates which extended features were flagged as
 	// supported by the implementation and tests will be attempted for.

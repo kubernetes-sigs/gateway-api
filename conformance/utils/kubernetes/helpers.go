@@ -106,20 +106,26 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 }
 
 // GatewayMustHaveLatestConditions waits until the specified Gateway has
-// the latest conditions to set.
-func GatewayMustHaveLatestConditions(t *testing.T, timeoutConfig config.TimeoutConfig, gw *v1beta1.Gateway) {
+// all conditions updated with the latest observed generation.
+func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, gwNN types.NamespacedName) {
 	t.Helper()
 
-	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(_ context.Context) (bool, error) {
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.LatestObservedGenerationSet, true, func(ctx context.Context) (bool, error) {
+		gw := &v1beta1.Gateway{}
+		err := c.Get(ctx, gwNN, gw)
+		if err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Logf("Gateway %s/%s latest conditions not set yet: %v", gw.Namespace, gw.Name, err)
+			t.Logf("Gateway %s latest conditions not set yet: %v", gwNN.String(), err)
 			return false, nil
 		}
 
 		return true, nil
 	})
 
-	require.NoErrorf(t, waitErr, "error waiting for %s Gateway to have Latest ObservedGeneration to be set: %v", gw.Name, waitErr)
+	require.NoErrorf(t, waitErr, "error waiting for Gateway %s to have Latest ObservedGeneration to be set: %v", gwNN.String(), waitErr)
 }
 
 // GatewayClassMustHaveLatestConditions will fail the test if there are
@@ -233,9 +239,40 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
-// GatewayAndHTTPRoutesMustBeAccepted waits until the specified Gateway has an IP
-// address assigned to it and the Route has a ParentRef referring to the
-// Gateway. The test will fail if these conditions are not met before the
+// MeshNamespacesMustBeReady waits until all Pods are marked Ready. This is
+// intended to be used for mesh tests and does not require any Gateways to
+// exist. This will cause the test to halt if the specified timeout is exceeded.
+func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, namespaces []string) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.NamespacesMustBeReady, true, func(ctx context.Context) (bool, error) {
+		for _, ns := range namespaces {
+			podList := &v1.PodList{}
+			err := c.List(ctx, podList, client.InNamespace(ns))
+			if err != nil {
+				t.Errorf("Error listing Pods: %v", err)
+			}
+			for _, pod := range podList.Items {
+				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
+					pod.Status.Phase != v1.PodSucceeded &&
+					pod.DeletionTimestamp == nil {
+					t.Logf("%s/%s Pod not ready yet", ns, pod.Name)
+					return false, nil
+				}
+			}
+		}
+		t.Logf("Pods in %s namespaces ready", strings.Join(namespaces, ", "))
+		return true, nil
+	})
+	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
+}
+
+// GatewayAndHTTPRoutesMustBeAccepted waits until:
+// 1. The specified Gateway has an IP address assigned to it.
+// 2. The route has a ParentRef referring to the Gateway.
+// 3. All the gateway's listeners have the ListenerConditionResolvedRefs set to true.
+//
+// The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
 	t.Helper()
@@ -263,17 +300,23 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 					SectionName: listener,
 				},
 				ControllerName: v1beta1.GatewayController(controllerName),
-				Conditions: []metav1.Condition{
-					{
-						Type:   string(v1beta1.RouteConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: string(v1beta1.RouteReasonAccepted),
-					},
-				},
+				Conditions: []metav1.Condition{{
+					Type:   string(v1beta1.RouteConditionAccepted),
+					Status: metav1.ConditionTrue,
+					Reason: string(v1beta1.RouteReasonAccepted),
+				}},
 			})
 		}
 		HTTPRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
 	}
+
+	resolvedRefsCondition := metav1.Condition{
+		Type:   string(v1beta1.ListenerConditionResolvedRefs),
+		Status: metav1.ConditionTrue,
+		Reason: "", // any reason
+	}
+
+	GatewayListenersMustHaveCondition(t, c, timeoutConfig, gw.NamespacedName, resolvedRefsCondition)
 
 	return gwAddr
 }
@@ -311,6 +354,29 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 	})
 	require.NoErrorf(t, waitErr, "error waiting for Gateway to have at least one IP address in status")
 	return net.JoinHostPort(ipAddr, port), waitErr
+}
+
+// GatewayListenersMustHaveCondition checks if every listener of the specified gateway has a
+// certain condition.
+func GatewayListenersMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName, condition metav1.Condition) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayListenersMustHaveCondition, true, func(ctx context.Context) (bool, error) {
+		var gw v1beta1.Gateway
+		if err := client.Get(ctx, gwName, &gw); err != nil {
+			return false, fmt.Errorf("error fetching Gateway: %w", err)
+		}
+
+		for _, listener := range gw.Status.Listeners {
+			if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
+				return false, nil
+			}
+		}
+
+		return true, nil
+	})
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations on all listeners")
 }
 
 // GatewayMustHaveZeroRoutes validates that the gateway has zero routes attached.  The status

@@ -70,13 +70,20 @@ type GatewaySpec struct {
 	// At least one Listener MUST be specified.
 	//
 	// Each listener in a Gateway must have a unique combination of Hostname,
-	// Port, and Protocol. Below combinations are considered Core and MUST be
-	// supported:
+	// Port, and Protocol.
+	//
+	// Within the HTTP Conformance Profile, the below combinations of port and
+	// protocol are considered Core and MUST be supported:
 	//
 	// 1. Port: 80, Protocol: HTTP
 	// 2. Port: 443, Protocol: HTTPS
 	//
-	// Port and protocol combinations not in this list are considered Extended.
+	// Within the TLS Conformance Profile, the below combinations of port and
+	// protocol are considered Core and MUST be supported:
+	//
+	// 1. Port: 443, Protocol: TLS
+	//
+	// Port and protocol combinations not listed above are considered Extended.
 	//
 	// An implementation MAY group Listeners by Port and then collapse each
 	// group of Listeners into a single Listener if the implementation
@@ -117,13 +124,12 @@ type GatewaySpec struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:MaxItems=64
+	// +kubebuilder:validation:XValidation:message="tls must be specified for protocols ['HTTPS', 'TLS']",rule="self.all(l, l.protocol in ['HTTPS', 'TLS'] ? has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="tls must not be specified for protocols ['HTTP', 'TCP', 'UDP']",rule="self.all(l, l.protocol in ['HTTP', 'TCP', 'UDP'] ? !has(l.tls) : true)"
+	// +kubebuilder:validation:XValidation:message="hostname must not be specified for protocols ['TCP', 'UDP']",rule="self.all(l, l.protocol in ['TCP', 'UDP']  ? (!has(l.hostname) || l.hostname == '') : true)"
+	// +kubebuilder:validation:XValidation:message="Listener name must be unique within the Gateway",rule="self.all(l1, self.exists_one(l2, l1.name == l2.name))"
+	// +kubebuilder:validation:XValidation:message="Combination of port, protocol and hostname must be unique for each listener",rule="self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))"
 	Listeners []Listener `json:"listeners"`
-
-	// Infrastructure defines infrastructure level attributes about this Gateway instance.
-	//
-	// <gateway:experimental>
-	// +optional
-	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 
 	// Addresses requested for this Gateway. This is optional and behavior can
 	// depend on the implementation. If a value is set in the spec and the
@@ -150,72 +156,12 @@ type GatewaySpec struct {
 	// Support: Extended
 	//
 	// +optional
+	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
+	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
 }
-
-// GatewayInfrastructure defines infrastructure level attributes about a Gateway
-type GatewayInfrastructure struct {
-	// Routability allows the Gateway to specify the accessibility of its addresses. Setting
-	// this property will override the default value defined by the GatewayClass.
-	//
-	// If the desired Gateway routability is incompatible with the GatewayClass implementations
-	// MUST set the condition `Accepted` to `False` with `Reason` set to `UnsupportedRoutability`.
-	//
-	// The default value of routability is implementation specific and MUST remain consistent for
-	// Gateways with the same gatewayClassName
-	//
-	// Implementations MUST clearly document if they support updates to this field. The default
-	// expectation should be that changes to this field are not supported unless an implementation
-	// specifies otherwise.
-	//
-	// If a Gateway is mutated but does not support the desired routability it MUST set the `Accepted`
-	// and `Programmed` conditions to `False` with `Reason` set to `UnsupportedRoutability`.
-	//
-	// +optional
-	Routability *GatewayRoutability `json:"routability,omitempty"`
-}
-
-// GatewayRoutablility represents the routability of a Gateway
-//
-// The pre-defined values listed in this package can be compared semantically.
-// `Public` has a larger scope than `Private`, while `Private` has a larger scope than
-// `Cluster`.
-//
-// Implementations can define custom routability values by specifying a vendor
-// prefix followed by a slash '/' and a custom name ie. `dev.example.com/my-routability`.
-//
-// +kubebuilder:validation:MinLength=1
-// +kubebuilder:validation:MaxLength=253
-// +kubebuilder:validation:Pattern=`^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$`
-type GatewayRoutability string
-
-const (
-	// GatewayRoutabilityPublic means the Gateway's address MUST
-	// be routable on the public internet.
-	//
-	// Support: Extended
-	GatewayRoutabilityPublic GatewayRoutability = "Public"
-
-	// GatewayRoutabilityPrivate means the Gateway's address MUST
-	// only be routable inside a private network larger than a single
-	// cluster (ie. VPC) and MAY include the RFC1918 address space.
-	//
-	// It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability.
-	// Kubernetes doesn't have a concept of 'Private' routability for Services. In the future this may
-	// change upstream.
-	//
-	// Support: Extended
-	GatewayRoutabilityPrivate GatewayRoutability = "Private"
-
-	// GatewayRoutabilityCluster means the Gateway's address MUST
-	// only be routable inside the [cluster's network].
-	//
-	// Support: Extended
-	//
-	// [cluster's network]: https://kubernetes.io/docs/concepts/cluster-administration/networking/#how-to-implement-the-kubernetes-network-model
-	GatewayRoutabilityCluster GatewayRoutability = "Cluster"
-)
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
 // network connections.
@@ -361,6 +307,8 @@ const (
 )
 
 // GatewayTLSConfig describes a TLS configuration.
+//
+// +kubebuilder:validation:XValidation:message="certificateRefs must be specified when TLSModeType is Terminate",rule="self.mode == 'Terminate' ? size(self.certificateRefs) > 0 : true"
 type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
@@ -526,6 +474,8 @@ type RouteGroupKind struct {
 }
 
 // GatewayAddress describes an address that can be bound to a Gateway.
+//
+// +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
 type GatewayAddress struct {
 	// Type of the address.
 	//
@@ -544,6 +494,8 @@ type GatewayAddress struct {
 }
 
 // GatewayStatusAddress describes an address that is bound to a Gateway.
+//
+// +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
 type GatewayStatusAddress struct {
 	// Type of the address.
 	//
@@ -559,16 +511,6 @@ type GatewayStatusAddress struct {
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=253
 	Value string `json:"value"`
-
-	// Routability specifies the routable bounds of this address
-	// Predefined values are: 'Private', 'Public', Cluster
-	// Other values MUST have a vendor prefix.
-	//
-	// Implementations that support Routability MUST populate this field
-	//
-	// +optional
-	// <gateway:experimental>
-	Routability *GatewayRoutability `json:"routability,omitempty"`
 }
 
 // GatewayStatus defines the observed state of Gateway.
@@ -578,15 +520,8 @@ type GatewayStatus struct {
 	// addresses in the Spec, e.g. if the Gateway automatically
 	// assigns an address from a reserved pool.
 	//
-	// Implementations that support GatewayRoutability MUST include an address
-	// that has the same routable semantics as defined in the Gateway spec.
-	//
-	// Implementations MAY add additional addresses in status, but they MUST be
-	// semantically less than the scope of the requested scope. For example if a
-	// user requests a `Private` routable Gateway then an additional address MAY
-	// have a routability of `Cluster` but MUST NOT include `Public`.
-	//
 	// +optional
+	// <gateway:validateIPAddress>
 	// +kubebuilder:validation:MaxItems=16
 	Addresses []GatewayStatusAddress `json:"addresses,omitempty"`
 
@@ -678,10 +613,6 @@ const (
 	// express a range of circumstances, including (but not limited to) IPAM
 	// address exhaustion, address not yet allocated, or a named address not being found.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
-
-	// This reason is used with "Programmed" and "Accepted" conditions when
-	// desired routability is not able to be fulfilled by the implementation
-	GatewayUnsupportedRoutability GatewayConditionReason = "UnsupportedRoutability"
 )
 
 const (
@@ -790,8 +721,23 @@ type ListenerStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	SupportedKinds []RouteGroupKind `json:"supportedKinds"`
 
-	// AttachedRoutes represents the total number of accepted Routes that have been
+	// AttachedRoutes represents the total number of Routes that have been
 	// successfully attached to this Listener.
+	//
+	// Successful attachment of a Route to a Listener is based solely on the
+	// combination of the AllowedRoutes field on the corresponding Listener
+	// and the Route's ParentRefs field. A Route is successfully attached to
+	// a Listener when it is selected by the Listener's AllowedRoutes field
+	// AND the Route has a valid ParentRef selecting the whole Gateway
+	// resource or a specific Listener as a parent resource (more detail on
+	// attachment semantics can be found in the documentation on the various
+	// Route kinds ParentRefs fields). Listener or Route status does not impact
+	// successful attachment, i.e. the AttachedRoutes field count MUST be set
+	// for Listeners with condition Accepted: false and MUST count successfully
+	// attached Routes that may themselves have Accepted: false conditions.
+	//
+	// Uses for this field include troubleshooting Route attachment and
+	// measuring blast radius/impact of changes to a Listener.
 	AttachedRoutes int32 `json:"attachedRoutes"`
 
 	// Conditions describe the current condition of this listener.

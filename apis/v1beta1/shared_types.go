@@ -25,7 +25,7 @@ import (
 // with "Core" support:
 //
 // * Gateway (Gateway conformance profile)
-// * Service (Mesh conformance profile)
+// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 //
 // This API may be extended in the future to support additional kinds of parent
 // resources.
@@ -49,7 +49,7 @@ type ParentReference struct {
 	// There are two kinds of parent resources with "Core" support:
 	//
 	// * Gateway (Gateway conformance profile)
-	// * Service (Mesh conformance profile)
+	// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 	//
 	// Support for other resources is Implementation-Specific.
 	//
@@ -66,6 +66,7 @@ type ParentReference struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable any other kind of cross-namespace reference.
 	//
+	// <gateway:experimental:description>
 	// ParentRefs from a Route to a Service in the same namespace are "producer"
 	// routes, which apply default routing rules to inbound connections from
 	// any namespace to the Service.
@@ -75,6 +76,7 @@ type ParentReference struct {
 	// connections originating from the same namespace as the Route, for which
 	// the intended destination of the connections are a Service targeted as a
 	// ParentRef of the Route.
+	// </gateway:experimental:description>
 	//
 	// Support: Core
 	//
@@ -92,6 +94,11 @@ type ParentReference struct {
 	// * Gateway: Listener Name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
+	// * Service: Port Name. When both Port (experimental) and SectionName
+	// are specified, the name and port of the selected listener must match
+	// both specified values. Note that attaching Routes to Services as Parents
+	// is part of experimental Mesh support and is not supported for any other
+	// purpose.
 	//
 	// Implementations MAY choose to support attaching Routes to other resources.
 	// If that is the case, they MUST clearly document how SectionName is
@@ -122,9 +129,11 @@ type ParentReference struct {
 	// and SectionName are specified, the name and port of the selected listener
 	// must match both specified values.
 	//
+	// <gateway:experimental:description>
 	// When the parent resource is a Service, this targets a specific port in the
 	// Service spec. When both Port (experimental) and SectionName are specified,
 	// the name and port of the selected port must match both specified values.
+	// </gateway:experimental:description>
 	//
 	// Implementations MAY choose to support other parent resources.
 	// Implementations supporting other types of parent resources MUST clearly
@@ -162,8 +171,9 @@ type CommonRouteSpec struct {
 	// There are two kinds of parent resources with "Core" support:
 	//
 	// * Gateway (Gateway conformance profile)
-	// * Service (Mesh conformance profile)
-	//
+	// <gateway:experimental:description>
+	// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+	// </gateway:experimental:description>
 	// This API may be extended in the future to support additional kinds of parent
 	// resources.
 	//
@@ -184,6 +194,7 @@ type CommonRouteSpec struct {
 	// Gateway has the AllowedRoutes field, and ReferenceGrant provides a
 	// generic way to enable other kinds of cross-namespace reference.
 	//
+	// <gateway:experimental:description>
 	// ParentRefs from a Route to a Service in the same namespace are "producer"
 	// routes, which apply default routing rules to inbound connections from
 	// any namespace to the Service.
@@ -193,9 +204,14 @@ type CommonRouteSpec struct {
 	// connections originating from the same namespace as the Route, for which
 	// the intended destination of the connections are a Service targeted as a
 	// ParentRef of the Route.
+	// </gateway:experimental:description>
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=32
+	// <gateway:standard:validation:XValidation:message="sectionName must be specified when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && p1.sectionName != '' && has(p2.sectionName) && p2.sectionName != '')) : true))">
+	// <gateway:standard:validation:XValidation:message="sectionName must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))">
+	// <gateway:experimental:validation:XValidation:message="sectionName or port must be specified when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '') ) || ( has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName != '') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName) && p2.sectionName != '') || (has(p2.port) && p2.port != 0) ) ) ) ): true ))">
+	// <gateway:experimental:validation:XValidation:message="sectionName or port must be unique when parentRefs includes 2 or more references to the same parent",rule="self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))">
 	ParentRefs []ParentReference `json:"parentRefs,omitempty"`
 }
 
@@ -600,6 +616,12 @@ type AddressType string
 // +kubebuilder:validation:Pattern=`^[A-Za-z0-9!#$%&'*+\-.^_\x60|~]+$`
 // +k8s:deepcopy-gen=false
 type HeaderName string
+
+// Duration is a string value representing a duration in time. The format is as specified
+// in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
+//
+// +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
+type Duration string
 
 const (
 	// A textual representation of a numeric IP address. IPv4

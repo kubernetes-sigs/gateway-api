@@ -33,12 +33,6 @@ unchanged.
 
 ### Path redirects
 
-!!! info "Experimental Channel"
-
-    The `Path` field described below is currently only included in the
-    "Experimental" channel of Gateway API. Starting in v0.7.0, this
-    feature will graduate to the "Standard" channel.
-
 Path redirects use an HTTP Path Modifier to replace either entire paths or path
 prefixes. For example, the HTTPRoute below will issue a 302 redirect to all
 `redirect.example` requests whose path begins with `/cayenne` to `/paprika`:

@@ -55,10 +55,14 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 						Path: "/mirror",
 					},
 				},
-				Backend:    "infra-backend-v1",
-				MirroredTo: "infra-backend-v2",
-				Namespace:  ns,
-			}, {
+				Backend: "infra-backend-v1",
+				MirroredTo: []http.BackendRef{{
+					Name:      "infra-backend-v2",
+					Namespace: ns,
+				}},
+				Namespace: ns,
+			},
+			{
 				Request: http.Request{
 					Path: "/mirror-and-modify-headers",
 					Headers: map[string]string{
@@ -77,9 +81,12 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 					},
 					AbsentHeaders: []string{"X-Header-Remove"},
 				},
-				Namespace:  ns,
-				Backend:    "infra-backend-v1",
-				MirroredTo: "infra-backend-v2",
+				Namespace: ns,
+				Backend:   "infra-backend-v1",
+				MirroredTo: []http.BackendRef{{
+					Name:      "infra-backend-v2",
+					Namespace: ns,
+				}},
 			},
 		}
 		for i := range testCases {
@@ -89,7 +96,7 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
 				t.Parallel()
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, ns, tc.MirroredTo, tc.Request.Path)
+				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
 			})
 		}
 	},

@@ -1,6 +1,3 @@
-//go:build experimental
-// +build experimental
-
 /*
 Copyright 2023 The Kubernetes Authors.
 
@@ -23,12 +20,12 @@ import (
 	"os"
 	"testing"
 
-	"gopkg.in/yaml.v2"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -39,15 +36,16 @@ import (
 )
 
 var (
-	cfg                 *rest.Config
-	k8sClientset        *kubernetes.Clientset
-	mgrClient           client.Client
-	supportedFeatures   sets.Set[suite.SupportedFeature]
-	exemptFeatures      sets.Set[suite.SupportedFeature]
-	namespaceLabels     map[string]string
-	implementation      *confv1a1.Implementation
-	conformanceProfiles sets.Set[suite.ConformanceProfileName]
-	skipTests           []string
+	cfg                  *rest.Config
+	k8sClientset         *kubernetes.Clientset
+	mgrClient            client.Client
+	supportedFeatures    sets.Set[suite.SupportedFeature]
+	exemptFeatures       sets.Set[suite.SupportedFeature]
+	namespaceLabels      map[string]string
+	namespaceAnnotations map[string]string
+	implementation       *confv1a1.Implementation
+	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
+	skipTests            []string
 )
 
 func TestExperimentalConformance(t *testing.T) {
@@ -72,17 +70,18 @@ func TestExperimentalConformance(t *testing.T) {
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures = suite.ParseSupportedFeatures(*flags.ExemptFeatures)
 	skipTests = suite.ParseSkipTests(*flags.SkipTests)
-	namespaceLabels = suite.ParseNamespaceLabels(*flags.NamespaceLabels)
+	namespaceLabels = suite.ParseKeyValuePairs(*flags.NamespaceLabels)
+	namespaceAnnotations = suite.ParseKeyValuePairs(*flags.NamespaceAnnotations)
 
 	// experimental conformance flags
-	conformanceProfiles := suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 
 	if conformanceProfiles.Len() > 0 {
 		// if some conformance profiles have been set, run the experimental conformance suite...
 		implementation, err = suite.ParseImplementation(
 			*flags.ImplementationOrganization,
 			*flags.ImplementationProject,
-			*flags.ImplementationUrl,
+			*flags.ImplementationURL,
 			*flags.ImplementationVersion,
 			*flags.ImplementationContact,
 		)
@@ -104,7 +103,6 @@ func testExperimentalConformance(t *testing.T) {
 		suite.ExperimentalConformanceOptions{
 			Options: suite.Options{
 				Client:     mgrClient,
-				RESTClient: k8sClientset.CoreV1().RESTClient().(*rest.RESTClient),
 				RestConfig: cfg,
 				// This clientset is needed in addition to the client only because
 				// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
@@ -116,6 +114,7 @@ func testExperimentalConformance(t *testing.T) {
 				ExemptFeatures:             exemptFeatures,
 				EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 				NamespaceLabels:            namespaceLabels,
+				NamespaceAnnotations:       namespaceAnnotations,
 				SkipTests:                  skipTests,
 			},
 			Implementation:      *implementation,
@@ -131,21 +130,21 @@ func testExperimentalConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error generating conformance profile report: %v", err)
 	}
-	writeReport(t.Log, *report, *flags.ReportOutput)
+	writeReport(t.Logf, *report, *flags.ReportOutput)
 }
 
-func writeReport(log func(...any), report confv1a1.ConformanceReport, output string) error {
+func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, output string) error {
 	rawReport, err := yaml.Marshal(report)
 	if err != nil {
 		return err
 	}
 
 	if output != "" {
-		if err = os.WriteFile(output, rawReport, 0644); err != nil {
+		if err = os.WriteFile(output, rawReport, 0o600); err != nil {
 			return err
 		}
 	}
-	log("Conformance report:\n %s", rawReport)
+	logf("Conformance report:\n%s", string(rawReport))
 
 	return nil
 }

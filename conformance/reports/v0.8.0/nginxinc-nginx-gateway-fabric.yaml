@@ -1,0 +1,38 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-08-31T16:40:14Z"
+gatewayAPIVersion: v0.8.0
+implementation:
+  contact:
+  - https://github.com/nginxinc/nginx-gateway-fabric/discussions/new/choose
+  organization: nginxinc
+  project: nginx-gateway-fabric
+  url: https://github.com/nginxinc/nginx-gateway-fabric
+  version: v0.6.0
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 4
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRouteSchemeRedirect
+    - HTTPRouteMethodMatching
+    - HTTPRouteQueryParamMatching
+    - HTTPRoutePortRedirect
+    unsupportedFeatures:
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRouteHostRewrite
+    - HTTPRouteRequestMirror
+    - HTTPResponseHeaderModification
+  name: HTTP

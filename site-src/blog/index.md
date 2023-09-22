@@ -1,5 +1,25 @@
 # Blog
 
+
+
+## [Gateway API: Introducing Service Mesh Support!]
+
+<small style="position:relative; top:-10px;">
+  :octicons-calendar-24: August 29, 2023 ·
+  :octicons-clock-24: 5 min read
+</small>
+
+We are thrilled to announce the v0.8.0 release of Gateway API! With this
+release, Gateway API support for service mesh has reached [Experimental
+status][status], we've introduced CEL validation and a `Mesh` conformance
+profile, and we've made some changes to the GEP process. We look forward to
+your feedback!
+
+[:octicons-arrow-right-24: Continue reading][Gateway API: Introducing Service Mesh Support!]
+
+[status]:https://gateway-api.sigs.k8s.io/geps/overview/#status
+[Gateway API: Introducing Service Mesh Support!]:/blog/2023/0829-mesh-support
+
 ## [Gateway API Graduates to Beta]
 
 <small style="position:relative; top:-10px;">

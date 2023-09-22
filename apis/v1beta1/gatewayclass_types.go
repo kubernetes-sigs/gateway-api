@@ -57,6 +57,9 @@ type GatewayClass struct {
 
 	// Status defines the current state of GatewayClass.
 	//
+	// Implementations MUST populate status on all GatewayClass resources which
+	// specify their controller name.
+	//
 	// +kubebuilder:default={conditions: {{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Waiting", lastTransitionTime: "1970-01-01T00:00:00Z"}}}
 	Status GatewayClassStatus `json:"status,omitempty"`
 }
@@ -78,6 +81,8 @@ type GatewayClassSpec struct {
 	// This field is not mutable and cannot be empty.
 	//
 	// Support: Core
+	//
+	// +kubebuilder:validation:XValidation:message="Value is immutable",rule="self == oldSelf"
 	ControllerName GatewayController `json:"controllerName"`
 
 	// ParametersRef is a reference to a resource that contains the configuration
@@ -153,6 +158,7 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "InvalidParameters"
+	// * "UnsupportedVersion"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -181,23 +187,51 @@ const (
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
 )
 
+const (
+	// This condition indicates whether the GatewayClass supports the version(s)
+	// of Gateway API CRDs present in the cluster. This condition MUST be set by
+	// a controller when it marks a GatewayClass "Accepted".
+	//
+	// The version of a Gateway API CRD is defined by the
+	// gateway.networking.k8s.io/bundle-version annotation on the CRD. If
+	// implementations detect any Gateway API CRDs that either do not have this
+	// annotation set, or have it set to a version that is not recognized or
+	// supported by the implementation, this condition MUST be set to false.
+	//
+	// Implementations MAY choose to either provide "best effort" support when
+	// an unrecognized CRD version is present. This would be communicated by
+	// setting the "Accepted" condition to true and the "SupportedVersion"
+	// condition to false.
+	//
+	// Alternatively, implementations MAY choose not to support CRDs with
+	// unrecognized versions. This would be communicated by setting the
+	// "Accepted" condition to false with the reason "UnsupportedVersions".
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "SupportedVersion"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "UnsupportedVersion"
+	//
+	// Controllers should prefer to use the values of GatewayClassConditionReason
+	// for the corresponding Reason, where appropriate.
+	GatewayClassConditionStatusSupportedVersion GatewayClassConditionType = "SupportedVersion"
+
+	// This reason is used with the "SupportedVersion" condition when the
+	// condition is true.
+	GatewayClassReasonSupportedVersion GatewayClassConditionReason = "SupportedVersion"
+
+	// This reason is used with the "SupportedVersion" or "Accepted" condition
+	// when the condition is false. A message SHOULD be included in this
+	// condition that includes the detected CRD version(s) present in the
+	// cluster and the CRD version(s) that are supported by the GatewayClass.
+	GatewayClassReasonUnsupportedVersion GatewayClassConditionReason = "UnsupportedVersion"
+)
+
 // GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatus struct {
-	// Routabilities specifies a list of supported routabilities offered by
-	// the GatewayClass. The first entry in this list will be the default
-	// routability used when Gateways of this class are created.
-	//
-	// Implementations MAY provide a pre-defined set of GatewayClasses that
-	// limit the routability choices of a Gateway.
-	//
-	// Implementations MUST populate this list with the GatewayRoutability values
-	// that are supported by this GatewayClass.
-	//
-	// +optional
-	// +kubebuilder:validation:MaxItems=8
-	// <gateway:experimental>
-	Routabilities []GatewayRoutability `json:"routabilities,omitempty"`
-
 	// Conditions is the current status from the controller for
 	// this GatewayClass.
 	//

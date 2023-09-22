@@ -49,13 +49,23 @@ An important consideration when implementing this API is how it might change in
 the future. Similar to the Ingress API before it, this API is designed to be
 implemented by a variety of different products within the same cluster. That
 means that the API version your implementation was developed with may be
-different than the API version it is used with. At a minimum, the following
-requirements must be met to ensure future versions of the API do not break your
-implementation:
+different than the API version it is used with.
+
+At a minimum, the following requirements must be met to ensure future versions
+of the API do not break your implementation:
 
 * Handle fields with loosened validation without crashing
 * Handle fields that have transitioned from required to optional without
   crashing
+
+### Supported API Versions
+
+The version of Gateway API CRDs that is installed in a cluster can be determined
+by looking at the `gateway.networking.k8s.io/bundle-version` annotation on each
+CRD. Each implementation MUST compare that with the list of versions that it
+recognizes and supports. Implementations with a GatewayClass MUST publish the
+`SupportedVersion` condition on the GatewayClass to indicate whether the CRDs
+installed in the cluster are supported.
 
 ## Limitations of CRD and Webhook Validation
 
@@ -68,7 +78,7 @@ fully reliable because it:
 
 * May not be deployed correctly.
 * May be loosened in future API releases. (Fields may contain values with less
-  restrictive validation in newer versions of the API). 
+  restrictive validation in newer versions of the API).
 
 *Note: These limitations are not unique to Gateway API and apply more broadly to
 any Kubernetes CRDs and webhooks.*

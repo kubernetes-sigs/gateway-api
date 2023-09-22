@@ -36,7 +36,7 @@ import (
 // conformance tests.
 type ConformanceTestSuite struct {
 	Client            client.Client
-	Clientset         *clientset.Clientset
+	Clientset         clientset.Interface
 	RESTClient        *rest.RESTClient
 	RestConfig        *rest.Config
 	RoundTripper      roundtripper.RoundTripper
@@ -55,16 +55,16 @@ type ConformanceTestSuite struct {
 
 // Options can be used to initialize a ConformanceTestSuite.
 type Options struct {
-	Client           client.Client
-	Clientset        *clientset.Clientset
-	RESTClient       *rest.RESTClient
-	RestConfig       *rest.Config
-	GatewayClassName string
-	Debug            bool
-	RoundTripper     roundtripper.RoundTripper
-	BaseManifests    string
-	MeshManifests    string
-	NamespaceLabels  map[string]string
+	Client               client.Client
+	Clientset            clientset.Interface
+	RestConfig           *rest.Config
+	GatewayClassName     string
+	Debug                bool
+	RoundTripper         roundtripper.RoundTripper
+	BaseManifests        string
+	MeshManifests        string
+	NamespaceLabels      map[string]string
+	NamespaceAnnotations map[string]string
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -90,12 +90,12 @@ func New(s Options) *ConformanceTestSuite {
 	}
 
 	switch {
-	case s.EnableAllSupportedFeatures == true:
+	case s.EnableAllSupportedFeatures:
 		s.SupportedFeatures = AllFeatures
 	case s.SupportedFeatures == nil:
-		s.SupportedFeatures = StandardCoreFeatures
+		s.SupportedFeatures = GatewayCoreFeatures
 	default:
-		for feature := range StandardCoreFeatures {
+		for feature := range GatewayCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}
 	}
@@ -111,7 +111,6 @@ func New(s Options) *ConformanceTestSuite {
 	suite := &ConformanceTestSuite{
 		Client:           s.Client,
 		Clientset:        s.Clientset,
-		RESTClient:       s.RESTClient,
 		RestConfig:       s.RestConfig,
 		RoundTripper:     roundTripper,
 		GatewayClassName: s.GatewayClassName,
@@ -120,7 +119,8 @@ func New(s Options) *ConformanceTestSuite {
 		BaseManifests:    s.BaseManifests,
 		MeshManifests:    s.MeshManifests,
 		Applier: kubernetes.Applier{
-			NamespaceLabels: s.NamespaceLabels,
+			NamespaceLabels:      s.NamespaceLabels,
+			NamespaceAnnotations: s.NamespaceAnnotations,
 		},
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
@@ -142,14 +142,15 @@ func New(s Options) *ConformanceTestSuite {
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T) {
-	t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
-	suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
-
-	suite.Applier.GatewayClass = suite.GatewayClassName
-	suite.Applier.ControllerName = suite.ControllerName
 	suite.Applier.FS = suite.FS
 
 	if suite.SupportedFeatures.Has(SupportGateway) {
+		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
+		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
+
+		suite.Applier.GatewayClass = suite.GatewayClassName
+		suite.Applier.ControllerName = suite.ControllerName
+
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
 
@@ -181,7 +182,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 			"gateway-conformance-app-backend",
 			"gateway-conformance-web-backend",
 		}
-		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
+		kubernetes.MeshNamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
 }
 
@@ -246,9 +247,9 @@ func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
 	return res
 }
 
-// ParseNamespaceLables parses flag arguments and converts the string to
+// ParseKeyValuePairs parses flag arguments and converts the string to
 // map[string]string containing label key/value pairs.
-func ParseNamespaceLabels(f string) map[string]string {
+func ParseKeyValuePairs(f string) map[string]string {
 	if f == "" {
 		return nil
 	}

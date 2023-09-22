@@ -40,6 +40,7 @@ var HTTPRouteRedirectPortAndScheme = suite.ConformanceTest{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 		suite.SupportHTTPRoutePortRedirect,
+		suite.SupportGatewayPort8080,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"

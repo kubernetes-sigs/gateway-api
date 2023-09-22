@@ -55,6 +55,11 @@ var GatewaySecretReferenceGrantSpecific = suite.ConformanceTest{
 						Status: metav1.ConditionTrue,
 						Reason: string(v1beta1.ListenerReasonProgrammed),
 					},
+					{
+						Type:   string(v1beta1.ListenerConditionResolvedRefs),
+						Status: metav1.ConditionTrue,
+						Reason: "", // any reason
+					},
 				},
 				AttachedRoutes: 0,
 			}}

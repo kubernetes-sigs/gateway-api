@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/1923
-    gateway.networking.k8s.io/bundle-version: v0.7.1-dev
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2245
+    gateway.networking.k8s.io/bundle-version: v0.8.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: gateways.gateway.networking.k8s.io
@@ -73,10 +73,24 @@ spec:
                   manner, assigning an appropriate set of Addresses. \n The implementation
                   MUST bind all Listeners to every GatewayAddress that it assigns
                   to the Gateway and add a corresponding entry in GatewayStatus.Addresses.
-                  \n Support: Extended"
+                  \n Support: Extended \n "
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -95,67 +109,59 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
+                      true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: IPAddress values must be unique
+                  rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
+                - message: Hostname values must be unique
+                  rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name
                   of a GatewayClass resource.
                 maxLength: 253
                 minLength: 1
                 type: string
-              infrastructure:
-                description: "Infrastructure defines infrastructure level attributes
-                  about this Gateway instance. \n <gateway:experimental>"
-                properties:
-                  routability:
-                    description: "Routability allows the Gateway to specify the accessibility
-                      of its addresses. Setting this property will override the default
-                      value defined by the GatewayClass. \n If the desired Gateway
-                      routability is incompatible with the GatewayClass implementations
-                      MUST set the condition `Accepted` to `False` with `Reason` set
-                      to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific and MUST remain consistent for Gateways
-                      with the same gatewayClassName \n Implementations MUST clearly
-                      document if they support updates to this field. The default
-                      expectation should be that changes to this field are not supported
-                      unless an implementation specifies otherwise. \n If a Gateway
-                      is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
-                    maxLength: 253
-                    minLength: 1
-                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                    type: string
-                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
                   least one Listener MUST be specified. \n Each listener in a Gateway
                   must have a unique combination of Hostname, Port, and Protocol.
-                  Below combinations are considered Core and MUST be supported: \n
-                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Port
-                  and protocol combinations not in this list are considered Extended.
-                  \n An implementation MAY group Listeners by Port and then collapse
-                  each group of Listeners into a single Listener if the implementation
-                  determines that the Listeners in the group are \"compatible\". An
-                  implementation MAY also group together and collapse compatible Listeners
-                  belonging to different Gateways. \n For example, an implementation
-                  might consider Listeners to be compatible with each other if all
-                  of the following conditions are met: \n 1. Either each Listener
-                  within the group specifies the \"HTTP\" Protocol or each Listener
-                  within the group specifies either the \"HTTPS\" or \"TLS\" Protocol.
-                  \n 2. Each Listener within the group specifies a Hostname that is
-                  unique within the group. \n 3. As a special case, one Listener within
-                  a group may omit Hostname, in which case this Listener matches when
-                  no other Listener matches. \n If the implementation does collapse
-                  compatible Listeners, the hostname provided in the incoming client
-                  request MUST be matched to a Listener to find the correct set of
-                  Routes. The incoming hostname MUST be matched using the Hostname
-                  field for each Listener in order of most to least specific. That
-                  is, exact matches must be processed before wildcard matches. \n
-                  If this field specifies multiple Listeners that have the same Port
-                  value but are not compatible, the implementation must raise a \"Conflicted\"
-                  condition in the Listener status. \n Support: Core"
+                  \n Within the HTTP Conformance Profile, the below combinations of
+                  port and protocol are considered Core and MUST be supported: \n
+                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Within
+                  the TLS Conformance Profile, the below combinations of port and
+                  protocol are considered Core and MUST be supported: \n 1. Port:
+                  443, Protocol: TLS \n Port and protocol combinations not listed
+                  above are considered Extended. \n An implementation MAY group Listeners
+                  by Port and then collapse each group of Listeners into a single
+                  Listener if the implementation determines that the Listeners in
+                  the group are \"compatible\". An implementation MAY also group together
+                  and collapse compatible Listeners belonging to different Gateways.
+                  \n For example, an implementation might consider Listeners to be
+                  compatible with each other if all of the following conditions are
+                  met: \n 1. Either each Listener within the group specifies the \"HTTP\"
+                  Protocol or each Listener within the group specifies either the
+                  \"HTTPS\" or \"TLS\" Protocol. \n 2. Each Listener within the group
+                  specifies a Hostname that is unique within the group. \n 3. As a
+                  special case, one Listener within a group may omit Hostname, in
+                  which case this Listener matches when no other Listener matches.
+                  \n If the implementation does collapse compatible Listeners, the
+                  hostname provided in the incoming client request MUST be matched
+                  to a Listener to find the correct set of Routes. The incoming hostname
+                  MUST be matched using the Hostname field for each Listener in order
+                  of most to least specific. That is, exact matches must be processed
+                  before wildcard matches. \n If this field specifies multiple Listeners
+                  that have the same Port value but are not compatible, the implementation
+                  must raise a \"Conflicted\" condition in the Listener status. \n
+                  Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
@@ -459,6 +465,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs must be specified when TLSModeType
+                          is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 : true'
                   required:
                   - name
                   - port
@@ -470,6 +481,24 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: tls must be specified for protocols ['HTTPS', 'TLS']
+                  rule: 'self.all(l, l.protocol in [''HTTPS'', ''TLS''] ? has(l.tls)
+                    : true)'
+                - message: tls must not be specified for protocols ['HTTP', 'TCP',
+                    'UDP']
+                  rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
+                    !has(l.tls) : true)'
+                - message: hostname must not be specified for protocols ['TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
+                    || l.hostname == '''') : true)'
+                - message: Listener name must be unique within the Gateway
+                  rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
+                - message: Combination of port, protocol and hostname must be unique
+                    for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
+                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
+                    == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
             required:
             - gatewayClassName
             - listeners
@@ -493,26 +522,25 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support GatewayRoutability
-                  MUST include an address that has the same routable semantics as
-                  defined in the Gateway spec. \n Implementations MAY add additional
-                  addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Private`
-                  routable Gateway then an additional address MAY have a routability
-                  of `Cluster` but MUST NOT include `Public`."
+                  from a reserved pool. \n "
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
-                    routability:
-                      description: "Routability specifies the routable bounds of this
-                        address Predefined values are: 'Private', 'Public', Cluster
-                        Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field \n <gateway:experimental>"
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                      type: string
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -530,6 +558,11 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
+                      true'
                 maxItems: 16
                 type: array
               conditions:
@@ -628,8 +661,23 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of accepted
+                      description: "AttachedRoutes represents the total number of
                         Routes that have been successfully attached to this Listener.
+                        \n Successful attachment of a Route to a Listener is based
+                        solely on the combination of the AllowedRoutes field on the
+                        corresponding Listener and the Route's ParentRefs field. A
+                        Route is successfully attached to a Listener when it is selected
+                        by the Listener's AllowedRoutes field AND the Route has a
+                        valid ParentRef selecting the whole Gateway resource or a
+                        specific Listener as a parent resource (more detail on attachment
+                        semantics can be found in the documentation on the various
+                        Route kinds ParentRefs fields). Listener or Route status does
+                        not impact successful attachment, i.e. the AttachedRoutes
+                        field count MUST be set for Listeners with condition Accepted:
+                        false and MUST count successfully attached Routes that may
+                        themselves have Accepted: false conditions. \n Uses for this
+                        field include troubleshooting Route attachment and measuring
+                        blast radius/impact of changes to a Listener."
                       format: int32
                       type: integer
                     conditions:
@@ -818,10 +866,24 @@ spec:
                   manner, assigning an appropriate set of Addresses. \n The implementation
                   MUST bind all Listeners to every GatewayAddress that it assigns
                   to the Gateway and add a corresponding entry in GatewayStatus.Addresses.
-                  \n Support: Extended"
+                  \n Support: Extended \n "
                 items:
                   description: GatewayAddress describes an address that can be bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
                     type:
                       default: IPAddress
@@ -840,67 +902,59 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
+                      true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: IPAddress values must be unique
+                  rule: 'self.all(a1, a1.type == ''IPAddress'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
+                - message: Hostname values must be unique
+                  rule: 'self.all(a1, a1.type == ''Hostname'' ? self.exists_one(a2,
+                    a2.type == a1.type && a2.value == a1.value) : true )'
               gatewayClassName:
                 description: GatewayClassName used for this Gateway. This is the name
                   of a GatewayClass resource.
                 maxLength: 253
                 minLength: 1
                 type: string
-              infrastructure:
-                description: "Infrastructure defines infrastructure level attributes
-                  about this Gateway instance. \n <gateway:experimental>"
-                properties:
-                  routability:
-                    description: "Routability allows the Gateway to specify the accessibility
-                      of its addresses. Setting this property will override the default
-                      value defined by the GatewayClass. \n If the desired Gateway
-                      routability is incompatible with the GatewayClass implementations
-                      MUST set the condition `Accepted` to `False` with `Reason` set
-                      to `UnsupportedRoutability`. \n The default value of routability
-                      is implementation specific and MUST remain consistent for Gateways
-                      with the same gatewayClassName \n Implementations MUST clearly
-                      document if they support updates to this field. The default
-                      expectation should be that changes to this field are not supported
-                      unless an implementation specifies otherwise. \n If a Gateway
-                      is mutated but does not support the desired routability it MUST
-                      set the `Accepted` and `Programmed` conditions to `False` with
-                      `Reason` set to `UnsupportedRoutability`."
-                    maxLength: 253
-                    minLength: 1
-                    pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                    type: string
-                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
                   least one Listener MUST be specified. \n Each listener in a Gateway
                   must have a unique combination of Hostname, Port, and Protocol.
-                  Below combinations are considered Core and MUST be supported: \n
-                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Port
-                  and protocol combinations not in this list are considered Extended.
-                  \n An implementation MAY group Listeners by Port and then collapse
-                  each group of Listeners into a single Listener if the implementation
-                  determines that the Listeners in the group are \"compatible\". An
-                  implementation MAY also group together and collapse compatible Listeners
-                  belonging to different Gateways. \n For example, an implementation
-                  might consider Listeners to be compatible with each other if all
-                  of the following conditions are met: \n 1. Either each Listener
-                  within the group specifies the \"HTTP\" Protocol or each Listener
-                  within the group specifies either the \"HTTPS\" or \"TLS\" Protocol.
-                  \n 2. Each Listener within the group specifies a Hostname that is
-                  unique within the group. \n 3. As a special case, one Listener within
-                  a group may omit Hostname, in which case this Listener matches when
-                  no other Listener matches. \n If the implementation does collapse
-                  compatible Listeners, the hostname provided in the incoming client
-                  request MUST be matched to a Listener to find the correct set of
-                  Routes. The incoming hostname MUST be matched using the Hostname
-                  field for each Listener in order of most to least specific. That
-                  is, exact matches must be processed before wildcard matches. \n
-                  If this field specifies multiple Listeners that have the same Port
-                  value but are not compatible, the implementation must raise a \"Conflicted\"
-                  condition in the Listener status. \n Support: Core"
+                  \n Within the HTTP Conformance Profile, the below combinations of
+                  port and protocol are considered Core and MUST be supported: \n
+                  1. Port: 80, Protocol: HTTP 2. Port: 443, Protocol: HTTPS \n Within
+                  the TLS Conformance Profile, the below combinations of port and
+                  protocol are considered Core and MUST be supported: \n 1. Port:
+                  443, Protocol: TLS \n Port and protocol combinations not listed
+                  above are considered Extended. \n An implementation MAY group Listeners
+                  by Port and then collapse each group of Listeners into a single
+                  Listener if the implementation determines that the Listeners in
+                  the group are \"compatible\". An implementation MAY also group together
+                  and collapse compatible Listeners belonging to different Gateways.
+                  \n For example, an implementation might consider Listeners to be
+                  compatible with each other if all of the following conditions are
+                  met: \n 1. Either each Listener within the group specifies the \"HTTP\"
+                  Protocol or each Listener within the group specifies either the
+                  \"HTTPS\" or \"TLS\" Protocol. \n 2. Each Listener within the group
+                  specifies a Hostname that is unique within the group. \n 3. As a
+                  special case, one Listener within a group may omit Hostname, in
+                  which case this Listener matches when no other Listener matches.
+                  \n If the implementation does collapse compatible Listeners, the
+                  hostname provided in the incoming client request MUST be matched
+                  to a Listener to find the correct set of Routes. The incoming hostname
+                  MUST be matched using the Hostname field for each Listener in order
+                  of most to least specific. That is, exact matches must be processed
+                  before wildcard matches. \n If this field specifies multiple Listeners
+                  that have the same Port value but are not compatible, the implementation
+                  must raise a \"Conflicted\" condition in the Listener status. \n
+                  Support: Core"
                 items:
                   description: Listener embodies the concept of a logical endpoint
                     where a Gateway accepts network connections.
@@ -1204,6 +1258,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs must be specified when TLSModeType
+                          is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 : true'
                   required:
                   - name
                   - port
@@ -1215,6 +1274,24 @@ spec:
                 x-kubernetes-list-map-keys:
                 - name
                 x-kubernetes-list-type: map
+                x-kubernetes-validations:
+                - message: tls must be specified for protocols ['HTTPS', 'TLS']
+                  rule: 'self.all(l, l.protocol in [''HTTPS'', ''TLS''] ? has(l.tls)
+                    : true)'
+                - message: tls must not be specified for protocols ['HTTP', 'TCP',
+                    'UDP']
+                  rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
+                    !has(l.tls) : true)'
+                - message: hostname must not be specified for protocols ['TCP', 'UDP']
+                  rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
+                    || l.hostname == '''') : true)'
+                - message: Listener name must be unique within the Gateway
+                  rule: self.all(l1, self.exists_one(l2, l1.name == l2.name))
+                - message: Combination of port, protocol and hostname must be unique
+                    for each listener
+                  rule: 'self.all(l1, self.exists_one(l2, l1.port == l2.port && l1.protocol
+                    == l2.protocol && (has(l1.hostname) && has(l2.hostname) ? l1.hostname
+                    == l2.hostname : !has(l1.hostname) && !has(l2.hostname))))'
             required:
             - gatewayClassName
             - listeners
@@ -1238,26 +1315,25 @@ spec:
                 description: "Addresses lists the IP addresses that have actually
                   been bound to the Gateway. These addresses may differ from the addresses
                   in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n Implementations that support GatewayRoutability
-                  MUST include an address that has the same routable semantics as
-                  defined in the Gateway spec. \n Implementations MAY add additional
-                  addresses in status, but they MUST be semantically less than the
-                  scope of the requested scope. For example if a user requests a `Private`
-                  routable Gateway then an additional address MAY have a routability
-                  of `Cluster` but MUST NOT include `Public`."
+                  from a reserved pool. \n "
                 items:
                   description: GatewayStatusAddress describes an address that is bound
                     to a Gateway.
+                  oneOf:
+                  - properties:
+                      type:
+                        enum:
+                        - IPAddress
+                      value:
+                        anyOf:
+                        - format: ipv4
+                        - format: ipv6
+                  - properties:
+                      type:
+                        not:
+                          enum:
+                          - IPAddress
                   properties:
-                    routability:
-                      description: "Routability specifies the routable bounds of this
-                        address Predefined values are: 'Private', 'Public', Cluster
-                        Other values MUST have a vendor prefix. \n Implementations
-                        that support Routability MUST populate this field \n <gateway:experimental>"
-                      maxLength: 253
-                      minLength: 1
-                      pattern: ^Public|Private|Cluster|[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/[A-Za-z0-9\/\-_]+$
-                      type: string
                     type:
                       default: IPAddress
                       description: Type of the address.
@@ -1275,6 +1351,11 @@ spec:
                   required:
                   - value
                   type: object
+                  x-kubernetes-validations:
+                  - message: Hostname value must only contain valid characters (matching
+                      ^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)
+                    rule: 'self.type == ''Hostname'' ? self.value.matches(r"""^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$"""):
+                      true'
                 maxItems: 16
                 type: array
               conditions:
@@ -1373,8 +1454,23 @@ spec:
                   description: ListenerStatus is the status associated with a Listener.
                   properties:
                     attachedRoutes:
-                      description: AttachedRoutes represents the total number of accepted
+                      description: "AttachedRoutes represents the total number of
                         Routes that have been successfully attached to this Listener.
+                        \n Successful attachment of a Route to a Listener is based
+                        solely on the combination of the AllowedRoutes field on the
+                        corresponding Listener and the Route's ParentRefs field. A
+                        Route is successfully attached to a Listener when it is selected
+                        by the Listener's AllowedRoutes field AND the Route has a
+                        valid ParentRef selecting the whole Gateway resource or a
+                        specific Listener as a parent resource (more detail on attachment
+                        semantics can be found in the documentation on the various
+                        Route kinds ParentRefs fields). Listener or Route status does
+                        not impact successful attachment, i.e. the AttachedRoutes
+                        field count MUST be set for Listeners with condition Accepted:
+                        false and MUST count successfully attached Routes that may
+                        themselves have Accepted: false conditions. \n Uses for this
+                        field include troubleshooting Route attachment and measuring
+                        blast radius/impact of changes to a Listener."
                       format: int32
                       type: integer
                     conditions:
