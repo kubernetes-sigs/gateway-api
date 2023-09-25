@@ -281,7 +281,7 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 
 ### Kong
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kong-kubernetes-ingress-controller.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/kong-kubernetes-ingress-controller.yaml)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
