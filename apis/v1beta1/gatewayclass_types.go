@@ -57,7 +57,6 @@ type GatewayClass struct {
 
 	// Status defines the current state of GatewayClass.
 	//
-	// TODO(liorlieberman) must populate status but conditions are optional?
 	// Implementations MUST populate status on all GatewayClass resources which
 	// specify their controller name.
 	//
@@ -202,14 +201,12 @@ type GatewayClassStatus struct {
 	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
-	//TODO(liorlieberman) should we say here as well that this should be sorted asc?
-	// SupportedFeatures is the features the GatewayClass support.
-	//TODO(liorlieberman) validate this values
+	// SupportedFeatures is the set of features the GatewayClass support.
+	// It should be sorted in ascending alphabetical order.
 	//+optional
 	// +listType=set
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxItems=64
-	//TODO(liorliberman) should we use kubebuilder default?
 	SupportedFeatures []string `json:"supportedFeatures,omitempty"`
 }
 
