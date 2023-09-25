@@ -82,7 +82,8 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/... ./conformance/echo-basic/...
+	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/... ./conformance/echo-basic/... ./gwctl/pkg/...
+
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
