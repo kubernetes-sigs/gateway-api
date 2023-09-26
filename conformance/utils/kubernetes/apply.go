@@ -118,17 +118,17 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 		}
 
 		var primOverlayAddrs []interface{}
-		if overlayUsable {
-			t.Logf("address pool of %d usable addresses will be overlayed", len(a.UsableNetworkAddresses))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses)...)
+		if len(specialAddrs) > 0 {
+			t.Logf("the test provides %d special addresses that will be kept", len(specialAddrs))
+			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
 		}
 		if overlayUnusuable {
 			t.Logf("address pool of %d unusable addresses will be overlayed", len(a.UnusableNetworkAddresses))
 			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UnusableNetworkAddresses)...)
 		}
-		if len(specialAddrs) > 0 {
-			t.Logf("the test provides %d special addresses that will be kept", len(specialAddrs))
-			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
+		if overlayUsable {
+			t.Logf("address pool of %d usable addresses will be overlayed", len(a.UsableNetworkAddresses))
+			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses)...)
 		}
 
 		err = unstructured.SetNestedSlice(uObj.Object, primOverlayAddrs, "spec", "addresses")
