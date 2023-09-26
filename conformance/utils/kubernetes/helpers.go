@@ -40,6 +40,12 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
+// GatewayExcludedFromReadinessChecks is an annotation that can be placed on a
+// Gateway provided via the tests to indicate that it is NOT expected to be
+// Accepted or Provisioned in its default state. This is generally helpful for
+// tests which validate fixing broken Gateways, e.t.c.
+const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
+
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
 // relying on a specific api version.
 type GatewayRef struct {
@@ -200,6 +206,11 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			}
 			for _, gw := range gwList.Items {
 				gw := gw
+
+				if val, ok := gw.Annotations[GatewayExcludedFromReadinessChecks]; ok && val == "true" {
+					t.Logf("Gateway %s/%s is skipped for setup and wont be tested", ns, gw.Name)
+					continue
+				}
 
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
 					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)

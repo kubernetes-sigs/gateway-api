@@ -4,6 +4,8 @@ kind: Gateway
 metadata:
   name: gateway-static-addresses
   namespace: gateway-conformance-infra
+  annotations:
+    gateway-api/skip-this-for-readiness: "true"
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   addresses:
