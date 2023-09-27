@@ -124,27 +124,38 @@ spec:
                   support: \n * Gateway (Gateway conformance profile)  * Service (Mesh
                   conformance profile, experimental, ClusterIP Services only)  This
                   API may be extended in the future to support additional kinds of
-                  parent resources. \n It is invalid to reference an identical parent
-                  more than once. It is valid to reference multiple distinct sections
-                  within the same parent resource, such as two separate Listeners
-                  on the same Gateway or two separate ports on the same Service. \n
-                  It is possible to separately reference multiple distinct objects
-                  that may be collapsed by an implementation. For example, some implementations
-                  may choose to merge compatible Gateway Listeners together. If that
-                  is the case, the list of routes attached to those resources should
-                  also be merged. \n Note that for ParentRefs that cross namespace
-                  boundaries, there are specific rules. Cross-namespace references
-                  are only valid if they are explicitly allowed by something in the
-                  namespace they are referring to. For example, Gateway has the AllowedRoutes
-                  field, and ReferenceGrant provides a generic way to enable other
-                  kinds of cross-namespace reference. \n  ParentRefs from a Route
-                  to a Service in the same namespace are \"producer\" routes, which
-                  apply default routing rules to inbound connections from any namespace
-                  to the Service. \n ParentRefs from a Route to a Service in a different
-                  namespace are \"consumer\" routes, and these routing rules are only
-                  applied to outbound connections originating from the same namespace
-                  as the Route, for which the intended destination of the connections
-                  are a Service targeted as a ParentRef of the Route.  \n "
+                  parent resources. \n ParentRefs must be _distinct_. This means either
+                  that: \n * They select different objects.  If this is the case,
+                  then parentRef entries are distinct. In terms of fields, this means
+                  that the multi-part key defined by `group`, `kind`, `namespace`,
+                  and `name` must be unique across all parentRef entries in the Route.
+                  * They do not select different objects, but for each optional field
+                  used, each ParentRef that selects the same object must set the same
+                  set of optional fields to different values. If one ParentRef sets
+                  a combination of optional fields, all must set the same combination.
+                  \n Some examples: \n * If one ParentRef sets `sectionName`, all
+                  ParentRefs referencing the same object must also set `sectionName`.
+                  * If one ParentRef sets `port`, all ParentRefs referencing the same
+                  object must also set `port`. * If one ParentRef sets `sectionName`
+                  and `port`, all ParentRefs referencing the same object must also
+                  set `sectionName` and `port`. \n It is possible to separately reference
+                  multiple distinct objects that may be collapsed by an implementation.
+                  For example, some implementations may choose to merge compatible
+                  Gateway Listeners together. If that is the case, the list of routes
+                  attached to those resources should also be merged. \n Note that
+                  for ParentRefs that cross namespace boundaries, there are specific
+                  rules. Cross-namespace references are only valid if they are explicitly
+                  allowed by something in the namespace they are referring to. For
+                  example, Gateway has the AllowedRoutes field, and ReferenceGrant
+                  provides a generic way to enable other kinds of cross-namespace
+                  reference. \n  ParentRefs from a Route to a Service in the same
+                  namespace are \"producer\" routes, which apply default routing rules
+                  to inbound connections from any namespace to the Service. \n ParentRefs
+                  from a Route to a Service in a different namespace are \"consumer\"
+                  routes, and these routing rules are only applied to outbound connections
+                  originating from the same namespace as the Route, for which the
+                  intended destination of the connections are a Service targeted as
+                  a ParentRef of the Route.  \n "
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
@@ -271,16 +282,13 @@ spec:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
                   rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
-                    == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__)
+                    == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
-                    == '''') ) || ( has(p1.__namespace__) && has(p2.__namespace__)
-                    && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName)
-                    || p1.sectionName == '''') && (!has(p2.sectionName) || p2.sectionName
-                    == '''') && (!has(p1.port) || p1.port == 0) && (!has(p2.port)
-                    || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName
-                    != '''') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName)
-                    && p2.sectionName != '''') || (has(p2.port) && p2.port != 0) )
-                    ) ) ): true ))'
+                    == '''')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
+                    p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName)
+                    || p1.sectionName == '''') == (!has(p2.sectionName) || p2.sectionName
+                    == '''') && (!has(p1.port) || p1.port == 0) == (!has(p2.port)
+                    || p2.port == 0)): true))'
                 - message: sectionName or port must be unique when parentRefs includes
                     2 or more references to the same parent
                   rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
@@ -2565,27 +2573,38 @@ spec:
                   support: \n * Gateway (Gateway conformance profile)  * Service (Mesh
                   conformance profile, experimental, ClusterIP Services only)  This
                   API may be extended in the future to support additional kinds of
-                  parent resources. \n It is invalid to reference an identical parent
-                  more than once. It is valid to reference multiple distinct sections
-                  within the same parent resource, such as two separate Listeners
-                  on the same Gateway or two separate ports on the same Service. \n
-                  It is possible to separately reference multiple distinct objects
-                  that may be collapsed by an implementation. For example, some implementations
-                  may choose to merge compatible Gateway Listeners together. If that
-                  is the case, the list of routes attached to those resources should
-                  also be merged. \n Note that for ParentRefs that cross namespace
-                  boundaries, there are specific rules. Cross-namespace references
-                  are only valid if they are explicitly allowed by something in the
-                  namespace they are referring to. For example, Gateway has the AllowedRoutes
-                  field, and ReferenceGrant provides a generic way to enable other
-                  kinds of cross-namespace reference. \n  ParentRefs from a Route
-                  to a Service in the same namespace are \"producer\" routes, which
-                  apply default routing rules to inbound connections from any namespace
-                  to the Service. \n ParentRefs from a Route to a Service in a different
-                  namespace are \"consumer\" routes, and these routing rules are only
-                  applied to outbound connections originating from the same namespace
-                  as the Route, for which the intended destination of the connections
-                  are a Service targeted as a ParentRef of the Route.  \n "
+                  parent resources. \n ParentRefs must be _distinct_. This means either
+                  that: \n * They select different objects.  If this is the case,
+                  then parentRef entries are distinct. In terms of fields, this means
+                  that the multi-part key defined by `group`, `kind`, `namespace`,
+                  and `name` must be unique across all parentRef entries in the Route.
+                  * They do not select different objects, but for each optional field
+                  used, each ParentRef that selects the same object must set the same
+                  set of optional fields to different values. If one ParentRef sets
+                  a combination of optional fields, all must set the same combination.
+                  \n Some examples: \n * If one ParentRef sets `sectionName`, all
+                  ParentRefs referencing the same object must also set `sectionName`.
+                  * If one ParentRef sets `port`, all ParentRefs referencing the same
+                  object must also set `port`. * If one ParentRef sets `sectionName`
+                  and `port`, all ParentRefs referencing the same object must also
+                  set `sectionName` and `port`. \n It is possible to separately reference
+                  multiple distinct objects that may be collapsed by an implementation.
+                  For example, some implementations may choose to merge compatible
+                  Gateway Listeners together. If that is the case, the list of routes
+                  attached to those resources should also be merged. \n Note that
+                  for ParentRefs that cross namespace boundaries, there are specific
+                  rules. Cross-namespace references are only valid if they are explicitly
+                  allowed by something in the namespace they are referring to. For
+                  example, Gateway has the AllowedRoutes field, and ReferenceGrant
+                  provides a generic way to enable other kinds of cross-namespace
+                  reference. \n  ParentRefs from a Route to a Service in the same
+                  namespace are \"producer\" routes, which apply default routing rules
+                  to inbound connections from any namespace to the Service. \n ParentRefs
+                  from a Route to a Service in a different namespace are \"consumer\"
+                  routes, and these routing rules are only applied to outbound connections
+                  originating from the same namespace as the Route, for which the
+                  intended destination of the connections are a Service targeted as
+                  a ParentRef of the Route.  \n "
                 items:
                   description: "ParentReference identifies an API object (usually
                     a Gateway) that can be considered a parent of this resource (usually
@@ -2712,16 +2731,13 @@ spec:
                 - message: sectionName or port must be specified when parentRefs includes
                     2 or more references to the same parent
                   rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
-                    == p2.kind && p1.name == p2.name && ( ( (!has(p1.__namespace__)
+                    == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
-                    == '''') ) || ( has(p1.__namespace__) && has(p2.__namespace__)
-                    && p1.__namespace__ == p2.__namespace__ ) ) ? ( ( ( (!has(p1.sectionName)
-                    || p1.sectionName == '''') && (!has(p2.sectionName) || p2.sectionName
-                    == '''') && (!has(p1.port) || p1.port == 0) && (!has(p2.port)
-                    || p2.port == 0) ) || ( ( (has(p1.sectionName) && p1.sectionName
-                    != '''') || (has(p1.port) && p1.port != 0) ) && ( (has(p2.sectionName)
-                    && p2.sectionName != '''') || (has(p2.port) && p2.port != 0) )
-                    ) ) ): true ))'
+                    == '''')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
+                    p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName)
+                    || p1.sectionName == '''') == (!has(p2.sectionName) || p2.sectionName
+                    == '''') && (!has(p1.port) || p1.port == 0) == (!has(p2.port)
+                    || p2.port == 0)): true))'
                 - message: sectionName or port must be unique when parentRefs includes
                     2 or more references to the same parent
                   rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind

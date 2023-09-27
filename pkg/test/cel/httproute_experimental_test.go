@@ -143,8 +143,8 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			}},
 		},
 		{
-			name:       "valid ParentRefs with multiple mixed references to the same parent",
-			wantErrors: []string{},
+			name:       "invalid ParentRefs with multiple mixed references to the same parent",
+			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1b1.ParentReference{{
 				Kind:        ptrTo(gatewayv1b1.Kind("Gateway")),
 				Group:       ptrTo(gatewayv1b1.Group("gateway.networking.k8s.io")),
@@ -171,8 +171,11 @@ func TestHTTPRouteParentRefExperimental(t *testing.T) {
 			}},
 		},
 		{
-			name:       "valid because duplicate parent refs with first having sectionName and second having both sectionName and port",
-			wantErrors: []string{},
+			// when referencing the same object, both parentRefs need to specify
+			// the same optional fields (both parentRefs must specify port,
+			// sectionName, or both)
+			name:       "invalid because duplicate parent refs with first having sectionName and second having both sectionName and port",
+			wantErrors: []string{"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent"},
 			parentRefs: []gatewayv1b1.ParentReference{{
 				Kind:        ptrTo(gatewayv1b1.Kind("Gateway")),
 				Group:       ptrTo(gatewayv1b1.Group("gateway.networking.k8s.io")),
