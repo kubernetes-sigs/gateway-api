@@ -16,6 +16,19 @@ limitations under the License.
 
 package v1alpha2
 
+const (
+	// PolicyLabelKey is the label whose presence identifies a CRD that the
+	// Gateway API Policy attachment model. The value of the label SHOULD be one
+	// of the following:
+	//  - A label value of "Inherited" indicates that this Policy is inheritable.
+	//    An example of inheritable policy is one which if applied at the Gateway
+	//    level would affect all attached HTTPRoutes and their respective
+	//    Backends.
+	//  - A label value of "Direct" indicates that the policy only affects the
+	//    resource to which it is attached and does not affect it's sub resources.
+	PolicyLabelKey = "gateway.networking.k8s.io/policy"
+)
+
 // PolicyTargetReference identifies an API object to apply a direct or
 // inherited policy to. This should be used as part of Policy resources
 // that can target Gateway API resources. For more information on how this
