@@ -294,7 +294,7 @@ For help and support with Kong's implementations please feel free to [create an 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kgo]:https://github.com/kong/gateway-operator-docs
+[kgo]:https://docs.konghq.com/gateway-operator/latest/
 [kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
 [kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
