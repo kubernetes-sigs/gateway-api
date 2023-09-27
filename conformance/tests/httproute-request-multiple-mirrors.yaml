@@ -10,7 +10,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /mirror
+        value: /multi-mirror
     filters:
     - type: RequestMirror
       requestMirror:
@@ -31,7 +31,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /mirror-and-modify-request-headers
+        value: /multi-mirror-and-modify-request-headers
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
