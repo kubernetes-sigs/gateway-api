@@ -1134,11 +1134,16 @@ type HTTPBackendRef struct {
 	//   case, the Reason must be set to `RefNotPermitted` and the Message of the
 	//   Condition must explain which cross-namespace reference is not allowed.
 	//
+	// * It refers to a Kubernetes Service that has an incompatible appProtocol
+	//   for the given Route type
+	//
 	// Support: Core for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
+	//
+	// Support for Kubernetes Service appProtocol: Extended
 	//
 	// +optional
 	BackendRef `json:",inline"`
