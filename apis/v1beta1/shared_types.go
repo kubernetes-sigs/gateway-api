@@ -243,6 +243,36 @@ type PortNumber int32
 // ReferenceGrant object is required in the referent namespace to allow that
 // namespace's owner to accept the reference. See the ReferenceGrant
 // documentation for details.
+//
+// When the BackendRef points to a Kubernetes Service implementations MUST allow
+// the backend protocol to be specified by:
+//   - setting the protocol field on the Service's ServicePort
+//   - setting the protocol field on the Service's related Endpoint/EndpointSlice's EndpointPort
+//   - setting the appProtocol field on the Service's ServicePort
+//   - setting the appProtocol field on the Service's related Endpoint/EndpointSlice's EndpointPort
+//
+// For appProtocol implementations MUST recognize the Kubernetes Standard Application Protocols
+// defined in [KEP-3726]. This supports IANA standard service names and extra constants defined
+// in the KEP that have a prefix of "kubernetes.io/". Gateway API MAY define additional
+// constants with the prefix "gateway.networking.k8s.io/"
+//
+// If a Service appProtocol isn't specified an implementation MAY infer the backend
+// protocol through its own means. Implementations MAY infer the protocol from the
+// Route type referring to the backend Service.
+//
+// Implementations MAY support multiplexing TCP and UDP on the same port. Otherwise
+// implementations MUST set ResolvedRefs condition to False with the Reason UnsupportedProtocol
+// with a clear message that multiplexing is not supported.
+//
+// If a Route attached to a Gateway is not able to send traffic to the backend using
+// the specified protocol then the backend is considered invalid. Implementations
+// MUST set ResolvedRefs condition to False with the Reason UnsupportedProtocol.
+//
+// Implementations MAY support different combinations of protocol/appProtocol/Route Type.
+// See [GEP-1911] for a table.
+//
+// [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
+// [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
 	BackendObjectReference `json:",inline"`
@@ -342,6 +372,7 @@ const (
 	// * "RefNotPermitted"
 	// * "InvalidKind"
 	// * "BackendNotFound"
+	// * "UnsupportedProtocol"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -366,6 +397,11 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one of the
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// Route's rules has a reference to a resource with a backend protocol that
+	// is not supported by this implementation.
+	RouteReasonUnsupportedProtocol RouteConditionReason = "UnsupportedProtocol"
 )
 
 // RouteParentStatus describes the status of a route with respect to an
