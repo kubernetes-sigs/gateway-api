@@ -197,6 +197,8 @@ func (d *DefaultRoundTripper) CaptureRoundTrip(request Request) (*CapturedReques
 		if err != nil {
 			return nil, nil, fmt.Errorf("unexpected error reading response: %w", err)
 		}
+	} else {
+		cReq.Method = method // assume it made the right request if the service being called isn't echoing
 	}
 
 	cRes := &CapturedResponse{

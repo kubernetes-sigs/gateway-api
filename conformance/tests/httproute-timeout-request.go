@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2023 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,10 +28,9 @@ import (
 
 func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteTimeoutRequest)
-	ConformanceTests = append(ConformanceTests, HTTPRouteTimeoutBackendRequest)
 }
 
-// Note that here we are only making sure Request and BackendRequest timeouts work individually.
+// Note that here we are only making sure Request timeouts work individually.
 // TODO: once we add retry support to Gateway API (future GEP-1731), add conformance tests to show
 // Request and BackendRequest timeouts working together.
 
@@ -53,49 +52,13 @@ var HTTPRouteTimeoutRequest = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				Request:  http.Request{Path: "/"},
-				Response: http.Response{StatusCode: 200},
+				Request:         http.Request{Path: "/request-timeout"},
+				ExpectedRequest: &http.ExpectedRequest{},
+				Response:        http.Response{StatusCode: 200},
 			}, {
-				Request:  http.Request{Path: "/?delay=1s"},
-				Response: http.Response{StatusCode: 504},
-			},
-		}
-
-		for i := range testCases {
-			// Declare tc here to avoid loop variable
-			// reuse issues across parallel tests.
-			tc := testCases[i]
-			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
-				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-			})
-		}
-	},
-}
-
-var HTTPRouteTimeoutBackendRequest = suite.ConformanceTest{
-	ShortName:   "HTTPRouteTimeoutBackendRequest",
-	Description: "An HTTPRoute with backend request timeout",
-	Manifests:   []string{"tests/httproute-timeout-backend-request.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteBackendTimeout,
-	},
-	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "backend-request-timeout", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
-
-		testCases := []http.ExpectedResponse{
-			{
-				Request:  http.Request{Path: "/"},
-				Response: http.Response{StatusCode: 200},
-			}, {
-				Request:  http.Request{Path: "/?delay=1s"},
-				Response: http.Response{StatusCode: 504},
+				Request:         http.Request{Path: "/request-timeout?delay=1s"},
+				ExpectedRequest: &http.ExpectedRequest{},
+				Response:        http.Response{StatusCode: 504},
 			},
 		}
 
