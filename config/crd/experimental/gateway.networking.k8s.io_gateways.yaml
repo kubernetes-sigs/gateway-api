@@ -129,6 +129,49 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
+              infrastructure:
+                description: "Infrastructure defines infrastructure level attributes
+                  about this Gateway instance. \n Support: Core \n "
+                properties:
+                  annotations:
+                    additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: "Annotations that SHOULD be applied to any resources
+                      created in response to this Gateway. \n For implementations
+                      creating other Kubernetes objects, this should be the `metadata.annotations`
+                      field on resources. For other implementations, this refers to
+                      any relevant (implementation specific) \"annotations\" concepts.
+                      \n An implementation may chose to add additional implementation-specific
+                      annotations as they see fit. \n Support: Extended"
+                    maxProperties: 8
+                    type: object
+                  labels:
+                    additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: "Labels that SHOULD be applied to any resources created
+                      in response to this Gateway. \n For implementations creating
+                      other Kubernetes objects, this should be the `metadata.labels`
+                      field on resources. For other implementations, this refers to
+                      any relevant (implementation specific) \"labels\" concepts.
+                      \n An implementation may chose to add additional implementation-specific
+                      labels as they see fit. \n Support: Extended"
+                    maxProperties: 8
+                    type: object
+                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At
@@ -937,6 +980,49 @@ spec:
                 maxLength: 253
                 minLength: 1
                 type: string
+              infrastructure:
+                description: "Infrastructure defines infrastructure level attributes
+                  about this Gateway instance. \n Support: Core \n "
+                properties:
+                  annotations:
+                    additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: "Annotations that SHOULD be applied to any resources
+                      created in response to this Gateway. \n For implementations
+                      creating other Kubernetes objects, this should be the `metadata.annotations`
+                      field on resources. For other implementations, this refers to
+                      any relevant (implementation specific) \"annotations\" concepts.
+                      \n An implementation may chose to add additional implementation-specific
+                      annotations as they see fit. \n Support: Extended"
+                    maxProperties: 8
+                    type: object
+                  labels:
+                    additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
+                      type: string
+                    description: "Labels that SHOULD be applied to any resources created
+                      in response to this Gateway. \n For implementations creating
+                      other Kubernetes objects, this should be the `metadata.labels`
+                      field on resources. For other implementations, this refers to
+                      any relevant (implementation specific) \"labels\" concepts.
+                      \n An implementation may chose to add additional implementation-specific
+                      labels as they see fit. \n Support: Extended"
+                    maxProperties: 8
+                    type: object
+                type: object
               listeners:
                 description: "Listeners associated with this Gateway. Listeners define
                   logical endpoints that are bound on this Gateway's addresses. At

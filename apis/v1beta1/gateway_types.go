@@ -178,6 +178,14 @@ type GatewaySpec struct {
 	// +kubebuilder:validation:XValidation:message="IPAddress values must be unique",rule="self.all(a1, a1.type == 'IPAddress' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	// +kubebuilder:validation:XValidation:message="Hostname values must be unique",rule="self.all(a1, a1.type == 'Hostname' ? self.exists_one(a2, a2.type == a1.type && a2.value == a1.value) : true )"
 	Addresses []GatewayAddress `json:"addresses,omitempty"`
+
+	// Infrastructure defines infrastructure level attributes about this Gateway instance.
+	//
+	// Support: Core
+	//
+	// <gateway:experimental>
+	// +optional
+	Infrastructure GatewayInfrastructure `json:"infrastructure,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
@@ -569,6 +577,31 @@ type GatewayStatus struct {
 	// +listMapKey=name
 	// +kubebuilder:validation:MaxItems=64
 	Listeners []ListenerStatus `json:"listeners,omitempty"`
+}
+
+// GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
+type GatewayInfrastructure struct {
+	// Labels that SHOULD be applied to any resources created in response to this Gateway.
+	//
+	// For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
+	// For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
+	//
+	// An implementation may chose to add additional implementation-specific labels as they see fit.
+	//
+	// Support: Extended
+	// +kubebuilder:validation:MaxProperties=8
+	Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
+
+	// Annotations that SHOULD be applied to any resources created in response to this Gateway.
+	//
+	// For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
+	// For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
+	//
+	// An implementation may chose to add additional implementation-specific annotations as they see fit.
+	//
+	// Support: Extended
+	// +kubebuilder:validation:MaxProperties=8
+	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
 }
 
 // GatewayConditionType is a type of condition associated with a
