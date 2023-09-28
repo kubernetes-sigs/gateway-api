@@ -244,6 +244,8 @@ type PortNumber int32
 // namespace's owner to accept the reference. See the ReferenceGrant
 // documentation for details.
 //
+// <gateway:experimental:description>
+//
 // When the BackendRef points to a Kubernetes Service implementations MUST allow
 // the backend protocol to be specified by:
 //   - setting the protocol field on the Service's ServicePort
@@ -270,6 +272,8 @@ type PortNumber int32
 //
 // Implementations MAY support different combinations of protocol/appProtocol/Route Type.
 // See [GEP-1911] for a table.
+//
+// </gateway:experimental:description>
 //
 // [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
 // [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/
