@@ -397,7 +397,8 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 				return true, nil
 			})
 
-			require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations on all listeners")
+			require.NoErrorf(t, waitErr, "error waiting for Gateway status to have the %s condition set to %s on all listeners",
+				condition.Type, condition.Status)
 		}(condition)
 	}
 
