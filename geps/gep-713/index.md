@@ -1464,8 +1464,8 @@ If a `sectionName` is specified, but does not exist on the targeted object, the 
 and the policy implementation should record a `resolvedRefs` or similar Condition in the Policy's status.
 
 When multiple Policies of the same type target the same object, one with a `sectionName` specified, and one without,
-the one with a `sectionName` is more specific, and so will have all its settings apply. The less-specific Policy will
-not attach to the target.
+the one with a `sectionName` is more specific, and so will have all its settings applied to the named target. The less-specific Policy will
+still be applied but MUST not affect the named target.
 
 Note that the `sectionName` is currently intended to be used only for Direct Policy Attachment when references to
 SectionName are actually needed. Inherited Policies are always applied to the entire object. 
