@@ -70,81 +70,81 @@ type GatewaySpec struct {
 	// At least one Listener MUST be specified.
 	//
 	// Each Listener in a set of Listeners (for example, in a single Gateway)
-	// must be _distinct_, in that a traffic flow must be able to be assigned to
+	// MUST be _distinct_, in that a traffic flow MUST be able to be assigned to
 	// exactly one listener. (This section uses "set of Listeners" rather than
 	// "Listeners in a single Gateway" because implementations MAY merge configuration
 	// from multiple Gateways onto a single data plane, and these rules _also_
 	// apply in that case).
 	//
 	// Practically, this means that each listener in a set MUST have a unique
-	// combination of Port, Protocol, TLS Settings, and, if supported by the
-	// protocol, Hostname.
+	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
 	//
-	// Some combinations of port, protoocl, and TLS settings are are considered
-	// Core support and MUST be supported by implementations:
+	// Some combinations of port, protocol, and TLS settings are are considered
+	// Core support and MUST be supported by implementations if they support the
+	// associated Route type:
 	//
-	// 1. Port: 80, Protocol: HTTP
-	// 2. Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided
-	// 3. Port: 443, Protocol: TLS, TLS Mode: Passthrough
+	// 1. HTTPRoute, Port: 80, Protocol: HTTP
+	// 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided
+	// 3. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough
 	//
 	// "Distinct" Listeners have the following property:
 	//
 	// The implementation can match inbound requests to a single distinct
 	// Listener. When multiple Listeners share values for fields (for
 	// example, two Listeners with the same Port value), the implementation
-	// can can match requests to only one of the Listeners using other
+	// can match requests to only one of the Listeners using other
 	// Listener fields.
-    // 
- 	// For example, the following Listener scenarios are distinct:
-    //
-    // 1. Multiple Listeners with the same Port that all use the "HTTP"
+	//
+	// For example, the following Listener scenarios are distinct:
+	//
+	// 1. Multiple Listeners with the same Port that all use the "HTTP"
 	//    Protocol that all have unique Hostname values.
 	// 2. Multiple Listeners with the same Port that use either the "HTTPS" or
 	//    "TLS" Protocol that all have unique Hostname values.
 	// 3. A mixture of "TCP" and "UDP" Protocol Listeners, where no Listener
-	//    with the same Protocol has the same Port value.   
-    //
-    // Some fields in the Listener struct have possible values that affect
-    // whether the Listener is distinct. Hostname is particularly relevant
-    // for HTTP or HTTPS protocols.
-    //
+	//    with the same Protocol has the same Port value.
+	//
+	// Some fields in the Listener struct have possible values that affect
+	// whether the Listener is distinct. Hostname is particularly relevant
+	// for HTTP or HTTPS protocols.
+	//
 	// When using the Hostname value to select between same-Port, same-Protocol
-    // Listeners, the Hostname value must be different on each Listener for the
-    // Listener to be distinct.
-    // 
-    // When the Listeners are distinct based on Hostname, inbound request
-    // hostnames MUST match from the most specific to least specific Hostname
-    // values to choose the correct Listener and its associated set of Routes.
-    //
+	// Listeners, the Hostname value must be different on each Listener for the
+	// Listener to be distinct.
+	//
+	// When the Listeners are distinct based on Hostname, inbound request
+	// hostnames MUST match from the most specific to least specific Hostname
+	// values to choose the correct Listener and its associated set of Routes.
+	//
 	// Exact matches must be processed before wildcard matches, and wildcard
 	// matches must be processed before fallback (empty Hostname value)
 	// matches. For example, `"foo.example.com"` takes precedence over
 	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
-    //
-    // Additionally, if there are multiple wildcard entries, more specific
-    // wildcard entries must be processed before less specific wildcard entries.
-    // For example, `"*.foo.example.com"` takes precedence over `"*.example.com"`.
-    // The precise definition here is that the higher the number of dots in the
-    // hostname to the right of the wildcard character, the higher the precedence.
-    //
-    // The wildcard character will match any number of characters _and dots_ to
-    // the left, however, so `"*.example.com"` will match both
-    // `"foo.bar.example.com"` _and_ `"bar.example.com"`.
-    //
-    // If a set of Listeners contains Listeners that are not distinct, then those
-    // Listeners are Conflicted, and the implementation MUST set the "Conflicted"
-    // condition in the Listener Status to "True".
-    //
-   	// Implementations MAY choose to still accept a Gateway with Conflicted
+	//
+	// Additionally, if there are multiple wildcard entries, more specific
+	// wildcard entries must be processed before less specific wildcard entries.
+	// For example, `"*.foo.example.com"` takes precedence over `"*.example.com"`.
+	// The precise definition here is that the higher the number of dots in the
+	// hostname to the right of the wildcard character, the higher the precedence.
+	//
+	// The wildcard character will match any number of characters _and dots_ to
+	// the left, however, so `"*.example.com"` will match both
+	// `"foo.bar.example.com"` _and_ `"bar.example.com"`.
+	//
+	// If a set of Listeners contains Listeners that are not distinct, then those
+	// Listeners are Conflicted, and the implementation MUST set the "Conflicted"
+	// condition in the Listener Status to "True".
+	//
+	// Implementations MAY choose to accept a Gateway with Conflicted
 	// Listeners if they accept a partial Listener set that contains no
 	// Conflicted Listeners. They MUST set a "ListenersNotValid" condition
 	// the Gateway Status when the Gateway contains Conflicted Listeners
 	// whether or not they accept the Gateway. That Condition SHOULD clearly
-    // indicate in the Message which Listeners are conflicted.
-    //
-    // A Gateway's Listeners are considered "compatible" if:
+	// indicate in the Message which Listeners are conflicted.
 	//
-    // 1. They are distinct.
+	// A Gateway's Listeners are considered "compatible" if:
+	//
+	// 1. They are distinct.
 	// 2. The implementation can serve them in compliance with the Addresses
 	//    requirement that all Listeners are available on all assigned
 	//    addresses.
@@ -154,7 +154,7 @@ type GatewaySpec struct {
 	// may not be compatible for another.
 	//
 	// For example, an implementation that cannot serve both TCP and UDP listeners
-    // on the same address, or cannot mix HTTPS and generic TLS listens on the same port
+	// on the same address, or cannot mix HTTPS and generic TLS listens on the same port
 	// would not consider those cases compatible, even though they are distinct.
 	//
 	// Note that requests SHOULD match at most one Listener. For example, if
