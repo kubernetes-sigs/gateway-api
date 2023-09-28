@@ -29,17 +29,24 @@ It is unlikely to require an enhancement if it:
 If you're unsure the proposed work requires an enhancement, file an issue
 and ask.
 
-## New Enhancement process
+## New Enhancement Process
 
-The new enhancement process is documented on the [GEP Overview][gep] page. Please
-see that page for all the details about how to log a new GEP, and the process
-it will follow on its journey towards Completed status.
+The process for creating new enhancement proposals is documented on the
+[GEP Overview][gep] page. Please see that page for all the details about how
+to log a new GEP, and the process it will follow on its journey towards
+Completed status.
 
-A **documented** discussion of some form **must** exist prior to submitting a request for enhancement
-if that enhancement is non-trivial (which we will define as either: _implicates changes to the API specification_ OR _has some kind of end-user impact_). Please use our [Github Discussions][discussion]
-forum as the initial place to start, and feel free to bring that discussion up for synchronous conversation in
-one of our [community meetings][meetings]. If the created request doesn't include reference to a discussion and/or recordings of discussion in our community meetings, please note that it _may_ get closed
-with a request to create an initial discussion first.
+A **documented** discussion of some form **must** exist prior to submitting a
+request for enhancement if that enhancement is non-trivial (which we will define
+as either: _implicates changes to the API specification_
+OR _has some kind of end-user impact_).
+
+Please use our [Github Discussions][discussion] forum as the initial place to
+start, and feel free to bring that discussion up for synchronous conversation in
+one of our [community meetings][meetings]. If the created request doesn't
+include reference to a discussion and/or recordings of discussion in our
+community meetings, please note that it _may_ get closed with a request to
+create an initial discussion first.
 
 [gep]: /geps/overview
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
