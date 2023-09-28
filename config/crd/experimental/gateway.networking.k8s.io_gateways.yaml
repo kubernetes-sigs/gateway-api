@@ -135,25 +135,41 @@ spec:
                 properties:
                   annotations:
                     additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
                       type: string
-                    description: "Annotations that should be applied to any resources
+                    description: "Annotations that SHOULD be applied to any resources
                       created in response to this Gateway. \n For implementations
                       creating other Kubernetes objects, this should be the `metadata.annotations`
                       field on resources. For other implementations, this refers to
                       any relevant (implementation specific) \"annotations\" concepts.
                       \n An implementation may chose to add additional implementation-specific
                       annotations as they see fit. \n Support: Extended"
+                    maxProperties: 8
                     type: object
                   labels:
                     additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
                       type: string
-                    description: "Labels that should be applied to any resources created
+                    description: "Labels that SHOULD be applied to any resources created
                       in response to this Gateway. \n For implementations creating
                       other Kubernetes objects, this should be the `metadata.labels`
                       field on resources. For other implementations, this refers to
                       any relevant (implementation specific) \"labels\" concepts.
                       \n An implementation may chose to add additional implementation-specific
                       labels as they see fit. \n Support: Extended"
+                    maxProperties: 8
                     type: object
                 type: object
               listeners:
@@ -970,25 +986,41 @@ spec:
                 properties:
                   annotations:
                     additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
                       type: string
-                    description: "Annotations that should be applied to any resources
+                    description: "Annotations that SHOULD be applied to any resources
                       created in response to this Gateway. \n For implementations
                       creating other Kubernetes objects, this should be the `metadata.annotations`
                       field on resources. For other implementations, this refers to
                       any relevant (implementation specific) \"annotations\" concepts.
                       \n An implementation may chose to add additional implementation-specific
                       annotations as they see fit. \n Support: Extended"
+                    maxProperties: 8
                     type: object
                   labels:
                     additionalProperties:
+                      description: AnnotationValue is the value of an annotation in
+                        Gateway API. This is used for validation of maps such as TLS
+                        options. This roughly matches Kubernetes annotation validation,
+                        although the length validation in that case is based on the
+                        entire size of the annotations struct.
+                      maxLength: 4096
+                      minLength: 0
                       type: string
-                    description: "Labels that should be applied to any resources created
+                    description: "Labels that SHOULD be applied to any resources created
                       in response to this Gateway. \n For implementations creating
                       other Kubernetes objects, this should be the `metadata.labels`
                       field on resources. For other implementations, this refers to
                       any relevant (implementation specific) \"labels\" concepts.
                       \n An implementation may chose to add additional implementation-specific
                       labels as they see fit. \n Support: Extended"
+                    maxProperties: 8
                     type: object
                 type: object
               listeners:

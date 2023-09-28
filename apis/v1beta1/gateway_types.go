@@ -581,7 +581,7 @@ type GatewayStatus struct {
 
 // GatewayInfrastructure defines infrastructure level attributes about a Gateway instance.
 type GatewayInfrastructure struct {
-	// Labels that should be applied to any resources created in response to this Gateway.
+	// Labels that SHOULD be applied to any resources created in response to this Gateway.
 	//
 	// For implementations creating other Kubernetes objects, this should be the `metadata.labels` field on resources.
 	// For other implementations, this refers to any relevant (implementation specific) "labels" concepts.
@@ -589,9 +589,10 @@ type GatewayInfrastructure struct {
 	// An implementation may chose to add additional implementation-specific labels as they see fit.
 	//
 	// Support: Extended
-	// +kubebuilder:validation:MaxItems=8
-	Labels map[string]string `json:"labels,omitempty"`
-	// Annotations that should be applied to any resources created in response to this Gateway.
+	// +kubebuilder:validation:MaxProperties=8
+	Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
+
+	// Annotations that SHOULD be applied to any resources created in response to this Gateway.
 	//
 	// For implementations creating other Kubernetes objects, this should be the `metadata.annotations` field on resources.
 	// For other implementations, this refers to any relevant (implementation specific) "annotations" concepts.
@@ -599,8 +600,8 @@ type GatewayInfrastructure struct {
 	// An implementation may chose to add additional implementation-specific annotations as they see fit.
 	//
 	// Support: Extended
-	// +kubebuilder:validation:MaxItems=8
-	Annotations map[string]string `json:"annotations,omitempty"`
+	// +kubebuilder:validation:MaxProperties=8
+	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
 }
 
 // GatewayConditionType is a type of condition associated with a
