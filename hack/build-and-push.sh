@@ -90,3 +90,13 @@ docker buildx build \
     --push \
     -f docker/Dockerfile.echo \
     .
+
+echo "Building and pushing echo-server image (previously in Ingress Controller Conformance Repo) ...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/echo-server-k8s:${GIT_TAG} \
+    -t ${REGISTRY}/echo-server-k8s:${VERSION_TAG} \
+    --platform ${BUILDX_PLATFORMS} \
+    --push \
+    -f docker/Dockerfile.echoserver \
+    .

@@ -1,0 +1,14 @@
+options:
+  substitution_option: ALLOW_LOOSE
+steps:
+  - name: 'gcr.io/k8s-testimages/gcb-docker-gcloud:v20220617-174ad91c3a'
+    entrypoint: /buildx-entrypoint
+    args:
+    - build
+    - --tag=gcr.io/$PROJECT_ID/echoserver:$_GIT_TAG
+    - --platform=linux/amd64,linux/arm64
+    - --push
+    - .
+substitutions:
+  _GIT_TAG: "12345"
+timeout: 1800s # allow up to 30min, as emulation can be slow
