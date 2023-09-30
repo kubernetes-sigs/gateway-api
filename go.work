@@ -1,3 +1,6 @@
 go 1.20
 
-use ./conformance/echoserver
+use (
+    .
+    ./conformance/echoserver
+)
