@@ -1162,6 +1162,12 @@ type HTTPBackendRef struct {
 	// * It refers to a Kubernetes Service that has an incompatible appProtocol
 	//   for the given Route type
 	//
+	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
+	//   is present that refers to the Service, and the implementation is unable
+	//   to meet the requirement. At the time of writing, BackendTLSPolicy is
+	//   experimental, but once it becomes standard, this will become a MUST
+	//   requirement.
+	//
 	// Support: Core for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
@@ -1169,6 +1175,8 @@ type HTTPBackendRef struct {
 	// Support for weight: Core
 	//
 	// Support for Kubernetes Service appProtocol: Extended
+	//
+	// Support for BackendTLSPolicy: Experimental and ImplementationSpecific
 	//
 	// +optional
 	BackendRef `json:",inline"`

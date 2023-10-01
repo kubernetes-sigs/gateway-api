@@ -94,7 +94,6 @@ nav:
       - Provisional:
         - geps/gep-1619.md
         - geps/gep-1867.md
-        - geps/gep-1897.md
         - geps/gep-1911.md
         - geps/gep-2162.md
       # - Implementable:
@@ -110,6 +109,7 @@ nav:
         - geps/gep-1709.md
         - geps/gep-1742.md
         - geps/gep-1748.md
+        - geps/gep-1897.md
         - geps/gep-2257.md
       - Standard:
         - geps/gep-709.md

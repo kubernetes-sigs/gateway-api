@@ -31,8 +31,6 @@ const (
 	PolicyLabelKey = "gateway.networking.k8s.io/policy"
 )
 
-
-
 // PolicyTargetReference identifies an API object to apply a direct or
 // inherited policy to. This should be used as part of Policy resources
 // that can target Gateway API resources. For more information on how this
@@ -128,12 +126,22 @@ const (
 // PolicyAncestorStatus describes the status of a route with respect to an
 // associated Ancestor.
 //
-// The object that a Policy attaches to (the object in its TargetRef) is its
-// _parent_, and any other objects above it in an object hierarchy are its
-// _ancestors_.
-// 
-// For some Policies, particularly Direct Attached Policies, the relevant object
-// that distinguishes its status is not necessarily the parent object.
+// Ancestors refer to objects that are either the Target of a policy or above it
+// in terms of object hierarchy. For example, if a policy targets a Service, the
+// Policy's Ancestors are, in order, the Service, the HTTPRoute, the Gateway, and
+// the GatewayClass. Almost always, in this hierarchy, the Gateway will be the most
+// useful object to place Policy status on, so we recommend that implementations
+// SHOULD use Gateway as the PolicyAncestorStatus object unless the designers
+// have a _very_ good reason otherwise.
+//
+// In the context of policy attachment, the Ancestor is used to distinguish which
+// resource results in a distinct application of this policy. For example, if a policy
+// targets a Service, it may have a distinct result per attached Gateway.
+//
+// Policies targeting the same resource may have different effects depending on the
+// ancestors of those resources. For example, different Gateways targeting the same
+// Service may have different capabilities, especially if they have different underlying
+// implementations.
 //
 // For example, in BackendTLSPolicy, the Policy attaches to a Service that is
 // used as a backend in a HTTPRoute that is itself attached to a Gateway.
@@ -142,9 +150,12 @@ const (
 //
 // Note that a parent is also an ancestor, so for objects where the parent is the
 // relevant object for status, this struct SHOULD still be used.
+//
+// This struct is intended to be used in a slice that's effectively a map,
+// with a composite key made up of the AncestorRef and the ControllerName.
 type PolicyAncestorStatus struct {
 	// AncestorRef corresponds with a ParentRef in the spec that this
-	// RouteParentStatus struct describes the status of.
+	// PolicyAncestorStatus struct describes the status of.
 	AncestorRef ParentReference `json:"ancestorRef"`
 
 	// ControllerName is a domain/path string that indicates the name of the
@@ -175,24 +186,30 @@ type PolicyAncestorStatus struct {
 // their status.
 type PolicyStatus struct {
 	// Ancestors is a list of ancestor resources (usually Gateways) that are
-	// associated with the route, and the status of the route with respect to
-	// each ancestor. When this route attaches to a parent, the controller that
+	// associated with the policy, and the status of the policy with respect to
+	// each ancestor. When this policy attaches to a parent, the controller that
 	// manages the parent and the ancestors MUST add an entry to this list when
-	// the controller first sees the route and SHOULD update the entry as
+	// the controller first sees the policy and SHOULD update the entry as
 	// appropriate when the relevant ancestor is modified.
 	//
 	// Note that choosing the relevant ancestor is left to the Policy designers;
 	// an important part of Policy design is designing the right object level at
 	// which to namespace this status.
 	//
-	// Note also that parent references that cannot be resolved by an implementation
-	// of this API will not be added to this list. Implementations of this API
-	// can only populate ancestor status for the parent resources they are
-	// responsible for.
+	// Note also that implementations MUST ONLY populate ancestor status for
+	// the Ancestor resources they are responsible for. Implementations MUST
+	// use the ControllerName field to uniquely identify the entries in this list
+	// that they are responsible for.
 	//
-	// A maximum of 32 ancestors will be represented in this list. An empty list
+	// Note that to achieve this, the list of PolicyAncestorStatus structs
+	// MUST be treated as a map with a composite key, made up of the AncestorRef
+	// and ControllerName fields combined.
+	//
+	// A maximum of 16 ancestors will be represented in this list. An empty list
 	// means the Policy is not relevant for any ancestors.
 	//
-	// +kubebuilder:validation:MaxItems=32
+	// If this slice is full, implementations MUST NOT add further entries.
+	//
+	// +kubebuilder:validation:MaxItems=16
 	Ancestors []PolicyAncestorStatus `json:"ancestors"`
 }
