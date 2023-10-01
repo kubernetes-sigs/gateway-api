@@ -16,6 +16,8 @@ limitations under the License.
 
 package v1alpha2
 
+import metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 const (
 	// PolicyLabelKey is the label whose presence identifies a CRD that the
 	// Gateway API Policy attachment model. The value of the label SHOULD be one
@@ -28,6 +30,8 @@ const (
 	//    resource to which it is attached and does not affect it's sub resources.
 	PolicyLabelKey = "gateway.networking.k8s.io/policy"
 )
+
+
 
 // PolicyTargetReference identifies an API object to apply a direct or
 // inherited policy to. This should be used as part of Policy resources
@@ -120,3 +124,75 @@ const (
 	// policy is attached to an invalid target resource.
 	PolicyReasonTargetNotFound PolicyConditionReason = "TargetNotFound"
 )
+
+// PolicyAncestorStatus describes the status of a route with respect to an
+// associated Ancestor.
+//
+// The object that a Policy attaches to (the object in its TargetRef) is its
+// _parent_, and any other objects above it in an object hierarchy are its
+// _ancestors_.
+// 
+// For some Policies, particularly Direct Attached Policies, the relevant object
+// that distinguishes its status is not necessarily the parent object.
+//
+// For example, in BackendTLSPolicy, the Policy attaches to a Service that is
+// used as a backend in a HTTPRoute that is itself attached to a Gateway.
+// In this case, the relevant object for status is the Gateway, and that is the
+// ancestor object referred to in this status.
+//
+// Note that a parent is also an ancestor, so for objects where the parent is the
+// relevant object for status, this struct SHOULD still be used.
+type PolicyAncestorStatus struct {
+	// AncestorRef corresponds with a ParentRef in the spec that this
+	// RouteParentStatus struct describes the status of.
+	AncestorRef ParentReference `json:"ancestorRef"`
+
+	// ControllerName is a domain/path string that indicates the name of the
+	// controller that wrote this status. This corresponds with the
+	// controllerName field on GatewayClass.
+	//
+	// Example: "example.net/gateway-controller".
+	//
+	// The format of this field is DOMAIN "/" PATH, where DOMAIN and PATH are
+	// valid Kubernetes names
+	// (https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names).
+	//
+	// Controllers MUST populate this field when writing status. Controllers should ensure that
+	// entries to status populated with their ControllerName are cleaned up when they are no
+	// longer necessary.
+	ControllerName GatewayController `json:"controllerName"`
+
+	// Conditions describes the status of the Policy with respect to the given Ancestor.
+	//
+	// +listType=map
+	// +listMapKey=type
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=8
+	Conditions []metav1.Condition `json:"conditions,omitempty"`
+}
+
+// PolicyStatus defines the common attributes that all Policies should include within
+// their status.
+type PolicyStatus struct {
+	// Ancestors is a list of ancestor resources (usually Gateways) that are
+	// associated with the route, and the status of the route with respect to
+	// each ancestor. When this route attaches to a parent, the controller that
+	// manages the parent and the ancestors MUST add an entry to this list when
+	// the controller first sees the route and SHOULD update the entry as
+	// appropriate when the relevant ancestor is modified.
+	//
+	// Note that choosing the relevant ancestor is left to the Policy designers;
+	// an important part of Policy design is designing the right object level at
+	// which to namespace this status.
+	//
+	// Note also that parent references that cannot be resolved by an implementation
+	// of this API will not be added to this list. Implementations of this API
+	// can only populate ancestor status for the parent resources they are
+	// responsible for.
+	//
+	// A maximum of 32 ancestors will be represented in this list. An empty list
+	// means the Policy is not relevant for any ancestors.
+	//
+	// +kubebuilder:validation:MaxItems=32
+	Ancestors []PolicyAncestorStatus `json:"ancestors"`
+}
