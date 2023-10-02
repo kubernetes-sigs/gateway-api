@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
@@ -227,7 +226,7 @@ func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, cli
 
 	// Optionally enable client certificate validation when client CA certificates are given.
 	if clientCA != "" {
-		ca, err := ioutil.ReadFile(clientCA)
+		ca, err := os.ReadFile(clientCA)
 		if err != nil {
 			return err
 		}
