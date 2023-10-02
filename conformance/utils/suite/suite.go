@@ -50,6 +50,7 @@ type ConformanceTestSuite struct {
 	SupportedFeatures sets.Set[SupportedFeature]
 	TimeoutConfig     config.TimeoutConfig
 	SkipTests         sets.Set[string]
+	RunTest           string
 	FS                embed.FS
 }
 
@@ -76,6 +77,8 @@ type Options struct {
 	// SkipTests contains all the tests not to be run and can be used to opt out
 	// of specific tests
 	SkipTests []string
+	// RunTest is a single test to run, mostly for development/debugging convenience.
+	RunTest string
 
 	FS *embed.FS
 }
@@ -125,6 +128,7 @@ func New(s Options) *ConformanceTestSuite {
 		SupportedFeatures: s.SupportedFeatures,
 		TimeoutConfig:     s.TimeoutConfig,
 		SkipTests:         sets.New(s.SkipTests...),
+		RunTest:           s.RunTest,
 		FS:                *s.FS,
 	}
 
@@ -222,7 +226,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	// check that the test should not be skipped
-	if suite.SkipTests.Has(test.ShortName) {
+	if suite.SkipTests.Has(test.ShortName) || suite.RunTest != "" && suite.RunTest != test.ShortName {
 		t.Skipf("Skipping %s: test explicitly skipped", test.ShortName)
 	}
 
