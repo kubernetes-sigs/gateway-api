@@ -262,9 +262,9 @@ type PortNumber int32
 // implementations MUST set ResolvedRefs condition to False with the "UnsupportedProtocol"
 // Reason with a clear message that multiplexing is not supported.
 //
-// If a Route attached to a Gateway is not able to send traffic to the backend using
-// the specified protocol then the backend is considered invalid. Implementations
-// MUST set ResolvedRefs condition to False with the Reason UnsupportedProtocol.
+// If a Route is not able to send traffic to the backend using the specified protocol then
+// the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
+// False with the "UnsupportedProtocol".
 //
 // Implementations MAY support different combinations of protocol/appProtocol/Route Type.
 // See [GEP-1911] for a table.
