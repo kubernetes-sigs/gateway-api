@@ -91,12 +91,12 @@ docker buildx build \
     -f docker/Dockerfile.echo \
     .
 
-echo "Building and pushing echo-server image (previously in Ingress Controller Conformance Repo) ...${BUILDX_PLATFORMS}"
+echo "Building and pushing echo-basic image (previously in Ingress Controller Conformance Repo) ...${BUILDX_PLATFORMS}"
 
 docker buildx build \
-    -t ${REGISTRY}/echo-server-k8s:${GIT_TAG} \
-    -t ${REGISTRY}/echo-server-k8s:${VERSION_TAG} \
+    -t ${REGISTRY}/echo-basic:${GIT_TAG} \
+    -t ${REGISTRY}/echo-basic:${VERSION_TAG} \
     --platform ${BUILDX_PLATFORMS} \
     --push \
-    -f docker/Dockerfile.echoserver \
+    -f docker/Dockerfile.echo-basic \
     .

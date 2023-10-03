@@ -2,5 +2,5 @@ go 1.20
 
 use (
     .
-    ./conformance/echoserver
+    ./conformance/echo-basic
 )

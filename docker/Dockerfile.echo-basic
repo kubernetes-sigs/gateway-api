@@ -13,21 +13,21 @@
 # limitations under the License.
 
 # Build
-FROM golang:1.19.0 as builder
+FROM golang:1.20.7 as builder
 
 ENV CGO_ENABLED=0
 
 WORKDIR /go/src/sigs.k8s.io/ingress-controller-conformance/
 
-COPY echoserver.go go.mod ../conformance/echoserver/
+COPY ./conformance/echo-basic/echo-basic.go ./conformance/echo-basic/go.mod ./
 
-RUN go build -trimpath -ldflags="-buildid= -s -w" -o echoserver .
+RUN go build -trimpath -ldflags="-buildid= -s -w" -o echo-basic .
 
 # Use distroless as minimal base image to package the binary
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY --from=builder /go/src/sigs.k8s.io/ingress-controller-conformance/echoserver /
+COPY --from=builder /go/src/sigs.k8s.io/ingress-controller-conformance/echo-basic /
 USER nonroot:nonroot
 
-ENTRYPOINT ["/echoserver"]
+ENTRYPOINT ["/echo-basic"]
