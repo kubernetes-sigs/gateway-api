@@ -263,8 +263,8 @@ type PortNumber int32
 // Route type referring to the backend Service.
 //
 // Implementations MAY support multiplexing TCP and UDP on the same port. Otherwise
-// implementations MUST set ResolvedRefs condition to False with the Reason UnsupportedProtocol
-// with a clear message that multiplexing is not supported.
+// implementations MUST set ResolvedRefs condition to False with the "UnsupportedProtocol"
+// Reason with a clear message that multiplexing is not supported.
 //
 // If a Route attached to a Gateway is not able to send traffic to the backend using
 // the specified protocol then the backend is considered invalid. Implementations
@@ -403,7 +403,7 @@ const (
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
 
 	// This reason is used with the "ResolvedRefs" condition when one of the
-	// Route's rules has a reference to a resource with a backend protocol that
+	// Route's rules has a reference to a resource with an app protocol that
 	// is not supported by this implementation.
 	RouteReasonUnsupportedProtocol RouteConditionReason = "UnsupportedProtocol"
 )
