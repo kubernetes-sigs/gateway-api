@@ -246,14 +246,10 @@ type PortNumber int32
 //
 // <gateway:experimental:description>
 //
-// When the BackendRef points to a Kubernetes Service implementations MUST allow
-// the backend protocol to be specified by:
-//   - setting the protocol field on the Service's ServicePort
-//   - setting the protocol field on the Service's related Endpoint/EndpointSlice's EndpointPort
-//   - setting the appProtocol field on the Service's ServicePort
-//   - setting the appProtocol field on the Service's related Endpoint/EndpointSlice's EndpointPort
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD honor the
+// appProtocol field if it is set for the target Service Port.
 //
-// For appProtocol implementations MUST recognize the Kubernetes Standard Application Protocols
+// Implementations supporting appProtocol MUST recognize the Kubernetes Standard Application Protocols
 // defined in [KEP-3726]. This supports IANA standard service names and extra constants defined
 // in the KEP that have a prefix of "kubernetes.io/". Gateway API MAY define additional
 // constants with the prefix "gateway.networking.k8s.io/"
