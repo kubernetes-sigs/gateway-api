@@ -301,9 +301,10 @@ spec:
                           \n If a Service appProtocol isn't specified an implementation
                           MAY infer the backend protocol through its own means. Implementations
                           MAY infer the protocol from the Route type referring to
-                          the backend Service. \n Implementations MAY support multiplexing
-                          TCP and UDP on the same port. Otherwise implementations
-                          MUST set ResolvedRefs condition to False with the \"UnsupportedProtocol\"
+                          the backend Service. \n Implementations MAY support Kubernetes
+                          Service BackendRefs that are multiplexing TCP and UDP on
+                          the same port. Otherwise implementations MUST set the Route
+                          ResolvedRefs condition to False with the \"UnsupportedProtocol\"
                           Reason with a clear message that multiplexing is not supported.
                           \n If a Route is not able to send traffic to the backend
                           using the specified protocol then the backend is considered
@@ -311,8 +312,8 @@ spec:
                           to False with the \"UnsupportedProtocol\". \n Implementations
                           MAY support different combinations of protocol/appProtocol/Route
                           Type. See [GEP-1911] for a table. \n </gateway:experimental:description>
-                          \n [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
-                          [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/"
+                          \n [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/
+                          [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols"
                         properties:
                           filters:
                             description: "Filters defined at this level should be
@@ -2644,9 +2645,10 @@ spec:
                           \n If a Service appProtocol isn't specified an implementation
                           MAY infer the backend protocol through its own means. Implementations
                           MAY infer the protocol from the Route type referring to
-                          the backend Service. \n Implementations MAY support multiplexing
-                          TCP and UDP on the same port. Otherwise implementations
-                          MUST set ResolvedRefs condition to False with the \"UnsupportedProtocol\"
+                          the backend Service. \n Implementations MAY support Kubernetes
+                          Service BackendRefs that are multiplexing TCP and UDP on
+                          the same port. Otherwise implementations MUST set the Route
+                          ResolvedRefs condition to False with the \"UnsupportedProtocol\"
                           Reason with a clear message that multiplexing is not supported.
                           \n If a Route is not able to send traffic to the backend
                           using the specified protocol then the backend is considered
@@ -2654,8 +2656,8 @@ spec:
                           to False with the \"UnsupportedProtocol\". \n Implementations
                           MAY support different combinations of protocol/appProtocol/Route
                           Type. See [GEP-1911] for a table. \n </gateway:experimental:description>
-                          \n [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
-                          [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/"
+                          \n [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/
+                          [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols"
                         properties:
                           filters:
                             description: "Filters defined at this level should be

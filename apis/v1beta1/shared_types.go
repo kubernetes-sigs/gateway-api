@@ -258,9 +258,10 @@ type PortNumber int32
 // protocol through its own means. Implementations MAY infer the protocol from the
 // Route type referring to the backend Service.
 //
-// Implementations MAY support multiplexing TCP and UDP on the same port. Otherwise
-// implementations MUST set ResolvedRefs condition to False with the "UnsupportedProtocol"
-// Reason with a clear message that multiplexing is not supported.
+// Implementations MAY support Kubernetes Service BackendRefs that are multiplexing TCP
+// and UDP on the same port. Otherwise implementations MUST set the Route ResolvedRefs
+// condition to False with the "UnsupportedProtocol" Reason with a clear message that
+// multiplexing is not supported.
 //
 // If a Route is not able to send traffic to the backend using the specified protocol then
 // the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
