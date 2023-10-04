@@ -200,7 +200,6 @@ func writeEchoResponseHeaders(w http.ResponseWriter, headers http.Header) {
 			}
 		}
 	}
-
 }
 
 func processError(w http.ResponseWriter, err error, code int) {

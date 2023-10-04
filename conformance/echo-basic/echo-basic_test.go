@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -289,4 +291,46 @@ func TestProcessErrorWithJSONError(t *testing.T) {
 	if !strings.Contains(responseBody.Message, "invalid character") {
 		t.Errorf("Expected error message to contain 'invalid character', but got '%s'", responseBody.Message)
 	}
+}
+
+func TestTLSStateToAssertions(t *testing.T) {
+	// Create a mock TLS connection state for testing
+	mockState := &tls.ConnectionState{
+		Version:            tls.VersionTLS13,
+		NegotiatedProtocol: "http/2",
+		ServerName:         "test-example.com",
+		CipherSuite:        tls.TLS_AES_256_GCM_SHA384,
+		PeerCertificates:   []*x509.Certificate{},
+	}
+
+	// Call the function to convert the mock state
+	result := tlsStateToAssertions(mockState)
+
+	// Define expected TLS state
+	expected := &TLSAssertions{
+		Version:            "TLSv1.3",
+		NegotiatedProtocol: "http/2",
+		ServerName:         "test-example.com",
+		CipherSuite:        "TLS_AES_256_GCM_SHA384",
+		PeerCertificates:   []string{},
+	}
+
+	// Test the converted result is matching the expected
+	if !compareTLSAssertions(result, expected) {
+		t.Errorf("Result does not match expected values.\nGot: %+v\nExpected: %+v", result, expected)
+	}
+}
+
+func compareTLSAssertions(a, b *TLSAssertions) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+	return a.Version == b.Version &&
+		a.NegotiatedProtocol == b.NegotiatedProtocol &&
+		a.ServerName == b.ServerName &&
+		a.CipherSuite == b.CipherSuite &&
+		strings.Join(a.PeerCertificates, "") == strings.Join(b.PeerCertificates, "")
 }
