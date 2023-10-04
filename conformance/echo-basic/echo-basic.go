@@ -116,8 +116,7 @@ func main() {
 		}()
 	}
 
-	select {
-	case err := <-errchan:
+	if err := <-errchan; err != nil {
 		panic(fmt.Sprintf("Failed to start listening: %s\n", err.Error()))
 	}
 }
