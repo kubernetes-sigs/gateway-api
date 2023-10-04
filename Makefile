@@ -82,7 +82,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/...
+	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/... ./conformance/echo-basic/...
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
