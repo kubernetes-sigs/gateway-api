@@ -81,12 +81,22 @@ docker buildx build \
     -f docker/Dockerfile.webhook \
     .
 
-echo "Building and pushing echo-server image...${BUILDX_PLATFORMS}"
+echo "Building and pushing echo-advanced image (from Istio) ...${BUILDX_PLATFORMS}"
 
 docker buildx build \
-    -t ${REGISTRY}/echo-server:${GIT_TAG} \
-    -t ${REGISTRY}/echo-server:${VERSION_TAG} \
+    -t ${REGISTRY}/echo-advanced:${GIT_TAG} \
+    -t ${REGISTRY}/echo-advanced:${VERSION_TAG} \
     --platform ${BUILDX_PLATFORMS} \
     --push \
-    -f docker/Dockerfile.echo \
+    -f docker/Dockerfile.echo-advanced \
+    .
+
+echo "Building and pushing echo-basic image (previously in Ingress Controller Conformance Repo) ...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/echo-basic:${GIT_TAG} \
+    -t ${REGISTRY}/echo-basic:${VERSION_TAG} \
+    --platform ${BUILDX_PLATFORMS} \
+    --push \
+    -f docker/Dockerfile.echo-basic \
     .
