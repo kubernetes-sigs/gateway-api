@@ -243,6 +243,26 @@ type PortNumber int32
 // ReferenceGrant object is required in the referent namespace to allow that
 // namespace's owner to accept the reference. See the ReferenceGrant
 // documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD honor the
+// appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols
+// defined in [KEP-3726].
+//
+// If a Service appProtocol isn't specified an implementation MAY infer the backend
+// protocol through its own means. Implementations MAY infer the protocol from the
+// Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified protocol then
+// the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
+// False with the "UnsupportedProtocol".
+//
+// </gateway:experimental:description>
+//
+// [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
 	BackendObjectReference `json:",inline"`
@@ -342,6 +362,7 @@ const (
 	// * "RefNotPermitted"
 	// * "InvalidKind"
 	// * "BackendNotFound"
+	// * "UnsupportedProtocol"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -366,6 +387,11 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one of the
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// Route's rules has a reference to a resource with an app protocol that
+	// is not supported by this implementation.
+	RouteReasonUnsupportedProtocol RouteConditionReason = "UnsupportedProtocol"
 )
 
 // RouteParentStatus describes the status of a route with respect to an

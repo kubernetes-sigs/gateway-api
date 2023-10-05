@@ -1110,7 +1110,32 @@ type HTTPRequestMirrorFilter struct {
 	BackendRef BackendObjectReference `json:"backendRef"`
 }
 
-// HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.
+// HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
+//
+// Note that when a namespace different than the local namespace is specified, a
+// ReferenceGrant object is required in the referent namespace to allow that
+// namespace's owner to accept the reference. See the ReferenceGrant
+// documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD honor the
+// appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols
+// defined in [KEP-3726].
+//
+// If a Service appProtocol isn't specified an implementation MAY infer the backend
+// protocol through its own means. Implementations MAY infer the protocol from the
+// Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified protocol then
+// the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
+// False with the "UnsupportedProtocol".
+//
+// </gateway:experimental:description>
+//
+// [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//

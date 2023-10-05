@@ -209,7 +209,7 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 		}
 		startTag := "<gateway:experimental:description>"
 		endTag := "</gateway:experimental:description>"
-		regexPattern := startTag + `(?s:(.*?))` + endTag
+		regexPattern := regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag)
 		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental:description>") {
 			re := regexp.MustCompile(regexPattern)
 			match := re.FindStringSubmatch(jsonProps.Description)
