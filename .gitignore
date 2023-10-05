@@ -56,3 +56,5 @@ admission
 .venv/
 release/
 site-src/geps
+
+go.work*
