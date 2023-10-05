@@ -560,10 +560,8 @@ type GRPCRouteFilter struct {
 // When the BackendRef points to a Kubernetes Service, implementations SHOULD honor the
 // appProtocol field if it is set for the target Service Port.
 //
-// Implementations supporting appProtocol MUST recognize the Kubernetes Standard Application Protocols
-// defined in [KEP-3726]. This supports IANA standard service names and extra constants defined
-// in the KEP that have a prefix of "kubernetes.io/". Gateway API MAY define additional
-// constants with the prefix "gateway.networking.k8s.io/"
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols
+// defined in [KEP-3726].
 //
 // If a Service appProtocol isn't specified an implementation MAY infer the backend
 // protocol through its own means. Implementations MAY infer the protocol from the
@@ -578,13 +576,9 @@ type GRPCRouteFilter struct {
 // the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
 // False with the "UnsupportedProtocol".
 //
-// Implementations MAY support different combinations of protocol/appProtocol/Route Type.
-// See [GEP-1911] for a table.
-//
 // </gateway:experimental:description>
 //
 // [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
-// [GEP-1911]: https://gateway-api.sigs.k8s.io/geps/gep-1911/
 type GRPCBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
