@@ -381,7 +381,7 @@ type GatewayTLSConfig struct {
 	// Mode defines the TLS behavior for the TLS session initiated by the client.
 	// There are two possible modes:
 	//
-	// - Terminate: The TLS session between the downstream client
+	// - Terminate (default): The TLS session between the downstream client
 	//   and the Gateway is terminated at the Gateway. This mode requires
 	//   certificateRefs to be set and contain at least one element.
 	// - Passthrough: The TLS session is NOT terminated by the Gateway. This
@@ -410,8 +410,8 @@ type GatewayTLSConfig struct {
 	// "ResolvedRefs" condition MUST be set to False for this listener with the
 	// "RefNotPermitted" reason.
 	//
-	// This field is required to have at least one element when the mode is set
-	// to "Terminate" (default) and is optional otherwise.
+	// This field is required to have at least one element when the mode is
+	// "Terminate" and is optional otherwise.
 	//
 	// CertificateRefs can reference to standard Kubernetes resources, i.e.
 	// Secret, or implementation-specific custom resources.

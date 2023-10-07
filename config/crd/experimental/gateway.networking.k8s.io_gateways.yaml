@@ -613,8 +613,8 @@ spec:
                             "RefNotPermitted" reason.
 
 
-                            This field is required to have at least one element when the mode is set
-                            to "Terminate" (default) and is optional otherwise.
+                            This field is required to have at least one element when the mode is
+                            "Terminate" and is optional otherwise.
 
 
                             CertificateRefs can reference to standard Kubernetes resources, i.e.
@@ -689,7 +689,7 @@ spec:
                             There are two possible modes:
 
 
-                            - Terminate: The TLS session between the downstream client
+                            - Terminate (default): The TLS session between the downstream client
                               and the Gateway is terminated at the Gateway. This mode requires
                               certificateRefs to be set and contain at least one element.
                             - Passthrough: The TLS session is NOT terminated by the Gateway. This
@@ -1704,8 +1704,8 @@ spec:
                             "RefNotPermitted" reason.
 
 
-                            This field is required to have at least one element when the mode is set
-                            to "Terminate" (default) and is optional otherwise.
+                            This field is required to have at least one element when the mode is
+                            "Terminate" and is optional otherwise.
 
 
                             CertificateRefs can reference to standard Kubernetes resources, i.e.
@@ -1780,7 +1780,7 @@ spec:
                             There are two possible modes:
 
 
-                            - Terminate: The TLS session between the downstream client
+                            - Terminate (default): The TLS session between the downstream client
                               and the Gateway is terminated at the Gateway. This mode requires
                               certificateRefs to be set and contain at least one element.
                             - Passthrough: The TLS session is NOT terminated by the Gateway. This
