@@ -158,6 +158,7 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "InvalidParameters"
+	// * "UnsupportedVersion"
 	//
 	// Possible reasons for this condition to be Unknown are:
 	//
@@ -186,6 +187,49 @@ const (
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
 )
 
+const (
+	// This condition indicates whether the GatewayClass supports the version(s)
+	// of Gateway API CRDs present in the cluster. This condition MUST be set by
+	// a controller when it marks a GatewayClass "Accepted".
+	//
+	// The version of a Gateway API CRD is defined by the
+	// gateway.networking.k8s.io/bundle-version annotation on the CRD. If
+	// implementations detect any Gateway API CRDs that either do not have this
+	// annotation set, or have it set to a version that is not recognized or
+	// supported by the implementation, this condition MUST be set to false.
+	//
+	// Implementations MAY choose to either provide "best effort" support when
+	// an unrecognized CRD version is present. This would be communicated by
+	// setting the "Accepted" condition to true and the "SupportedVersion"
+	// condition to false.
+	//
+	// Alternatively, implementations MAY choose not to support CRDs with
+	// unrecognized versions. This would be communicated by setting the
+	// "Accepted" condition to false with the reason "UnsupportedVersions".
+	//
+	// Possible reasons for this condition to be true are:
+	//
+	// * "SupportedVersion"
+	//
+	// Possible reasons for this condition to be False are:
+	//
+	// * "UnsupportedVersion"
+	//
+	// Controllers should prefer to use the values of GatewayClassConditionReason
+	// for the corresponding Reason, where appropriate.
+	GatewayClassConditionStatusSupportedVersion GatewayClassConditionType = "SupportedVersion"
+
+	// This reason is used with the "SupportedVersion" condition when the
+	// condition is true.
+	GatewayClassReasonSupportedVersion GatewayClassConditionReason = "SupportedVersion"
+
+	// This reason is used with the "SupportedVersion" or "Accepted" condition
+	// when the condition is false. A message SHOULD be included in this
+	// condition that includes the detected CRD version(s) present in the
+	// cluster and the CRD version(s) that are supported by the GatewayClass.
+	GatewayClassReasonUnsupportedVersion GatewayClassConditionReason = "UnsupportedVersion"
+)
+
 // GatewayClassStatus is the current status for the GatewayClass.
 type GatewayClassStatus struct {
 	// Conditions is the current status from the controller for
@@ -200,6 +244,14 @@ type GatewayClassStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// SupportedFeatures is the set of features the GatewayClass support.
+	// It MUST be sorted in ascending alphabetical order.
+	// +optional
+	// +listType=set
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxItems=64
+	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -210,3 +262,8 @@ type GatewayClassList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []GatewayClass `json:"items"`
 }
+
+// SupportedFeature is used to describe distinct features that are covered by
+// conformance tests.
+// +kubebuilder:validation:Enum=Gateway;GatewayPort8080;GatewayStaticAddresses;HTTPRoute;HTTPRouteDestinationPortMatching;HTTPRouteHostRewrite;HTTPRouteMethodMatching;HTTPRoutePathRedirect;HTTPRoutePathRewrite;HTTPRoutePortRedirect;HTTPRouteQueryParamMatching;HTTPRouteRequestMirror;HTTPRouteRequestMultipleMirrors;HTTPRouteResponseHeaderModification;HTTPRouteSchemeRedirect;Mesh;ReferenceGrant;TLSRoute
+type SupportedFeature string

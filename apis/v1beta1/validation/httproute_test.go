@@ -1176,3 +1176,132 @@ func TestValidateRequestRedirectFiltersWithNoBackendRef(t *testing.T) {
 		})
 	}
 }
+
+func toDuration(durationString string) *gatewayv1b1.Duration {
+	return (*gatewayv1b1.Duration)(&durationString)
+}
+
+func TestValidateHTTPTimeouts(t *testing.T) {
+	tests := []struct {
+		name     string
+		rules    []gatewayv1b1.HTTPRouteRule
+		errCount int
+	}{
+		{
+			name:     "valid httpRoute Rules timeouts",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("1ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules timeout set to 0s (disabled)",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0s"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules timeout set to 0ms (disabled)",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0ms"),
+					},
+				},
+			},
+		}, {}, {
+			name:     "valid httpRoute Rules timeout set to 0h (disabled)",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request: toDuration("0h"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules timeout and backendRequest have the same value",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1ms"),
+						BackendRequest: toDuration("1ms"),
+					},
+				},
+			},
+		}, {
+			name:     "invalid httpRoute Rules backendRequest timeout cannot be longer than request timeout",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1ms"),
+						BackendRequest: toDuration("2ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules request timeout 1s and backendRequest timeout 200ms",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("1s"),
+						BackendRequest: toDuration("200ms"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules request timeout 10s and backendRequest timeout 10s",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("10s"),
+						BackendRequest: toDuration("10s"),
+					},
+				},
+			},
+		}, {
+			name:     "invalid httpRoute Rules backendRequest timeout cannot be greater than request timeout",
+			errCount: 1,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("200ms"),
+						BackendRequest: toDuration("1s"),
+					},
+				},
+			},
+		}, {
+			name:     "valid httpRoute Rules request 0s (infinite) and backendRequest 100ms",
+			errCount: 0,
+			rules: []gatewayv1b1.HTTPRouteRule{
+				{
+					Timeouts: &gatewayv1b1.HTTPRouteTimeouts{
+						Request:        toDuration("0s"),
+						BackendRequest: toDuration("100ms"),
+					},
+				},
+			},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			route := gatewayv1b1.HTTPRoute{Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules}}
+			errs := ValidateHTTPRoute(&route)
+			if len(errs) != tc.errCount {
+				t.Errorf("got %d errors, want %d errors: %s", len(errs), tc.errCount, errs)
+			}
+		})
+	}
+}

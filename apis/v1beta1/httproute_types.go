@@ -263,6 +263,57 @@ type HTTPRouteRule struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []HTTPBackendRef `json:"backendRefs,omitempty"`
+
+	// Timeouts defines the timeouts that can be configured for an HTTP request.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+}
+
+// HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
+// Timeout values are represented with Gateway API Duration formatting.
+// Specifying a zero value such as "0s" is interpreted as no timeout.
+//
+// +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
+type HTTPRouteTimeouts struct {
+	// Request specifies the maximum duration for a gateway to respond to an HTTP request.
+	// If the gateway has not been able to respond before this deadline is met, the gateway
+	// MUST return a timeout error.
+	//
+	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
+	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
+	// to complete.
+	//
+	// This timeout is intended to cover as close to the whole request-response transaction
+	// as possible although an implementation MAY choose to start the timeout after the entire
+	// request stream has been received instead of immediately after the transaction is
+	// initiated by the client.
+	//
+	// When this field is unspecified, request timeout behavior is implementation-specific.
+	//
+	// Support: Extended
+	//
+	// +optional
+	Request *Duration `json:"request,omitempty"`
+
+	// BackendRequest specifies a timeout for an individual request from the gateway
+	// to a backend. This covers the time from when the request first starts being
+	// sent from the gateway to when the full response has been received from the backend.
+	//
+	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
+	// may result in more than one call from the gateway to the destination backend,
+	// for example, if automatic retries are supported.
+	//
+	// Because the Request timeout encompasses the BackendRequest timeout, the value of
+	// BackendRequest must be <= the value of Request timeout.
+	//
+	// Support: Extended
+	//
+	// +optional
+	BackendRequest *Duration `json:"backendRequest,omitempty"`
 }
 
 // PathMatchType specifies the semantics of how HTTP paths should be compared.
@@ -1059,7 +1110,30 @@ type HTTPRequestMirrorFilter struct {
 	BackendRef BackendObjectReference `json:"backendRef"`
 }
 
-// HTTPBackendRef defines how a HTTPRoute should forward an HTTP request.
+// HTTPBackendRef defines how a HTTPRoute forwards a HTTP request.
+//
+// Note that when a namespace different than the local namespace is specified, a
+// ReferenceGrant object is required in the referent namespace to allow that
+// namespace's owner to accept the reference. See the ReferenceGrant
+// documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD
+// honor the appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes
+// Standard Application Protocols defined in KEP-3726.
+//
+// If a Service appProtocol isn't specified, an implementation MAY infer the
+// backend protocol through its own means. Implementations MAY infer the
+// protocol from the Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified
+// protocol then the backend is considered invalid. Implementations MUST set the
+// "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
+//
+// </gateway:experimental:description>
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//
@@ -1083,11 +1157,24 @@ type HTTPBackendRef struct {
 	//   case, the Reason must be set to `RefNotPermitted` and the Message of the
 	//   Condition must explain which cross-namespace reference is not allowed.
 	//
+	// * It refers to a Kubernetes Service that has an incompatible appProtocol
+	//   for the given Route type
+	//
+	// * The BackendTLSPolicy object is installed in the cluster, a BackendTLSPolicy
+	//   is present that refers to the Service, and the implementation is unable
+	//   to meet the requirement. At the time of writing, BackendTLSPolicy is
+	//   experimental, but once it becomes standard, this will become a MUST
+	//   requirement.
+	//
 	// Support: Core for Kubernetes Service
 	//
 	// Support: Implementation-specific for any other resource
 	//
 	// Support for weight: Core
+	//
+	// Support for Kubernetes Service appProtocol: Extended
+	//
+	// Support for BackendTLSPolicy: Experimental and ImplementationSpecific
 	//
 	// +optional
 	BackendRef `json:",inline"`
