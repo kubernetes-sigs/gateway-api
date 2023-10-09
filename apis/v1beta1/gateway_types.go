@@ -132,6 +132,13 @@ type GatewaySpec struct {
 	// matches. For example, `"foo.example.com"` takes precedence over
 	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
 	//
+	// Note that requests SHOULD match at most one Listener. For example, if
+	// Listeners are defined for "foo.example.com" and "*.example.com", a
+	// request to "foo.example.com" SHOULD only be routed using routes attached
+	// to the "foo.example.com" Listener (and not the "*.example.com" Listener).
+	// This concept is known as "Listener Isolation". Implementations that do
+	// not support Listener Isolation MUST clearly document this.
+	//
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
 	//
