@@ -244,6 +244,14 @@ type GatewayClassStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// SupportedFeatures is the set of features the GatewayClass support.
+	// It MUST be sorted in ascending alphabetical order.
+	// +optional
+	// +listType=set
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxItems=64
+	SupportedFeatures []string `json:"supportedFeatures,omitempty"`
 }
 
 // +kubebuilder:object:root=true
