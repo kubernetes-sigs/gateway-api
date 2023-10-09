@@ -28,7 +28,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
-- [WSO2 APK][25] (pre-alpha)
+- [WSO2 APK][25] (GA)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
