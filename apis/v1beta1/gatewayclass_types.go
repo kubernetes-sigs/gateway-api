@@ -245,10 +245,9 @@ type GatewayClassStatus struct {
 	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 
-	// TODO(LiorLieberman) explore adding CEL validation to ensure the list is sorted.
 	// SupportedFeatures is the set of features the GatewayClass support.
-	// It should be sorted in ascending alphabetical order.
-	//+optional
+	// It MUST be sorted in ascending alphabetical order.
+	// +optional
 	// +listType=set
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxItems=64

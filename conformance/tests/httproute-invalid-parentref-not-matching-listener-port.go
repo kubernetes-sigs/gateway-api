@@ -37,7 +37,7 @@ var HTTPRouteInvalidParentRefNotMatchingListenerPort = suite.ConformanceTest{
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
-		suite.SupportRouteDestinationPortMatching,
+		suite.SupportHTTPRouteDestinationPortMatching,
 	},
 	Manifests: []string{"tests/httproute-invalid-parentref-not-matching-listener-port.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
