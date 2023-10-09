@@ -41,6 +41,12 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 )
 
+// GatewayExcludedFromReadinessChecks is an annotation that can be placed on a
+// Gateway provided via the tests to indicate that it is NOT expected to be
+// Accepted or Provisioned in its default state. This is generally helpful for
+// tests which validate fixing broken Gateways, e.t.c.
+const GatewayExcludedFromReadinessChecks = "gateway-api/skip-this-for-readiness"
+
 // GatewayRef is a tiny type for specifying an HTTP Route ParentRef without
 // relying on a specific api version.
 type GatewayRef struct {
@@ -202,6 +208,11 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			for _, gw := range gwList.Items {
 				gw := gw
 
+				if val, ok := gw.Annotations[GatewayExcludedFromReadinessChecks]; ok && val == "true" {
+					t.Logf("Gateway %s/%s is skipped for setup and wont be tested", ns, gw.Name)
+					continue
+				}
+
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
 					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)
 					return false, nil
@@ -238,6 +249,49 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 		return true, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
+}
+
+// GatewayMustHaveCondition checks that the supplied Gateway has the supplied Condition,
+// halting after the specified timeout is exceeded.
+func GatewayMustHaveCondition(
+	t *testing.T,
+	client client.Client,
+	timeoutConfig config.TimeoutConfig,
+	gwNN types.NamespacedName,
+	expectedCondition metav1.Condition,
+) {
+	t.Helper()
+
+	waitErr := wait.PollUntilContextTimeout(
+		context.Background(),
+		1*time.Second,
+		timeoutConfig.GatewayMustHaveCondition,
+		true,
+		func(ctx context.Context) (bool, error) {
+			gw := &v1beta1.Gateway{}
+			err := client.Get(ctx, gwNN, gw)
+			if err != nil {
+				return false, fmt.Errorf("error fetching Gateway: %w", err)
+			}
+
+			if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
+				return false, err
+			}
+
+			if findConditionInList(t,
+				gw.Status.Conditions,
+				expectedCondition.Type,
+				string(expectedCondition.Status),
+				expectedCondition.Reason,
+			) {
+				return true, nil
+			}
+
+			return false, nil
+		},
+	)
+
+	require.NoErrorf(t, waitErr, "error waiting for Gateway status to have a Condition matching expectations")
 }
 
 // MeshNamespacesMustBeReady waits until all Pods are marked Ready. This is

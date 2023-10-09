@@ -49,12 +49,18 @@ var GatewayCoreFeatures = sets.New(
 const (
 	// This option indicates that the Gateway can also use port 8080
 	SupportGatewayPort8080 SupportedFeature = "GatewayPort8080"
+
+	// SupportGatewayStaticAddresses option indicates that the Gateway is capable
+	// of allocating pre-determined addresses, rather than dynamically having
+	// addresses allocated for it.
+	SupportGatewayStaticAddresses SupportedFeature = "GatewayStaticAddresses"
 )
 
 // StandardExtendedFeatures are extra generic features that implementations may
 // choose to support as an opt-in.
 var GatewayExtendedFeatures = sets.New(
 	SupportGatewayPort8080,
+	SupportGatewayStaticAddresses,
 ).Insert(GatewayCoreFeatures.UnsortedList()...)
 
 // -----------------------------------------------------------------------------

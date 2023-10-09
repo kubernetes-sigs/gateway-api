@@ -540,13 +540,15 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: "Addresses lists the IP addresses that have actually
-                  been bound to the Gateway. These addresses may differ from the addresses
-                  in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n "
+                description: "Addresses lists the network addresses that have been
+                  bound to the Gateway. \n This list may differ from the addresses
+                  provided in the spec under some conditions: \n * no addresses are
+                  specified, all addresses are dynamically assigned * a combination
+                  of specified and dynamic addresses are assigned * a specified address
+                  was unusable (e.g. already in use) \n "
                 items:
-                  description: GatewayStatusAddress describes an address that is bound
-                    to a Gateway.
+                  description: GatewayStatusAddress describes a network address that
+                    is bound to a Gateway.
                   oneOf:
                   - properties:
                       type:
@@ -1354,13 +1356,15 @@ spec:
             description: Status defines the current state of Gateway.
             properties:
               addresses:
-                description: "Addresses lists the IP addresses that have actually
-                  been bound to the Gateway. These addresses may differ from the addresses
-                  in the Spec, e.g. if the Gateway automatically assigns an address
-                  from a reserved pool. \n "
+                description: "Addresses lists the network addresses that have been
+                  bound to the Gateway. \n This list may differ from the addresses
+                  provided in the spec under some conditions: \n * no addresses are
+                  specified, all addresses are dynamically assigned * a combination
+                  of specified and dynamic addresses are assigned * a specified address
+                  was unusable (e.g. already in use) \n "
                 items:
-                  description: GatewayStatusAddress describes an address that is bound
-                    to a Gateway.
+                  description: GatewayStatusAddress describes a network address that
+                    is bound to a Gateway.
                   oneOf:
                   - properties:
                       type:

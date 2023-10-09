@@ -525,7 +525,7 @@ type GatewayAddress struct {
 	Value string `json:"value"`
 }
 
-// GatewayStatusAddress describes an address that is bound to a Gateway.
+// GatewayStatusAddress describes a network address that is bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
 type GatewayStatusAddress struct {
@@ -547,10 +547,15 @@ type GatewayStatusAddress struct {
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
-	// Addresses lists the IP addresses that have actually been
-	// bound to the Gateway. These addresses may differ from the
-	// addresses in the Spec, e.g. if the Gateway automatically
-	// assigns an address from a reserved pool.
+	// Addresses lists the network addresses that have been bound to the
+	// Gateway.
+	//
+	// This list may differ from the addresses provided in the spec under some
+	// conditions:
+	//
+	//   * no addresses are specified, all addresses are dynamically assigned
+	//   * a combination of specified and dynamic addresses are assigned
+	//   * a specified address was unusable (e.g. already in use)
 	//
 	// +optional
 	// <gateway:validateIPAddress>
@@ -665,11 +670,34 @@ const (
 	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
 
-	// This reason is used with the "Programmed" condition when none of the requested
-	// addresses have been assigned to the Gateway. This reason can be used to
-	// express a range of circumstances, including (but not limited to) IPAM
-	// address exhaustion, address not yet allocated, or a named address not being found.
+	// This reason is used with the "Programmed" condition when the underlying
+	// implementation and network have yet to dynamically assign addresses for a
+	// Gateway.
+	//
+	// Some example situations where this reason can be used:
+	//
+	//   * IPAM address exhaustion
+	//   * Address not yet allocated
+	//
+	// When this reason is used the implementation SHOULD provide a clear
+	// message explaining the underlying problem, ideally with some hints as to
+	// what actions can be taken that might resolve the problem.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
+
+	// This reason is used with the "Programmed" condition when the underlying
+	// implementation (and possibly, network) are unable to use an address that
+	// was provided in the Gateway specification.
+	//
+	// Some example situations where this reason can be used:
+	//
+	//   * a named address not being found
+	//   * a provided static address can't be used
+	//   * the address is already in use
+	//
+	// When this reason is used the implementation SHOULD provide prescriptive
+	// information on which address is causing the problem and how to resolve it
+	// in the condition message.
+	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
 )
 
 const (
@@ -715,12 +743,9 @@ const (
 	// the Gateway.
 	GatewayReasonPending GatewayConditionReason = "Pending"
 
-	// This reason is used with the "Accepted" condition when the Gateway could not be configured
-	// because the requested address is not supported. This reason could be used in a number of
-	// instances, including:
-	//
-	// * The address is already in use.
-	// * The type of address is not supported by the implementation.
+	// This reason is used with the "Accepted" condition to indicate that the
+	// Gateway could not be accepted because an address that was provided is a
+	// type which is not supported by the implementation.
 	GatewayReasonUnsupportedAddress GatewayConditionReason = "UnsupportedAddress"
 )
 

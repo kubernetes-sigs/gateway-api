@@ -35,6 +35,11 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	GatewayMustHaveAddress time.Duration
 
+	// GatewayMustHaveCondition represents the maximum amount of time for a
+	// Gateway to have the supplied Condition.
+	// Max value for conformant implementation: None
+	GatewayMustHaveCondition time.Duration
+
 	// GatewayStatusMustHaveListeners represents the maximum time for a Gateway to have listeners in status that match the expected listeners.
 	// Max value for conformant implementation: None
 	GatewayStatusMustHaveListeners time.Duration
@@ -99,6 +104,7 @@ func DefaultTimeoutConfig() TimeoutConfig {
 		DeleteTimeout:                     10 * time.Second,
 		GetTimeout:                        10 * time.Second,
 		GatewayMustHaveAddress:            180 * time.Second,
+		GatewayMustHaveCondition:          180 * time.Second,
 		GatewayStatusMustHaveListeners:    60 * time.Second,
 		GatewayListenersMustHaveCondition: 60 * time.Second,
 		GWCMustBeAccepted:                 180 * time.Second,
@@ -128,6 +134,9 @@ func SetupTimeoutConfig(timeoutConfig *TimeoutConfig) {
 	}
 	if timeoutConfig.GatewayMustHaveAddress == 0 {
 		timeoutConfig.GatewayMustHaveAddress = defaultTimeoutConfig.GatewayMustHaveAddress
+	}
+	if timeoutConfig.GatewayMustHaveCondition == 0 {
+		timeoutConfig.GatewayMustHaveCondition = defaultTimeoutConfig.GatewayMustHaveCondition
 	}
 	if timeoutConfig.GatewayStatusMustHaveListeners == 0 {
 		timeoutConfig.GatewayStatusMustHaveListeners = defaultTimeoutConfig.GatewayStatusMustHaveListeners
