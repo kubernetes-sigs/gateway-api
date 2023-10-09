@@ -79,13 +79,18 @@ type GatewaySpec struct {
 	// Practically, this means that each listener in a set MUST have a unique
 	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
 	//
-	// Some combinations of port, protocol, and TLS settings are are considered
-	// Core support and MUST be supported by implementations if they support the
-	// associated Route type:
+	// Some combinations of port, protocol, and TLS settings are considered
+	// Core support and MUST be supported by implementations based on their
+	// targeted conformance profile:
+	//
+	// HTTP Profile
 	//
 	// 1. HTTPRoute, Port: 80, Protocol: HTTP
 	// 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided
-	// 3. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough
+	//
+	// TLS Profile
+	//
+	// 1. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough
 	//
 	// "Distinct" Listeners have the following property:
 	//
@@ -135,12 +140,21 @@ type GatewaySpec struct {
 	// Listeners are Conflicted, and the implementation MUST set the "Conflicted"
 	// condition in the Listener Status to "True".
 	//
-	// Implementations MAY choose to accept a Gateway with Conflicted
-	// Listeners if they accept a partial Listener set that contains no
-	// Conflicted Listeners. They MUST set a "ListenersNotValid" condition
-	// the Gateway Status when the Gateway contains Conflicted Listeners
-	// whether or not they accept the Gateway. That Condition SHOULD clearly
-	// indicate in the Message which Listeners are conflicted.
+	// Implementations MAY choose to accept a Gateway with some Conflicted
+	// Listeners only if they only accept the partial Listener set that contains
+	// no Conflicted Listeners. To put this another way, implementations may
+	// accept a partial Listener set only if they throw out *all* the conflicting
+	// Listeners. No picking one of the conflicting listeners as the winner.
+	// This also means that the Gateway must have at least one non-conflicting
+	// Listener in this case, otherwise it violates the requirement that at
+	// least one Listener must be present.
+	//
+	// The implementation MUST set a "ListenersNotValid" condition on the
+	// Gateway Status when the Gateway contains Conflicted Listeners whether or
+	// not they accept the Gateway. That Condition SHOULD clearly
+	// indicate in the Message which Listeners are conflicted, and which are
+	// Accepted. Additionally, the Listener status for those listeners SHOULD
+	// indicate which Listeners are conflicted and not Accepted.
 	//
 	// A Gateway's Listeners are considered "compatible" if:
 	//
