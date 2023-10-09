@@ -15,12 +15,6 @@ help implementers of this API to skip making common mistakes.
 It may not be very relevant if you are intending to _use_ this API as an end
 user as opposed to _building_ something that uses it.
 
-!!! note
-    This document is officially a part of the Gateway API specification.
-    Requirements in this document labelled as MUST, SHOULD, or MAY must be treated
-    the same as in the detailed specification page. (That is, the words MUST, SHOULD,
-    and MAY must be interpreted as described in RFC 2119.)
-
 This is a living document, if you see something missing, PRs welcomed!
 
 ## Important things to remember about Gateway API
@@ -87,13 +81,6 @@ Similarly, if an implementation was written with a _higher_ version, the newer
 values that it understands will simply _never be used_, as they are not present
 in the older version.
 
-A similar guarantee occurs between the "experimental" and "standard" channels for
-objects in the same API version, so an implementation may be written with the
-experimental API definitions, but work just fine with having only the standard
-definitions installed - there will be fields or values that will never be used.
-The same applies for an implementation written using the standard API definitions
-running in a cluster with the experimental definitions installed.
-
 ## Implementation Rules and Guidelines
 
 ### CRD Management
@@ -113,10 +100,13 @@ storage version of the resource, which could have unforseen effects. Most of the
 time, things will probably work, but if it doesn't work, it will most likely 
 break in weird ways.
 
+Additionally, older versions of the API may be missing fields or features, which
+could be very disruptive for users.
+
 Try your best to ensure that the bundle version doesn't roll backwards. It's safer.
 
 Implementations SHOULD also handle the Gateway API CRDs _not_ being present in
-the cluster without crashing or panicing. Exiting with a clear fatal error is
+the cluster without crashing or panicking. Exiting with a clear fatal error is
 acceptable in this case, as is disabling Gateway API support even if enabled in
 configuration.
 
@@ -137,7 +127,9 @@ they MUST have a way to ensure:
 
 - there are no other Gateway API CRDs installed in the cluster before starting, or
 - that the CRD definitions are only installed if they are a higher bundle version
-  than any existing Gateway API CRDs
+  than any existing Gateway API CRDs. Note that even this may not be safe if there
+  are breaking changes in the experimental channel resources, so implementations
+  should be _very_ careful with doing this.
 
 This avoids problems if another implementation is also installed in the cluster
 and expects a higher version of the CRDs to be installed.
@@ -151,16 +143,27 @@ to:
 - Check if there are any Gateway API CRDs installed in the cluster.
 - If not, install its most compatible version of the CRDs.
 - If so, only install its version of the CRDs if the bundle version is higher
-  than the existing one.
+  than the existing one, and the mechanism may also need to check if there are
+  incompatible changes included in any versions as well.
 
 
 Because of our backwards compatibility guarantees, it's also safe for a controller
 to flip the install channel between "standard" and "experimental", although
-implementations MUST NOT do this without consulting the implementation owner.
+implementations MUST NOT do this without requiring confirmation from the cluster
+administrator.
 
 Automatic CRD installation has the advantage that there is less for the
 implementation user to do; any required version checking can be performed by
 code instead of by the cluster admin.
+
+It should also be noted that many infra and cluster admins do this sort of
+automatic CRD management using external management systems that will not be
+visible to a Gateway implementation, so automatic installation MUST be able to
+be disabled by the installation owner (whether that is the infra or cluster
+admin).
+
+Because of all these caveats, we DO NOT recommend doing automatic CRD management
+at this time.
 
 #### Manual CRD installation
 
@@ -219,6 +222,7 @@ implementations).
 
 In all of these cases, there are some relatively-common Condition types that have
 similar meanings:
+
 - `Accepted` - the resource or part thereof contains acceptable config that will
 produce some configuration in the underlying data plane that the implementation
 controls. This does not mean that the _whole_ configuration is valid, just that
@@ -251,8 +255,8 @@ version of the object.
 For each currently available conformance profile, there are a set of resources
 that implementations are expected to reconcile.
 
-The following section goes through each Gateway API object, indicates expected
-behaviors, and which conformance profiles that object is included in.
+The following section goes through each Gateway API object and indicates expected
+behaviors.
 
 #### GatewayClass
 
@@ -277,11 +281,6 @@ the only possible reason for this is that there is a pointer to a `paramsRef`
 object that is not supported by the implementation), then the implementation
 SHOULD mark the incompatible GatewayClass as not `Accepted`.
 
-Watched in profiles:
-
-- HTTP
-- TLS
-
 #### Gateway
 
 Gateway objects MUST refer in the `spec.gatewayClassName` field to a GatewayClass
@@ -291,11 +290,6 @@ reconcile them.
 Gateway objects that fall out of scope (for example, because the GatewayClass
 they reference was deleted) for reconciliation MAY have their status removed by
 the implementation as part of the delete process, but this is not required.
-
-Watched in profiles:
-
-- HTTP
-- TLS
 
 #### General Route information
 
@@ -320,31 +314,20 @@ in its routing directives.
 
 Watched in profiles:
 
-- HTTP
-- MESH
-
 #### TLSRoute
 
 TLSRoutes route encrypted TLS traffic using the SNI header, _without decrypting
 the traffic stream_, to the relevant backends.
-
-Watched in profiles:
-
-- TLS
 
 #### TCPRoute
 
 TCPRoutes route a TCP stream that arrives at a Listener to one of the given
 backends.
 
-Not currently included in any conformance profiles.
-
 #### UDPRoute
 
 UDPRoutes route UDP packets that arrive at a Listener to one of the given
 backends.
-
-Not currently included in any conformance profiles.
 
 #### ReferenceGrant
 
@@ -359,9 +342,3 @@ or both.
 Implementations that support cross-namespace references MUST watch ReferenceGrant
 and reconcile any ReferenceGrant that points to an object that's referred to by
 an in-scope Gateway API object.
-
-Watched in profiles:
-
-- HTTP
-- TLS
-- MESH
