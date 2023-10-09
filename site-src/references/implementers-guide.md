@@ -1,7 +1,5 @@
 # Gateway API Implementer's Guide
 
-aka
-
 Everything you wanted to know about building a Gateway API implementation
 but were too afraid to ask.
 
@@ -309,10 +307,9 @@ will indicate that any remaining status is out of date.
 #### HTTPRoute
 
 HTTPRoutes route HTTP traffic that is _unencrypted_ and available for inspection.
-This allows the HTTPRoute to use HTTP properties, like path, method, or headers
-in its routing directives.
-
-Watched in profiles:
+This includes HTTPS traffic that's terminated at the Gateway (since that is then
+decrypted), and allows the HTTPRoute to use HTTP properties, like path, method,
+or headers in its routing directives.
 
 #### TLSRoute
 
