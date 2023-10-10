@@ -86,12 +86,15 @@ in the older version.
 For a Gateway API implementation to work, the Gateway API CRDs must be installed
 in the Kubernetes cluster the implementation is watching.
 
-Implementations have two options: automatically installing CRDs or requiring
-installation before working. Both have tradeoffs.
+Implementations have two possible options: installing CRDs themselves (implementation
+controlled) or requiring installation by some other mechanism before working 
+(externally controlled). Both have tradeoffs, but implementation controlled has
+significantly more, and so we DO NOT recommend using implementation controlled
+methods at this time.
 
-Either way has certain things that SHOULD be true, however:
+Regardless, either way has certain things that SHOULD be true, however:
 
-Whatever method is used, cluster admins SHOULD attempt to ensure that
+Whatever method is used, infra and cluster admins SHOULD attempt to ensure that
 the Bundle version of the CRDs is not _downgraded_. Although we ensure that
 API changes are backwards compatible, changing CRD definitions can change the
 storage version of the resource, which could have unforseen effects. Most of the
@@ -114,14 +117,17 @@ getting the list of installed CRDs before attempting to watch those resources.
 (Note that this will require the implementation to have `read` access to those
 resources though.)
 
-#### Automatic CRD installation
+#### Implementation-controlled CRD installation
 
-Automatic CRD installation also includes automatic installation mechanisms such
-as Helm, if the CRDs are included in a Helm chart with the implementation's
-installation.
+Implementation-controlled CRD installation also includes automatic installation
+mechanisms such as Helm, if the CRDs are included in a Helm chart with the
+implementation's installation.
 
-CRD definitions MAY be installed automatically by implementations, and if they do,
-they MUST have a way to ensure:
+Because of significant caveats we DO NOT recommend doing implementation-controlled
+CRD management at this time.
+
+However, if you really must, CRD definitions MAY be installed by implementations,
+but if they do, they MUST have a way to ensure:
 
 - there are no other Gateway API CRDs installed in the cluster before starting, or
 - that the CRD definitions are only installed if they are a higher bundle version
@@ -132,47 +138,37 @@ they MUST have a way to ensure:
 This avoids problems if another implementation is also installed in the cluster
 and expects a higher version of the CRDs to be installed.
 
-If the implementation can guarantee that no other implementation will interact
-with the cluster, then it MAY automatically install a relevant version of the CRDs.
+The worst outcome here would be two implementations trying to do automatic install
+of _different_ CRD versions, resulting in the CRD versions flapping between
+versions or channels. This would _not_ produce good outcomes.
 
-The ideal method for an automatic installation would require the implementation
+The safer method for an automatic installation would require the implementation
 to:
 
 - Check if there are any Gateway API CRDs installed in the cluster.
 - If not, install its most compatible version of the CRDs.
 - If so, only install its version of the CRDs if the bundle version is higher
-  than the existing one, and the mechanism may also need to check if there are
+  than the existing one, and the mechanism will also need to check if there are
   incompatible changes included in any versions as well.
 
+This is going to be _very_ difficult to pull off in practice.
 
-Because of our backwards compatibility guarantees, it's also safe for a controller
-to flip the install channel between "standard" and "experimental", although
-implementations MUST NOT do this without requiring confirmation from the cluster
-administrator.
-
-Automatic CRD installation has the advantage that there is less for the
-implementation user to do; any required version checking can be performed by
-code instead of by the cluster admin.
-
-It should also be noted that many infra and cluster admins do this sort of
-automatic CRD management using external management systems that will not be
-visible to a Gateway implementation, so automatic installation MUST be able to
-be disabled by the installation owner (whether that is the infra or cluster
+It should also be noted that many infra and cluster admins manage CRDs using
+externally controlled methods that will not be visible to a Gateway
+implementation, so if you still proceed with automatic installation, it MUST be
+able to be disabled by the installation owner (whether that is the infra or cluster
 admin).
 
 Because of all these caveats, we DO NOT recommend doing automatic CRD management
 at this time.
 
-#### Manual CRD installation
+#### Externally controlled CRD installation
 
-Manual CRD installation has the advantage that the implementer needs to maintain
-less code; however, it pushes the responsibility for correctly managing the
-Gateway API CRDs back to the cluster admin, who may not have as much context
-as is provided here.
+Because of all of the complexities mentioned in the "Implementation controlled"
+section of this document, we recommend that implementations supply documentation
+on how to check if CRDs are installed and upgrade versions if required.
 
-Implementations MAY require the installation to be done manually; if so, the
-installation instructions SHOULD include commands to check if there are any other
-CRDs installed already and verify that the installation will not be a downgrade.
+Additions to this document to add suggested commands here are welcomed.
 
 ### Conformance and Version compatibility
 
@@ -248,7 +244,7 @@ This allows users of the API to determine if the status is relevant to the curre
 version of the object.
 
 
-### Resources details
+### Resource details
 
 For each currently available conformance profile, there are a set of resources
 that implementations are expected to reconcile.
