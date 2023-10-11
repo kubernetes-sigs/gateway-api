@@ -24,7 +24,7 @@ import (
 
 // ValidateTLSRoute validates TLSRoute according to the Gateway API specification.
 // For additional details of the TLSRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1alpha2.TLSRoute
+// https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TLSRoute
 func ValidateTLSRoute(route *gatewayv1a2.TLSRoute) field.ErrorList {
 	return validateTLSRouteSpec(&route.Spec, field.NewPath("spec"))
 }

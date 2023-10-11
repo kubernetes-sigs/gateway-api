@@ -46,7 +46,7 @@ var (
 
 // ValidateHTTPRoute validates HTTPRoute according to the Gateway API specification.
 // For additional details of the HTTPRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/v1beta1/references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
+// https://gateway-api.sigs.k8s.io/v1beta1/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRoute
 func ValidateHTTPRoute(route *gatewayv1b1.HTTPRoute) field.ErrorList {
 	return ValidateHTTPRouteSpec(&route.Spec, field.NewPath("spec"))
 }

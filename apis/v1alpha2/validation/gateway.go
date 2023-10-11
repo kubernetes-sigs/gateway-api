@@ -26,7 +26,7 @@ import (
 // ValidateGateway validates gw according to the Gateway API specification.
 // For additional details of the Gateway spec, refer to:
 //
-//	https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+//	https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 //
 // Validation that is not possible with CRD annotations may be added here in the future.
 // See https://github.com/kubernetes-sigs/gateway-api/issues/868 for more information.

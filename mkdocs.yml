@@ -77,15 +77,15 @@ nav:
     - gRPC Routing: guides/grpc-routing.md
     - Migrating from Ingress: guides/migrating-from-ingress.md
   - Reference:
-    - Implementer's Guide: references/implementers-guide.md
+    - Implementer's Guide: reference/implementers-guide.md
     - API Types:
         GatewayClass: api-types/gatewayclass.md
         Gateway: api-types/gateway.md
         HTTPRoute: api-types/httproute.md
         ReferenceGrant: api-types/referencegrant.md
         GRPCRoute: api-types/grpcroute.md
-    - API specification: references/spec.md
-    - Policy Attachment: references/policy-attachment.md
+    - API specification: reference/spec.md
+    - Policy Attachment: reference/policy-attachment.md
     - Enhancement Proposals:
       - Overview: geps/overview.md
       - Declined:
