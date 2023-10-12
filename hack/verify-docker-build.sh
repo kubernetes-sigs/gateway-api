@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Copyright 2023 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,22 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Build
-FROM golang:1.21.3 as builder
+set -o errexit
+set -o nounset
+set -o pipefail
 
-ENV CGO_ENABLED=0
+SCRIPT_ROOT=$(dirname "${BASH_SOURCE}")/..
 
-WORKDIR /go/src/sigs.k8s.io/gateway-api/conformance/echo-basic
+echo "Verifying docker images"
 
-COPY ./conformance/echo-basic ./
+docker buildx rm ${BUILDX_CONTEXT} || true
+docker buildx create --use --name ${BUILDX_CONTEXT} --platform "${BUILDX_PLATFORMS}"
 
-RUN go build -trimpath -ldflags="-buildid= -s -w" -o echo-basic .
+VERIFY=true ./hack/build-and-push.sh
 
-# Use distroless as minimal base image to package the binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
-WORKDIR /
-COPY --from=builder /go/src/sigs.k8s.io/gateway-api/conformance/echo-basic/echo-basic /
-USER nonroot:nonroot
-
-ENTRYPOINT ["/echo-basic"]
