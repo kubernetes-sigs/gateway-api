@@ -1465,7 +1465,7 @@ and the policy implementation should record a `resolvedRefs` or similar Conditio
 
 When multiple Policies of the same type target the same object, one with a `sectionName` specified, and one without,
 the one with a `sectionName` is more specific, and so will have all its settings applied to the named target. The less-specific Policy will
-still be applied but MUST not affect the named target.
+still be applied but MUST not affect the named target i.e. it will be applied to all other sections which have not been targeted by another Policy 
 
 Note that the `sectionName` is currently intended to be used only for Direct Policy Attachment when references to
 SectionName are actually needed. Inherited Policies are always applied to the entire object. 
