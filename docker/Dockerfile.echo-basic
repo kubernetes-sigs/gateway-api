@@ -17,9 +17,9 @@ FROM golang:1.20.7 as builder
 
 ENV CGO_ENABLED=0
 
-WORKDIR /go/src/sigs.k8s.io/ingress-controller-conformance/
+WORKDIR /go/src/sigs.k8s.io/gateway-api/conformance/echo-basic
 
-COPY ./conformance/echo-basic/echo-basic.go ./conformance/echo-basic/go.mod ./
+COPY ./conformance/echo-basic ./
 
 RUN go build -trimpath -ldflags="-buildid= -s -w" -o echo-basic .
 
@@ -27,7 +27,7 @@ RUN go build -trimpath -ldflags="-buildid= -s -w" -o echo-basic .
 # Refer to https://github.com/GoogleContainerTools/distroless for more details
 FROM gcr.io/distroless/static:nonroot
 WORKDIR /
-COPY --from=builder /go/src/sigs.k8s.io/ingress-controller-conformance/echo-basic /
+COPY --from=builder /go/src/sigs.k8s.io/gateway-api/conformance/echo-basic/echo-basic /
 USER nonroot:nonroot
 
 ENTRYPOINT ["/echo-basic"]
