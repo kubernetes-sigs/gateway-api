@@ -6,6 +6,8 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v0.8.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
+  labels:
+    gateway.networking.k8s.io/policy: Direct
   name: backendtlspolicies.gateway.networking.k8s.io
 spec:
   group: gateway.networking.k8s.io
