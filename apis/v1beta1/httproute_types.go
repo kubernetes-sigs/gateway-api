@@ -1119,23 +1119,21 @@ type HTTPRequestMirrorFilter struct {
 //
 // <gateway:experimental:description>
 //
-// When the BackendRef points to a Kubernetes Service, implementations SHOULD honor the
-// appProtocol field if it is set for the target Service Port.
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD
+// honor the appProtocol field if it is set for the target Service Port.
 //
-// Implementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols
-// defined in [KEP-3726].
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes
+// Standard Application Protocols defined in KEP-3726.
 //
-// If a Service appProtocol isn't specified an implementation MAY infer the backend
-// protocol through its own means. Implementations MAY infer the protocol from the
-// Route type referring to the backend Service.
+// If a Service appProtocol isn't specified, an implementation MAY infer the
+// backend protocol through its own means. Implementations MAY infer the
+// protocol from the Route type referring to the backend Service.
 //
-// If a Route is not able to send traffic to the backend using the specified protocol then
-// the backend is considered invalid. Implementations MUST set ResolvedRefs condition to
-// False with the "UnsupportedProtocol".
+// If a Route is not able to send traffic to the backend using the specified
+// protocol then the backend is considered invalid. Implementations MUST set the
+// "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
 //
 // </gateway:experimental:description>
-//
-// [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
 type HTTPBackendRef struct {
 	// BackendRef is a reference to a backend to forward matched requests to.
 	//

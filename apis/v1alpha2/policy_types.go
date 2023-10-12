@@ -209,6 +209,11 @@ type PolicyStatus struct {
 	// means the Policy is not relevant for any ancestors.
 	//
 	// If this slice is full, implementations MUST NOT add further entries.
+	// Instead they MUST consider the policy unimplementable and signal that
+	// on any related resources such as the ancestor that would be referenced
+	// here. For example, if this list was full on BackendTLSPolicy, no
+	// additional Gateways would be able to reference the Service targeted by
+	// the BackendTLSPolicy.
 	//
 	// +kubebuilder:validation:MaxItems=16
 	Ancestors []PolicyAncestorStatus `json:"ancestors"`

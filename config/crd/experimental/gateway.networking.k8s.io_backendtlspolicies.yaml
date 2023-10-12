@@ -107,24 +107,21 @@ spec:
                       objects that contain a PEM-encoded TLS CA certificate bundle,
                       which is used to validate a TLS handshake between the Gateway
                       and backend Pod. \n If CACertRefs is empty or unspecified, then
-                      StandardCerts must be specified.  Only one of CACertRefs or
-                      StandardCerts may be specified, not both. \n If CACertRefs is
-                      empty or unspecified, then system trusted certificates should
-                      be used. If there are none, or the implementation doesn't define
-                      system trusted certificates, then a TLS connection must fail.
-                      \n References to a resource in a different namespace are invalid
-                      for the moment, although we will revisit this in the future.
-                      \n A single CACertRef to a Kubernetes ConfigMap kind has \"Core\"
-                      support.  Implementations MAY choose to support attaching multiple
-                      certificates to a backend, but this behavior is implementation-specific.
-                      \n Support: Core - An optional single reference to a Kubernetes
-                      ConfigMap, with the CA certificate in a key named `ca.crt`.
-                      \n Support: Implementation-specific (More than one reference,
-                      or other kinds of resources)."
+                      WellKnownCACerts must be specified. Only one of CACertRefs or
+                      WellKnownCACerts may be specified, not both. If CACertRefs is
+                      empty or unspecified, the configuration for WellKnownCACerts
+                      MUST be honored instead. \n References to a resource in a different
+                      namespace are invalid for the moment, although we will revisit
+                      this in the future. \n A single CACertRef to a Kubernetes ConfigMap
+                      kind has \"Core\" support. Implementations MAY choose to support
+                      attaching multiple certificates to a backend, but this behavior
+                      is implementation-specific. \n Support: Core - An optional single
+                      reference to a Kubernetes ConfigMap, with the CA certificate
+                      in a key named `ca.crt`. \n Support: Implementation-specific
+                      (More than one reference, or other kinds of resources)."
                     items:
-                      description: "ObjectReference identifies an API object including
-                        its namespace, with no default kind. The Group and Kind fields
-                        are thus required in this version. \n The API object must
+                      description: "LocalObjectReference identifies an API object
+                        within the namespace of the referrer. The API object must
                         be valid in the cluster; the Group and Kind must be registered
                         in the cluster for this reference to be valid. \n References
                         to objects with invalid Group and Kind are not valid, and
@@ -132,36 +129,23 @@ spec:
                         set on the containing object."
                       properties:
                         group:
-                          description: Group is the group of the referent.  For example,
-                            "gateway.networking.k8s.io". When set to the empty string,
-                            core API group is inferred.
+                          description: Group is the group of the referent. For example,
+                            "gateway.networking.k8s.io". When unspecified or empty
+                            string, core API group is inferred.
                           maxLength: 253
                           pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                           type: string
                         kind:
-                          description: Kind is the kind of the referent.  For example,
-                            "ConfigMap".
+                          description: Kind is kind of the referent. For example "HTTPRoute"
+                            or "Service".
                           maxLength: 63
                           minLength: 1
                           pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
                           type: string
                         name:
-                          description: Name is the metadata.name of the referenced
-                            config map.
+                          description: Name is the name of the referent.
                           maxLength: 253
                           minLength: 1
-                          type: string
-                        namespace:
-                          description: "Namespace is the namespace of the referenced
-                            object. When unspecified, the local namespace is inferred.
-                            \n Note that when a namespace different than the local
-                            namespace is specified, a ReferenceGrant object is required
-                            in the referent namespace to allow that namespace's owner
-                            to accept the reference. See the ReferenceGrant documentation
-                            for details. \n Support: Core"
-                          maxLength: 63
-                          minLength: 1
-                          pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                       required:
                       - group
@@ -183,11 +167,10 @@ spec:
                   wellKnownCACerts:
                     description: "WellKnownCACerts specifies whether system CA certificates
                       may be used in the TLS handshake between the gateway and backend
-                      pod. \n If WellKnownCACerts is unspecified or set to \"\", then
-                      CACertRefs must be specified with at least one entry for a valid
-                      configuration. Only one of CACertRefs or WellKnownCACerts may
-                      be specified, not both. \n WellKnownCACerts must be set to \"System\"
-                      when CACertRefs is unspecified. \n Support: Core for \"System\""
+                      pod. \n If WellKnownCACerts is unspecified or empty (\"\"),
+                      then CACertRefs must be specified with at least one entry for
+                      a valid configuration. Only one of CACertRefs or WellKnownCACerts
+                      may be specified, not both. \n Support: Core for \"System\""
                     enum:
                     - System
                     type: string
@@ -195,10 +178,10 @@ spec:
                 - hostname
                 type: object
                 x-kubernetes-validations:
-                - message: must not contain both CertRefs and StandardCerts
+                - message: must not contain both CertRefs and WellKnownCACerts
                   rule: (has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts)
                     && self.wellKnownCACerts != "")
-                - message: must specify either CertRefs or StandardCerts
+                - message: must specify either CertRefs or WellKnownCACerts
                   rule: '!(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts)
                     && self.wellKnownCACerts != "")'
             required:
@@ -227,7 +210,11 @@ spec:
                   fields combined. \n A maximum of 16 ancestors will be represented
                   in this list. An empty list means the Policy is not relevant for
                   any ancestors. \n If this slice is full, implementations MUST NOT
-                  add further entries."
+                  add further entries. Instead they MUST consider the policy unimplementable
+                  and signal that on any related resources such as the ancestor that
+                  would be referenced here. For example, if this list was full on
+                  BackendTLSPolicy, no additional Gateways would be able to reference
+                  the Service targeted by the BackendTLSPolicy."
                 items:
                   description: "PolicyAncestorStatus describes the status of a route
                     with respect to an associated Ancestor. \n Ancestors refer to
