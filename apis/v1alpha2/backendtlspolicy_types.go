@@ -28,6 +28,7 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:resource:categories=gateway-api,shortName=btlspolicy
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+// +kubebuilder:metadata:labels="gateway.networking.k8s.io/policy=Direct"
 
 // BackendTLSPolicy provides a way to configure how a Gateway
 // connects to a Backend via TLS.
