@@ -51,6 +51,8 @@ Session.vim
 .*.timestamp
 /site
 admission
+go.work
+go.work.sum
 
 /cache
 .venv/
