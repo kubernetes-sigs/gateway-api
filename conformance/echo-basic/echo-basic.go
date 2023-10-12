@@ -171,13 +171,13 @@ func runH2CServer(h2cPort string, errchan chan<- error) {
 
 		echoHandler(w, r)
 	})
-	h1s := &http.Server{
+	h2c := &http.Server{
 		ReadHeaderTimeout: time.Second,
 		Addr:              fmt.Sprintf(":%s", h2cPort),
 		Handler:           h2c.NewHandler(handler, &http2.Server{}),
 	}
 	fmt.Printf("Starting server, listening on port %s (h2c)\n", h2cPort)
-	err := h1s.ListenAndServe()
+	err := h2c.ListenAndServe()
 	if err != nil {
 		errchan <- err
 	}
