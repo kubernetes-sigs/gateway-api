@@ -28,6 +28,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/net/http2"
+	"golang.org/x/net/http2/h2c"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -76,6 +79,10 @@ func main() {
 	if httpPort == "" {
 		httpPort = "3000"
 	}
+	h2cPort := os.Getenv("H2C_PORT")
+	if h2cPort == "" {
+		h2cPort = "3001"
+	}
 
 	httpsPort := os.Getenv("HTTPS_PORT")
 	if httpsPort == "" {
@@ -104,6 +111,8 @@ func main() {
 			errchan <- err
 		}
 	}()
+
+	go runH2CServer(h2cPort, errchan)
 
 	// Enable HTTPS if certificate and private key are given.
 	if os.Getenv("TLS_SERVER_CERT") != "" && os.Getenv("TLS_SERVER_PRIVKEY") != "" {
@@ -150,6 +159,28 @@ func delayResponse(request *http.Request) error {
 	}
 	time.Sleep(t)
 	return nil
+}
+
+func runH2CServer(h2cPort string, errchan chan<- error) {
+	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.ProtoMajor != 2 && r.Header.Get("Upgrade") != "h2c" {
+			w.WriteHeader(http.StatusBadRequest)
+			fmt.Fprint(w, "Expected h2c request")
+			return
+		}
+
+		echoHandler(w, r)
+	})
+	h2c := &http.Server{
+		ReadHeaderTimeout: time.Second,
+		Addr:              fmt.Sprintf(":%s", h2cPort),
+		Handler:           h2c.NewHandler(handler, &http2.Server{}),
+	}
+	fmt.Printf("Starting server, listening on port %s (h2c)\n", h2cPort)
+	err := h2c.ListenAndServe()
+	if err != nil {
+		errchan <- err
+	}
 }
 
 func echoHandler(w http.ResponseWriter, r *http.Request) {
