@@ -183,16 +183,6 @@ func runH2CServer(h2cPort string, errchan chan<- error) {
 	}
 }
 
-func h2cHandler(w http.ResponseWriter, r *http.Request) {
-	if r.ProtoMajor != 2 {
-		w.WriteHeader(http.StatusBadRequest)
-		fmt.Fprint(w, "Expected h2(c) request")
-		return
-	}
-
-	echoHandler(w, r)
-}
-
 func echoHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("Echoing back request made to %s to client (%s)\n", r.RequestURI, r.RemoteAddr)
 
