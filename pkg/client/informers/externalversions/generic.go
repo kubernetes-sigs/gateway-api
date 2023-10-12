@@ -54,6 +54,8 @@ func (f *genericInformer) Lister() cache.GenericLister {
 func (f *sharedInformerFactory) ForResource(resource schema.GroupVersionResource) (GenericInformer, error) {
 	switch resource {
 	// Group=gateway.networking.k8s.io, Version=v1alpha2
+	case v1alpha2.SchemeGroupVersion.WithResource("backendtlspolicies"):
+		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1alpha2().BackendTLSPolicies().Informer()}, nil
 	case v1alpha2.SchemeGroupVersion.WithResource("grpcroutes"):
 		return &genericInformer{resource: resource.GroupResource(), informer: f.Gateway().V1alpha2().GRPCRoutes().Informer()}, nil
 	case v1alpha2.SchemeGroupVersion.WithResource("gateways"):

@@ -262,6 +262,10 @@ type PortNumber int32
 //
 // </gateway:experimental:description>
 //
+// Note that when the BackendTLSPolicy object is enabled by the implementation,
+// there are some extra rules about validity to consider here. See the fields
+// where this struct is used for more information about the exact behavior.
+//
 // [KEP-3726]: https://github.com/kubernetes/enhancements/tree/master/keps/sig-network/3726-standard-application-protocols
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
