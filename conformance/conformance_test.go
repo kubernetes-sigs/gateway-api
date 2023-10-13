@@ -73,6 +73,7 @@ func TestConformance(t *testing.T) {
 		NamespaceLabels:            namespaceLabels,
 		NamespaceAnnotations:       namespaceAnnotations,
 		SkipTests:                  skipTests,
+		RunTest:                    *flags.RunTest,
 	})
 	cSuite.Setup(t)
 
