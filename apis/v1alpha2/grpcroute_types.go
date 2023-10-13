@@ -19,7 +19,7 @@ package v1alpha2
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // +genclient
@@ -421,7 +421,7 @@ const (
 	GRPCHeaderMatchRegularExpression GRPCHeaderMatchType = "RegularExpression"
 )
 
-type GRPCHeaderName v1beta1.HeaderName
+type GRPCHeaderName v1.HeaderName
 
 // GRPCRouteFilterType identifies a type of GRPCRoute filter.
 type GRPCRouteFilterType string

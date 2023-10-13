@@ -108,11 +108,11 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "httproutes"
 							},
 							"object": {
-								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+								"apiVersion": "gateway.networking.k8s.io/v1",
 								"kind": "HTTPRoute"
 							},
 						"operation": "CREATE"
@@ -122,7 +122,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				wantFailureMessage: "submitted object is not of kind AdmissionReview\n",
 			},
 			{
-				name: "valid v1alpha2 Gateway resource",
+				name: "valid v1 Gateway resource",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
 						"apiVersion": "` + apiVersion + `",
@@ -130,12 +130,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "gateways"
 							},
 							"object": {
    								"kind": "Gateway",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-1",
    								   "labels": {
@@ -171,7 +171,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "valid v1alpha2 HTTPRoute resource",
+				name: "valid v1 HTTPRoute resource",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
 						"apiVersion": "` + apiVersion + `",
@@ -179,12 +179,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "httproutes"
 							},
 							"object": {
    								"kind": "HTTPRoute",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "http-app-1",
    								   "labels": {
@@ -235,7 +235,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "valid v1alpha2 HTTPRoute resource with two request mirror filters",
+				name: "valid v1 HTTPRoute resource with two request mirror filters",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
 						"apiVersion": "` + apiVersion + `",
@@ -243,12 +243,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "httproutes"
 							},
 							"object": {
    								"kind": "HTTPRoute",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "http-app-1",
    								   "labels": {
@@ -314,12 +314,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -338,7 +338,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "update to v1alpha2 GatewayClass parameters field does" +
+				name: "update to v1 GatewayClass parameters field does" +
 					" not result in an error",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -347,12 +347,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -362,7 +362,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							},
 							"oldObject": {
    								"kind": "GatewayClass",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -388,7 +388,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 				},
 			},
 			{
-				name: "update to v1alpha2 GatewayClass controllerName field" +
+				name: "update to v1 GatewayClass controllerName field" +
 					" results in an error ",
 				reqBody: dedent.Dedent(`{
 						"kind": "AdmissionReview",
@@ -397,12 +397,12 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "gatewayclasses"
 							},
 							"object": {
    								"kind": "GatewayClass",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -412,7 +412,7 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							},
 							"oldObject": {
    								"kind": "GatewayClass",
-   								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+   								"apiVersion": "gateway.networking.k8s.io/v1",
    								"metadata": {
    								   "name": "gateway-class-1"
    								},
@@ -442,11 +442,11 @@ func TestServeHTTPSubmissions(t *testing.T) {
 							"uid": "7313cd05-eddc-4150-b88c-971a0d53b2ab",
 							"resource": {
 								"group": "gateway.networking.k8s.io",
-								"version": "v1alpha2",
+								"version": "v1",
 								"resource": "brokenroutes"
 							},
 							"object": {
-								"apiVersion": "gateway.networking.k8s.io/v1alpha2",
+								"apiVersion": "gateway.networking.k8s.io/v1",
 								"kind": "HTTPRoute"
 							},
 						"operation": "CREATE"

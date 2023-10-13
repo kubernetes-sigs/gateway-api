@@ -23,34 +23,34 @@ import (
 	"testing"
 	"time"
 
-	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestValidateGatewayClassUpdate(t *testing.T) {
 	ctx := context.Background()
-	baseGatewayClass := gatewayv1b1.GatewayClass{
+	baseGatewayClass := gatewayv1.GatewayClass{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "foo",
 		},
-		Spec: gatewayv1b1.GatewayClassSpec{
+		Spec: gatewayv1.GatewayClassSpec{
 			ControllerName: "example.net/gateway-controller",
 		},
 	}
 
 	testCases := []struct {
 		desc           string
-		creationMutate func(gw *gatewayv1b1.GatewayClass)
-		updationMutate func(gw *gatewayv1b1.GatewayClass)
+		creationMutate func(gw *gatewayv1.GatewayClass)
+		updationMutate func(gw *gatewayv1.GatewayClass)
 		wantError      string
 	}{
 		{
 			desc: "cannot upgrade controllerName",
-			creationMutate: func(gwc *gatewayv1b1.GatewayClass) {
+			creationMutate: func(gwc *gatewayv1.GatewayClass) {
 				gwc.Spec.ControllerName = "example.net/gateway-controller-1"
 			},
-			updationMutate: func(gwc *gatewayv1b1.GatewayClass) {
+			updationMutate: func(gwc *gatewayv1.GatewayClass) {
 				gwc.Spec.ControllerName = "example.net/gateway-controller-2"
 			},
 			wantError: "Value is immutable",
