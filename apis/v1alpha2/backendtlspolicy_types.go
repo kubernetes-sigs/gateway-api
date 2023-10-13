@@ -28,6 +28,8 @@ import (
 // +kubebuilder:storageversion
 // +kubebuilder:resource:categories=gateway-api,shortName=btlspolicy
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
+//
+// BackendTLSPolicy is a Direct Attached Policy.
 // +kubebuilder:metadata:labels="gateway.networking.k8s.io/policy=Direct"
 
 // BackendTLSPolicy provides a way to configure how a Gateway
@@ -51,9 +53,7 @@ type BackendTLSPolicyList struct {
 	Items           []BackendTLSPolicy `json:"items"`
 }
 
-// BackendTLSPolicySpec defines the desired state of
-// BackendTLSPolicy.
-// Note: BackendTLSPolicy is a Direct Attached Policy only.
+// BackendTLSPolicySpec defines the desired state of BackendTLSPolicy.
 //
 // Support: Extended
 type BackendTLSPolicySpec struct {
@@ -75,54 +75,43 @@ type BackendTLSPolicySpec struct {
 }
 
 // BackendTLSPolicyConfig contains backend TLS policy configuration.
-// +kubebuilder:validation:XValidation:message="must not contain both CertRefs and StandardCerts",rule="(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
-// +kubebuilder:validation:XValidation:message="must specify either CertRefs or StandardCerts",rule="!(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
+// +kubebuilder:validation:XValidation:message="must not contain both CertRefs and WellKnownCACerts",rule="(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify either CertRefs or WellKnownCACerts",rule="!(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
 type BackendTLSPolicyConfig struct {
 	// CACertRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
 	// validate a TLS handshake between the Gateway and backend Pod.
 	//
-	// If CACertRefs is empty or unspecified, then StandardCerts must
-	// be specified.  Only one of CACertRefs or StandardCerts may be
-	// specified, not both.
+	// If CACertRefs is empty or unspecified, then WellKnownCACerts must be
+	// specified. Only one of CACertRefs or WellKnownCACerts may be specified,
+	// not both. If CACertRefs is empty or unspecified, the configuration for
+	// WellKnownCACerts MUST be honored instead.
 	//
-	// If CACertRefs is empty or unspecified, then system trusted
-	// certificates should be used. If there are none, or the
-	// implementation doesn't define system trusted certificates,
-	// then a TLS connection must fail.
+	// References to a resource in a different namespace are invalid for the
+	// moment, although we will revisit this in the future.
 	//
-	// References to a resource in a different namespace are
-	// invalid for the moment, although we will revisit this
-	// in the future.
+	// A single CACertRef to a Kubernetes ConfigMap kind has "Core" support.
+	// Implementations MAY choose to support attaching multiple certificates to
+	// a backend, but this behavior is implementation-specific.
 	//
-	// A single CACertRef to a Kubernetes ConfigMap kind has "Core"
-	// support.  Implementations MAY choose to support attaching
-	// multiple certificates to a backend, but this behavior is
-	// implementation-specific.
-	//
-	// Support: Core - An optional single reference to a Kubernetes
-	// ConfigMap, with the CA certificate in a key named `ca.crt`.
+	// Support: Core - An optional single reference to a Kubernetes ConfigMap,
+	// with the CA certificate in a key named `ca.crt`.
 	//
 	// Support: Implementation-specific (More than one reference, or other kinds
 	// of resources).
 	//
 	// +kubebuilder:validation:MaxItems=8
 	// +optional
-	CACertRefs []v1beta1.ObjectReference `json:"caCertRefs,omitempty"`
+	CACertRefs []v1beta1.LocalObjectReference `json:"caCertRefs,omitempty"`
 
-	// WellKnownCACerts specifies whether system CA certificates may
-	// be used in the TLS handshake between the gateway and
-	// backend pod.
+	// WellKnownCACerts specifies whether system CA certificates may be used in
+	// the TLS handshake between the gateway and backend pod.
 	//
-	// If WellKnownCACerts is unspecified or set to "", then CACertRefs must
-	// be specified with at least one entry for a valid configuration.
-	// Only one of CACertRefs or WellKnownCACerts may be specified, not both.
-	//
-	// WellKnownCACerts must be set to "System" when CACertRefs is unspecified.
-	//
+	// If WellKnownCACerts is unspecified or empty (""), then CACertRefs must be
+	// specified with at least one entry for a valid configuration. Only one of
+	// CACertRefs or WellKnownCACerts may be specified, not both.
 	//
 	// Support: Core for "System"
-	//
 	//
 	// +optional
 	WellKnownCACerts *WellKnownCACertType `json:"wellKnownCACerts,omitempty"`
@@ -144,6 +133,6 @@ type BackendTLSPolicyConfig struct {
 type WellKnownCACertType string
 
 const (
-	// Indicates that standard system CA certificates should be used.
+	// Indicates that well known system CA certificates should be used.
 	WellKnownCACertSystem WellKnownCACertType = "System"
 )

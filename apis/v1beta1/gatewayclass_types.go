@@ -251,7 +251,7 @@ type GatewayClassStatus struct {
 	// +listType=set
 	// <gateway:experimental>
 	// +kubebuilder:validation:MaxItems=64
-	SupportedFeatures []string `json:"supportedFeatures,omitempty"`
+	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -262,3 +262,8 @@ type GatewayClassList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []GatewayClass `json:"items"`
 }
+
+// SupportedFeature is used to describe distinct features that are covered by
+// conformance tests.
+// +kubebuilder:validation:Enum=Gateway;GatewayPort8080;GatewayStaticAddresses;HTTPRoute;HTTPRouteDestinationPortMatching;HTTPRouteHostRewrite;HTTPRouteMethodMatching;HTTPRoutePathRedirect;HTTPRoutePathRewrite;HTTPRoutePortRedirect;HTTPRouteQueryParamMatching;HTTPRouteRequestMirror;HTTPRouteRequestMultipleMirrors;HTTPRouteResponseHeaderModification;HTTPRouteSchemeRedirect;Mesh;ReferenceGrant;TLSRoute
+type SupportedFeature string

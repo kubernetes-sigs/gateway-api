@@ -58,10 +58,8 @@ func (in *BackendTLSPolicyConfig) DeepCopyInto(out *BackendTLSPolicyConfig) {
 	*out = *in
 	if in.CACertRefs != nil {
 		in, out := &in.CACertRefs, &out.CACertRefs
-		*out = make([]v1beta1.ObjectReference, len(*in))
-		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
-		}
+		*out = make([]v1beta1.LocalObjectReference, len(*in))
+		copy(*out, *in)
 	}
 	if in.WellKnownCACerts != nil {
 		in, out := &in.WellKnownCACerts, &out.WellKnownCACerts

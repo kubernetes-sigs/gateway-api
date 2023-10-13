@@ -224,6 +224,27 @@ spec:
                 description: 'SupportedFeatures is the set of features the GatewayClass
                   support. It MUST be sorted in ascending alphabetical order. '
                 items:
+                  description: SupportedFeature is used to describe distinct features
+                    that are covered by conformance tests.
+                  enum:
+                  - Gateway
+                  - GatewayPort8080
+                  - GatewayStaticAddresses
+                  - HTTPRoute
+                  - HTTPRouteDestinationPortMatching
+                  - HTTPRouteHostRewrite
+                  - HTTPRouteMethodMatching
+                  - HTTPRoutePathRedirect
+                  - HTTPRoutePathRewrite
+                  - HTTPRoutePortRedirect
+                  - HTTPRouteQueryParamMatching
+                  - HTTPRouteRequestMirror
+                  - HTTPRouteRequestMultipleMirrors
+                  - HTTPRouteResponseHeaderModification
+                  - HTTPRouteSchemeRedirect
+                  - Mesh
+                  - ReferenceGrant
+                  - TLSRoute
                   type: string
                 maxItems: 64
                 type: array
@@ -437,6 +458,27 @@ spec:
                 description: 'SupportedFeatures is the set of features the GatewayClass
                   support. It MUST be sorted in ascending alphabetical order. '
                 items:
+                  description: SupportedFeature is used to describe distinct features
+                    that are covered by conformance tests.
+                  enum:
+                  - Gateway
+                  - GatewayPort8080
+                  - GatewayStaticAddresses
+                  - HTTPRoute
+                  - HTTPRouteDestinationPortMatching
+                  - HTTPRouteHostRewrite
+                  - HTTPRouteMethodMatching
+                  - HTTPRoutePathRedirect
+                  - HTTPRoutePathRewrite
+                  - HTTPRoutePortRedirect
+                  - HTTPRouteQueryParamMatching
+                  - HTTPRouteRequestMirror
+                  - HTTPRouteRequestMultipleMirrors
+                  - HTTPRouteResponseHeaderModification
+                  - HTTPRouteSchemeRedirect
+                  - Mesh
+                  - ReferenceGrant
+                  - TLSRoute
                   type: string
                 maxItems: 64
                 type: array
