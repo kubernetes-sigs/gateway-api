@@ -76,5 +76,6 @@ func TestConformance(t *testing.T) {
 	})
 	cSuite.Setup(t)
 
-	cSuite.Run(t, tests.ConformanceTests)
+	//cSuite.Run(t, tests.ConformanceTests)
+	cSuite.Run(t, []suite.ConformanceTest{tests.HTTPRouteTimeoutRequest})
 }

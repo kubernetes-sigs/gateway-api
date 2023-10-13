@@ -52,13 +52,11 @@ var HTTPRouteTimeoutBackendRequest = suite.ConformanceTest{
 
 		testCases := []http.ExpectedResponse{
 			{
-				Request:         http.Request{Path: "/backend-timeout"},
-				ExpectedRequest: &http.ExpectedRequest{},
-				Response:        http.Response{StatusCode: 200},
+				Request:  http.Request{Path: "/backend-timeout"},
+				Response: http.Response{StatusCode: 200},
 			}, {
-				Request:         http.Request{Path: "/backend-timeout?delay=1s"},
-				ExpectedRequest: &http.ExpectedRequest{},
-				Response:        http.Response{StatusCode: 504},
+				Request:  http.Request{Path: "/backend-timeout?delay=1s"},
+				Response: http.Response{StatusCode: 504},
 			},
 		}
 

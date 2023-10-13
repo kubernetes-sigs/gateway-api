@@ -12,7 +12,7 @@ spec:
         type: PathPrefix
         value: /request-timeout
     backendRefs:
-    - name: infra-backend-delay
+    - name: infra-backend-v1
       port: 8080
     timeouts:
       request: 500ms
