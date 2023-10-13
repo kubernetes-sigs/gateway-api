@@ -126,6 +126,10 @@ verify:
 docs:
 	hack/make-docs.sh
 
+.PHONY: update-conformance-image-refs
+update-conformance-image-refs:
+	hack/update-conformance-image-refs.sh
+
 # Verify if support Docker Buildx.
 .PHONY: image.buildx.verify
 image.buildx.verify:
