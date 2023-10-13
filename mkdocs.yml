@@ -29,6 +29,9 @@ plugins:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
         'contributing/gamma.md': 'concepts/gamma.md#contributing'
+        'references/implementers-guide.md': 'reference/implementers-guide.md'
+        'references/spec.md': 'reference/spec.md'
+        'references/policy-attachment.md': 'reference/policy-attachment.md'
   - mermaid2
 markdown_extensions:
   - admonition
