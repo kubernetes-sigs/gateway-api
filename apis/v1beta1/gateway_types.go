@@ -69,49 +69,38 @@ type GatewaySpec struct {
 	// logical endpoints that are bound on this Gateway's addresses.
 	// At least one Listener MUST be specified.
 	//
-	// Each listener in a Gateway must have a unique combination of Hostname,
-	// Port, and Protocol.
+	// Each Listener in a set of Listeners (for example, in a single Gateway)
+	// MUST be _distinct_, in that a traffic flow MUST be able to be assigned to
+	// exactly one listener. (This section uses "set of Listeners" rather than
+	// "Listeners in a single Gateway" because implementations MAY merge configuration
+	// from multiple Gateways onto a single data plane, and these rules _also_
+	// apply in that case).
 	//
-	// Within the HTTP Conformance Profile, the below combinations of port and
-	// protocol are considered Core and MUST be supported:
+	// Practically, this means that each listener in a set MUST have a unique
+	// combination of Port, Protocol, and, if supported by the protocol, Hostname.
 	//
-	// 1. Port: 80, Protocol: HTTP
-	// 2. Port: 443, Protocol: HTTPS
+	// Some combinations of port, protocol, and TLS settings are considered
+	// Core support and MUST be supported by implementations based on their
+	// targeted conformance profile:
 	//
-	// Within the TLS Conformance Profile, the below combinations of port and
-	// protocol are considered Core and MUST be supported:
+	// HTTP Profile
 	//
-	// 1. Port: 443, Protocol: TLS
+	// 1. HTTPRoute, Port: 80, Protocol: HTTP
+	// 2. HTTPRoute, Port: 443, Protocol: HTTPS, TLS Mode: Terminate, TLS keypair provided
 	//
-	// Port and protocol combinations not listed above are considered Extended.
+	// TLS Profile
 	//
-	// A Gateway's Listeners are considered "compatible" if:
+	// 1. TLSRoute, Port: 443, Protocol: TLS, TLS Mode: Passthrough
 	//
-	// 1. The implementation can serve them in compliance with the Addresses
-	//    requirement that all Listeners are available on all assigned
-	//    addresses.
-	// 2. The implementation can match inbound requests to a single distinct
-	//    Listener. When multiple Listeners share values for fields (for
-	//    example, two Listeners with the same Port value), the implementation
-	//    can can match requests to only one of the Listeners using other
-	//    Listener fields.
+	// "Distinct" Listeners have the following property:
 	//
-	// Compatible combinations in Extended support are expected to vary across
-	// implementations. A combination that is compatible for one implementation
-	// may not be compatible for another.
+	// The implementation can match inbound requests to a single distinct
+	// Listener. When multiple Listeners share values for fields (for
+	// example, two Listeners with the same Port value), the implementation
+	// can match requests to only one of the Listeners using other
+	// Listener fields.
 	//
-	// If this field specifies multiple Listeners that are not compatible, the
-	// implementation MUST set the "Conflicted" condition in the Listener
-	// Status to "True".
-	//
-	// Implementations MAY choose to still accept a Gateway with conflicted
-	// Listeners if they accept a partial Listener set that contains no
-	// incompatible Listeners. They MUST set a "ListenersNotValid" condition
-	// the Gateway Status when the Gateway contains incompatible Listeners
-	// whether or not they accept the Gateway.
-	//
-	// For example, the following Listener scenarios may be compatible
-	// depending on implementation capabilities:
+	// For example, the following Listener scenarios are distinct:
 	//
 	// 1. Multiple Listeners with the same Port that all use the "HTTP"
 	//    Protocol that all have unique Hostname values.
@@ -120,17 +109,74 @@ type GatewaySpec struct {
 	// 3. A mixture of "TCP" and "UDP" Protocol Listeners, where no Listener
 	//    with the same Protocol has the same Port value.
 	//
-	// An implementation that cannot serve both TCP and UDP listeners on the same
-	// address, or cannot mix HTTPS and generic TLS listens on the same port
-	// would not consider those cases compatible.
+	// Some fields in the Listener struct have possible values that affect
+	// whether the Listener is distinct. Hostname is particularly relevant
+	// for HTTP or HTTPS protocols.
 	//
-	// Implementations using the Hostname value to select between same-Port
-	// Listeners MUST match inbound request hostnames from the most specific
-	// to least specific Hostname values to find the correct set of Routes.
+	// When using the Hostname value to select between same-Port, same-Protocol
+	// Listeners, the Hostname value must be different on each Listener for the
+	// Listener to be distinct.
+	//
+	// When the Listeners are distinct based on Hostname, inbound request
+	// hostnames MUST match from the most specific to least specific Hostname
+	// values to choose the correct Listener and its associated set of Routes.
+	//
 	// Exact matches must be processed before wildcard matches, and wildcard
 	// matches must be processed before fallback (empty Hostname value)
 	// matches. For example, `"foo.example.com"` takes precedence over
 	// `"*.example.com"`, and `"*.example.com"` takes precedence over `""`.
+	//
+	// Additionally, if there are multiple wildcard entries, more specific
+	// wildcard entries must be processed before less specific wildcard entries.
+	// For example, `"*.foo.example.com"` takes precedence over `"*.example.com"`.
+	// The precise definition here is that the higher the number of dots in the
+	// hostname to the right of the wildcard character, the higher the precedence.
+	//
+	// The wildcard character will match any number of characters _and dots_ to
+	// the left, however, so `"*.example.com"` will match both
+	// `"foo.bar.example.com"` _and_ `"bar.example.com"`.
+	//
+	// If a set of Listeners contains Listeners that are not distinct, then those
+	// Listeners are Conflicted, and the implementation MUST set the "Conflicted"
+	// condition in the Listener Status to "True".
+	//
+	// Implementations MAY choose to accept a Gateway with some Conflicted
+	// Listeners only if they only accept the partial Listener set that contains
+	// no Conflicted Listeners. To put this another way, implementations may
+	// accept a partial Listener set only if they throw out *all* the conflicting
+	// Listeners. No picking one of the conflicting listeners as the winner.
+	// This also means that the Gateway must have at least one non-conflicting
+	// Listener in this case, otherwise it violates the requirement that at
+	// least one Listener must be present.
+	//
+	// The implementation MUST set a "ListenersNotValid" condition on the
+	// Gateway Status when the Gateway contains Conflicted Listeners whether or
+	// not they accept the Gateway. That Condition SHOULD clearly
+	// indicate in the Message which Listeners are conflicted, and which are
+	// Accepted. Additionally, the Listener status for those listeners SHOULD
+	// indicate which Listeners are conflicted and not Accepted.
+	//
+	// A Gateway's Listeners are considered "compatible" if:
+	//
+	// 1. They are distinct.
+	// 2. The implementation can serve them in compliance with the Addresses
+	//    requirement that all Listeners are available on all assigned
+	//    addresses.
+	//
+	// Compatible combinations in Extended support are expected to vary across
+	// implementations. A combination that is compatible for one implementation
+	// may not be compatible for another.
+	//
+	// For example, an implementation that cannot serve both TCP and UDP listeners
+	// on the same address, or cannot mix HTTPS and generic TLS listens on the same port
+	// would not consider those cases compatible, even though they are distinct.
+	//
+	// Note that requests SHOULD match at most one Listener. For example, if
+	// Listeners are defined for "foo.example.com" and "*.example.com", a
+	// request to "foo.example.com" SHOULD only be routed using routes attached
+	// to the "foo.example.com" Listener (and not the "*.example.com" Listener).
+	// This concept is known as "Listener Isolation". Implementations that do
+	// not support Listener Isolation MUST clearly document this.
 	//
 	// Implementations MAY merge separate Gateways onto a single set of
 	// Addresses if all Listeners across all Gateways are compatible.
@@ -158,9 +204,6 @@ type GatewaySpec struct {
 	// This could be the IP address or hostname of an external load balancer or
 	// other networking infrastructure, or some other address that traffic will
 	// be sent to.
-	//
-	// The .listener.hostname field is used to route traffic that has already
-	// arrived at the Gateway to the correct in-cluster destination.
 	//
 	// If no Addresses are specified, the implementation MAY schedule the
 	// Gateway in an implementation-specific manner, assigning an appropriate
@@ -518,7 +561,7 @@ type GatewayAddress struct {
 	Value string `json:"value"`
 }
 
-// GatewayStatusAddress describes an address that is bound to a Gateway.
+// GatewayStatusAddress describes a network address that is bound to a Gateway.
 //
 // +kubebuilder:validation:XValidation:message="Hostname value must only contain valid characters (matching ^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$)",rule="self.type == 'Hostname' ? self.value.matches(r\"\"\"^(\\*\\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$\"\"\"): true"
 type GatewayStatusAddress struct {
@@ -540,10 +583,15 @@ type GatewayStatusAddress struct {
 
 // GatewayStatus defines the observed state of Gateway.
 type GatewayStatus struct {
-	// Addresses lists the IP addresses that have actually been
-	// bound to the Gateway. These addresses may differ from the
-	// addresses in the Spec, e.g. if the Gateway automatically
-	// assigns an address from a reserved pool.
+	// Addresses lists the network addresses that have been bound to the
+	// Gateway.
+	//
+	// This list may differ from the addresses provided in the spec under some
+	// conditions:
+	//
+	//   * no addresses are specified, all addresses are dynamically assigned
+	//   * a combination of specified and dynamic addresses are assigned
+	//   * a specified address was unusable (e.g. already in use)
 	//
 	// +optional
 	// <gateway:validateIPAddress>
@@ -658,11 +706,34 @@ const (
 	// resources are available.
 	GatewayReasonNoResources GatewayConditionReason = "NoResources"
 
-	// This reason is used with the "Programmed" condition when none of the requested
-	// addresses have been assigned to the Gateway. This reason can be used to
-	// express a range of circumstances, including (but not limited to) IPAM
-	// address exhaustion, address not yet allocated, or a named address not being found.
+	// This reason is used with the "Programmed" condition when the underlying
+	// implementation and network have yet to dynamically assign addresses for a
+	// Gateway.
+	//
+	// Some example situations where this reason can be used:
+	//
+	//   * IPAM address exhaustion
+	//   * Address not yet allocated
+	//
+	// When this reason is used the implementation SHOULD provide a clear
+	// message explaining the underlying problem, ideally with some hints as to
+	// what actions can be taken that might resolve the problem.
 	GatewayReasonAddressNotAssigned GatewayConditionReason = "AddressNotAssigned"
+
+	// This reason is used with the "Programmed" condition when the underlying
+	// implementation (and possibly, network) are unable to use an address that
+	// was provided in the Gateway specification.
+	//
+	// Some example situations where this reason can be used:
+	//
+	//   * a named address not being found
+	//   * a provided static address can't be used
+	//   * the address is already in use
+	//
+	// When this reason is used the implementation SHOULD provide prescriptive
+	// information on which address is causing the problem and how to resolve it
+	// in the condition message.
+	GatewayReasonAddressNotUsable GatewayConditionReason = "AddressNotUsable"
 )
 
 const (
@@ -708,12 +779,9 @@ const (
 	// the Gateway.
 	GatewayReasonPending GatewayConditionReason = "Pending"
 
-	// This reason is used with the "Accepted" condition when the Gateway could not be configured
-	// because the requested address is not supported. This reason could be used in a number of
-	// instances, including:
-	//
-	// * The address is already in use.
-	// * The type of address is not supported by the implementation.
+	// This reason is used with the "Accepted" condition to indicate that the
+	// Gateway could not be accepted because an address that was provided is a
+	// type which is not supported by the implementation.
 	GatewayReasonUnsupportedAddress GatewayConditionReason = "UnsupportedAddress"
 )
 

@@ -1,4 +1,4 @@
-# Implementation guidelines
+# Design guidelines
 
 There are some general design guidelines used throughout this API.
 

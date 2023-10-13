@@ -243,6 +243,28 @@ type PortNumber int32
 // ReferenceGrant object is required in the referent namespace to allow that
 // namespace's owner to accept the reference. See the ReferenceGrant
 // documentation for details.
+//
+// <gateway:experimental:description>
+//
+// When the BackendRef points to a Kubernetes Service, implementations SHOULD
+// honor the appProtocol field if it is set for the target Service Port.
+//
+// Implementations supporting appProtocol SHOULD recognize the Kubernetes
+// Standard Application Protocols defined in KEP-3726.
+//
+// If a Service appProtocol isn't specified, an implementation MAY infer the
+// backend protocol through its own means. Implementations MAY infer the
+// protocol from the Route type referring to the backend Service.
+//
+// If a Route is not able to send traffic to the backend using the specified
+// protocol then the backend is considered invalid. Implementations MUST set the
+// "ResolvedRefs" condition to "False" with the "UnsupportedProtocol" reason.
+//
+// </gateway:experimental:description>
+//
+// Note that when the BackendTLSPolicy object is enabled by the implementation,
+// there are some extra rules about validity to consider here. See the fields
+// where this struct is used for more information about the exact behavior.
 type BackendRef struct {
 	// BackendObjectReference references a Kubernetes object.
 	BackendObjectReference `json:",inline"`
@@ -278,7 +300,7 @@ const (
 	// This condition indicates whether the route has been accepted or rejected
 	// by a Gateway, and why.
 	//
-	// Possible reasons for this condition to be true are:
+	// Possible reasons for this condition to be True are:
 	//
 	// * "Accepted"
 	//
@@ -329,19 +351,22 @@ const (
 	// are incompatible filters present on a route rule (for example if
 	// the URLRewrite and RequestRedirect are both present on an HTTPRoute).
 	RouteReasonIncompatibleFilters RouteConditionReason = "IncompatibleFilters"
+)
 
+const (
 	// This condition indicates whether the controller was able to resolve all
 	// the object references for the Route.
 	//
-	// Possible reasons for this condition to be true are:
+	// Possible reasons for this condition to be True are:
 	//
 	// * "ResolvedRefs"
 	//
-	// Possible reasons for this condition to be false are:
+	// Possible reasons for this condition to be False are:
 	//
 	// * "RefNotPermitted"
 	// * "InvalidKind"
 	// * "BackendNotFound"
+	// * "UnsupportedProtocol"
 	//
 	// Controllers may raise this condition with other reasons,
 	// but should prefer to use the reasons listed above to improve
@@ -366,6 +391,48 @@ const (
 	// This reason is used with the "ResolvedRefs" condition when one of the
 	// Route's rules has a reference to a resource that does not exist.
 	RouteReasonBackendNotFound RouteConditionReason = "BackendNotFound"
+
+	// This reason is used with the "ResolvedRefs" condition when one of the
+	// Route's rules has a reference to a resource with an app protocol that
+	// is not supported by this implementation.
+	RouteReasonUnsupportedProtocol RouteConditionReason = "UnsupportedProtocol"
+)
+
+const (
+	// This condition indicates that the Route contains a combination of both
+	// valid and invalid rules.
+	//
+	// When this happens, implementations MUST take one of the following
+	// approaches:
+	//
+	// 1) Drop Rule(s): With this approach, implementations will drop the
+	//    invalid Route Rule(s) until they are fully valid again. The message
+	//    for this condition MUST start with the prefix "Dropped Rule" and
+	//    include information about which Rules have been dropped. In this
+	//    state, the "Accepted" condition MUST be set to "True" with the latest
+	//    generation of the resource.
+	// 2) Fall Back: With this approach, implementations will fall back to the
+	//    last known good state of the entire Route. The message for this
+	//    condition MUST start with the prefix "Fall Back" and include
+	//    information about why the current Rule(s) are invalid. To represent
+	//    this, the "Accepted" condition MUST be set to "True" with the
+	//    generation of the last known good state of the resource.
+	//
+	// Reverting to the last known good state should only be done by
+	// implementations that have a means of restoring that state if/when they
+	// are restarted.
+	//
+	// This condition MUST NOT be set if a Route is fully valid, fully invalid,
+	// or not accepted. By extension, that means that this condition MUST only
+	// be set when it is "True".
+	//
+	// Possible reasons for this condition to be True are:
+	//
+	// * "UnsupportedValue"
+	//
+	// Controllers may raise this condition with other reasons, but should
+	// prefer to use the reasons listed above to improve interoperability.
+	RouteConditionPartiallyInvalid RouteConditionType = "PartiallyInvalid"
 )
 
 // RouteParentStatus describes the status of a route with respect to an

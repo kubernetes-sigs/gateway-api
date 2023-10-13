@@ -244,6 +244,14 @@ type GatewayClassStatus struct {
 	// +kubebuilder:validation:MaxItems=8
 	// +kubebuilder:default={{type: "Accepted", status: "Unknown", message: "Waiting for controller", reason: "Pending", lastTransitionTime: "1970-01-01T00:00:00Z"}}
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
+
+	// SupportedFeatures is the set of features the GatewayClass support.
+	// It MUST be sorted in ascending alphabetical order.
+	// +optional
+	// +listType=set
+	// <gateway:experimental>
+	// +kubebuilder:validation:MaxItems=64
+	SupportedFeatures []SupportedFeature `json:"supportedFeatures,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -254,3 +262,8 @@ type GatewayClassList struct {
 	metav1.ListMeta `json:"metadata,omitempty"`
 	Items           []GatewayClass `json:"items"`
 }
+
+// SupportedFeature is used to describe distinct features that are covered by
+// conformance tests.
+// +kubebuilder:validation:Enum=Gateway;GatewayPort8080;GatewayStaticAddresses;HTTPRoute;HTTPRouteDestinationPortMatching;HTTPRouteHostRewrite;HTTPRouteMethodMatching;HTTPRoutePathRedirect;HTTPRoutePathRewrite;HTTPRoutePortRedirect;HTTPRouteQueryParamMatching;HTTPRouteRequestMirror;HTTPRouteRequestMultipleMirrors;HTTPRouteResponseHeaderModification;HTTPRouteSchemeRedirect;Mesh;ReferenceGrant;TLSRoute
+type SupportedFeature string

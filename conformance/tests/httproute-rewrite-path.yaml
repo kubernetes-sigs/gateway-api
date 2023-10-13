@@ -23,6 +23,19 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /strip-prefix
+    filters:
+    - type: URLRewrite
+      urlRewrite:
+        path:
+          type: ReplacePrefixMatch
+          replacePrefixMatch: /
+    backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+  - matches:
+    - path:
+        type: PathPrefix
         value: /full/one
     filters:
     - type: URLRewrite

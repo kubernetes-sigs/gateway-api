@@ -28,7 +28,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
-- [WSO2 APK][25] (pre-alpha)
+- [WSO2 APK][25] (GA)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
@@ -129,7 +129,7 @@ We are actively supporting various features of the Gateway API. For compatibilit
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/cilium-cilium.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/cilium-cilium.yaml)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium

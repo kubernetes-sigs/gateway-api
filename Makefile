@@ -83,6 +83,9 @@ vet:
 # Run go test against code
 test:
 	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/...
+# Run tests for each submodule.
+	cd "conformance/echo-basic" && go test -race -cover ./...
+	cd "gwctl" && go test -race -cover ./...
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
@@ -136,8 +139,8 @@ image.buildx.verify:
 		docker buildx version; \
 	fi
 
-BUILDX_CONTEXT = gateway-api-builder
-BUILDX_PLATFORMS = linux/amd64,linux/arm64
+export BUILDX_CONTEXT = gateway-api-builder
+export BUILDX_PLATFORMS = linux/amd64,linux/arm64
 
 # Setup multi-arch docker buildx enviroment.
 .PHONY: image.multiarch.setup
