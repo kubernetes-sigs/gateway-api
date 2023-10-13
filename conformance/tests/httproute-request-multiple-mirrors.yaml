@@ -10,7 +10,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /mirror
+        value: /multi-mirror
     filters:
     - type: RequestMirror
       requestMirror:
@@ -22,7 +22,7 @@ spec:
       requestMirror:
         backendRef:
           name: infra-backend-v3
-          namespace: another-namespace
+          namespace: gateway-conformance-infra
           port: 8080
     backendRefs:
     - name: infra-backend-v1
@@ -31,7 +31,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /mirror-and-modify-request-headers
+        value: /multi-mirror-and-modify-request-headers
     filters:
     - type: RequestHeaderModifier
       requestHeaderModifier:
@@ -55,7 +55,7 @@ spec:
       requestMirror:
         backendRef:
           name: infra-backend-v3
-          namespace: another-namespace
+          namespace: gateway-conformance-infra
           port: 8080
     backendRefs:
     - name: infra-backend-v1

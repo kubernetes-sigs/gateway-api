@@ -87,11 +87,18 @@ var GatewayModifyListeners = suite.ConformanceTest{
 						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 						Kind:  v1beta1.Kind("HTTPRoute"),
 					}},
-					Conditions: []metav1.Condition{{
-						Type:   string(v1beta1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: "", // any reason
-					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1beta1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1beta1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
 					AttachedRoutes: 1,
 				},
 				{
@@ -100,11 +107,18 @@ var GatewayModifyListeners = suite.ConformanceTest{
 						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 						Kind:  v1beta1.Kind("HTTPRoute"),
 					}},
-					Conditions: []metav1.Condition{{
-						Type:   string(v1beta1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: "", // any reason
-					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1beta1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1beta1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
 					AttachedRoutes: 1,
 				},
 			}
@@ -161,11 +175,18 @@ var GatewayModifyListeners = suite.ConformanceTest{
 						Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
 						Kind:  v1beta1.Kind("HTTPRoute"),
 					}},
-					Conditions: []metav1.Condition{{
-						Type:   string(v1beta1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: "", // any reason
-					}},
+					Conditions: []metav1.Condition{
+						{
+							Type:   string(v1beta1.ListenerConditionAccepted),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+						{
+							Type:   string(v1beta1.ListenerConditionResolvedRefs),
+							Status: metav1.ConditionTrue,
+							Reason: "", // any reason
+						},
+					},
 					AttachedRoutes: 1,
 				},
 			}

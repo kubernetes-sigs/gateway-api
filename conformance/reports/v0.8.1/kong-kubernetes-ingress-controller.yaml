@@ -1,0 +1,39 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-09-25T14:43:27Z"
+gatewayAPIVersion: v0.8.1
+implementation:
+  contact:
+  - github.com/kong/kubernetes-ingress-controller/issues/new/choose
+  organization: Kong
+  project: kubernetes-ingress-controller
+  url: github.com/kong/kubernetes-ingress-controller
+  version: v2.12.0
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 2
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPResponseHeaderModification
+    - HTTPRouteMethodMatching
+    unsupportedFeatures:
+    - HTTPRouteSchemeRedirect
+    - HTTPRoutePathRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRewrite
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteQueryParamMatching
+    - HTTPRoutePortRedirect
+  name: HTTP

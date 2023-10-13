@@ -83,16 +83,19 @@ vet:
 # Run go test against code
 test:
 	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/...
+# Run tests for each submodule.
+	cd "conformance/echo-basic" && go test -race -cover ./...
+	cd "gwctl" && go test -race -cover ./...
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
-	go test ${GO_TEST_FLAGS} -v ./conformance -args ${CONFORMANCE_FLAGS}
+	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
 
 # Run experimental conformance tests against controller implementation
 .PHONY: conformance.experimental
 conformance.experimental:
-	go test ${GO_TEST_FLAGS} --tags experimental -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
+	go test ${GO_TEST_FLAGS} -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
@@ -136,8 +139,8 @@ image.buildx.verify:
 		docker buildx version; \
 	fi
 
-BUILDX_CONTEXT = gateway-api-builder
-BUILDX_PLATFORMS = linux/amd64,linux/arm64
+export BUILDX_CONTEXT = gateway-api-builder
+export BUILDX_PLATFORMS = linux/amd64,linux/arm64
 
 # Setup multi-arch docker buildx enviroment.
 .PHONY: image.multiarch.setup

@@ -1,0 +1,47 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-09-25T14:21:25Z"
+gatewayAPIVersion: v0.8.1
+implementation:
+  contact:
+    - https://github.com/cilium/community/blob/main/roles/Maintainers.md
+  organization: cilium
+  project: cilium
+  url: github.com/cilium/cilium
+  version: v1.15.0-pre.1
+kind: ConformanceReport
+profiles:
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 29
+        Skipped: 0
+      summary: ""
+    extended:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 9
+        Skipped: 0
+      summary: ""
+      supportedFeatures:
+        - HTTPRouteQueryParamMatching
+        - HTTPResponseHeaderModification
+        - HTTPRoutePathRedirect
+        - HTTPRouteHostRewrite
+        - HTTPRoutePathRewrite
+        - HTTPRouteRequestMirror
+        - HTTPRouteSchemeRedirect
+        - HTTPRouteMethodMatching
+        - HTTPRoutePortRedirect
+      unsupportedFeatures:
+        - HTTPRouteRequestMultipleMirrors
+    name: HTTP
+  - core:
+      result: success
+      statistics:
+        Failed: 0
+        Passed: 11
+        Skipped: 0
+      summary: ""
+    name: TLS

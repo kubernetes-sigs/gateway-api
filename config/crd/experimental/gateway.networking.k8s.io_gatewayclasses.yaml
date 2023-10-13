@@ -220,6 +220,14 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              supportedFeatures:
+                description: 'SupportedFeatures is the set of features the GatewayClass
+                  support. It MUST be sorted in ascending alphabetical order. '
+                items:
+                  type: string
+                maxItems: 64
+                type: array
+                x-kubernetes-list-type: set
             type: object
         required:
         - spec
@@ -425,6 +433,14 @@ spec:
                 x-kubernetes-list-map-keys:
                 - type
                 x-kubernetes-list-type: map
+              supportedFeatures:
+                description: 'SupportedFeatures is the set of features the GatewayClass
+                  support. It MUST be sorted in ascending alphabetical order. '
+                items:
+                  type: string
+                maxItems: 64
+                type: array
+                x-kubernetes-list-type: set
             type: object
         required:
         - spec

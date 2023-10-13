@@ -115,7 +115,7 @@ spec:
       containers:
       - name: infra-backend-v1
         # From https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:
@@ -161,7 +161,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v2
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:
@@ -207,7 +207,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v3
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:
@@ -289,7 +289,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
@@ -358,7 +358,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
@@ -420,7 +420,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v1
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:
@@ -466,7 +466,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v2
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:
@@ -519,7 +519,7 @@ spec:
     spec:
       containers:
       - name: web-backend
-        image: gcr.io/k8s-staging-ingressconformance/echoserver:v20221109-7ee2f3e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231005-v0.8.1-68-gd4ff2d4f
         env:
         - name: POD_NAME
           valueFrom:

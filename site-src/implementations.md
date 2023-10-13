@@ -15,20 +15,20 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Contour][3] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
-- [Flomesh Service Mesh][17] (work in progress)
+- [Flomesh Service Mesh][17] (beta)
 - [Gloo Edge 2.0][5] (work in progress)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (beta)
-- [Kuma][11] (alpha)
+- [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
-- [NGINX Kubernetes Gateway][12]
+- [NGINX Gateway Fabric][12]
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
-- [WSO2 APK][25] (pre-alpha)
+- [WSO2 APK][25] (GA)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
@@ -55,7 +55,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [9]:#istio
 [10]:#kong
 [11]:#kuma
-[12]:#nginx-kubernetes-gateway
+[12]:#nginx-gateway-fabric
 [13]:#traefik
 [14]:#flagger
 [15]:#cert-manager
@@ -129,7 +129,7 @@ We are actively supporting various features of the Gateway API. For compatibilit
 
 ### Cilium
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/cilium-cilium.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Cilium-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/cilium-cilium.yaml)
 
 [Cilium][cilium] is an eBPF-based networking, observability and security
 solution for Kubernetes and other networking environments. It includes [Cilium
@@ -188,6 +188,8 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 
 ### Envoy Gateway
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-EnvoyGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/envoy-gateway.yaml)
+
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
 APIs and fields of the Gateway API are outlined [here][eg-supported].
 Use the [quickstart][eg-quickstart] to get Envoy Gateway running with Gateway API in a
@@ -200,12 +202,16 @@ few simple steps.
 
 ### Flomesh Service Mesh (FSM)
 
-[Flomesh Service Mesh][fsm] is a community driven Kubernetes North-South traffic manager, and provides an implementation of Ingress controller, Gateway API, Load Balancer, and cross-cluster service registration and service discovery.
+[Flomesh Service Mesh][fsm] is a community driven lightweight service mesh for Kubernetes East-West and North-South traffic management. Flomesh uses [ebpf](https://www.kernel.org/doc/html/latest/bpf/index.html) for layer4 and [pipy](https://flomesh.io/pipy) proxy for layer7 traffic management. Flomesh comes bundled with a load balancer, cross-cluster service registration/discovery and it supports multi-cluster networking. It supports `Ingress` (and as such is an "Ingress controller") and Gateway API.
 
-The [Flomesh.io][flomesh] team is actively working towards an implementation of the Gateway API. You can track progress of this implementation [here](https://github.com/flomesh-io/fsm/issues/18).
+FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it currently supports Kubernetes Gateway API version [v0.7.1](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.7.1) with support for `v0.8.0` currently in progress.
+
+- [FSM Kubernetes Gateway API compatibility matrix](https://github.com/flomesh-io/fsm/blob/main/docs/gateway-api-compatibility.md)
+- [How to use Gateway API support in FSM](https://github.com/flomesh-io/fsm/blob/main/docs/tests/gateway-api/README.md)
 
 [fsm]:https://github.com/flomesh-io/fsm
 [flomesh]:https://flomesh.io
+[fgw]:https://github.com/flomesh-io/fgw
 
 ### Gloo Edge
 
@@ -275,7 +281,7 @@ Check out the [Gateway API task][istio-2] for more information about the Gateway
 
 ### Kong
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kong-kubernetes-ingress-controller.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Kong%20Ingress%20Controller-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/kong-kubernetes-ingress-controller.yaml)
 
 [Kong][kong] is an open source API Gateway built for hybrid and multi-cloud environments.
 
@@ -288,18 +294,18 @@ For help and support with Kong's implementations please feel free to [create an 
 [kong]:https://konghq.com
 [kic]:https://github.com/kong/kubernetes-ingress-controller
 [kong-gw-guide]:https://docs.konghq.com/kubernetes-ingress-controller/latest/guides/using-gateway-api/
-[kgo]:https://github.com/kong/gateway-operator-docs
+[kgo]:https://docs.konghq.com/gateway-operator/latest/
 [kong-issue-new]:https://github.com/Kong/kubernetes-ingress-controller/issues/new
 [kong-disc-new]:https://github.com/Kong/kubernetes-ingress-controller/discussions/new
 [kong-slack]:https://kubernetes.slack.com/archives/CDCA87FRD
 
 ### Kuma
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/kumahq-kuma.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/kumahq-kuma.yaml)
 
 [Kuma][kuma] is an open source service mesh.
 
-Kuma is actively working on an implementation of Gateway API specification for the Kuma builtin Gateway. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma builtin gateway using the Gateway API.
+Kuma implements the Gateway API specification for the Kuma built-in, Envoy-based Gateway with a beta stability guarantee. Check the [Gateway API Documentation][kuma-1] for information on how to setup a Kuma built-in gateway using the Gateway API.
 
 Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
 Gateway API [support for east-west traffic management][gamma] within the mesh.
@@ -328,19 +334,19 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 - [Gateway specific documentation](https://docs.litespeedtech.com/cloud/kubernetes/gateway).
 - Full support is available on the [LiteSpeed support web site](https://www.litespeedtech.com/support).
 
-### NGINX Kubernetes Gateway
+### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-NGINX Kubernetes Gateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/nginxinc-nginx-kubernetes-gateway.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/nginxinc-nginx-gateway-fabric.yaml)
 
-[NGINX Kubernetes Gateway][nginx-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Kubernetes Gateway is currently under development and supports a subset of the Gateway API.
+[NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Gateway Fabric is currently under development and supports a subset of the Gateway API.
 
-If you have any suggestions or experience issues with NGINX Kubernetes Gateway, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-kubernetes-gateway channel on NGINX slack][nginx-slack].
+If you have any suggestions or experience issues with NGINX Gateway Fabric, please [create an issue][nginx-issue-new] or a [discussion][nginx-disc-new] on GitHub. You can also ask for help in the [#nginx-gateway-fabric channel on NGINX slack][nginx-slack].
 
-[nginx-kubernetes-gateway]:https://github.com/nginxinc/nginx-kubernetes-gateway
+[nginx-gateway-fabric]:https://github.com/nginxinc/nginx-gateway-fabric
 [nginx]:https://nginx.org/
-[nginx-issue-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/issues/new
-[nginx-disc-new]:https://github.com/nginxinc/nginx-kubernetes-gateway/discussions/new
-[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-kubernetes-gateway
+[nginx-issue-new]:https://github.com/nginxinc/nginx-gateway-fabric/issues/new
+[nginx-disc-new]:https://github.com/nginxinc/nginx-gateway-fabric/discussions/new
+[nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
 
 ### STUNner
 
