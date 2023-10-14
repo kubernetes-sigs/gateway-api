@@ -5,6 +5,10 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    groups:
+      k8s.io: # Group k8s.io golang dependencies updates
+          patterns:
+            - "k8s.io/*"
 
   # Dependencies listed in .github/workflows/*.yml
   - package-ecosystem: "github-actions"
