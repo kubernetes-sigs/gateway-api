@@ -35,8 +35,8 @@ const (
 	channelAnnotation       = "gateway.networking.k8s.io/channel"
 
 	// These values must be updated during the release process
-	bundleVersion = "v0.8.0"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2245"
+	bundleVersion = "v1.0.0-rc1"
+	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2466"
 )
 
 var standardKinds = map[string]bool{
@@ -53,6 +53,7 @@ func main() {
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
+		"sigs.k8s.io/gateway-api/apis/v1",
 	)
 	if err != nil {
 		log.Fatalf("failed to load package roots: %s", err)

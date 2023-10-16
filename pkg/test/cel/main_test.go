@@ -22,6 +22,7 @@ import (
 	"path"
 	"testing"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 
@@ -48,6 +49,7 @@ func TestMain(m *testing.M) {
 	}
 	v1alpha2.AddToScheme(k8sClient.Scheme())
 	v1beta1.AddToScheme(k8sClient.Scheme())
+	v1.AddToScheme(k8sClient.Scheme())
 
 	os.Exit(m.Run())
 }

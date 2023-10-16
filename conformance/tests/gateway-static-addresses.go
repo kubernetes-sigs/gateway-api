@@ -26,7 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
@@ -76,7 +76,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 		kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
 		t.Logf("retrieving Gateway %s/%s and noting the provided addresses", gwNN.Namespace, gwNN.Name)
-		currentGW := &v1beta1.Gateway{}
+		currentGW := &v1.Gateway{}
 		err := s.Client.Get(ctx, gwNN, currentGW)
 		require.NoError(t, err, "error getting Gateway: %v", err)
 		require.Len(t, currentGW.Spec.Addresses, 3, "expected 3 addresses on the Gateway, one invalid, one usable and one unusable. somehow got %d", len(currentGW.Spec.Addresses))
@@ -86,9 +86,9 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 
 		t.Logf("verifying that the Gateway %s/%s is NOT accepted due to an address type that the implementation doesn't support", gwNN.Namespace, gwNN.Name)
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1beta1.GatewayConditionAccepted),
+			Type:   string(v1.GatewayConditionAccepted),
 			Status: metav1.ConditionFalse,
-			Reason: string(v1beta1.GatewayReasonUnsupportedAddress),
+			Reason: string(v1.GatewayReasonUnsupportedAddress),
 		})
 
 		t.Logf("patching Gateway %s/%s to remove the invalid address %s", gwNN.Namespace, gwNN.Name, invalidAddress.Value)
@@ -102,14 +102,14 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 		err = s.Client.Get(ctx, gwNN, currentGW)
 		require.NoError(t, err, "error getting Gateway: %v", err)
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1beta1.GatewayConditionAccepted),
+			Type:   string(v1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1beta1.GatewayReasonAccepted),
+			Reason: string(v1.GatewayReasonAccepted),
 		})
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1beta1.GatewayConditionProgrammed),
+			Type:   string(v1.GatewayConditionProgrammed),
 			Status: metav1.ConditionFalse,
-			Reason: string(v1beta1.GatewayReasonAddressNotUsable),
+			Reason: string(v1.GatewayReasonAddressNotUsable),
 		})
 
 		t.Logf("patching Gateway %s/%s to remove the unusable address %s", gwNN.Namespace, gwNN.Name, unusableAddress.Value)
@@ -123,14 +123,14 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 		err = s.Client.Get(ctx, gwNN, currentGW)
 		require.NoError(t, err, "error getting Gateway: %v", err)
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1beta1.GatewayConditionAccepted),
+			Type:   string(v1.GatewayConditionAccepted),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1beta1.GatewayReasonAccepted),
+			Reason: string(v1.GatewayReasonAccepted),
 		})
 		kubernetes.GatewayMustHaveCondition(t, s.Client, s.TimeoutConfig, gwNN, metav1.Condition{
-			Type:   string(v1beta1.GatewayConditionProgrammed),
+			Type:   string(v1.GatewayConditionProgrammed),
 			Status: metav1.ConditionTrue,
-			Reason: string(v1beta1.GatewayReasonProgrammed),
+			Reason: string(v1.GatewayReasonProgrammed),
 		})
 		kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, finalExpectedListenerState)
 		require.Len(t, currentGW.Spec.Addresses, 1, "expected only 1 address left specified on Gateway")
@@ -144,7 +144,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 // Private Helper Functions
 // -----------------------------------------------------------------------------
 
-func filterAddr(addrs []v1beta1.GatewayAddress, filter v1beta1.GatewayAddress) (newAddrs []v1beta1.GatewayAddress) {
+func filterAddr(addrs []v1.GatewayAddress, filter v1.GatewayAddress) (newAddrs []v1.GatewayAddress) {
 	for _, addr := range addrs {
 		if addr.Value != filter.Value {
 			newAddrs = append(newAddrs, addr)
@@ -153,21 +153,21 @@ func filterAddr(addrs []v1beta1.GatewayAddress, filter v1beta1.GatewayAddress) (
 	return
 }
 
-var finalExpectedListenerState = []v1beta1.ListenerStatus{
+var finalExpectedListenerState = []v1.ListenerStatus{
 	{
-		Name: v1beta1.SectionName("http"),
-		SupportedKinds: []v1beta1.RouteGroupKind{{
-			Group: (*v1beta1.Group)(&v1beta1.GroupVersion.Group),
-			Kind:  v1beta1.Kind("HTTPRoute"),
+		Name: v1.SectionName("http"),
+		SupportedKinds: []v1.RouteGroupKind{{
+			Group: (*v1.Group)(&v1.GroupVersion.Group),
+			Kind:  v1.Kind("HTTPRoute"),
 		}},
 		Conditions: []metav1.Condition{
 			{
-				Type:   string(v1beta1.ListenerConditionAccepted),
+				Type:   string(v1.ListenerConditionAccepted),
 				Status: metav1.ConditionTrue,
 				Reason: "", // any reason
 			},
 			{
-				Type:   string(v1beta1.ListenerConditionResolvedRefs),
+				Type:   string(v1.ListenerConditionResolvedRefs),
 				Status: metav1.ConditionTrue,
 				Reason: "", // any reason
 			},

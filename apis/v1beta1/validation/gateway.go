@@ -24,25 +24,26 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 var (
 	// set of protocols for which we need to validate that hostname is empty
 	protocolsHostnameInvalid = map[gatewayv1b1.ProtocolType]struct{}{
-		gatewayv1b1.TCPProtocolType: {},
-		gatewayv1b1.UDPProtocolType: {},
+		gatewayv1.TCPProtocolType: {},
+		gatewayv1.UDPProtocolType: {},
 	}
 	// set of protocols for which TLSConfig shall not be present
 	protocolsTLSInvalid = map[gatewayv1b1.ProtocolType]struct{}{
-		gatewayv1b1.HTTPProtocolType: {},
-		gatewayv1b1.UDPProtocolType:  {},
-		gatewayv1b1.TCPProtocolType:  {},
+		gatewayv1.HTTPProtocolType: {},
+		gatewayv1.UDPProtocolType:  {},
+		gatewayv1.TCPProtocolType:  {},
 	}
 	// set of protocols for which TLSConfig must be set
 	protocolsTLSRequired = map[gatewayv1b1.ProtocolType]struct{}{
-		gatewayv1b1.HTTPSProtocolType: {},
-		gatewayv1b1.TLSProtocolType:   {},
+		gatewayv1.HTTPSProtocolType: {},
+		gatewayv1.TLSProtocolType:   {},
 	}
 
 	validHostnameAddress = `^(\*\.)?[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$`
@@ -120,7 +121,7 @@ func ValidateTLSCertificateRefs(listeners []gatewayv1b1.Listener, path *field.Pa
 	var errs field.ErrorList
 	for i, c := range listeners {
 		if isProtocolInSubset(c.Protocol, protocolsTLSRequired) && c.TLS != nil {
-			if *c.TLS.Mode == gatewayv1b1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
+			if *c.TLS.Mode == gatewayv1.TLSModeTerminate && len(c.TLS.CertificateRefs) == 0 {
 				errs = append(errs, field.Forbidden(path.Index(i).Child("tls").Child("certificateRefs"), "should be set and not empty when TLSModeType is Terminate"))
 			}
 		}
