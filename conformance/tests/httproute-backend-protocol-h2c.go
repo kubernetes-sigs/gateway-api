@@ -48,25 +48,8 @@ var HTTPRouteBackendProtocolH2C = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 
-		// TODO - client h2c upgrade flow
-		//
-		// Go's HTTP client is unable to handle the protocol change transparently see: https://github.com/golang/go/issues/46249
-		//
-		// t.Run("h2c upgrade request should reach backend", func(t *testing.T) {
-		// 	http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
-		// 		Request: http.Request{
-		// 			Path: "/",
-		// 			Headers: map[string]string{
-		// 				"Connection":     "Upgrade, HTTP2-Settings",
-		// 				"Upgrade":        "h2c",
-		// 				"HTTP2-Settings": "",
-		// 			},
-		// 		},
-		// 		Response:  http.Response{StatusCode: 200},
-		// 		Backend:   "infra-backend-v1",
-		// 		Namespace: "gateway-conformance-infra",
-		// 	})
-		// })
+		// We are not testing the h2c HTTP upgrade mechanism as it is deprecated
+		// See: https://datatracker.ietf.org/doc/html/rfc9113#versioning
 
 		t.Run("http2 prior knowledge request should reach backend", func(t *testing.T) {
 			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, http.ExpectedResponse{
