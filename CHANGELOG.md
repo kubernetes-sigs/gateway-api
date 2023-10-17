@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v1.0.0-rc1][#v100-rc1]
 - [v0.8.1](#v081)
 - [v0.8.0](#v080)
 - [v0.8.0-rc2](#v080-rc2)
@@ -31,10 +32,123 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
-# Unreleased
+# v1.0.0-rc1
 
-## Other Changes
+The working group expects that this release candidate is quite close to the
+final v0.8.0 release. However, breaking API changes are still possible.
 
+This release candidate is suitable for implementors, but the working group does
+not recommend shipping products based on a release candidate API due to the
+possibility of incompatible changes prior to the final release. The following
+represents the changes since v0.8.0-rc1:
+
+## Gateway, GatewayClass, and HTTPRoute are GA 🎉
+
+Gateway, GatewayClass, and HTTPRoute have all graduated to GA with a `v1` API
+version. Although these APIs will continue to grow with future additions, the
+versions of these resources available via the Standard Channel are stable and
+recommended for use in production. Many implementations are fully passing
+conformance tests that cover the functionality of each of these resources. These
+APIs are graduating to GA with only minor spec clarifications since the v0.8.0
+release.
+
+## CEL Migration
+
+Starting in v0.8.0, Gateway API CRDs now include CEL validation. In this release
+the validating webhook is no longer bundled with CRD installation. Instead we
+include a separate `webhook-install.yaml` file as part of the release artifacts.
+
+If you're running Kubernetes 1.25+, we do not recommend installing the webhook
+and additionally suggest that you uninstall any previously installed versions of
+the webhook.
+
+If you're still running Kubernetes 1.23 or 1.24, we recommend installing the
+webhook until you can upgrade to Kubernetes 1.25 or newer.
+
+## New Experimental Features
+
+There are several exciting new experimental features in this release:
+
+### BackendTLSPolicy
+A new `BackendTLSPolicy` resource has been introduced for configuring TLS
+connections from Gateways to Backends. This allows you to configure the Gateway
+to validate the certificates served by Backends. For more information, refer to
+[GEP 1897](https://gateway-api.sigs.k8s.io/geps/gep-1897/).
+
+Primary Author: @candita
+
+### HTTPRoute Timeouts
+HTTPRoute has a new `Timeouts` field on Route Rules. This allows you to
+configure overall Request Timeouts as well as Backend Request Timeouts. For more
+information, refer to [GEP 1742](https://gateway-api.sigs.k8s.io/geps/gep-1742/).
+
+Primary Authors: @frankbu, @SRodi
+
+### Gateway Infrastructure Labels
+Gateway has a new `Infrastructure` field that allows you to specify `Labels` or
+`Annotations` that you'd like to be propagated to each resource generated for a
+Gateway. For example, these labels and annotations may be copied to Services and
+Deployments provisioned for in-cluster Gateways, or to other
+implementation-specific resources, such as Cloud Load Balancers. For more
+information, refer to [GEP
+1762](https://gateway-api.sigs.k8s.io/geps/gep-1762/).
+
+Primary Author: @howardjohn
+
+### WebSockets, HTTP/2, and More
+Some coordinated work across both Gateway API and upstream Kubernetes has
+defined 3 new values for the AppProtocol field on Service Ports:
+
+* `kubernetes.io/h2c` - HTTP/2 over cleartext as described in
+  [RFC7540](https://www.rfc-editor.org/rfc/rfc7540)
+* `kubernetes.io/ws` - WebSocket over cleartext as described in
+  [RFC6445](https://www.rfc-editor.org/rfc/rfc6455)
+* `kubernetes.io/wss` - WebSocket over TLS as described in
+  [RFC6455](https://www.rfc-editor.org/rfc/rfc6455)
+
+These can now be used with Gateway API to describe the protocol to use for
+connections to Kubernetes Services. For more information, refer to [GEP
+1911](https://gateway-api.sigs.k8s.io/geps/gep-1911/).
+
+### A new CLI tool: gwctl
+An experimental new CLI tool and kubectl plugin, gwctl aims to improve the UX
+when interacting with Gateway API. Initially it is focused on Policy Attachment,
+making it easier to understand which policies are available in a cluster, and
+which have been applied. In future releases, we hope to expand the scope of this
+tool to provide more detailed responses when getting and describing Gateway API
+resources. Note that this tool is still in very early stages and it's very
+likely that future releases will include breaking changes for gwctl. For more
+information, refer to the [gwctl
+Readme](https://github.com/kubernetes-sigs/gateway-api/tree/main/gwctl).
+
+Primary Author: @gauravkghildiyal
+
+## Everything Else
+
+Of course there's a lot more in this release:
+
+### Spec Clarifications
+- Clarify that the Gateway Listener status AttachedRoutes field is a count of
+  the number of Routes associated with a Listener regardless of Gateway or Route
+  status. (#2396, @sunjayBhatia)
+- Gateway: A new concept called "Listener Isolation" has been introduced to
+  describe the recommendation that at most one Listener matches a request, and
+  only Routes attached to that Listener are used for routing. (#2465, @robscott)
+- Experimental Channel: For ParentRefs to be considered distinct, they either
+  both need to specify a distinct SectionName, both need to specify a distinct
+  Port, or both. (#2433, @robscott)
+- Updated rules about Listener uniqueness to use the term `distinct` (#2436,
+  @youngnick)
+
+### Status
+- GatewayClass Status: A new experimental `supportedFeatures` field has been
+  added. Implementations should populate this with the features they support.
+  (#2461, @Liorlieberman, @robscott)
+- GatewayClass Status: A new SupportedVersion condition has been added that MUST
+  be set when a GatewayClass is accepted. (#2384, @robscott)
+- Route Status: A new "PartiallyInvalid" condition has been added for all Route
+  types. This condition also includes guidance for how partially invalid states
+  should be handled with Gateway API. (#2429, @robscott)
 - The condition reason `GatewayReasonUnsupportedAddress` for `Accepted` now ONLY
   applies when an address type is provided for a `Gateway` which it does not
   support.
@@ -48,6 +162,28 @@
   reason it can not be used for this Gateway (e.g. the address is already in use
   on the network).
   (#2412 @shaneutt)
+
+### Documentation
+- A guide for Gateway API implementers is now included in the specification.
+  (#2454, @youngnick)
+- Gateway API versioning will continue to rely on two release channels -
+  Standard and Experimental. New resources will start in the Experimental
+  Channel with an alpha API Version and then graduate to the Standard Channel
+  with a GA API version. Resources that already have Beta API versions will
+  continue to have them, but no additional Gateway API resources will get a Beta
+  API version. (#2446, @robscott)
+
+### Cleanup
+- Validating Webhook logs now use `Errorf` instead of `Fatalf`. (#2361, @yylt)
+
+### Other (Cleanup or Flake)
+- Resources related to the validating webhook such as the `gateway-system`
+  namespace and the `gateway-api-admission-server` deployment have been removed
+  from the installation manifests, in favor of CEL based Validations that are
+  built into the CRD definition. These are still available in
+  `webhook-install.yaml` in case you would like to optionally install them.
+  (#2401, @arkodg)
+
 
 # v0.8.1
 
