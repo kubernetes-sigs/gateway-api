@@ -17,7 +17,7 @@ The specification of an HTTPRoute consists of:
   matching the Host header of HTTP requests.
 - [Rules][httprouterule]- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists of [matches][matches],
-  [filters][filters] (optional), and [backendRefs][backendRef] (optional)
+  [filters][filters] (optional), [backendRefs][backendRef] (optional) and [timeouts][timeouts] (optional)
   fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
@@ -164,6 +164,27 @@ Service:
 
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
+
+#### Timeouts (optional)
+
+Timeouts define API objects for L7 timeouts in HTTPRoutes. If unspecified, timeout behavior is implementation-specific.
+
+There are 2 kinds of timeouts that can be configured in an HTTPRouteRule:
+
+1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. Whether the gateway starts the timeout before or after the entire client request stream has been received, is implementation dependent. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
+
+2. `backendRequest` is a timeout for a single request from the gateway to a backend. Typically used in conjunction with retry configuration, if supported by an implementation. This timeout covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.
+
+Because the `request` timeout encompasses the `backendRequest` timeout, the value of `backendRequest` must be less or equal to the value of `request` timeout.
+
+Timeouts are optional, and timeouts fields they are of type `Duration`. A zero-valued timeout ("0s") is interpreted as disabling the timeout. A valid non-zero-valued timeout must be >= 1ms.
+
+The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
+```yaml
+{% include 'standard/http-route-timeouts/timeout-example.yaml' %}
+```
+
+Reference the [timeouts][timeouts] API documentation for additional details.
 
 ## Status
 
