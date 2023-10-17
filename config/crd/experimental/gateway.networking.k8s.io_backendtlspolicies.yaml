@@ -178,12 +178,12 @@ spec:
                 - hostname
                 type: object
                 x-kubernetes-validations:
-                - message: must not contain both CertRefs and WellKnownCACerts
-                  rule: (has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts)
-                    && self.wellKnownCACerts != "")
-                - message: must specify either CertRefs or WellKnownCACerts
-                  rule: '!(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts)
+                - message: must not contain both CACertRefs and WellKnownCACerts
+                  rule: '!(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts)
                     && self.wellKnownCACerts != "")'
+                - message: must specify either CACertRefs or WellKnownCACerts
+                  rule: (has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts)
+                    && self.wellKnownCACerts != "")
             required:
             - targetRef
             - tls

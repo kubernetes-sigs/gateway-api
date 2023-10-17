@@ -75,8 +75,8 @@ type BackendTLSPolicySpec struct {
 }
 
 // BackendTLSPolicyConfig contains backend TLS policy configuration.
-// +kubebuilder:validation:XValidation:message="must not contain both CertRefs and WellKnownCACerts",rule="(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
-// +kubebuilder:validation:XValidation:message="must specify either CertRefs or WellKnownCACerts",rule="!(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
+// +kubebuilder:validation:XValidation:message="must not contain both CACertRefs and WellKnownCACerts",rule="!(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify either CACertRefs or WellKnownCACerts",rule="(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
 type BackendTLSPolicyConfig struct {
 	// CACertRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
