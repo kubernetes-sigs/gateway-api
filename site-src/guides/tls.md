@@ -1,12 +1,12 @@
 # TLS Configuration
 
-Gateway API allow for a variety of ways to configure TLS. This document lays
+Gateway API allows for a variety of ways to configure TLS. This document lays
 out various TLS settings and gives general guidelines on how to use them
 effectively.
 
 !!! info "Experimental Channel"
 
-    The `TLSRoute` resource described below is currently only included in the
+    The `TLSRoute` and `BackendTLSPolicy` resources described below are currently only included in the
     "Experimental" channel of Gateway API. For more information on release
     channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
 
@@ -25,16 +25,19 @@ upstream connections is managed independently.
 
 Depending on the Listener Protocol, different TLS modes and Route types are supported.
 
-Listener Protocol | TLS Mode | Route Type Supported
---- | --- | ---
-TLS | Passthrough | TLSRoute
-TLS | Terminate | TCPRoute
-HTTPS | Terminate | HTTPRoute
+| Listener Protocol | TLS Mode    | Connection/s Affected   | Route Type Supported |
+|-------------------|-------------|-------------------------|----------------------|
+| TLS               | Passthrough | Downstream and Upstream | TLSRoute             |
+| TLS               | Terminate   | Downstream              | TCPRoute             |
+| HTTPS             | Terminate   | Downstream              | HTTPRoute            |
+| HTTPS             | Backend     | Upstream                | HTTPRoute            |
 
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
-effect as the TLS session from the client is NOT terminated at the Gateway.
-The rest of the document assumes that TLS is being terminated at the Gateway,
-which is the default setting.
+effect as the TLS session from the client is NOT terminated at the Gateway, but rather
+passes through the Gateway, encrypted.
+In the case of `Backend`, only the Upstream connection is affected.
+For `HTTPRoute`, the use of both `Terminate` and `Backend` is supported, and provides what
+is commonly known as a connection that is terminated and then re-encrypted at the Gateway.
 
 ## Downstream TLS
 
@@ -42,13 +45,13 @@ Downstream TLS settings are configured using listeners at the Gateway level.
 
 ### Listeners and TLS
 
-Listeners expose the TLS setting on a per domain or sub-domain basis.
+Listeners expose the TLS setting on a per domain or subdomain basis.
 TLS settings of a listener are applied to all domains that satisfy the
 `hostname` criteria.
 
 In the following example, the Gateway serves the TLS certificate
 defined in the `default-cert` Secret resource for all requests.
-Although, the example refers to HTTPS protocol, one can also use the same
+Although the example refers to HTTPS protocol, one can also use the same
 feature for TLS-only protocol along with TLSRoutes.
 
 ```yaml
@@ -96,6 +99,56 @@ would be invalid.
 
 ```yaml
 {% include 'standard/tls-cert-cross-namespace.yaml' %}
+```
+
+## Upstream TLS
+
+Upstream TLS settings are configured using the experimental `BackendTLSPolicy`
+applied to a `Service` that accesses the backend to be targeted.
+This type of TLS is used when the backend pod has its own certificate and the
+application developer needs to convey how to successfully connect to the
+backend pod from the Gateway.
+
+### TargetRefs and TLS
+
+The `TargetRef` identifies the `Service` for which your HTTPRoute requires TLS.
+The `TLS` configuration for upstream TLS contains a required `Hostname`, and either
+`CACertRefs` or `WellKnownCACerts`.
+`Hostname` refers to the SNI the Gateway should use to connect to the backend, and
+must match the certificate served by the backend pod.
+`CACertRefs` refer to one or more PEM-encoded TLS certificates.
+If there are no specific certificates to use, then you must set `WellKnownCACerts` to
+"System" to tell the Gateway to use a set of trusted CA Certificates.  Refer to your
+implementation documentation for more details.
+
+!!! info "Restrictions"
+
+    - Cross-namespace certificate references are not allowed.
+    - Wildcard hostnames are not allowed.
+
+### Examples
+
+#### Using System Certificates
+
+In this example, the `BackendTLSPolicy` is configured to use system certificates
+to connect with a TLS-encrypted upstream connection to the pod called `dev-pod`,
+with hostname `dev-pod.example.com`, and
+served by the service called `dev-service`.
+
+```yaml
+{% include 'experimental/v1alpha2/backendtlspolicy-system-certs.yaml' %}
+```
+
+#### Using Explicit CA Certificates
+
+In this example, the `BackendTLSPolicy` is configured to use certificates defined
+in the configuration map `auth-cert`
+to connect with a TLS-encrypted upstream connection to the pod called `auth-pod`,
+with hostname `auth-pod.example.com`, and
+served by the service called `auth-service`.
+
+```yaml
+{% include 'experimental/v1alpha2/backendtlspolicy-ca-certs.yaml' %}
 ```
 
 ## Extensions
