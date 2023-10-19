@@ -4,8 +4,8 @@
 aliases:
   # Reference: https://github.com/kubernetes/org/blob/main/OWNERS_ALIASES
   sig-network-leads:
-    - caseydavenport
-    - dcbw
+    - danwinship
+    - shaneutt
     - thockin
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
