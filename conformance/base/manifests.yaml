@@ -100,6 +100,11 @@ spec:
     appProtocol: kubernetes.io/h2c
     port: 8081
     targetPort: 3001
+  - name: third-port
+    protocol: TCP
+    appProtocol: kubernetes.io/ws
+    port: 8082
+    targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
