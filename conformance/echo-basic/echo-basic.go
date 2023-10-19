@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
@@ -31,6 +32,7 @@ import (
 
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
+	"golang.org/x/net/websocket"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -100,6 +102,7 @@ func main() {
 	httpMux.HandleFunc("/health", healthHandler)
 	httpMux.HandleFunc("/status/", statusHandler)
 	httpMux.HandleFunc("/", echoHandler)
+	httpMux.Handle("/ws", websocket.Handler(wsHandler))
 	httpHandler := &preserveSlashes{httpMux}
 
 	errchan := make(chan error)
@@ -128,6 +131,11 @@ func main() {
 	if err := <-errchan; err != nil {
 		panic(fmt.Sprintf("Failed to start listening: %s\n", err.Error()))
 	}
+}
+
+func wsHandler(ws *websocket.Conn) {
+	fmt.Println("established websocket connection", ws.RemoteAddr())
+	io.Copy(ws, ws)
 }
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
