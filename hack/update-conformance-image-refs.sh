@@ -29,8 +29,8 @@ esac
 }
 
 IMAGES=(
- gcr.io/k8s-staging-gateway-api/echo-advanced
- gcr.io/k8s-staging-gateway-api/echo-basic
+  "${REGISTRY}/echo-advanced"
+  "${REGISTRY}/echo-basic"
 )
 
 # Export so we can use run::sed in subshells
@@ -46,10 +46,11 @@ for IMAGE in ${IMAGES[@]}; do
     | sort -rV \
     | head -n1 > "$TAG_FILE"
 
+  export REPO=${IMAGE#"${REGISTRY}"}
   export IMAGE_TAG=$(cat "$TAG_FILE")
   export IMAGE
   echo "Found tag $IMAGE_TAG - updating manifests..."
-  find . -type f -name "*.yaml" -exec bash -c 'run::sed -e "s,image:.*${IMAGE}.*$,image: ${IMAGE}:${IMAGE_TAG},g" "$0"' {} \;
+  find . -type f -name "*.yaml" -exec bash -c 'run::sed -e "s,image:.*${REPO}.*$,image: ${IMAGE}:${IMAGE_TAG},g" "$0"' {} \;
 done
 
 
