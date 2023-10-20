@@ -166,7 +166,9 @@ Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
 
 #### Timeouts (optional)
+
 ??? example "Experimental Channel in v1.0.0+"
+
     HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
 
 HTTPRoute Rules now include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
