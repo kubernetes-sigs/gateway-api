@@ -166,22 +166,24 @@ Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
 
 #### Timeouts (optional)
+??? example "Experimental Channel in v1.0.0+"
+    HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
 
-Timeouts resources are API objects that provide request timeouts for use in `HTTPRoutes`. If unspecified, timeout behavior is implementation-specific.
+HTTPRoute Rules now include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
 
-There are 2 kinds of timeouts that can be configured in an HTTPRouteRule:
+There are 2 kinds of timeouts that can be configured in an HTTPRoute Rule:
 
-1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. Whether the gateway starts the timeout before or after the entire client request stream has been received, is implementation dependent. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
+1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. Whether the Gateway starts the timeout before or after the entire client request stream has been received, is implementation dependent. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
 
-2. `backendRequest` is a timeout for a single request from the gateway to a backend which may be used in conjunction with retry configuration (if supported by the implementation). This timeout covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend.
+2. `backendRequest` is a timeout for a single request from the Gateway to a backend. This timeout covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend. This can be particularly helpful if the Gateway retries connections to a backend.
 
-Because the `request` timeout encompasses the `backendRequest` timeout, the value of `backendRequest` must be less or equal to the value of `request` timeout.
+Because the `request` timeout encompasses the `backendRequest` timeout, the value of `backendRequest` must not be greater than the value of `request` timeout.
 
 Timeouts are optional and their fields are of type `Duration`. A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
 
 The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
 ```yaml
-{% include 'standard/http-route-timeouts/timeout-example.yaml' %}
+{% include 'experimental/http-route-timeouts/timeout-example.yaml' %}
 ```
 
 Reference the [timeouts][timeouts] API documentation for additional details.
