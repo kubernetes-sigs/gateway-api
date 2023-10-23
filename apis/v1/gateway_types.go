@@ -636,6 +636,8 @@ type GatewayInfrastructure struct {
 	// An implementation may chose to add additional implementation-specific labels as they see fit.
 	//
 	// Support: Extended
+	//
+	// +optional
 	// +kubebuilder:validation:MaxProperties=8
 	Labels map[AnnotationKey]AnnotationValue `json:"labels,omitempty"`
 
@@ -647,6 +649,8 @@ type GatewayInfrastructure struct {
 	// An implementation may chose to add additional implementation-specific annotations as they see fit.
 	//
 	// Support: Extended
+	//
+	// +optional
 	// +kubebuilder:validation:MaxProperties=8
 	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
 }
