@@ -30,6 +30,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	fakeclient "sigs.k8s.io/controller-runtime/pkg/client/fake"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
@@ -52,6 +53,7 @@ func NewK8sClients(kubeconfig string) (*K8sClients, error) {
 	}
 	gatewayv1alpha2.AddToScheme(client.Scheme())
 	gatewayv1beta1.AddToScheme(client.Scheme())
+	gatewayv1.AddToScheme(client.Scheme())
 
 	dc := dynamic.NewForConfigOrDie(restConfig)
 

@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
@@ -65,6 +66,7 @@ func TestExperimentalConformance(t *testing.T) {
 
 	v1alpha2.AddToScheme(mgrClient.Scheme())
 	v1beta1.AddToScheme(mgrClient.Scheme())
+	v1.AddToScheme(client.Scheme())
 
 	// standard conformance flags
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)

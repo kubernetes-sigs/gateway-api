@@ -20,6 +20,7 @@ package conformance_test
 import (
 	"testing"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
@@ -48,6 +49,7 @@ func TestConformance(t *testing.T) {
 
 	v1alpha2.AddToScheme(client.Scheme())
 	v1beta1.AddToScheme(client.Scheme())
+	v1.AddToScheme(client.Scheme())
 
 	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)
 	exemptFeatures := suite.ParseSupportedFeatures(*flags.ExemptFeatures)
