@@ -66,7 +66,7 @@ func TestExperimentalConformance(t *testing.T) {
 
 	v1alpha2.AddToScheme(mgrClient.Scheme())
 	v1beta1.AddToScheme(mgrClient.Scheme())
-	v1.AddToScheme(client.Scheme())
+	v1.AddToScheme(mgrClient.Scheme())
 
 	// standard conformance flags
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
