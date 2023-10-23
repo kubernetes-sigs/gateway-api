@@ -24,7 +24,7 @@ import (
 
 // ValidateGatewayClassUpdate validates an update to oldClass according to the
 // Gateway API specification. For additional details of the GatewayClass spec, refer to:
-// https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.GatewayClass
+// https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1alpha2.GatewayClass
 func ValidateGatewayClassUpdate(oldClass, newClass *gatewayv1a2.GatewayClass) field.ErrorList {
 	if oldClass == nil || newClass == nil {
 		return nil

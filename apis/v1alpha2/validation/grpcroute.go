@@ -42,7 +42,7 @@ var (
 
 // ValidateGRPCRoute validates GRPCRoute according to the Gateway API specification.
 // For additional details of the GRPCRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/v1alpha2/references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRoute
+// https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRoute
 func ValidateGRPCRoute(route *gatewayv1a2.GRPCRoute) field.ErrorList {
 	return validateGRPCRouteSpec(&route.Spec, field.NewPath("spec"))
 }

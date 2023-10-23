@@ -49,8 +49,8 @@ In this way each `TCPRoute` "attaches" itself to a different port on the
 `Gateway` so that the service `my-foo-service` is taking traffic for port `8080`
 from outside the cluster and `my-bar-service` takes the port `8090` traffic.
 
-[tcproute]:/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
+[tcproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
-[httproute]:/references/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
-[gateway]:/references/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
+[httproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
+[gateway]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/

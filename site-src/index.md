@@ -89,7 +89,7 @@ you the necessary background:
 - [User guides](/guides)
 - [Gateway controller implementations](/implementations#gateways)
 - [Service Mesh implementations](/implementations#meshes)
-- [API reference spec](/references/spec)
+- [API reference spec](/reference/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 ## Gateway API concepts

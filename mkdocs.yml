@@ -29,6 +29,9 @@ plugins:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
         'contributing/gamma.md': 'concepts/gamma.md#contributing'
+        'references/implementers-guide.md': 'reference/implementers-guide.md'
+        'references/spec.md': 'reference/spec.md'
+        'references/policy-attachment.md': 'reference/policy-attachment.md'
   - mermaid2
 markdown_extensions:
   - admonition
@@ -77,15 +80,15 @@ nav:
     - gRPC Routing: guides/grpc-routing.md
     - Migrating from Ingress: guides/migrating-from-ingress.md
   - Reference:
-    - Implementer's Guide: references/implementers-guide.md
+    - Implementer's Guide: reference/implementers-guide.md
     - API Types:
         GatewayClass: api-types/gatewayclass.md
         Gateway: api-types/gateway.md
         HTTPRoute: api-types/httproute.md
         ReferenceGrant: api-types/referencegrant.md
         GRPCRoute: api-types/grpcroute.md
-    - API specification: references/spec.md
-    - Policy Attachment: references/policy-attachment.md
+    - API specification: reference/spec.md
+    - Policy Attachment: reference/policy-attachment.md
     - Enhancement Proposals:
       - Overview: geps/overview.md
       - Declined:

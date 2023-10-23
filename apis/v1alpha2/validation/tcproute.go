@@ -24,7 +24,7 @@ import (
 
 // ValidateTCPRoute validates TCPRoute according to the Gateway API specification.
 // For additional details of the TCPRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
+// https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
 func ValidateTCPRoute(route *gatewayv1a2.TCPRoute) field.ErrorList {
 	return validateTCPRouteSpec(&route.Spec, field.NewPath("spec"))
 }

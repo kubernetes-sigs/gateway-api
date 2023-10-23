@@ -263,12 +263,12 @@ only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][grpcrouterule].
 
 
-[grpcroute]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCPRoute
-[grpcrouterule]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteRule
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1beta1.Hostname
+[grpcroute]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCPRoute
+[grpcrouterule]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteRule
+[hostname]: /reference/spec/#gateway.networking.k8s.io/v1beta1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteMatch
-[filters]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteFilter
-[backendRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.GRPCBackendRef
-[parentRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
+[matches]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteMatch
+[filters]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteFilter
+[backendRef]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCBackendRef
+[parentRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
 
