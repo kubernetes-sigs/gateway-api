@@ -171,7 +171,7 @@ on `weight` and other fields.
 
     HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
 
-HTTPRoute Rules now include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
+HTTPRoute Rules include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
 
 There are 2 kinds of timeouts that can be configured in an HTTPRoute Rule:
 
