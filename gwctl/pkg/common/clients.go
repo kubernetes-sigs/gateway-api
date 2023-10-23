@@ -68,6 +68,7 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 	scheme := scheme.Scheme
 	gatewayv1alpha2.AddToScheme(scheme)
 	gatewayv1beta1.AddToScheme(scheme)
+	gatewayv1.AddToScheme(scheme)
 	apiextensionsv1.AddToScheme(scheme)
 
 	fakeClient := fakeclient.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initRuntimeObjects...).Build()
