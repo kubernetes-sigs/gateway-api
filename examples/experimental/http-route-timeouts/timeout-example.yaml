@@ -5,16 +5,14 @@ metadata:
 spec:
   parentRefs:
   - name: example-gateway
-  hostnames:
-  - "timeout.example.com"
   rules:
   - matches:
     - path:
         type: PathPrefix
         value: /timeout
-    backendRefs:
-    - name: timeout-svc
-      port: 8080
     timeouts:
       request: 10s
       backendRequest: 2s
+    backendRefs:
+    - name: timeout-svc
+      port: 8080
