@@ -227,7 +227,7 @@ type GatewaySpec struct {
 	//
 	// <gateway:experimental>
 	// +optional
-	Infrastructure GatewayInfrastructure `json:"infrastructure,omitempty"`
+	Infrastructure *GatewayInfrastructure `json:"infrastructure,omitempty"`
 }
 
 // Listener embodies the concept of a logical endpoint where a Gateway accepts
