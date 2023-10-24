@@ -13,6 +13,6 @@ spec:
     #   appProtocol: kubernetes.io/ws
     #   protocol: TCP
     #   port: 8082
-    # targetPort: 3000
+    #   targetPort: 3000
     - name: infra-backend-v1
       port: 8082
