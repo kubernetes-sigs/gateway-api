@@ -134,7 +134,7 @@ const (
 	// This option indicates support for HTTPRoute backendRequest timeouts (extended conformance).
 	SupportHTTPRouteBackendTimeout SupportedFeature = "HTTPRouteBackendTimeout"
 
-	// This option indicates support for HTTPRoute with a backendref with an appProtoocol 'kubernetes.io/h2c'
+	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/h2c'
 	SupportHTTPRouteBackendProtocolH2C SupportedFeature = "HTTPRouteBackendProtocolH2C"
 )
 
