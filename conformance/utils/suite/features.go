@@ -133,6 +133,9 @@ const (
 
 	// This option indicates support for HTTPRoute backendRequest timeouts (extended conformance).
 	SupportHTTPRouteBackendTimeout SupportedFeature = "HTTPRouteBackendTimeout"
+
+	// This option indicates support for HTTPRoute with a backendref with an appProtocol 'kubernetes.io/h2c'
+	SupportHTTPRouteBackendProtocolH2C SupportedFeature = "HTTPRouteBackendProtocolH2C"
 )
 
 // HTTPRouteExtendedFeatures includes all the supported features for HTTPRoute
@@ -167,6 +170,7 @@ const (
 // Implementations have the flexibility to opt-in for either specific features or the entire set.
 var HTTPRouteExperimentalFeatures = sets.New(
 	SupportHTTPRouteDestinationPortMatching,
+	SupportHTTPRouteBackendProtocolH2C,
 )
 
 // -----------------------------------------------------------------------------
