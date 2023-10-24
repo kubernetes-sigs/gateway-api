@@ -135,6 +135,8 @@ func main() {
 
 func wsHandler(ws *websocket.Conn) {
 	fmt.Println("established websocket connection", ws.RemoteAddr())
+	// Echo websocket frames from the connection back to the client
+	// until io.EOF
 	io.Copy(ws, ws)
 }
 
