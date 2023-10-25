@@ -30,6 +30,7 @@ Listener Protocol | TLS Mode | Route Type Supported
 TLS | Passthrough | TLSRoute
 TLS | Terminate | TCPRoute
 HTTPS | Terminate | HTTPRoute
+GRPCS | Terminate | GRPCRoute
 
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway.
