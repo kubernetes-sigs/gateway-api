@@ -79,6 +79,7 @@ nav:
     - TCP routing: guides/tcp.md
     - gRPC Routing: guides/grpc-routing.md
     - Migrating from Ingress: guides/migrating-from-ingress.md
+    - Backend Protocol Selection: guides/backend-protocol.md
   - Reference:
     - Implementer's Guide: reference/implementers-guide.md
     - API Types:
