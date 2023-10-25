@@ -175,7 +175,7 @@ HTTPRoute Rules include a `Timeouts` field. If unspecified, timeout behavior is 
 
 There are 2 kinds of timeouts that can be configured in an HTTPRoute Rule:
 
-1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. Whether the Gateway starts the timeout before or after the entire client request stream has been received, is implementation dependent. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
+1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
 
 2. `backendRequest` is a timeout for a single request from the Gateway to a backend. This timeout covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend. This can be particularly helpful if the Gateway retries connections to a backend.
 
