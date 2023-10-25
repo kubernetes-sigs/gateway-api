@@ -138,6 +138,10 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 					}
 					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 				}
+				// Add Exempt Features into unsupported features list
+				if s.ExemptFeatures.Has(f) {
+					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
+				}
 			}
 		}
 	}
