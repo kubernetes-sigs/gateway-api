@@ -235,9 +235,9 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [httprouterule]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule
 [hostname]: /reference/spec/#gateway.networking.k8s.io/v1beta1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
-[filters]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
-[backendRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
-[parentRef]: /references/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
-[timeouts]: /references/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
+[matches]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch
+[filters]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
+[backendRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
+[parentRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
+[timeouts]: /reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
 
