@@ -181,7 +181,7 @@ There are 2 kinds of timeouts that can be configured in an HTTPRoute Rule:
 
 Because the `request` timeout encompasses the `backendRequest` timeout, the value of `backendRequest` must not be greater than the value of `request` timeout.
 
-Timeouts are optional and their fields are of type `Duration`. A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
+Timeouts are optional, and their fields are of type [Duration](/geps/gep-2257/). A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
 
 The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
 ```yaml
