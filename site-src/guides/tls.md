@@ -118,8 +118,9 @@ The `TLS` configuration for upstream TLS contains a required `Hostname`, and eit
 must match the certificate served by the backend pod.
 `CACertRefs` refer to one or more PEM-encoded TLS certificates.
 If there are no specific certificates to use, then you must set `WellKnownCACerts` to
-"System" to tell the Gateway to use a set of trusted CA Certificates.  Refer to your
-implementation documentation for more details.
+"System" to tell the Gateway to use a set of trusted CA Certificates. There may be some
+variation in which system certificates are used by each implementation. Refer to documentation
+from your implementation of choice for more information.
 
 !!! info "Restrictions"
 
