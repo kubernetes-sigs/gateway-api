@@ -18,14 +18,14 @@ In the future, gwctl may be able to read status from the policy resource to dete
 git clone https://github.com/kubernetes-sigs/gateway-api.git
 
 # Go to the gwctl directory
-cd gateway-api
+cd gateway-api/gwctl
 
-# Ensure vendor depedencies
+# Ensure vendor dependencies
 go mod tidy
 go mod vendor
 
 # Build the gwctl binary
-go build -o bin/gwctl gwctl/cmd/main.go
+go build -o bin/gwctl cmd/main.go
 
 # Add binary to PATH
 export PATH=./bin:${PATH}
