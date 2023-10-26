@@ -25,7 +25,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -236,7 +236,7 @@ func Test_listenersMatch(t *testing.T) {
 				{
 					SupportedKinds: []v1beta1.RouteGroupKind{
 						{
-							Group: (*v1beta1.Group)(pointer.String("gateway.networking.k8s.io")),
+							Group: ptr.To[v1beta1.Group]("gateway.networking.k8s.io"),
 							Kind:  v1beta1.Kind("HTTPRoute"),
 						},
 					},
