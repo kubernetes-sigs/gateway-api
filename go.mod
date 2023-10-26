@@ -1,11 +1,12 @@
 module sigs.k8s.io/gateway-api
 
-go 1.20
+go 1.21
 
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/lithammer/dedent v1.1.0
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/net v0.14.0
 	k8s.io/api v0.28.2
 	k8s.io/apiextensions-apiserver v0.28.2
 	k8s.io/apimachinery v0.28.2
@@ -52,7 +53,6 @@ require (
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/oauth2 v0.8.0 // indirect
 	golang.org/x/sys v0.11.0 // indirect
 	golang.org/x/term v0.11.0 // indirect
