@@ -19,7 +19,7 @@ will split traffic 90% to `foo-v1` and 10% to `foo-v2`.
 and so the sum of all the weights within a single route rule is the
 denominator for all of the backends. `weight` is an optional parameter and if
 not specified, defaults to 1. If only a single backend is specified for a
-route rule it implicitly recieves 100% of the traffic, no matter what (if any)
+route rule it implicitly receives 100% of the traffic, no matter what (if any)
 weight is specified.
 
 ## Guide
@@ -38,7 +38,7 @@ This example assumes that the following Gateway is deployed:
 At first, there may only be a single version of a Service that serves
 production user traffic for `foo.example.com`. The following HTTPRoute has no
 `weight` specified for `foo-v1`  or `foo-v2` so they will implicitly
-recieve 100% of the traffic matched by each of their route rules. A canary
+receive 100% of the traffic matched by each of their route rules. A canary
 route rule is used (matching the header `traffic=test`) to send synthetic test
 traffic before splitting any production user traffic to `foo-v2`.
 [Routing precedence](/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule)
@@ -54,11 +54,11 @@ ensures that all traffic with the matching host and header
 
 ## Blue-green traffic rollout
 
-After internal testing has validated succesful responses from `foo-v2`,
+After internal testing has validated successful responses from `foo-v2`,
 it's desirable to shift a small percentage of the traffic to the new Service
 for gradual and more realistic testing. The HTTPRoute below adds `foo-v2`
 as a backend along with weights. The weights add up to a total of 100 so
-`foo-v1` recieves 90/100=90% of the traffic and `foo-v2` recieves
+`foo-v1` receives 90/100=90% of the traffic and `foo-v2` receives
 10/100=10% of the traffic.
 
 ![Traffic splitting](/images/traffic-splitting-2.png)

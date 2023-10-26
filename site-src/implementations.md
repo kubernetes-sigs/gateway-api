@@ -265,7 +265,7 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 
 Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and Consul CRDs provide a Kubernetes native workflow to manage traffic patterns and permissions in the mesh. [Consul API Gateway][consul-api-gw-doocs] supports Gateway API for managing North-South traffic.
 
-Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for current infomation on the supported version and features of the Gateway API.
+Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for current information on the supported version and features of the Gateway API.
 
 [consul]:https://consul.io
 [consul-api-gw-doocs]:https://www.consul.io/docs/api-gateway

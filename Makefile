@@ -146,7 +146,7 @@ image.buildx.verify:
 export BUILDX_CONTEXT = gateway-api-builder
 export BUILDX_PLATFORMS = linux/amd64,linux/arm64
 
-# Setup multi-arch docker buildx enviroment.
+# Setup multi-arch docker buildx environment.
 .PHONY: image.multiarch.setup
 image.multiarch.setup: image.buildx.verify
 # Ensure qemu is in binfmt_misc.

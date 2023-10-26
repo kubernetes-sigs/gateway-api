@@ -138,7 +138,7 @@ func fetchPolicies(ctx context.Context, dc dynamic.Interface, policyCRDs map[Pol
 		gvr := schema.GroupVersionResource{
 			Group:    policyCRD.crd.Spec.Group,
 			Version:  policyCRD.crd.Spec.Versions[0].Name,
-			Resource: policyCRD.crd.Spec.Names.Plural, // CRD Kinds directy map to the Resource.
+			Resource: policyCRD.crd.Spec.Names.Plural, // CRD Kinds directly map to the Resource.
 		}
 
 		var policies *unstructured.UnstructuredList

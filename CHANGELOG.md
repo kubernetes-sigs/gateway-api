@@ -182,7 +182,7 @@ Of course there's a lot more in this release:
   (#2412 @shaneutt)
 - The condition reason `GatewayReasonAddressNotUsable` for `Programmed` has been
   added to deal with situations where a static address has been provided for a
-  Gateway which is of a supported type, and is syntatically valid, but for some
+  Gateway which is of a supported type, and is syntactically valid, but for some
   reason it can not be used for this Gateway (e.g. the address is already in use
   on the network).
   (#2412 @shaneutt)
@@ -937,11 +937,11 @@ For all major changes since the `v0.5.x` release series, please see the
 - Loosen the Accepted check in GatewayClass observed generation tests to
   provide a more realistic test for implementations.
   (#1655, @arkodg)
-- A "SkipTests" field has been added to accomodate implementations in
+- A "SkipTests" field has been added to accommodate implementations in
   running subsets of the tests as needed, this can be particularly helpful
   for new implementations that want to add conformance iteratively.
   (#1578, @mlavacca)
-- Fixed a broken test for GRPCRoute that caused an erronous failure.
+- Fixed a broken test for GRPCRoute that caused an erroneous failure.
   (#1692, @arkodg)
 - Added "all-features" flag to conformance test to enable all supported
   features on test runs.
@@ -1385,7 +1385,7 @@ for the type changes when updating the Gateway API dependency in their projects.
 - `GatewayTLSConfig`'s `CertificateRefs` field is now a slice of pointers to
   structs instead of the structs directly.
   [#1176](https://github.com/kubernetes-sigs/gateway-api/pull/1176)
-- `HTTPPathModifer` field `Absolute` renamed to `ReplaceFullPath`
+- `HTTPPathModifier` field `Absolute` renamed to `ReplaceFullPath`
   [#1124](https://github.com/kubernetes-sigs/gateway-api/pull/1124)
 - the `ParentRef` type was renamed to `ParentReference`
   [#982](https://github.com/kubernetes-sigs/gateway-api/pull/982)
@@ -1567,7 +1567,7 @@ for the type changes when updating the Gateway API dependency in their projects.
 - `GatewayTLSConfig`'s `CertificateRefs` field is now a slice of pointers to
   structs instead of the structs directly.
   [#1176](https://github.com/kubernetes-sigs/gateway-api/pull/1176)
-- `HTTPPathModifer` field `Absolute` renamed to `ReplaceFullPath`
+- `HTTPPathModifier` field `Absolute` renamed to `ReplaceFullPath`
   [#1124](https://github.com/kubernetes-sigs/gateway-api/pull/1124)
 - the `ParentRef` type was renamed to `ParentReference`
   [#982](https://github.com/kubernetes-sigs/gateway-api/pull/982)
@@ -1675,7 +1675,7 @@ The following changes have been made since v0.3.0:
   What policy? Well, it's kind of up to the implementations, but the best example
   to begin with is timeout policy.
 
-  Timeout policy for HTTP connections is highly depedent on how the underlying
+  Timeout policy for HTTP connections is highly dependent on how the underlying
   implementation handles policy - it's very difficult to extract commonalities.
 
   This is intended to allow things like:
@@ -2019,7 +2019,7 @@ Gateway API objects.
   What policy? Well, it's kind of up to the implementations, but the best example
   to begin with is timeout policy.
 
-  Timeout policy for HTTP connections is highly depedent on how the underlying
+  Timeout policy for HTTP connections is highly dependent on how the underlying
   implementation handles policy - it's very difficult to extract commonalities.
 
   This is intended to allow things like:
@@ -2189,7 +2189,7 @@ Service APIs has been renamed to Gateway API.
 
 #### HTTPRoute
 - New `set` property has been introduced for `HTTPRequestHeader` Filter. Headers
-  specified under `set` are overriden instead of added.
+  specified under `set` are overridden instead of added.
   [#475](https://github.com/kubernetes-sigs/service-apis/pull/475).
 
 #### Misc
