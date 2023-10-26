@@ -141,7 +141,7 @@ performance, and avoid the operational complexity of sidecars. Cilium also
 supports the sidecar proxy model, offering choice to users. As of [Cilium 1.14][cilium114blog],
 Cilium supports Gateway API, passing conformance for v0.7.1.
 
-Cilium is open source and is a CNCF incubation project.
+Cilium is open source and is a CNCF Graduates project.
 
 If you have questions about Cilium Service Mesh the #service-mesh channel on
 [Cilium Slack][cilium-slack] is a good place to start. For contributing to the development
