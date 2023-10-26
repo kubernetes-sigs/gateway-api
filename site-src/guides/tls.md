@@ -25,7 +25,7 @@ upstream connections is managed independently.
 
 Depending on the Listener Protocol, different TLS modes and Route types are supported.
 
-| Listener Protocol | TLS Mode    | Connection/s Affected   | Route Type Supported |
+| Listener Protocol | TLS Mode    | Connections Affected   | Route Type Supported |
 |-------------------|-------------|-------------------------|----------------------|
 | TLS               | Passthrough | Downstream and Upstream | TLSRoute             |
 | TLS               | Terminate   | Downstream              | TCPRoute             |
