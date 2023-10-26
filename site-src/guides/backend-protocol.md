@@ -1,8 +1,11 @@
 # Backend Protocol
 
-Not all Gateway implementations support automatic protocol selection. Even in some cases protocols are disabled without an explicit opt-in (eg. websockets with Contour & NGINX). 
+??? example "Experimental Channel in v1.0.0+"
 
-When a Route's backend references a Kubernetes Service application developers can specify the protocol using `ServicePort` [`appProtocol`][appProtocol] field.
+    This concept is part of the Experimental Channel in `v1.0.0+`.
+Not all implementations of Gateway API support automatic protocol selection. In some cases protocols are disabled without an explicit opt-in. 
+
+When a Route's backend references a Kubernetes Service, application developers can specify the protocol using `ServicePort` [`appProtocol`][appProtocol] field.
 
 For example the following `frontend` Kubernetes Service is indicating the port `8080` supports HTTP/2 Prior Knowledge.
 
@@ -22,7 +25,7 @@ spec:
     targetPort: 8080
 ```
 
-Currently, Gateway conformance is testing support for:
+Currently, Gateway API has conformance testing for:
 
 - `kubernetes.io/h2c` - HTTP/2 Prior Knowledge
 - `kubernetes.io/ws` - WebSocket over HTTP
