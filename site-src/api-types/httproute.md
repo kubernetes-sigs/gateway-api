@@ -17,7 +17,7 @@ The specification of an HTTPRoute consists of:
   matching the Host header of HTTP requests.
 - [Rules][httprouterule]- Define a list of rules to perform actions against
   matching HTTP requests. Each rule consists of [matches][matches],
-  [filters][filters] (optional), and [backendRefs][backendRef] (optional)
+  [filters][filters] (optional), [backendRefs][backendRef] (optional) and [timeouts][timeouts] (optional)
   fields.
 
 The following illustrates an HTTPRoute that sends all traffic to one Service:
@@ -165,6 +165,31 @@ Service:
 Reference the [backendRef][backendRef] API documentation for additional details
 on `weight` and other fields.
 
+#### Timeouts (optional)
+
+??? example "Experimental Channel in v1.0.0+"
+
+    HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
+
+HTTPRoute Rules include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
+
+There are 2 kinds of timeouts that can be configured in an HTTPRoute Rule:
+
+1. `request` is the timeout for the Gateway API implementation to send a response to a client HTTP request. This timeout is intended to cover as close to the whole request-response transaction as possible, although an implementation MAY choose to start the timeout after the entire request stream has been received instead of immediately after the transaction is initiated by the client.
+
+2. `backendRequest` is a timeout for a single request from the Gateway to a backend. This timeout covers the time from when the request first starts being sent from the gateway to when the full response has been received from the backend. This can be particularly helpful if the Gateway retries connections to a backend.
+
+Because the `request` timeout encompasses the `backendRequest` timeout, the value of `backendRequest` must not be greater than the value of `request` timeout.
+
+Timeouts are optional, and their fields are of type [Duration](/geps/gep-2257/). A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
+
+The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
+```yaml
+{% include 'experimental/http-route-timeouts/timeout-example.yaml' %}
+```
+
+Reference the [timeouts][timeouts] API documentation for additional details.
+
 ## Status
 
 Status defines the observed state of HTTPRoute.
@@ -214,4 +239,5 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [filters]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter
 [backendRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
+[timeouts]: /reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
 
