@@ -23,21 +23,22 @@ For Gateways, there are two connections involved:
 With Gateway API, TLS configuration of downstream and
 upstream connections is managed independently.
 
-Depending on the Listener Protocol, different TLS modes and Route types are supported.
+For downstream connections, depending on the Listener Protocol, different TLS modes and Route types are supported.
 
-| Listener Protocol | TLS Mode    | Connections Affected   | Route Type Supported |
-|-------------------|-------------|-------------------------|----------------------|
-| TLS               | Passthrough | Downstream and Upstream | TLSRoute             |
-| TLS               | Terminate   | Downstream              | TCPRoute             |
-| HTTPS             | Terminate   | Downstream              | HTTPRoute            |
-| HTTPS             | Backend     | Upstream                | HTTPRoute            |
+| Listener Protocol | TLS Mode    | Route Type Supported |
+|-------------------|-------------|---------------------|
+| TLS               | Passthrough | TLSRoute            |
+| TLS               | Terminate   | TCPRoute            |
+| HTTPS             | Terminate   | HTTPRoute           |
 
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway, but rather
 passes through the Gateway, encrypted.
-In the case of `Backend`, only the Upstream connection is affected.
-For `HTTPRoute`, the use of both `Terminate` and `Backend` is supported, and provides what
-is commonly known as a connection that is terminated and then re-encrypted at the Gateway.
+
+For upstream connections, `BackendTLSPolicy` is used, and neither listener protocol nor TLS mode apply to the
+upstream TLS configuration. For `HTTPRoute`, the use of both `Terminate` TLS mode and `BackendTLSPolicy` is supported.
+Using these together provides what is commonly known as a connection that is terminated and then re-encrypted at
+the Gateway.
 
 ## Downstream TLS
 
@@ -132,9 +133,8 @@ from your implementation of choice for more information.
 #### Using System Certificates
 
 In this example, the `BackendTLSPolicy` is configured to use system certificates
-to connect with a TLS-encrypted upstream connection to the pod called `dev-pod`,
-with hostname `dev-pod.example.com`, and
-served by the service called `dev-service`.
+to connect with a TLS-encrypted upstream connection where Pods backing the
+`dev` Service are expected to serve a valid certificate for `dev.example.com`.
 
 ```yaml
 {% include 'experimental/v1alpha2/backendtlspolicy-system-certs.yaml' %}
@@ -144,9 +144,8 @@ served by the service called `dev-service`.
 
 In this example, the `BackendTLSPolicy` is configured to use certificates defined
 in the configuration map `auth-cert`
-to connect with a TLS-encrypted upstream connection to the pod called `auth-pod`,
-with hostname `auth-pod.example.com`, and
-served by the service called `auth-service`.
+to connect with a TLS-encrypted upstream connection where Pods backing the
+`auth` Service are expected to serve a valid certificate for `auth.example.com`.
 
 ```yaml
 {% include 'experimental/v1alpha2/backendtlspolicy-ca-certs.yaml' %}
