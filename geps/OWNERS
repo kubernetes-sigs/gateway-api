@@ -9,3 +9,6 @@ reviewers:
   - gateway-api-maintainers
   - gateway-api-mesh-leads
   - gateway-api-gep-reviewers
+
+labels:
+  - kind/gep
