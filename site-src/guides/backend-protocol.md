@@ -3,6 +3,7 @@
 ??? example "Experimental Channel in v1.0.0+"
 
     This concept is part of the Experimental Channel in `v1.0.0+`.
+
 Not all implementations of Gateway API support automatic protocol selection. In some cases protocols are disabled without an explicit opt-in. 
 
 When a Route's backend references a Kubernetes Service, application developers can specify the protocol using `ServicePort` [`appProtocol`][appProtocol] field.

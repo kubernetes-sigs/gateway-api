@@ -194,6 +194,9 @@ Reference the [timeouts][timeouts] API documentation for additional details.
 
 ??? example "Experimental Channel in v1.0.0+"
 
+    This concept is part of the Experimental Channel in `v1.0.0+`.
+
+
 Some implementations may require the [backendRef][backendRef] to be labeled 
 explicitly in order to route traffic using a certain protocol. For Kubernetes 
 Service backends this can be done by specifying the [`appProtocol`][appProtocol]
