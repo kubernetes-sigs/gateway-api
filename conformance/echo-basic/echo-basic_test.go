@@ -156,11 +156,11 @@ func TestEchoHandler(t *testing.T) {
 		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedXContentTypeOptions, xContentTypeOptions)
 	}
 
-	// Test the response body by unmarshaling it into a RequestAssertions struct
+	// Test the response body by unmarshalling it into a RequestAssertions struct
 	var responseAssertions RequestAssertions
 	err := json.Unmarshal(rr.Body.Bytes(), &responseAssertions)
 	if err != nil {
-		t.Errorf("Error unmarshaling response body: %v", err)
+		t.Errorf("Error unmarshalling response body: %v", err)
 	}
 
 	// Test RequestAssertions struct contains expected path
@@ -253,13 +253,13 @@ func TestProcessError(t *testing.T) {
 		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedXContentTypeOptions, xContentTypeOptions)
 	}
 
-	// Test the response body by unmarshaling it into a responseBody struct
+	// Test the response body by unmarshalling it into a responseBody struct
 	var responseBody struct {
 		Message string `json:"message"`
 	}
 	err = json.Unmarshal(rr.Body.Bytes(), &responseBody)
 	if err != nil {
-		t.Errorf("Error unmarshaling response body: %v", err)
+		t.Errorf("Error unmarshalling response body: %v", err)
 	}
 
 	// Test response body error message
@@ -294,13 +294,13 @@ func TestProcessErrorWithJSONError(t *testing.T) {
 		t.Errorf("Expected X-Content-Type-Options header %s, but got %s", expectedXContentTypeOptions, xContentTypeOptions)
 	}
 
-	// Test the response body by unmarshaling it into a responseBody struct
+	// Test the response body by unmarshalling it into a responseBody struct
 	var responseBody struct {
 		Message string `json:"message"`
 	}
 	err = json.Unmarshal(rr.Body.Bytes(), &responseBody)
 	if err != nil {
-		t.Errorf("Error unmarshaling response body: %v", err)
+		t.Errorf("Error unmarshalling response body: %v", err)
 	}
 
 	// Test response body error message

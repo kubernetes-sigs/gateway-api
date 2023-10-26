@@ -23,7 +23,7 @@ import (
 	gatewayvalidationv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1/validation"
 )
 
-// validateParentRefs validates ParentRefs SectionName must be set and uique
+// validateParentRefs validates ParentRefs SectionName must be set and unique
 // when ParentRefs includes 2 or more references to the same parent
 var validateParentRefs = gatewayvalidationv1b1.ValidateParentRefs
 

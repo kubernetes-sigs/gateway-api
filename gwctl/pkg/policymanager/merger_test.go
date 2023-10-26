@@ -164,7 +164,7 @@ func TestMergePoliciesOfSimilarKind(t *testing.T) {
 
 	got, err := MergePoliciesOfSimilarKind(policies)
 	if err != nil {
-		t.Fatalf("MergePoliciesOfSimilarKind returne err=%v; want no error", err)
+		t.Fatalf("MergePoliciesOfSimilarKind returned err=%v; want no error", err)
 	}
 	cmpopts := cmp.Exporter(func(t reflect.Type) bool {
 		return t == reflect.TypeOf(Policy{})
@@ -423,7 +423,7 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 				t.Fatalf("MergePoliciesOfDifferentHierarchy(...) returned err=%v; want err=%v", err, tc.wantErr)
 			}
 
-			// Use a custom transfomer to only compare specific fields of the Policy
+			// Use a custom transformer to only compare specific fields of the Policy
 			// that we are interested in testing.
 			cmpopts := cmp.Transformer("PolicyTransformer", func(p Policy) map[string]interface{} {
 				return map[string]interface{}{

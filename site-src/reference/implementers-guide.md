@@ -97,7 +97,7 @@ Regardless, either way has certain things that SHOULD be true, however:
 Whatever method is used, infra and cluster admins SHOULD attempt to ensure that
 the Bundle version of the CRDs is not _downgraded_. Although we ensure that
 API changes are backwards compatible, changing CRD definitions can change the
-storage version of the resource, which could have unforseen effects. Most of the
+storage version of the resource, which could have unforeseen effects. Most of the
 time, things will probably work, but if it doesn't work, it will most likely 
 break in weird ways.
 
@@ -294,7 +294,7 @@ them reconcilable.
 - The implementation MUST update the status for each in-scope Route with the
 relevant Conditions, using the namespaced `parents` field. See the specific Route
 types for details, but this usually includes `Accepted`, `Programmed` and
-`ResovledRefs` Conditions.
+`ResolvedRefs` Conditions.
 - Routes that fall out of scope SHOULD NOT have status updated, since it's possible
 that these updates may overwrite any new owners. The `observedGeneration` field
 will indicate that any remaining status is out of date.
