@@ -11,4 +11,4 @@ spec:
     group: ""
   tls:
     wellKnownCACerts: "System"
-    hostname: dev-pod.example.com
+    hostname: dev.example.com
