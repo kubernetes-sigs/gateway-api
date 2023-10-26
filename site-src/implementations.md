@@ -13,6 +13,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
+- [Easegress][30] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (beta)
@@ -73,6 +74,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [27]:#azure-application-gateway-for-containers
 [28]:#linkerd
 [29]:#tyk
+[30]:#easegress
 
 [gamma]:/concepts/gamma/
 
@@ -175,6 +177,17 @@ _Some "extended" functionality is not implemented yet, [contributions welcome!][
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 [contour-contrib]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
+
+### Easegress
+
+[Easegress][easegress] is a Cloud Native traffic orchestration system.
+
+It can function as a sophisticated modern gateway, a robust distributed cluster, a flexible traffic orchestrator, or even an accessible service mesh.
+
+Easegress currently supports Gateway API `v1beta1` version of the specification by [GatewayController][easegress-gatewaycontroller].
+
+[easegress]:https://megaease.com/easegress/
+[easegress-gatewaycontroller]:https://github.com/megaease/easegress/blob/main/docs/04.Cloud-Native/4.2.Gateway-API.md
 
 ### Emissary-Ingress (Ambassador API Gateway)
 
