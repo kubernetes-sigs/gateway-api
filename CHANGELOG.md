@@ -32,6 +32,30 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
+# v1.0.0-rc2
+
+The working group expects that this release candidate is quite close to the
+final v0.8.0 release. However, breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but the working group does
+not recommend shipping products based on a release candidate API due to the
+possibility of incompatible changes prior to the final release. The following
+represents the changes since v1.0.0-rc1:
+
+## Bug Fixes
+* CEL validation for BackendTLSPolicy was fixed with corresponding tests added
+  (#2491, @ygnas)
+* Fixes the API version for `ReferenceGrant` from `v1` to `v1beta1` in the
+  `GatewaySecretInvalidReferenceGrant` conformance test YAML (#2494, @arkodg)
+* Gateway infrastructure field is now a pointer (#2508, @danehans)
+
+## Conformance Tests
+* h2c Backend Protocol conformance tests were added (#2456, @dprotaso)
+* WebSocket Backend Protocol conformance tests were added (#2495, @dprotaso)
+* New conformance test for Gateway Status AttachedRoutes (#2477, @danehans)
+* Implemented the `ExemptFeatures` field for Experimental Conformance Profiles
+  (#2515, @arkodg)
+
 # v1.0.0-rc1
 
 The working group expects that this release candidate is quite close to the
