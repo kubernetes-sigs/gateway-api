@@ -105,23 +105,24 @@ would be invalid.
 ## Upstream TLS
 
 Upstream TLS settings are configured using the experimental `BackendTLSPolicy`
-applied to a `Service` that accesses the backend to be targeted.
-This type of TLS is used when the backend pod has its own certificate and the
-application developer needs to convey how to successfully connect to the
-backend pod from the Gateway.
+attached to a `Service` via a target reference.
+
+This resource can be used to describe the SNI the Gateway should use to connect to the
+backend and how the certificate served by the backend Pod(s) should be verified.
 
 ### TargetRefs and TLS
 
-The `TargetRef` identifies the `Service` for which your HTTPRoute requires TLS.
-The `TLS` configuration for upstream TLS contains a required `Hostname`, and either
-`CACertRefs` or `WellKnownCACerts`.
-`Hostname` refers to the SNI the Gateway should use to connect to the backend, and
+BackendTLSPolicy contains specification for the `TargetRef` and `TLS`.  TargetRef is required and
+identifies the `Service` for which your HTTPRoute requires TLS. The `TLS` configuration contains a
+required `Hostname`, and either `CACertRefs` or `WellKnownCACerts`.
+
+Hostname refers to the SNI the Gateway should use to connect to the backend, and
 must match the certificate served by the backend pod.
-`CACertRefs` refer to one or more PEM-encoded TLS certificates.
-If there are no specific certificates to use, then you must set `WellKnownCACerts` to
-"System" to tell the Gateway to use a set of trusted CA Certificates. There may be some
-variation in which system certificates are used by each implementation. Refer to documentation
-from your implementation of choice for more information.
+
+CACertRefs refer to one or more PEM-encoded TLS certificates. If there are no specific certificates
+to use, then you must set WellKnownCACerts to "System" to tell the Gateway to use a set of trusted
+CA Certificates. There may be some variation in which system certificates are used by each implementation.
+Refer to documentation from your implementation of choice for more information.
 
 !!! info "Restrictions"
 
@@ -132,9 +133,9 @@ from your implementation of choice for more information.
 
 #### Using System Certificates
 
-In this example, the `BackendTLSPolicy` is configured to use system certificates
-to connect with a TLS-encrypted upstream connection where Pods backing the
-`dev` Service are expected to serve a valid certificate for `dev.example.com`.
+In this example, the `BackendTLSPolicy` is configured to use system certificates to connect with a
+TLS-encrypted upstream connection where Pods backing the `dev` Service are expected to serve a valid
+certificate for `dev.example.com`.
 
 ```yaml
 {% include 'experimental/v1alpha2/backendtlspolicy-system-certs.yaml' %}
@@ -142,10 +143,9 @@ to connect with a TLS-encrypted upstream connection where Pods backing the
 
 #### Using Explicit CA Certificates
 
-In this example, the `BackendTLSPolicy` is configured to use certificates defined
-in the configuration map `auth-cert`
-to connect with a TLS-encrypted upstream connection where Pods backing the
-`auth` Service are expected to serve a valid certificate for `auth.example.com`.
+In this example, the `BackendTLSPolicy` is configured to use certificates defined in the configuration
+map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods backing the `auth` Service
+are expected to serve a valid certificate for `auth.example.com`.
 
 ```yaml
 {% include 'experimental/v1alpha2/backendtlspolicy-ca-certs.yaml' %}
