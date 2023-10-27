@@ -182,7 +182,7 @@ func isTestExtended(profile ConformanceProfile, test ConformanceTest) bool {
 	for _, supportedFeature := range test.Features {
 		// if ANY of the features needed for the test are extended features,
 		// then we consider the entire test extended level support.
-		if profile.ExtendedFeatures.Has(supportedFeature) {
+		if !profile.CoreFeatures.Has(supportedFeature) {
 			return true
 		}
 	}
