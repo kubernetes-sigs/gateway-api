@@ -70,6 +70,20 @@ readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boi
 echo "Generating CRDs"
 go run ./pkg/generator
 
+# throw away
+new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
+
+echo "Generating openapi schema"
+go run k8s.io/code-generator/cmd/openapi-gen \
+  -O zz_generated.openapi \
+  --report-filename "${new_report}" \
+  --output-package "sigs.k8s.io/gateway-api/pkg/generated/openapi" \
+  --input-dirs "${GATEWAY_INPUT_DIRS}" \
+  --input-dirs "k8s.io/apimachinery/pkg/apis/meta/v1" \
+  --input-dirs "k8s.io/apimachinery/pkg/runtime" \
+  --input-dirs "k8s.io/apimachinery/pkg/version" \
+  ${COMMON_FLAGS}
+
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
 go run k8s.io/code-generator/cmd/client-gen \
   --clientset-name "${CLIENTSET_NAME}" \
