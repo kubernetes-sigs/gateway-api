@@ -102,11 +102,6 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 				}},
 				Conditions: []metav1.Condition{
 					{
-						Type:   string(v1.ListenerConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: "", // any reason
-					},
-					{
 						Type:   string(v1.ListenerConditionProgrammed),
 						Status: metav1.ConditionFalse,
 						Reason: "", // any reason
@@ -125,7 +120,7 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 			hrouteNN := types.NamespacedName{Name: "http-route-4", Namespace: "gateway-conformance-infra"}
 			notAccepted := metav1.Condition{
 				Type:   string(v1.RouteConditionAccepted),
-				Status: metav1.ConditionTrue,
+				Status: metav1.ConditionFalse,
 				Reason: "", // any reason
 			}
 			unresolved := metav1.Condition{
