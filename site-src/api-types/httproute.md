@@ -190,6 +190,19 @@ The following example uses the `request` field which will cause a timeout if a c
 
 Reference the [timeouts][timeouts] API documentation for additional details.
 
+##### Backend Protocol
+
+??? example "Experimental Channel in v1.0.0+"
+
+    This concept is part of the Experimental Channel in `v1.0.0+`.
+
+
+Some implementations may require the [backendRef][backendRef] to be labeled 
+explicitly in order to route traffic using a certain protocol. For Kubernetes 
+Service backends this can be done by specifying the [`appProtocol`][appProtocol]
+field.
+
+
 ## Status
 
 Status defines the observed state of HTTPRoute.
@@ -240,4 +253,4 @@ resolution applies to merging, refer to the [API specification][httprouterule].
 [backendRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPBackendRef
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1beta1.ParentRef
 [timeouts]: /reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteTimeouts
-
+[appProtocol]: https://kubernetes.io/docs/concepts/services-networking/service/#application-protocol
