@@ -84,6 +84,13 @@ go run k8s.io/code-generator/cmd/openapi-gen \
   --input-dirs "k8s.io/apimachinery/pkg/version" \
   ${COMMON_FLAGS}
 
+echo "Generating apply configuration"
+go run k8s.io/code-generator/cmd/applyconfiguration-gen \
+  --input-dirs "${GATEWAY_INPUT_DIRS}" \
+  --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
+  --output-package "${APIS_PKG}/apis/applyconfiguration" \
+  ${COMMON_FLAGS}
+
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
 go run k8s.io/code-generator/cmd/client-gen \
   --clientset-name "${CLIENTSET_NAME}" \
