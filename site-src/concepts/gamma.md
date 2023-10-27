@@ -164,8 +164,8 @@ important:
     custom timeouts for that consumer's use of the workload). This Route will
     only affect requests from workloads in the same Namespace as the Route.
 
-    For example, this HTTPRoute would cause all clients of the `smiley`
-    workload in the `fast-clients` Namespace to have a 100ms timeout:
+    For example, this HTTPRoute would cause all clients in the `fast-clients`
+    Namespace of the `smiley` workload to have a 100ms timeout:
 
     ```yaml
     kind: HTTPRoute
