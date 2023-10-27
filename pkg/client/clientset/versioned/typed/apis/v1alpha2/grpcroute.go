@@ -20,12 +20,15 @@ package v1alpha2
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
@@ -47,6 +50,8 @@ type GRPCRouteInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha2.GRPCRouteList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.GRPCRoute, err error)
+	Apply(ctx context.Context, gRPCRoute *apisv1alpha2.GRPCRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.GRPCRoute, err error)
+	ApplyStatus(ctx context.Context, gRPCRoute *apisv1alpha2.GRPCRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.GRPCRoute, err error)
 	GRPCRouteExpansion
 }
 
@@ -188,6 +193,62 @@ func (c *gRPCRoutes) Patch(ctx context.Context, name string, pt types.PatchType,
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied gRPCRoute.
+func (c *gRPCRoutes) Apply(ctx context.Context, gRPCRoute *apisv1alpha2.GRPCRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.GRPCRoute, err error) {
+	if gRPCRoute == nil {
+		return nil, fmt.Errorf("gRPCRoute provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(gRPCRoute)
+	if err != nil {
+		return nil, err
+	}
+	name := gRPCRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("gRPCRoute.Name must be provided to Apply")
+	}
+	result = &v1alpha2.GRPCRoute{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("grpcroutes").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *gRPCRoutes) ApplyStatus(ctx context.Context, gRPCRoute *apisv1alpha2.GRPCRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.GRPCRoute, err error) {
+	if gRPCRoute == nil {
+		return nil, fmt.Errorf("gRPCRoute provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(gRPCRoute)
+	if err != nil {
+		return nil, err
+	}
+
+	name := gRPCRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("gRPCRoute.Name must be provided to Apply")
+	}
+
+	result = &v1alpha2.GRPCRoute{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("grpcroutes").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

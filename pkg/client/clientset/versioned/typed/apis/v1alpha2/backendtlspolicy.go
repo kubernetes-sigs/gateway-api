@@ -20,12 +20,15 @@ package v1alpha2
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
@@ -47,6 +50,8 @@ type BackendTLSPolicyInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1alpha2.BackendTLSPolicyList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.BackendTLSPolicy, err error)
+	Apply(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error)
+	ApplyStatus(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error)
 	BackendTLSPolicyExpansion
 }
 
@@ -188,6 +193,62 @@ func (c *backendTLSPolicies) Patch(ctx context.Context, name string, pt types.Pa
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied backendTLSPolicy.
+func (c *backendTLSPolicies) Apply(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+	if backendTLSPolicy == nil {
+		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(backendTLSPolicy)
+	if err != nil {
+		return nil, err
+	}
+	name := backendTLSPolicy.Name
+	if name == nil {
+		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
+	}
+	result = &v1alpha2.BackendTLSPolicy{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("backendtlspolicies").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *backendTLSPolicies) ApplyStatus(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+	if backendTLSPolicy == nil {
+		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(backendTLSPolicy)
+	if err != nil {
+		return nil, err
+	}
+
+	name := backendTLSPolicy.Name
+	if name == nil {
+		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
+	}
+
+	result = &v1alpha2.BackendTLSPolicy{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("backendtlspolicies").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

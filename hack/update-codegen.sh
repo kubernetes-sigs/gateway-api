@@ -97,6 +97,7 @@ go run k8s.io/code-generator/cmd/client-gen \
   --input-base "${APIS_PKG}" \
   --input "${GATEWAY_INPUT_DIRS//${APIS_PKG}/}" \
   --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
+  --apply-configuration-package "${APIS_PKG}/apis/applyconfiguration" \
   ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
