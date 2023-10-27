@@ -20,12 +20,15 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
@@ -47,6 +50,8 @@ type GatewayClassInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.GatewayClassList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.GatewayClass, err error)
+	Apply(ctx context.Context, gatewayClass *apisv1.GatewayClassApplyConfiguration, opts metav1.ApplyOptions) (result *v1.GatewayClass, err error)
+	ApplyStatus(ctx context.Context, gatewayClass *apisv1.GatewayClassApplyConfiguration, opts metav1.ApplyOptions) (result *v1.GatewayClass, err error)
 	GatewayClassExpansion
 }
 
@@ -177,6 +182,60 @@ func (c *gatewayClasses) Patch(ctx context.Context, name string, pt types.PatchT
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied gatewayClass.
+func (c *gatewayClasses) Apply(ctx context.Context, gatewayClass *apisv1.GatewayClassApplyConfiguration, opts metav1.ApplyOptions) (result *v1.GatewayClass, err error) {
+	if gatewayClass == nil {
+		return nil, fmt.Errorf("gatewayClass provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(gatewayClass)
+	if err != nil {
+		return nil, err
+	}
+	name := gatewayClass.Name
+	if name == nil {
+		return nil, fmt.Errorf("gatewayClass.Name must be provided to Apply")
+	}
+	result = &v1.GatewayClass{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("gatewayclasses").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *gatewayClasses) ApplyStatus(ctx context.Context, gatewayClass *apisv1.GatewayClassApplyConfiguration, opts metav1.ApplyOptions) (result *v1.GatewayClass, err error) {
+	if gatewayClass == nil {
+		return nil, fmt.Errorf("gatewayClass provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(gatewayClass)
+	if err != nil {
+		return nil, err
+	}
+
+	name := gatewayClass.Name
+	if name == nil {
+		return nil, fmt.Errorf("gatewayClass.Name must be provided to Apply")
+	}
+
+	result = &v1.GatewayClass{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Resource("gatewayclasses").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)

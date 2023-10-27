@@ -20,12 +20,15 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
@@ -133,6 +136,51 @@ func (c *FakeGateways) DeleteCollection(ctx context.Context, opts metav1.DeleteO
 func (c *FakeGateways) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.Gateway, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(gatewaysResource, c.ns, name, pt, data, subresources...), &v1.Gateway{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1.Gateway), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied gateway.
+func (c *FakeGateways) Apply(ctx context.Context, gateway *apisv1.GatewayApplyConfiguration, opts metav1.ApplyOptions) (result *v1.Gateway, err error) {
+	if gateway == nil {
+		return nil, fmt.Errorf("gateway provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(gateway)
+	if err != nil {
+		return nil, err
+	}
+	name := gateway.Name
+	if name == nil {
+		return nil, fmt.Errorf("gateway.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(gatewaysResource, c.ns, *name, types.ApplyPatchType, data), &v1.Gateway{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1.Gateway), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeGateways) ApplyStatus(ctx context.Context, gateway *apisv1.GatewayApplyConfiguration, opts metav1.ApplyOptions) (result *v1.Gateway, err error) {
+	if gateway == nil {
+		return nil, fmt.Errorf("gateway provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(gateway)
+	if err != nil {
+		return nil, err
+	}
+	name := gateway.Name
+	if name == nil {
+		return nil, fmt.Errorf("gateway.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(gatewaysResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1.Gateway{})
 
 	if obj == nil {
 		return nil, err

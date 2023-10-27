@@ -20,12 +20,15 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -133,6 +136,51 @@ func (c *FakeUDPRoutes) DeleteCollection(ctx context.Context, opts v1.DeleteOpti
 func (c *FakeUDPRoutes) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.UDPRoute, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, name, pt, data, subresources...), &v1alpha2.UDPRoute{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha2.UDPRoute), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied uDPRoute.
+func (c *FakeUDPRoutes) Apply(ctx context.Context, uDPRoute *apisv1alpha2.UDPRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.UDPRoute, err error) {
+	if uDPRoute == nil {
+		return nil, fmt.Errorf("uDPRoute provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(uDPRoute)
+	if err != nil {
+		return nil, err
+	}
+	name := uDPRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.UDPRoute{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha2.UDPRoute), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeUDPRoutes) ApplyStatus(ctx context.Context, uDPRoute *apisv1alpha2.UDPRouteApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.UDPRoute, err error) {
+	if uDPRoute == nil {
+		return nil, fmt.Errorf("uDPRoute provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(uDPRoute)
+	if err != nil {
+		return nil, err
+	}
+	name := uDPRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("uDPRoute.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(udproutesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.UDPRoute{})
 
 	if obj == nil {
 		return nil, err

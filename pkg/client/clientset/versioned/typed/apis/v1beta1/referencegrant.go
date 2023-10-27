@@ -20,12 +20,15 @@ package v1beta1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
@@ -46,6 +49,7 @@ type ReferenceGrantInterface interface {
 	List(ctx context.Context, opts v1.ListOptions) (*v1beta1.ReferenceGrantList, error)
 	Watch(ctx context.Context, opts v1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ReferenceGrant, err error)
+	Apply(ctx context.Context, referenceGrant *apisv1beta1.ReferenceGrantApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.ReferenceGrant, err error)
 	ReferenceGrantExpansion
 }
 
@@ -171,6 +175,32 @@ func (c *referenceGrants) Patch(ctx context.Context, name string, pt types.Patch
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied referenceGrant.
+func (c *referenceGrants) Apply(ctx context.Context, referenceGrant *apisv1beta1.ReferenceGrantApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.ReferenceGrant, err error) {
+	if referenceGrant == nil {
+		return nil, fmt.Errorf("referenceGrant provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(referenceGrant)
+	if err != nil {
+		return nil, err
+	}
+	name := referenceGrant.Name
+	if name == nil {
+		return nil, fmt.Errorf("referenceGrant.Name must be provided to Apply")
+	}
+	result = &v1beta1.ReferenceGrant{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("referencegrants").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)
