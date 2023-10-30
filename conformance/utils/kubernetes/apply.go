@@ -249,6 +249,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 		resource.SetResourceVersion(existingResource.GetResourceVersion())
 
 		err = c.Update(ctx, resource)
+		require.NoErrorf(t, err, "error updating resource")
 
 		if cleanup {
 			t.Cleanup(func() {
@@ -260,7 +261,6 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 			})
 		}
 
-		require.NoErrorf(t, err, "error updating resource")
 	}
 }
 

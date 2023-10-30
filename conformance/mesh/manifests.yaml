@@ -170,4 +170,3 @@ spec:
       - name: echo
         image: gcr.io/k8s-staging-gateway-api/echo-advanced:v20231024-v1.0.0-rc1-33-g9c830e50
         imagePullPolicy: IfNotPresent
-        
