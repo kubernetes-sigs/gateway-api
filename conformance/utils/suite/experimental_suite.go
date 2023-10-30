@@ -138,8 +138,16 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 					}
 					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 				}
+				// Add Exempt Features into unsupported features list
+				if s.ExemptFeatures.Has(f) {
+					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
+				}
 			}
 		}
+	}
+
+	for feature := range s.ExemptFeatures {
+		s.SupportedFeatures.Delete(feature)
 	}
 
 	if s.FS == nil {
@@ -160,10 +168,12 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 			NamespaceLabels:      s.NamespaceLabels,
 			NamespaceAnnotations: s.NamespaceAnnotations,
 		},
-		SupportedFeatures: s.SupportedFeatures,
-		TimeoutConfig:     s.TimeoutConfig,
-		SkipTests:         sets.New(s.SkipTests...),
-		FS:                *s.FS,
+		SupportedFeatures:        s.SupportedFeatures,
+		TimeoutConfig:            s.TimeoutConfig,
+		SkipTests:                sets.New(s.SkipTests...),
+		FS:                       *s.FS,
+		UsableNetworkAddresses:   s.UsableNetworkAddresses,
+		UnusableNetworkAddresses: s.UnusableNetworkAddresses,
 	}
 
 	// apply defaults

@@ -23,9 +23,14 @@ readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
 
+python3 -m venv .venv
+source .venv/bin/activate
+
 # See configuration file in ${KUBE_ROOT}/.yamllint.yaml.
 pip3 install yamllint==$VERSION
 
 yamllint -c .yamllint.yaml .
+
+deactivate
 
 # ex: ts=2 sw=2 et filetype=sh

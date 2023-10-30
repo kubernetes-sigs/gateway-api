@@ -83,16 +83,19 @@ vet:
 # Run go test against code
 test:
 	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/...
+# Run tests for each submodule.
+	cd "conformance/echo-basic" && go test -race -cover ./...
+	cd "gwctl" && go test -race -cover ./...
 
 # Run conformance tests against controller implementation
 .PHONY: conformance
 conformance:
-	go test ${GO_TEST_FLAGS} -v ./conformance -args ${CONFORMANCE_FLAGS}
+	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
 
 # Run experimental conformance tests against controller implementation
 .PHONY: conformance.experimental
 conformance.experimental:
-	go test ${GO_TEST_FLAGS} --tags experimental -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
+	go test ${GO_TEST_FLAGS} -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
 
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
@@ -123,6 +126,10 @@ verify:
 docs:
 	hack/make-docs.sh
 
+.PHONY: update-conformance-image-refs
+update-conformance-image-refs:
+	hack/update-conformance-image-refs.sh
+
 # Verify if support Docker Buildx.
 .PHONY: image.buildx.verify
 image.buildx.verify:
@@ -136,10 +143,10 @@ image.buildx.verify:
 		docker buildx version; \
 	fi
 
-BUILDX_CONTEXT = gateway-api-builder
-BUILDX_PLATFORMS = linux/amd64,linux/arm64
+export BUILDX_CONTEXT = gateway-api-builder
+export BUILDX_PLATFORMS = linux/amd64,linux/arm64
 
-# Setup multi-arch docker buildx enviroment.
+# Setup multi-arch docker buildx environment.
 .PHONY: image.multiarch.setup
 image.multiarch.setup: image.buildx.verify
 # Ensure qemu is in binfmt_misc.

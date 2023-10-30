@@ -1,4 +1,4 @@
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: gateway-with-one-attached-route
@@ -20,7 +20,7 @@ spec:
             # to all namespaces
             kubernetes.io/metadata.name: gateway-conformance-infra
 ---
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-route-1
@@ -35,7 +35,7 @@ spec:
     - name: infra-backend-v1
       port: 8080
 ---
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: gateway-with-two-attached-routes
@@ -57,7 +57,7 @@ spec:
             # to all namespaces
             kubernetes.io/metadata.name: gateway-conformance-infra
 ---
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-route-2
@@ -72,7 +72,7 @@ spec:
     - name: infra-backend-v1
       port: 8080
 ---
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-route-3
@@ -85,4 +85,48 @@ spec:
   rules:
   - backendRefs:
     - name: infra-backend-v1
+      port: 8080
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: unresolved-gateway-with-one-attached-unresolved-route
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  listeners:
+  - name: tls
+    port: 443
+    protocol: HTTPS
+    allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: Selector
+        selector:
+          matchLabels:
+            # This label is added automatically as of K8s 1.22
+            # to all namespaces
+            kubernetes.io/metadata.name: gateway-conformance-infra
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: does-not-exist
+      mode: Terminate
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: http-route-4
+  namespace: gateway-conformance-infra
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: unresolved-gateway-with-one-attached-unresolved-route
+    namespace: gateway-conformance-infra
+    sectionName: tls
+  rules:
+  - backendRefs:
+    - name: does-not-exist
       port: 8080

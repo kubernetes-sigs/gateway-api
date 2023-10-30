@@ -35,8 +35,8 @@ const (
 	channelAnnotation       = "gateway.networking.k8s.io/channel"
 
 	// These values must be updated during the release process
-	bundleVersion = "v0.8.0"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2245"
+	bundleVersion = "v1.0.0-rc2"
+	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2466"
 )
 
 var standardKinds = map[string]bool{
@@ -53,6 +53,7 @@ func main() {
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
+		"sigs.k8s.io/gateway-api/apis/v1",
 	)
 	if err != nil {
 		log.Fatalf("failed to load package roots: %s", err)
@@ -206,6 +207,21 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 					Rule:    celMatch[2],
 				})
 			}
+		}
+		startTag := "<gateway:experimental:description>"
+		endTag := "</gateway:experimental:description>"
+		regexPattern := regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag)
+		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental:description>") {
+			re := regexp.MustCompile(regexPattern)
+			match := re.FindStringSubmatch(jsonProps.Description)
+			if len(match) != 2 {
+				log.Fatalf("Invalid <gateway:experimental:description> tag for %s", name)
+			}
+			modifiedDescription := re.ReplaceAllString(jsonProps.Description, "")
+			jsonProps.Description = modifiedDescription
+		} else {
+			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, startTag, "")
+			jsonProps.Description = strings.ReplaceAll(jsonProps.Description, endTag, "")
 		}
 
 		if numValid < numExpressions {

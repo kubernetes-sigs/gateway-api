@@ -23,7 +23,7 @@ import (
 	"testing"
 	"time"
 
-	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -47,73 +47,73 @@ func TestHTTPPathMatch(t *testing.T) {
 	tests := []struct {
 		name       string
 		wantErrors []string
-		path       *gatewayv1b1.HTTPPathMatch
+		path       *gatewayv1.HTTPPathMatch
 	}{
 		{
 			name:       "invalid because path does not start with '/'",
 			wantErrors: []string{"value must be an absolute path and start with '/' when type one of ['Exact', 'PathPrefix']"},
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 				Value: ptrTo("foo"),
 			},
 		},
 		{
 			name:       "invalid httpRoute prefix (/.)",
 			wantErrors: []string{"must not end with '/.' when type one of ['Exact', 'PathPrefix']"},
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 				Value: ptrTo("/."),
 			},
 		},
 		{
 			name:       "invalid exact (/./)",
 			wantErrors: []string{"must not contain '/./' when type one of ['Exact', 'PathPrefix']"},
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("Exact")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
 				Value: ptrTo("/foo/./bar"),
 			},
 		},
 		{
 			name:       "invalid type",
 			wantErrors: []string{"type must be one of ['Exact', 'PathPrefix', 'RegularExpression']"},
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("FooBar")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("FooBar")),
 				Value: ptrTo("/path"),
 			},
 		},
 		{
 			name: "valid because type is RegularExpression but would not be valid for Exact",
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("RegularExpression")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("RegularExpression")),
 				Value: ptrTo("/foo/./bar"),
 			},
 		},
 		{
 			name: "valid httpRoute prefix",
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 				Value: ptrTo("/path"),
 			},
 		},
 		{
 			name: "valid path with some special characters",
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("Exact")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
 				Value: ptrTo("/abc/123'/a-b-c/d@gmail/%0A"),
 			},
 		},
 		{
 			name: "invalid prefix path (/[])",
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 				Value: ptrTo("/[]"),
 			},
 			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
 		},
 		{
 			name: "invalid exact path (/^)",
-			path: &gatewayv1b1.HTTPPathMatch{
-				Type:  ptrTo(gatewayv1b1.PathMatchType("Exact")),
+			path: &gatewayv1.HTTPPathMatch{
+				Type:  ptrTo(gatewayv1.PathMatchType("Exact")),
 				Value: ptrTo("/^"),
 			},
 			wantErrors: []string{"must only contain valid characters (matching ^(?:[-A-Za-z0-9/._~!$&'()*+,;=:@]|[%][0-9a-fA-F]{2})+$) for types ['Exact', 'PathPrefix']"},
@@ -122,21 +122,21 @@ func TestHTTPPathMatch(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{
-					Rules: []gatewayv1b1.HTTPRouteRule{{
-						Matches: []gatewayv1b1.HTTPRouteMatch{{
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						Matches: []gatewayv1.HTTPRouteMatch{{
 							Path: tc.path,
 						}},
-						BackendRefs: []gatewayv1b1.HTTPBackendRef{{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
-									Name: gatewayv1b1.ObjectName("test"),
-									Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+						BackendRefs: []gatewayv1.HTTPBackendRef{{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
+									Name: gatewayv1.ObjectName("test"),
+									Port: ptrTo(gatewayv1.PortNumber(8080)),
 								},
 							},
 						}},
@@ -149,30 +149,30 @@ func TestHTTPPathMatch(t *testing.T) {
 }
 
 func TestBackendObjectReference(t *testing.T) {
-	portPtr := func(n int) *gatewayv1b1.PortNumber {
-		p := gatewayv1b1.PortNumber(n)
+	portPtr := func(n int) *gatewayv1.PortNumber {
+		p := gatewayv1.PortNumber(n)
 		return &p
 	}
 
-	groupPtr := func(g string) *gatewayv1b1.Group {
-		p := gatewayv1b1.Group(g)
+	groupPtr := func(g string) *gatewayv1.Group {
+		p := gatewayv1.Group(g)
 		return &p
 	}
 
-	kindPtr := func(k string) *gatewayv1b1.Kind {
-		p := gatewayv1b1.Kind(k)
+	kindPtr := func(k string) *gatewayv1.Kind {
+		p := gatewayv1.Kind(k)
 		return &p
 	}
 
 	tests := []struct {
 		name       string
 		wantErrors []string
-		rules      []gatewayv1b1.HTTPRouteRule
-		backendRef gatewayv1b1.BackendObjectReference
+		rules      []gatewayv1.HTTPRouteRule
+		backendRef gatewayv1.BackendObjectReference
 	}{
 		{
 			name: "default groupkind with port",
-			backendRef: gatewayv1b1.BackendObjectReference{
+			backendRef: gatewayv1.BackendObjectReference{
 				Name: "backend",
 				Port: portPtr(99),
 			},
@@ -180,13 +180,13 @@ func TestBackendObjectReference(t *testing.T) {
 		{
 			name:       "default groupkind with no port",
 			wantErrors: []string{"Must have port for Service reference"},
-			backendRef: gatewayv1b1.BackendObjectReference{
+			backendRef: gatewayv1.BackendObjectReference{
 				Name: "backend",
 			},
 		},
 		{
 			name: "explicit service with port",
-			backendRef: gatewayv1b1.BackendObjectReference{
+			backendRef: gatewayv1.BackendObjectReference{
 				Group: groupPtr(""),
 				Kind:  kindPtr("Service"),
 				Name:  "backend",
@@ -196,7 +196,7 @@ func TestBackendObjectReference(t *testing.T) {
 		{
 			name:       "explicit service with no port",
 			wantErrors: []string{"Must have port for Service reference"},
-			backendRef: gatewayv1b1.BackendObjectReference{
+			backendRef: gatewayv1.BackendObjectReference{
 				Group: groupPtr(""),
 				Kind:  kindPtr("Service"),
 				Name:  "backend",
@@ -204,7 +204,7 @@ func TestBackendObjectReference(t *testing.T) {
 		},
 		{
 			name: "explicit ref with no port",
-			backendRef: gatewayv1b1.BackendObjectReference{
+			backendRef: gatewayv1.BackendObjectReference{
 				Group: groupPtr("foo.example.com"),
 				Kind:  kindPtr("Foo"),
 				Name:  "backend",
@@ -214,15 +214,15 @@ func TestBackendObjectReference(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{
-					Rules: []gatewayv1b1.HTTPRouteRule{{
-						BackendRefs: []gatewayv1b1.HTTPBackendRef{{
-							BackendRef: gatewayv1b1.BackendRef{
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						BackendRefs: []gatewayv1.HTTPBackendRef{{
+							BackendRef: gatewayv1.BackendRef{
 								BackendObjectReference: tc.backendRef,
 							},
 						}},
@@ -238,98 +238,98 @@ func TestHTTPRouteFilter(t *testing.T) {
 	tests := []struct {
 		name        string
 		wantErrors  []string
-		routeFilter gatewayv1b1.HTTPRouteFilter
+		routeFilter gatewayv1.HTTPRouteFilter
 	}{
 		{
 			name: "valid HTTPRouteFilterRequestHeaderModifier route filter",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-					Set:    []gatewayv1b1.HTTPHeader{{Name: "name", Value: "foo"}},
-					Add:    []gatewayv1b1.HTTPHeader{{Name: "add", Value: "foo"}},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+				RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+					Set:    []gatewayv1.HTTPHeader{{Name: "name", Value: "foo"}},
+					Add:    []gatewayv1.HTTPHeader{{Name: "add", Value: "foo"}},
 					Remove: []string{"remove"},
 				},
 			},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with non-matching field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type:          gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-				RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type:          gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestHeaderModifier must be specified for RequestHeaderModifier filter.type", "filter.requestMirror must be nil if the filter.type is not RequestMirror"},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestHeaderModifier type filter with empty value field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
 			},
 			wantErrors: []string{"filter.requestHeaderModifier must be specified for RequestHeaderModifier filter.type"},
 		},
 		{
 			name: "valid HTTPRouteFilterRequestMirror route filter",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
-				RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{BackendRef: gatewayv1b1.BackendObjectReference{
-					Group:     ptrTo(gatewayv1b1.Group("group")),
-					Kind:      ptrTo(gatewayv1b1.Kind("kind")),
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestMirror,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{BackendRef: gatewayv1.BackendObjectReference{
+					Group:     ptrTo(gatewayv1.Group("group")),
+					Kind:      ptrTo(gatewayv1.Kind("kind")),
 					Name:      "name",
-					Namespace: ptrTo(gatewayv1b1.Namespace("ns")),
-					Port:      ptrTo(gatewayv1b1.PortNumber(22)),
+					Namespace: ptrTo(gatewayv1.Namespace("ns")),
+					Port:      ptrTo(gatewayv1.PortNumber(22)),
 				}},
 			},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestMirror type filter with non-matching field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type:                  gatewayv1b1.HTTPRouteFilterRequestMirror,
-				RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type:                  gatewayv1.HTTPRouteFilterRequestMirror,
+				RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{},
 			},
 			wantErrors: []string{"filter.requestHeaderModifier must be nil if the filter.type is not RequestHeaderModifier", "filter.requestMirror must be specified for RequestMirror filter.type"},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestMirror type filter with empty value field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestMirror,
 			},
 			wantErrors: []string{"filter.requestMirror must be specified for RequestMirror filter.type"},
 		},
 		{
 			name: "valid HTTPRouteFilterRequestRedirect route filter",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-				RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+				RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 					Scheme:   ptrTo("http"),
-					Hostname: ptrTo(gatewayv1b1.PreciseHostname("hostname")),
-					Path: &gatewayv1b1.HTTPPathModifier{
-						Type:            gatewayv1b1.FullPathHTTPPathModifier,
+					Hostname: ptrTo(gatewayv1.PreciseHostname("hostname")),
+					Path: &gatewayv1.HTTPPathModifier{
+						Type:            gatewayv1.FullPathHTTPPathModifier,
 						ReplaceFullPath: ptrTo("path"),
 					},
-					Port:       ptrTo(gatewayv1b1.PortNumber(8080)),
+					Port:       ptrTo(gatewayv1.PortNumber(8080)),
 					StatusCode: ptrTo(302),
 				},
 			},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestRedirect type filter with non-matching field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type:          gatewayv1b1.HTTPRouteFilterRequestRedirect,
-				RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type:          gatewayv1.HTTPRouteFilterRequestRedirect,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestMirror must be nil if the filter.type is not RequestMirror", "filter.requestRedirect must be specified for RequestRedirect filter.type"},
 		},
 		{
 			name: "invalid HTTPRouteFilterRequestRedirect type filter with empty value field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 			},
 			wantErrors: []string{"filter.requestRedirect must be specified for RequestRedirect filter.type"},
 		},
 		{
 			name: "valid HTTPRouteFilterExtensionRef filter",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterExtensionRef,
-				ExtensionRef: &gatewayv1b1.LocalObjectReference{
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterExtensionRef,
+				ExtensionRef: &gatewayv1.LocalObjectReference{
 					Group: "group",
 					Kind:  "kind",
 					Name:  "name",
@@ -338,27 +338,27 @@ func TestHTTPRouteFilter(t *testing.T) {
 		},
 		{
 			name: "invalid HTTPRouteFilterExtensionRef type filter with non-matching field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type:          gatewayv1b1.HTTPRouteFilterExtensionRef,
-				RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type:          gatewayv1.HTTPRouteFilterExtensionRef,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestMirror must be nil if the filter.type is not RequestMirror", "filter.extensionRef must be specified for ExtensionRef filter.type"},
 		},
 		{
 			name: "invalid HTTPRouteFilterExtensionRef type filter with empty value field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterExtensionRef,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterExtensionRef,
 			},
 			wantErrors: []string{"filter.extensionRef must be specified for ExtensionRef filter.type"},
 		},
 		{
 			name: "valid HTTPRouteFilterURLRewrite route filter",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-				URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-					Hostname: ptrTo(gatewayv1b1.PreciseHostname("hostname")),
-					Path: &gatewayv1b1.HTTPPathModifier{
-						Type:            gatewayv1b1.FullPathHTTPPathModifier,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterURLRewrite,
+				URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+					Hostname: ptrTo(gatewayv1.PreciseHostname("hostname")),
+					Path: &gatewayv1.HTTPPathModifier{
+						Type:            gatewayv1.FullPathHTTPPathModifier,
 						ReplaceFullPath: ptrTo("path"),
 					},
 				},
@@ -366,16 +366,16 @@ func TestHTTPRouteFilter(t *testing.T) {
 		},
 		{
 			name: "invalid HTTPRouteFilterURLRewrite type filter with non-matching field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type:          gatewayv1b1.HTTPRouteFilterURLRewrite,
-				RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{},
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type:          gatewayv1.HTTPRouteFilterURLRewrite,
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestMirror must be nil if the filter.type is not RequestMirror", "filter.urlRewrite must be specified for URLRewrite filter.type"},
 		},
 		{
 			name: "invalid HTTPRouteFilterURLRewrite type filter with empty value field",
-			routeFilter: gatewayv1b1.HTTPRouteFilter{
-				Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
+			routeFilter: gatewayv1.HTTPRouteFilter{
+				Type: gatewayv1.HTTPRouteFilterURLRewrite,
 			},
 			wantErrors: []string{"filter.urlRewrite must be specified for URLRewrite filter.type"},
 		},
@@ -383,14 +383,14 @@ func TestHTTPRouteFilter(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{
-					Rules: []gatewayv1b1.HTTPRouteRule{{
-						Filters: []gatewayv1b1.HTTPRouteFilter{tc.routeFilter},
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{{
+						Filters: []gatewayv1.HTTPRouteFilter{tc.routeFilter},
 					}},
 				},
 			}
@@ -400,30 +400,30 @@ func TestHTTPRouteFilter(t *testing.T) {
 }
 
 func TestHTTPRouteRule(t *testing.T) {
-	testService := gatewayv1b1.ObjectName("test-service")
+	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
 		wantErrors []string
-		rules      []gatewayv1b1.HTTPRouteRule
+		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
 			name: "valid httpRoute with no filters",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+									Port: ptrTo(gatewayv1.PortNumber(8080)),
 								},
 								Weight: ptrTo(int32(100)),
 							},
@@ -434,23 +434,23 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid httpRoute with 1 filter",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
-							RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{
-								BackendRef: gatewayv1b1.BackendObjectReference{
+							Type: gatewayv1.HTTPRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(8081)),
+									Port: ptrTo(gatewayv1.PortNumber(8081)),
 								},
 							},
 						},
@@ -460,21 +460,21 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid httpRoute with duplicate ExtensionRef filters",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Set: []gatewayv1b1.HTTPHeader{
+							Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{
 									{
 										Name:  "special-header",
 										Value: "foo",
@@ -483,31 +483,31 @@ func TestHTTPRouteRule(t *testing.T) {
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
-							RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{
-								BackendRef: gatewayv1b1.BackendObjectReference{
+							Type: gatewayv1.HTTPRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+									Port: ptrTo(gatewayv1.PortNumber(8080)),
 								},
 							},
 						},
 						{
 							Type: "ExtensionRef",
-							ExtensionRef: &gatewayv1b1.LocalObjectReference{
+							ExtensionRef: &gatewayv1.LocalObjectReference{
 								Kind: "Service",
 								Name: "test",
 							},
 						},
 						{
 							Type: "ExtensionRef",
-							ExtensionRef: &gatewayv1b1.LocalObjectReference{
+							ExtensionRef: &gatewayv1.LocalObjectReference{
 								Kind: "Service",
 								Name: "test",
 							},
 						},
 						{
 							Type: "ExtensionRef",
-							ExtensionRef: &gatewayv1b1.LocalObjectReference{
+							ExtensionRef: &gatewayv1.LocalObjectReference{
 								Kind: "Service",
 								Name: "test",
 							},
@@ -518,14 +518,14 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid redirect path modifier",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:            gatewayv1b1.FullPathHTTPPathModifier,
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:            gatewayv1.FullPathHTTPPathModifier,
 									ReplaceFullPath: ptrTo("foo"),
 								},
 							},
@@ -536,18 +536,18 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid rewrite path modifier",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{{
-					Path: &gatewayv1b1.HTTPPathMatch{
-						Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{{
+					Path: &gatewayv1.HTTPPathMatch{
+						Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 						Value: ptrTo("/bar"),
 					},
 				}},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-					URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterURLRewrite,
+					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -556,27 +556,27 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "multiple actions for different request headers",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-					RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-						Add: []gatewayv1b1.HTTPHeader{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+					RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+						Add: []gatewayv1.HTTPHeader{
 							{
-								Name:  gatewayv1b1.HTTPHeaderName("x-vegetable"),
+								Name:  gatewayv1.HTTPHeaderName("x-vegetable"),
 								Value: "carrot",
 							},
 							{
-								Name:  gatewayv1b1.HTTPHeaderName("x-grain"),
+								Name:  gatewayv1.HTTPHeaderName("x-grain"),
 								Value: "rye",
 							},
 						},
-						Set: []gatewayv1b1.HTTPHeader{
+						Set: []gatewayv1.HTTPHeader{
 							{
-								Name:  gatewayv1b1.HTTPHeaderName("x-fruit"),
+								Name:  gatewayv1.HTTPHeaderName("x-fruit"),
 								Value: "watermelon",
 							},
 							{
-								Name:  gatewayv1b1.HTTPHeaderName("x-spice"),
+								Name:  gatewayv1.HTTPHeaderName("x-spice"),
 								Value: "coriander",
 							},
 						},
@@ -586,16 +586,16 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "multiple actions for different response headers",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
-					ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-						Add: []gatewayv1b1.HTTPHeader{{
-							Name:  gatewayv1b1.HTTPHeaderName("x-example"),
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterResponseHeaderModifier,
+					ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+						Add: []gatewayv1.HTTPHeader{{
+							Name:  gatewayv1.HTTPHeaderName("x-example"),
 							Value: "blueberry",
 						}},
-						Set: []gatewayv1b1.HTTPHeader{{
-							Name:  gatewayv1b1.HTTPHeaderName("x-different"),
+						Set: []gatewayv1.HTTPHeader{{
+							Name:  gatewayv1.HTTPHeaderName("x-different"),
 							Value: "turnip",
 						}},
 					},
@@ -605,23 +605,23 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "backendref with request redirect httpRoute filter",
 			wantErrors: []string{"RequestRedirect filter must not be used together with backendRefs"},
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Scheme:     ptrTo("https"),
 								StatusCode: ptrTo(301),
 							},
 						},
 					},
-					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(80)),
+									Port: ptrTo(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -631,12 +631,12 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "request redirect without backendref in httpRoute filter",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 								Scheme:     ptrTo("https"),
 								StatusCode: ptrTo(301),
 							},
@@ -647,22 +647,22 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "backendref without request redirect filter",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Set: []gatewayv1b1.HTTPHeader{{Name: "name", Value: "foo"}},
+							Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{{Name: "name", Value: "foo"}},
 							},
 						},
 					},
-					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(80)),
+									Port: ptrTo(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -672,14 +672,14 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "backendref without any filter",
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(80)),
+									Port: ptrTo(gatewayv1.PortNumber(80)),
 								},
 							},
 						},
@@ -689,20 +689,20 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid use of URLRewrite filter",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-					URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterURLRewrite,
+					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -712,26 +712,26 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid URLRewrite filter because too many path matches",
 			wantErrors: []string{"When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/bar"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-					URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterURLRewrite,
+					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -741,20 +741,20 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid URLRewrite filter because too many path matches",
 			wantErrors: []string{"When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchType(gatewayv1b1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-					URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterURLRewrite,
+					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -763,20 +763,20 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid use of RequestRedirect filter",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-					RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -786,26 +786,26 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid RequestRedirect filter because too many path matches",
 			wantErrors: []string{"When using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/bar"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-					RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -815,20 +815,20 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid RequestRedirect filter because path match has type ReplaceFullPath",
 			wantErrors: []string{"When using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchType(gatewayv1b1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-					RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -837,28 +837,28 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid use of URLRewrite filter (within backendRefs)",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-							URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -870,34 +870,34 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid URLRewrite filter (within backendRefs) because too many path matches",
 			wantErrors: []string{"Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/bar"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-							URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -909,28 +909,28 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid URLRewrite filter (within backendRefs) because path match has type ReplaceFullPath",
 			wantErrors: []string{"Within backendRefs, When using URLRewrite filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchType(gatewayv1b1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for URLRewrite filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-							URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -941,28 +941,28 @@ func TestHTTPRouteRule(t *testing.T) {
 		},
 		{
 			name: "valid use of RequestRedirect filter (within backendRefs)",
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -974,34 +974,34 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid RequestRedirect filter (within backendRefs) because too many path matches",
 			wantErrors: []string{"Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/foo"),
 						},
 					},
 					{ // Cannot have multiple path matches.
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchPathPrefix),
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchPathPrefix),
 							Value: ptrTo("/bar"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -1013,28 +1013,28 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid RequestRedirect filter (within backendRefs) because path match has type ReplaceFullPath",
 			wantErrors: []string{"Within backendRefs, when using RequestRedirect filter with path.replacePrefixMatch, exactly one PathPrefix match must be specified"},
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Matches: []gatewayv1b1.HTTPRouteMatch{
+			rules: []gatewayv1.HTTPRouteRule{{
+				Matches: []gatewayv1.HTTPRouteMatch{
 					{
-						Path: &gatewayv1b1.HTTPPathMatch{
-							Type:  ptrTo(gatewayv1b1.PathMatchType(gatewayv1b1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
+						Path: &gatewayv1.HTTPPathMatch{
+							Type:  ptrTo(gatewayv1.PathMatchType(gatewayv1.FullPathHTTPPathModifier)), // Incorrect Patch match Type for RequestRedirect filter with ReplacePrefixMatch.
 							Value: ptrTo("/foo"),
 						},
 					},
 				},
-				BackendRefs: []gatewayv1b1.HTTPBackendRef{
+				BackendRefs: []gatewayv1.HTTPBackendRef{
 					{
-						BackendRef: gatewayv1b1.BackendRef{
-							BackendObjectReference: gatewayv1b1.BackendObjectReference{
+						BackendRef: gatewayv1.BackendRef{
+							BackendObjectReference: gatewayv1.BackendObjectReference{
 								Name: testService,
-								Port: ptrTo(gatewayv1b1.PortNumber(80)),
+								Port: ptrTo(gatewayv1.PortNumber(80)),
 							},
 						},
-						Filters: []gatewayv1b1.HTTPRouteFilter{{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+						Filters: []gatewayv1.HTTPRouteFilter{{
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
@@ -1046,20 +1046,20 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "rewrite and redirect filters combined (invalid)",
 			wantErrors: []string{"May specify either httpRouteFilterRequestRedirect or httpRouteFilterRequestRewrite, but not both"}, // errCount: 3,
-			rules: []gatewayv1b1.HTTPRouteRule{{
-				Filters: []gatewayv1b1.HTTPRouteFilter{{
-					Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-					URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+			rules: []gatewayv1.HTTPRouteRule{{
+				Filters: []gatewayv1.HTTPRouteFilter{{
+					Type: gatewayv1.HTTPRouteFilterURLRewrite,
+					URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
 				}, {
-					Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-					RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-						Path: &gatewayv1b1.HTTPPathModifier{
-							Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+					Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+					RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+						Path: &gatewayv1.HTTPPathModifier{
+							Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 							ReplacePrefixMatch: ptrTo("foo"),
 						},
 					},
@@ -1069,31 +1069,31 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid because repeated URLRewrite filter",
 			wantErrors: []string{"URLRewrite filter cannot be repeated"},
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-							URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("foo"),
 								},
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-							URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+							Type: gatewayv1.HTTPRouteFilterURLRewrite,
+							URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 									ReplacePrefixMatch: ptrTo("bar"),
 								},
 							},
@@ -1105,21 +1105,21 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid because repeated RequestHeaderModifier filter among mix of filters",
 			wantErrors: []string{"RequestHeaderModifier filter cannot be repeated"},
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Set: []gatewayv1b1.HTTPHeader{
+							Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{
 									{
 										Name:  "special-header",
 										Value: "foo",
@@ -1128,18 +1128,18 @@ func TestHTTPRouteRule(t *testing.T) {
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestMirror,
-							RequestMirror: &gatewayv1b1.HTTPRequestMirrorFilter{
-								BackendRef: gatewayv1b1.BackendObjectReference{
+							Type: gatewayv1.HTTPRouteFilterRequestMirror,
+							RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{
+								BackendRef: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(8080)),
+									Port: ptrTo(gatewayv1.PortNumber(8080)),
 								},
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Add: []gatewayv1b1.HTTPHeader{
+							Type: gatewayv1.HTTPRouteFilterRequestHeaderModifier,
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Add: []gatewayv1.HTTPHeader{
 									{
 										Name:  "my-header",
 										Value: "bar",
@@ -1154,21 +1154,21 @@ func TestHTTPRouteRule(t *testing.T) {
 		{
 			name:       "invalid because multiple filters are repeated",
 			wantErrors: []string{"ResponseHeaderModifier filter cannot be repeated", "RequestRedirect filter cannot be repeated"},
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					Filters: []gatewayv1b1.HTTPRouteFilter{
+					Filters: []gatewayv1.HTTPRouteFilter{
 						{
-							Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
-							ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Set: []gatewayv1b1.HTTPHeader{
+							Type: gatewayv1.HTTPRouteFilterResponseHeaderModifier,
+							ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{
 									{
 										Name:  "special-header",
 										Value: "foo",
@@ -1177,9 +1177,9 @@ func TestHTTPRouteRule(t *testing.T) {
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterResponseHeaderModifier,
-							ResponseHeaderModifier: &gatewayv1b1.HTTPHeaderFilter{
-								Add: []gatewayv1b1.HTTPHeader{
+							Type: gatewayv1.HTTPRouteFilterResponseHeaderModifier,
+							ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Add: []gatewayv1.HTTPHeader{
 									{
 										Name:  "my-header",
 										Value: "bar",
@@ -1188,19 +1188,19 @@ func TestHTTPRouteRule(t *testing.T) {
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:            gatewayv1b1.FullPathHTTPPathModifier,
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:            gatewayv1.FullPathHTTPPathModifier,
 									ReplaceFullPath: ptrTo("foo"),
 								},
 							},
 						},
 						{
-							Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-							RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
-								Path: &gatewayv1b1.HTTPPathModifier{
-									Type:            gatewayv1b1.FullPathHTTPPathModifier,
+							Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+							RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
+								Path: &gatewayv1.HTTPPathModifier{
+									Type:            gatewayv1.FullPathHTTPPathModifier,
 									ReplaceFullPath: ptrTo("bar"),
 								},
 							},
@@ -1213,12 +1213,12 @@ func TestHTTPRouteRule(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})
@@ -1226,48 +1226,48 @@ func TestHTTPRouteRule(t *testing.T) {
 }
 
 func TestHTTPBackendRef(t *testing.T) {
-	testService := gatewayv1b1.ObjectName("test-service")
+	testService := gatewayv1.ObjectName("test-service")
 	tests := []struct {
 		name       string
 		wantErrors []string
-		rules      []gatewayv1b1.HTTPRouteRule
+		rules      []gatewayv1.HTTPRouteRule
 	}{
 		{
 			name:       "invalid because repeated URLRewrite filter within backendRefs",
 			wantErrors: []string{"URLRewrite filter cannot be repeated"},
-			rules: []gatewayv1b1.HTTPRouteRule{
+			rules: []gatewayv1.HTTPRouteRule{
 				{
-					Matches: []gatewayv1b1.HTTPRouteMatch{
+					Matches: []gatewayv1.HTTPRouteMatch{
 						{
-							Path: &gatewayv1b1.HTTPPathMatch{
-								Type:  ptrTo(gatewayv1b1.PathMatchType("PathPrefix")),
+							Path: &gatewayv1.HTTPPathMatch{
+								Type:  ptrTo(gatewayv1.PathMatchType("PathPrefix")),
 								Value: ptrTo("/"),
 							},
 						},
 					},
-					BackendRefs: []gatewayv1b1.HTTPBackendRef{
+					BackendRefs: []gatewayv1.HTTPBackendRef{
 						{
-							BackendRef: gatewayv1b1.BackendRef{
-								BackendObjectReference: gatewayv1b1.BackendObjectReference{
+							BackendRef: gatewayv1.BackendRef{
+								BackendObjectReference: gatewayv1.BackendObjectReference{
 									Name: testService,
-									Port: ptrTo(gatewayv1b1.PortNumber(80)),
+									Port: ptrTo(gatewayv1.PortNumber(80)),
 								},
 							},
-							Filters: []gatewayv1b1.HTTPRouteFilter{
+							Filters: []gatewayv1.HTTPRouteFilter{
 								{
-									Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-									URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-										Path: &gatewayv1b1.HTTPPathModifier{
-											Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+									Type: gatewayv1.HTTPRouteFilterURLRewrite,
+									URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+										Path: &gatewayv1.HTTPPathModifier{
+											Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 											ReplacePrefixMatch: ptrTo("foo"),
 										},
 									},
 								},
 								{
-									Type: gatewayv1b1.HTTPRouteFilterURLRewrite,
-									URLRewrite: &gatewayv1b1.HTTPURLRewriteFilter{
-										Path: &gatewayv1b1.HTTPPathModifier{
-											Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+									Type: gatewayv1.HTTPRouteFilterURLRewrite,
+									URLRewrite: &gatewayv1.HTTPURLRewriteFilter{
+										Path: &gatewayv1.HTTPPathModifier{
+											Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 											ReplacePrefixMatch: ptrTo("bar"),
 										},
 									},
@@ -1282,12 +1282,12 @@ func TestHTTPBackendRef(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{Rules: tc.rules},
+				Spec: gatewayv1.HTTPRouteSpec{Rules: tc.rules},
 			}
 			validateHTTPRoute(t, route, tc.wantErrors)
 		})
@@ -1298,47 +1298,47 @@ func TestHTTPPathModifier(t *testing.T) {
 	tests := []struct {
 		name         string
 		wantErrors   []string
-		pathModifier gatewayv1b1.HTTPPathModifier
+		pathModifier gatewayv1.HTTPPathModifier
 	}{
 		{
 			name: "valid ReplaceFullPath",
-			pathModifier: gatewayv1b1.HTTPPathModifier{
-				Type:            gatewayv1b1.FullPathHTTPPathModifier,
+			pathModifier: gatewayv1.HTTPPathModifier{
+				Type:            gatewayv1.FullPathHTTPPathModifier,
 				ReplaceFullPath: ptrTo("foo"),
 			},
 		},
 		{
 			name:       "replaceFullPath must be specified when type is set to 'ReplaceFullPath'",
 			wantErrors: []string{"replaceFullPath must be specified when type is set to 'ReplaceFullPath'"},
-			pathModifier: gatewayv1b1.HTTPPathModifier{
-				Type: gatewayv1b1.FullPathHTTPPathModifier,
+			pathModifier: gatewayv1.HTTPPathModifier{
+				Type: gatewayv1.FullPathHTTPPathModifier,
 			},
 		},
 		{
 			name:       "type must be 'ReplaceFullPath' when replaceFullPath is set",
 			wantErrors: []string{"type must be 'ReplaceFullPath' when replaceFullPath is set"},
-			pathModifier: gatewayv1b1.HTTPPathModifier{
+			pathModifier: gatewayv1.HTTPPathModifier{
 				ReplaceFullPath: ptrTo("foo"),
 			},
 		},
 		{
 			name: "valid ReplacePrefixMatch",
-			pathModifier: gatewayv1b1.HTTPPathModifier{
-				Type:               gatewayv1b1.PrefixMatchHTTPPathModifier,
+			pathModifier: gatewayv1.HTTPPathModifier{
+				Type:               gatewayv1.PrefixMatchHTTPPathModifier,
 				ReplacePrefixMatch: ptrTo("/foo"),
 			},
 		},
 		{
 			name:       "replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'",
 			wantErrors: []string{"replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'"},
-			pathModifier: gatewayv1b1.HTTPPathModifier{
-				Type: gatewayv1b1.PrefixMatchHTTPPathModifier,
+			pathModifier: gatewayv1.HTTPPathModifier{
+				Type: gatewayv1.PrefixMatchHTTPPathModifier,
 			},
 		},
 		{
 			name:       "type must be 'ReplacePrefixMatch' when replacePrefixMatch is set",
 			wantErrors: []string{"type must be 'ReplacePrefixMatch' when replacePrefixMatch is set"},
-			pathModifier: gatewayv1b1.HTTPPathModifier{
+			pathModifier: gatewayv1.HTTPPathModifier{
 				ReplacePrefixMatch: ptrTo("/foo"),
 			},
 		},
@@ -1346,18 +1346,18 @@ func TestHTTPPathModifier(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1b1.HTTPRoute{
+			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1b1.HTTPRouteSpec{
-					Rules: []gatewayv1b1.HTTPRouteRule{
+				Spec: gatewayv1.HTTPRouteSpec{
+					Rules: []gatewayv1.HTTPRouteRule{
 						{
-							Filters: []gatewayv1b1.HTTPRouteFilter{
+							Filters: []gatewayv1.HTTPRouteFilter{
 								{
-									Type: gatewayv1b1.HTTPRouteFilterRequestRedirect,
-									RequestRedirect: &gatewayv1b1.HTTPRequestRedirectFilter{
+									Type: gatewayv1.HTTPRouteFilterRequestRedirect,
+									RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
 										Path: &tc.pathModifier,
 									},
 								},
@@ -1371,7 +1371,7 @@ func TestHTTPPathModifier(t *testing.T) {
 	}
 }
 
-func validateHTTPRoute(t *testing.T, route *gatewayv1b1.HTTPRoute, wantErrors []string) {
+func validateHTTPRoute(t *testing.T, route *gatewayv1.HTTPRoute, wantErrors []string) {
 	t.Helper()
 
 	ctx := context.Background()

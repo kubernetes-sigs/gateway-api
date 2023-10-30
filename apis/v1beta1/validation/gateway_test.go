@@ -23,6 +23,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation/field"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -56,7 +57,7 @@ func TestValidateGateway(t *testing.T) {
 	}{
 		"tls config present with http protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
 			expectErrs: []field.Error{
@@ -70,7 +71,7 @@ func TestValidateGateway(t *testing.T) {
 		},
 		"tls config present with tcp protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.TCPProtocolType
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 			},
 			expectErrs: []field.Error{
@@ -84,7 +85,7 @@ func TestValidateGateway(t *testing.T) {
 		},
 		"tls config not set with https protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPSProtocolType
 			},
 			expectErrs: []field.Error{
 				{
@@ -97,7 +98,7 @@ func TestValidateGateway(t *testing.T) {
 		},
 		"tls config not set with tls protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TLSProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.TLSProtocolType
 			},
 			expectErrs: []field.Error{
 				{
@@ -110,19 +111,19 @@ func TestValidateGateway(t *testing.T) {
 		},
 		"tls config not set with http protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 			},
 			expectErrs: nil,
 		},
 		"tls config not set with tcp protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.TCPProtocolType
 			},
 			expectErrs: nil,
 		},
 		"tls config not set with udp protocol": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.UDPProtocolType
 			},
 			expectErrs: nil,
 		},
@@ -130,7 +131,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TCPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.TCPProtocolType
 			},
 			expectErrs: []field.Error{
 				{
@@ -145,7 +146,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
 				gw.Spec.Listeners[0].Hostname = &hostname
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.UDPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.UDPProtocolType
 			},
 			expectErrs: []field.Error{
 				{
@@ -159,8 +160,8 @@ func TestValidateGateway(t *testing.T) {
 		"certificatedRefs not set with https protocol and TLS terminate mode": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
-				tlsMode := gatewayv1b1.TLSModeType("Terminate")
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPSProtocolType
 				gw.Spec.Listeners[0].Hostname = &hostname
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 				gw.Spec.Listeners[0].TLS.Mode = &tlsMode
@@ -177,8 +178,8 @@ func TestValidateGateway(t *testing.T) {
 		"certificatedRefs not set with tls protocol and TLS terminate mode": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostname := gatewayv1b1.Hostname("foo.bar.com")
-				tlsMode := gatewayv1b1.TLSModeType("Terminate")
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.TLSProtocolType
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners[0].Protocol = gatewayv1.TLSProtocolType
 				gw.Spec.Listeners[0].Hostname = &hostname
 				gw.Spec.Listeners[0].TLS = &tlsConfig
 				gw.Spec.Listeners[0].TLS.Mode = &tlsMode
@@ -218,13 +219,13 @@ func TestValidateGateway(t *testing.T) {
 				hostnameFoo := gatewayv1b1.Hostname("foo.com")
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 				gw.Spec.Listeners[0].Port = 80
 				gw.Spec.Listeners = append(gw.Spec.Listeners,
 					gatewayv1b1.Listener{
 						Name:     "bar",
 						Hostname: &hostnameFoo,
-						Protocol: gatewayv1b1.HTTPProtocolType,
+						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     80,
 					},
 				)
@@ -240,12 +241,12 @@ func TestValidateGateway(t *testing.T) {
 		"combination of port and protocol are not unique for each listener when hostnames not set": {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				gw.Spec.Listeners[0].Name = "foo"
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 				gw.Spec.Listeners[0].Port = 80
 				gw.Spec.Listeners = append(gw.Spec.Listeners,
 					gatewayv1b1.Listener{
 						Name:     "bar",
-						Protocol: gatewayv1b1.HTTPProtocolType,
+						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     80,
 					},
 				)
@@ -263,13 +264,13 @@ func TestValidateGateway(t *testing.T) {
 				hostnameFoo := gatewayv1b1.Hostname("foo.com")
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 				gw.Spec.Listeners[0].Port = 80
 				gw.Spec.Listeners = append(gw.Spec.Listeners,
 					gatewayv1b1.Listener{
 						Name:     "bar",
 						Hostname: &hostnameFoo,
-						Protocol: gatewayv1b1.HTTPProtocolType,
+						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     8080,
 					},
 				)
@@ -282,13 +283,13 @@ func TestValidateGateway(t *testing.T) {
 				hostnameBar := gatewayv1b1.Hostname("bar.com")
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPProtocolType
 				gw.Spec.Listeners[0].Port = 80
 				gw.Spec.Listeners = append(gw.Spec.Listeners,
 					gatewayv1b1.Listener{
 						Name:     "bar",
 						Hostname: &hostnameBar,
-						Protocol: gatewayv1b1.HTTPProtocolType,
+						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     80,
 					},
 				)
@@ -299,7 +300,7 @@ func TestValidateGateway(t *testing.T) {
 			mutate: func(gw *gatewayv1b1.Gateway) {
 				hostnameFoo := gatewayv1b1.Hostname("foo.com")
 				tlsConfigFoo := tlsConfig
-				tlsModeFoo := gatewayv1b1.TLSModeType("Terminate")
+				tlsModeFoo := gatewayv1.TLSModeType("Terminate")
 				tlsConfigFoo.Mode = &tlsModeFoo
 				tlsConfigFoo.CertificateRefs = []gatewayv1b1.SecretObjectReference{
 					{
@@ -308,14 +309,14 @@ func TestValidateGateway(t *testing.T) {
 				}
 				gw.Spec.Listeners[0].Name = "foo"
 				gw.Spec.Listeners[0].Hostname = &hostnameFoo
-				gw.Spec.Listeners[0].Protocol = gatewayv1b1.HTTPSProtocolType
+				gw.Spec.Listeners[0].Protocol = gatewayv1.HTTPSProtocolType
 				gw.Spec.Listeners[0].Port = 8000
 				gw.Spec.Listeners[0].TLS = &tlsConfigFoo
 				gw.Spec.Listeners = append(gw.Spec.Listeners,
 					gatewayv1b1.Listener{
 						Name:     "bar",
 						Hostname: &hostnameFoo,
-						Protocol: gatewayv1b1.TLSProtocolType,
+						Protocol: gatewayv1.TLSProtocolType,
 						Port:     8000,
 						TLS:      &tlsConfigFoo,
 					},

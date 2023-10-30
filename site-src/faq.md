@@ -27,7 +27,7 @@
     A: There are a few mechanisms available
     for extending the API with implementation-specific capabilities:
 
-    * The [Policy Attachment](https://gateway-api.sigs.k8s.io/references/policy-attachment/)
+    * The [Policy Attachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/)
       model allows you to decorate Gateway API objects with implementation-specific CRDs. A
       policy or configuration object could match the Gateway API object either
       by name or by using an explicit object reference.

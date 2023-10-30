@@ -5,8 +5,8 @@ the specification and Custom Resource Definitions (CRDs).
 
 ## Status
 
-The latest supported version is `v1beta1` as released by the [v0.7.0
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.7.0) of
+The latest supported version is `v1beta1` as released by the [v0.8.1
+release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.8.1) of
 this project.
 
 This version of the API is has beta level support for the following resources:
@@ -60,6 +60,6 @@ Participation in the Kubernetes community is governed by the
 [cm]: https://gateway-api.sigs.k8s.io/contributing/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
 [getting-started]: https://gateway-api.sigs.k8s.io/v1alpha2/guides
-[spec]: https://gateway-api.sigs.k8s.io/v1alpha2/references/spec
+[spec]: https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model

@@ -23,25 +23,25 @@ import (
 	"testing"
 	"time"
 
-	gatewayv1b1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 func TestValidateGateway(t *testing.T) {
 	ctx := context.Background()
-	baseGateway := gatewayv1b1.Gateway{
+	baseGateway := gatewayv1.Gateway{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      "foo",
 			Namespace: metav1.NamespaceDefault,
 		},
-		Spec: gatewayv1b1.GatewaySpec{
+		Spec: gatewayv1.GatewaySpec{
 			GatewayClassName: "foo",
-			Listeners: []gatewayv1b1.Listener{
+			Listeners: []gatewayv1.Listener{
 				{
-					Name:     gatewayv1b1.SectionName("http"),
-					Protocol: gatewayv1b1.HTTPProtocolType,
-					Port:     gatewayv1b1.PortNumber(80),
+					Name:     gatewayv1.SectionName("http"),
+					Protocol: gatewayv1.HTTPProtocolType,
+					Port:     gatewayv1.PortNumber(80),
 				},
 			},
 		},
@@ -49,19 +49,19 @@ func TestValidateGateway(t *testing.T) {
 
 	testCases := []struct {
 		desc         string
-		mutate       func(gw *gatewayv1b1.Gateway)
-		mutateStatus func(gw *gatewayv1b1.Gateway)
+		mutate       func(gw *gatewayv1.Gateway)
+		mutateStatus func(gw *gatewayv1.Gateway)
 		wantErrors   []string
 	}{
 		{
 			desc: "tls config present with http protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("http"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
-						TLS:      &gatewayv1b1.GatewayTLSConfig{},
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.GatewayTLSConfig{},
 					},
 				}
 			},
@@ -69,13 +69,13 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "tls config present with tcp protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tcp"),
-						Protocol: gatewayv1b1.TCPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
-						TLS:      &gatewayv1b1.GatewayTLSConfig{},
+						Name:     gatewayv1.SectionName("tcp"),
+						Protocol: gatewayv1.TCPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
+						TLS:      &gatewayv1.GatewayTLSConfig{},
 					},
 				}
 			},
@@ -83,12 +83,12 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "tls config not set with https protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("https"),
-						Protocol: gatewayv1b1.HTTPSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8443),
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
 					},
 				}
 			},
@@ -96,12 +96,12 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "tls config not set with tls protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tls"),
-						Protocol: gatewayv1b1.TLSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8443),
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
 					},
 				}
 			},
@@ -109,49 +109,49 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "tls config not set with http protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("http"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 					},
 				}
 			},
 		},
 		{
 			desc: "tls config not set with tcp protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tcp"),
-						Protocol: gatewayv1b1.TCPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("tcp"),
+						Protocol: gatewayv1.TCPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 					},
 				}
 			},
 		},
 		{
 			desc: "tls config not set with udp protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("udp"),
-						Protocol: gatewayv1b1.UDPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("udp"),
+						Protocol: gatewayv1.UDPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 					},
 				}
 			},
 		},
 		{
 			desc: "hostname present with tcp protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostname := gatewayv1b1.Hostname("foo")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostname := gatewayv1.Hostname("foo")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tcp"),
-						Protocol: gatewayv1b1.TCPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("tcp"),
+						Protocol: gatewayv1.TCPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 						Hostname: &hostname,
 					},
 				}
@@ -160,13 +160,13 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "hostname present with udp protocol",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostname := gatewayv1b1.Hostname("foo")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostname := gatewayv1.Hostname("foo")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("udp"),
-						Protocol: gatewayv1b1.UDPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("udp"),
+						Protocol: gatewayv1.UDPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 						Hostname: &hostname,
 					},
 				}
@@ -175,14 +175,14 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "certificateRefs not set with https protocol and TLS terminate mode",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				tlsMode := gatewayv1b1.TLSModeType("Terminate")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("https"),
-						Protocol: gatewayv1b1.HTTPSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8443),
-						TLS: &gatewayv1b1.GatewayTLSConfig{
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
 							Mode: &tlsMode,
 						},
 					},
@@ -192,14 +192,14 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "certificateRefs not set with tls protocol and TLS terminate mode",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				tlsMode := gatewayv1b1.TLSModeType("Terminate")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tls"),
-						Protocol: gatewayv1b1.TLSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8443),
-						TLS: &gatewayv1b1.GatewayTLSConfig{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
 							Mode: &tlsMode,
 						},
 					},
@@ -209,17 +209,17 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "certificateRefs set with tls protocol and TLS terminate mode",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				tlsMode := gatewayv1b1.TLSModeType("Terminate")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("tls"),
-						Protocol: gatewayv1b1.TLSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8443),
-						TLS: &gatewayv1b1.GatewayTLSConfig{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
 							Mode: &tlsMode,
-							CertificateRefs: []gatewayv1b1.SecretObjectReference{
-								{Name: gatewayv1b1.ObjectName("foo")},
+							CertificateRefs: []gatewayv1.SecretObjectReference{
+								{Name: gatewayv1.ObjectName("foo")},
 							},
 						},
 					},
@@ -228,22 +228,22 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "names are not unique within the Gateway",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("http"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 					},
 					{
-						Name:     gatewayv1b1.SectionName("http"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8000),
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8000),
 					},
 					{
-						Name:     gatewayv1b1.SectionName("http"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("http"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 					},
 				}
 			},
@@ -251,41 +251,41 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "names are unique within the Gateway",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("http-1"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("http-1"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 					},
 					{
-						Name:     gatewayv1b1.SectionName("http-2"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8000),
+						Name:     gatewayv1.SectionName("http-2"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8000),
 					},
 					{
-						Name:     gatewayv1b1.SectionName("http-3"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8080),
+						Name:     gatewayv1.SectionName("http-3"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
 					},
 				}
 			},
 		},
 		{
 			desc: "combination of port, protocol, and hostname are not unique for each listener",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostnameFoo := gatewayv1b1.Hostname("foo.com")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostnameFoo := gatewayv1.Hostname("foo.com")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameFoo,
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameFoo,
 					},
 				}
@@ -294,17 +294,17 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "combination of port and protocol are not unique for each listener when hostnames not set",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 					},
 				}
 			},
@@ -312,19 +312,19 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "port is unique when protocol and hostname are the same",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostnameFoo := gatewayv1b1.Hostname("foo.com")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostnameFoo := gatewayv1.Hostname("foo.com")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameFoo,
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8000),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8000),
 						Hostname: &hostnameFoo,
 					},
 				}
@@ -332,20 +332,20 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "hostname is unique when protocol and port are the same",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostnameFoo := gatewayv1b1.Hostname("foo.com")
-				hostnameBar := gatewayv1b1.Hostname("bar.com")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostnameFoo := gatewayv1.Hostname("foo.com")
+				hostnameBar := gatewayv1.Hostname("bar.com")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameFoo,
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameBar,
 					},
 				}
@@ -353,42 +353,42 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "one omitted hostname is unique when protocol and port are the same",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostnameFoo := gatewayv1b1.Hostname("foo.com")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostnameFoo := gatewayv1.Hostname("foo.com")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 						Hostname: &hostnameFoo,
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(80),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
 					},
 				}
 			},
 		},
 		{
 			desc: "protocol is unique when port and hostname are the same",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				hostnameFoo := gatewayv1b1.Hostname("foo.com")
-				gw.Spec.Listeners = []gatewayv1b1.Listener{
+			mutate: func(gw *gatewayv1.Gateway) {
+				hostnameFoo := gatewayv1.Hostname("foo.com")
+				gw.Spec.Listeners = []gatewayv1.Listener{
 					{
-						Name:     gatewayv1b1.SectionName("foo"),
-						Protocol: gatewayv1b1.HTTPProtocolType,
-						Port:     gatewayv1b1.PortNumber(8000),
+						Name:     gatewayv1.SectionName("foo"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8000),
 						Hostname: &hostnameFoo,
 					},
 					{
-						Name:     gatewayv1b1.SectionName("bar"),
-						Protocol: gatewayv1b1.HTTPSProtocolType,
-						Port:     gatewayv1b1.PortNumber(8000),
+						Name:     gatewayv1.SectionName("bar"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(8000),
 						Hostname: &hostnameFoo,
-						TLS: &gatewayv1b1.GatewayTLSConfig{
-							CertificateRefs: []gatewayv1b1.SecretObjectReference{
-								{Name: gatewayv1b1.ObjectName("foo")},
+						TLS: &gatewayv1.GatewayTLSConfig{
+							CertificateRefs: []gatewayv1.SecretObjectReference{
+								{Name: gatewayv1.ObjectName("foo")},
 							},
 						},
 					},
@@ -397,18 +397,18 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "ip address and hostname in addresses are valid",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1111:2222:3333:4444::",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}
@@ -416,18 +416,18 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "ip address and hostname in addresses are invalid",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4:8080",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "*foo/bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "12:34:56::",
 					},
 				}
@@ -436,18 +436,18 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "ip address and hostname in status addresses are valid",
-			mutateStatus: func(gw *gatewayv1b1.Gateway) {
-				gw.Status.Addresses = []gatewayv1b1.GatewayStatusAddress{
+			mutateStatus: func(gw *gatewayv1.Gateway) {
+				gw.Status.Addresses = []gatewayv1.GatewayStatusAddress{
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1111:2222:3333:4444::",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}
@@ -455,18 +455,18 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "ip address and hostname in status addresses are invalid",
-			mutateStatus: func(gw *gatewayv1b1.Gateway) {
-				gw.Status.Addresses = []gatewayv1b1.GatewayStatusAddress{
+			mutateStatus: func(gw *gatewayv1.Gateway) {
+				gw.Status.Addresses = []gatewayv1.GatewayStatusAddress{
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4:8080",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "*foo/bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "12:34:56::",
 					},
 				}
@@ -475,22 +475,22 @@ func TestValidateGateway(t *testing.T) {
 		},
 		{
 			desc: "duplicate ip address or hostname",
-			mutate: func(gw *gatewayv1b1.Gateway) {
-				gw.Spec.Addresses = []gatewayv1b1.GatewayAddress{
+			mutate: func(gw *gatewayv1.Gateway) {
+				gw.Spec.Addresses = []gatewayv1.GatewayAddress{
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.IPAddressType),
+						Type:  ptrTo(gatewayv1.IPAddressType),
 						Value: "1.2.3.4",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 					{
-						Type:  ptrTo(gatewayv1b1.HostnameAddressType),
+						Type:  ptrTo(gatewayv1.HostnameAddressType),
 						Value: "foo.bar",
 					},
 				}

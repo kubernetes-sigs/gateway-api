@@ -24,7 +24,7 @@ import (
 
 // ValidateUDPRoute validates UDPRoute according to the Gateway API specification.
 // For additional details of the UDPRoute spec, refer to:
-// https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1alpha2.UDPRoute
+// https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1alpha2.UDPRoute
 func ValidateUDPRoute(route *gatewayv1a2.UDPRoute) field.ErrorList {
 	return validateUDPRouteSpec(&route.Spec, field.NewPath("spec"))
 }

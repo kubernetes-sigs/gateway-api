@@ -29,6 +29,9 @@ plugins:
         'guides/getting-started.md': 'guides/index.md'
         'contributing/community.md': 'contributing/index.md'
         'contributing/gamma.md': 'concepts/gamma.md#contributing'
+        'references/implementers-guide.md': 'reference/implementers-guide.md'
+        'references/spec.md': 'reference/spec.md'
+        'references/policy-attachment.md': 'reference/policy-attachment.md'
   - mermaid2
 markdown_extensions:
   - admonition
@@ -77,14 +80,15 @@ nav:
     - gRPC Routing: guides/grpc-routing.md
     - Migrating from Ingress: guides/migrating-from-ingress.md
   - Reference:
+    - Implementer's Guide: reference/implementers-guide.md
     - API Types:
         GatewayClass: api-types/gatewayclass.md
         Gateway: api-types/gateway.md
         HTTPRoute: api-types/httproute.md
         ReferenceGrant: api-types/referencegrant.md
         GRPCRoute: api-types/grpcroute.md
-    - API specification: references/spec.md
-    - Policy Attachment: references/policy-attachment.md
+    - API specification: reference/spec.md
+    - Policy Attachment: reference/policy-attachment.md
     - Enhancement Proposals:
       - Overview: geps/overview.md
       - Declined:
@@ -92,34 +96,36 @@ nav:
         - geps/gep-1282.md
       - Provisional:
         - geps/gep-1619.md
-        - geps/gep-1897.md
         - geps/gep-1867.md
         - geps/gep-2162.md
-      - Implementable:
-        - geps/gep-1742.md
+      # - Implementable:
+      #   -
       - Experimental:
+        - geps/gep-713.md
+        - geps/gep-957.md
+        - geps/gep-1016.md
         - geps/gep-1324.md
         - geps/gep-1426.md
-        - geps/gep-1686.md
-        - geps/gep-1748.md
         - geps/gep-1651.md
-        - geps/gep-1016.md
-        - geps/gep-957.md
-        - geps/gep-713.md
+        - geps/gep-1686.md
         - geps/gep-1709.md
+        - geps/gep-1742.md
+        - geps/gep-1748.md
+        - geps/gep-1897.md
+        - geps/gep-1911.md
         - geps/gep-2257.md
       - Standard:
-        - geps/gep-1364.md
-        - geps/gep-1323.md
-        - geps/gep-922.md
-        - geps/gep-917.md
-        - geps/gep-851.md
-        - geps/gep-820.md
-        - geps/gep-746.md
-        - geps/gep-726.md
-        - geps/gep-724.md
-        - geps/gep-718.md
         - geps/gep-709.md
+        - geps/gep-718.md
+        - geps/gep-724.md
+        - geps/gep-726.md
+        - geps/gep-746.md
+        - geps/gep-820.md
+        - geps/gep-851.md
+        - geps/gep-917.md
+        - geps/gep-922.md
+        - geps/gep-1323.md
+        - geps/gep-1364.md
       - Glossary: concepts/glossary.md
   - Contributing:
     - How to Get Involved: contributing/index.md
