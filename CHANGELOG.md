@@ -2,6 +2,8 @@
 
 ## Table of Contents
 
+- [v1.0.0][#v100]
+- [v1.0.0-rc2][#v100-rc2]
 - [v1.0.0-rc1][#v100-rc1]
 - [v0.8.1](#v081)
 - [v0.8.0](#v080)
@@ -32,7 +34,7 @@
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
 
-# v1.0
+# v1.0.0
 
 On behalf of Kubernetes SIG Network, we are pleased to announce the v1.0 release!
 This release marks a huge milestone for this project. Several key APIs are
