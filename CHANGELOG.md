@@ -41,14 +41,16 @@ This release marks a huge milestone for this project. Several key APIs are
 graduating to GA (generally available), while other significant features have
 been added to the Experimental channel.
 
-It's been four years since this project began, and we would never have got here
-without the support of a dedicated and active community. The maintainers would like
-to thanks _everyone_ who's contributed to Gateway API, whether in the form of
-commits to the repo, discussion, ideas, or general support. We literally couldn't have gotten this far without you.
+It's been four years since this project began, and we would never have gotten
+here without the support of a dedicated and active community. The maintainers
+would like to thanks _everyone_ who's contributed to Gateway API, whether in the
+form of commits to the repo, discussion, ideas, or general support. We literally
+couldn't have gotten this far without you.
 
 This project is nowhere near finished, as you can see from the large amount of
-features being added into the Experimental Channel. With such a big set of things still to do, contributors and contributions are
-more vital than ever. Please feel welcome to join our
+features being added into the Experimental Channel. With such a big set of
+things still to do, contributors and contributions are more vital than ever.
+Please feel welcome to join our
 [community!](https://gateway-api.sigs.k8s.io/contributing/)!
 
 ## Gateway, GatewayClass, and HTTPRoute are GA 🎉
