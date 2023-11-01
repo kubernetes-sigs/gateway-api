@@ -5,18 +5,16 @@ the specification and Custom Resource Definitions (CRDs).
 
 ## Status
 
-The latest supported version is `v1beta1` as released by the [v1.0.0
-release](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.0.0) of
-this project.
+The latest supported version is `v1` as released by
+the [v1.0.0 release][gh_release] of this project.
 
-This version of the API is has beta level support for the following resources:
+This version of the API is has GA level support for the following resources:
 
-- `v1beta1.GatewayClass`
-- `v1beta1.Gateway`
-- `v1beta1.HTTPRoute`
-- `v1beta1.ReferenceGrant`
+- `v1.GatewayClass`
+- `v1.Gateway`
+- `v1.HTTPRoute`
 
-For all other APIs we provide alpha level support.
+For all the other APIs and their support levels please consult [the spec][spec].
 
 ## Documentation
 
@@ -42,7 +40,7 @@ one of the guides.
 A complete API reference, please refer to:
 
 - [API reference][spec]
-- [Go docs for the package](https://pkg.go.dev/sigs.k8s.io/gateway-api/apis/v1alpha2)
+- [Go docs for the package][godoc]
 
 ## Contributing
 
@@ -59,7 +57,9 @@ Participation in the Kubernetes community is governed by the
 [sn]: https://github.com/kubernetes/community/tree/master/sig-network
 [cm]: https://gateway-api.sigs.k8s.io/contributing/community
 [slack]: https://kubernetes.slack.com/messages/sig-network-gateway-api
-[getting-started]: https://gateway-api.sigs.k8s.io/v1alpha2/guides
-[spec]: https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec
+[getting-started]: https://gateway-api.sigs.k8s.io/guides/
+[spec]: https://gateway-api.sigs.k8s.io/reference/spec/
 [concepts]: https://gateway-api.sigs.k8s.io/concepts/api-overview
 [security-model]: https://gateway-api.sigs.k8s.io/concepts/security-model
+[gh_release]: https://github.com/kubernetes-sigs/gateway-api/releases/tag/v1.0.0
+[godoc]: https://pkg.go.dev/sigs.k8s.io/gateway-api
