@@ -30,7 +30,7 @@ applied to a Service that accesses a backend, where the BackendTLSPolicy resides
 Service to which it is applied. The BackendTLSPolicy and the Service must reside in the same namespace in order
 to prevent the complications involved with sharing trust across namespace boundaries.  
 
-One can reuse the same BackendTLSPolicy for all the different Routes that might point to a referenced Service.
+All Gateway API Routes that point to a referenced Service should respect a configured BackendTLSPolicy.
 
 ## Spec
 
