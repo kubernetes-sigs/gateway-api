@@ -4,11 +4,6 @@
 
     The `BackendTLSPolicy` resource is Alpha and part of the Experimental Channel in `v1.0.0+`.
 
-!!! info "Experimental Channel"
-
-    The `BackendTLSPolicy` resource described below is currently only included in the "Experimental" channel
-    of Gateway API. For more information on release channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
-
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.
