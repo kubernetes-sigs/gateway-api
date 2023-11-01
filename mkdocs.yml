@@ -83,11 +83,13 @@ nav:
   - Reference:
     - Implementer's Guide: reference/implementers-guide.md
     - API Types:
-        GatewayClass: api-types/gatewayclass.md
-        Gateway: api-types/gateway.md
-        HTTPRoute: api-types/httproute.md
-        ReferenceGrant: api-types/referencegrant.md
-        GRPCRoute: api-types/grpcroute.md
+      - Gateway: api-types/gateway.md
+      - GatewayClass: api-types/gatewayclass.md
+      - GRPCRoute: api-types/grpcroute.md
+      - HTTPRoute: api-types/httproute.md
+      - Policy:
+        - BackendTLSPolicy: api-types/backendtlspolicy.md
+      - ReferenceGrant: api-types/referencegrant.md
     - API specification: reference/spec.md
     - Policy Attachment: reference/policy-attachment.md
     - Enhancement Proposals:

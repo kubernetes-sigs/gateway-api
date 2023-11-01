@@ -4,7 +4,6 @@
 
     The `BackendTLSPolicy` resource is Alpha and part of the Experimental Channel in `v1.0.0+`.
 
-
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.
 
@@ -18,7 +17,7 @@ While there are other API objects provided for TLS to be configured for **passth
 this API object allows users to specifically configure **backend** TLS termination.  For more information on TLS
 configuration in Gateway API, see [TLS Configuration](/guides/tls/).
 
-![Image showing three Termination Types](/images/tls-termination-types.png)
+![Image showing three TLS Termination Types](/images/tls-termination-types.png)
 
 BackendTLSPolicy is a Direct [PolicyAttachment](/reference/policy-attachment/) without defaults or overrides,
 applied to a Service that accesses a backend, where the BackendTLSPolicy resides in the same namespace as the
@@ -40,11 +39,27 @@ may be specified, but not both.
 - [WellKnownCACerts][wellKnownCACerts] - Specifies whether system CA certificates may be used in the TLS
 handshake between the Gateway and backend Pod.  Either CACertRefs or WellKnownCACerts may be specified, but not both.
 
-![Image showing BackendTLSPolicy objects](images/backendtlspolicy-api.png)
+The following chart outlines the object definitions and relationship:
+```mermaid
+flowchart LR
+    backendTLSPolicy[["<b>backendTLSPolicy</b> <hr><align=left>BackendTLSPolicySpec: spec<br>PolicyStatus: status</align>"]]
+    spec[["<b>spec</b><hr>PolicyTargetReferenceWithSectionName: targetRef <br> BackendTLSPolicyConfig: tls"]]
+    status[["<b>status</b><hr>[ ]PolicyAncestorStatus: ancestors"]]
+    tls[["<b>tls</b><hr>LocalObjectReference: caCertRefs<br>wellKnownCACertType: wellKnownCACerts<br>PreciseHostname: hostname"]]
+    ancestorStatus[["<b>ancestors</b><hr>AncestorRef: parentReference<br>GatewayController: controllerName<br>[]Condition: conditions"]]
+    targetRef[[<b>targetRef</b><hr>]]
+    service["<b>service</>"]
+    backendTLSPolicy -->spec
+    backendTLSPolicy -->status
+    spec -->targetRef & tls
+    status -->ancestorStatus
+    targetRef -->service
+    note[<em>choose only one<hr> caCertRef OR wellKnownCACerts</em>]
+    style note fill:#fff
+    tls -.- note
+```
 
 The following illustrates a BackendTLSPolicy that configures TLS for a Service serving a backend:
-![HTTPRoute with backendTLSPolicy](/images/httproute-with-backend-tls-policy.png)
-
 ```mermaid
 flowchart LR
     client(["client"])
@@ -71,7 +86,8 @@ required object reference that specifies a Service by its Name, Kind (Service), 
 TargetRef identifies the Service for which your HTTPRoute requires TLS.
 
 !!! info "Restrictions"
-- Cross-namespace certificate references are not allowed.
+
+    - Cross-namespace certificate references are not allowed.
 
 ### BackendTLSPolicyConfig
 
