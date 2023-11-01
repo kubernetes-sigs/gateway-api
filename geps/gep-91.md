@@ -14,7 +14,7 @@ This GEP proposes a way to validate the TLS certificate presented by the downstr
 - Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trusted anchor to validate the certificates presented by the client.
 
 ## Non-Goals
-- Define other fields that can be used to verify the client certificate such as the Cerificate Hash or Subject Alt Name. 
+- Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
 
 ## References
 

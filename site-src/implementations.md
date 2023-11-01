@@ -13,6 +13,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
+- [Easegress][30] (beta)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (beta)
@@ -73,6 +74,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [27]:#azure-application-gateway-for-containers
 [28]:#linkerd
 [29]:#tyk
+[30]:#easegress
 
 [gamma]:/concepts/gamma/
 
@@ -139,7 +141,7 @@ performance, and avoid the operational complexity of sidecars. Cilium also
 supports the sidecar proxy model, offering choice to users. As of [Cilium 1.14][cilium114blog],
 Cilium supports Gateway API, passing conformance for v0.7.1.
 
-Cilium is open source and is a CNCF incubation project.
+Cilium is open source and is a CNCF Graduates project.
 
 If you have questions about Cilium Service Mesh the #service-mesh channel on
 [Cilium Slack][cilium-slack] is a good place to start. For contributing to the development
@@ -175,6 +177,17 @@ _Some "extended" functionality is not implemented yet, [contributions welcome!][
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 [contour-contrib]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
+
+### Easegress
+
+[Easegress][easegress] is a Cloud Native traffic orchestration system.
+
+It can function as a sophisticated modern gateway, a robust distributed cluster, a flexible traffic orchestrator, or even an accessible service mesh.
+
+Easegress currently supports Gateway API `v1beta1` version of the specification by [GatewayController][easegress-gatewaycontroller].
+
+[easegress]:https://megaease.com/easegress/
+[easegress-gatewaycontroller]:https://github.com/megaease/easegress/blob/main/docs/04.Cloud-Native/4.2.Gateway-API.md
 
 ### Emissary-Ingress (Ambassador API Gateway)
 
@@ -252,7 +265,7 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 
 Consul service mesh works on any Kubernetes distribution, connects multiple clusters, and Consul CRDs provide a Kubernetes native workflow to manage traffic patterns and permissions in the mesh. [Consul API Gateway][consul-api-gw-doocs] supports Gateway API for managing North-South traffic.
 
-Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for current infomation on the supported version and features of the Gateway API.
+Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for current information on the supported version and features of the Gateway API.
 
 [consul]:https://consul.io
 [consul-api-gw-doocs]:https://www.consul.io/docs/api-gateway
@@ -336,7 +349,7 @@ The [LiteSpeed Ingress Controller](https://litespeedtech.com/products/litespeed-
 
 ### NGINX Gateway Fabric
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/nginxinc-nginx-gateway-fabric.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-NGINX Gateway Fabric-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/nginxinc-nginx-gateway-fabric.yaml)
 
 [NGINX Gateway Fabric][nginx-gateway-fabric] is an open-source project that provides an implementation of the Gateway API using [NGINX][nginx] as the data plane. The goal of this project is to implement the core Gateway API -- Gateway, GatewayClass, HTTPRoute, TCPRoute, TLSRoute, and UDPRoute -- to configure an HTTP or TCP/UDP load balancer, reverse-proxy, or API gateway for applications running on Kubernetes. NGINX Gateway Fabric is currently under development and supports a subset of the Gateway API.
 

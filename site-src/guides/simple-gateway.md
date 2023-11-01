@@ -12,7 +12,7 @@ match all HTTP traffic and directs it to a single Service named `foo-svc`.
 {% include 'standard/simple-gateway/gateway.yaml' %}
 ```
 
-The Gateway represents the instantation of a logical load balancer. It's
+The Gateway represents the instantiation of a logical load balancer. It's
 templated from a hypothetical `acme-lb` GatewayClass. The Gateway listens for
 HTTP traffic on port 80. This particular GatewayClass automatically assigns an
 IP address which will be shown in the `Gateway.status` after it has been

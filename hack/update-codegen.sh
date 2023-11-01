@@ -26,7 +26,7 @@ readonly GOMODCACHE="$(go env GOMODCACHE)"
 readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
-readonly MIN_REQUIRED_GO_VER="1.20"
+readonly MIN_REQUIRED_GO_VER="$(go list -m -f '{{.GoVersion}}')"
 
 function go_version_matches {
   go version | perl -ne "exit 1 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 < ${MIN_REQUIRED_GO_VER})"
