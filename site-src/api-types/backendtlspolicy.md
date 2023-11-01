@@ -66,7 +66,7 @@ flowchart LR
 
 ### Targeting backends
 
-A BackendTLSPolicy targets a backend Pod (or set of Pods) via a`TargetRef` to a Service.  This TargetRef is a
+A BackendTLSPolicy targets a backend Pod (or set of Pods) via a TargetRef to a Service.  This TargetRef is a
 required object reference that specifies a Service by its Name, Kind (Service), and optionally its Namespace and Group.
 TargetRef identifies the Service for which your HTTPRoute requires TLS.
 
