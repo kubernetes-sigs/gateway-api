@@ -156,13 +156,13 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/projectcontour-contour.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/projectcontour-contour.yaml)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.26.0][contour-release] implements Gateway API v0.8.0, supporting the v1alpha2 and v1beta1 API versions.
+Contour [v1.27.0][contour-release] implements Gateway API v0.8.1, supporting the v1alpha2 and v1beta1 API versions.
 All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus TLSRoute, TCPRoute, and GRPCRoute, are supported.
-Contour's implementation passes all core and most extended Gateway API conformance tests included in the v0.8.0 release.
+Contour's implementation passes all core and most extended Gateway API conformance tests included in the v0.8.1 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
@@ -171,9 +171,9 @@ For help and support with Contour's implementation, [create an issue][contour-is
 _Some "extended" functionality is not implemented yet, [contributions welcome!][contour-contrib]._
 
 [contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.26.0
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.27.0
 [contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
-[contour-guide]:https://projectcontour.io/docs/1.26/guides/gateway-api/
+[contour-guide]:https://projectcontour.io/docs/1.27/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 [contour-contrib]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
