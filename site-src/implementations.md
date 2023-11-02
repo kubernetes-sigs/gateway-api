@@ -273,13 +273,13 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.7.1-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.7.1/istio.io-istio.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/istio-istio.yaml)
 
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
-A light-weight minimal install of Istio can be used to provide a Beta-quality
+A minimal install of Istio can be used to provide a fully compliant
 implementation of the Kubernetes Gateway API for cluster ingress traffic
-control. For service mesh users, Istio 1.16 and later support the [GAMMA
+control. For service mesh users, Istio also fully supports the [GAMMA
 initiative's][gamma] experimental Gateway API [support for east-west traffic
 management][gamma] within the mesh.
 
