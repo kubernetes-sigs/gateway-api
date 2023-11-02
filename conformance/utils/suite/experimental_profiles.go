@@ -67,9 +67,7 @@ var (
 			SupportReferenceGrant,
 			SupportHTTPRoute,
 		),
-		ExtendedFeatures: sets.New[SupportedFeature]().
-			Insert(HTTPRouteExtendedFeatures.UnsortedList()...).
-			Insert(GatewayExtendedFeatures.UnsortedList()...),
+		ExtendedFeatures: HTTPRouteExtendedFeatures,
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS
@@ -81,7 +79,6 @@ var (
 			SupportReferenceGrant,
 			SupportTLSRoute,
 		),
-		ExtendedFeatures: GatewayExtendedFeatures,
 	}
 
 	// MeshConformanceProfile is a ConformanceProfile that covers testing
