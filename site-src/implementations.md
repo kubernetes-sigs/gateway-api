@@ -201,7 +201,7 @@ See [here][emissary-gateway-api] for more details on using the Gateway API with 
 
 ### Envoy Gateway
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-EnvoyGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/envoy-gateway.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-EnvoyGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/envoy-gateway.yaml)
 
 [Envoy Gateway][eg-home] is an [Envoy][envoy-org] subproject for managing Envoy-based application gateways. The supported
 APIs and fields of the Gateway API are outlined [here][eg-supported].
@@ -210,8 +210,8 @@ few simple steps.
 
 [eg-home]:https://gateway.envoyproxy.io/
 [envoy-org]:https://github.com/envoyproxy
-[eg-supported]: https://gateway.envoyproxy.io/v0.5.0/user/gatewayapi-support.html
-[eg-quickstart]:https://gateway.envoyproxy.io/v0.5.0/user/quickstart.html
+[eg-supported]: https://gateway.envoyproxy.io/v0.6.0/user/gatewayapi-support
+[eg-quickstart]:https://gateway.envoyproxy.io/v0.6.0/user/quickstart
 
 ### Flomesh Service Mesh (FSM)
 
