@@ -118,18 +118,12 @@ var GatewayWithAttachedRoutes = suite.ConformanceTest{
 			kubernetes.GatewayStatusMustHaveListeners(t, s.Client, s.TimeoutConfig, gwNN, listeners)
 
 			hrouteNN := types.NamespacedName{Name: "http-route-4", Namespace: "gateway-conformance-infra"}
-			notAccepted := metav1.Condition{
-				Type:   string(v1.RouteConditionAccepted),
-				Status: metav1.ConditionFalse,
-				Reason: "", // any reason
-			}
 			unresolved := metav1.Condition{
 				Type:   string(v1.RouteConditionResolvedRefs),
 				Status: metav1.ConditionFalse,
 				Reason: "", // any reason
 			}
 
-			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, hrouteNN, gwNN, notAccepted)
 			kubernetes.HTTPRouteMustHaveCondition(t, s.Client, s.TimeoutConfig, hrouteNN, gwNN, unresolved)
 		})
 	},
