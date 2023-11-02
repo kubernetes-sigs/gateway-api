@@ -1,0 +1,48 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-11-02T01:45:03Z"
+gatewayAPIVersion: v1.0.0
+implementation:
+  contact:
+  - https://github.com/envoyproxy/gateway/blob/main/GOVERNANCE.md
+  organization: envoyproxy
+  project: envoy-gateway
+  url: https://github.com/envoyproxy/gateway
+  version: v0.6.0
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 10
+      Skipped: 0
+    summary: ""
+  name: TLS
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRouteResponseHeaderModification
+    - HTTPRoutePortRedirect
+    - HTTPRouteBackendTimeout
+    - HTTPRouteMethodMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteSchemeRedirect
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRoutePathRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRewrite
+  name: HTTP
