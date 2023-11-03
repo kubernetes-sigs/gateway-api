@@ -87,7 +87,9 @@ var (
 		Name: MeshConformanceProfileName,
 		CoreFeatures: sets.New(
 			SupportMesh,
+			SupportHTTPRoute,
 		),
+		ExtendedFeatures: HTTPRouteExtendedFeatures,
 	}
 )
 
