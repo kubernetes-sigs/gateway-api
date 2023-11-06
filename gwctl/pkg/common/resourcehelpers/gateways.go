@@ -22,6 +22,7 @@ import (
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
