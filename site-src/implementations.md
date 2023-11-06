@@ -17,7 +17,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (beta)
-- [Gloo Edge 2.0][5] (work in progress)
+- [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
