@@ -17,7 +17,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (beta)
-- [Gloo Edge 2.0][5] (work in progress)
+- [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
 - [HashiCorp Consul][8]
@@ -49,7 +49,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [2]:#apisix
 [3]:#contour
 [4]:#emissary-ingress-ambassador-api-gateway
-[5]:#gloo-edge
+[5]:#gloo-gateway
 [6]:#google-kubernetes-engine
 [7]:#haproxy-ingress
 [8]:#hashicorp-consul
@@ -226,11 +226,14 @@ FSM support of Gateway API is built on top [Flomesh Gateway API](fgw) and it cur
 [flomesh]:https://flomesh.io
 [fgw]:https://github.com/flomesh-io/fgw
 
-### Gloo Edge
+### Gloo Gateway
 
-Gloo Edge 2.0 is an Istio-native, fully-featured Envoy based API gateway that brings [Gloo Edge][glooedge] functionality to Istio. The [Solo.io][solo] team is actively working towards an implementation of the Gateway API.
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-GlooGateway-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/gloo-gateway.yaml)
 
-[glooedge]:https://docs.solo.io/gloo-edge/
+[Gloo Gateway][gloogateway] by [Solo.io][solo] is a feature-rich, Kubernetes-native ingress controller and next-generation API gateway.
+Gloo Gateway 2.0 brings the full power and community support of Gateway API to its existing control-plane implementation.
+
+[gloogateway]:https://docs.solo.io/gloo-gateway/v2
 [solo]:https://www.solo.io
 
 ### Google Kubernetes Engine

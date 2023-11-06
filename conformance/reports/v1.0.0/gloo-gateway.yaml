@@ -1,0 +1,42 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2023-11-06T16:11:11Z"
+gatewayAPIVersion: v1.0.0
+implementation:
+  contact:
+  - eitan@solo.io
+  - yuval@solo.io
+  organization: solo.io
+  project: gloo-gateway
+  url: github.com/solo-io/gloo
+  version: v2.0.0-beta1
+kind: ConformanceReport
+profiles:
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 6
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRoutePortRedirect
+    - HTTPRouteSchemeRedirect
+    - HTTPRoutePathRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteMethodMatching
+    - HTTPRouteResponseHeaderModification
+    unsupportedFeatures:
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestTimeout
+    - HTTPRouteHostRewrite
+    - HTTPRoutePathRewrite
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteBackendTimeout
+  name: HTTP
