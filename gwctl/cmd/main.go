@@ -18,7 +18,6 @@ package main
 
 import (
 	"context"
-	_ "embed"
 	"flag"
 	"os"
 	"path"

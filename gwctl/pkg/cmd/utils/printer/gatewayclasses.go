@@ -18,7 +18,6 @@ package printer
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 	"io"
 

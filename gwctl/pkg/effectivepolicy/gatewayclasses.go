@@ -18,7 +18,6 @@ package effectivepolicy
 
 import (
 	"context"
-	_ "embed"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 

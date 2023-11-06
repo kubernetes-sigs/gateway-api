@@ -17,7 +17,6 @@ limitations under the License.
 package printer
 
 import (
-	_ "embed"
 	"fmt"
 	"io"
 	"sort"

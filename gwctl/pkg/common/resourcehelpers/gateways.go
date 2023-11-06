@@ -18,7 +18,6 @@ package resourcehelpers
 
 import (
 	"context"
-	_ "embed"
 
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
