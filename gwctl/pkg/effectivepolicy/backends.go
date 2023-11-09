@@ -19,12 +19,12 @@ package effectivepolicy
 import (
 	"context"
 
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
 type backends struct {

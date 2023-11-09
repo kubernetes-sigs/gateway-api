@@ -18,15 +18,14 @@ package main
 
 import (
 	"context"
-	_ "embed"
 	"flag"
 	"os"
 	"path"
 
-	"k8s.io/klog/v2"
-
 	"github.com/spf13/cobra"
 	cobraflag "github.com/spf13/pflag"
+	"k8s.io/klog/v2"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/describe"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/get"
 	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"

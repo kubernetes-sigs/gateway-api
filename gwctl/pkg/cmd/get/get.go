@@ -22,6 +22,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils/printer"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"

@@ -26,6 +26,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/utils/strings/slices"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 

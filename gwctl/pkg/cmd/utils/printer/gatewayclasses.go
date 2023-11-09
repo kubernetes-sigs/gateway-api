@@ -18,15 +18,14 @@ package printer
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 	"io"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/yaml"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 )
 
 type GatewayClassesPrinter struct {

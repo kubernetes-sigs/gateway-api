@@ -18,7 +18,6 @@ package effectivepolicy
 
 import (
 	"context"
-	_ "embed"
 	"fmt"
 
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"

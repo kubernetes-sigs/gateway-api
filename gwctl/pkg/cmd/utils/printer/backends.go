@@ -21,11 +21,11 @@ import (
 	"fmt"
 	"io"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"sigs.k8s.io/yaml"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 )
 
 type BackendsPrinter struct {
