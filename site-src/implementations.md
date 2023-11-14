@@ -25,7 +25,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [Kong][10] (GA)
 - [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
-- [NGINX Gateway Fabric][12]
+- [NGINX Gateway Fabric][12] (GA)
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
