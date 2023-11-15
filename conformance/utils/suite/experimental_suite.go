@@ -109,39 +109,37 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 	// conformance profile or at least some specific features they support.
 	if s.EnableAllSupportedFeatures {
 		s.SupportedFeatures = AllFeatures
-	} else {
-		if s.SupportedFeatures == nil {
-			s.SupportedFeatures = sets.New[SupportedFeature]()
-		}
+	} else if s.SupportedFeatures == nil {
+		s.SupportedFeatures = sets.New[SupportedFeature]()
+	}
 
-		for _, conformanceProfileName := range s.ConformanceProfiles.UnsortedList() {
-			conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
-			if err != nil {
-				return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
+	for _, conformanceProfileName := range s.ConformanceProfiles.UnsortedList() {
+		conformanceProfile, err := getConformanceProfileForName(conformanceProfileName)
+		if err != nil {
+			return nil, fmt.Errorf("failed to retrieve conformance profile: %w", err)
+		}
+		// the use of a conformance profile implicitly enables any features of
+		// that profile which are supported at a Core level of support.
+		for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
+			if !s.SupportedFeatures.Has(f) {
+				s.SupportedFeatures.Insert(f)
 			}
-			// the use of a conformance profile implicitly enables any features of
-			// that profile which are supported at a Core level of support.
-			for _, f := range conformanceProfile.CoreFeatures.UnsortedList() {
-				if !s.SupportedFeatures.Has(f) {
-					s.SupportedFeatures.Insert(f)
+		}
+		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
+			if s.SupportedFeatures.Has(f) {
+				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
+					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
 				}
+				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
+			} else {
+				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+				}
+				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}
-			for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
-				if s.SupportedFeatures.Has(f) {
-					if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
-						suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
-					}
-					suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
-				} else {
-					if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
-						suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
-					}
-					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
-				}
-				// Add Exempt Features into unsupported features list
-				if s.ExemptFeatures.Has(f) {
-					suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
-				}
+			// Add Exempt Features into unsupported features list
+			if s.ExemptFeatures.Has(f) {
+				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}
 		}
 	}
