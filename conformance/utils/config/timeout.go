@@ -60,7 +60,7 @@ type TimeoutConfig struct {
 	// Max value for conformant implementation: None
 	HTTPRouteMustHaveCondition time.Duration
 
-	// TLSRouteMustHaveCondition represents the maximum time for an TLSRoute to have the supplied Condition.
+	// TLSRouteMustHaveCondition represents the maximum time for a TLSRoute to have the supplied Condition.
 	// Max value for conformant implementation: None
 	TLSRouteMustHaveCondition time.Duration
 

@@ -105,7 +105,7 @@ var conformanceProfileMap = map[ConformanceProfileName]ConformanceProfile{
 	MeshConformanceProfileName: MeshConformanceProfile,
 }
 
-// getConformanceProfileForName retrieves a known ConformanceProfile by it's simple
+// getConformanceProfileForName retrieves a known ConformanceProfile by its simple
 // human readable ConformanceProfileName.
 func getConformanceProfileForName(name ConformanceProfileName) (ConformanceProfile, error) {
 	profile, ok := conformanceProfileMap[name]
