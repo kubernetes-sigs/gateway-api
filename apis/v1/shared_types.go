@@ -334,9 +334,10 @@ const (
 	RouteReasonNoMatchingListenerHostname RouteConditionReason = "NoMatchingListenerHostname"
 
 	// This reason is used with the "Accepted" condition when there are
-	// no matching Parents. In the case of Gateways, this can occur when
-	// a Route ParentRef specifies a Port and/or SectionName that does not
-	// match any Listeners in the Gateway.
+	// no matching Parents. In the case of Gateways, this can occur when:
+	// * no referenced parent exists
+	// * a route ParentRef specifies a Port and/or SectionName that does not
+	//   match any Listeners in the Gateway.
 	RouteReasonNoMatchingParent RouteConditionReason = "NoMatchingParent"
 
 	// This reason is used with the "Accepted" condition when a value for an Enum
