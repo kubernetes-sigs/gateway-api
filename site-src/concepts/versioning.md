@@ -2,12 +2,11 @@
 
 ## Overview
 Each new release of Gateway API is defined with a "bundle version" that
-represents the Git tag of a release, such as v0.8.0. This contains the
+represents the Git tag of a release, such as v1.0.0. This contains the
 following:
 
 * API Types (Go bindings for the resources)
 * CRDs (Kubernetes definitions of the resources)
-* Validating Webhook (Will be deprecated in v1.0 release)
 
 ### Release Channels
 Release channels are used to indicate feature stability within Gateway API. All

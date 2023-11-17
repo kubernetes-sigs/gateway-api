@@ -29,9 +29,9 @@ for you.
 
 ## Installing Gateway API
 
-A Gateway API bundle represents the set of CRDs and validating webhook
-associated with a version of Gateway API. Each release includes two
-channels with different levels of stability:
+A Gateway API bundle represents the set of CRDs associated with a version of
+Gateway API. Each release includes two channels with different levels of
+stability:
 
 ### Install Standard Channel
 
@@ -64,8 +64,8 @@ kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/downloa
 ### Cleanup
 
 After you're done, you can clean up after yourself by uninstalling the Gateway
-API CRDs and webhook by replacing "apply" with "delete" in the commands above.
-If these resources are in-use or if they were installed by a Gateway controller,
-then do not uninstall them. This will uninstall the Gateway API resources for
-the entire cluster. Do not do this if they might be in-use by someone else as
-this will break anything using these resources.
+API CRDs by replacing "apply" with "delete" in the commands above. If these
+resources are in-use or if they were installed by a Gateway controller, then do
+not uninstall them. This will uninstall the Gateway API resources for the entire
+cluster. Do not do this if they might be in-use by someone else as this will
+break anything using these resources.

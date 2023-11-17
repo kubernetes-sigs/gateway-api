@@ -5,12 +5,11 @@ labels: kind/bug
 
 ---
 <!--
-Thank you for your interest in Gateway API! Please note that bug reports 
+Thank you for your interest in Gateway API! Please note that bug reports
 here should only be used for bugs with the API itself, such as:
 
 - Incomplete or inaccurate validation
 - Problems with the API specification
-- Unexpected errors with the validating webhook
 - Flaws in conformance tests
 
 Bugs that don't fit into one of the above categories should likely be filed
