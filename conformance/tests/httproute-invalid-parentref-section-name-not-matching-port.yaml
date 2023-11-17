@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
-  name: gateway-with-one-not-matching-port-and-section-name-route
+  name: gw-with-one-section-name-not-matching-port-route
   namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
@@ -22,7 +22,7 @@ metadata:
   namespace: gateway-conformance-infra
 spec:
   parentRefs:
-  - name: gateway-with-one-not-matching-port-and-section-name-route
+  - name: gw-with-one-section-name-not-matching-port-route
     namespace: gateway-conformance-infra
     sectionName: http
     # mismatched port value here (81 does not match gateway http listener's port) triggers NoMatchingParent reason
