@@ -13,7 +13,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (beta)
-- [Easegress][30] (beta)
+- [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (beta)
 - [Flomesh Service Mesh][17] (beta)
