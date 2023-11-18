@@ -21,13 +21,16 @@ package flags
 
 import (
 	"flag"
+	"fmt"
+	"k8s.io/apimachinery/pkg/util/sets"
+	"sigs.k8s.io/gateway-api/conformance/utils/suite"
 )
 
 var (
 	GatewayClassName           = flag.String("gateway-class", "gateway-conformance", "Name of GatewayClass to use for tests")
 	ShowDebug                  = flag.Bool("debug", false, "Whether to print debug logs")
 	CleanupBaseResources       = flag.Bool("cleanup-base-resources", true, "Whether to cleanup base test resources after the run")
-	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites")
+	SupportedFeatures          = flag.String("supported-features", "", "Supported features included in conformance tests suites, including "+fmt.Sprint(sets.List(suite.AllFeatures)))
 	SkipTests                  = flag.String("skip-tests", "", "Comma-separated list of tests to skip")
 	RunTest                    = flag.String("run-test", "", "Name of a single test to run, instead of the whole suite")
 	ExemptFeatures             = flag.String("exempt-features", "", "Exempt Features excluded from conformance tests suites")
