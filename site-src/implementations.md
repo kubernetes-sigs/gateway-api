@@ -7,9 +7,9 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1] (public preview)
-- [AKO][31] (tech preview)
 - [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Apache APISIX][2] (beta)
+- [Avi Kubernetes Operator][31] (tech preview)
 - [Azure Application Gateway for Containers][27] (preview)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
@@ -76,7 +76,7 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 [28]:#linkerd
 [29]:#tyk
 [30]:#easegress
-[31]:#ako
+[31]:#avi-kubernetes-operator
 
 [gamma]:/concepts/gamma/
 
@@ -114,7 +114,7 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 Starting with AKO version [v1.11.1], Gateway API version v0.6.2 is supported. It implements v1beta1 version of Gateway API specification supporting GatewayClass, Gateway and HTTPRoute objects. AKO Gateway API is currently in Tech Preview.
 
-Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes Operator Gateway Api][ako-gw]
+Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes Operator Gateway Api][ako-gw].
 
 [ako]:https://docs.vmware.com/en/VMware-NSX-Advanced-Load-Balancer/1.11/Avi-Kubernetes-Operator-Guide/GUID-1E86BD1A-899F-40C2-A931-29310B2B340F.html
 [ako-gw]:https://docs.vmware.com/en/VMware-NSX-Advanced-Load-Balancer/1.11/Avi-Kubernetes-Operator-Guide/GUID-84BD68AB-B96F-425C-8323-3A249D6AC8B2.html
