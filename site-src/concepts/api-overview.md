@@ -209,8 +209,9 @@ The following is required for a Route to be attached to a Gateway:
 
 A Route can reference a Gateway by specifying the namespace (optional if the
 Route and the Gateway are in the same namespace) and name of the Gateway in
-a `parentRef`. A Route can further select a subset of listeners under the
-Gateway using the following fields in `parentRef`:
+a `parentRef`. By default, a Route will attach to all listeners of a Gateway,
+however it can restrict the selection to a subset of listeners using the
+following fields in `parentRef`:
 
 1. **SectionName** When `sectionName` is set, the Route selects the listener
    with the specified name.
