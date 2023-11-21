@@ -35,11 +35,11 @@ channels with different levels of stability:
 
 ### Install Standard Channel
 
-The standard release channel includes all resources that have graduated to beta,
-including GatewayClass, Gateway, ReferenceGrant, and HTTPRoute. To install this
-channel, run the following kubectl command:
+The standard release channel includes all resources that have graduated to GA or
+beta, including GatewayClass, Gateway, HTTPRoute, and ReferenceGrant. To install
+this channel, run the following kubectl command:
 
-```
+```bash
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/standard-install.yaml
 ```
 
@@ -57,11 +57,12 @@ documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/).
 
 To install the experimental channel, run the following kubectl command:
 
-```
+```bash
 kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.0.0/experimental-install.yaml
 ```
 
 ### Cleanup
+
 After you're done, you can clean up after yourself by uninstalling the Gateway
 API CRDs and webhook by replacing "apply" with "delete" in the commands above.
 If these resources are in-use or if they were installed by a Gateway controller,
