@@ -114,7 +114,7 @@ APISIX currently supports Gateway API `v1beta1` version of the specification for
 
 Starting with AKO version [v1.11.1], Gateway API version v0.6.2 is supported. It implements v1beta1 version of Gateway API specification supporting GatewayClass, Gateway and HTTPRoute objects. AKO Gateway API is currently in Tech Preview.
 
-Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes Operator Gateway Api][ako-gw].
+Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes Operator Gateway API][ako-gw].
 
 [ako]:https://docs.vmware.com/en/VMware-NSX-Advanced-Load-Balancer/1.11/Avi-Kubernetes-Operator-Guide/GUID-1E86BD1A-899F-40C2-A931-29310B2B340F.html
 [ako-gw]:https://docs.vmware.com/en/VMware-NSX-Advanced-Load-Balancer/1.11/Avi-Kubernetes-Operator-Guide/GUID-84BD68AB-B96F-425C-8323-3A249D6AC8B2.html
