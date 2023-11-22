@@ -12,7 +12,7 @@ are implemented by many vendors and have broad industry support.
 [GatewayClass]: /api-types/gatewayclass
 [Gateway]: /api-types/gateway
 [HTTPRoute]: /api-types/httproute
-[TCPRoute]: /api-types/tcproute
+[TCPRoute]: /concepts/api-overview/#tcproute-and-udproute
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
 
 ![Gateway API Model](./images/api-model.png)
