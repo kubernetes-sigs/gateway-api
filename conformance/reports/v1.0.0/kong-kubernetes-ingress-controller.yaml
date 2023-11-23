@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2023-11-06T09:41:05Z"
+date: "2023-11-23T09:42:40Z"
 gatewayAPIVersion: v1.0.0
 implementation:
   contact:
@@ -7,7 +7,7 @@ implementation:
   organization: Kong
   project: kubernetes-ingress-controller
   url: github.com/kong/kubernetes-ingress-controller
-  version: v3.0.0
+  version: v3.0.1
 kind: ConformanceReport
 profiles:
   - core:
@@ -25,17 +25,17 @@ profiles:
         Skipped: 0
       summary: ""
       supportedFeatures:
-        - HTTPRouteQueryParamMatching
-        - HTTPRouteResponseHeaderModification
         - HTTPRouteMethodMatching
+        - HTTPRouteResponseHeaderModification
+        - HTTPRouteQueryParamMatching
       unsupportedFeatures:
-        - HTTPRouteBackendTimeout
-        - HTTPRoutePathRewrite
-        - HTTPRouteRequestMirror
-        - HTTPRouteRequestMultipleMirrors
-        - HTTPRouteRequestTimeout
         - HTTPRoutePortRedirect
+        - HTTPRouteHostRewrite
+        - HTTPRouteRequestTimeout
         - HTTPRouteSchemeRedirect
         - HTTPRoutePathRedirect
-        - HTTPRouteHostRewrite
+        - HTTPRoutePathRewrite
+        - HTTPRouteRequestMultipleMirrors
+        - HTTPRouteBackendTimeout
+        - HTTPRouteRequestMirror
     name: HTTP
