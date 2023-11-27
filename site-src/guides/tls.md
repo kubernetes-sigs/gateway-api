@@ -30,6 +30,7 @@ For downstream connections, depending on the Listener Protocol, different TLS mo
 | TLS               | Passthrough | TLSRoute            |
 | TLS               | Terminate   | TCPRoute            |
 | HTTPS             | Terminate   | HTTPRoute           |
+| GRPC              | Terminate   | GRPCRoute           |
 
 Please note that in case of `Passthrough` TLS mode, no TLS settings take
 effect as the TLS session from the client is NOT terminated at the Gateway, but rather
