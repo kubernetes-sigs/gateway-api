@@ -91,7 +91,7 @@ Service.
 [GatewayClass]: /api-types/gatewayclass
 [Gateway]: /api-types/gateway
 [HTTPRoute]: /api-types/httproute
-[TCPRoute]: /api-types/tcproute
+[TCPRoute]: /concepts/api-overview/#tcproute-and-udproute
 [Service]: https://kubernetes.io/docs/concepts/services-networking/service/
 [service-mesh]:/concepts/glossary#service-mesh
 [service-facets]:/concepts/service-facets
