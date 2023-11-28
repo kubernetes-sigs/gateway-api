@@ -13,6 +13,7 @@ This version of the API is has GA level support for the following resources:
 - `v1.GatewayClass`
 - `v1.Gateway`
 - `v1.HTTPRoute`
+- `v1.ReferenceGrant`
 
 For all the other APIs and their support levels please consult [the spec][spec].
 
