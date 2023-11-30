@@ -133,6 +133,9 @@ const (
 
 	// This option indicates support for HTTPRoute backendRequest timeouts (extended conformance).
 	SupportHTTPRouteBackendTimeout SupportedFeature = "HTTPRouteBackendTimeout"
+
+	// This option indicates support for HTTPRoute parentRef port (extended conformance).
+	SupportHTTPRouteParentRefPort SupportedFeature = "HTTPRouteParentRefPort"
 )
 
 // HTTPRouteExtendedFeatures includes all the supported features for HTTPRoute
@@ -151,6 +154,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteRequestMultipleMirrors,
 	SupportHTTPRouteRequestTimeout,
 	SupportHTTPRouteBackendTimeout,
+	SupportHTTPRouteParentRefPort,
 )
 
 // -----------------------------------------------------------------------------

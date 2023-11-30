@@ -37,6 +37,7 @@ var HTTPRouteInvalidParentRefSectionNameNotMatchingPort = suite.ConformanceTest{
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteParentRefPort,
 	},
 	Manifests: []string{"tests/httproute-invalid-parentref-section-name-not-matching-port.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
