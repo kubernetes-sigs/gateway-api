@@ -409,9 +409,8 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 
 		port = strconv.FormatInt(int64(gw.Spec.Listeners[0].Port), 10)
 
-		// TODO: Support more than IPAddress
 		for _, address := range gw.Status.Addresses {
-			if address.Type != nil && *address.Type == gatewayv1.IPAddressType {
+			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
 				ipAddr = address.Value
 				return true, nil
 			}
