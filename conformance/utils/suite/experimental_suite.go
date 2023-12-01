@@ -19,6 +19,7 @@ package suite
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -255,10 +256,19 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 	}
 	defer suite.lock.RUnlock()
 
+	testNames := make([]string, 0, len(suite.results))
+	for tN := range suite.results {
+		testNames = append(testNames, tN)
+	}
+	sort.Strings(testNames)
 	profileReports := newReports()
-	for _, testResult := range suite.results {
-		conformanceProfiles := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles)
-		for _, profile := range conformanceProfiles.UnsortedList() {
+	for _, tN := range testNames {
+		testResult := suite.results[tN]
+		conformanceProfiles := getConformanceProfilesForTest(testResult.test, suite.conformanceProfiles).UnsortedList()
+		sort.Slice(conformanceProfiles, func(i, j int) bool {
+			return conformanceProfiles[i].Name < conformanceProfiles[j].Name
+		})
+		for _, profile := range conformanceProfiles {
 			profileReports.addTestResults(*profile, testResult)
 		}
 	}
