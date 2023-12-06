@@ -4,7 +4,7 @@
     publish = "site"
 [build.environment]
     PYTHON_VERSION = "3.8"
-    GO_VERSION = "1.21.4"
+    GO_VERSION = "1.21"
 
 # Standard Netlify redirects
 [[redirects]]
