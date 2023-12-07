@@ -2,7 +2,9 @@
 [build]
     command = "make docs"
     publish = "site"
-    environment = { PYTHON_VERSION = "3.8" }
+[build.environment]
+    PYTHON_VERSION = "3.8"
+    GO_VERSION = "1.21.4"
 
 # Standard Netlify redirects
 [[redirects]]
