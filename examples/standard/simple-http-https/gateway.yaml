@@ -18,3 +18,11 @@ spec:
       certificateRefs:
       - kind: Secret
         name: example-com
+  - name: https-default-tls-mode
+    port: 8443
+    protocol: HTTPS
+    hostname: "*.foo.com"
+    tls:
+      certificateRefs:
+      - kind: Secret
+        name: foo-com
