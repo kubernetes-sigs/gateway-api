@@ -85,9 +85,10 @@ Implementors and integrators of Gateway API are encouraged to update this docume
 In this section you will find specific links to blog posts, documentation and other Gateway API references for specific implementations.
 
 ### Acnodal EPIC
-[EPIC][epic] is an Open Source External Gateway platform designed and built with Kubernetes.  It consists of the Gateway Cluster, k8s Gateway controller, a stand alone Linux Gateway controller and the Gateway Service Manager.  Together they create a platform for providing Gateway services to cluster users.   Each gateway consists of multiple Envoy instances running on the gateway cluster not the workload clusters. The Gateway Service Manager is a simple user management and UI that can be used to implement Gateway-as-a-Service infrastructure for public and private clusters, and integrate non-k8s endpoints.
+[EPIC][epicdocs] is an Open Source External Gateway platform designed and built with Kubernetes.  It consists of the Gateway Cluster, k8s Gateway controller, a stand alone Linux Gateway controller and the Gateway Service Manager.  Together they create a platform for providing Gateway services to cluster users.   Each gateway consists of multiple Envoy instances running on the gateway cluster not the workload clusters. The Gateway Service Manager is a simple user management and UI that can be used to implement Gateway-as-a-Service infrastructure for public and private clusters, and integrate non-k8s endpoints.
 
-[Documentation][epicdocs]   [Source Repo][epicsource]
+- [Documentation][epicdocs]
+- [Source Repo][epicsource]
 
 [epicdocs]:https://www.epic-gateway.org/
 [epicsource]:https://github.com/epic-gateway
