@@ -54,6 +54,10 @@ const (
 	// of allocating pre-determined addresses, rather than dynamically having
 	// addresses allocated for it.
 	SupportGatewayStaticAddresses SupportedFeature = "GatewayStaticAddresses"
+
+	// SupportGatewayHTTPListenerIsolation option indicates support for the isolation
+	// of HTTP listeners.
+	SupportGatewayHTTPListenerIsolation SupportedFeature = "GatewayHTTPListenerIsolation"
 )
 
 // GatewayExtendedFeatures are extra generic features that implementations may
@@ -61,6 +65,7 @@ const (
 var GatewayExtendedFeatures = sets.New(
 	SupportGatewayPort8080,
 	SupportGatewayStaticAddresses,
+	SupportGatewayHTTPListenerIsolation,
 )
 
 // -----------------------------------------------------------------------------
