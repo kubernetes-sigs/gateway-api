@@ -85,7 +85,6 @@ reviewer or approver, this includes:
 * Conformance
 * Documentation
 * GEPs
-* Webhook Validation
 
 ## Maintainers and GAMMA Leads
 

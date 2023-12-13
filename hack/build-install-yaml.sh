@@ -39,14 +39,6 @@ cat << EOF >> release/standard-install.yaml
 #
 EOF
 
-cat hack/boilerplate/boilerplate.sh.txt > release/webhook-install.yaml
-sed -i "s/YEAR/$thisyear/g" release/webhook-install.yaml
-cat << EOF >> release/webhook-install.yaml
-#
-# Gateway API deprecated webhook install
-#
-EOF
-
 for file in `ls config/crd/experimental/gateway*.yaml`
 do
     echo "---" >> release/experimental-install.yaml
@@ -63,15 +55,6 @@ do
     echo "# $file" >> release/standard-install.yaml
     echo "#" >> release/standard-install.yaml
     cat $file >> release/standard-install.yaml
-done
-
-for file in `ls config/webhook/*.yaml`
-do
-    echo "---" >> release/webhook-install.yaml
-    echo "#" >> release/webhook-install.yaml
-    echo "# $file" >> release/webhook-install.yaml
-    echo "#" >> release/webhook-install.yaml
-    cat $file >> release/webhook-install.yaml
 done
 
 echo "Generated:" release/*-install.yaml

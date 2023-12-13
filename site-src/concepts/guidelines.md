@@ -69,6 +69,12 @@ installed in the cluster are supported.
 
 ## Limitations of CRD and Webhook Validation
 
+??? note "Webhook Validation is Deprecated"
+
+    Webhook validation in Gateway API has been deprecated and will be fully
+    removed in v1.1.0. With that said, all of this guidance will still apply for
+    implementations as long as they support v1.0.0 or older releases of the API.
+
 CRD and webhook validation is not the final validation i.e. webhook is "nice UX"
 but not schema enforcement. This validation is intended to provide immediate
 feedback to users when they provide an invalid configuration. Write code

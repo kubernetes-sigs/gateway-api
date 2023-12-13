@@ -58,15 +58,11 @@ all: generate vet fmt verify test
 
 # Run generators for protos, Deepcopy funcs, CRDs, and docs.
 .PHONY: generate
-generate: update-codegen update-webhook-yaml
+generate: update-codegen
 
 .PHONY: update-codegen
 update-codegen:
 	hack/update-codegen.sh
-
-.PHONY: update-webhook-yaml
-update-webhook-yaml:
-	hack/update-webhook-yaml.sh
 
 .PHONY: build-install-yaml
 build-install-yaml:
@@ -82,7 +78,7 @@ vet:
 
 # Run go test against code
 test:
-	go test -race -cover ./pkg/admission/... ./apis/... ./conformance/utils/...
+	go test -race -cover ./apis/... ./conformance/utils/...
 # Run tests for each submodule.
 	cd "conformance/echo-basic" && go test -race -cover ./...
 	cd "gwctl" && go test -race -cover ./...
