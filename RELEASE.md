@@ -51,9 +51,9 @@ For a **PATCH** release:
   one maintainer/codeowner to provide a `lgtm`.
 - Verify the CI tests pass and merge the PR into `release-x.x`.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
-  Github's [release][release] page.
+  GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the Github release.
+  Attach these files to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 For a **MAJOR** or **MINOR** release:
@@ -66,9 +66,9 @@ For a **MAJOR** or **MINOR** release:
   exist until the tag is cut and image is promoted to production registry.)
 - Verify the CI tests pass before continuing.
 - Create a tag using the `HEAD` of the `release-x.x` branch. This can be done using the `git` CLI or
-  Github's [release][release] page.
+  GitHub's [release][release] page.
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
-  Attach these files to the Github release.
+  Attach these files to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
 
 For an **RC** release:
@@ -80,11 +80,11 @@ For an **RC** release:
 - Include the changelog update in this PR.
 - Merge the update PR.
 - Tag the release using the commit on `main` where the changelog update merged.
-  This can  be done using the `git` CLI or Github's [release][release]
+  This can  be done using the `git` CLI or GitHub's [release][release]
   page.
 - Run the `make build-install-yaml` command which will generate
   install files in the `release/` directory.
-- Attach these files to the Github release.
+- Attach these files to the GitHub release.
 
 ### Promoting images to production registry
 Gateway API follows the standard kubernetes image promotion process described [here][kubernetes-image-promotion].
