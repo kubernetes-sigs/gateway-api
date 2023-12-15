@@ -1,4 +1,4 @@
-# Design guidelines
+# API Design Guide
 
 There are some general design guidelines used throughout this API.
 

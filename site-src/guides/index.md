@@ -69,3 +69,8 @@ resources are in-use or if they were installed by a Gateway controller, then do
 not uninstall them. This will uninstall the Gateway API resources for the entire
 cluster. Do not do this if they might be in-use by someone else as this will
 break anything using these resources.
+
+### More on CRD Management
+This guide only provides a high level overview of how to get started with
+Gateway API. For more on the topic of managing Gateway API CRDs, refer to our
+[CRD Management Guide](/guides/crd-management.md).

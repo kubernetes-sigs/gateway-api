@@ -87,8 +87,8 @@ The resources that already have a beta API version (v1beta1) are:
 * GatewayClass
 * ReferenceGrant
 
-In the upcoming v1.0 release, HTTPRoute, Gateway, and GatewayClass will all
-graduate to a GA API Version (v1).
+In the v1.0 release, HTTPRoute, Gateway, and GatewayClass all graduated to
+include a GA API Version (v1).
 
 ReferenceGrant is a special case since it is in the process of [transitioning
 into an upstream Kubernetes
@@ -165,6 +165,10 @@ consistent upgrade experiences across versions. To accomplish that, we commit to
 3. Take every possible effort to avoid introduction of a conversion webhook. If
    a conversion webhook needs to be introduced, it will be supported for the
    lifetime of the API, or at least until an alternative is available.
+
+## CRD Management
+For information on how to manage Gateway API CRDs in your clusters, refer to our
+[CRD Management Guide](/guides/crd-management.md).
 
 ## Out of Scope
 ### Unreleased APIs

@@ -1,4 +1,4 @@
-# Gateway API Implementer's Guide
+# Implementer's Guide
 
 Everything you wanted to know about building a Gateway API implementation
 but were too afraid to ask.
@@ -57,23 +57,22 @@ the cluster, if any.
 
 [versioning]: /concepts/versioning
 
-### Changes to the Gateway API CRDs are backwards compatible
+### Changes to the Standard Channel CRDs are backwards compatible
 
-Part of the contract for Gateway API CRDs is that changes _within an API version_
-must be _compatible_.
+Part of the contract for Standard Channel CRDs is that changes _within an API
+version_ must be _compatible_. Note that CRDs that are part of Experimental
+Channel do not provide any backwards compatibility guarantees.
 
-"Within an API Version" means changes to a CRD that occur while the same API version
-(`v1alpha2` or `v1` for example) is in use, and "compatible" means that any new
-fields, values, or validation will be added to ensure that _previous_
-objects _will still be valid objects_ after the change.
+Although the [Gateway API versioning policy](/concepts/versioning) largely
+aligns with upstream Kubernetes APIs, it does allow for "corrections to
+validation". For example, if the API spec stated that a value was invalid but
+the corresponding validation did not cover that, it's possible that a future
+release may add validation to prevent that invalid input.
 
-This means that once Gateway API objects move to the `v1` API version, then _all_
-changes must be compatible.
-
-This contract also means that an implementation will not fail with a higher version
-of the API than the version it was written with, because the newer schema being
-stored by Kubernetes will definitely be able to be serialized into the older version
-used in code by the implementation.
+This contract also means that an implementation will not fail with a higher
+version of the API than the version it was written with, because the newer
+schema being stored by Kubernetes will definitely be able to be serialized into
+the older version used in code by the implementation.
 
 Similarly, if an implementation was written with a _higher_ version, the newer
 values that it understands will simply _never be used_, as they are not present
@@ -83,92 +82,9 @@ in the older version.
 
 ### CRD Management
 
-For a Gateway API implementation to work, the Gateway API CRDs must be installed
-in the Kubernetes cluster the implementation is watching.
-
-Implementations have two possible options: installing CRDs themselves (implementation
-controlled) or requiring installation by some other mechanism before working 
-(externally controlled). Both have tradeoffs, but implementation controlled has
-significantly more, and so we DO NOT recommend using implementation controlled
-methods at this time.
-
-Regardless, either way has certain things that SHOULD be true, however:
-
-Whatever method is used, infra and cluster admins SHOULD attempt to ensure that
-the Bundle version of the CRDs is not _downgraded_. Although we ensure that
-API changes are backwards compatible, changing CRD definitions can change the
-storage version of the resource, which could have unforeseen effects. Most of the
-time, things will probably work, but if it doesn't work, it will most likely 
-break in weird ways.
-
-Additionally, older versions of the API may be missing fields or features, which
-could be very disruptive for users.
-
-Try your best to ensure that the bundle version doesn't roll backwards. It's safer.
-
-Implementations SHOULD also handle the Gateway API CRDs _not_ being present in
-the cluster without crashing or panicking. Exiting with a clear fatal error is
-acceptable in this case, as is disabling Gateway API support even if enabled in
-configuration.
-
-Practically, for implementations using tools like `controller-runtime` or
-similar tooling, they may need to check for the _presence_ of the CRDs by 
-getting the list of installed CRDs before attempting to watch those resources.
-(Note that this will require the implementation to have `read` access to those
-resources though.)
-
-#### Implementation-controlled CRD installation
-
-Implementation-controlled CRD installation also includes automatic installation
-mechanisms such as Helm, if the CRDs are included in a Helm chart with the
-implementation's installation.
-
-Because of significant caveats we DO NOT recommend doing implementation-controlled
-CRD management at this time.
-
-However, if you really must, CRD definitions MAY be installed by implementations,
-but if they do, they MUST have a way to ensure:
-
-- there are no other Gateway API CRDs installed in the cluster before starting, or
-- that the CRD definitions are only installed if they are a higher bundle version
-  than any existing Gateway API CRDs. Note that even this may not be safe if there
-  are breaking changes in the experimental channel resources, so implementations
-  should be _very_ careful with doing this.
-
-This avoids problems if another implementation is also installed in the cluster
-and expects a higher version of the CRDs to be installed.
-
-The worst outcome here would be two implementations trying to do automatic install
-of _different_ CRD versions, resulting in the CRD versions flapping between
-versions or channels. This would _not_ produce good outcomes.
-
-The safer method for an automatic installation would require the implementation
-to:
-
-- Check if there are any Gateway API CRDs installed in the cluster.
-- If not, install its most compatible version of the CRDs.
-- If so, only install its version of the CRDs if the bundle version is higher
-  than the existing one, and the mechanism will also need to check if there are
-  incompatible changes included in any versions as well.
-
-This is going to be _very_ difficult to pull off in practice.
-
-It should also be noted that many infra and cluster admins manage CRDs using
-externally controlled methods that will not be visible to a Gateway
-implementation, so if you still proceed with automatic installation, it MUST be
-able to be disabled by the installation owner (whether that is the infra or cluster
-admin).
-
-Because of all these caveats, we DO NOT recommend doing automatic CRD management
-at this time.
-
-#### Externally controlled CRD installation
-
-Because of all of the complexities mentioned in the "Implementation controlled"
-section of this document, we recommend that implementations supply documentation
-on how to check if CRDs are installed and upgrade versions if required.
-
-Additions to this document to add suggested commands here are welcomed.
+For information on how to manage Gateway API CRDs, including when it is
+acceptable to bundle CRD installation with your implementation, refer to our
+[CRD Management Guide](/guides/crd-management.md).
 
 ### Conformance and Version compatibility
 
@@ -270,7 +186,7 @@ Implementations MAY choose only one GatewayClass out of the pool of otherwise
 acceptable GatewayClasses if they can only reconcile one, or, if they are capable
 of reconciling multiple GatewayClasses, they may also choose as many as they like.
 
-If something in the GatewayClass renders it incompatibie (at the time of writing,
+If something in the GatewayClass renders it incompatible (at the time of writing,
 the only possible reason for this is that there is a pointer to a `paramsRef`
 object that is not supported by the implementation), then the implementation
 SHOULD mark the incompatible GatewayClass as not `Accepted`.
