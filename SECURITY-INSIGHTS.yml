@@ -1,0 +1,55 @@
+header:
+  schema-version: 1.0.0
+  expiration-date: '2024-12-16T01:00:00.000Z'
+  project-url: https://github.com/kubernetes-sigs/gateway-api/
+  changelog: https://github.com/kubernetes-sigs/gateway-api/blob/main/CHANGELOG.md
+  license: https://github.com/kubernetes-sigs/gateway-api/blob/main/LICENSE
+project-lifecycle:
+  status: active
+  roadmap: https://github.com/orgs/kubernetes-sigs/projects/20
+  bug-fixes-only: false
+  core-maintainers:
+  - https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES 
+  release-cycle: https://github.com/kubernetes-sigs/gateway-api/blob/main/RELEASE.md
+contribution-policy:
+  accepts-pull-requests: true
+  accepts-automated-pull-requests: true
+  automated-tools-list:
+    - automated-tool: dependabot
+      action: allowed
+      path:
+        - /
+  contributing-policy: https://github.com/kubernetes-sigs/gateway-api/blob/main/CONTRIBUTING.md
+  code-of-conduct: https://github.com/kubernetes-sigs/gateway-api/blob/main/code-of-conduct.md
+documentation:
+  - https://gateway-api.sigs.k8s.io/
+distribution-points:
+  - 'https://pkg.go.dev/sigs.k8s.io/gateway-api'
+security-artifacts:
+  threat-model:
+    threat-model-created: false
+  self-assessment:
+    self-assessment-created: false
+security-testing:
+- tool-type: sca
+  tool-name: Dependabot
+  tool-version: "2"
+  tool-url: https://github.com/dependabot
+  integration:
+    ad-hoc: false
+    ci: true
+    before-release: true 
+security-contacts:
+- type: email
+  value: security@kubernetes.io 
+  primary: true
+vulnerability-reporting:
+  accepts-vulnerability-reports: true
+  email-contact: security@kubernetes.io
+  Security-policy: 'https://kubernetes.io/security/'
+  bug-bounty-available: true
+  bug-bounty-url: 'https://hackerone.com/kubernetes'
+dependencies:
+  third-party-packages: true
+  dependencies-lists:
+  - 'https://github.com/kubernetes-sigs/gateway-api/blob/main/go.mod'
