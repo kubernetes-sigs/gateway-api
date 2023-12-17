@@ -46,7 +46,7 @@ security-contacts:
 vulnerability-reporting:
   accepts-vulnerability-reports: true
   email-contact: security@kubernetes.io
-  Security-policy: 'https://kubernetes.io/security/'
+  security-policy: 'https://kubernetes.io/security/'
   bug-bounty-available: true
   bug-bounty-url: 'https://hackerone.com/kubernetes'
 dependencies:
