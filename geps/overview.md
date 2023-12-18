@@ -8,8 +8,10 @@ process for the main Kubernetes project:
 1. Make changes and proposals discoverable (current and future).
 1. Document design ideas, tradeoffs, decisions that were made for
   historical reference.
+1. Record the results of larger community discussions.
+1. Record changes to the GEP process itself.
 
-## Process
+## Process diagram
 
 This diagram shows the state diagram of the GEP process at a high level, but the details are below.
 
@@ -18,16 +20,85 @@ This diagram shows the state diagram of the GEP process at a high level, but the
 ```mermaid
 flowchart TD
     D([Discuss with<br />the community]) --> C
-    C([Issue Created]) --> Provisional
-    Provisional -->|GEP Doc PR<br />done| Implementable
+    C([Issue Created]) --> E([API GEP])
+    C([Issue Created]) --> Memorandum
+    E([API GEP]) --> Provisional
+    Memorandum -------> Accepted
     Provisional -->|If practical <br /> work needed| Prototyping
+    Provisional -->|GEP Doc PR<br />done| Implementable
     Prototyping -->|GEP Doc PR<br />done| Implementable
     Implementable -->|Gateway API<br />work completed| Experimental
     Experimental -->|Supported in<br />multiple implementations<br />+ Conformance tests| Standard
     Standard -->|Entire change is GA or implemented| Completed
+
 ```
 
 </div>
+
+## GEP Definitions
+
+### Types of GEPs
+
+There are two types of GEPs:
+- API GEPs: These GEPs make changes to the Gateway API specification, including
+  adding or updating new features, and so on.
+- Memorandum GEPs: These GEPs either
+  - Document an agreement for further work, creating no spec changes themselves
+  - Update the GEP process
+
+The Memorandum process is shorter, but has much more stringent requirements.
+Memorandum GEPs are the exception, not the rule.
+
+The first few phases of the process are the same for each type.
+
+### GEP States
+
+Each GEP has a state, which tracks where it is in the GEP process.
+
+* GEPs can move to some states from any other state:
+  * **Declined**: The GEP has been declined and further work will not occur.
+  * **Deferred**: Work on the GEP has been deferred until a later date.
+
+The two types of GEPs have different possible states.
+
+API GEPs flow through a number of states, which generally correspond to the level
+of stability of the change described in the GEP:
+  * **Provisional**: The change is in its early phases, and the community has
+    agreed on goals. This state documents the "What" and the "Why" of the change.
+  * **Prototyping**: This state may be used if there is difficulty agreeing on the
+    approach to take for implementation, it's anticipated that one or more
+    possible implementations will be prototyped in this phase. This state is
+    optional.
+  * **Implementable**: An API for the change has been chosen and is specified in
+    both the GEP document, with the API also present in the Gateway API spec at
+    an Experimental level.
+  * **Experimental**: One or more implementations have implemented the change and
+    some conformance tests have been added.
+  * **Standard**: Multiple implementations have implemented this change and
+    sufficient conformance coverage is available to consider this API design
+    mostly complete.
+  * **Completed**: All implementation work on this API GEP has been completed.
+
+Memorandum GEPs have only a single state:
+  * **Accepted**: The Memorandum has been accepted by the community and is now
+    in effect.
+
+### Relationsips between GEPs
+
+GEPs can have relationships between them. At this time, there are three possible
+relationships:
+
+* **Obsoletes** and its backreference **ObsoletedBy**: when a GEP is made obsolete
+  by another GEP, and has its functionality completely replaced. The Obsoleted
+  GEP is moved to the **Declined** state.
+* **Updates** and its backreference **UpdatedBy**: when a GEP has additional details
+  or implementation added in another GEP.
+* **SeeAlso**: when a GEP is relevant to another GEP, but is not affected in any
+  other defined way.
+
+Relationships are tracked in the YAML metadata files accompanying each GEP.
+
+## Process
 
 ### 1. Discuss with the community
 
@@ -48,9 +119,14 @@ into this document.
 
 ### 3. Agree on the Goals
 Although it can be tempting to start writing out all the details of your
-proposal, it's important to first ensure we all agree on the goals. The first
-version of your GEP should aim for a "Provisional" status and leave out any
-implementation details, focusing primarily on "Goals" and "Non-Goals".
+proposal, it's important to first ensure we all agree on the goals.
+
+For API GEPs, the first version of your GEP should aim for a "Provisional"
+status and leave out any implementation details, focusing primarily on
+"Goals" and "Non-Goals".
+
+For Memorandum GEPs, the first version of your GEP will be the only one, as
+Memorandums have only a single stage - `Accepted`.
 
 ### 3. Document Implementation Details
 Now that everyone agrees on the goals, it is time to start writing out your
