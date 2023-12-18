@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 724
+name: Refresh Route-Gateway Binding
+type: API
+status: Standard
+authors:
+  - robscott

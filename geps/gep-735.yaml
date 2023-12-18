@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 735
+name: TCP and UDP addresses matching
+type: API
+status: Declined
+authors:
+  - shaneutt

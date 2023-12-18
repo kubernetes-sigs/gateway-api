@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 726
+name: Add Path Redirects and Rewrites
+type: API
+status: Standard
+authors:
+  - robscott

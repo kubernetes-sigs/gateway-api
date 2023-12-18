@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1323
+name: Response Header Filter
+type: API
+status: Standard
+authors:
+  - aryan9600
+

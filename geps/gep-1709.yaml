@@ -1,0 +1,10 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1709
+name: Conformance Profiles
+type: API
+status: Experimental
+authors:
+  - shaneutt
+  - mlavacca
+  - arkodg

@@ -1,0 +1,12 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1867
+name: Per-Gateway Infrastructure
+type: API
+status: Experimental
+authors:
+  - howardjohn
+relationships:
+  updates:
+  - number: 1762
+    name: In Cluster Gateway Deployments

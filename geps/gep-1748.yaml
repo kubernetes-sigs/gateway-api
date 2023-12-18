@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1748
+name: Gateway API Interaction with Multi-Cluster Services
+type: API
+status: Experimental
+authors:
+  - robscott

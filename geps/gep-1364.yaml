@@ -1,0 +1,8 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1364
+name: Status and Conditions Update
+type: API
+status: Standard
+authors:
+  - youngnick
