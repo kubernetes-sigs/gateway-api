@@ -86,7 +86,7 @@ Memorandum GEPs have only a single state:
   * **Accepted**: The Memorandum has been accepted by the community and is now
     in effect.
 
-### Relationsips between GEPs
+### Relationships between GEPs
 
 GEPs can have relationships between them. At this time, there are three possible
 relationships:
