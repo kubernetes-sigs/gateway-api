@@ -27,9 +27,11 @@ plugins:
   - redirects:
       redirect_maps:
         'guides/getting-started.md': 'guides/index.md'
+        'concepts/guidelines.md': 'guides/api-design.md'
         'contributing/community.md': 'contributing/index.md'
         'contributing/gamma.md': 'concepts/gamma.md#contributing'
-        'references/implementers-guide.md': 'reference/implementers-guide.md'
+        'reference/implementers-guide.md': 'guides/implementers.md'
+        'references/implementers-guide.md': 'guides/implementers.md'
         'references/spec.md': 'reference/spec.md'
         'references/policy-attachment.md': 'reference/policy-attachment.md'
   - mermaid2
@@ -58,7 +60,6 @@ nav:
         API Overview: concepts/api-overview.md
         GAMMA: concepts/gamma.md
         Conformance: concepts/conformance.md
-        Implementation Guidelines: concepts/guidelines.md
         Roles and Personas: concepts/roles-and-personas.md
         Service Facets: concepts/service-facets.md
         Security Model: concepts/security-model.md
@@ -68,20 +69,23 @@ nav:
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:
-    - Getting started: guides/index.md
-    - Simple Gateway: guides/simple-gateway.md
-    - HTTP routing: guides/http-routing.md
-    - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
-    - HTTP header modifier: guides/http-header-modifier.md
-    - HTTP traffic splitting: guides/traffic-splitting.md
-    - Cross-Namespace routing: guides/multiple-ns.md
-    - TLS: guides/tls.md
-    - TCP routing: guides/tcp.md
-    - gRPC Routing: guides/grpc-routing.md
-    - Migrating from Ingress: guides/migrating-from-ingress.md
-    - Backend Protocol Selection: guides/backend-protocol.md
+    - User Guides:
+      - Getting started: guides/index.md
+      - Simple Gateway: guides/simple-gateway.md
+      - HTTP routing: guides/http-routing.md
+      - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
+      - HTTP header modifier: guides/http-header-modifier.md
+      - HTTP traffic splitting: guides/traffic-splitting.md
+      - Cross-Namespace routing: guides/multiple-ns.md
+      - TLS: guides/tls.md
+      - TCP routing: guides/tcp.md
+      - gRPC Routing: guides/grpc-routing.md
+      - Migrating from Ingress: guides/migrating-from-ingress.md
+      - Backend Protocol Selection: guides/backend-protocol.md
+    - API Design: guides/api-design.md
+    - CRD Management: guides/crd-management.md
+    - Implementer's Guide: guides/implementers.md
   - Reference:
-    - Implementer's Guide: reference/implementers-guide.md
     - API Types:
       - Gateway: api-types/gateway.md
       - GatewayClass: api-types/gatewayclass.md
