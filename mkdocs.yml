@@ -107,6 +107,7 @@ nav:
         - geps/gep-735.md
         - geps/gep-1282.md
       - Provisional:
+        - geps/gep-91.md
         - geps/gep-1619.md
         - geps/gep-1867.md
       # - Implementable:
