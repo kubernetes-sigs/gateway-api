@@ -40,11 +40,12 @@ flowchart TD
 ### Types of GEPs
 
 There are two types of GEPs:
-- API GEPs: These GEPs make changes to the Gateway API specification, including
+
+* API GEPs: These GEPs make changes to the Gateway API specification, including
   adding or updating new features, and so on.
-- Memorandum GEPs: These GEPs either
-  - Document an agreement for further work, creating no spec changes themselves
-  - Update the GEP process
+* Memorandum GEPs: These GEPs either
+    * Document an agreement for further work, creating no spec changes themselves
+    * Update the GEP process
 
 The Memorandum process is shorter, but has much more stringent requirements.
 Memorandum GEPs are the exception, not the rule.
@@ -56,13 +57,14 @@ The first few phases of the process are the same for each type.
 Each GEP has a state, which tracks where it is in the GEP process.
 
 * GEPs can move to some states from any other state:
-  * **Declined**: The GEP has been declined and further work will not occur.
-  * **Deferred**: Work on the GEP has been deferred until a later date.
+    * **Declined**: The GEP has been declined and further work will not occur.
+    * **Deferred**: Work on the GEP has been deferred until a later date.
 
 The two types of GEPs have different possible states.
 
 API GEPs flow through a number of states, which generally correspond to the level
 of stability of the change described in the GEP:
+
   * **Provisional**: The change is in its early phases, and the community has
     agreed on goals. This state documents the "What" and the "Why" of the change.
   * **Prototyping**: This state may be used if there is difficulty agreeing on the
@@ -80,6 +82,7 @@ of stability of the change described in the GEP:
   * **Completed**: All implementation work on this API GEP has been completed.
 
 Memorandum GEPs have only a single state:
+
   * **Accepted**: The Memorandum has been accepted by the community and is now
     in effect.
 
