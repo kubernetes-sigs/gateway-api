@@ -1,4 +1,4 @@
-apiVersion: gateway.networking.k8s.io/v1alpha1
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 957
 name: Destination Port Matching

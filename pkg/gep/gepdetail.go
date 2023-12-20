@@ -20,13 +20,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type GEPType string
-
-const (
-	APIGEPType   GEPType = "API"
-	MemoGEPTtype GEPType = "Memorandum"
-)
-
 type GEPStatus string
 
 const (
@@ -35,16 +28,16 @@ const (
 	GEPStatusDeclined GEPStatus = "Declined"
 	GEPStatusDeferred GEPStatus = "Deferred"
 
-	// API GEP statuses
+	// Memorandum Status
+	GEPStatusMemorandum GEPStatus = "Memorandum"
+
+	// Standard GEP statuses
 	GEPStatusProvisional   GEPStatus = "Provisional"
 	GEPStatusPrototyping   GEPStatus = "Prototyping"
 	GEPStatusImplementable GEPStatus = "Implementable"
 	GEPStatusExperimental  GEPStatus = "Experimental"
 	GEPStatusStandard      GEPStatus = "Standard"
 	GEPStatusCompleted     GEPStatus = "Completed"
-
-	// Memorandum GEP status
-	GEPStatusAccepted GEPStatus = "Accepted"
 )
 
 // GEPDetail holds the metadata used to describe a Gateway API GEP (Gateway
@@ -57,11 +50,6 @@ type GEPDetail struct {
 
 	// The GEP's name, usually the name of the issue without the "GEP:" prefix.
 	Name string `json:"name"`
-
-	// The GEP's type.
-	//
-	// Current valid types are `API` or `Memorandum`
-	Type GEPType `json:"type"`
 
 	// The GEP's status.
 	//
@@ -80,6 +68,16 @@ type GEPDetail struct {
 
 	// References provides a list of hyperlinks to other references used by the GEP.
 	References []string `json:"references,omitempty"`
+
+	// FeatureNames provides a list of feature names (used in conformance tests
+	// and GatewayClass supported features lists)
+	// TODO(youngnick): Move the canonical feature names list from
+	// `conformance/utils/features.go` to its own package in `pkg`, and
+	// then move this to SupportedFeatures type instead.
+	FeatureNames []string
+
+	// Changelog provides a list of hyperlinks to PRs that affected this GEP.
+	Changelog []string
 }
 
 // GEPRelationships describes the possible relationships GEPs may have.

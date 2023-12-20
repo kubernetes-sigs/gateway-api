@@ -20,10 +20,8 @@ This diagram shows the state diagram of the GEP process at a high level, but the
 ```mermaid
 flowchart TD
     D([Discuss with<br />the community]) --> C
-    C([Issue Created]) --> E([API GEP])
-    C([Issue Created]) --> Memorandum
-    E([API GEP]) --> Provisional
-    Memorandum -------> Accepted
+    C([Issue Created]) -------> Memorandum
+    C([Issue Created]) --> Provisional
     Provisional -->|If practical <br /> work needed| Prototyping
     Provisional -->|GEP Doc PR<br />done| Implementable
     Prototyping -->|GEP Doc PR<br />done| Implementable
@@ -37,54 +35,44 @@ flowchart TD
 
 ## GEP Definitions
 
-### Types of GEPs
-
-There are two types of GEPs:
-
-* API GEPs: These GEPs make changes to the Gateway API specification, including
-  adding or updating new features, and so on.
-* Memorandum GEPs: These GEPs either
-    * Document an agreement for further work, creating no spec changes themselves
-    * Update the GEP process
-
-The Memorandum process is shorter, but has much more stringent requirements.
-Memorandum GEPs are the exception, not the rule.
-
-The first few phases of the process are the same for each type.
-
 ### GEP States
 
 Each GEP has a state, which tracks where it is in the GEP process.
 
-* GEPs can move to some states from any other state:
-    * **Declined**: The GEP has been declined and further work will not occur.
-    * **Deferred**: Work on the GEP has been deferred until a later date.
+GEPs can move to some states from any other state:
 
-The two types of GEPs have different possible states.
+  * **Declined**: The GEP has been declined and further work will not occur.
+  * **Deferred:** We do not currently have bandwidth to handle this GEP, it
+    may be revisited in the future.
+  * **Declined:** This proposal was considered by the community but ultimately
+  rejected.
+  * **Withdrawn:** This proposal was considered by the community but ultimately
+  withdrawn by the author.
+
+There is a special state to cover Memorandum GEPs:
+
+  * **Memorandum**: These GEPs either:
+    * Document an agreement for further work, creating no spec changes themselves, or
+    * Update the GEP process.
 
 API GEPs flow through a number of states, which generally correspond to the level
 of stability of the change described in the GEP:
 
-  * **Provisional**: The change is in its early phases, and the community has
-    agreed on goals. This state documents the "What" and the "Why" of the change.
-  * **Prototyping**: This state may be used if there is difficulty agreeing on the
-    approach to take for implementation, it's anticipated that one or more
-    possible implementations will be prototyped in this phase. This state is
-    optional.
-  * **Implementable**: An API for the change has been chosen and is specified in
-    both the GEP document, with the API also present in the Gateway API spec at
-    an Experimental level.
-  * **Experimental**: One or more implementations have implemented the change and
-    some conformance tests have been added.
-  * **Standard**: Multiple implementations have implemented this change and
-    sufficient conformance coverage is available to consider this API design
-    mostly complete.
+  * **Provisional:** The goals described by this GEP have consensus but
+    implementation details have not been agreed to yet.
+  * **Prototyping:** An extension of `Provisional` which can be opted in to in
+    order to indicate to the community that there are some active practical tests
+    and experiments going on which are intended to be a part of the development
+    of this GEP. This may include APIs or code, but that content _must_ not be
+    distributed with releases.
+  * **Implementable:** The goals and implementation details described by this GEP
+    have consensus but have not been fully implemented yet.
+  * **Experimental:** This GEP has been implemented and is part of the
+    "Experimental" release channel. Breaking changes are still possible, up to
+    and including complete removal and moving to `Rejected`.
+  * **Standard:** This GEP has been implemented and is part of the
+    "Standard" release channel. It should be quite stable.
   * **Completed**: All implementation work on this API GEP has been completed.
-
-Memorandum GEPs have only a single state:
-
-  * **Accepted**: The Memorandum has been accepted by the community and is now
-    in effect.
 
 ### Relationships between GEPs
 
@@ -210,38 +198,6 @@ The GEP issue should only be closed once the feature has:
 
 In short, the GEP issue should only be closed when the work is "done" (whatever
 that means for that GEP).
-
-## Status
-
-Each GEP has a status field that defines it's current state. Each transition
-will require a PR to update the GEP and should be discussed at a community
-meeting before merging. Most GEPS will proceed through the following states:
-
-* **Provisional:** The goals described by this GEP have consensus but
-  implementation details have not been agreed to yet.
-* **Prototyping:** An extension of `Provisional` which can be opted in to in
-  order to indicate to the community that there are some active practical tests
-  and experiments going on which are intended to be a part of the development
-  of this GEP. This may include APIs or code, but that content _must_ not be
-  distributed with releases.
-* **Implementable:** The goals and implementation details described by this GEP
-  have consensus but have not been fully implemented yet.
-* **Experimental:** This GEP has been implemented and is part of the
-  "Experimental" release channel. Breaking changes are still possible, up to
-  and including complete removal and moving to `Rejected`.
-* **Standard:** This GEP has been implemented and is part of the
-  "Standard" release channel. It should be quite stable.
-
-Although less common, some GEPs may end up in one of the following states:
-
-* **Deferred:** We do not currently have bandwidth to handle this GEP, it
-  may be revisited in the future.
-* **Rejected:** This proposal was considered by the community but ultimately
-  rejected.
-* **Replaced:** This proposal was considered by the community but ultimately
-  replaced by a newer proposal.
-* **Withdrawn:** This proposal was considered by the community but ultimately
-  withdrawn by the author.
 
 ## Format
 

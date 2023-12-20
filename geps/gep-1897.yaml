@@ -1,4 +1,4 @@
-apiVersion: gateway.networking.k8s.io/v1alpha1
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 1897
 name: BackendTLSPolicy - Explicit Backend TLS Connection Configuration
@@ -11,6 +11,6 @@ authors:
   - youngnick
 relationships:
   obsoletes:
-  - number: 1282
-    name: Describing Backend Properties
-    description: Implements just part of the Backend Properties GEP.
+    - number: 1282
+      name: Describing Backend Properties
+      description: Implements just part of the Backend Properties GEP.

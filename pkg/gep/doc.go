@@ -23,4 +23,5 @@ limitations under the License.
 // change. Expect breaking changes and/or complete removals if you start using
 // them.
 
+// +groupName=internal.gateway.networking.k8s.io
 package v1alpha1
