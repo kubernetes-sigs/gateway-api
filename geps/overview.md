@@ -89,6 +89,14 @@ relationships:
 
 Relationships are tracked in the YAML metadata files accompanying each GEP.
 
+### GEP metadata file
+
+Each GEP has a YAML file containing metadata alongside it, please keep it up to
+date as changes to the GEP occur.
+
+In particular, note the `authors`, and `changelog` fields, please keep those up
+to date.
+
 ## Process
 
 ### 1. Discuss with the community
