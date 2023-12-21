@@ -321,16 +321,7 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
-// GatewayAndRoutesMustBeAccepted waits until:
-//  1. The specified Gateway has an IP address assigned to it.
-//  2. The route has a ParentRef referring to the Gateway.
-//  3. All the gateway's listeners have the following conditions set to true:
-//     - ListenerConditionResolvedRefs
-//     - ListenerConditionAccepted
-//     - ListenerConditionProgrammed
-//
-// The test will fail if these conditions are not met before the timeouts.
-func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
+func WaitForGatewayAndRoutesToBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs []types.NamespacedName, routeHandler func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool)) string {
 	t.Helper()
 
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
@@ -363,7 +354,8 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 				}},
 			})
 		}
-		RouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired, routeType)
+
+		routeHandler(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
 	}
 
 	requiredListenerConditions := []metav1.Condition{
@@ -398,7 +390,34 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 //
 // The test will fail if these conditions are not met before the timeouts.
 func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, routeNNs...)
+	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+		HTTPRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
+	}
+	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler)
+}
+
+// GatewayAndTLSRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the TLSRoute has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []gatewayv1.Hostname) {
+	var hostnames []gatewayv1.Hostname
+	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+		route := TLSRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
+		hostnames = route.Spec.Hostnames
+	}
+	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler), hostnames
+}
+
+// GatewayAndUDPRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the UDPRoute has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+		UDPRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
+	}
+	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler)
 }
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
@@ -740,54 +759,6 @@ func parentRefToString(p gatewayv1.ParentReference) string {
 	return string(p.Name)
 }
 
-// GatewayAndTLSRoutesMustBeAccepted waits until the specified Gateway has an IP
-// address assigned to it and the TLSRoute has a ParentRef referring to the
-// Gateway. The test will fail if these conditions are not met before the
-// timeouts.
-func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []gatewayv1.Hostname) {
-	t.Helper()
-
-	var hostnames []gatewayv1.Hostname
-
-	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
-	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
-
-	ns := gatewayv1.Namespace(gw.Namespace)
-	kind := gatewayv1.Kind("Gateway")
-
-	for _, routeNN := range routeNNs {
-		namespaceRequired := true
-		if routeNN.Namespace == gw.Namespace {
-			namespaceRequired = false
-		}
-
-		var parents []gatewayv1.RouteParentStatus
-		for _, listener := range gw.listenerNames {
-			parents = append(parents, gatewayv1.RouteParentStatus{
-				ParentRef: gatewayv1.ParentReference{
-					Group:       (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-					Kind:        &kind,
-					Name:        gatewayv1.ObjectName(gw.Name),
-					Namespace:   &ns,
-					SectionName: listener,
-				},
-				ControllerName: gatewayv1.GatewayController(controllerName),
-				Conditions: []metav1.Condition{
-					{
-						Type:   string(gatewayv1.RouteConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: string(gatewayv1.RouteReasonAccepted),
-					},
-				},
-			})
-		}
-		route := TLSRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
-		hostnames = route.Spec.Hostnames
-	}
-
-	return gwAddr, hostnames
-}
-
 // TLSRouteMustHaveCondition checks that the supplied TLSRoute has the supplied Condition,
 // halting after the specified timeout is exceeded.
 func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeNN types.NamespacedName, gwNN types.NamespacedName, condition metav1.Condition) {
@@ -819,51 +790,6 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 	})
 
 	require.NoErrorf(t, waitErr, "error waiting for TLSRoute status to have a Condition matching expectations")
-}
-
-// GatewayAndUDPRoutesMustBeAccepted waits until the specified Gateway has an IP
-// address assigned to it and the UDPRoute has a ParentRef referring to the
-// Gateway. The test will fail if these conditions are not met before the
-// timeouts.
-func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	t.Helper()
-
-	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
-	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
-
-	ns := gatewayv1.Namespace(gw.Namespace)
-	kind := gatewayv1.Kind("Gateway")
-
-	for _, routeNN := range routeNNs {
-		namespaceRequired := true
-		if routeNN.Namespace == gw.Namespace {
-			namespaceRequired = false
-		}
-
-		var parents []gatewayv1.RouteParentStatus
-		for _, listener := range gw.listenerNames {
-			parents = append(parents, gatewayv1.RouteParentStatus{
-				ParentRef: gatewayv1.ParentReference{
-					Group:       (*gatewayv1.Group)(&gatewayv1.GroupVersion.Group),
-					Kind:        &kind,
-					Name:        gatewayv1.ObjectName(gw.Name),
-					Namespace:   &ns,
-					SectionName: listener,
-				},
-				ControllerName: gatewayv1.GatewayController(controllerName),
-				Conditions: []metav1.Condition{
-					{
-						Type:   string(gatewayv1.RouteConditionAccepted),
-						Status: metav1.ConditionTrue,
-						Reason: string(gatewayv1.RouteReasonAccepted),
-					},
-				},
-			})
-		}
-		UDPRouteMustHaveParents(t, c, timeoutConfig, routeNN, parents, namespaceRequired)
-	}
-
-	return gwAddr
 }
 
 func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
