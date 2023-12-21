@@ -211,16 +211,19 @@ references valid is enough to produce some configuration in the underlying data
 plane.
 
 So, All Conditions Positive pros:
+
 * We're close already. Most conditions in the API are currently positive polarity.
 * Easier to understand - there are no double negatives. "Good: true" is less
 cognitive overhead than "NotGood: false".
 
 Cons:
+
 * Reduces flexibility - it can surprisingly difficult to avoid double negatives for
 conditions that describe error states, as in general programmers are more used
 to reporting "something went wrong" than they are "everything's okay".
 
 Not sure if pro or con:
+
 * Leans the design towards favoring conditions always being present, since you
 can't be sure if everything is good unless you see `AllGood: true`. The absence
 of a positive-polarity condition implies that the condition could be false. This
@@ -232,11 +235,13 @@ In this case, only a limited set of summary conditions are positive, and the res
 are negative.
 
 Pros:
+
 * Error states can be described with `Error: true` instead of `NoError: false`.
 * Negative polarity error conditions are more friendly to not being present (since
 absence of `Error: true` implies everything's okay).
 
 Cons:
+
 * Any code handling conditions will need a list of the positive ones, and will
 need to assume that any others are negative.
 
