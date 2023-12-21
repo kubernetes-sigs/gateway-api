@@ -1,8 +1,11 @@
 # Implementations
 
-This document tracks downstream implementations and integrations of Gateway API and provides status and resource references for them.
+This document tracks downstream implementations and integrations of Gateway API
+and provides status and resource references for them.
 
-Implementors and integrators of Gateway API are encouraged to update this document with status information about their implementations, the versions they cover, and documentation to help users get started.
+Implementors and integrators of Gateway API are encouraged to update this
+document with status information about their implementations, the versions they
+cover, and documentation to help users get started.
 
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 

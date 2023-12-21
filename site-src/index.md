@@ -1,47 +1,50 @@
-## What is the Gateway API?
+# Introduction
 
-Gateway API is an open source project managed by the
-[SIG-NETWORK][sig-network] community. It is an API (collection of resources)
-that model service networking in Kubernetes. These resources -
-[`GatewayClass`][GatewayClass], [`Gateway`][Gateway],
-[`HTTPRoute`][HTTPRoute], [`TCPRoute`][TCPRoute], etc., as well as the
-Kubernetes [`Service`][Service] resource - aim to evolve Kubernetes service
-networking through expressive, extensible, and role-oriented interfaces that
-are implemented by many vendors and have broad industry support.
+Gateway API is an official Kubernetes project focused on L4 and L7 routing in
+Kubernetes. This project represents the next generation of Kubernetes Ingress,
+Load Balancing, and Service Mesh APIs. From the outset, it has been designed to
+be generic, expressive, and role-oriented.
 
-[GatewayClass]: /api-types/gatewayclass
-[Gateway]: /api-types/gateway
-[HTTPRoute]: /api-types/httproute
-[TCPRoute]: /concepts/api-overview/#tcproute-and-udproute
-[Service]: https://kubernetes.io/docs/concepts/services-networking/service/
+The overall resource model focuses on 3 separate
+[personas](/concepts/roles-and-personas) and corresponding resources that
+they are expected to manage:
 
-![Gateway API Model](./images/api-model.png)
+<!-- Source: https://docs.google.com/presentation/d/11HEYCgFi-aya7FS91JvAfllHiIlvfgcp7qpi_Azjk4E/edit#slide=id.g292839eca6d_1_0 -->
+<img src="/images/resource-model.png" alt="Gateway API Resource Model" class="center" />
 
-The Gateway API was originally designed to manage traffic from clients outside
-the cluster to services inside the cluster -- the _ingress_ or
-[_north/south_][north/south traffic] case. Over time, interest from service
-mesh users prompted the creation of the [GAMMA initiative][gamma] to define
-how the Gateway API could also be used for inter-service or [_east/west_
-traffic][east/west traffic] within the same cluster.
+Most of the configuration in this API is contained in the Routing layer. These
+protocol-specific resources ([HTTPRoute](/api-types/httproute),
+[GRPCRoute](/api-types/grpcroute), etc) enable advanced routing capabilities
+for both Ingress and Mesh.
 
-If you're familiar with the older [Ingress API], you can think of the Gateway
-API as analogous to a more-expressive next-generation version of that API.
+The Gateway API Logo helps illustrate the dual purpose of this API, enabling
+routing for both North-South (Ingress) and East-West (Mesh) traffic to share the
+same configuration.
+
+<img src="/images/logo/logo-text-horizontal.png" alt="Gateway API Logo" class="center" />
 
 ## Gateway API for Ingress <a name="for-ingress"></a>
 
-When using the Gateway API to manage ingress traffic, the [Gateway] resource
+??? success "Standard in v0.5.0+"
+
+    Gateway, GatewayClass, and HTTPRoute have been part of the Standard Channel
+    of Gateway API since v0.5.0 and are considered stable APIs. For more
+    information refer to our [versioning guide](/concepts/versioning).
+
+When using Gateway API to manage ingress traffic, the [Gateway](/api-types/gateway) resource
 defines a point of access at which traffic can be routed across multiple
 contexts -- for example, from outside the cluster to inside the cluster
 ([north/south traffic]).
 
-Each Gateway is associated with a [GatewayClass], which describes the actual
-kind of [gateway controller] that will handle traffic for the Gateway;
-individual routing resources (such as [HTTPRoute]) are then [associated with
-the Gateway resources][gateway-attachment]. Separating these different
-concerns into distinct resources is a critical part of the role-oriented
-nature of the Gateway API, as well as allowing for multiple kinds of gateway
-controllers (represented by GatewayClass resources), each with multiple
-instances (represented by Gateway resources), in the same cluster.
+Each Gateway is associated with a [GatewayClass](/api-types/gatewayclass), which
+describes the actual kind of [gateway controller] that will handle traffic for
+the Gateway; individual routing resources (such as
+[HTTPRoute](/api-types/httproute)) are then [associated with the Gateway
+resources][gateway-attachment]. Separating these different concerns into
+distinct resources is a critical part of the role-oriented nature of Gateway
+API, as well as allowing for multiple kinds of gateway controllers (represented
+by GatewayClass resources), each with multiple instances (represented by Gateway
+resources), in the same cluster.
 
 [Ingress API]:https://kubernetes.io/docs/concepts/services-networking/ingress/
 [north/south traffic]:/concepts/glossary#northsouth-traffic
@@ -49,30 +52,30 @@ instances (represented by Gateway resources), in the same cluster.
 [gateway controller]:/concepts/glossary#gateway-controller
 [gateway-attachment]:/concepts/api-overview#attaching-routes-to-gateways
 
-## Gateway API for Service Mesh (the [GAMMA initiative][gamma]) <a name="for-service-mesh"></a>
+## Gateway API for Service Mesh (the [GAMMA initiative](/mesh/gamma)) <a name="for-service-mesh"></a>
 
-!!! danger "Experimental in v0.8.0"
+??? example "Experimental in v0.8.0+"
 
-    The [GAMMA initiative][gamma] work for supporting service mesh use cases
-    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
+    The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
+    is _experimental_ in `v0.8.0`+. It is possible that it will change; we do
     not recommend it in production at this point.
 
-Things are a bit different when using the Gateway API to manage a [service
+Things are a bit different when using Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
-cluster, the [Gateway] and [GatewayClass] resources are not used; instead,
-individual route resources (such as [HTTPRoute]) are [associated directly with
-Service resources][mesh-attachment], permitting the mesh to manage traffic
-from any traffic directed to that Service while preserving the role-oriented
-nature of the Gateway API.
+cluster, the [Gateway](/api-types/gateway) and
+[GatewayClass](/api-types/gatewayclass) resources are not used; instead,
+individual route resources (such as [HTTPRoute](/api-types/httproute)) are
+[associated directly with Service resources][mesh-attachment], permitting the
+mesh to manage traffic from any traffic directed to that Service while
+preserving the role-oriented nature of Gateway API.
 
-To date, [GAMMA][gamma] has been able to support mesh functionality with
-fairly minimal changes to the Gateway API. One particular area that has
+To date, [GAMMA](/mesh/gamma) has been able to support mesh functionality with
+fairly minimal changes to Gateway API. One particular area that has
 rapidly become critical for GAMMA, though, is the definition of the different
 [facets of the Service resource][service-facets].
 
-In Gateway API v0.8.0, GAMMA support for service mesh is **experimental**. We
-encourage working with it and providing feedback, but you **must** be prepared
-for change in the GAMMA APIs.
+Support for service mesh is **experimental**. We encourage working with it and
+providing feedback, but you **must** be prepared for change in the GAMMA APIs.
 
 [gamma]:/concepts/gamma/
 [service-mesh]:/concepts/glossary#service-mesh
@@ -81,19 +84,18 @@ for change in the GAMMA APIs.
 
 ## Getting started
 
-Whether you are a user interested in using the Gateway API or an implementer
+Whether you are a user interested in using Gateway API or an implementer
 interested in conforming to the API, the following resources will help give
 you the necessary background:
 
 - [API overview](/concepts/api-overview)
 - [User guides](/guides)
-- [Gateway controller implementations](/implementations#gateways)
-- [Service Mesh implementations](/implementations#meshes)
+- [Implementations](/implementations)
 - [API reference spec](/reference/spec)
 - [Community links](/contributing/community) and [developer guide](/contributing/devguide)
 
 ## Gateway API concepts
-The following design goals drive the concepts of the Gateway API. These
+The following design goals drive the concepts of Gateway API. These
 demonstrate how Gateway aims to improve upon current standards like Ingress.
 
 - **Role-oriented** - Gateway is composed of API resources which model
@@ -120,13 +122,13 @@ model.
 load balancers and VIPs by permitting independent Route resources to attach to
 the same Gateway. This allows teams (even across Namespaces) to share
 infrastructure safely without direct coordination.
-- **Typed Routes and typed backends** - The Gateway API supports typed Route
+- **Typed Routes and typed backends** - Gateway API supports typed Route
 resources and also different types of backends. This allows the API to be
 flexible in supporting various protocols (like HTTP and gRPC) and
 various backend targets (like Kubernetes Services, storage buckets, or
 functions).
 - Experimental **Service mesh support** with the [GAMMA initiative][gamma] -
-The Gateway API supports associating routing resources with Service resources,
+Gateway API supports associating routing resources with Service resources,
 to configure service meshes as well as ingress controllers.
 
 ## Why does a role-oriented API matter?
@@ -136,14 +138,14 @@ infrastructure is built to be shared. However, shared infrastructure raises a
 common challenge - how to provide flexibility to users of the infrastructure
 while maintaining control by owners of the infrastructure?
 
-The Gateway API accomplishes this through a role-oriented design for
+Gateway API accomplishes this through a role-oriented design for
 Kubernetes service networking that strikes a balance between distributed
 flexibility and centralized control. It allows shared network infrastructure
 (hardware load balancers, cloud networking, cluster-hosted proxies etc) to be
 used by many different and non-coordinating teams, all bound by the policies
 and constraints set by cluster operators.
 
-The roles used for the Gateway API's design are defined by three personas:
+The roles used for Gateway API's design are defined by three personas:
 
 ### Personas
 
@@ -159,8 +161,8 @@ The roles used for the Gateway API's design are defined by three personas:
 
 - **Ana** (she/her) is an _application developer_. Ana is in a unique position
   among the Gateway API roles: her focus is on the business needs her
-  application is meant to serve, _not_ Kubernetes or the Gateway API. In fact,
-  Ana is likely to view the Gateway API and Kubernetes as pure friction
+  application is meant to serve, _not_ Kubernetes or Gateway API. In fact,
+  Ana is likely to view Gateway API and Kubernetes as pure friction
   getting in her way to get things done.
 
 (These three are discussed in more detail in [Roles and
@@ -168,7 +170,7 @@ Personas](/concepts/roles-and-personas).)
 
 It should be clear that while Ana, Chihiro, and Ian do not necessarily see
 eye-to-eye about everything, they need to work together to keep things running
-smoothly. This is the core challenge of the Gateway API in a nutshell.
+smoothly. This is the core challenge of Gateway API in a nutshell.
 
 ### Use Cases
 
@@ -177,7 +179,7 @@ flexibility allows the API to adapt to vastly different organizational models
 and implementations while remaining a portable and standard API.
 
 The use cases presented are deliberately cast in terms of the roles presented
-above. Ultimately the Gateway API is meant for use by humans, which means that
+above. Ultimately Gateway API is meant for use by humans, which means that
 it must fit the uses to which each of Ana, Chihiro, and Ian will put it.
 
 [use-cases]:/concepts/use-cases
@@ -190,10 +192,10 @@ traffic routing and manipulation, such as load balancing, request and response
 transformation, and sometimes more advanced features like authentication and
 authorization, rate limiting, and circuit breaking.
 
-The Gateway API is an interface, or set of resources, that model service
+Gateway API is an interface, or set of resources, that model service
 networking in Kubernetes. One of the main resources is a `Gateway`, which
 declares the Gateway type (or class) to instantiate and its configuration. As
-a Gateway Provider, you can implement the Gateway API to model Kubernetes
+a Gateway Provider, you can implement Gateway API to model Kubernetes
 service networking in an expressive, extensible, and role-oriented way.
 
 Most Gateway API implementations are API Gateways to some extent, but not all
@@ -201,15 +203,12 @@ API Gateways are Gateway API implementations.
 
 ## Who is working on Gateway API?
 
-The Gateway API is a
+Gateway API is a
 [SIG-Network](https://github.com/kubernetes/community/tree/master/sig-network)
-project being built to improve and standardize service networking in
-Kubernetes. Current and in-progress implementations include Contour,
-Emissary-ingress (Ambassador API Gateway), Google Kubernetes Engine (GKE),
-Istio, Kong, Linkerd, and Traefik. Check out the [implementations
-reference](implementations.md) to see the latest projects & products that
-support Gateway. If you are interested in contributing to or building an
-implementation using the Gateway API then don’t hesitate to [get
+project being built to improve and standardize service networking in Kubernetes.
+Check out the [implementations reference](implementations.md) to see the latest
+projects & products that support Gateway. If you are interested in contributing
+to or building an implementation using Gateway API then don’t hesitate to [get
 involved!](/contributing/community)
 
 [sig-network]: https://github.com/kubernetes/community/tree/master/sig-network

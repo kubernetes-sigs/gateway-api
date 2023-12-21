@@ -22,7 +22,7 @@ Gateway API and not the API specification itself, please check our
 you can get help with your specific implementation.
 
 [gh-issues]: https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
-[implementations]:https://gateway-api.sigs.k8s.io/implementations/
+[implementations]:/implementations/
 
 ## Communications
 

@@ -1,6 +1,6 @@
 # Metaresources and Policy Attachment
 
-The Gateway API defines a Kubernetes object that _augments_ the behavior of an object
+Gateway API defines a Kubernetes object that _augments_ the behavior of an object
 in a standard way as a _Metaresource_. ReferenceGrant
 is an example of this general type of metaresource, but it is far from the only
 one.
@@ -13,5 +13,5 @@ A "Policy Attachment" is a specific type of _metaresource_ that can affect speci
 settings across either one object (this is "Direct Policy Attachment"), or objects
 in a hierarchy (this is "Inherited Policy Attachment").
 
-This pattern is EXPERIMENTAL, and is described in [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
+This pattern is EXPERIMENTAL, and is described in [GEP-713](/geps/gep-713/).
 Please see that document for technical details.

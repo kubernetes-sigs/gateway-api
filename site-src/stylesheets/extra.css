@@ -1,0 +1,43 @@
+/* Hide title in favor of logo */
+.md-header__topic {
+    display: none;
+}
+
+/* Use Kubernetes color as primary */
+:root {
+    --md-primary-fg-color: #326ce5;
+}
+
+/* Increase size of logo */
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+    height: 1.8rem;
+}
+
+/* Always show tabs, even on smaller screens */
+@media screen and (max-width: 76.234375em) {
+    .md-header__button.md-logo {
+        display: block;
+    }
+    .md-tabs {
+        display: block;
+    }
+}
+
+/* Rounded search box + results */
+.md-search__form {
+    border-radius: .5rem;
+}
+
+[data-md-toggle=search]:checked~.md-header .md-search__form {
+    border-radius: .5rem .5rem 0 0;
+}
+[dir=ltr] .md-search__output {
+    border-radius: 0 0 .5rem .5rem;
+}
+
+/* Center images  */
+img.center {
+    display: block;
+    margin: 20px auto;
+    width: 550px;
+}

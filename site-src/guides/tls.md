@@ -8,7 +8,7 @@ effectively.
 
     The `TLSRoute` and `BackendTLSPolicy` resources described below are currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+    channels, refer to the [related documentation](/concepts/versioning).
 
 ## Client/Server and TLS
 

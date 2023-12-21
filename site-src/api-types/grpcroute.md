@@ -2,14 +2,9 @@
 
 ??? example "Experimental Channel in v0.6.0+"
 
-    The `GRPCRoute` resource is Alpha and part of the Experimental Channel in `v0.6.0+`.
-
-!!! info "Experimental Channel"
-
-    The `GRPCRoute` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
-
+    The `GRPCRoute` resource is Alpha and part of the Experimental Channel in
+    `v0.6.0+`. For more information on release channels, refer to the [related
+    documentation](/concepts/versioning).
 
 [GRPCRoute][grpcroute] is a Gateway API type for specifying routing behavior
 of gRPC requests from a Gateway listener to an API object, i.e. Service.
@@ -41,7 +36,7 @@ the following criteria are met:
 - Users of the enapsulated protocol would experience a degraded user experience if forced to route at a lower layer.
 - The encapsulated protocol has a significant user base, particularly in the Kubernetes community.
 
-gRPC meets all of these criteria, so the decision was made to include `GRPCRoute`in the Gateway API.
+gRPC meets all of these criteria, so the decision was made to include `GRPCRoute`in Gateway API.
 
 ### Cross Serving
 
