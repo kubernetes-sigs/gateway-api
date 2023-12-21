@@ -10,7 +10,7 @@ authors:
   - howardjohn
   - kflynn
 relationships:
-  updates:
+  extends:
     - number: 1324
       name: Service Mesh in Gateway API
       description: Adds initial Mesh conformance testing plan

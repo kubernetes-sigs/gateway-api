@@ -9,7 +9,7 @@ authors:
   - howardjohn
   - keithmattix
 relationships:
-  updates:
+  extends:
     - number: 1324
       name: Service Mesh in Gateway API
       description: Adds initial Service binding proposal

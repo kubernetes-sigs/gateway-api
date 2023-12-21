@@ -7,7 +7,7 @@ status: Experimental
 authors:
   - kflynn
 relationships:
-  updates:
+  extends:
     - number: 1742
       name: HTTPRoute Timeouts
       description: Adds a duration format for us in timeouts.

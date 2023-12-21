@@ -8,6 +8,6 @@ authors:
   - howardjohn
   - frakbu
 relationships:
-  updatedBy:
+  extendedBy:
     - number: 1867
       name: Per-Gateway Infrastructure

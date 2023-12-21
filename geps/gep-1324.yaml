@@ -8,7 +8,7 @@ authors:
   - markmc
   - kflynn
 relationships:
-  updatedBy:
+  extendedBy:
     - number: 1426
       name: xRoutes Mesh Binding
       description: Adds initial Service binding proposal

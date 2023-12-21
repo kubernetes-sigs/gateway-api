@@ -7,6 +7,6 @@ status: Experimental
 authors:
   - howardjohn
 relationships:
-  updates:
+  extends:
     - number: 1762
       name: In Cluster Gateway Deployments

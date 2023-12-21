@@ -87,9 +87,9 @@ type GEPRelationships struct {
 	// The GEP is Obsoleted by the listed GEPs.
 	ObsoletedBy []GEPRelationship `json:"obsoletedBy,omitempty"`
 	// The GEP Updates the listed GEPs.
-	Updates []GEPRelationship `json:"updates,omitempty"`
+	Extends []GEPRelationship `json:"updates,omitempty"`
 	// The GEP is Updated by the listed GEPs.
-	UpdatedBy []GEPRelationship `json:"updatedBy,omitempty"`
+	ExtendedBy []GEPRelationship `json:"updatedBy,omitempty"`
 	// The listed GEPs are relevant for some other reason.
 	SeeAlso []GEPRelationship `json:"seeAlso,omitempty"`
 }
