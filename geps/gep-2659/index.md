@@ -110,22 +110,24 @@ kind: GEPDetails
 number: 2659
 name: Document and improve the GEP process
 status: Memorandum
-relationships:
-  # Normally, these will be omitted, because `omitempty`.
-  # They are included here for clarity.
-  obsoletes: {}
-  obsoletedBy: {}
-  extends: {}
-  extendedBy: {}
-  seeAlso:
-  - number: "713"
-    name: "Policy attachment and Metaresources"
-    description: "GEP will move to Memorandum type after being split"
-  - number: "1324"
-    name: "Service Mesh in Gateway API"
-    description: "GEP is Memorandum type"
 authors:
   - youngnick
+relationships:
+  # obsoletes indicates that a GEP makes the linked GEP obsolete, and completely
+  # replaces that GEP. The obsoleted GEP MUST have its obsoletedBy field
+  # set back to this GEP, and MUST be moved to Declined.
+  obsoletes: {}
+  obsoletedBy: {}
+  # extends indicates that a GEP extends the linkned GEP, adding more detail
+  # or additional implementation. The extended GEP MUST have its extendedBy
+  # field set back to this GEP.
+  extends: {}
+  extendedBy: {}
+  # seeAlso indicates other GEPs that are relevant in some way without being
+  # covered by an existing relationship.
+  seeAlso: {}
+# latestRelease indicates the latest release in which the GEP was changed.
+# update this when you update a GEP.
 latestRelease: v1.1
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing Github discussions, Google docs, etc.

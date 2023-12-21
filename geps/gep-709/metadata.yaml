@@ -2,7 +2,6 @@ apiVersion: internal.gateway.networking.k8s.io/v1alpha1
 kind: GEPDetails
 number: 709
 name: Cross Namespace References from Routes
-type: API
 status: Standard
 authors:
   - robscott
