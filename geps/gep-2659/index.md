@@ -72,14 +72,14 @@ and a common language, or further process changes to the GEP process itself.
 The defining characteristic here is that the GEP MUST NOT result in any changes
 to the Gateway API spec, and MAY result in further GEPs to further clarify.
 For GEPs that _do_ make changes to the API, but also require further GEPs to
-clarify, they SHOULD use the new "Updated By" relationship instead.
+clarify, they SHOULD use the new "Extended By" relationship instead.
 
 Memorandum GEPs should be used sparingly, and should form the umbrella for a
 significant amount of work, particularly work that may have parts that can
 move through the GEP phases at different speeds.
 
 The status is reached when a Memorandum GEP is merged, although as we will document
-in the "Addition of GEP relationships" section, it can still be Updated
+in the "Addition of GEP relationships" section, it can still be Extended
 or Obsoleted.
 
 Existing GEPs that meet this criteria will be gradually moved to be proper
@@ -126,9 +126,6 @@ relationships:
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
   seeAlso: {}
-# latestRelease indicates the latest release in which the GEP was changed.
-# update this when you update a GEP.
-latestRelease: v1.1
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing Github discussions, Google docs, etc.
 references: {}
@@ -137,7 +134,8 @@ references: {}
 featureNames: {}
 # changelog is a list of hyperlinks to PRs that make changes to the GEP, in
 # ascending date order.
-changelog: {}
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2689"
 ```
 
 ### Addition of GEP relationships
@@ -146,7 +144,7 @@ As you can see in the previous section, this GEP adds three relationships betwee
 GEPs:
 - `Obsoletes` and its backreference `ObsoletedBy` - when a GEP is made obsolete
   by another GEP, and has its functionality completely replaced.
-- `Updates` and its backreference `UpdatedBy` - when a GEP has additional details
+- `Extends` and its backreference `ExtendedBy` - when a GEP has additional details
   or implementation added in another GEP.
 - `SeeAlso` - when a GEP is relevant to another GEP, but is not affected in any
   other defined way.
@@ -158,7 +156,7 @@ At this time it's the updater's responsibility to ensure that both directions
 are created for bidirectional relationships.
 
 Further relationships may be added at a later date (at which time that GEP will
-have an `Updates` relationship to this one).
+have an `Extends` relationship to this one).
 
 Because of the addition of structured definitions for these relationships, the
 relationships will _not_ be recorded in the main GEP file (it's anticipated

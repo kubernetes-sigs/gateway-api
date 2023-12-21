@@ -59,9 +59,6 @@ type GEPDetail struct {
 	// The GEP's authors, listed as their Github handles.
 	Authors []string `json:"authors"`
 
-	// The latest release in which the GEP was worked on.
-	LatestRelease string `json:"latestRelease"`
-
 	// Relationships describes the possible relationships between this GEP and
 	// other GEPs.
 	Relationships GEPRelationships `json:"relationships,omitempty"`

@@ -24,9 +24,6 @@ relationships:
   # seeAlso indicates other GEPs that are relevant in some way without being
   # covered by an existing relationship.
   seeAlso: {}
-# latestRelease indicates the latest release in which the GEP was changed.
-# update this when you update a GEP.
-latestRelease: v1.1
 # references is a list of hyperlinks to relevant external references.
 # It's intended to be used for storing Github discussions, Google docs, etc.
 references: {}

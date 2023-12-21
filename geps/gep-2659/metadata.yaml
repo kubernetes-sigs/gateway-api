@@ -17,4 +17,5 @@ relationships:
       description: GEP is Memorandum type
 authors:
   - youngnick
-latestRelease: v1.1
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2689"

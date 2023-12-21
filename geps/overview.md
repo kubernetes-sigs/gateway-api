@@ -11,7 +11,7 @@ process for the main Kubernetes project:
 1. Record the results of larger community discussions.
 1. Record changes to the GEP process itself.
 
-## Process diagram
+## Process
 
 This diagram shows the state diagram of the GEP process at a high level, but the details are below.
 
@@ -82,7 +82,7 @@ relationships:
 * **Obsoletes** and its backreference **ObsoletedBy**: when a GEP is made obsolete
   by another GEP, and has its functionality completely replaced. The Obsoleted
   GEP is moved to the **Declined** state.
-* **Updates** and its backreference **UpdatedBy**: when a GEP has additional details
+* **Extends** and its backreference **ExtendedBy**: when a GEP has additional details
   or implementation added in another GEP.
 * **SeeAlso**: when a GEP is relevant to another GEP, but is not affected in any
   other defined way.
