@@ -1,0 +1,18 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1742
+name: HTTPRoute Timeouts
+status: Experimental
+authors:
+  - youngnick
+  - spacewander
+  - frankbu
+  - shaneutt
+  - candita
+  - robscott
+  - sjberman
+relationships:
+  extendedBy:
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Adds a duration format for us in timeouts.

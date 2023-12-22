@@ -1,7 +1,7 @@
 # GEP-922: Gateway API Versioning
 
 * Issue: [#922](https://github.com/kubernetes-sigs/gateway-api/issues/922)
-* Status: Standard
+* Status: Memorandum
 
 !!! note
     Although this GEP serves as a reference for how we developed the Gateway API

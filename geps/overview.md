@@ -8,6 +8,8 @@ process for the main Kubernetes project:
 1. Make changes and proposals discoverable (current and future).
 1. Document design ideas, tradeoffs, decisions that were made for
   historical reference.
+1. Record the results of larger community discussions.
+1. Record changes to the GEP process itself.
 
 ## Process
 
@@ -18,16 +20,84 @@ This diagram shows the state diagram of the GEP process at a high level, but the
 ```mermaid
 flowchart TD
     D([Discuss with<br />the community]) --> C
+    C([Issue Created]) -------> Memorandum
     C([Issue Created]) --> Provisional
-    Provisional -->|GEP Doc PR<br />done| Implementable
     Provisional -->|If practical <br /> work needed| Prototyping
+    Provisional -->|GEP Doc PR<br />done| Implementable
     Prototyping -->|GEP Doc PR<br />done| Implementable
     Implementable -->|Gateway API<br />work completed| Experimental
     Experimental -->|Supported in<br />multiple implementations<br />+ Conformance tests| Standard
     Standard -->|Entire change is GA or implemented| Completed
+
 ```
 
 </div>
+
+## GEP Definitions
+
+### GEP States
+
+Each GEP has a state, which tracks where it is in the GEP process.
+
+GEPs can move to some states from any other state:
+
+  * **Declined**: The GEP has been declined and further work will not occur.
+  * **Deferred:** We do not currently have bandwidth to handle this GEP, it
+    may be revisited in the future.
+  * **Declined:** This proposal was considered by the community but ultimately
+  rejected.
+  * **Withdrawn:** This proposal was considered by the community but ultimately
+  withdrawn by the author.
+
+There is a special state to cover Memorandum GEPs:
+
+  * **Memorandum**: These GEPs either:
+    * Document an agreement for further work, creating no spec changes themselves, or
+    * Update the GEP process.
+
+API GEPs flow through a number of states, which generally correspond to the level
+of stability of the change described in the GEP:
+
+  * **Provisional:** The goals described by this GEP have consensus but
+    implementation details have not been agreed to yet.
+  * **Prototyping:** An extension of `Provisional` which can be opted in to in
+    order to indicate to the community that there are some active practical tests
+    and experiments going on which are intended to be a part of the development
+    of this GEP. This may include APIs or code, but that content _must_ not be
+    distributed with releases.
+  * **Implementable:** The goals and implementation details described by this GEP
+    have consensus but have not been fully implemented yet.
+  * **Experimental:** This GEP has been implemented and is part of the
+    "Experimental" release channel. Breaking changes are still possible, up to
+    and including complete removal and moving to `Rejected`.
+  * **Standard:** This GEP has been implemented and is part of the
+    "Standard" release channel. It should be quite stable.
+  * **Completed**: All implementation work on this API GEP has been completed.
+
+### Relationships between GEPs
+
+GEPs can have relationships between them. At this time, there are three possible
+relationships:
+
+* **Obsoletes** and its backreference **ObsoletedBy**: when a GEP is made obsolete
+  by another GEP, and has its functionality completely replaced. The Obsoleted
+  GEP is moved to the **Declined** state.
+* **Extends** and its backreference **ExtendedBy**: when a GEP has additional details
+  or implementation added in another GEP.
+* **SeeAlso**: when a GEP is relevant to another GEP, but is not affected in any
+  other defined way.
+
+Relationships are tracked in the YAML metadata files accompanying each GEP.
+
+### GEP metadata file
+
+Each GEP has a YAML file containing metadata alongside it, please keep it up to
+date as changes to the GEP occur.
+
+In particular, note the `authors`, and `changelog` fields, please keep those up
+to date.
+
+## Process
 
 ### 1. Discuss with the community
 
@@ -48,9 +118,14 @@ into this document.
 
 ### 3. Agree on the Goals
 Although it can be tempting to start writing out all the details of your
-proposal, it's important to first ensure we all agree on the goals. The first
-version of your GEP should aim for a "Provisional" status and leave out any
-implementation details, focusing primarily on "Goals" and "Non-Goals".
+proposal, it's important to first ensure we all agree on the goals.
+
+For API GEPs, the first version of your GEP should aim for a "Provisional"
+status and leave out any implementation details, focusing primarily on
+"Goals" and "Non-Goals".
+
+For Memorandum GEPs, the first version of your GEP will be the only one, as
+Memorandums have only a single stage - `Accepted`.
 
 ### 3. Document Implementation Details
 Now that everyone agrees on the goals, it is time to start writing out your
@@ -131,38 +206,6 @@ The GEP issue should only be closed once the feature has:
 
 In short, the GEP issue should only be closed when the work is "done" (whatever
 that means for that GEP).
-
-## Status
-
-Each GEP has a status field that defines it's current state. Each transition
-will require a PR to update the GEP and should be discussed at a community
-meeting before merging. Most GEPS will proceed through the following states:
-
-* **Provisional:** The goals described by this GEP have consensus but
-  implementation details have not been agreed to yet.
-* **Prototyping:** An extension of `Provisional` which can be opted in to in
-  order to indicate to the community that there are some active practical tests
-  and experiments going on which are intended to be a part of the development
-  of this GEP. This may include APIs or code, but that content _must_ not be
-  distributed with releases.
-* **Implementable:** The goals and implementation details described by this GEP
-  have consensus but have not been fully implemented yet.
-* **Experimental:** This GEP has been implemented and is part of the
-  "Experimental" release channel. Breaking changes are still possible, up to
-  and including complete removal and moving to `Rejected`.
-* **Standard:** This GEP has been implemented and is part of the
-  "Standard" release channel. It should be quite stable.
-
-Although less common, some GEPs may end up in one of the following states:
-
-* **Deferred:** We do not currently have bandwidth to handle this GEP, it
-  may be revisited in the future.
-* **Rejected:** This proposal was considered by the community but ultimately
-  rejected.
-* **Replaced:** This proposal was considered by the community but ultimately
-  replaced by a newer proposal.
-* **Withdrawn:** This proposal was considered by the community but ultimately
-  withdrawn by the author.
 
 ## Format
 

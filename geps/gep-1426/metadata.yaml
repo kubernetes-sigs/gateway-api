@@ -1,0 +1,14 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1426
+name: xRoutes Mesh Binding
+status: Experimental
+authors:
+  - mikemorris
+  - howardjohn
+  - keithmattix
+relationships:
+  extends:
+    - number: 1324
+      name: Service Mesh in Gateway API
+      description: Adds initial Service binding proposal

@@ -1,7 +1,7 @@
 # GEP-1324: Service Mesh in Gateway API
 
 * Issue: [#1324](https://github.com/kubernetes-sigs/gateway-api/issues/1324)
-* Status: Experimental
+* Status: Memorandum
 
 > **Note**: This GEP is exempt from the [Probationary Period][expprob] rules
 > of our GEP overview as it existed before those rules did, and so it has been

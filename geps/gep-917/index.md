@@ -1,7 +1,7 @@
 # GEP-917: Gateway API Conformance Testing
 
 * Issue: [#917](https://github.com/kubernetes-sigs/gateway-api/issues/917)
-* Status: Standard
+* Status: Memorandum
 
 ## TLDR
 

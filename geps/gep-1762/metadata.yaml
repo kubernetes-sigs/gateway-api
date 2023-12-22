@@ -1,0 +1,12 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 1762
+name: In Cluster Gateway Deployments
+status: Experimental
+authors:
+  - howardjohn
+  - frakbu
+relationships:
+  extendedBy:
+    - number: 1867
+      name: Per-Gateway Infrastructure

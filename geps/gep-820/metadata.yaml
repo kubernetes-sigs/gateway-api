@@ -1,0 +1,8 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 820
+name: Drop extension points from Route matches
+status: Standard
+authors:
+  - hbagdi
+  - robscott
