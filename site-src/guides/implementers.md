@@ -180,7 +180,7 @@ one compatible GatewayClass out of the set of GatewayClasses that have a matchin
 `controllerName`, and indicate that it accepts processing of that GatewayClass
 by setting an `Accepted` Condition to `status: true` in each. Any GatewayClasses
 that have a matching `controllerName` but are _not_ Accepted must have the
-`Accepted` Condition sett to `status: false`.
+`Accepted` Condition set to `status: false`.
 
 Implementations MAY choose only one GatewayClass out of the pool of otherwise
 acceptable GatewayClasses if they can only reconcile one, or, if they are capable
