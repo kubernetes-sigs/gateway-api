@@ -8,20 +8,20 @@
 ## TLDR
 
 This GEP proposes a way to validate the TLS certificate presented by the downstream client to the server
-(Gateway Listener in this case) during a [TLS Handshake Protocol][], also commonly referred to as mutual TLS (mTLS).
+(Gateway Listener in this case) during a [TLS Handshake Protocol][].
 
 ## Goals
-- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trusted anchor to validate the certificates presented by the client.
+- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client.
 
 ## Non-Goals
 - Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
 
 ### API
 
-* Introduce a `clientValidation` field with [Gateway.Tls][] that can be used to validate the client intiating the TLS connection
-to the Gateway
-* Introduce a `caCerficateRefs` field within `clientValidation` that can be used to specify a list of CA Certificates that
-can be used as a trusted anchor to validate the certificates presented by the client
+* Introduce a `clientValidation` field of type `ClientValidationContext` within [GatewayTLSConfig][] that can be used to validate the client initiating the TLS connection
+to the Gateway.
+* Introduce a `caCertificateRefs` field within `ClientValidationContext` that can be used to specify a list of CA Certificates that
+can be used as a trust anchor to validate the certificates presented by the client.
 
 #### GO
 
@@ -33,12 +33,17 @@ type ClientValidationContext struct {
     // CACertificateRefs contains one or more references to
     // Kubernetes objects that contain TLS certificates of
     // the Certificate Authorities that can be used to
-    // as a trusted anchor to validate the certificates presented by the client.
+    // as a trust anchor to validate the certificates presented by the client.
     //
-    // A single CACertificateRef to a Kubernetes ConfigMap with a key called `ca.crt`
-    // has "Core" support.
-    // Implementations MAY choose to support attaching multiple certificates to
+    // A single CACertRef to a Kubernetes ConfigMap kind has "Core" support.
+    // Implementations MAY choose to support attaching multiple CA certificates to
     // a Listener, but this behavior is implementation-specific.
+    //
+    // Support: Core - An optional single reference to a Kubernetes ConfigMap,
+    // with the CA certificate in a key named `ca.crt`.
+    //
+    // Support: Implementation-specific (More than one reference, or other kinds
+    // of resources).
     //
     // References to a resource in different namespace are invalid UNLESS there
     // is a ReferenceGrant in the target namespace that allows the certificate
@@ -46,7 +51,7 @@ type ClientValidationContext struct {
     // "ResolvedRefs" condition MUST be set to False for this listener with the
     // "RefNotPermitted" reason.
     //
-    // +kubebuilder:validation:MaxItems=64
+    // +kubebuilder:validation:MaxItems=8
     // +optional
     CACertificateRefs []corev1.ObjectReference `json:”caCertificateRefs,omitempty”`
 }
@@ -59,7 +64,7 @@ type ClientValidationContext struct {
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
-  name: mtls-basic
+  name: client-validation-basic
 spec:
   gatewayClassName: acme-lb
   listeners:
@@ -83,4 +88,4 @@ spec:
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[Gateway.TLS]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.GatewayTLSConfig
+[GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.GatewayTLSConfig
