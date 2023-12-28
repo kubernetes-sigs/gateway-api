@@ -913,6 +913,12 @@ const (
 	// ignored. For example, the paths `/abc`, `/abc/`, and `/abc/def` would all
 	// match the prefix `/abc`, but the path `/abcd` would not.
 	PrefixMatchHTTPPathModifier HTTPPathModifierType = "ReplacePrefixMatch"
+
+	// This type of modifier indicates that the full path will be replaced
+	// by the specified value. For example, the path `/foo/bar/baz` with a
+	// RegularExpression match of `/foo/(.*)/baz`, the `bar` will be relaced
+	// with other
+	RegularExpressionHTTPPathModifier HTTPPathModifierType = "RegularExpression"
 )
 
 // HTTPPathModifier defines configuration for path modifiers.
@@ -921,6 +927,8 @@ const (
 // +kubebuilder:validation:XValidation:message="type must be 'ReplaceFullPath' when replaceFullPath is set",rule="has(self.replaceFullPath) ? self.type == 'ReplaceFullPath' : true"
 // +kubebuilder:validation:XValidation:message="replacePrefixMatch must be specified when type is set to 'ReplacePrefixMatch'",rule="self.type == 'ReplacePrefixMatch' ? has(self.replacePrefixMatch) : true"
 // +kubebuilder:validation:XValidation:message="type must be 'ReplacePrefixMatch' when replacePrefixMatch is set",rule="has(self.replacePrefixMatch) ? self.type == 'ReplacePrefixMatch' : true"
+// +kubebuilder:validation:XValidation:message="regularExpression must be specified when type is set to 'RegularExpression'",rule="self.type == 'regularExpression' ? has(self.regularExpression) : true"
+// +kubebuilder:validation:XValidation:message="type must be 'RegularExpression' when regularExpression is set",rule="has(self.regularExpression) ? self.type == 'RegularExpression' : true"
 type HTTPPathModifier struct {
 	// Type defines the type of path modifier. Additional types may be
 	// added in a future release of the API.
@@ -932,7 +940,7 @@ type HTTPPathModifier struct {
 	// Accepted Condition for the Route to `status: False`, with a
 	// Reason of `UnsupportedValue`.
 	//
-	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch
+	// +kubebuilder:validation:Enum=ReplaceFullPath;ReplacePrefixMatch;RegularExpression
 	Type HTTPPathModifierType `json:"type"`
 
 	// ReplaceFullPath specifies the value with which to replace the full path
@@ -974,6 +982,15 @@ type HTTPPathModifier struct {
 	// +kubebuilder:validation:MaxLength=1024
 	// +optional
 	ReplacePrefixMatch *string `json:"replacePrefixMatch,omitempty"`
+
+	// This type of modifier indicates that the full path will be replaced
+	// by the specified value. For example, the path `/foo/bar/baz` with a
+	// RegularExpression match of `/foo/(.*)/baz`, the `bar` will be relaced
+	// with other
+	//
+	// +kubebuilder:validation:MaxLength=1024
+	// +optional
+	RegularExpression *string `json:"regularExpression,omitempty"`
 }
 
 // HTTPRequestRedirect defines a filter that redirects a request. This filter

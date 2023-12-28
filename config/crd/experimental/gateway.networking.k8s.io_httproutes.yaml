@@ -637,6 +637,15 @@ spec:
                                         `Location` header. When empty, the request
                                         path is used as-is. \n Support: Extended"
                                       properties:
+                                        regularExpression:
+                                          description: This type of modifier indicates
+                                            that the full path will be replaced by
+                                            the specified value. For example, the
+                                            path `/foo/bar/baz` with a RegularExpression
+                                            match of `/foo/(.*)/baz`, the `bar` will
+                                            be relaced with other
+                                          maxLength: 1024
+                                          type: string
                                         replaceFullPath:
                                           description: ReplaceFullPath specifies the
                                             value with which to replace the full path
@@ -697,6 +706,7 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
+                                          - RegularExpression
                                           type: string
                                       required:
                                       - type
@@ -718,6 +728,14 @@ spec:
                                           when replacePrefixMatch is set
                                         rule: 'has(self.replacePrefixMatch) ? self.type
                                           == ''ReplacePrefixMatch'' : true'
+                                      - message: regularExpression must be specified
+                                          when type is set to 'RegularExpression'
+                                        rule: 'self.type == ''regularExpression''
+                                          ? has(self.regularExpression) : true'
+                                      - message: type must be 'RegularExpression'
+                                          when regularExpression is set
+                                        rule: 'has(self.regularExpression) ? self.type
+                                          == ''RegularExpression'' : true'
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
@@ -943,6 +961,15 @@ spec:
                                       description: "Path defines a path rewrite. \n
                                         Support: Extended"
                                       properties:
+                                        regularExpression:
+                                          description: This type of modifier indicates
+                                            that the full path will be replaced by
+                                            the specified value. For example, the
+                                            path `/foo/bar/baz` with a RegularExpression
+                                            match of `/foo/(.*)/baz`, the `bar` will
+                                            be relaced with other
+                                          maxLength: 1024
+                                          type: string
                                         replaceFullPath:
                                           description: ReplaceFullPath specifies the
                                             value with which to replace the full path
@@ -1003,6 +1030,7 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
+                                          - RegularExpression
                                           type: string
                                       required:
                                       - type
@@ -1024,6 +1052,14 @@ spec:
                                           when replacePrefixMatch is set
                                         rule: 'has(self.replacePrefixMatch) ? self.type
                                           == ''ReplacePrefixMatch'' : true'
+                                      - message: regularExpression must be specified
+                                          when type is set to 'RegularExpression'
+                                        rule: 'self.type == ''regularExpression''
+                                          ? has(self.regularExpression) : true'
+                                      - message: type must be 'RegularExpression'
+                                          when regularExpression is set
+                                        rule: 'has(self.regularExpression) ? self.type
+                                          == ''RegularExpression'' : true'
                                   type: object
                               required:
                               - type
@@ -1458,6 +1494,14 @@ spec:
                                   When empty, the request path is used as-is. \n Support:
                                   Extended"
                                 properties:
+                                  regularExpression:
+                                    description: This type of modifier indicates that
+                                      the full path will be replaced by the specified
+                                      value. For example, the path `/foo/bar/baz`
+                                      with a RegularExpression match of `/foo/(.*)/baz`,
+                                      the `bar` will be relaced with other
+                                    maxLength: 1024
+                                    type: string
                                   replaceFullPath:
                                     description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
@@ -1512,6 +1556,7 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
+                                    - RegularExpression
                                     type: string
                                 required:
                                 - type
@@ -1533,6 +1578,14 @@ spec:
                                     replacePrefixMatch is set
                                   rule: 'has(self.replacePrefixMatch) ? self.type
                                     == ''ReplacePrefixMatch'' : true'
+                                - message: regularExpression must be specified when
+                                    type is set to 'RegularExpression'
+                                  rule: 'self.type == ''regularExpression'' ? has(self.regularExpression)
+                                    : true'
+                                - message: type must be 'RegularExpression' when regularExpression
+                                    is set
+                                  rule: 'has(self.regularExpression) ? self.type ==
+                                    ''RegularExpression'' : true'
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. \n If
@@ -1743,6 +1796,14 @@ spec:
                                 description: "Path defines a path rewrite. \n Support:
                                   Extended"
                                 properties:
+                                  regularExpression:
+                                    description: This type of modifier indicates that
+                                      the full path will be replaced by the specified
+                                      value. For example, the path `/foo/bar/baz`
+                                      with a RegularExpression match of `/foo/(.*)/baz`,
+                                      the `bar` will be relaced with other
+                                    maxLength: 1024
+                                    type: string
                                   replaceFullPath:
                                     description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
@@ -1797,6 +1858,7 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
+                                    - RegularExpression
                                     type: string
                                 required:
                                 - type
@@ -1818,6 +1880,14 @@ spec:
                                     replacePrefixMatch is set
                                   rule: 'has(self.replacePrefixMatch) ? self.type
                                     == ''ReplacePrefixMatch'' : true'
+                                - message: regularExpression must be specified when
+                                    type is set to 'RegularExpression'
+                                  rule: 'self.type == ''regularExpression'' ? has(self.regularExpression)
+                                    : true'
+                                - message: type must be 'RegularExpression' when regularExpression
+                                    is set
+                                  rule: 'has(self.regularExpression) ? self.type ==
+                                    ''RegularExpression'' : true'
                             type: object
                         required:
                         - type
@@ -3103,6 +3173,15 @@ spec:
                                         `Location` header. When empty, the request
                                         path is used as-is. \n Support: Extended"
                                       properties:
+                                        regularExpression:
+                                          description: This type of modifier indicates
+                                            that the full path will be replaced by
+                                            the specified value. For example, the
+                                            path `/foo/bar/baz` with a RegularExpression
+                                            match of `/foo/(.*)/baz`, the `bar` will
+                                            be relaced with other
+                                          maxLength: 1024
+                                          type: string
                                         replaceFullPath:
                                           description: ReplaceFullPath specifies the
                                             value with which to replace the full path
@@ -3163,6 +3242,7 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
+                                          - RegularExpression
                                           type: string
                                       required:
                                       - type
@@ -3184,6 +3264,14 @@ spec:
                                           when replacePrefixMatch is set
                                         rule: 'has(self.replacePrefixMatch) ? self.type
                                           == ''ReplacePrefixMatch'' : true'
+                                      - message: regularExpression must be specified
+                                          when type is set to 'RegularExpression'
+                                        rule: 'self.type == ''regularExpression''
+                                          ? has(self.regularExpression) : true'
+                                      - message: type must be 'RegularExpression'
+                                          when regularExpression is set
+                                        rule: 'has(self.regularExpression) ? self.type
+                                          == ''RegularExpression'' : true'
                                     port:
                                       description: "Port is the port to be used in
                                         the value of the `Location` header in the
@@ -3409,6 +3497,15 @@ spec:
                                       description: "Path defines a path rewrite. \n
                                         Support: Extended"
                                       properties:
+                                        regularExpression:
+                                          description: This type of modifier indicates
+                                            that the full path will be replaced by
+                                            the specified value. For example, the
+                                            path `/foo/bar/baz` with a RegularExpression
+                                            match of `/foo/(.*)/baz`, the `bar` will
+                                            be relaced with other
+                                          maxLength: 1024
+                                          type: string
                                         replaceFullPath:
                                           description: ReplaceFullPath specifies the
                                             value with which to replace the full path
@@ -3469,6 +3566,7 @@ spec:
                                           enum:
                                           - ReplaceFullPath
                                           - ReplacePrefixMatch
+                                          - RegularExpression
                                           type: string
                                       required:
                                       - type
@@ -3490,6 +3588,14 @@ spec:
                                           when replacePrefixMatch is set
                                         rule: 'has(self.replacePrefixMatch) ? self.type
                                           == ''ReplacePrefixMatch'' : true'
+                                      - message: regularExpression must be specified
+                                          when type is set to 'RegularExpression'
+                                        rule: 'self.type == ''regularExpression''
+                                          ? has(self.regularExpression) : true'
+                                      - message: type must be 'RegularExpression'
+                                          when regularExpression is set
+                                        rule: 'has(self.regularExpression) ? self.type
+                                          == ''RegularExpression'' : true'
                                   type: object
                               required:
                               - type
@@ -3924,6 +4030,14 @@ spec:
                                   When empty, the request path is used as-is. \n Support:
                                   Extended"
                                 properties:
+                                  regularExpression:
+                                    description: This type of modifier indicates that
+                                      the full path will be replaced by the specified
+                                      value. For example, the path `/foo/bar/baz`
+                                      with a RegularExpression match of `/foo/(.*)/baz`,
+                                      the `bar` will be relaced with other
+                                    maxLength: 1024
+                                    type: string
                                   replaceFullPath:
                                     description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
@@ -3978,6 +4092,7 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
+                                    - RegularExpression
                                     type: string
                                 required:
                                 - type
@@ -3999,6 +4114,14 @@ spec:
                                     replacePrefixMatch is set
                                   rule: 'has(self.replacePrefixMatch) ? self.type
                                     == ''ReplacePrefixMatch'' : true'
+                                - message: regularExpression must be specified when
+                                    type is set to 'RegularExpression'
+                                  rule: 'self.type == ''regularExpression'' ? has(self.regularExpression)
+                                    : true'
+                                - message: type must be 'RegularExpression' when regularExpression
+                                    is set
+                                  rule: 'has(self.regularExpression) ? self.type ==
+                                    ''RegularExpression'' : true'
                               port:
                                 description: "Port is the port to be used in the value
                                   of the `Location` header in the response. \n If
@@ -4209,6 +4332,14 @@ spec:
                                 description: "Path defines a path rewrite. \n Support:
                                   Extended"
                                 properties:
+                                  regularExpression:
+                                    description: This type of modifier indicates that
+                                      the full path will be replaced by the specified
+                                      value. For example, the path `/foo/bar/baz`
+                                      with a RegularExpression match of `/foo/(.*)/baz`,
+                                      the `bar` will be relaced with other
+                                    maxLength: 1024
+                                    type: string
                                   replaceFullPath:
                                     description: ReplaceFullPath specifies the value
                                       with which to replace the full path of a request
@@ -4263,6 +4394,7 @@ spec:
                                     enum:
                                     - ReplaceFullPath
                                     - ReplacePrefixMatch
+                                    - RegularExpression
                                     type: string
                                 required:
                                 - type
@@ -4284,6 +4416,14 @@ spec:
                                     replacePrefixMatch is set
                                   rule: 'has(self.replacePrefixMatch) ? self.type
                                     == ''ReplacePrefixMatch'' : true'
+                                - message: regularExpression must be specified when
+                                    type is set to 'RegularExpression'
+                                  rule: 'self.type == ''regularExpression'' ? has(self.regularExpression)
+                                    : true'
+                                - message: type must be 'RegularExpression' when regularExpression
+                                    is set
+                                  rule: 'has(self.regularExpression) ? self.type ==
+                                    ''RegularExpression'' : true'
                             type: object
                         required:
                         - type
