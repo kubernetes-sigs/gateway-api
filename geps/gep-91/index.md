@@ -11,7 +11,7 @@ This GEP proposes a way to validate the TLS certificate presented by the downstr
 (Gateway Listener in this case) during a [TLS Handshake Protocol][].
 
 ## Goals
-- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client.
+- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client. This use case has been been highlighted in the [Gateway API TLS Use Cases][] document under point 7.
 
 ## Non-Goals
 - Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
@@ -89,3 +89,4 @@ spec:
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
 [GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.GatewayTLSConfig
+[Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm
