@@ -21,7 +21,7 @@ example, to issue a permanent redirect (301) from HTTP to HTTPS, configure
 `requestRedirect.statusCode=301` and `requestRedirect.scheme="https"`:
 
 ```yaml
-{% include 'standard/http-redirect-rewrite/httproute-redirect-https.yaml' %}
+{% include 'standard/http-redirect-rewrite/httproute-redirect-http.yaml' %}
 ```
 
 Redirects change configured URL components to match the redirect configuration
@@ -30,6 +30,32 @@ example, the request `GET http://redirect.example/cinnamon` will result in a
 301 response with a `location: https://redirect.example/cinnamon` header. The
 hostname (`redirect.example`), path (`/cinnamon`), and port (implicit) remain
 unchanged.
+
+### HTTP-to-HTTPS redirects
+
+To redirect HTTP traffic to HTTPS, you need to have a Gateway with both HTTP
+and HTTPS listeners.
+
+```yaml
+{% include 'standard/http-redirect-rewrite/gateway-redirect-http-https.yaml' %}
+```
+There are multiple ways to secure a Gateway. In this example, it is secured
+using a Kubernetes Secret(`redirect-example` in the `certificateRefs` section).
+
+You need a HTTPRoute that attaches to the HTTP listener and does the redirect
+to HTTPS. Here we set `sectionName` to be `http` so it only selects the
+listener named `http`.
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-redirect-http.yaml' %}
+```
+
+You also need a HTTPRoute that attaches to the HTTPS listener that forwards
+HTTPS traffic to application backends.
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-redirect-https.yaml' %}
+```
 
 ### Path redirects
 
