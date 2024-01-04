@@ -88,8 +88,3 @@ Implementations MAY prevent end-users from updating the name of a route rule. If
 ### Use filters to extend behavior of specific route rules
 - Does not solve for easy referencing in debugging, logging, status messages – i.e. some verbosity required to communicate what route rule the events refers to
 - No support for third-parties
-
-## References
-
-(Add any additional document links. Again, we should try to avoid
-too much content not in version control to avoid broken links)
