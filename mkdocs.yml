@@ -109,6 +109,7 @@ nav:
       - Provisional:
         - geps/gep-91/index.md
         - geps/gep-1619/index.md
+        - geps/gep-1651/index.md
         - geps/gep-1867/index.md
       # - Implementable:
       #   -
@@ -117,7 +118,6 @@ nav:
         - geps/gep-957/index.md
         - geps/gep-1016/index.md
         - geps/gep-1426/index.md
-        - geps/gep-1651/index.md
         - geps/gep-1686/index.md
         - geps/gep-1709/index.md
         - geps/gep-1742/index.md
