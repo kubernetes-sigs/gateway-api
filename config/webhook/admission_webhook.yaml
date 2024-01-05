@@ -8,7 +8,7 @@ webhooks:
   rules:
   - operations: [ "CREATE" , "UPDATE" ]
     apiGroups: [ "gateway.networking.k8s.io" ]
-    apiVersions: [ "v1alpha2", "v1beta1" ]
+    apiVersions: [ "v1beta1", "v1" ]
     resources: [ "gateways", "gatewayclasses", "httproutes" ]
   failurePolicy: Fail
   sideEffects: None
