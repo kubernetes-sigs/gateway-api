@@ -206,7 +206,7 @@ type HTTPRouteRule struct {
 	//
 	// To reject an invalid combination or order of filters, implementations SHOULD
 	// consider the Route Rule(s) with this configuration invalid. If all Route Rule(s)
-	// in a Route are invalid, the entire Route would be considered invalid. In only
+	// in a Route are invalid, the entire Route would be considered invalid. If only
 	// a portion of Route Rules are invalid, implementations MUST set the
 	// "PartiallyInvalid" condition for the Route.
 	//
