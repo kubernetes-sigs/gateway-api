@@ -19,13 +19,13 @@ _THEN_
 
 ## Installing a Gateway controller
 
-There are [multiple projects](/implementations) that support the
-Gateway API. By installing a Gateway controller in your Kubernetes cluster,
-you can try out the guides above. This will demonstrate that the desired routing
-configuration is actually being implemented by your Gateway resources (and the
-network infrastructure that your Gateway resources represent). Note that many
-of the Gateway controller setups will install and remove the Gateway API bundle
-for you.
+There are [multiple projects](/implementations) that support Gateway API. By
+installing a Gateway controller in your Kubernetes cluster, you can try out the
+guides above. This will demonstrate that the desired routing configuration is
+actually being implemented by your Gateway resources (and the network
+infrastructure that your Gateway resources represent). Note that many of the
+Gateway controller setups will install and remove the Gateway API bundle for
+you.
 
 ## Installing Gateway API
 
@@ -53,7 +53,7 @@ Note that future releases of the API could include breaking changes to
 experimental resources and fields. For example, any experimental resource or
 field could be removed in a future release. For more information on the
 experimental channel, refer to our [versioning
-documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/).
+documentation](/concepts/versioning/).
 
 To install the experimental channel, run the following kubectl command:
 

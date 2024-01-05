@@ -1,13 +1,13 @@
 # Cross-Namespace routing
 
-The Gateway API has core support for cross Namespace routing. This is useful
+Gateway API has core support for cross Namespace routing. This is useful
 when more than one user or team is sharing the underlying networking
 infrastructure, yet control and configuration must be segmented to minimize
 access and fault domains.
 
 Gateways and Routes can be deployed into different Namespaces and Routes  can
-attach to Gateways across Namespace boundaries. This allows user access 
-control to be applied differently across Namespaces for Routes and Gateways, 
+attach to Gateways across Namespace boundaries. This allows user access
+control to be applied differently across Namespaces for Routes and Gateways,
 effectively segmenting access and control to different parts of the
 cluster-wide  routing configuration. The ability for Routes to attach to
 Gateways across Namespace boundaries are governed by [_Route Attachment_](#cross-namespace-route-attachment). Route attachment is explored
@@ -33,7 +33,7 @@ apps. This is controlled by a central infrastructure team, operating in the
 By managing this certificate through the single shared Gateway they are able
 to centrally control security without directly involving application teams.
 
-The logical relationship between the Gateway API resources looks like this:
+The logical relationship between Gateway API resources looks like this:
 
 ![Cross-Namespace routing](/images/cross-namespace-routing.svg)
 
@@ -46,16 +46,16 @@ Gateway and Route attachment is bidirectional - attachment can only succeed if
 the Gateway owner and Route owner both agree to the relationship. This
 bi-directional relationship exists for two reasons:
 
-- Route owners don't want to overexpose their applications through paths they 
+- Route owners don't want to overexpose their applications through paths they
 are not aware of.
-- Gateway owners don't want certain apps or teams using Gateways without 
-permission. For example, an internal service shouldn't be accessible 
+- Gateway owners don't want certain apps or teams using Gateways without
+permission. For example, an internal service shouldn't be accessible
 through an internet Gateway.
 
 Gateways support _attachment constraints_ which are fields on Gateway
 listeners that restrict which Routes can be attached. Gateways support
 Namespaces and Route types as attachment constraints. Any Routes that do not
-meet the attachment constraints are not able to attach to that Gateway. 
+meet the attachment constraints are not able to attach to that Gateway.
 Similarly, Routes explicitly reference Gateways that they want to attach to
 through the Route's `parentRef` field. Together these create a handshake
 between the infra owners and application owners that enables them to
@@ -75,7 +75,7 @@ Namespace:
 ```
 
 The `https` listener in the above Gateway matches traffic for the
-`foo.example.com` domain. This allows the infrastructure team to manage all 
+`foo.example.com` domain. This allows the infrastructure team to manage all
 aspects of the domain. The HTTPRoutes below do not need to specify domains
 and will match all traffic by default if `hostname` is not set. This makes
 it easier to manage HTTPRoutes because they can be domain agnostic, which is
@@ -84,10 +84,10 @@ helpful when application domains are not static.
 This Gateway also configures HTTPS using the `foo-example-com` Secret
 in the `infra-ns` Namespace. This allows the infrastructure team to centrally
 manage TLS on behalf of app owners. The `foo-example-com` certificate will
-terminate all traffic going to its attached Routes, without any TLS 
+terminate all traffic going to its attached Routes, without any TLS
 configuration on the HTTPRoutes themselves.
 
-This Gateway uses a Namespace selector to define which HTTPRoutes are allowed 
+This Gateway uses a Namespace selector to define which HTTPRoutes are allowed
 to attach. This allows the infrastructure team to constrain who
 or which apps can use this Gateway by allowlisting a set of Namespaces.
 
@@ -123,7 +123,7 @@ attach to a Gateway then the `listeners[].routes` field does not have to be
 configured and all Routes can freely use the Gateway.
 
 
-## Route Attachment 
+## Route Attachment
 
 The store team deploys their route for the `store` Service in the `store-ns`
 Namespace:

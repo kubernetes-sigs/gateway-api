@@ -31,13 +31,18 @@ the cluster.
 
 ### GatewayClass
 
+??? success "Standard Channel in v0.5.0+"
+    The `GatewayClass` resource is GA and has been part of the Standard Channel in
+    `v0.5.0+`. For more information on release channels, refer to the [related
+    documentation](/concepts/versioning).
+
 GatewayClass defines a set of Gateways that share a common configuration and
 behaviour. Each GatewayClass will be handled by a single controller, although
 controllers may handle more than one GatewayClass.
 
 GatewayClass is a cluster-scoped resource. There must be at least one
 GatewayClass defined in order to be able to have functional Gateways. A
-controller that implements the Gateway API does so by providing an associated
+controller that implements Gateway API does so by providing an associated
 GatewayClass resource that the user can reference from their Gateway(s).
 
 This is similar to
@@ -49,6 +54,11 @@ PersistentVolumes. In Ingress v1beta1, the closest analog to GatewayClass is the
 IngressClass object.
 
 ### Gateway
+
+??? success "Standard Channel in v0.5.0+"
+    The `Gateway` resource is GA and has been part of the Standard Channel since
+    `v0.5.0`. For more information on release channels, refer to the [related
+    documentation](/concepts/versioning).
 
 A Gateway describes how traffic can be translated to Services within the
 cluster. That is, it defines a request for a way to translate traffic from
@@ -84,6 +94,11 @@ types may be added to the API in future.
 
 #### HTTPRoute
 
+??? success "Standard Channel in v0.5.0+"
+    The `HTTPRoute` resource is GA and has been part of the Standard Channel in
+    `v0.5.0+`. For more information on release channels, refer to the [related
+    documentation](/concepts/versioning).
+
 HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
 for use in cases where you want to inspect the HTTP stream and use HTTP request data
 for either routing or modification, for example using HTTP Headers for routing, or
@@ -91,11 +106,11 @@ modifying them in-flight.
 
 #### TLSRoute
 
-!!! info "Experimental Channel"
+??? example "Experimental Channel in v0.3.0+"
 
-    The `TLSRoute` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+    The `TLSRoute` resource is Alpha and has been part of the Experimental
+    Channel since `v0.3.0+`. For more information on release channels, refer to
+    the [related documentation](/concepts/versioning).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
 for where you want to use the SNI as the main routing method, and are not interested
@@ -104,11 +119,11 @@ connection is proxied without any inspection to the backend.
 
 #### TCPRoute and UDPRoute
 
-!!! info "Experimental Channel"
+??? example "Experimental Channel in v0.3.0+"
 
-    The `TCPRoute` and `UDPRoute` resources described below are currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+    The `TCPRoute` and `UDPRoute` resources are Alpha and have been part of the
+    Experimental Channel since `v0.3.0`. For more information on release
+    channels, refer to the [related documentation](/concepts/versioning).
 
 TCPRoute (and UDPRoute) are intended for use for mapping one or more ports
 to a single backend. In this case, there is no discriminator you can
@@ -120,11 +135,11 @@ is passed through to the backend.
 
 #### GRPCRoute
 
-!!! info "Experimental Channel"
+??? example "Experimental Channel in v0.6.0+"
 
-    The `GRPCRoute` resource described below is currently only included in the
-    "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+    The `GRPCRoute` resource is Alpha and has been part of the Experimental
+    Channel since `v0.6.0`. For more information on release channels, refer to
+    the [related documentation](/concepts/versioning).
 
 GRPCRoute is for idiomatically routing gRPC traffic. Gateways supporting
 GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
@@ -150,10 +165,6 @@ provide custom configuration for this until there is a standardized approach
 defined by Gateway API.
 
 ## Attaching Routes to Gateways
-
-!!! note
-    This section has changed significantly between v1alpha1 and v1alpha2. This
-    section describes the v1alpha2 approach.
 
 When a Route attaches to a Gateway, it represents configuration that is applied
 on the Gateway that configures the underlying load balancer or proxy. How and
@@ -201,11 +212,10 @@ The following is required for a Route to be attached to a Gateway:
 
 #### Referencing Gateways
 
-!!! info "Experimental Channel"
-
+??? example "Experimental Channel"
     The `Port` field described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/#adding-experimental-fields).
+    channels, refer to the [related documentation](/concepts/versioning/#adding-experimental-fields).
 
 A Route can reference a Gateway by specifying the namespace (optional if the
 Route and the Gateway are in the same namespace) and name of the Gateway in
@@ -316,7 +326,7 @@ Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
     best choice for configuring mesh routing, but it is still **experimental**
     and thus **subject to change**.
 
-When using the Gateway API to configure a [service mesh], the Route will
+When using Gateway API to configure a [service mesh], the Route will
 attach directly to a Service, representing configuration meant to be applied
 to any traffic directed to the Service. How and which Routes attach to a given
 Service is controlled by the Routes themselves (working with Kubernetes RBAC),

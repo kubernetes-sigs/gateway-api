@@ -1,6 +1,6 @@
-# Roles and personas
+# Roles and Personas
 
-## Introduction
+## Background
 
 In the original design of Kubernetes, Ingress and Service resources were based
 on a usage model in which the developers who create Services and Ingresses
@@ -17,18 +17,18 @@ This raises a fundamental challenge: how do you provide the flexibility needed
 by the users of the infrastructure, while also maintaining control by the
 owners of the infrastructure?
 
-The Gateway API defines several distinct roles, each with an associated
+Gateway API defines several distinct roles, each with an associated
 _persona_, as a tool for surfacing and discussing the differing needs of
 different users in order to balance usability, flexibility, and control.
-Design work within the Gateway API is deliberately cast in terms of these
+Design work within Gateway API is deliberately cast in terms of these
 personas.
 
 Note that, depending on the environment, a single human may end up taking on
 multiple roles, as discussed below.
 
-## Roles and Personas
+## Key Roles and Personas
 
-The Gateway API defines three roles and personas:
+Gateway API defines three roles and personas:
 
 * **Ian**<a name="ian"></a> (he/him) is an _infrastructure provider_,
   responsible for the care and feeding of a set of infrastructure that permits
@@ -46,12 +46,12 @@ The Gateway API defines three roles and personas:
 
 * **Ana**<a name="ana"></a> (she/her) is an _application developer_,
   responsible for creating and managing an application running in a cluster.
-  From the Gateway API's point of view, Ana will need to manage configuration
+  From Gateway API's point of view, Ana will need to manage configuration
   (e.g. timeouts, request matching/filter) and Service composition (e.g. path
-  routing to backends). She is in a unique position among the Gateway API
+  routing to backends). She is in a unique position among Gateway API
   personas, since her focus is on the business needs her application is meant
-  to serve, _not_ Kubernetes or the Gateway API. In fact, Ana is likely to
-  view the Gateway API and Kubernetes as pure friction getting in her way to
+  to serve, _not_ Kubernetes or Gateway API. In fact, Ana is likely to
+  view Gateway API and Kubernetes as pure friction getting in her way to
   get things done.
 
 Depending on the environment, multiple roles can map to the same user:

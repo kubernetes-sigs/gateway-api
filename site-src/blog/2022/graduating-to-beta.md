@@ -40,9 +40,9 @@ invite you to jump in and find an implementation that suits you. At the time of
 this release there are over a dozen [implementations][impl] for popular API
 gateways and service meshes and guides are available to start exploring quickly.
 
-[gw]:https://gateway-api.sigs.k8s.io/api-types/gateway/
+[gw]:/api-types/gateway/
 [ing]:https://kubernetes.io/docs/reference/kubernetes-api/service-resources/ingress-v1/
-[impl]:https://gateway-api.sigs.k8s.io/implementations/
+[impl]:/implementations/
 
 ### Getting started
 
@@ -69,13 +69,13 @@ repository, or join in the [discussions][disc]. Also check out the [community
 page][community] which includes links to the Slack channel and community meetings.
 
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
-[concepts]:https://gateway-api.sigs.k8s.io/concepts/api-overview/
-[guides]:https://gateway-api.sigs.k8s.io/guides/getting-started/
-[impl]:https://gateway-api.sigs.k8s.io/implementations/
-[install-crds]:https://gateway-api.sigs.k8s.io/guides/getting-started/#install-the-crds
+[concepts]:/concepts/api-overview/
+[guides]:/guides/getting-started/
+[impl]:/implementations/
+[install-crds]:/guides/getting-started/#install-the-crds
 [issue]:https://github.com/kubernetes-sigs/gateway-api/issues/new/choose
 [disc]:https://github.com/kubernetes-sigs/gateway-api/discussions
-[community]:https://gateway-api.sigs.k8s.io/contributing/community/
+[community]:/contributing/community/
 
 ## Release highlights
 
@@ -84,9 +84,9 @@ page][community] which includes links to the Slack channel and community meeting
 The `v0.5.0` release is particularly historic because it marks the growth in
 maturity to a beta API version (`v1beta1`) release for some of the key APIs:
 
-- [GatewayClass](https://gateway-api.sigs.k8s.io/api-types/gatewayclass/)
-- [Gateway](https://gateway-api.sigs.k8s.io/api-types/gateway/)
-- [HTTPRoute](https://gateway-api.sigs.k8s.io/api-types/httproute/)
+- [GatewayClass](/api-types/gatewayclass/)
+- [Gateway](/api-types/gateway/)
+- [HTTPRoute](/api-types/httproute/)
 
 This achievement was marked by the completion of several graduation criteria:
 
@@ -96,11 +96,11 @@ This achievement was marked by the completion of several graduation criteria:
 - Kubernetes SIG Network API reviewers have approved graduation to beta.
 
 For more information on Gateway API versioning, refer to the [official
-documentation](https://gateway-api.sigs.k8s.io/concepts/versioning/). To see
+documentation](/concepts/versioning/). To see
 what's in store for future releases check out the [next steps](#next-steps)
 section.
 
-[impl]:https://gateway-api.sigs.k8s.io/implementations/
+[impl]:/implementations/
 
 ### Release channels
 
@@ -125,10 +125,10 @@ and end-users.
 
 For this release we've added the following experimental features:
 
-- [Routes can attach to Gateways by specifying port numbers](https://gateway-api.sigs.k8s.io/geps/gep-957/)
-- [URL rewrites and path redirects](https://gateway-api.sigs.k8s.io/geps/gep-726/)
+- [Routes can attach to Gateways by specifying port numbers](/geps/gep-957/)
+- [URL rewrites and path redirects](/geps/gep-726/)
 
-[ch]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
+[ch]:/concepts/versioning/#release-channels-eg-experimental-standard
 
 ### Other improvements
 
@@ -137,7 +137,7 @@ the [v0.5.0 release notes](https://github.com/kubernetes-sigs/gateway-api/releas
 
 ## Gateway API for service mesh: the GAMMA Initiative
 Some service mesh projects have [already implemented support for the Gateway
-API](https://gateway-api.sigs.k8s.io/implementations/). Significant overlap
+API](/implementations/). Significant overlap
 between the Service Mesh Interface (SMI) APIs and the Gateway API has [inspired
 discussion in the SMI
 community](https://github.com/servicemeshinterface/smi-spec/issues/249) about
@@ -146,12 +146,12 @@ possible integration.
 We are pleased to announce that the service mesh community, including
 representatives from Cilium Service Mesh, Consul, Istio, Kuma, Linkerd, NGINX
 Service Mesh and Open Service Mesh, is coming together to form the [GAMMA
-Initiative](https://gateway-api.sigs.k8s.io/concepts/gamma/), a dedicated
+Initiative](/concepts/gamma/), a dedicated
 workstream within the Gateway API subproject focused on Gateway API for Mesh
 Management and Administration.
 
 This group will deliver [enhancement
-proposals](https://gateway-api.sigs.k8s.io/v1beta1/contributing/gep/) consisting
+proposals](/v1beta1/contributing/gep/) consisting
 of resources, additions, and modifications to the Gateway API specification for
 mesh and mesh-adjacent use-cases.
 
@@ -169,11 +169,11 @@ As we continue to mature the API for production use cases, here are some of the 
 - [Route delegation][pr1085]
 - Layer 4 API maturity: Graduating [TCPRoute][tcpr], [UDPRoute][udpr] and
   [TLSRoute][tlsr] to beta
-- [GAMMA Initiative](https://gateway-api.sigs.k8s.io/concepts/gamma/) - Gateway API for Service Mesh
+- [GAMMA Initiative](/concepts/gamma/) - Gateway API for Service Mesh
 
 If there's something on this list you want to get involved in, or there's
 something not on this list that you want to advocate for to get on the roadmap
-please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](https://gateway-api.sigs.k8s.io/contributing/community/#meetings).
+please join us in the #sig-network-gateway-api channel on Kubernetes Slack or our weekly [community calls](/contributing/community/#meetings).
 
 [gep1016]:https://github.com/kubernetes-sigs/gateway-api/blob/master/geps/gep-1016.md
 [grpc]:https://grpc.io/
@@ -181,4 +181,4 @@ please join us in the #sig-network-gateway-api channel on Kubernetes Slack or ou
 [tcpr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tcproute_types.go
 [udpr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/udproute_types.go
 [tlsr]:https://github.com/kubernetes-sigs/gateway-api/blob/main/apis/v1alpha2/tlsroute_types.go
-[community]:https://gateway-api.sigs.k8s.io/contributing/community/
+[community]:/contributing/community/

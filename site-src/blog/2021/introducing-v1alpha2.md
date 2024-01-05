@@ -30,13 +30,13 @@ conversion is not possible.
 ### Simpler Route-Gateway Binding
 In v1alpha1 we provided many ways to connect Gateways and Routes. This was a bit
 more complicated to understand than we'd like. With v1alpha2, we've focused on
-simpler attachment mechanism: 
+simpler attachment mechanism:
 
 * Routes directly reference the Gateway(s) they want to attach to. This is a
   list, so a Route can attach to more than one Gateway.
 * Each Gateway listener can choose to specify the kinds of Routes they support
   and where they can be. This defaults to Routes that support the specified
-  protocol in the same Namespace as the Gateway. 
+  protocol in the same Namespace as the Gateway.
 
 For example, the following HTTPRoute uses the `parentRefs` field to attach
 itself to the `prod-web-gw` Gateway.
@@ -55,7 +55,7 @@ spec:
       port: 8080
 ```
 
-This is covered in more detail in [GEP 724](https://gateway-api.sigs.k8s.io/geps/gep-709/).
+This is covered in more detail in [GEP 724](/geps/gep-709/).
 
 ### Safe Cross Namespace References
 
@@ -63,7 +63,7 @@ This is covered in more detail in [GEP 724](https://gateway-api.sigs.k8s.io/geps
 
     The `ReferenceGrant` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](https://gateway-api.sigs.k8s.io/concepts/versioning).
+    channels, refer to the [related documentation](/concepts/versioning).
 
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
@@ -97,7 +97,7 @@ spec:
     kind: Service
 ```
 
-This is covered in more detail in [GEP 709](https://gateway-api.sigs.k8s.io/geps/gep-709/).
+This is covered in more detail in [GEP 709](/geps/gep-709/).
 
 ### Policy Attachment
 One of the key goals of this API is to provide meaningful and consistent
@@ -127,12 +127,12 @@ of that policy would cascade down to Routes attached to that policy:
 
 ![Simple Ingress Example](/images/policy/ingress-simple.png)
 
-This is covered in more detail in [GEP 713](https://gateway-api.sigs.k8s.io/geps/gep-713/).
+This is covered in more detail in [GEP 713](/geps/gep-713/).
 
 ## Next Steps
 There are a lot of changes in v1alpha2 that we haven't covered here. For the
 full changelog, refer to our [v0.4.0 release
-notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0). 
+notes](https://github.com/kubernetes-sigs/gateway-api/releases/tag/v0.4.0).
 
 Many of our [implementations](/implementations) are planning to release support
 for the v1alpha2 API in the coming weeks. We'll update our documentation as

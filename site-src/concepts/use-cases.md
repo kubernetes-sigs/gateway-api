@@ -1,12 +1,12 @@
-# Gateway API Use Cases
+# Use Cases
 
-The Gateway API covers a _very_ wide range of use cases (which is both a
+Gateway API covers a _very_ wide range of use cases (which is both a
 strength and a weakness!). This page is emphatically _not_ meant to be an
 exhaustive list of these use cases: rather, it is meant to provide some
 examples that can be helpful to demonstrate how the API can be used.
 
 In all cases, it's very important to bear in mind the [roles and personas]
-used in the Gateway API. The use cases presented here are deliberately
+used in Gateway API. The use cases presented here are deliberately
 described in terms of [Ana], [Chihiro], and [Ian]: they are the ones for whom
 the API must be usable. (It's also important to remember that even though
 these roles might be filled by the same person, especially in smaller

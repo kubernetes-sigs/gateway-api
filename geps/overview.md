@@ -16,7 +16,7 @@ process for the main Kubernetes project:
 This diagram shows the state diagram of the GEP process at a high level, but the details are below.
 
 <div align="center">
-  
+
 ```mermaid
 flowchart TD
     D([Discuss with<br />the community]) --> C
@@ -222,36 +222,44 @@ What is out of scope: see [text from KEP][kep-when-to-use]. Examples:
 
 ## FAQ
 
-* Q: Why is it named GEP?
-  * A: To avoid potential confusion if people start following the cross
-    references to the full KEP process.
-* Q: Why have a different process than mainline?
-  * A: We would like to keep the machinery to an absolute minimum for now --
-    this may change as we move to v1.
-* Q: Is it ok to discuss using shared docs, scratch docs etc?
-  * A: Yes, this can be a helpful intermediate step when iterating on design
-    details. It is important that all major feedback, discussions, and
-    alternatives considered in that step are represented in the GEP though. A
-    key goal of GEPs is to show why we made a decision and which alternatives
-    were considered. If separate docs are used, it's important that we can
-    still see all relevant context and decisions in the final GEP.
-* Q: When should I mark a GEP as `Prototyping` as opposed to `Provisional`?
-  * A: The `Prototyping` status carries the same base meaning as `Provisional`
-    in that consensus is not complete between stakeholders and we're not ready
-    to move toward releasing content yet. You should use `Prototyping` to
-    indicate to your fellow community members that we're in a state of active
-    practical tests and experiments which are intended to help us learn and
-    iterate on the GEP. These can include distributing content, but not under
-    any release channel.
-* Q: Should I implement support for `Experimental` channel features?
-  * A: Ultimately one of the main ways to get something into `Standard` is for
-    it to mature through the `Experimental` phase, so we really _need_ people
-    to implement these features and provide feedback in order to have progress.
-    That said, the graduation of a feature past `Experimental` is not a forgone
-    conclusion. Before implementing an experimental feature, you should:
+#### Why is it named GEP?
+To avoid potential confusion if people start following the cross references to
+the full KEP process.
 
-    * Clearly document that support for the feature is experimental and may disappear in the future.
-    * Have a plan in place for how you would handle the removal of this feature from the API.
+#### Why have a different process than mainline?
+Gateway API has some differences with most upstream KEPs. Notably Gateway API
+intentionally avoids including any implementation with the project, so this
+process is focused entirely on the substance of the API. As this project is
+based on CRDs it also has an entirely separately release process, and has
+developed concepts like "release channels" that do not exist in upstream.
+
+#### Is it ok to discuss using shared docs, scratch docs etc?
+Yes, this can be a helpful intermediate step when iterating on design details.
+It is important that all major feedback, discussions, and alternatives
+considered in that step are represented in the GEP though. A key goal of GEPs is
+to show why we made a decision and which alternatives were considered. If
+separate docs are used, it's important that we can still see all relevant
+context and decisions in the final GEP.
+
+#### When should I mark a GEP as `Prototyping` as opposed to `Provisional`?
+The `Prototyping` status carries the same base meaning as `Provisional` in that
+consensus is not complete between stakeholders and we're not ready to move
+toward releasing content yet. You should use `Prototyping` to indicate to your
+fellow community members that we're in a state of active practical tests and
+experiments which are intended to help us learn and iterate on the GEP. These
+can include distributing content, but not under any release channel.
+
+#### Should I implement support for `Experimental` channel features?
+Ultimately one of the main ways to get something into `Standard` is for it to
+mature through the `Experimental` phase, so we really _need_ people to implement
+these features and provide feedback in order to have progress. That said, the
+graduation of a feature past `Experimental` is not a forgone conclusion. Before
+implementing an experimental feature, you should:
+
+* Clearly document that support for the feature is experimental and may
+  disappear in the future.
+* Have a plan in place for how you would handle the removal of this feature from
+  the API.
 
 [kep]: https://github.com/kubernetes/enhancements
 [kep-when-to-use]: https://github.com/kubernetes/enhancements/tree/master/keps#do-i-have-to-use-the-kep-process

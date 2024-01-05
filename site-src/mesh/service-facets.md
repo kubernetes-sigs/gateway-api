@@ -12,7 +12,7 @@ often realize. When you create a Service, typically the cluster machinery will:
   load-balanced across all the endpoint IPs.
 
 Unfortunately, these implementation details become very important when
-considering how the Gateway API can work for service meshes!
+considering how Gateway API can work for service meshes!
 
 In [GAMMA initiative][gamma] work, it has become useful to consider Services
 as comprising two separate _facets_:
@@ -24,9 +24,10 @@ as comprising two separate _facets_:
   are not part of the Service backend, but they are of course strongly
   associated with the endpoint IPs.)
 
-The distinction between the facets is critical because the [gateway] and the
-[mesh] each need to decide whether a request that mentions a given Service
-should be directed to the Service's frontend or its backend:
+The distinction between the facets is critical because the
+[gateway](/api-types/gateway/) and the [mesh](/mesh) each need to decide whether
+a request that mentions a given Service should be directed to the Service's
+frontend or its backend:
 
 - Directing the request to the Service's frontend (_Service routing_) leaves
   the decision of which endpoint IP to use to the underlying network
@@ -38,7 +39,7 @@ should be directed to the Service's frontend or its backend:
   example, a gateway implementing sticky sessions).
 
 While Service routing may be the most direct fit for [Ana]'s sense of routing,
-endpoint routing can be more predictable when using the Gateway API for both
+endpoint routing can be more predictable when using Gateway API for both
 [north/south] and [east/west traffic]. The [GAMMA initiative][gamma] is working to
 formalize guidance for this use case.
 

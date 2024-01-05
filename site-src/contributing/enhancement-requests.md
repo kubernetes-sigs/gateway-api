@@ -50,7 +50,7 @@ create an initial discussion first.
 
 [gep]: /geps/overview
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
-[meetings]: https://gateway-api.sigs.k8s.io/contributing/#meetings
+[meetings]: /contributing/#meetings
 
 ## Why are Enhancements Tracked
 
