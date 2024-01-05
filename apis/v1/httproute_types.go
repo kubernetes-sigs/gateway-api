@@ -196,11 +196,19 @@ type HTTPRouteRule struct {
 	// Filters define the filters that are applied to requests that match
 	// this rule.
 	//
-	// This spec does not mandate a specific ordering for the execution of filters.
-	// However an implementation may decide to execute the filters in the listed order.
-	// In case the implementation cannot support the listed order (due to its internal
-	// ordering limitation), the implementation will drop the route rule with such a
-	// conflict and set the status RouteConditionPartiallyInvalid for the Route.
+	// Wherever possible, implementations SHOULD implement filters in the order
+	// they are specified. 
+	//
+	// Implementations MAY choose to implement this ordering strictly, rejecting
+	// any combination or order of filters that can not be supported. If implementations
+	// choose a strict interpretation of filter ordering, they MUST clearly document
+	// that behavior.
+	//
+	// To reject an invalid combination or order of filters, implementations SHOULD
+	// consider the Route Rule(s) with this configuration invalid. If all Route Rule(s)
+	// in a Route are invalid, the entire Route would be considered invalid. In only
+	// a portion of Route Rules are invalid, implementations should set the 
+	// "PartiallyInvalid" condition for the Route.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	//
