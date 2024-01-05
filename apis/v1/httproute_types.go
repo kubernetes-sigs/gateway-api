@@ -197,7 +197,7 @@ type HTTPRouteRule struct {
 	// this rule.
 	//
 	// Wherever possible, implementations SHOULD implement filters in the order
-	// they are specified. 
+	// they are specified.
 	//
 	// Implementations MAY choose to implement this ordering strictly, rejecting
 	// any combination or order of filters that can not be supported. If implementations
@@ -207,7 +207,7 @@ type HTTPRouteRule struct {
 	// To reject an invalid combination or order of filters, implementations SHOULD
 	// consider the Route Rule(s) with this configuration invalid. If all Route Rule(s)
 	// in a Route are invalid, the entire Route would be considered invalid. In only
-	// a portion of Route Rules are invalid, implementations should set the 
+	// a portion of Route Rules are invalid, implementations MUST set the
 	// "PartiallyInvalid" condition for the Route.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
