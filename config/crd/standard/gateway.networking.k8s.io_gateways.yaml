@@ -536,6 +536,9 @@ spec:
                     'UDP']
                   rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
                     !has(l.tls) : true)'
+                - message: tls mode must be Terminate for protocol HTTPS
+                  rule: 'self.all(l, (l.protocol == ''HTTPS'' && has(l.tls)) ? (l.tls.mode
+                    == '''' || l.tls.mode == ''Terminate'') : true)'
                 - message: hostname must not be specified for protocols ['TCP', 'UDP']
                   rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
                     || l.hostname == '''') : true)'
@@ -1381,6 +1384,9 @@ spec:
                     'UDP']
                   rule: 'self.all(l, l.protocol in [''HTTP'', ''TCP'', ''UDP''] ?
                     !has(l.tls) : true)'
+                - message: tls mode must be Terminate for protocol HTTPS
+                  rule: 'self.all(l, (l.protocol == ''HTTPS'' && has(l.tls)) ? (l.tls.mode
+                    == '''' || l.tls.mode == ''Terminate'') : true)'
                 - message: hostname must not be specified for protocols ['TCP', 'UDP']
                   rule: 'self.all(l, l.protocol in [''TCP'', ''UDP'']  ? (!has(l.hostname)
                     || l.hostname == '''') : true)'
