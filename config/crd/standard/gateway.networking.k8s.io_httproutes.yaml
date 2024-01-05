@@ -1128,12 +1128,16 @@ spec:
                       type: array
                     filters:
                       description: "Filters define the filters that are applied to
-                        requests that match this rule. \n The effects of ordering
-                        of multiple behaviors are currently unspecified. This can
-                        change in the future based on feedback during the alpha stage.
-                        \n Conformance-levels at this level are defined based on the
-                        type of filter: \n - ALL core filters MUST be supported by
-                        all implementations. - Implementers are encouraged to support
+                        requests that match this rule. \n This spec does not mandate
+                        a specific ordering for the execution of filters. However
+                        an implementation may decide to execute the filters in the
+                        listed order. In case the implementation cannot support the
+                        listed order (due to its internal ordering limitation), the
+                        implementation will drop the route rule with such a conflict
+                        and set the status RouteConditionPartiallyInvalid for the
+                        Route. \n Conformance-levels at this level are defined based
+                        on the type of filter: \n - ALL core filters MUST be supported
+                        by all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
                         the same filter multiple times is not supported unless explicitly
@@ -3461,12 +3465,16 @@ spec:
                       type: array
                     filters:
                       description: "Filters define the filters that are applied to
-                        requests that match this rule. \n The effects of ordering
-                        of multiple behaviors are currently unspecified. This can
-                        change in the future based on feedback during the alpha stage.
-                        \n Conformance-levels at this level are defined based on the
-                        type of filter: \n - ALL core filters MUST be supported by
-                        all implementations. - Implementers are encouraged to support
+                        requests that match this rule. \n This spec does not mandate
+                        a specific ordering for the execution of filters. However
+                        an implementation may decide to execute the filters in the
+                        listed order. In case the implementation cannot support the
+                        listed order (due to its internal ordering limitation), the
+                        implementation will drop the route rule with such a conflict
+                        and set the status RouteConditionPartiallyInvalid for the
+                        Route. \n Conformance-levels at this level are defined based
+                        on the type of filter: \n - ALL core filters MUST be supported
+                        by all implementations. - Implementers are encouraged to support
                         extended filters. - Implementation-specific custom filters
                         have no API guarantees across implementations. \n Specifying
                         the same filter multiple times is not supported unless explicitly
