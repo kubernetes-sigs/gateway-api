@@ -463,7 +463,6 @@ spec:
       cachePolicy:
         includeQueryString: false
   targetRef:
-    type: direct
     kind: HTTPRoute
     name: example
 ```
@@ -1227,8 +1226,7 @@ Thus its status as EXPERIMENTAL DO NOT USE YET.
 #### Validating Admission Controller to inform users about relevant Policy
 
 Implementations MAY supply a Validating Admission Webhook that will return a
-WARNING message when an applied object is affected by some Policy, which may be 
-an inherited or indirect one.
+WARNING message when an applied object is affected by some Policy.
 
 The warning message MAY include the name, namespace, apiGroup and Kind of relevant
 Policy objects.
