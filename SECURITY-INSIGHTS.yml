@@ -17,8 +17,6 @@ contribution-policy:
   automated-tools-list:
     - automated-tool: dependabot
       action: allowed
-      path:
-        - /
   contributing-policy: https://github.com/kubernetes-sigs/gateway-api/blob/main/CONTRIBUTING.md
   code-of-conduct: https://github.com/kubernetes-sigs/gateway-api/blob/main/code-of-conduct.md
 documentation:
