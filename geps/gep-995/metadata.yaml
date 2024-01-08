@@ -1,0 +1,9 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 995
+name: Named route rules
+status: Provisional
+authors:
+  - guicassolato
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2593"
