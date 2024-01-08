@@ -197,6 +197,21 @@ var TLSRouteCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
+// Features - UDPRoute Conformance (Core)
+// -----------------------------------------------------------------------------
+
+const (
+	// This option indicates support for UDPRoute
+	SupportUDPRoute SupportedFeature = "UDPRoute"
+)
+
+// UDPRouteCoreFeatures includes all SupportedFeatures needed to be conformant with
+// the UDPRoute resource.
+var UDPRouteFeatures = sets.New(
+	SupportUDPRoute,
+)
+
+// -----------------------------------------------------------------------------
 // Features - Mesh Conformance (Core)
 // -----------------------------------------------------------------------------
 
