@@ -235,8 +235,8 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		Name:      string(structuredPolicy.Spec.TargetRef.Name),
 		Namespace: structuredPolicy.GetNamespace(),
 	}
-	if result.targetRef.Namespace == "default" {
-		result.targetRef.Namespace = ""
+	if result.targetRef.Namespace == "" {
+		result.targetRef.Namespace = "default"
 	}
 	if structuredPolicy.Spec.TargetRef.Namespace != nil {
 		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
@@ -250,6 +250,10 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 	result.inherited = policyCRD.IsInherited()
 
 	return result, nil
+}
+
+func (p Policy) Name() string {
+	return fmt.Sprintf("%v/%v/%v", p.PolicyCrdID(), p.u.GetNamespace(), p.u.GetName())
 }
 
 // PolicyCrdID returns a unique identifier for the CRD of this policy.

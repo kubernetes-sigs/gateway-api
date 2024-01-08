@@ -17,20 +17,17 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 type GatewaysPrinter struct {
 	Out io.Writer
-	EPC *effectivepolicy.Calculator
 }
 
 type gatewayDescribeView struct {
@@ -43,34 +40,27 @@ type gatewayDescribeView struct {
 	EffectivePolicies        map[policymanager.PolicyCrdID]policymanager.Policy `json:",omitempty"`
 }
 
-func (gp *GatewaysPrinter) PrintDescribeView(ctx context.Context, gws []gatewayv1beta1.Gateway) {
-	for i, gw := range gws {
-		allPolicies, err := gp.EPC.Gateways.GetDirectlyAttachedPolicies(ctx, gw.Namespace, gw.Name)
-		if err != nil {
-			panic(err)
-		}
-		effectivePolicies, err := gp.EPC.Gateways.GetEffectivePolicies(ctx, gw.Namespace, gw.Name)
-		if err != nil {
-			panic(err)
-		}
-
+func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
+	index := 0
+	for _, gatewayNode := range resourceModel.Gateways {
+		index++
 		views := []gatewayDescribeView{
 			{
-				Name:      gw.GetName(),
-				Namespace: gw.GetNamespace(),
+				Name:      gatewayNode.Gateway.GetName(),
+				Namespace: gatewayNode.Gateway.GetNamespace(),
 			},
 			{
-				GatewayClass: string(gw.Spec.GatewayClassName),
+				GatewayClass: string(gatewayNode.Gateway.Spec.GatewayClassName),
 			},
 		}
-		if policyRefs := policymanager.ToPolicyRefs(allPolicies); len(policyRefs) != 0 {
+		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
 			views = append(views, gatewayDescribeView{
 				DirectlyAttachedPolicies: policyRefs,
 			})
 		}
-		if len(effectivePolicies) != 0 {
+		if len(gatewayNode.EffectivePolicies) != 0 {
 			views = append(views, gatewayDescribeView{
-				EffectivePolicies: effectivePolicies,
+				EffectivePolicies: gatewayNode.EffectivePolicies,
 			})
 		}
 
@@ -82,7 +72,7 @@ func (gp *GatewaysPrinter) PrintDescribeView(ctx context.Context, gws []gatewayv
 			fmt.Fprint(gp.Out, string(b))
 		}
 
-		if i+1 != len(gws) {
+		if index+1 <= len(resourceModel.Gateways) {
 			fmt.Fprintf(gp.Out, "\n\n")
 		}
 	}

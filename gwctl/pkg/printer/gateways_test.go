@@ -18,7 +18,6 @@ package printer
 
 import (
 	"bytes"
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -26,32 +25,31 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	objects := []runtime.Object{
-		&gatewayv1beta1.GatewayClass{
+		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gatewayclass",
 			},
-			Spec: gatewayv1beta1.GatewayClassSpec{
+			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: "example.net/gateway-controller",
 				Description:    common.PtrTo("random"),
 			},
 		},
 
-		&gatewayv1beta1.Gateway{
+		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gateway",
 			},
-			Spec: gatewayv1beta1.GatewaySpec{
+			Spec: gatewayv1.GatewaySpec{
 				GatewayClassName: "foo-gatewayclass",
 			},
 		},
@@ -160,16 +158,19 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	gws, err := resourcehelpers.ListGateways(context.Background(), params.K8sClients, "")
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to List Gateways: %v", err)
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
 	gp := &GatewaysPrinter{
 		Out: params.Out,
-		EPC: effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager),
 	}
-	gp.PrintDescribeView(context.Background(), gws)
+	gp.PrintDescribeView(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `

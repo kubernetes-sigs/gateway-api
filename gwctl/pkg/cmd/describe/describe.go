@@ -17,19 +17,17 @@ limitations under the License.
 package describe
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
-	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils/printer"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type describeFlags struct {
@@ -58,15 +56,18 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 	kind := args[0]
 	ns := flags.namespace
 	if flags.allNamespaces {
-		ns = ""
+		ns = metav1.NamespaceAll
 	}
 
-	epc := effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager)
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, EPC: epc}
-	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, EPC: epc}
-	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out, EPC: epc}
-	backendsPrinter := &printer.BackendsPrinter{Out: params.Out, EPC: epc}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
+	gwPrinter := &printer.GatewaysPrinter{Out: params.Out}
+	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out}
+	backendsPrinter := &printer.BackendsPrinter{Out: params.Out}
 
 	switch kind {
 	case "policy", "policies":
@@ -86,76 +87,52 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 		policiesPrinter.PrintDescribeView(policyList)
 
 	case "httproute", "httproutes":
-		var httpRoutes []gatewayv1beta1.HTTPRoute
-		if len(args) == 1 {
-			var err error
-			httpRoutes, err = resourcehelpers.ListHTTPRoutes(context.TODO(), params.K8sClients, ns)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			httpRoute, err := resourcehelpers.GetHTTPRoute(context.TODO(), params.K8sClients, ns, args[1])
-			if err != nil {
-				panic(err)
-			}
-			httpRoutes = []gatewayv1beta1.HTTPRoute{httpRoute}
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
 		}
-		httpRoutesPrinter.PrintDescribeView(context.TODO(), httpRoutes)
+		resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(filter)
+		if err != nil {
+			panic(err)
+		}
+		httpRoutesPrinter.PrintDescribeView(resourceModel)
 
 	case "gateway", "gateways":
-		var gws []gatewayv1beta1.Gateway
-		if len(args) == 1 {
-			var err error
-			gws, err = resourcehelpers.ListGateways(context.TODO(), params.K8sClients, ns)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			gw, err := resourcehelpers.GetGateways(context.TODO(), params.K8sClients, ns, args[1])
-			if err != nil {
-				panic(err)
-			}
-			gws = []gatewayv1beta1.Gateway{gw}
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
 		}
-		gwPrinter.PrintDescribeView(context.TODO(), gws)
+		resourceModel, err := discoverer.DiscoverResourcesForGateway(filter)
+		if err != nil {
+			panic(err)
+		}
+		gwPrinter.PrintDescribeView(resourceModel)
 
 	case "gatewayclass", "gatewayclasses":
-		var gwClasses []gatewayv1beta1.GatewayClass
-		if len(args) == 1 {
-			var err error
-			gwClasses, err = resourcehelpers.ListGatewayClasses(context.TODO(), params.K8sClients)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			gwc, err := resourcehelpers.GetGatewayClass(context.TODO(), params.K8sClients, args[1])
-			if err != nil {
-				panic(err)
-			}
-			gwClasses = []gatewayv1beta1.GatewayClass{gwc}
+		filter := resourcediscovery.Filter{}
+		if len(args) > 1 {
+			filter.Name = args[1]
 		}
-		gwcPrinter.PrintDescribeView(context.TODO(), gwClasses)
+		resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(filter)
+		if err != nil {
+			panic(err)
+		}
+		gwcPrinter.PrintDescribeView(resourceModel)
 
 	case "backend", "backends":
-		var backendsList []unstructured.Unstructured
-
-		// We default the backends to just "Service" types initially.
-		resourceType := "service"
-
-		if len(args) == 1 {
-			var err error
-			backendsList, err = resourcehelpers.ListBackends(context.TODO(), params.K8sClients, resourceType, ns)
-			if err != nil {
-				panic(err)
-			}
-		} else {
-			backend, err := resourcehelpers.GetBackend(context.TODO(), params.K8sClients, resourceType, ns, args[1])
-			if err != nil {
-				panic(err)
-			}
-			backendsList = []unstructured.Unstructured{backend}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			// We default the backends to just "Service" types initially.
+			ResourceType: "service",
 		}
-		backendsPrinter.PrintDescribeView(context.TODO(), backendsList)
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForBackend(filter)
+		if err != nil {
+			panic(err)
+		}
+		backendsPrinter.PrintDescribeView(resourceModel)
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unrecognized RESOURCE_TYPE\n")

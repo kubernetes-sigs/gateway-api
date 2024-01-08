@@ -17,20 +17,17 @@ limitations under the License.
 package printer
 
 import (
-	"context"
 	"fmt"
 	"io"
 
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 type GatewayClassesPrinter struct {
 	Out io.Writer
-	EPC *effectivepolicy.Calculator
 }
 
 type gatewayClassDescribeView struct {
@@ -42,25 +39,21 @@ type gatewayClassDescribeView struct {
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
 }
 
-func (gcp *GatewayClassesPrinter) PrintDescribeView(ctx context.Context, gwClasses []gatewayv1beta1.GatewayClass) {
-	for i, gwc := range gwClasses {
-		directlyAttachedPolicies, err := gcp.EPC.GatewayClasses.GetDirectlyAttachedPolicies(ctx, gwc.Name)
-		if err != nil {
-			panic(err)
-		}
-
-		policyRefs := policymanager.ToPolicyRefs(directlyAttachedPolicies)
+func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
+	index := 0
+	for _, gatewayClassNode := range resourceModel.GatewayClasses {
+		index++
 
 		views := []gatewayClassDescribeView{
 			{
-				Name: gwc.GetName(),
+				Name: gatewayClassNode.GatewayClass.GetName(),
 			},
 			{
-				ControllerName: string(gwc.Spec.ControllerName),
-				Description:    *gwc.Spec.Description,
+				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
+				Description:    *gatewayClassNode.GatewayClass.Spec.Description,
 			},
 		}
-		if len(policyRefs) != 0 {
+		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
 			views = append(views, gatewayClassDescribeView{
 				DirectlyAttachedPolicies: policyRefs,
 			})
@@ -74,7 +67,7 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(ctx context.Context, gwClass
 			fmt.Fprint(gcp.Out, string(b))
 		}
 
-		if i+1 != len(gwClasses) {
+		if index+1 <= len(resourceModel.GatewayClasses) {
 			fmt.Fprintf(gcp.Out, "\n\n")
 		}
 	}

@@ -17,16 +17,14 @@ limitations under the License.
 package get
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils/printer"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 type getFlags struct {
@@ -58,9 +56,8 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		ns = ""
 	}
 
-	epc := effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager)
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, EPC: epc}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
 
 	switch kind {
 	case "policy", "policies":
@@ -72,11 +69,19 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		policiesPrinter.PrintCRDs(list)
 
 	case "httproute", "httproutes":
-		list, err := resourcehelpers.ListHTTPRoutes(context.TODO(), params.K8sClients, ns)
+		discoverer := resourcediscovery.Discoverer{
+			K8sClients:    params.K8sClients,
+			PolicyManager: params.PolicyManager,
+		}
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(filter)
 		if err != nil {
 			panic(err)
 		}
-		httpRoutesPrinter.Print(list)
+		httpRoutesPrinter.Print(resourceModel)
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unrecognized RESOURCE_TYPE\n")
