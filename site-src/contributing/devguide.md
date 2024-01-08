@@ -1,40 +1,8 @@
-<!--
-Copyright 2019 The Kubernetes Authors.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
--->
-
-## Developing Gateway API
-
-You must have a working [Go environment] and then clone the repo:
-
-```
-mkdir -p $GOPATH/src/sigs.k8s.io
-cd $GOPATH/src/sigs.k8s.io
-git clone https://github.com/kubernetes-sigs/gateway-api
-cd gateway-api
-```
-
-This project works with Go modules; you can chose to setup your environment
-outside $GOPATH as well.
-
-# Building, testing and deploying
-
-You will need to have Docker installed to perform the steps below.
+# Dev Guide
 
 ## Project management
 
-We are using the Github issues and project dashboard to manage the list of TODOs
+We are using the GitHub issues and project dashboard to manage the list of TODOs
 for this project:
 
 * [Open issues][gh-issues]
@@ -63,46 +31,58 @@ command in PR and issue comments][issue-cmds]. For example,
 [prio-labels]:https://github.com/kubernetes-sigs/gateway-api/labels?q=priority
 [issue-cmds]:https://prow.k8s.io/command-help?repo=kubernetes-sigs%2Fgateway-api
 
-## Building the code
+## Prerequisites
 
-The project uses `make` to drive the build.
-`make` will run code generators, and run static analysis against the code and
-generate Kubernetes CRDs.
-You can kick off an overall build from the top-level makefile:
+Before you start developing with Gateway API, we'd recommend having the
+following prerequisites installed:
 
-```shell
-make
+* [Go](https://golang.org/doc/install)
+* [Kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
+* [Kind](https://kubernetes.io/docs/tasks/tools/#kind)
+
+Note that Kind and many of our build tasks also have a dependency on Docker or
+Podman.
+
+### Building, testing and deploying
+
+Clone the repo:
+
+```
+mkdir -p $GOPATH/src/sigs.k8s.io
+cd $GOPATH/src/sigs.k8s.io
+git clone https://github.com/kubernetes-sigs/gateway-api
+cd gateway-api
 ```
 
-## Adding Experimental Fields
+This project works with Go modules; you can chose to setup your environment
+outside $GOPATH as well.
 
-Starting with v0.5.0, all additions to the API must start in the experimental
-release channel. Experimental fields must be marked with the
-`<gateway:experimental>` annotation in Go type definitions. Gateway API CRD
-generation will only include these fields in the experimental set of CRDs.
+### Building the code
+
+The project uses `make` to drive the build. `make` will run code generators, and
+run static analysis against the code and generate Kubernetes CRDs. You can kick
+off an overall build from the top-level makefile:
+
+```shell
+make generate
+```
+
+### Adding Experimental Fields
+
+All additions to the API must start in the Experimental release channel.
+Experimental fields must be marked with the `<gateway:experimental>` annotation
+in Go type definitions. Gateway API CRD generation will only include these
+fields in the experimental set of CRDs.
 
 If experimental fields are removed or renamed, the original field name should be
 removed from the go struct, with a tombstone comment
 ([example](https://github.com/kubernetes/kubernetes/blob/707b8b6efd1691b84095c9f995f2c259244e276c/staging/src/k8s.io/api/core/v1/types.go#L4444-L4445))
 ensuring the field name will not be reused.
 
-## Install CRDs
+### Submitting a Pull Request
 
-To install gateway-api CRDs into a Kubernetes cluster:
-
-```shell
-make install
-```
-
-To uninstall CRDs and associated resources:
-
-```shell
-make uninstall
-```
-
-## Submitting a Pull Request
-
-Gateway API follows a similar pull request process as [Kubernetes].
+Gateway API follows a similar pull request process as
+[Kubernetes](https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md).
 Merging a pull request requires the following steps to be completed before the
 pull request will be merged automatically.
 
@@ -123,20 +103,22 @@ make verify
 
 [prow-setup]: https://github.com/kubernetes/test-infra/tree/master/config/jobs/kubernetes-sigs/gateway-api
 
-## Documentation
+### Documentation
 
-The site documentation is written in Markdown and compiled with [mkdocs]. Each PR
-will automatically include a [Netlify] deploy preview. When new code merges, it will
-automatically be deployed with Netlify to [gateway-api.sigs.k8s.io]. If you want to manually
-preview docs changes locally, you can install mkdocs and run:
+The site documentation is written in Markdown and compiled with
+[mkdocs](https://www.mkdocs.org/). Each PR will automatically include a
+[Netlify](https://netlify.com/) deploy preview. When new code merges, it will
+automatically be deployed with Netlify to
+[gateway-api.sigs.k8s.io](https://gateway-api.sigs.k8s.io). If you want to
+manually preview docs changes locally, you can install mkdocs and run:
 
 ```shell
  make docs
 ```
 
-To make it easier to use the right version of [mkdocs], there is a `.venv`
-target to create a Python virtualenv that includes [mkdocs]. To use the
-[mkdocs] live preview server while you edit, you can run [mkdocs] from
+To make it easier to use the right version of mkdocs, there is a `.venv`
+target to create a Python virtualenv that includes mkdocs. To use the
+mkdocs live preview server while you edit, you can run mkdocs from
 the virtualenv:
 
 ```shell
@@ -149,14 +131,10 @@ INFO    -  Building documentation...
 ...
 ```
 
-[mkdocs]: https://www.mkdocs.org/
-[Netlify]: https://netlify.com/
-[gateway-api.sigs.k8s.io]: https://gateway-api.sigs.k8s.io
-[Go environment]: https://golang.org/doc/install
-[Kubernetes]: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md
+For more information on how documentation should be written, refer to our
+[Documentation Style Guide](/contributing/style-guide).
 
 ## Conformance Tests
 
-To develop or run conformance tests, follow the [Conformance Test Guide].
-
-[Conformance Test Guide]: /concepts/conformance/#running-tests
+To develop or run conformance tests, refer to the [Conformance Test
+Documentation](/concepts/conformance/#running-tests).
