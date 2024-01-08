@@ -35,7 +35,7 @@ func init() {
 var UDPRouteTest = suite.ConformanceTest{
 	ShortName:   "UDPRoute",
 	Description: "Make sure UDPRoute is working",
-	Manifests:   []string{"testdata/udproute.yaml"},
+	Manifests:   []string{"tests/udproute-simple.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		t.Run("Simple UDP request matching UDPRoute should reach coredns backend", func(t *testing.T) {
 			namespace := "gateway-conformance-udp"
