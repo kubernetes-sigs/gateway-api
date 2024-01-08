@@ -53,16 +53,14 @@ This approach is dependent on both the "frontend" role of the Kubernetes `Servic
 
 ### Why Service?
 
-The GAMMA initiative has been working to bring service mesh use-cases to the Gateway API spec, taking the best practices and learnings from mesh implementations and codifying them in a spec. Most mesh users are familiar with using the Kubernetes `Service` resource as the foundation for traffic routing. In particular, service meshes take advantage of the IP address management and corresponding DNS functionality provided by `Service`.
+The GAMMA initiative has been working to bring service mesh use-cases to the Gateway API spec, taking the best practices and learnings from mesh implementations and codifying them in a spec. Most mesh users are familiar with using the Kubernetes Service resource as the foundation for traffic routing: not only do service meshes take advantage of the IP address management and corresponding DNS functionality provided by Service, but one of the key value propositions of service meshes is that they can be added "on top" of preexisting deployments, which are almost certain to already be using Service resources. This architecture is generally a simple, effective way for service meshes to operate.
 
-Generally, this architecture makes perfect sense; unfortunately, `Service` is far too coupled of a resource. It orchestrates not only IP address allocation and DNS but also endpoint collection and propagation, load balancing, etc. For this reason, it **cannot** be the right long-term answer for `parentRef` binding; however, it is the only feasible option that mesh implementations have today.
-One of the key value propositions of service meshes is that they can be added "on top" to preexisting deployments. These deployments are very likely to already consist of `Service` resources.
-In particular, the ubiquity of `Service` in the Kubernetes ecosystem and the time and effort needed to get support for a new resource into the ecosystem, for example with managed Kubernetes providers, makes waiting for a replacement infeasible.
+Add to that the ubiquity of Service in the Kubernetes ecosystem as well as the time and effort needed to get support for a new resource into the ecosystem (especially true for managed Kubernetes providers), and it's clearly impractical to force GAMMA to wait for a replacement for Service.
 
-We expect this to change and indeed, we plan to be a part of that change. However, in the interest of releasing a spec for service meshes in particular now, the `Service` resource must be supported by the graduated GAMMA spec.
+Unfortunately, Service is a badly overloaded resource. It orchestrates not only IP address allocation and DNS but also endpoint collection and propagation, load balancing, etc. For this reason, it cannot be the only long-term answer for `parentRef` binding -- however, it is the only feasible option that mesh implementations have today, and as such the graduated GAMMA specification MUST support Service as a `parentRef`.
 
-Luckily `parentRef` is flexible enough to support additional resources in the future. Work on a replacement for `Service` in GAMMA can begin and continue in parallel with the graduation of this spec.
-In fact we believe the GAMMA use case for `Service`, i.e. IP management and DNS, serves as a great basis for developing and trialing a replacement resource.
+We expect this situation to change -- and, indeed, we plan to be a part of that change. Luckily, `parentRef` is flexible enough to support additional resources in the future, which allows work on a replacement for Service in GAMMA to begin and continue in parallel with the graduation of this spec. In fact, we believe that GAMMA's use case can serve as an excellent basis for developing and trialing new, more composable mechanisms for managing IP address allocation and DNS.
+
 
 ## API
 
