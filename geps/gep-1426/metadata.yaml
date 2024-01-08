@@ -12,3 +12,5 @@ relationships:
     - number: 1324
       name: Service Mesh in Gateway API
       description: Adds initial Service binding proposal
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2688"
