@@ -95,7 +95,6 @@ nav:
     - API Design: guides/api-design.md
     - CRD Management: guides/crd-management.md
     - Implementer's Guide: guides/implementers.md
-    - Documentation Style Guide: guides/documentation.md
   - Reference:
     - API Types:
       - Gateway: api-types/gateway.md
@@ -151,5 +150,6 @@ nav:
   - Contributing:
     - How to Get Involved: contributing/index.md
     - Developer Guide: contributing/devguide.md
+    - Documentation Style Guide: contributing/style-guide.md
     - Enhancement Requests: contributing/enhancement-requests.md
     - Contributor Ladder: contributing/contributor-ladder.md
