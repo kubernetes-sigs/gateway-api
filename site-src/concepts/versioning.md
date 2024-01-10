@@ -168,7 +168,7 @@ consistent upgrade experiences across versions. To accomplish that, we commit to
 
 ## CRD Management
 For information on how to manage Gateway API CRDs in your clusters, refer to our
-[CRD Management Guide](/guides/crd-management.md).
+[CRD Management Guide](/guides/crd-management).
 
 ## Out of Scope
 ### Unreleased APIs
