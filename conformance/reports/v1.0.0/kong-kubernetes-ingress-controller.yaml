@@ -1,41 +1,41 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2023-11-23T09:42:40Z"
+date: "2024-01-11T10:57:53Z"
 gatewayAPIVersion: v1.0.0
 implementation:
   contact:
-    - github.com/kong/kubernetes-ingress-controller/issues/new/choose
+  - github.com/kong/kubernetes-ingress-controller/issues/new/choose
   organization: Kong
   project: kubernetes-ingress-controller
   url: github.com/kong/kubernetes-ingress-controller
-  version: v3.0.1
+  version: v3.0.2
 kind: ConformanceReport
 profiles:
-  - core:
-      result: success
-      statistics:
-        Failed: 0
-        Passed: 29
-        Skipped: 0
-      summary: ""
-    extended:
-      result: success
-      statistics:
-        Failed: 0
-        Passed: 3
-        Skipped: 0
-      summary: ""
-      supportedFeatures:
-        - HTTPRouteMethodMatching
-        - HTTPRouteResponseHeaderModification
-        - HTTPRouteQueryParamMatching
-      unsupportedFeatures:
-        - HTTPRoutePortRedirect
-        - HTTPRouteHostRewrite
-        - HTTPRouteRequestTimeout
-        - HTTPRouteSchemeRedirect
-        - HTTPRoutePathRedirect
-        - HTTPRoutePathRewrite
-        - HTTPRouteRequestMultipleMirrors
-        - HTTPRouteBackendTimeout
-        - HTTPRouteRequestMirror
-    name: HTTP
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 29
+      Skipped: 0
+    summary: ""
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 3
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRouteMethodMatching
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteResponseHeaderModification
+    unsupportedFeatures:
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteSchemeRedirect
+    - HTTPRoutePortRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRouteRequestTimeout
+    - HTTPRoutePathRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRouteRequestMirror
+    - HTTPRouteBackendTimeout
+  name: HTTP
