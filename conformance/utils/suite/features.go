@@ -220,7 +220,7 @@ var MeshCoreFeatures = sets.New(
 //
 // NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
-       Insert(GatewayCoreFeatures.UnsortedList()...).
+	Insert(GatewayCoreFeatures.UnsortedList()...).
 	Insert(GatewayExtendedFeatures.UnsortedList()...).
 	Insert(ReferenceGrantCoreFeatures.UnsortedList()...).
 	Insert(HTTPRouteCoreFeatures.UnsortedList()...).
