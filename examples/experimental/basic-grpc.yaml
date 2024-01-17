@@ -1,6 +1,6 @@
 #$ Used in:
 #$ - site-src/api-types/grpcroute.md
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: GatewayClass
 metadata:
   name: acme-lb
@@ -11,7 +11,7 @@ spec:
     group: acme.io
     kind: Parameters
 ---
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: my-gateway
