@@ -22,7 +22,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -55,12 +55,12 @@ func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceMode
 }
 
 type httpRouteDescribeView struct {
-	Name                     string                           `json:",omitempty"`
-	Namespace                string                           `json:",omitempty"`
-	Hostnames                []gatewayv1beta1.Hostname        `json:",omitempty"`
-	ParentRefs               []gatewayv1beta1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef           `json:",omitempty"`
-	EffectivePolicies        any                              `json:",omitempty"`
+	Name                     string                      `json:",omitempty"`
+	Namespace                string                      `json:",omitempty"`
+	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
+	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
+	DirectlyAttachedPolicies []policymanager.ObjRef      `json:",omitempty"`
+	EffectivePolicies        any                         `json:",omitempty"`
 }
 
 func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

@@ -122,8 +122,6 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 	case "backend", "backends":
 		filter := resourcediscovery.Filter{
 			Namespace: ns,
-			// We default the backends to just "Service" types initially.
-			ResourceType: "service",
 		}
 		if len(args) > 1 {
 			filter.Name = args[1]
