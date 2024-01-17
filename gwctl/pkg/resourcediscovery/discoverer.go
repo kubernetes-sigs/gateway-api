@@ -18,7 +18,6 @@ package resourcediscovery
 
 import (
 	"context"
-	"fmt"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -28,21 +27,17 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
-	"k8s.io/client-go/discovery"
 	"k8s.io/klog/v2"
-	"k8s.io/utils/strings/slices"
 )
 
 // Filter struct defines parameters for filtering resources
 type Filter struct {
-	Namespace    string
-	Name         string
-	Labels       map[string]string
-	ResourceType string
+	Namespace string
+	Name      string
+	Labels    map[string]string
 }
 
 // Discoverer orchestrates the discovery of resources and their associated
@@ -228,7 +223,7 @@ func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resource
 	}
 }
 
-// discoverNamespaces discovers Namespaces for resources that exist in the
+// discoverNamespaces adds Namespaces for resources that exist in the
 // resourceModel.
 func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *ResourceModel) {
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
@@ -245,8 +240,7 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 	}
 }
 
-// discoverPolicies discovers Policies for resources that exist in the
-// resourceModel.
+// discoverPolicies adds Policies for resources that exist in the resourceModel.
 func (d Discoverer) discoverPolicies(ctx context.Context, resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
 }
@@ -330,56 +324,35 @@ func fetchHTTPRoutes(ctx context.Context, k8sClients *common.K8sClients, filter 
 }
 
 // fetchBackends fetches Backends based on a filter.
+//
+// At the moment, this is exclusively used for Backends of type Service, though
+// it still returns a slice of unstructured.Unstructured for future extensions.
 func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]unstructured.Unstructured, error) {
-	apiResource, err := apiResourceFromResourceType(filter.ResourceType, k8sClients.DiscoveryClient)
-	if err != nil {
-		return nil, err
-	}
 	gvr := schema.GroupVersionResource{
-		Group:    apiResource.Group,
-		Version:  apiResource.Version,
-		Resource: apiResource.Name,
+		Group:    "",
+		Version:  "v1",
+		Resource: "services",
 	}
 
-	listOptions := metav1.ListOptions{}
 	if filter.Name != "" {
-		listOptions.FieldSelector = fields.OneTermEqualSelector("metadata.name", filter.Name).String()
+		// Use Get call.
+		backend, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
+			return []unstructured.Unstructured{}, err
+		}
+
+		return []unstructured.Unstructured{*backend}, nil
 	}
 
-	var backendsList *unstructured.UnstructuredList
-	if apiResource.Namespaced {
-		backendsList, err = k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
-	} else {
-		backendsList, err = k8sClients.DC.Resource(gvr).List(ctx, listOptions)
+	// Use List call.
+	listOptions := metav1.ListOptions{
+		LabelSelector: labels.SelectorFromSet(filter.Labels).String(),
 	}
+	var backendsList *unstructured.UnstructuredList
+	backendsList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
 	if err != nil {
 		return nil, err
 	}
 
 	return backendsList.Items, nil
-}
-
-func apiResourceFromResourceType(resourceType string, discoveryClient discovery.DiscoveryInterface) (metav1.APIResource, error) {
-	resourceGroups, err := discoveryClient.ServerPreferredResources()
-	if err != nil {
-		return metav1.APIResource{}, err
-	}
-	for _, resourceGroup := range resourceGroups {
-		gv, err := schema.ParseGroupVersion(resourceGroup.GroupVersion)
-		if err != nil {
-			return metav1.APIResource{}, err
-		}
-		for _, resource := range resourceGroup.APIResources {
-			var choices []string
-			choices = append(choices, resource.Kind)
-			choices = append(choices, resource.Name)
-			choices = append(choices, resource.ShortNames...)
-			choices = append(choices, resource.SingularName)
-			if slices.Contains(choices, resourceType) {
-				resource.Version = gv.Version
-				return resource, nil
-			}
-		}
-	}
-	return metav1.APIResource{}, fmt.Errorf("GVR for %v not found in discovery", resourceType)
 }

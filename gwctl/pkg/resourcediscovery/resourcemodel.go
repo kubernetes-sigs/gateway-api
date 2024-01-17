@@ -17,6 +17,9 @@ limitations under the License.
 package resourcediscovery
 
 import (
+	"fmt"
+	"sort"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
@@ -455,6 +458,11 @@ func convertPoliciesMapToSlice(policies map[policyID]*PolicyNode) []policymanage
 	for _, policyNode := range policies {
 		result = append(result, *policyNode.Policy)
 	}
+	sort.Slice(result, func(i, j int) bool {
+		a := fmt.Sprintf("%v/%v/%v", result[i].PolicyCrdID(), result[i].Unstructured().GetNamespace(), result[i].Unstructured().GetName())
+		b := fmt.Sprintf("%v/%v/%v", result[j].PolicyCrdID(), result[j].Unstructured().GetNamespace(), result[j].Unstructured().GetName())
+		return a < b
+	})
 	return result
 }
 
