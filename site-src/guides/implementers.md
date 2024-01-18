@@ -86,7 +86,7 @@ For information on how to manage Gateway API CRDs, including when it is
 acceptable to bundle CRD installation with your implementation, refer to our
 [CRD Management Guide](/guides/crd-management).
 
-### Conformance and Version compatibility
+### Conformance and Version Compatibility
 
 A conformant Gateway API implementation is one that passes the conformance tests
 that are included in each Gateway API bundle version release.
@@ -105,14 +105,14 @@ to the Gateway API Github repo containing details of their testing.
 
 The conformance suite output includes the Gateway API version supported.
 
-#### Version compatibility
+#### Version Compatibility
 
 Once v1.0 is released, for implementations supporting Gateway and GatewayClass,
 they MUST set a new Condition, `SupportedVersion`, with `status: true` meaning
 that the installed CRD version is supported, and `status: false` meaning that it
 is not.
 
-### Standard Status fields and Conditions
+### Standard Status Fields and Conditions
 
 Gateway API has many resources, but when designing this, we've worked to keep
 the status experience as consistent as possible across objects, using the
@@ -159,8 +159,112 @@ the `metadata.generation` field of the object at the time the status is generate
 This allows users of the API to determine if the status is relevant to the current
 version of the object.
 
+## TLS
 
-### Resource details
+TLS is a large topic in Gateway API, with the set of capabilities continuing to
+expand. There is a [TLS guide](/guides/tls) that covers this topic in more depth
+from a user-facing perspective, but this section attempts to fill in some gaps
+from an implementer's perspective.
+
+### Listener Isolation
+Within Gateways, TLS config is currently tied exclusively to Listeners. To make
+that approach manageable, we're encouraging all implementations to work towards
+the goal of providing full "Listener Isolation" as defined below:
+
+Requests SHOULD match at most one Listener. For example, if Listeners are
+defined for "foo.example.com" and "*.example.com", a request to
+"foo.example.com" SHOULD only be routed using routes attached to the
+"foo.example.com" Listener (and not the "*.example.com" Listener).
+
+Implementations that do not support Listener Isolation MUST clearly document
+this. In the future, we plan to add HTTPS Listener Isolation conformance tests
+to ensure this behavior is consistent across implementations that claim support
+for the feature. See
+[#2803](https://github.com/kubernetes-sigs/gateway-api/issues/2803) for the
+latest updates on these tests.
+
+### Indirect Configuration
+There are a variety of instances where TLS Certificates may not be managed
+directly by the owner of a Gateway. Although this is not meant to be an
+exhaustive list, it documents some of the approaches we expect to see used to
+manage TLS Certificates with Gateway API:
+
+#### 1. Certificates from other places
+Some providers offer the ability to configure and host TLS Certificates outside
+of Kubernetes altogether. Implementations that can connect to those external
+providers may expose that capability via a TLS option on the Gateway Listener,
+for example:
+
+```
+  listeners:
+  - name: https
+    protocol: HTTPS
+    port: 443
+    tls:
+      mode: Terminate
+      options:
+        vendor.example.com/certificate-name: store-example-com
+```
+
+In this example, the `store-example-com` name would refer to the name of a
+certificate stored by the external `vendor.example.com` TLS Certificate
+provider.
+
+#### 2. Automatically generated TLS certs that are populated later
+Many users would prefer that TLS certs were automatically generated on their
+behalf. One potential implementation of that would involve a controller that
+watches Gateways and HTTPRoutes, generates TLS certs, and attaches them to the
+Gateway. Depending on the implementation details, Gateway owners may need to
+configure something at the Gateway or Listener level to explicitly opt-in to
+this feature. For example, let's say someone created `acme-cert-generator` to
+generate certs following this pattern. That generator may choose to only
+generate and populate certs on Gateway Listeners with `acme.io/cert-generator`
+set in `tls.options` or a similar annotation set for the entire Gateway.
+
+Note that this is actually fairly similar to [how Cert Manager works
+today](https://cert-manager.io/docs/usage/gateway/), but that requires Gateway
+owners to reference a Kubernetes Secret that it will then populate. This
+specific approach was required because TLS CertificateRefs were required to be
+specified until Gateway API v1.1.
+
+With the relaxing of Gateway API validation in v1.1, TLS Certificates can be
+left unspecified on creation, allowing for less configuration when working with
+generated TLS certificates.
+
+#### 3. Certs that are specified by other personas
+In some organizations, Application Developers are responsible for managing TLS
+Certificates (see [Roles and Personas](/concepts/roles-and-personas) for more on
+this and other roles).
+
+To enable this use case, a new controller and CRD would be created. This
+CRD would link hostnames to user-provided certs, and then the controller would
+populate the certs specified by that CRD on Gateway listeners that matched those
+hostnames. This would also likely benefit from a Listener or Gateway-level
+opt-in for the behavior.
+
+### Overall Guidelines for TLS Extensions
+When building TLS extensions on top of Gateway API, it's important to follow the
+following guidelines:
+
+1. Use domain-prefixed names that are unique to your implementation for any TLS
+   Options or Annotations. (For example, use `example.com/certificate-name`
+   instead of just `certificate-name`).
+2. Do not encode sensitive information like certificates in the option or
+   annotation value. Instead favor references via concise names that are easy
+   to understand. Although these values can technically be as long as 253
+   characters, we strongly recommend keeping the values below 50 characters to
+   maintain overall readability and UX.
+3. To enable these extensions, Gateway API v1.1+ will no longer require TLS
+   Config to be specified on Gateway Listeners. When a Gateway Listener does not
+   have sufficient TLS configuration specified, implementations MUST set the
+   `Programmed` condition to `False` for that Listener with the
+   `InvalidTLSConfig` reason.
+4. Regardless of any extensions you may choose to support, it is important to
+   support the core TLS configuration that is intended to be portable across all
+   implementations. Extensions have their place in this API, but all
+   implementations MUST still support the core capabilities of the API.
+
+## Resource Details
 
 For each currently available conformance profile, there are a set of resources
 that implementations are expected to reconcile.
@@ -168,7 +272,7 @@ that implementations are expected to reconcile.
 The following section goes through each Gateway API object and indicates expected
 behaviors.
 
-#### GatewayClass
+### GatewayClass
 
 GatewayClass has one main `spec` field - `controllerName`. Each implementation
 is expected to claim a domain-prefixed string value (like
@@ -191,7 +295,7 @@ the only possible reason for this is that there is a pointer to a `paramsRef`
 object that is not supported by the implementation), then the implementation
 SHOULD mark the incompatible GatewayClass as not `Accepted`.
 
-#### Gateway
+### Gateway
 
 Gateway objects MUST refer in the `spec.gatewayClassName` field to a GatewayClass
 that exists and is `Accepted` by an implementation for that implementation to
@@ -201,20 +305,20 @@ Gateway objects that fall out of scope (for example, because the GatewayClass
 they reference was deleted) for reconciliation MAY have their status removed by
 the implementation as part of the delete process, but this is not required.
 
-#### General Route information
+### Routes
 
 All Route objects share some properties:
 
 - They MUST be attached to an in-scope parent for the implementation to consider
-them reconcilable.
+  them reconcilable.
 - The implementation MUST update the status for each in-scope Route with the
-relevant Conditions, using the namespaced `parents` field. See the specific Route
-types for details, but this usually includes `Accepted`, `Programmed` and
-`ResolvedRefs` Conditions.
-- Routes that fall out of scope SHOULD NOT have status updated, since it's possible
-that these updates may overwrite any new owners. The `observedGeneration` field
-will indicate that any remaining status is out of date.
-
+  relevant Conditions, using the namespaced `parents` field. See the specific
+  Route types for details, but this usually includes `Accepted`, `Programmed`
+  and `ResolvedRefs` Conditions.
+- Routes that fall out of scope SHOULD NOT have status updated, since it's
+  possible that these updates may overwrite any new owners. The
+  `observedGeneration` field will indicate that any remaining status is out of
+  date.
 
 #### HTTPRoute
 
@@ -238,7 +342,7 @@ backends.
 UDPRoutes route UDP packets that arrive at a Listener to one of the given
 backends.
 
-#### ReferenceGrant
+### ReferenceGrant
 
 ReferenceGrant is a special resource that is used by resource owners in one
 namespace to _selectively_ allow references from Gateway API objects in other

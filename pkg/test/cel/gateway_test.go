@@ -125,7 +125,6 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"tls must be specified for protocols ['HTTPS', 'TLS']"},
 		},
 		{
 			desc: "tls config not set with tls protocol",
@@ -138,7 +137,6 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"tls must be specified for protocols ['HTTPS', 'TLS']"},
 		},
 		{
 			desc: "tls config not set with http protocol",
@@ -221,7 +219,6 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"certificateRefs must be specified when TLSModeType is Terminate"},
 		},
 		{
 			desc: "certificateRefs not set with tls protocol and TLS terminate mode",
@@ -238,7 +235,6 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
-			wantErrors: []string{"certificateRefs must be specified when TLSModeType is Terminate"},
 		},
 		{
 			desc: "certificateRefs set with tls protocol and TLS terminate mode",
