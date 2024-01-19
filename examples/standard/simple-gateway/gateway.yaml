@@ -1,7 +1,7 @@
 #$ Used in:
 #$ - site-src/guides/traffic-splitting.md
 #$ - site-src/guides/simple-gateway.md
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: prod-web
