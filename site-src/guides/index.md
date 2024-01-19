@@ -73,4 +73,4 @@ break anything using these resources.
 ### More on CRD Management
 This guide only provides a high level overview of how to get started with
 Gateway API. For more on the topic of managing Gateway API CRDs, refer to our
-[CRD Management Guide](/guides/crd-management.md).
+[CRD Management Guide](/guides/crd-management).
