@@ -84,7 +84,7 @@ in the older version.
 
 For information on how to manage Gateway API CRDs, including when it is
 acceptable to bundle CRD installation with your implementation, refer to our
-[CRD Management Guide](/guides/crd-management.md).
+[CRD Management Guide](/guides/crd-management).
 
 ### Conformance and Version compatibility
 
