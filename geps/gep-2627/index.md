@@ -8,9 +8,10 @@
 For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. Gateways define listeners that can have assigned hostnames or wildcards.  The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API.   Instead of leaving this as an exercise for the user to figure out, this proposal attempts to provide options to ease Gateway API operations.
 
 ## Goals
-* Allow cluster operators or infrastructure providers to declaratively express which DNS service they want to use with a particular Gateway or Gateway Listener and have that DNS service interacted with via a controller to provision and configure the defined listener hostnames as DNS names and records based on the addresses assigned to the gateway instances.
-* Provide a standard CRD-based API as an alternative to the need for "loose" APIs such as annotations.   Support an easily extended, standardized, versioned, and status-reporting API. 
-* Increase portability and supportability across gateway providers and third party implementors, for this type of key configuration
+* Allow cluster operators to declaratively express which DNS service they want to use with a particular Gateway or Gateway Listener.
+* Provide a mechanism to allow the DNS configuration to be delegated to a chosen controller.
+* Provide a standard CRD-based API as an alternative to the need for "loose" APIs such as annotations.   Support an easily extended, standardized, versioned, and status-reporting API.
+* Increase portability and supportability between Gateway API implementations and third party controllers offering DNS integration.
 
 ## Non-Goals
 
@@ -20,7 +21,9 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 
 As a cluster administrator, I manage a set of domains and a set of gateways. I would like to declaratively define which DNS provider to use to configure connectivity for clients accessing these domains and my gateway so that I can see and configure which DNS provider is being used and limit which domains can be used.
 
-A a cluster administrator, I would like to have the dns names automatically populated into my specified dns zones as a set of records based on the assigned addresses of my gateways and have the status of the DNS records reported back to me, so that I do not have to undertake external automation or management of this essential task and can leverage existing kube based monitoring tools to know the status of the integration.
+As a cluster administrator, I would like to have the DNS names automatically populated into my specified DNS zones as a set of records based on the assigned addresses of my gateways so that I do not have to undertake external automation or management of this essential task.
+
+As a cluster administrator I would have the status of the DNS records reported back to me, so that I can leverage existing kube based monitoring tools to know the status of the integration.
 
 As a cluster administrator, I would like the DNS records to be setup automatically based on the assigned gateways address and if the IP or hostname changes, I would like for the DNS to update automatically to ensure traffic continues to reach my gateway. 
 
@@ -33,12 +36,7 @@ Initial draft will not offer an API yet until the use cases are agreed. Some tho
 
 ## Conformance Details
 
-(This section describes the names to be used for the feature or
-features in conformance tests and profiles.
-
-These should be `CamelCase` names that specify the feature as
-precisely as possible, and are particularly important for
-Extended features, since they may be surfaced to users.)
+TBD
 
 ## Alternatives
 
@@ -46,5 +44,4 @@ it is possible to use `external-dns` to manage dns based on HTTPRoutes and Gatew
 
 ## References
 
-(Add any additional document links. Again, we should try to avoid
-too much content not in version control to avoid broken links)
+TBD
