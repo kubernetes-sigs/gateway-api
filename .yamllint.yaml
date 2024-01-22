@@ -5,7 +5,7 @@ ignore: |
   .golangci.yml
   mkdocs.yml
   cloudbuild.yaml
-  config/crd/kustomization.yaml
+  config/crd
 
 rules:
   braces:
