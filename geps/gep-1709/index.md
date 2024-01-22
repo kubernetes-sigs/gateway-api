@@ -233,19 +233,13 @@ move on to [certification](#certification) to report the results.
 
 ### Implementation mode
 
-The certification process runs against an implementation using a specific mode.
-The final report will contain such a mode in the modes field. A "mode" is intended
-to capture situations where a Gateway API implementation may have different features
-and capabilities depending on how it is deployed (e.g. an implementation might be
-deployed with an external, OR internal load balancer, and have different capabilities
-depending on the mode chosen). The modes are implementation-specific, and no upstream
-mode is defined, except for `plain`, the default one used in case no mode is specified.
-
-### Implementation version
-
-Every report can specify multiple results, dependent on the tested version of the
-implementation being certified. Each certification run uses a specific version of
-the implementation, multiple certification processes can be merged as explained [below](#multiple-reports-merge).
+The certification process runs against an implementation using a specific mode,
+specified in the final report's "mode" field. A "mode" is intended to capture situations
+where a Gateway API implementation may have different features and capabilities
+depending on how it is deployed (e.g. an implementation might be deployed with an
+external, OR internal load balancer, and have different capabilities depending on
+the mode chosen). The modes are implementation-specific, and no upstream mode is
+defined, except for `default`, which is used in case no mode is specified.
 
 ### Gateway API version and channel
 
@@ -261,7 +255,7 @@ there are CRDs with different channels, the certification fails specifying that
 it's not possible to run the tests as there are different Gateway API channels
 installed in the cluster. If all the Gateway API `CRD`s have the same version
 and the same channel, the tests can be run and the detected version and channel
-will be set in the `apiVersion` and `apiVersionChannel` fields of
+will be set in the `gatewayAPIVersion` and `gatewayAPIChannel` fields of
 the final report. Furthermore, the suite must run all the experimental tests when
 the channel is `experimental`, and the related features are enabled.
 
@@ -306,52 +300,51 @@ implementation:
   - @acme/maintainers
   version: v1.0.0
 date: "2023-02-28 20:29:41+00:00"
-apiVersion: v0.8.0
-apiChannel: experimental
-mode: plain
+gatewayAPIVersion: v0.8.0
+gatewayAPIChannel: experimental
+mode: default
 profiles:
-  profiles:
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 8
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
-  - name: tcp
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 4
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "some extended features supported"
-      statistics:
-        passed: 2
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      unsupportedFeatures:
-      - ExtendedFeature3
+- name: http
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 20
+      skipped: 0
+      failed: 0
+  extended:
+    result: success
+    summary: "all extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    - ExtendedFeature3
+    - ExtendedFeature4
+    - ExtendedFeature5
+- name: tcp
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 4
+      skipped: 0
+      failed: 0
+  extended:
+    result: skipped
+    summary: "some extended features supported"
+    statistics:
+      passed: 2
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
 ```
 
 > **WARNING**: It is an important clarification that this is NOT a full
@@ -374,7 +367,7 @@ profiles:
 
 The above report describes an implementation that just released `v1`, uses gateway
 API `v0.8.0` `experimental` channel, and has `HTTP` `core` and `extended` and `TCP`
-core and partial `extended` support in `plain` mode.
+core and partial `extended` support in `default` mode.
 
 ### Multiple reports
 
@@ -393,36 +386,35 @@ implementation:
   - @acme/maintainers
   version: v0.9.0
 date: "2023-02-28 20:29:41+00:00"
-apiVersion: v0.8.0
-apiChannel: standard
-mode: plain
+gatewayAPIVersion: v0.8.0
+gatewayAPIChannel: standard
+mode: default
 profiles:
-  profiles:
-  - name: http
-    core:
-      result: success
-      summary: "some core functionality passed"
-      statistics:
-        passed: 18
-        skipped: 2
-        failed: 0
-      skippedTests:
-      - CoreTest8
-      - CoreTest15
-    extended:
-      result: success
-      summary: "some extended features supported"
-      statistics:
-        passed: 8
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      unsupportedFeatures:
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
+- name: http
+  core:
+    result: success
+    summary: "some core functionality passed"
+    statistics:
+      passed: 18
+      skipped: 2
+      failed: 0
+    skippedTests:
+    - CoreTest8
+    - CoreTest15
+  extended:
+    result: success
+    summary: "some extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
+    - ExtendedFeature4
+    - ExtendedFeature5
 ```
 
 ```yaml
@@ -436,58 +428,58 @@ implementation:
   - @acme/maintainers
   version: v1.0.0
 date: "2023-06-1 20:29:41+00:00"
-apiVersion: v1.0.0
-apiChannel: experimental
-mode: plain
+gatewayAPIVersion: v1.0.0
+gatewayAPIChannel: experimental
+mode: default
 profiles:
-  profiles:
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 8
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
-  - name: tcp
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 4
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "some extended features supported"
-      statistics:
-        passed: 2
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      unsupportedFeatures:
-      - ExtendedFeature3
+- name: http
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 20
+      skipped: 0
+      failed: 0
+  extended:
+    result: success
+    summary: "all extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    - ExtendedFeature3
+    unsupportedFeatures:
+    - ExtendedFeature4
+    - ExtendedFeature5
+- name: tcp
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 4
+      skipped: 0
+      failed: 0
+  extended:
+    result: skipped
+    summary: "some extended features supported"
+    statistics:
+      passed: 2
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
 ```
 
 > **NOTE**: In the above you can see the `acme` implementation's progression. In
 > their release `v0.9.0` they had started adding `HTTP` support and added the
 > conformance tests to CI, but they were still skipping some core tests. In
-> their next release `v0.1.0` they completed adding `HTTP` `Core`
+> their next release `v1.0.0` they completed adding `HTTP` `Core`
 > functionality (and even added three extended features), and also added
 > `TCP` functionality with `Core` and partial `Extended` support.
 
@@ -520,16 +512,16 @@ is the following:
 |   |-- v1.0
 |   |   |-- acme-operator
 |   |   |   |-- README.md
-|   |   |   |-- standard-v2.13-plain-report.yaml
+|   |   |   |-- standard-v2.13-default-report.yaml
 |   |-- v1.1
 |   |   |-- acme-operator
 |   |   |   |-- README.md
-|   |   |   |-- standard-v2.14-plain-report.yaml
+|   |   |   |-- standard-v2.14-default-report.yaml
 |   |   |   |-- standard-v2.14-with-the-lot-report.yaml
 |   |   |   |-- extended-v2.14-with-the-lot-report.yaml
 |   |   |-- umbrella-operator
 |   |   |   |-- README.md
-|   |   |   |-- standard-v1.8-plain-report.yaml
+|   |   |   |-- standard-v1.8-default-report.yaml
 ```
 
 The main folder `conformance/reports` contains a set of sub-folders, each for a
@@ -537,9 +529,8 @@ Gateway API version. Implementors will create their project folder in all the Ga
 API version folders for which they have a supported implementation. The implementors
 folder contains the following set of files:
 
-* `README.md`: contains general information about the implementation and a table
-  with some information, as shown below, to give users a quick overview of
-  the implementation details.
+* `README.md`: contains general information about the implementation, a table of
+  contents, and the instructions to reproduce the claimed report.
 * `<API-channel>-<implementation-version>-<mode-name>-report.yaml`: the report
   generated by the conformance test suite for the specific mode.
 
@@ -549,44 +540,41 @@ The README.md files SHOULD be structured in the following way (enrichment from
 implementors is allowed, even though the minimum content is described below):
 
 ```md
-# Acme
+# Acme operator
 
 General information about the Acme/operator project
 
-## Support Matrix
+## Table of contents
 
-| API channel | Implementation version | Mode | Profiles | Extended Features | Report |
-|-------------|------------------------|------|----------|-------------------|--------|
-|             |                        |      |          |                   |        |
-|             |                        |      |          |                   |        |
-|             |                        |      |          |                   |        |
+| API channel | Implementation version | Mode | Report |
+|-------------|------------------------|------|--------|
+|             |                        |      |        |
+|             |                        |      |        |
+|             |                        |      |        |
 
+## To reproduce
+
+Instructions on how to reproduce the claimed report.
 ```
 
-Each row of the support matrix MUST correspond to an uploaded report and contains
-the most important fields. An example follows:
+Each row of the table of contents MUST correspond to an uploaded report and contains
+the most implementation version and the mode. An example follows:
 
-| API channel  | Implementation version | Mode         | Profiles  | Extended Features                                                                       | Report                                        |
-|--------------|------------------------|--------------|-----------|-----------------------------------------------------------------------------------------|-----------------------------------------------|
-| standard     | v2.15                  | plain        | HTTP      | HTTPRouteQueryParamMatching HTTPRouteMethodMatching                                     | ./standard-v2.15-plain-report.yaml            |
-| standard     | v2.16                  | plain        | HTTP      | HTTPRouteQueryParamMatching HTTPRouteMethodMatching                                     | ./standard-v2.16-plain-report.yaml            |
-| experimental | v2.16                  | with-the-lot | HTTP, TLS | HTTPRouteQueryParamMatching HTTPRouteMethodMatching HTTPRouteResponseHeaderModification | ./experimental-v2.16-with-the-lot-report.yaml |
-
-> **NOTE**: only the profiles for which the current report is core conformant CAN
-> be added to the `Profiles` section. Only the features marked as `Supported` can
-> be added in the `Extended Features` section.
+| API channel  | Implementation version | Mode         | Report                                        |
+|--------------|------------------------|--------------|-----------------------------------------------|
+| standard     | v2.15                  | default      | ./standard-v2.15-default-report.yaml            |
+| standard     | v2.16                  | default      | ./standard-v2.16-default-report.yaml            |
+| experimental | v2.16                  | with-the-lot | ./experimental-v2.16-with-the-lot-report.yaml |
 
 > **NOTE**: the column `Report` contains the link to the corresponding uploaded report.
 
-> **NOTE**: This support matrix could be improved in the future with a link to
-> proof of conformance, such as artifacts containing logs or instructions to run
-> the tests.
+> **NOTE**: This table of contents could be improved in the future with a link to
+> proof of conformance, such as artifacts containing logs.
 
 ## Certification Process
 
-For this initial iteration the raw report data of the `ConformanceReports` will
-live in its own directory and _is predominantly meant for machine consumption_.
-Report data will be compiled into human-friendly displays during the an
+The raw report data of the `ConformanceReports` _is predominantly meant for machine
+consumption_. Report data will be compiled into human-friendly displays during an
 automated certification process.
 
 Certification starts with the pull request described during the [reporting
