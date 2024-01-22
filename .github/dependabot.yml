@@ -9,21 +9,37 @@ updates:
       k8s.io: # Group k8s.io golang dependencies updates
           patterns:
             - "k8s.io/*"
+    labels:
+      - go
+      - dependencies
+      - ok-to-test
 
   # Dependencies listed in .github/workflows/*.yml
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - github_actions
+      - dependencies
+      - ok-to-test
 
   # Dependencies listed in Dockerfile
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - docker
+      - dependencies
+      - ok-to-test
 
   # Dependencies listed in requirements.txt
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
+    labels:
+      - python
+      - dependencies
+      - ok-to-test
