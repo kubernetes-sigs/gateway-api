@@ -13,7 +13,7 @@ the Gateway API project and receive recognition (e.g. badges).
 
 ## Goals
 
-- Add high level profiles which downstream implementations can subscribe to in
+- Add high-level profiles which downstream implementations can subscribe to in
   order to run tests for the associated supported feature sets.
 - Add a reporting mechanism where conformance results can be reported back to
   the Gateway API project and provide "badges" to visibly decorate the
@@ -71,7 +71,7 @@ conformance suite as a library.
 
 ### Profiles
 
-"Profiles" are effectively categories which represent the high level grouping of
+"Profiles" are effectively categories which represent the high-level grouping of
 tests related to some feature (or feature set) of Gateway API. When conformance
 is reported using one of these profiles extra features can be covered according
 to support levels:
@@ -231,6 +231,16 @@ move on to [certification](#certification) to report the results.
 [go]:https://go.dev
 [lib]:https://pkg.go.dev/sigs.k8s.io/gateway-api@v0.6.2/conformance/utils/suite
 
+### Implementation mode
+
+The certification process runs against an implementation using a specific mode,
+specified in the final report's "mode" field. A "mode" is intended to capture situations
+where a Gateway API implementation may have different features and capabilities
+depending on how it is deployed (e.g. an implementation might be deployed with an
+external, OR internal load balancer, and have different capabilities depending on
+the mode chosen). The modes are implementation-specific, and no upstream mode is
+defined, except for `default`, which is used in case no mode is specified.
+
 ### Gateway API version and channel
 
 The certification is related to a specific API version and a specific channel,
@@ -245,8 +255,8 @@ there are CRDs with different channels, the certification fails specifying that
 it's not possible to run the tests as there are different Gateway API channels
 installed in the cluster. If all the Gateway API `CRD`s have the same version
 and the same channel, the tests can be run and the detected version and channel
-will be set in the `GatewayAPIVersion` and `gatewayAPIChannel` fields of the
-final report. Furthermore, the suite must run all the experimental tests when
+will be set in the `gatewayAPIVersion` and `gatewayAPIChannel` fields of
+the final report. Furthermore, the suite must run all the experimental tests when
 the channel is `experimental`, and the related features are enabled.
 
 In addition to the `CRD`s version, the suite needs to check its version in
@@ -266,14 +276,12 @@ VERSION file contains the semver of the latest release and is manually bumped at
 release time. The script hack/verify-all.sh will be updated to ensure the
 generated `.go` file is up to date with the VERSION file.
 
-### Certification
-
 Implementations will be able to report their conformance testing results using
 our [reporting process](#reporting-process). Implementations will be able to
 visibly demonstrate their conformance results on their downstream projects and
 repositories using our [certification process](#certification-process).
 
-#### Reporting Process
+## Reporting process
 
 When conformance tests are executed an argument can be provided to the test
 suite to emit `ConformanceReport` resource with the test results. This resource
@@ -288,53 +296,55 @@ implementation:
   organization: acme
   project: operator
   url: https://acme.com
-  version: v1.0.0
   contact:
   - @acme/maintainers
+  version: v1.0.0
 date: "2023-02-28 20:29:41+00:00"
-gatewayAPIVersion: v0.7.0
-gatewayAPIChannel: standard
+gatewayAPIVersion: v0.8.0
+gatewayAPIChannel: experimental
+mode: default
 profiles:
-  - name: tcp
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 4
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 6
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 8
-        skipped: 0
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
+- name: http
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 20
+      skipped: 0
+      failed: 0
+  extended:
+    result: success
+    summary: "all extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    - ExtendedFeature3
+    - ExtendedFeature4
+    - ExtendedFeature5
+- name: tcp
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 4
+      skipped: 0
+      failed: 0
+  extended:
+    result: skipped
+    summary: "some extended features supported"
+    statistics:
+      passed: 2
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
 ```
 
 > **WARNING**: It is an important clarification that this is NOT a full
@@ -355,13 +365,15 @@ profiles:
 > regarding conformance, e.t.c.). Optionally, it can be an email address or
 > a support URL (e.g. Github new issue page).
 
-The above report describes an implementation that just released `v1` and has
-`Core` support for `TCP` functionality and fully supports both `Core` and
-`Extended` `HTTP` functionality.
+The above report describes an implementation that just released `v1`, uses gateway
+API `v0.8.0` `experimental` channel, and has `HTTP` `core` and `extended` and `TCP`
+core and partial `extended` support in `default` mode.
 
-`ConformanceReports` can be stored as a list of reports in chronological order.
-The following shows previous releases of the `acme`/`operator` implementation and
-its feature progression:
+### Multiple reports
+
+Multiple `ConformanceReports` can be stored as a list of reports for a specific
+Gateway API version. The following shows previous releases of the `acme`/`operator`
+implementation and its feature progression:
 
 ```yaml
 apiVersion: v1alpha1
@@ -370,173 +382,106 @@ implementation:
   organization: acme
   project: operator
   url: https://acme.com
-  version: v0.91.0
   contact:
   - @acme/maintainers
-date: "2022-09-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.2
+  version: v0.9.0
+date: "2023-02-28 20:29:41+00:00"
+gatewayAPIVersion: v0.8.0
 gatewayAPIChannel: standard
+mode: default
 profiles:
-  - name: tcp
-    core:
-      result: partial
-      summary: "some tests were manually skipped"
-      statistics:
-        passed: 2
-        skipped: 2
-        failed: 0
-      skippedTests:
-      - TCPRouteBasics
-      - UDPRouteBasics
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 4
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: success
-      summary: "all extended features supported"
-      statistics:
-        passed: 5
-        skipped: 3
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      unsupportedFeatures:
-      - ExtendedFeature4
-      - ExtendedFeature5
----
+- name: http
+  core:
+    result: success
+    summary: "some core functionality passed"
+    statistics:
+      passed: 18
+      skipped: 2
+      failed: 0
+    skippedTests:
+    - CoreTest8
+    - CoreTest15
+  extended:
+    result: success
+    summary: "some extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
+    - ExtendedFeature4
+    - ExtendedFeature5
+```
+
+```yaml
 apiVersion: v1alpha1
 kind: ConformanceReport
 implementation:
   organization: acme
   project: operator
-  url: https://acmeorg.com
-  version: v0.90.0
+  url: https://acme.com
   contact:
   - @acme/maintainers
-date: "2022-08-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.1
-gatewayAPIChannel: standard
+  version: v1.0.0
+date: "2023-06-1 20:29:41+00:00"
+gatewayAPIVersion: v1.0.0
+gatewayAPIChannel: experimental
+mode: default
 profiles:
-  - name: tcp
-    core:
-      result: failed
-      summary: "all tests are failing"
-      statistics:
-        passed: 0
-        skipped: 0
-        failed: 4
-      failedTests:
-      - TCPRouteExampleTest1
-      - TCPRouteExampleTest2
-      - TCPRouteExampleTest3
-      - TCPRouteExampleTest4
-  - name: http
-    core:
-      result: success
-      summary: "all core functionality passed"
-      statistics:
-        passed: 20
-        skipped: 0
-        failed: 0
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 2
-        skipped: 6
-        failed: 0
-      supportedFeatures:
-      - ExtendedFeature1
-      unsupportedFeatures:
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
----
-apiVersion: v1alpha1
-kind: ConformanceReport
-implementation:
-  organization: acme
-  project: operator
-  url: https://acmeorg.com
-  version: v0.89.0
-  contact:
-  - @acme/maintainers
-date: "2022-07-28 20:29:41+00:00"
-gatewayAPIVersion: v0.6.0
-gatewayAPIChannel: standard
-profiles:
-  - name: http
-    core:
-      result: partial
-      summary: "some tests were skipped"
-      statistics:
-        passed: 16
-        skipped: 2
-        failed: 0
-      skippedTests:
-      - HTTPRouteTestExample1
-      - HTTPRouteTestExample2
-    extended:
-      result: skipped
-      summary: "no extended features supported"
-      statistics:
-        passed: 0
-        skipped: 8
-        failed: 0
-      unsupportedFeatures:
-      - ExtendedFeature1
-      - ExtendedFeature2
-      - ExtendedFeature3
-      - ExtendedFeature4
-      - ExtendedFeature5
+- name: http
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 20
+      skipped: 0
+      failed: 0
+  extended:
+    result: success
+    summary: "all extended features supported"
+    statistics:
+      passed: 8
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    - ExtendedFeature3
+    unsupportedFeatures:
+    - ExtendedFeature4
+    - ExtendedFeature5
+- name: tcp
+  core:
+    result: success
+    summary: "all core functionality passed"
+    statistics:
+      passed: 4
+      skipped: 0
+      failed: 0
+  extended:
+    result: skipped
+    summary: "some extended features supported"
+    statistics:
+      passed: 2
+      skipped: 0
+      failed: 0
+    supportedFeatures:
+    - ExtendedFeature1
+    - ExtendedFeature2
+    unsupportedFeatures:
+    - ExtendedFeature3
 ```
 
 > **NOTE**: In the above you can see the `acme` implementation's progression. In
-> their release `v0.89.0` they had started adding `HTTP` support and added the
+> their release `v0.9.0` they had started adding `HTTP` support and added the
 > conformance tests to CI, but they were still skipping some core tests. In
-> their next release `v0.90.0` they completed adding `HTTP` `Core`
-> functionality (and even added one extended feature), and also starting adding
-> `TCP` functionality during `v0.90.0` (but it was failing at that time). In
-> `v0.91.0` they had completed core `HTTP` supported and added two more
-> `Extended` features, and also started to get their `TCP` functionality to
-> partially pass.
-
-Implementers can submit their reports upstream by creating a pull request to
-the Gateway API repository and adding new reports to a file specific to their
-implementation's organization and project name:
-
-```console
-conformance/reports/<version>/<organization>-<project>.yaml
-```
-
-The `<version>` directory in the above refers to the version of Gateway API. The
-`latest` release will include a symlink that points to the latest version
-directory.
-
-For instance:
-
-```console
-conformance/reports/v0.7.1/acme-operator.yaml
-```
+> their next release `v1.0.0` they completed adding `HTTP` `Core`
+> functionality (and even added three extended features), and also added
+> `TCP` functionality with `Core` and partial `Extended` support.
 
 > **NOTE**: Implementations **MUST** report for a specific release version
 > (e.g. `v0.7.1`) and not use branches or Git SHAs. Some exceptions will be
@@ -555,11 +500,81 @@ Creating a pull request to add the `ConformanceReport` will start the
 
 [crd]:https://kubernetes.io/docs/tasks/extend-kubernetes/custom-resources/custom-resource-definitions/
 
-#### Certification Process
+### Reports submission
 
-For this initial iteration the raw report data of the `ConformanceReports` will
-live in its own directory and _is predominantly meant for machine consumption_.
-Report data will be compiled into human-friendly displays during the an
+Implementers can create as many reports as they want, with different API versions,
+API channels, modes, and implementation versions. The reports can be submitted upstream
+by creating a pull request to the Gateway API repository. The reports folder tree
+is the following:
+
+```console
+|-- conformance/reports
+|   |-- v1.0
+|   |   |-- acme-operator
+|   |   |   |-- README.md
+|   |   |   |-- standard-v2.13-default-report.yaml
+|   |-- v1.1
+|   |   |-- acme-operator
+|   |   |   |-- README.md
+|   |   |   |-- standard-v2.14-default-report.yaml
+|   |   |   |-- standard-v2.14-with-the-lot-report.yaml
+|   |   |   |-- extended-v2.14-with-the-lot-report.yaml
+|   |   |-- umbrella-operator
+|   |   |   |-- README.md
+|   |   |   |-- standard-v1.8-default-report.yaml
+```
+
+The main folder `conformance/reports` contains a set of sub-folders, each for a
+Gateway API version. Implementors will create their project folder in all the Gateway
+API version folders for which they have a supported implementation. The implementors
+folder contains the following set of files:
+
+* `README.md`: contains general information about the implementation, a table of
+  contents, and the instructions to reproduce the claimed report.
+* `<API-channel>-<implementation-version>-<mode-name>-report.yaml`: the report
+  generated by the conformance test suite for the specific mode.
+
+#### README.md structure
+
+The README.md files SHOULD be structured in the following way (enrichment from
+implementors is allowed, even though the minimum content is described below):
+
+```md
+# Acme operator
+
+General information about the Acme/operator project
+
+## Table of contents
+
+| API channel | Implementation version | Mode | Report |
+|-------------|------------------------|------|--------|
+|             |                        |      |        |
+|             |                        |      |        |
+|             |                        |      |        |
+
+## To reproduce
+
+Instructions on how to reproduce the claimed report.
+```
+
+Each row of the table of contents MUST correspond to an uploaded report and contains
+the most implementation version and the mode. An example follows:
+
+| API channel  | Implementation version | Mode         | Report                                        |
+|--------------|------------------------|--------------|-----------------------------------------------|
+| standard     | v2.15                  | default      | ./standard-v2.15-default-report.yaml            |
+| standard     | v2.16                  | default      | ./standard-v2.16-default-report.yaml            |
+| experimental | v2.16                  | with-the-lot | ./experimental-v2.16-with-the-lot-report.yaml |
+
+> **NOTE**: the column `Report` contains the link to the corresponding uploaded report.
+
+> **NOTE**: This table of contents could be improved in the future with a link to
+> proof of conformance, such as artifacts containing logs.
+
+## Certification Process
+
+The raw report data of the `ConformanceReports` _is predominantly meant for machine
+consumption_. Report data will be compiled into human-friendly displays during an
 automated certification process.
 
 Certification starts with the pull request described during the [reporting
@@ -608,20 +623,20 @@ iteration to add this if desired, but it probably warrants its own GEP as we
 need to make sure we have buy-in from multiple stakeholders with different
 implementations that are implementing those features.
 
-### High Level Profiles
+### High-Level Profiles
 
-We originally started with two high level profiles:
+We originally started with two high-level profiles:
 
-- `Layer4`
-- `Layer7`
+* `Layer4`
+* `Layer7`
 
-However the overwhelming feedback from the community was to go a step down and
+However, the overwhelming feedback from the community was to go a step down and
 define profiles at the level of each individual API (e.g. `HTTPRoute`,
 `TCPRoute`, `GRPCRoute`, e.t.c.). One of the main reasons for this was that we
 already have multiple known implementations of Gateway API which only support
 a single route type (`UDPRoute`, in particular as it turns out).
 
-We may consider in the future doing some of these higher level profiles if
+We may consider in the future doing some of these higher-level profiles if
 there's a technical reason or strong desire from implementers.
 
 ## Graduation Criteria
@@ -646,4 +661,3 @@ The following are items that **MUST** be resolved to move this GEP to
 
 - https://github.com/kubernetes-sigs/gateway-api/issues/1709
 - https://github.com/kubernetes-sigs/gateway-api/issues/1329
-
