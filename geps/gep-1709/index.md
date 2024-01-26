@@ -646,7 +646,12 @@ The following are items that **MUST** be resolved to move this GEP to
 
 - [x] some kind of basic level of display for the report data needs to exist.
   It's OK for a more robust display layer to be part of a follow-up effort.
-- [ ] initially we were OK with storing reports in the Git repository as files.
+  - for now we ended up with badges in our implementations page. We have
+    [another effort](https://github.com/kubernetes-sigs/gateway-api/issues/2550)
+    underway to build an even better display layer, but we consider this
+    additive and the current display is sufficient for moving the project to
+    standard.
+- [x] initially we were OK with storing reports in the Git repository as files.
   While this is probably sufficient during the `Experimental` phase, we need to
   re-evaluate this before `Standard` and see if this remains sufficient or if
   we want to store the data elsewhere.
