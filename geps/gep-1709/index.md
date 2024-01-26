@@ -659,9 +659,14 @@ The following are items that **MUST** be resolved to move this GEP to
     so for the purposes of calling this standard we're going to move forward
     as-is. It should be straightforward and reasonable to change the storage
     mechanism later as needs arise.
+- [x] We have been actively [gathering feedback from SIG
   Arch][sig-arch-feedback]. Some time during the `experimental` phase needs to
   be allowed to continue to engage with SIG Arch and incorporate their feedback
   into the test suite.
+  - SIG Arch did not have any significant feedback during the experimental
+    phase. In the same timespan the Network Policy group has started using our
+    test suite and APIs as well, so it seems the overall approach has obvious
+    merit, and doesn't appear to be redundant.
 
 [sig-arch-feedback]:https://groups.google.com/g/kubernetes-sig-architecture/c/YjrVZ4NJQiA/m/7Qg7ScddBwAJ
 
