@@ -655,7 +655,10 @@ The following are items that **MUST** be resolved to move this GEP to
   While this is probably sufficient during the `Experimental` phase, we need to
   re-evaluate this before `Standard` and see if this remains sufficient or if
   we want to store the data elsewhere.
-- [ ] We have been actively [gathering feedback from SIG
+  - During the experimental phase this has not caused any significant issues,
+    so for the purposes of calling this standard we're going to move forward
+    as-is. It should be straightforward and reasonable to change the storage
+    mechanism later as needs arise.
   Arch][sig-arch-feedback]. Some time during the `experimental` phase needs to
   be allowed to continue to engage with SIG Arch and incorporate their feedback
   into the test suite.
