@@ -17,16 +17,18 @@ limitations under the License.
 package main
 
 import (
-	"testing"
 	"context"
-	"time"
 	"fmt"
 	"math/rand"
+	"testing"
+	"time"
 
 	"google.golang.org/grpc"
 	// "google.golang.org/grpc/reflection"
-	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	// "google.golang.org/grpc/credentials"
 	// "google.golang.org/grpc/peer"
 
@@ -47,28 +49,24 @@ const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
 func randStr(length int) string {
 	s := ""
 	for i := 0; i < length; i++ {
-		letter := letters[rand.Int() % len(letters)]
+		letter := letters[rand.Int()%len(letters)]
 		s = s + string([]byte{letter})
 	}
 	return s
 }
 
-func TestReflectionService(t *testing.T) {
-	// TODO: Implement.
-}
-
 type methodFunc = func(context.Context, pb.GrpcEchoClient, *pb.EchoRequest) (*pb.EchoResponse, error)
 
-func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
+func clientAndServer(t *testing.T) (pb.GrpcEchoClient, serverConfig, string) {
 	t.Helper()
 	podContext := pb.Context{
-		Namespace: 	randStr(12),
-		Ingress:   	randStr(12),
-		ServiceName:   	randStr(12),
-		Pod:       	randStr(12),
+		Namespace:   randStr(12),
+		Ingress:     randStr(12),
+		ServiceName: randStr(12),
+		Pod:         randStr(12),
 	}
 	config := serverConfig{
-		HTTPPort: ServerHTTPPort,
+		HTTPPort:   ServerHTTPPort,
 		PodContext: podContext,
 	}
 	httpPort, _ := runServer(config)
@@ -81,14 +79,20 @@ func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
 		t.Fatal(err)
 	}
 
+	stub := pb.NewGrpcEchoClient(conn)
+	return stub, config, serverTarget
+}
+
+func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
+	t.Helper()
+	stub, config, serverTarget := clientAndServer(t)
+
 	const testHeaderKey = "foo"
 	testHeaderValue := randStr(12)
 	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
 	ctx = metadata.AppendToOutgoingContext(ctx, testHeaderKey, testHeaderValue)
 
-	stub := pb.NewGrpcEchoClient(conn)
 	req := pb.EchoRequest{}
-	// resp, err := stub.Echo(ctx, &req)
 	resp, err := f(ctx, stub, &req)
 	if err != nil {
 		t.Fatal(err)
@@ -119,8 +123,8 @@ func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
 		t.Fatalf("serverTarget wrong. expected: %s, got: %s", resp.GetAssertions().GetAuthority(), serverTarget)
 	}
 
-	if resp.GetAssertions().GetContext() == nil || !proto.Equal(resp.GetAssertions().GetContext(), &podContext) {
-		t.Fatalf("podContext wrong. expected %v\ngot: %v", podContext, resp.GetAssertions().GetContext())
+	if resp.GetAssertions().GetContext() == nil || !proto.Equal(resp.GetAssertions().GetContext(), &config.PodContext) {
+		t.Fatalf("podContext wrong. expected %v\ngot: %v", config.PodContext, resp.GetAssertions().GetContext())
 	}
 
 	echoedTestHeaderValues := []string{}
@@ -153,3 +157,17 @@ func TestEchoTwoMethod(t *testing.T) {
 	})
 }
 
+func TestEchoThreeMethod(t *testing.T) {
+	stub, _, _ := clientAndServer(t)
+	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
+	req := pb.EchoRequest{}
+	resp, err := stub.EchoThree(ctx, &req)
+	if err == nil {
+		t.Fatalf("Expected RPC to fail but got success: %v", resp)
+	}
+
+	code := status.Code(err)
+	if code != codes.Unimplemented {
+		t.Fatalf("Expected code Unimplemented but found %v: %v", code, err)
+	}
+}

@@ -17,53 +17,52 @@ limitations under the License.
 package main
 
 import (
+	"context"
+	"crypto/tls"
+	"encoding/pem"
 	"fmt"
 	"net"
 	"os"
-	"context"
 	"os/signal"
-	"syscall"
-	"crypto/tls"
-	"strings"
-	"encoding/pem"
 	"strconv"
-
+	"strings"
+	"syscall"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
+	"google.golang.org/grpc/reflection"
 
 	pb "sigs.k8s.io/gateway-api/conformance/grpc-echo/grpcechoserver"
 )
 
 type serverConfig struct {
 	// Controlled by HTTP_PORT env var
-	HTTPPort		int
+	HTTPPort int
 
 	// Controlled by multiple env vars -- one for each field:
 	//   - NAMESPACE
 	//   - INGRESS_NAME
 	//   - SERVICE_NAME
 	//   - POD_NAME
-	PodContext 		pb.Context
+	PodContext pb.Context
 
 	// Controlled by TLS_SERVER_CERT env var
-	TLSServerCert		string
+	TLSServerCert string
 
 	// Controlled by TLS_SERVER_PRIVKEY env var
-	TLSServerPrivKey	string
+	TLSServerPrivKey string
 
 	// Controlled by HTPPS_PORT env var
-	HTTPSPort		int
+	HTTPSPort int
 }
 
 type echoServer struct {
 	pb.UnimplementedGrpcEchoServer
 	fullService string
-	tls bool
-	podContext pb.Context
+	tls         bool
+	podContext  pb.Context
 }
 
 func fullMethod(svc, method string) string {
@@ -94,7 +93,7 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 				authority = v
 			}
 			headers = append(headers, &pb.Header{
-				Key: k,
+				Key:   k,
 				Value: v,
 			})
 		}
@@ -102,9 +101,9 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 	resp := &pb.EchoResponse{
 		Assertions: &pb.Assertions{
 			FullyQualifiedMethod: s.fullMethod(methodName),
-			Headers: headers,
-			Authority: authority,
-			Context: &s.podContext,
+			Headers:              headers,
+			Authority:            authority,
+			Context:              &s.podContext,
 		},
 	}
 	if s.tls {
@@ -150,7 +149,6 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 	}
 	return resp, nil
 }
-
 
 func (s *echoServer) Echo(ctx context.Context, in *pb.EchoRequest) (*pb.EchoResponse, error) {
 	return s.doEcho("Echo", ctx, in)
@@ -209,13 +207,12 @@ func runServer(config serverConfig) (int, int) {
 	return resolvedHttpPort, resolvedHttpsPort
 }
 
-
 func main() {
 	podContext := pb.Context{
-		Namespace: 	os.Getenv("NAMESPACE"),
-		Ingress:   	os.Getenv("INGRESS_NAME"),
-		ServiceName:   	os.Getenv("SERVICE_NAME"),
-		Pod:       	os.Getenv("POD_NAME"),
+		Namespace:   os.Getenv("NAMESPACE"),
+		Ingress:     os.Getenv("INGRESS_NAME"),
+		ServiceName: os.Getenv("SERVICE_NAME"),
+		Pod:         os.Getenv("POD_NAME"),
 	}
 	var err error
 	httpPortStr := os.Getenv("HTTP_PORT")
@@ -243,11 +240,11 @@ func main() {
 	}
 
 	config := serverConfig{
-		HTTPPort: httpPort,
-		PodContext: podContext,
-		TLSServerCert: os.Getenv("TLS_SERVER_CERT"),
+		HTTPPort:         httpPort,
+		PodContext:       podContext,
+		TLSServerCert:    os.Getenv("TLS_SERVER_CERT"),
 		TLSServerPrivKey: os.Getenv("TLS_SERVER_PRIV_KEY"),
-		HTTPSPort: httpsPort,
+		HTTPSPort:        httpsPort,
 	}
 	runServer(config)
 	done := make(chan os.Signal, 1)
