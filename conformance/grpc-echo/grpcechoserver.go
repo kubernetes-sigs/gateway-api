@@ -26,6 +26,7 @@ import (
 	"crypto/tls"
 	"strings"
 	"encoding/pem"
+	"strconv"
 
 
 	"google.golang.org/grpc"
@@ -37,10 +38,32 @@ import (
 	pb "sigs.k8s.io/gateway-api/conformance/grpc-echo/grpcechoserver"
 )
 
+type serverConfig struct {
+	// Controlled by HTTP_PORT env var
+	HTTPPort		int
+
+	// Controlled by multiple env vars -- one for each field:
+	//   - NAMESPACE
+	//   - INGRESS_NAME
+	//   - SERVICE_NAME
+	//   - POD_NAME
+	PodContext 		pb.Context
+
+	// Controlled by TLS_SERVER_CERT env var
+	TLSServerCert		string
+
+	// Controlled by TLS_SERVER_PRIVKEY env var
+	TLSServerPrivKey	string
+
+	// Controlled by HTPPS_PORT env var
+	HTTPSPort		int
+}
+
 type echoServer struct {
 	pb.UnimplementedGrpcEchoServer
 	fullService string
 	tls bool
+	podContext pb.Context
 }
 
 func fullMethod(svc, method string) string {
@@ -81,10 +104,11 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 			FullyQualifiedMethod: s.fullMethod(methodName),
 			Headers: headers,
 			Authority: authority,
-			Context: podContext,
+			Context: &s.podContext,
 		},
 	}
 	if s.tls {
+		// TODO: Pull this out into a function so that we can unit test it.
 		tlsAssertions := &pb.TLSAssertions{}
 		p, ok := peer.FromContext(ctx)
 		if !ok {
@@ -136,67 +160,96 @@ func (s *echoServer) EchoTwo(ctx context.Context, in *pb.EchoRequest) (*pb.EchoR
 	return s.doEcho("EchoTwo", ctx, in)
 }
 
-var podContext *pb.Context
-
-
-func main() {
-	podContext = &pb.Context{
-		Namespace: 	os.Getenv("NAMESPACE"),
-		Ingress:   	os.Getenv("INGRESS_NAME"),
-		ServiceName:   	os.Getenv("SERVICE_NAME"),
-		Pod:       	os.Getenv("POD_NAME"),
-	}
-
+func runServer(config serverConfig) (int, int) {
 	svcs := pb.File_grpcecho_proto.Services()
 	svcd := svcs.ByName("GrpcEcho")
 	if svcd == nil {
-		fmt.Println("failed to look up service GrpcEcho.\n")
+		fmt.Println("failed to look up service GrpcEcho.")
 		os.Exit(1)
 	}
 	fullService := string(svcd.FullName())
 
 	// Set up plaintext server.
-	httpPort := os.Getenv("HTTP_PORT")
-	if httpPort == "" {
-		httpPort = "3000"
-	}
-	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", httpPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPPort))
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
 		os.Exit(1)
 	}
+	resolvedHttpPort := lis.Addr().(*net.TCPAddr).Port
 	s := grpc.NewServer()
-	pb.RegisterGrpcEchoServer(s, &echoServer{fullService: fullService, tls: false})
+	pb.RegisterGrpcEchoServer(s, &echoServer{fullService: fullService, tls: false, podContext: config.PodContext})
 	reflection.Register(s)
 
 	fmt.Printf("plaintext server listening at %v\n", lis.Addr())
 
 	go s.Serve(lis)
 
-	if os.Getenv("TLS_SERVER_CERT") != "" && os.Getenv("TLS_SERVER_PRIVKEY") != "" {
+	resolvedHttpsPort := -1
+	if config.TLSServerCert != "" && config.TLSServerPrivKey != "" {
 		// Set up TLS server.
-		httpsPort := os.Getenv("HTTPS_PORT")
-		if httpsPort == "" {
-			httpsPort = "8443"
-		}
-		creds, err := credentials.NewServerTLSFromFile(os.Getenv("TLS_SERVER_CERT"), os.Getenv("TLS_SERVER_PRIVKEY") )
+		creds, err := credentials.NewServerTLSFromFile(config.TLSServerCert, config.TLSServerPrivKey)
 		if err != nil {
 			fmt.Printf("failed to create credentials: %v\n", err)
 			os.Exit(1)
 		}
-		secureListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s", httpsPort))
+		secureListener, err := net.Listen("tcp", fmt.Sprintf("0.0.0.0:%d", config.HTTPSPort))
 		if err != nil {
 			fmt.Printf("failed to listen: %v\n", err)
 			os.Exit(1)
 		}
+		resolvedHttpsPort = secureListener.Addr().(*net.TCPAddr).Port
 		secureServer := grpc.NewServer(grpc.Creds(creds))
-		pb.RegisterGrpcEchoServer(secureServer, &echoServer{fullService: fullService, tls: true})
+		pb.RegisterGrpcEchoServer(secureServer, &echoServer{fullService: fullService, tls: true, podContext: config.PodContext})
 		reflection.Register(secureServer)
 
 		fmt.Printf("secure server listening at %v\n", secureListener.Addr())
 		go secureServer.Serve(secureListener)
 	}
 
+	return resolvedHttpPort, resolvedHttpsPort
+}
+
+
+func main() {
+	podContext := pb.Context{
+		Namespace: 	os.Getenv("NAMESPACE"),
+		Ingress:   	os.Getenv("INGRESS_NAME"),
+		ServiceName:   	os.Getenv("SERVICE_NAME"),
+		Pod:       	os.Getenv("POD_NAME"),
+	}
+	var err error
+	httpPortStr := os.Getenv("HTTP_PORT")
+	var httpPort int
+	if httpPortStr == "" {
+		httpPort = 3000
+	} else {
+		httpPort, err = strconv.Atoi(httpPortStr)
+		if err != nil {
+			fmt.Printf("non-integer value in HTTP_PORT '%s': %v\n", httpPortStr, err)
+			os.Exit(1)
+		}
+	}
+
+	httpsPortStr := os.Getenv("HTTPS_PORT")
+	var httpsPort int
+	if httpsPortStr == "" {
+		httpsPort = 8443
+	} else {
+		httpsPort, err = strconv.Atoi(httpsPortStr)
+		if err != nil {
+			fmt.Printf("non-integer value in HTTPS_PORT '%s': %v\n", httpsPortStr, err)
+			os.Exit(1)
+		}
+	}
+
+	config := serverConfig{
+		HTTPPort: httpPort,
+		PodContext: podContext,
+		TLSServerCert: os.Getenv("TLS_SERVER_CERT"),
+		TLSServerPrivKey: os.Getenv("TLS_SERVER_PRIV_KEY"),
+		HTTPSPort: httpsPort,
+	}
+	runServer(config)
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 	<-done
