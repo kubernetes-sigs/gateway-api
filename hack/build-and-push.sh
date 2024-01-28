@@ -93,3 +93,13 @@ docker buildx build \
     ${DOCKER_PUSH_FLAG} \
     -f docker/Dockerfile.echo-basic \
     .
+
+echo "Building and pushing grpc-echo image ...${BUILDX_PLATFORMS}"
+
+docker buildx build \
+    -t ${REGISTRY}/grpc-echo:${GIT_TAG} \
+    -t ${REGISTRY}/grpc-echo:${VERSION_TAG} \
+    --platform ${BUILDX_PLATFORMS} \
+    ${DOCKER_PUSH_FLAG} \
+    -f docker/Dockerfile.grpc-echo \
+    .
