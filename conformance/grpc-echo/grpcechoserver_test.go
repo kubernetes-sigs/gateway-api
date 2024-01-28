@@ -57,8 +57,10 @@ func TestReflectionService(t *testing.T) {
 	// TODO: Implement.
 }
 
-// TODO: Parameterize over Echo2 and Echo3 as well.
-func TestEchoService(t *testing.T) {
+type methodFunc = func(context.Context, pb.GrpcEchoClient, *pb.EchoRequest) (*pb.EchoResponse, error)
+
+func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
+	t.Helper()
 	podContext := pb.Context{
 		Namespace: 	randStr(12),
 		Ingress:   	randStr(12),
@@ -81,14 +83,13 @@ func TestEchoService(t *testing.T) {
 
 	const testHeaderKey = "foo"
 	testHeaderValue := randStr(12)
-	respHeaders := &metadata.MD{}
-	respTrailers := &metadata.MD{}
 	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
 	ctx = metadata.AppendToOutgoingContext(ctx, testHeaderKey, testHeaderValue)
 
 	stub := pb.NewGrpcEchoClient(conn)
 	req := pb.EchoRequest{}
-	resp, err := stub.Echo(ctx, &req, grpc.Header(respHeaders), grpc.Trailer(respTrailers))
+	// resp, err := stub.Echo(ctx, &req)
+	resp, err := f(ctx, stub, &req)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -108,7 +109,8 @@ func TestEchoService(t *testing.T) {
 		t.Fatalf("no assertions populated in response: %v", resp.GetAssertions())
 	}
 
-	const expectedFullyQualifiedMethod = "/gateway_api_conformance.grpc_echo.grpcecho.GrpcEcho/Echo"
+	const fullyQualifiedService = "/gateway_api_conformance.grpc_echo.grpcecho.GrpcEcho/"
+	expectedFullyQualifiedMethod := fullyQualifiedService + methodName
 	if resp.GetAssertions().GetFullyQualifiedMethod() != expectedFullyQualifiedMethod {
 		t.Fatalf("fully_qualified_method wrong. expected: %s, got: %s", resp.GetAssertions().GetFullyQualifiedMethod(), expectedFullyQualifiedMethod)
 	}
@@ -137,5 +139,17 @@ func TestEchoService(t *testing.T) {
 	if echoedTestHeaderValue != testHeaderValue {
 		t.Fatalf("echoed header value was wrong. expected: %s, got: %s", testHeaderValue, echoedTestHeaderValue)
 	}
+}
+
+func TestEchoMethod(t *testing.T) {
+	testEchoMethod(t, "Echo", func(ctx context.Context, stub pb.GrpcEchoClient, req *pb.EchoRequest) (*pb.EchoResponse, error) {
+		return stub.Echo(ctx, req)
+	})
+}
+
+func TestEchoTwoMethod(t *testing.T) {
+	testEchoMethod(t, "EchoTwo", func(ctx context.Context, stub pb.GrpcEchoClient, req *pb.EchoRequest) (*pb.EchoResponse, error) {
+		return stub.EchoTwo(ctx, req)
+	})
 }
 
