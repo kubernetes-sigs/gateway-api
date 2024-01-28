@@ -79,13 +79,16 @@ func TestEchoService(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	headers := &metadata.MD{}
-	trailers := &metadata.MD{}
+	const testHeaderKey = "foo"
+	testHeaderValue := randStr(12)
+	respHeaders := &metadata.MD{}
+	respTrailers := &metadata.MD{}
 	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
+	ctx = metadata.AppendToOutgoingContext(ctx, testHeaderKey, testHeaderValue)
 
 	stub := pb.NewGrpcEchoClient(conn)
 	req := pb.EchoRequest{}
-	resp, err := stub.Echo(ctx, &req, grpc.Header(headers), grpc.Trailer(trailers))
+	resp, err := stub.Echo(ctx, &req, grpc.Header(respHeaders), grpc.Trailer(respTrailers))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,6 +121,21 @@ func TestEchoService(t *testing.T) {
 		t.Fatalf("podContext wrong. expected %v\ngot: %v", podContext, resp.GetAssertions().GetContext())
 	}
 
-	t.Fatalf("%v", resp)
+	echoedTestHeaderValues := []string{}
+	for _, header := range resp.GetAssertions().GetHeaders() {
+		if header.GetKey() == testHeaderKey {
+			echoedTestHeaderValues = append(echoedTestHeaderValues, header.GetValue())
+		}
+	}
+
+	if len(echoedTestHeaderValues) != 1 {
+		t.Fatalf("echoed header value had unexpected size %d: %v", len(echoedTestHeaderValues), echoedTestHeaderValues)
+	}
+
+	echoedTestHeaderValue := echoedTestHeaderValues[0]
+
+	if echoedTestHeaderValue != testHeaderValue {
+		t.Fatalf("echoed header value was wrong. expected: %s, got: %s", testHeaderValue, echoedTestHeaderValue)
+	}
 }
 

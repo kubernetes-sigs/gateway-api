@@ -90,7 +90,6 @@ service GrpcEcho {
 	// emulate the service having more than one method.
 	rpc EchoTwo(EchoRequest) returns (EchoResponse) {}
 
-	// Behaves identically to Echo, but lives at a different method to
-	// emulate the service having more than two methods.
+	// An intentionally unimplemented method.
 	rpc EchoThree(EchoRequest) returns (EchoResponse) {}
 }
