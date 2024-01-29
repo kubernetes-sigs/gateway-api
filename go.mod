@@ -6,6 +6,7 @@ require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/net v0.20.0
+	google.golang.org/grpc v1.61.0
 	k8s.io/api v0.29.0
 	k8s.io/apiextensions-apiserver v0.29.0
 	k8s.io/apimachinery v0.29.0
@@ -14,8 +15,13 @@ require (
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 	sigs.k8s.io/controller-runtime v0.16.3
 	sigs.k8s.io/controller-tools v0.14.0
+	sigs.k8s.io/gateway-api/conformance/grpc-echo v0.0.0-00010101000000-000000000000
 	sigs.k8s.io/yaml v1.4.0
 )
+
+// Needed because of the go.sum and go.mod used for Dockerfile
+// The same generated code is reused in the conformance tests.
+replace sigs.k8s.io/gateway-api/conformance/grpc-echo => ./conformance/grpc-echo
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -66,6 +72,7 @@ require (
 	golang.org/x/time v0.5.0 // indirect
 	golang.org/x/tools v0.16.1 // indirect
 	google.golang.org/appengine v1.6.8 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20231106174013-bbf56f31fb17 // indirect
 	google.golang.org/protobuf v1.32.0 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
