@@ -26,8 +26,7 @@ type GrpcEchoClient interface {
 	// Behaves identically to Echo, but lives at a different method to
 	// emulate the service having more than one method.
 	EchoTwo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
-	// Behaves identically to Echo, but lives at a different method to
-	// emulate the service having more than two methods.
+	// An intentionally unimplemented method.
 	EchoThree(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
 }
 
@@ -74,8 +73,7 @@ type GrpcEchoServer interface {
 	// Behaves identically to Echo, but lives at a different method to
 	// emulate the service having more than one method.
 	EchoTwo(context.Context, *EchoRequest) (*EchoResponse, error)
-	// Behaves identically to Echo, but lives at a different method to
-	// emulate the service having more than two methods.
+	// An intentionally unimplemented method.
 	EchoThree(context.Context, *EchoRequest) (*EchoResponse, error)
 	mustEmbedUnimplementedGrpcEchoServer()
 }

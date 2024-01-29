@@ -258,7 +258,7 @@ type Assertions struct {
 	unknownFields protoimpl.UnknownFields
 
 	// The fully qualified method of the current RPC, e.g.
-	// "/ingress_controller_conformance.images.grpcechoserver.grpcecho.GrpcEcho/Echo"
+	// "/gateway_api_conformance.grpc_echo.grpcecho.GrpcEcho/Echo"
 	FullyQualifiedMethod string `protobuf:"bytes,1,opt,name=fully_qualified_method,json=fullyQualifiedMethod,proto3" json:"fully_qualified_method,omitempty"`
 	// The headers present in the request.
 	Headers []*Header `protobuf:"bytes,2,rep,name=headers,proto3" json:"headers,omitempty"`
