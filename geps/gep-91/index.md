@@ -71,7 +71,7 @@ type ClientValidationContext struct {
     //
     // +kubebuilder:validation:MaxItems=8
     // +optional
-    CACertificateRefs []corev1.ObjectReference `json:”caCertificateRefs,omitempty”`
+    CACertificateRefs []SecretObjectReference `json:”caCertificateRefs,omitempty”`
 }
 
 ```
