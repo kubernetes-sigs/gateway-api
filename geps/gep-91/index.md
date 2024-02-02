@@ -10,6 +10,21 @@
 This GEP proposes a way to validate the TLS certificate presented by the downstream client to the server
 (Gateway Listener in this case) during a [TLS Handshake Protocol][].
 
+### Existing support in Implementations
+
+This feature is widely supported in implementations that support Gateway API.
+This table highlights the support. Please feel free to add any missing implementations not mentioned below.
+
+| Implementation | Support       |
+|----------------|------------|
+| Apache APISIX  | [ApisixTls.Client.CASecret](https://apisix.apache.org/docs/ingress-controller/tutorials/mtls/#mutual-authentication)      |
+| Contour        | [HTTPProxy.Spec.VirtualHost.Tls.ClientValidation.CASecret](https://projectcontour.io/docs/v1.17.1/config/tls-termination/)      |
+| Emissary Ingress| [TlSContext.Spec.Secret](https://www.getambassador.io/docs/emissary/latest/topics/running/tls/mtls)     |
+| Gloo Edge      | [VirtualService.Spec.SSLConfig.SecretRef](https://docs.solo.io/gloo-edge/latest/guides/security/tls/server_tls/#configuring-downstream-mtls-in-a-virtual-service)      |
+| Istio          | [Gateway.Spec.Servers.TLS.Mode](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway)      |
+| Kong           | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)      |
+| Traefik        | [TLSOption.Spec.ClientAuth](https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls)    |
+
 ## Goals
 - Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client. This use case has been been highlighted in the [Gateway API TLS Use Cases][] document under point 7.
 
