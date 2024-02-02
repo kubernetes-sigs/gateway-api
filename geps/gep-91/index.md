@@ -10,7 +10,13 @@
 This GEP proposes a way to validate the TLS certificate presented by the downstream client to the server
 (Gateway Listener in this case) during a [TLS Handshake Protocol][].
 
-### Existing support in Implementations
+## Goals
+- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client. This use case has been been highlighted in the [Gateway API TLS Use Cases][] document under point 7.
+
+## Non-Goals
+- Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
+
+## Existing support in Implementations
 
 This feature is widely supported in implementations that support Gateway API.
 This table highlights the support. Please feel free to add any missing implementations not mentioned below.
@@ -24,12 +30,6 @@ This table highlights the support. Please feel free to add any missing implement
 | Istio          | [Gateway.Spec.Servers.TLS.Mode](https://istio.io/latest/docs/tasks/traffic-management/ingress/secure-ingress/#configure-a-mutual-tls-ingress-gateway)      |
 | Kong           | [mTLS Plugin](https://docs.konghq.com/hub/kong-inc/mtls-auth/)      |
 | Traefik        | [TLSOption.Spec.ClientAuth](https://doc.traefik.io/traefik/https/tls/#client-authentication-mtls)    |
-
-## Goals
-- Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client. This use case has been been highlighted in the [Gateway API TLS Use Cases][] document under point 7.
-
-## Non-Goals
-- Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
 
 ### API
 
