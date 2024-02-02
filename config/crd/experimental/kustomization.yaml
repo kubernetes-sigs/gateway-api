@@ -7,3 +7,4 @@ resources:
 - gateway.networking.k8s.io_tlsroutes.yaml
 - gateway.networking.k8s.io_udproutes.yaml
 - gateway.networking.k8s.io_grpcroutes.yaml
+- gateway.networking.k8s.io_backendtlspolicies.yaml
