@@ -22,6 +22,9 @@ This GEP proposes a way to validate the TLS certificate presented by the downstr
 to the Gateway.
 * Introduce a `caCertificateRefs` field within `ClientValidationContext` that can be used to specify a list of CA Certificates that
 can be used as a trust anchor to validate the certificates presented by the client.
+* Add CEL validation to ensure that `caCertificateRefs` cannot be empty. This validation will be removed once more fields are added
+into `clientValidation`.
+* This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the peer on the connection between the Gateway and the downstream client.
 
 #### GO
 
@@ -32,10 +35,10 @@ can be used as a trust anchor to validate the certificates presented by the clie
 type ClientValidationContext struct {
     // CACertificateRefs contains one or more references to
     // Kubernetes objects that contain TLS certificates of
-    // the Certificate Authorities that can be used to
+    // the Certificate Authorities that can be used
     // as a trust anchor to validate the certificates presented by the client.
     //
-    // A single CACertRef to a Kubernetes ConfigMap kind has "Core" support.
+    // A single CA certificate reference to a Kubernetes ConfigMap kind has "Core" support.
     // Implementations MAY choose to support attaching multiple CA certificates to
     // a Listener, but this behavior is implementation-specific.
     //
@@ -45,7 +48,7 @@ type ClientValidationContext struct {
     // Support: Implementation-specific (More than one reference, or other kinds
     // of resources).
     //
-    // References to a resource in different namespace are invalid UNLESS there
+    // References to a resource in a different namespace are invalid UNLESS there
     // is a ReferenceGrant in the target namespace that allows the certificate
     // to be attached. If a ReferenceGrant does not allow this reference, the
     // "ResolvedRefs" condition MUST be set to False for this listener with the
@@ -84,9 +87,16 @@ spec:
           name: foo-example-com-ca-cert
 ```
 
+## Deferred
+
+This section highlights use cases that may be covered in a future iteration of this GEP
+
+* Using system CA certificates as the trust anchor to validate the certificates presented by the client.
+
 ## References
 
 [TLS Handshake Protocol]: https://www.rfc-editor.org/rfc/rfc5246#section-7.4
 [Certificate Path Validation]: https://www.rfc-editor.org/rfc/rfc5280#section-6
-[GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1beta1.GatewayTLSConfig
+[GatewayTLSConfig]: https://gateway-api.sigs.k8s.io/references/spec/#gateway.networking.k8s.io/v1.GatewayTLSConfig
+[BackendTLSPolicy]: https://gateway-api.sigs.k8s.io/api-types/backendtlspolicy/
 [Gateway API TLS Use Cases]: https://docs.google.com/document/d/17sctu2uMJtHmJTGtBi_awGB0YzoCLodtR6rUNmKMCs8/edit?pli=1#heading=h.cxuq8vo8pcxm
