@@ -6,7 +6,7 @@ livereload==2.6.3
 # mkdocs 2.4.1 requires Markdown < 3.4.0
 # https://github.com/kubernetes-sigs/gateway-api/pull/1671#issuecomment-1400586465
 markdown~=3.2
-MarkupSafe==2.1.4
+MarkupSafe==2.1.5
 mkdocs==1.5.3
 mkdocs-awesome-pages-plugin==2.9.2
 mkdocs-macros-plugin==1.0.5
