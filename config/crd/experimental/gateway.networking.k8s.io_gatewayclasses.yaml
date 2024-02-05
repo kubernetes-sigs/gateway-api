@@ -268,15 +268,20 @@ spec:
                   - GatewayPort8080
                   - GatewayStaticAddresses
                   - HTTPRoute
+                  - HTTPRouteBackendProtocolH2C
+                  - HTTPRouteBackendProtocolWebSocket
+                  - HTTPRouteBackendTimeout
                   - HTTPRouteDestinationPortMatching
                   - HTTPRouteHostRewrite
                   - HTTPRouteMethodMatching
+                  - HTTPRouteParentRefPort
                   - HTTPRoutePathRedirect
                   - HTTPRoutePathRewrite
                   - HTTPRoutePortRedirect
                   - HTTPRouteQueryParamMatching
                   - HTTPRouteRequestMirror
                   - HTTPRouteRequestMultipleMirrors
+                  - HTTPRouteRequestTimeout
                   - HTTPRouteResponseHeaderModification
                   - HTTPRouteSchemeRedirect
                   - Mesh
@@ -542,15 +547,20 @@ spec:
                   - GatewayPort8080
                   - GatewayStaticAddresses
                   - HTTPRoute
+                  - HTTPRouteBackendProtocolH2C
+                  - HTTPRouteBackendProtocolWebSocket
+                  - HTTPRouteBackendTimeout
                   - HTTPRouteDestinationPortMatching
                   - HTTPRouteHostRewrite
                   - HTTPRouteMethodMatching
+                  - HTTPRouteParentRefPort
                   - HTTPRoutePathRedirect
                   - HTTPRoutePathRewrite
                   - HTTPRoutePortRedirect
                   - HTTPRouteQueryParamMatching
                   - HTTPRouteRequestMirror
                   - HTTPRouteRequestMultipleMirrors
+                  - HTTPRouteRequestTimeout
                   - HTTPRouteResponseHeaderModification
                   - HTTPRouteSchemeRedirect
                   - Mesh
