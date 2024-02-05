@@ -2,7 +2,7 @@
 
 * Issue: [#1709](https://github.com/kubernetes-sigs/gateway-api/issues/1709)
 * Status: Experimental
-* Probationary Period: Re-evaluate in February 2024
+* Probationary Period: Re-evaluate in April 2024
 
 ## TLDR
 
