@@ -59,6 +59,12 @@ func TestNewGatewayRef(t *testing.T) {
 				"fake-listener-3",
 			},
 		},
+		{
+			name: "verifying the contents of a GatewayRef with nil listener names",
+			nsn:  types.NamespacedName{Namespace: corev1.NamespaceDefault, Name: "fake-gateway"},
+			// nil listenerNames
+			listenerNames: nil,
+		},
 	}
 
 	for i := 0; i < len(tests); i++ {
@@ -66,7 +72,7 @@ func TestNewGatewayRef(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			ref := NewGatewayRef(test.nsn, test.listenerNames...)
 			require.IsType(t, GatewayRef{}, ref)
-			if test.listenerNames == nil {
+			if test.listenerNames == nil || len(test.listenerNames) == 0 {
 				require.Len(t, ref.listenerNames, 1)
 				assert.Equal(t, "", string(*ref.listenerNames[0]))
 			} else {
