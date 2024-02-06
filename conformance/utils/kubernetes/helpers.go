@@ -321,7 +321,10 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
-func WaitForGatewayAndRoutesToBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs []types.NamespacedName, routeHandler func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool)) string {
+// RouteHandlerFunc represents a function type for handling routes
+type RouteHandlerFunc func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool)
+
+func WaitForGatewayAndRoutesToBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs []types.NamespacedName, routeHandler RouteHandlerFunc) string {
 	t.Helper()
 
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
@@ -390,7 +393,7 @@ func WaitForGatewayAndRoutesToBeAccepted(t *testing.T, c client.Client, timeoutC
 //
 // The test will fail if these conditions are not met before the timeouts.
 func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+	var routeHandler RouteHandlerFunc = func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
 		HTTPRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
 	}
 	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler)
@@ -402,10 +405,11 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 // timeouts.
 func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) (string, []gatewayv1.Hostname) {
 	var hostnames []gatewayv1.Hostname
-	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+	var routeHandler RouteHandlerFunc = func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
 		route := TLSRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
 		hostnames = route.Spec.Hostnames
 	}
+
 	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler), hostnames
 }
 
@@ -414,9 +418,10 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 // Gateway. The test will fail if these conditions are not met before the
 // timeouts.
 func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
-	routeHandler := func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+	var routeHandler RouteHandlerFunc = func(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
 		UDPRouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired)
 	}
+
 	return WaitForGatewayAndRoutesToBeAccepted(t, c, timeoutConfig, controllerName, gw, routeNNs, routeHandler)
 }
 
