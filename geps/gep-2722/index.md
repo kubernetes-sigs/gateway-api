@@ -15,40 +15,42 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
 ## Motivations
 
 * Limited kubectl customizability for CRDs: 
-  * kubectl's customization capabilities for CRDs (through
-    `additionalPrinterColumns`) is constrained, limiting the ability to create
-    optimal views for Gateway API resources. 
+    * kubectl's customization capabilities for CRDs (through
+      `additionalPrinterColumns`) is constrained, limiting the ability to create
+      optimal views for Gateway API resources. 
 * Complex policy attachment management: 
-  * As described in [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/),
-    policies present a valuable mechanism for expanding the capabilities of
-    Gateway API resources. However, discoverability poses a challenge due to the
-    absence of a clear connection between resources and their associated
-    policies. There have been growing questions around suitability of policies
-    as a means to provide extensions.
+    * As described in [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/),
+      policies present a valuable mechanism for expanding the capabilities of
+      Gateway API resources. However, discoverability poses a challenge due to
+      the absence of a clear connection between resources and their associated
+      policies. There have been growing questions around suitability of policies
+      as a means to provide extensions.
 * Challenging multi-resource model navigation:
-  * Comprehending the relationships between multiple Gateway API resources can
-    be challenging within kubectl. 
+    * Comprehending the relationships between multiple Gateway API resources can
+      be challenging within kubectl. 
 
 ## Goals
 
 * Greater control over output formatting and presentation:
-  * Offer greater control over output formatting and presentation, enhancing
-    visibility and understanding of Gateway API resources.
+    * Offer greater control over output formatting and presentation, enhancing
+      visibility and understanding of Gateway API resources.
 * Improved policy discoverability, increasing adoption and usability:
-  * Make policies easily discoverable, aiding in the adoption and fostering
-    broader acceptance of policies as an extension mechanism.
+    * Make policies easily discoverable, aiding in the adoption and fostering
+      broader acceptance of policies as an extension mechanism.
 * Simplified multi-resource model navigation:
-  * Facilitate navigation of the multi-resource model by making connections
-    between Gateway API resources explicit, aiding in configuration,
-    troubleshooting, and issue identification.
+    * Facilitate navigation of the multi-resource model by making connections
+      between Gateway API resources explicit, aiding in configuration,
+      troubleshooting, and issue identification.
 * Proactive error detection and reporting:
-  * Leverage native understanding of resource relationships to proactively
-    detect and report on potential configuration errors, further simplifying
-    issue identification and resolution. This would complement the ability of
-    users to readily pinpoint configuration problems themselves.
-* Provide incentive for policy implementations that are consistent across cloud providers: 
-  * Encourage the adoption of consistent policy implementations across different
-    Gateway API providers, promoting interoperability and predictability.
+    * Leverage native understanding of resource relationships to proactively
+      detect and report on potential configuration errors, further simplifying
+      issue identification and resolution. This would complement the ability of
+      users to readily pinpoint configuration problems themselves.
+* Provide incentive for policy implementations that are consistent across cloud
+  providers: 
+    * Encourage the adoption of consistent policy implementations across
+      different Gateway API providers, promoting interoperability and
+      predictability.
 
 ## Commands Specification
 
@@ -80,12 +82,12 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
   for cluster-scoped resources).
 * `-t` **Target Resource**: Filters policies based on the target resource type
   they apply to. Applicable only to the policies resource.
-  * Syntax: `-t <key1>=<value1>,<key2>=<value2>,...`
-  * Supported keys:
-    * kind: Resource kind (e.g., "httproute", "gateway")
-    * namespace: Resource namespace
-    * name: Resource name
-    * group: Resource API group
+    * Syntax: `-t <key1>=<value1>,<key2>=<value2>,...`
+    * Supported keys:
+        * kind: Resource kind (e.g., "httproute", "gateway")
+        * namespace: Resource namespace
+        * name: Resource name
+        * group: Resource API group
 
 #### Output Formats:
 
@@ -93,14 +95,14 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
   information with details from related resources.
 
 * **get**:
-  * One-line format (default): Displays basic resource information in a single
-    line.
-  * YAML format (-o yaml): Presents resource information in the YAML data
-    format.
-  * JSON format (-o json): Presents resource information in the JSON data
-    format.
-  * Wide format (-o wide): Includes additional columns beyond those displayed in
-    the one-line format.
+    * One-line format (default): Displays basic resource information in a single
+      line.
+    * YAML format (-o yaml): Presents resource information in the YAML data
+      format.
+    * JSON format (-o json): Presents resource information in the JSON data
+      format.
+    * Wide format (-o wide): Includes additional columns beyond those displayed in
+      the one-line format.
   
   <details>
     <summary>Output columns while using get</summary>
@@ -377,11 +379,11 @@ distribution mechanisms will be provided:
   allowing easier installation, and handling automatic updates for the user.
 * **Versioning:** gwctl versions will be aligned with Gateway API releases (for
   the time when gwctl is developed within the same repository as Gateway API)
-  * As gwctl matures, the need for maintaining it within the primary Gateway API
-    repository will be reassessed. Factors such as a potential divergence in
-    release cadence, independent contributor growth or the desire to reduce the
-    triage workload for Gateway API maintainers could motivate a move to a
-    separate repository.
+    * As gwctl matures, the need for maintaining it within the primary Gateway API
+      repository will be reassessed. Factors such as a potential divergence in
+      release cadence, independent contributor growth or the desire to reduce the
+      triage workload for Gateway API maintainers could motivate a move to a
+      separate repository.
 
 ### Future Milestones
 * Each output of `describe` will include an extra `Analysis` field. This field
