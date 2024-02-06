@@ -23,6 +23,6 @@ jobs:
             echo "found diff between the current and the expected supportedFeatures"
             echo -e "expected: ${GREEN}${expected_features}${NC}"
             echo -e "current: ${RED}${current_features}${NC}"
-            echo -e "${YELLOW}Please run \`go run hack/supportedfeatures/main.go\` and update +kubebuilder:validation:Enum in gatewayclass_types.go${NC}"
+            echo -e "${YELLOW}Please run \`hack/supportedfeatures/update_supported_features.sh\` to update kubebuilder:validation:Enum list${NC}"
             exit 1
           fi
