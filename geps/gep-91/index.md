@@ -14,7 +14,7 @@ This GEP proposes a way to validate the TLS certificate presented by the downstr
 - Define an API field to specify the CA Certificate within the Gateway Listener configuration that can be used as a trust anchor to validate the certificates presented by the client. This use case has been been highlighted in the [Gateway API TLS Use Cases][] document under point 7.
 
 ## Non-Goals
-- Define other fields that can be used to verify the client certificate such as the Certificate Hash or Subject Alt Name. 
+- Define other fields that can be used to verify the client certificate such as the Certificate Hash. 
 
 ## Existing support in Implementations
 
@@ -37,8 +37,6 @@ This table highlights the support. Please feel free to add any missing implement
 to the Gateway.
 * Introduce a `caCertificateRefs` field within `ClientValidationContext` that can be used to specify a list of CA Certificates that
 can be used as a trust anchor to validate the certificates presented by the client.
-* Add CEL validation to ensure that `caCertificateRefs` cannot be empty. This validation will be removed once more fields are added
-into `clientValidation`.
 * This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the peer on the connection between the Gateway and the downstream client.
 
 #### GO
@@ -70,8 +68,15 @@ type ClientValidationContext struct {
     // "RefNotPermitted" reason.
     //
     // +kubebuilder:validation:MaxItems=8
-    // +optional
+    // +kubebuilder:validation:MinItems=1
     CACertificateRefs []SecretObjectReference `json:”caCertificateRefs,omitempty”`
+    // SubjectAltNames contains one or more alternate names to verify
+    // the subject identity in the certificate presented by the client.
+    //
+    // Support: Core
+    //
+    // +optional
+    SubjectAltNames []string `json:"subjectAltNames,omitempty"`
 }
 
 ```
