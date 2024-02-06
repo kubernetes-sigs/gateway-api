@@ -1,0 +1,28 @@
+name: 'kubebuilder-supported-features-freshness'
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'conformance/utils/suite/**'
+jobs:
+  checker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'checkout'
+        uses: actions/checkout@v4
+      - name: 'check_diff'
+        run: |
+          RED='\033[0;31m'
+          GREEN='\033[0;32m'
+          YELLOW='‘\033[1;33m'
+          NC='\033[0m'
+          current_features=$(grep -B 1 'type SupportedFeature string' apis/v1/gatewayclass_types.go | grep -oP '// \+kubebuilder:validation:Enum=\K.*') 
+          expected_features=$(go run hack/supportedfeatures/main.go)
+          if [[ "$current_features" != "$expected_features" ]]; then
+            echo "found diff between the current and the expected supportedFeatures"
+            echo -e "expected: ${GREEN}${expected_features}${NC}"
+            echo -e "current: ${RED}${current_features}${NC}"
+            echo -e "${YELLOW}Please run \`hack/supportedfeatures/update_supported_features.sh\` to update kubebuilder:validation:Enum list${NC}"
+            exit 1
+          fi
