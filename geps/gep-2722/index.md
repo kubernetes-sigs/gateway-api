@@ -267,15 +267,9 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
                 <td>-o wide</td>
             </tr>
             <tr>
-                <td rowspan="6">policycrd</td>
+                <td rowspan="5">policycrd</td>
                 <td>NAME</td>
-                <td>Name of the Policy CRD</td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>KIND</td>
-                <td>The kind of Policy CRD in the form <kind.group></kind.group>
-                </td>
+                <td>Name of the Policy CRD in the form &lt;kind.group&gt;</td>
                 <td></td>
             </tr>
             <tr>
@@ -306,7 +300,7 @@ TLDR: This GEP proposes `gwctl`, a new command line tool designed to streamline
             </tr>
             <tr>
                 <td>KIND</td>
-                <td>The kind of policy in the form <kind.group></kind.group>
+                <td>The kind of policy in the form &lt;kind.group&gt;
                 </td>
                 <td></td>
             </tr>
@@ -371,8 +365,8 @@ distribution mechanisms will be provided:
   Windows) will be made available for download. Tooling like
   [GoReleaser](https://goreleaser.com/) can be used to streamline some of the
   build processes. Binaries will be offered in two variants:
-  * `gwctl` for standalone use.
-  * `kubectl-gw` for use as a kubectl plugin (`kubectl gw`).
+    * `gwctl` for standalone use.
+    * `kubectl-gw` for use as a kubectl plugin (`kubectl gw`).
 * **Kubectl Plugin Integration:** gwctl will be integrated with
   [Krew](https://github.com/kubernetes-sigs/krew), the kubectl plugin manager.
   This should immensely help with improving discoverability of the plugin,
@@ -445,16 +439,23 @@ outlining the range of values that may be presented:
 
 * `gwctl get policycrds -o wide`
   ```
-  NAME                            CONTROLLER                      ACCEPTED  AGE   DESCRIPTION             Gateways
-  bar-com-internal-gateway-class  bar.baz/internal-gateway-class  True      100d  Internal Load Balancer  10
-  foo-com-external-gateway-class  foo.com/external-gateway-class  True      365d  External Load Balancer  25
+  NAME                               POLICY TYPE  SCOPE       POLICIES COUNT  AGE
+  healthcheckpolicies.foo.com        Direct       Namespaced  1               5d
+  retryonpolicies.foo.com            Direct       Namespaced  2               4d
+  timeoutpolicies.bar.com            Inherited    Cluster     1               10m
+  tlsminimumversionpolicies.baz.com  Direct       Namespaced  3               45s
   ```
 
-* `gwctl get gatewayclass -o wide`
+* `gwctl get policies -o wide`
   ```
-  NAME                            CONTROLLER                      ACCEPTED  AGE   DESCRIPTION             Gateways
-  bar-com-internal-gateway-class  bar.baz/internal-gateway-class  True      100d  Internal Load Balancer  10
-  foo-com-external-gateway-class  foo.com/external-gateway-class  True      365d  External Load Balancer  25
+  NAME                                 KIND                                TARGET NAME                     TARGET KIND   POLICY TYPE  AGE
+  demo-timeout-policy-on-gatewayclass  TimeoutPolicy.foo.com               foo-com-external-gateway-class  GatewayClass  Inherited    10d
+  demo-timeout-policy-on-namespace     TimeoutPolicy.foo.com               default                         Namespace     Inherited    10d
+  demo-health-check-1                  HealthCheckPolicy.bar.com           demo-gateway-1                  Gateway       Direct       10d
+  demo-retry-policy-1                  RetryOnPolicy.baz.com               demo-gateway-1                  Gateway       Direct       10d
+  demo-retry-policy-2                  RetryOnPolicy.baz.com               demo-httproute-2                HTTPRoute     Direct       10d
+  demo-tls-min-version-policy-1        TLSMinimumVersionPolicy.foobar.com  demo-gateway-3                  Gateway       Direct       10d
+  demo-tls-min-version-policy-2        TLSMinimumVersionPolicy.foobar.com  demo-gateway-4                  Gateway       Direct       10d
   ```
 
 * `gwctl describe gateway demo-gateway`
@@ -515,8 +516,8 @@ outlining the range of values that may be presented:
   DirectlyAttachedPolicies:
     TYPE                   NAME
     ----                   ----
-    TimeoutPolicy.foo.com  ns1/demo-timeout-policy-on-gatewayclass
-    RetryOnPolicy.baz.com  ns2/demo-retry-policy-1
+    TimeoutPolicy.foo.com  demo-timeout-policy-on-gatewayclass
+    RetryOnPolicy.baz.com  demo-retry-policy-1
   InheritedPolicies:
     TYPE                   NAME                                 TARGET KIND   TARGET NAME
     ----                   ----                                 -----------   -----------
@@ -585,10 +586,10 @@ outlining the range of values that may be presented:
         kind: Gateway
         name: demo-gateway
   DirectlyAttachedPolicies:
-    Group    Kind               Name                 Namespace
-    -----    ----               ----                 ---------
-    foo.com  HealthCheckPolicy  demo-health-check-1  default
-    foo.com  RetryOnPolicy      demo-retry-policy-1  default
+    TYPE                       NAME
+    ----                       ----
+    HealthCheckPolicy.foo.com  demo-health-check-1
+    RetryOnPolicy.baz.com      demo-retry-policy-1
   InheritedPolicies:
     TYPE                   NAME                                 TARGET KIND   TARGET NAME
     ----                   ----                                 -----------   -----------
@@ -635,7 +636,7 @@ outlining the range of values that may be presented:
       status: "True"
       type: Accepted
   DirectlyAttachedPolicies:
-  - Group: bar.com
-    Kind: TimeoutPolicy
-    Name: demo-timeout-policy-on-gatewayclass
+    TYPE                   NAME
+    ----                   ----
+    TimeoutPolicy.bar.com  demo-timeout-policy-on-gatewayclass
   ```
