@@ -190,7 +190,7 @@ spec:
     protocol: HTTP
   - name: domain-a
     hostname: a.example.com
-    protocol: HTTP
+    protocol: HTTPWe want to keep this API very simple so that the merging requirement level could increase from `MAY` to `MUST`
     port: 80
 ```
 
@@ -337,6 +337,12 @@ Policies attached to a parent Gateway apply to both the parent and all children 
 Policies that attach to a child Gateway apply to all listeners defined in that Gateway, but do not impact
 parent or sibling listeners.
 If the implementation cannot apply the policy to only specific listeners, it should reject the policy.
+
+## Future Goals
+
+### Requirement Level
+
+We want to keep this API very simple so that the merging requirement level could increase from `MAY` to `MUST`
 
 ## Alternatives
 
