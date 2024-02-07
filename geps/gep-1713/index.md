@@ -241,7 +241,7 @@ A parent resource MUST not set `spec.infrastructure.attachTo`.
 That is, we do not allow multiple tiers of Gateways chaining to each other; there is only a single parent with children.
 This can be validated in the CRD schema.
 
-A child resource cannot `attachTo` any resource that doesn't allow attachment (i.e. it does not specify `spec.infrastructure.allowedChildren` for `Gateway`s).
+A child resource cannot `attachTo` any Gateway resource that doesn't allow attachment (eg. it does not specify `spec.infrastructure.allowedChildren` for `Gateway`s).
 This will be detected by the implementation and reported in [status](#status-fields).
 
 ##### Listeners
