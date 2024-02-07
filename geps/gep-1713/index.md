@@ -190,7 +190,7 @@ spec:
     protocol: HTTP
   - name: domain-a
     hostname: a.example.com
-    protocol: HTTPWe want to keep this API very simple so that the merging requirement level could increase from `MAY` to `MUST`
+    protocol: HTTP
     port: 80
 ```
 
@@ -238,7 +238,7 @@ A child resource MUST not set any `spec.infrastructure` fields beyond `attachTo`
 This can be validated in the CRD schema.
 
 A parent resource MUST not set `spec.infrastructure.attachTo`.
-That is, we do not allow multiple tiers of Gateways chaining to each other; there is only a single parent with children..
+That is, we do not allow multiple tiers of Gateways chaining to each other; there is only a single parent with children.
 This can be validated in the CRD schema.
 
 A child resource cannot `attachTo` any resource that doesn't allow attachment (i.e. it does not specify `spec.infrastructure.allowedChildren` for `Gateway`s).
