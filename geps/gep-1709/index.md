@@ -2,7 +2,7 @@
 
 * Issue: [#1709](https://github.com/kubernetes-sigs/gateway-api/issues/1709)
 * Status: Experimental
-* Probationary Period: Re-evaluate in February 2024
+* Probationary Period: Re-evaluate in April 2024
 
 ## TLDR
 
@@ -646,14 +646,31 @@ The following are items that **MUST** be resolved to move this GEP to
 
 - [x] some kind of basic level of display for the report data needs to exist.
   It's OK for a more robust display layer to be part of a follow-up effort.
-- [ ] initially we were OK with storing reports in the Git repository as files.
+  - for now we ended up with badges in our implementations page. We have
+    [another effort](https://github.com/kubernetes-sigs/gateway-api/issues/2550)
+    underway to build an even better display layer, but we consider this
+    additive and the current display is sufficient for moving the project to
+    standard.
+- [x] initially we were OK with storing reports in the Git repository as files.
   While this is probably sufficient during the `Experimental` phase, we need to
   re-evaluate this before `Standard` and see if this remains sufficient or if
   we want to store the data elsewhere.
-- [ ] We have been actively [gathering feedback from SIG
+  - During the experimental phase this has not caused any significant issues,
+    so for the purposes of calling this standard we're going to move forward
+    as-is. It should be straightforward and reasonable to change the storage
+    mechanism later as needs arise.
+- [x] We have been actively [gathering feedback from SIG
   Arch][sig-arch-feedback]. Some time during the `experimental` phase needs to
   be allowed to continue to engage with SIG Arch and incorporate their feedback
   into the test suite.
+  - SIG Arch did not have any significant feedback during the experimental
+    phase. In the same timespan the Network Policy group has started using our
+    test suite and APIs as well, so it seems the overall approach has obvious
+    merit, and doesn't appear to be redundant.
+- [ ] Finalize the report organization structure based on feedback during the
+  experimental phase.
+- [ ] Base documentation must exist for implementations to run the tests via
+  the CLI and via the Golang library.
 
 [sig-arch-feedback]:https://groups.google.com/g/kubernetes-sig-architecture/c/YjrVZ4NJQiA/m/7Qg7ScddBwAJ
 
