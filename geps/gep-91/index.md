@@ -56,8 +56,8 @@ type ClientValidationContext struct {
     // Implementations MAY choose to support attaching multiple CA certificates to
     // a Listener, but this behavior is implementation-specific.
     //
-    // Support: Core - An optional single reference to a Kubernetes Secret and ConfigMap,
-    // with the CA certificate in a key named `ca.crt`.
+    // Support: Core - An optional single reference to a single Kubernetes Secret
+    // and to a single Kubernetes ConfigMap with the CA certificate in a key named `ca.crt`.
     //
     // Support: Implementation-specific (More than one reference, or other kinds
     // of resources).
