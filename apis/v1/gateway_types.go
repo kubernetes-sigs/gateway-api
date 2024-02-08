@@ -424,6 +424,15 @@ type GatewayTLSConfig struct {
 	// +kubebuilder:validation:MaxItems=64
 	CertificateRefs []SecretObjectReference `json:"certificateRefs,omitempty"`
 
+	// ClientValidation can be used to validate the client initiating a TLS connection
+	// to the Gateway.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	ClientValidation *ClientValidationContext `json:"clientValidation,omitempty"`
+
 	// Options are a list of key/value pairs to enable extended TLS
 	// configuration for each implementation. For example, configuring the
 	// minimum TLS version or supported cipher suites.
@@ -438,6 +447,44 @@ type GatewayTLSConfig struct {
 	// +optional
 	// +kubebuilder:validation:MaxProperties=16
 	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
+}
+
+// ClientValidationContext holds configuration that can be used to validate the client intiating the TLS connection
+// to the Gateway.
+// By default, no client specific configuration is validated.
+type ClientValidationContext struct {
+	// CACertificateRefs contains one or more references to
+	// Kubernetes objects that contain TLS certificates of
+	// the Certificate Authorities that can be used
+	// as a trust anchor to validate the certificates presented by the client.
+	//
+	// A single CA certificate reference to a Kubernetes ConfigMap kind has "Core" support.
+	// Implementations MAY choose to support attaching multiple CA certificates to
+	// a Listener, but this behavior is implementation-specific.
+	//
+	// Support: Core - An optional single reference to a Kubernetes Secret and ConfigMap,
+	// with the CA certificate in a key named `ca.crt`.
+	//
+	// Support: Implementation-specific (More than one reference, or other kinds
+	// of resources).
+	//
+	// References to a resource in a different namespace are invalid UNLESS there
+	// is a ReferenceGrant in the target namespace that allows the certificate
+	// to be attached. If a ReferenceGrant does not allow this reference, the
+	// "ResolvedRefs" condition MUST be set to False for this listener with the
+	// "RefNotPermitted" reason.
+	//
+	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MinItems=1
+	CACertificateRefs []SecretObjectReference `json:"caCertificateRefs"`
+
+	// SubjectAltNames contains one or more alternate names to verify
+	// the subject identity in the certificate presented by the client.
+	//
+	// Support: Core
+	//
+	// +optional
+	SubjectAltNames []string `json:"subjectAltNames,omitempty"`
 }
 
 // TLSModeType type defines how a Gateway handles TLS sessions.

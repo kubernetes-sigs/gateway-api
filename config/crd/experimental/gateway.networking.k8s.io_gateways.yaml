@@ -682,6 +682,113 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                        clientValidation:
+                          description: |+
+                            ClientValidation can be used to validate the client initiating a TLS connection
+                            to the Gateway.
+
+
+                            Support: Extended
+
+
+                          properties:
+                            caCertificateRefs:
+                              description: |-
+                                CACertificateRefs contains one or more references to
+                                Kubernetes objects that contain TLS certificates of
+                                the Certificate Authorities that can be used
+                                as a trust anchor to validate the certificates presented by the client.
+
+
+                                A single CA certificate reference to a Kubernetes ConfigMap kind has "Core" support.
+                                Implementations MAY choose to support attaching multiple CA certificates to
+                                a Listener, but this behavior is implementation-specific.
+
+
+                                Support: Core - An optional single reference to a Kubernetes Secret and ConfigMap,
+                                with the CA certificate in a key named `ca.crt`.
+
+
+                                Support: Implementation-specific (More than one reference, or other kinds
+                                of resources).
+
+
+                                References to a resource in a different namespace are invalid UNLESS there
+                                is a ReferenceGrant in the target namespace that allows the certificate
+                                to be attached. If a ReferenceGrant does not allow this reference, the
+                                "ResolvedRefs" condition MUST be set to False for this listener with the
+                                "RefNotPermitted" reason.
+                              items:
+                                description: |-
+                                  SecretObjectReference identifies an API object including its namespace,
+                                  defaulting to Secret.
+
+
+                                  The API object must be valid in the cluster; the Group and Kind must
+                                  be registered in the cluster for this reference to be valid.
+
+
+                                  References to objects with invalid Group and Kind are not valid, and must
+                                  be rejected by the implementation, with appropriate Conditions set
+                                  on the containing object.
+                                properties:
+                                  group:
+                                    default: ""
+                                    description: |-
+                                      Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                      When unspecified or empty string, core API group is inferred.
+                                    maxLength: 253
+                                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                    type: string
+                                  kind:
+                                    default: Secret
+                                    description: Kind is kind of the referent. For
+                                      example "Secret".
+                                    maxLength: 63
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                    type: string
+                                  name:
+                                    description: Name is the name of the referent.
+                                    maxLength: 253
+                                    minLength: 1
+                                    type: string
+                                  namespace:
+                                    description: |-
+                                      Namespace is the namespace of the referenced object. When unspecified, the local
+                                      namespace is inferred.
+
+
+                                      Note that when a namespace different than the local namespace is specified,
+                                      a ReferenceGrant object is required in the referent namespace to allow that
+                                      namespace's owner to accept the reference. See the ReferenceGrant
+                                      documentation for details.
+
+
+                                      Support: Core
+                                    maxLength: 63
+                                    minLength: 1
+                                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                    type: string
+                                required:
+                                - name
+                                type: object
+                              maxItems: 8
+                              minItems: 1
+                              type: array
+                            subjectAltNames:
+                              description: |-
+                                SubjectAltNames contains one or more alternate names to verify
+                                the subject identity in the certificate presented by the client.
+
+
+                                Support: Core
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - caCertificateRefs
+                          type: object
                         mode:
                           default: Terminate
                           description: |-
@@ -1773,6 +1880,113 @@ spec:
                             type: object
                           maxItems: 64
                           type: array
+                        clientValidation:
+                          description: |+
+                            ClientValidation can be used to validate the client initiating a TLS connection
+                            to the Gateway.
+
+
+                            Support: Extended
+
+
+                          properties:
+                            caCertificateRefs:
+                              description: |-
+                                CACertificateRefs contains one or more references to
+                                Kubernetes objects that contain TLS certificates of
+                                the Certificate Authorities that can be used
+                                as a trust anchor to validate the certificates presented by the client.
+
+
+                                A single CA certificate reference to a Kubernetes ConfigMap kind has "Core" support.
+                                Implementations MAY choose to support attaching multiple CA certificates to
+                                a Listener, but this behavior is implementation-specific.
+
+
+                                Support: Core - An optional single reference to a Kubernetes Secret and ConfigMap,
+                                with the CA certificate in a key named `ca.crt`.
+
+
+                                Support: Implementation-specific (More than one reference, or other kinds
+                                of resources).
+
+
+                                References to a resource in a different namespace are invalid UNLESS there
+                                is a ReferenceGrant in the target namespace that allows the certificate
+                                to be attached. If a ReferenceGrant does not allow this reference, the
+                                "ResolvedRefs" condition MUST be set to False for this listener with the
+                                "RefNotPermitted" reason.
+                              items:
+                                description: |-
+                                  SecretObjectReference identifies an API object including its namespace,
+                                  defaulting to Secret.
+
+
+                                  The API object must be valid in the cluster; the Group and Kind must
+                                  be registered in the cluster for this reference to be valid.
+
+
+                                  References to objects with invalid Group and Kind are not valid, and must
+                                  be rejected by the implementation, with appropriate Conditions set
+                                  on the containing object.
+                                properties:
+                                  group:
+                                    default: ""
+                                    description: |-
+                                      Group is the group of the referent. For example, "gateway.networking.k8s.io".
+                                      When unspecified or empty string, core API group is inferred.
+                                    maxLength: 253
+                                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                                    type: string
+                                  kind:
+                                    default: Secret
+                                    description: Kind is kind of the referent. For
+                                      example "Secret".
+                                    maxLength: 63
+                                    minLength: 1
+                                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                                    type: string
+                                  name:
+                                    description: Name is the name of the referent.
+                                    maxLength: 253
+                                    minLength: 1
+                                    type: string
+                                  namespace:
+                                    description: |-
+                                      Namespace is the namespace of the referenced object. When unspecified, the local
+                                      namespace is inferred.
+
+
+                                      Note that when a namespace different than the local namespace is specified,
+                                      a ReferenceGrant object is required in the referent namespace to allow that
+                                      namespace's owner to accept the reference. See the ReferenceGrant
+                                      documentation for details.
+
+
+                                      Support: Core
+                                    maxLength: 63
+                                    minLength: 1
+                                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
+                                    type: string
+                                required:
+                                - name
+                                type: object
+                              maxItems: 8
+                              minItems: 1
+                              type: array
+                            subjectAltNames:
+                              description: |-
+                                SubjectAltNames contains one or more alternate names to verify
+                                the subject identity in the certificate presented by the client.
+
+
+                                Support: Core
+                              items:
+                                type: string
+                              type: array
+                          required:
+                          - caCertificateRefs
+                          type: object
                         mode:
                           default: Terminate
                           description: |-
