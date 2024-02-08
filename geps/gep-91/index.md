@@ -51,7 +51,8 @@ type ClientValidationContext struct {
     // the Certificate Authorities that can be used
     // as a trust anchor to validate the certificates presented by the client.
     //
-    // A single CA certificate reference to a Kubernetes ConfigMap kind has "Core" support.
+    // A single CA certificate reference to a Kubernetes ConfigMap or Secret kind
+    // has "Core" support.
     // Implementations MAY choose to support attaching multiple CA certificates to
     // a Listener, but this behavior is implementation-specific.
     //
