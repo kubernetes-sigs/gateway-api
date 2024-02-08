@@ -484,6 +484,7 @@ type ClientValidationContext struct {
 	// Support: Core
 	//
 	// +optional
+	// +kubebuilder:validation:MinItems=1
 	SubjectAltNames []string `json:"subjectAltNames,omitempty"`
 }
 

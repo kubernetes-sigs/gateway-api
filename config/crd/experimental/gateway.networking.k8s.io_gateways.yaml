@@ -785,6 +785,7 @@ spec:
                                 Support: Core
                               items:
                                 type: string
+                              minItems: 1
                               type: array
                           required:
                           - caCertificateRefs
@@ -1983,6 +1984,7 @@ spec:
                                 Support: Core
                               items:
                                 type: string
+                              minItems: 1
                               type: array
                           required:
                           - caCertificateRefs
