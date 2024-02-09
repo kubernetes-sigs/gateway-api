@@ -18,7 +18,7 @@ For more information, see the [Migrating from
 Ingress](/guides/migrating-from-ingress/) guide.
 
 #### Will there be a default controller implementation?
-No. There are already many great [implementations](/implementations) to choose
+No. There are already many great [implementations](/implementations.md) to choose
 from. The scope of this project is to define the API, conformance tests, and
 overall documentation.
 
