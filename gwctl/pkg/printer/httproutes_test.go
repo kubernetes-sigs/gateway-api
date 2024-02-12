@@ -18,7 +18,6 @@ package printer
 
 import (
 	"bytes"
-	"context"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -26,22 +25,21 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	objects := []runtime.Object{
-		&gatewayv1beta1.GatewayClass{
+		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gatewayclass",
 			},
-			Spec: gatewayv1beta1.GatewayClassSpec{
+			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: "example.net/gateway-controller",
 				Description:    common.PtrTo("random"),
 			},
@@ -72,12 +70,12 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 			},
 		},
 
-		&gatewayv1beta1.Gateway{
+		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-gateway",
 				Namespace: "default",
 			},
-			Spec: gatewayv1beta1.GatewaySpec{
+			Spec: gatewayv1.GatewaySpec{
 				GatewayClassName: "foo-gatewayclass",
 			},
 		},
@@ -106,15 +104,15 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 			},
 		},
 
-		&gatewayv1beta1.HTTPRoute{
+		&gatewayv1.HTTPRoute{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-httproute",
 			},
-			Spec: gatewayv1beta1.HTTPRouteSpec{
-				CommonRouteSpec: gatewayv1beta1.CommonRouteSpec{
-					ParentRefs: []gatewayv1beta1.ParentReference{{
-						Kind:  common.PtrTo(gatewayv1beta1.Kind("Gateway")),
-						Group: common.PtrTo(gatewayv1beta1.Group("gateway.networking.k8s.io")),
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{{
+						Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+						Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
 						Name:  "foo-gateway",
 					}},
 				},
@@ -194,16 +192,19 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	httpRoutes, err := resourcehelpers.ListHTTPRoutes(context.Background(), params.K8sClients, "")
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to List HTTPRoutespkg/resources/httproutes/httproutes_test.go: %v", err)
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
 	hp := &HTTPRoutesPrinter{
 		Out: params.Out,
-		EPC: effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager),
 	}
-	hp.PrintDescribeView(context.Background(), httpRoutes)
+	hp.PrintDescribeView(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
