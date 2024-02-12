@@ -38,6 +38,7 @@ to the Gateway.
 * Introduce a `caCertificateRefs` field within `ClientValidationContext` that can be used to specify a list of CA Certificates that
 can be used as a trust anchor to validate the certificates presented by the client.
 * This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the peer on the connection between the Gateway and the downstream client.
+* Introduce an optional `subjectAltNames` field within `ClientValidationContext` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. The maximum number of alternate names that can be specified is implementation defined.
 
 #### GO
 
@@ -77,6 +78,7 @@ type ClientValidationContext struct {
     // Support: Core
     //
     // +optional
+    // +kubebuilder:validation:MinItems=1
     SubjectAltNames []string `json:"subjectAltNames,omitempty"`
 }
 
