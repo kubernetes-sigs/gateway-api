@@ -44,3 +44,9 @@ aliases:
   gateway-api-gep-reviewers:
     - candita
     - gcs278
+
+  gwctl-approvers:
+    - gauravkghildiyal
+
+  gwctl-reviewers:
+    - gauravkghildiyal
