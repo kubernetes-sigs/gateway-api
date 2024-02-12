@@ -139,7 +139,7 @@ Below shows an example of an end to end configuration with Gateway merging.
 Here we define a parent resource, which allows children from the same namespace.
 A single listener is defined in the parent.
 
-The child gateway attaches to this Gateway and specifies an additional listener.
+The child Gateway attaches to this Gateway and specifies an additional listener.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
@@ -198,8 +198,9 @@ spec:
 
 #### Route Attaching
 
-Routes MUST be able to specify a "child" Gateways as a `parentRef` and make use of the fields in `ParentReference` to help target a specific listener.
-
+Routes MUST be able to specify a child Gateway as a `parentRef` and make use of the fields in `ParentReference` to help target a specific listener.
+If no listener is targeted (`sectionName`/`port` are unset) then the Route references all the listeners on the child Gateway. It MUST NOT attach
+to a listener on a parent or sibling Gateway.
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1beta1
