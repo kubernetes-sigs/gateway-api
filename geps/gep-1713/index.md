@@ -311,16 +311,18 @@ For instance, if a child listener is invalid, `ListenersNotValid` would be repor
 `Programmed` is not expected, generally, to depend on the children resources, but if an implementation does depend on these
 they should consider child resources when reporting this status.
 
-For child gateways, `Accepted` and `Programmed` should consider the overall merged Gateway status, but only the child's own listeners.
+For child gateways, `Accepted` and `Programmed` should not consider the overall merged Gateway status, but only the child's own listeners.
+The exception to this is if the parent Gateway is not valid in any regard.
 
 For example, if I have a `parent`, `child-1`, and `child-2`:
-* If parent is entirely invalid (for example, an invalid `address`), all three Gateways will reported `Accepted=False`.
+* If `parent` is entirely invalid (for example, an invalid `address`), all three Gateways will reported `Accepted=False`.
 * If `child-1` has an invalid listener, `parent` and `child-1` will report `ListenersNotValid`, while `child-2` will not.
 * If `child-1` references a parent that doesn't exist then `child-1` will report `Accepted=False`
 * If `child-1` references a parent that doesn't allow merging then `child-1` will report `Accepted=False`
 * If `child-1` references another child (eg. `child-2`) then `child-1` will report `Accepted=False` 
 * If `child-1` references itself then `child-1` will report `Accepted=False`
 * If `child-1` and `parent` have different gatewayClassNames then `child-1` will report `Accepted=False`
+* If `child-1` references a parent whose allowed child namespaces do not include `child-1`'s namespace, then `child-1` will report `Accepted=False`
 
 When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
 to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
