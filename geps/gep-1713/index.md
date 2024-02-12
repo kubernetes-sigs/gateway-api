@@ -330,6 +330,7 @@ to avoid accidentally leaking sensitive information that the child would not oth
 Listener conditions should only be set for listeners directly defined in a given Gateway.
 Parent gateways MUST NOT have children's resources in their listener conditions list.
 Children gateways MUST NOT have parent's or sibling's resources in their listener conditions list.
+An implementation MAY reject Listeners with ListenerConditionAccepted=False and Reason "TooManyListeners"
 
 #### Policy attachment
 
