@@ -43,6 +43,64 @@ spec:
 Note that the target Gateway needs to allow HTTPRoutes from the route's
 namespace to be attached for the attachment to be successful.
 
+You can also attach routes to specific sections of the parent resource.
+For example, let's say that the `acme-lb` Gateway includes the following
+listeners:
+
+```yaml
+  listeners:
+  - name: foo
+    protocol: HTTP
+    port: 8080
+    ...
+  - name: bar
+    protocol: HTTP
+    port: 8090
+    ...
+  - name: baz
+    protocol: HTTP
+    port: 8090
+    ...
+```
+
+You can bind a route to listener `foo` only, using the `sectionName` field
+in `parentRefs`:
+
+```yaml
+spec:
+  parentRefs:
+  - name: acme-lb
+    sectionName: foo
+```
+
+Alternatively, you can achieve the same effect by using the `port` field,
+instead of `sectionName`, in the `parentRefs`:
+
+```yaml
+spec:
+  parentRefs:
+  - name: acme-lb
+    port: 8080
+```
+
+Binding to a port also allows you to attach to multiple listeners at once.
+For example, binding to port `8090` of the `acme-lb` Gateway would be more
+convenient than binding to the corresponding listeners by name:
+
+```yaml
+spec:
+  parentRefs:
+  - name: acme-lb
+    sectionName: bar
+  - name: acme-lb
+    sectionName: baz
+```
+
+However, when binding Routes by port number, Gateway admins will no longer have
+the flexibility to switch ports on the Gateway without also updating the Routes.
+The approach should only be used when a Route should apply to a specific port
+number as opposed to listeners whose ports may be changed.
+
 ### Hostnames
 
 Hostnames define a list of hostnames to match against the Host header of the
