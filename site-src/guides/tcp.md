@@ -49,8 +49,24 @@ In this way each `TCPRoute` "attaches" itself to a different port on the
 `Gateway` so that the service `my-foo-service` is taking traffic for port `8080`
 from outside the cluster and `my-bar-service` takes the port `8090` traffic.
 
+Note that you can achieve this same result by binding the Routes to the Gateway
+listeners using the `port` field in the `parentRefs`:
+
+```yaml
+spec:
+  parentRefs:
+  - name: my-tcp-gateway
+    port: 8080
+```
+
+Using the `port` field instead of `sectionName` for the attachment has the
+downside of more tightly coupling the relationship between the Gateway and
+its associated Routes. Refer to [Attaching to Gateways][attaching] for more
+details.
+
 [tcproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.TCPRoute
 [tcp]:https://datatracker.ietf.org/doc/html/rfc793
 [httproute]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.HTTPRoute
 [gateway]:/reference/spec/#gateway.networking.k8s.io/v1alpha2.Gateway
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/
+[attaching]:/api-types/httproute/#attaching-to-gateways
