@@ -83,7 +83,7 @@ spec:
     port: 8080
 ```
 
-Binding to a port also llows you to attach to multiple listeners at once.
+Binding to a port also allows you to attach to multiple listeners at once.
 For example, binding to port `8090` of the `acme-lb` Gateway would be more
 convenient than binding to the corresponding listeners by name:
 
