@@ -10,12 +10,12 @@ aliases:
 
   # Reference: https://github.com/kubernetes/org/blob/main/config/kubernetes-sigs/sig-network/teams.yaml
   gateway-api-maintainers:
-    - bowei
     - robscott
     - shaneutt
     - youngnick
 
   emeritus-gateway-api-maintainers:
+    - bowei
     - danehans
     - hbagdi
     - jpeach
