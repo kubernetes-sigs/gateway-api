@@ -336,7 +336,7 @@ For help and support with Kong's implementations please feel free to [create an 
 
 ### Kuma
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/kumahq-kuma.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kumahq-kuma.yaml)
 
 [Kuma][kuma] is an open source service mesh.
 
