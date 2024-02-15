@@ -333,7 +333,7 @@ Kubernetes provides an API that allows you to enable [session affinity](https://
 on service objects. It ensures consistent sessions by utilizing the client's IP address and also offers the option to
 set a timeout for the maximum session duration. Implementations of Gateway API, such as service mesh use cases, may use
 the service IP directly. In these cases where both Kubernetes service session affinity and Gateway API session
-persistence are both enabled, the route must be rejected, and a status should be set describing the incompatibility of
+persistence are both enabled, the route MUST be rejected, and a status should be set describing the incompatibility of
 these two configurations.
 
 ## API
@@ -614,12 +614,12 @@ To learn more about the process of attaching to services, routes, and the route 
 
 In scenarios involving traffic splitting, session persistence impacts load balancing done after routing, regardless if
 it is attached to a service or a route. When a persistent session is established and traffic splitting is configured
-across services, the persistence to a single backend should be maintained across services. Consequently, a persistent
+across services, the persistence to a single backend MUST be maintained across services. Consequently, a persistent
 session takes precedence over traffic split weights when selecting a backend after route matching. It's important to
 note that session persistence does not impact the process of route matching.
 
 When using multiple backends in traffic splitting, all backend services should have session persistence enabled.
-Nonetheless, implementations should also support traffic splitting scenarios in which one service has persistence
+Nonetheless, implementations MUST also support traffic splitting scenarios in which one service has persistence
 enabled while the other does not. This support is necessary, particularly in scenarios where users are transitioning
 to or from an implementation version designed with or without persistence.
 
@@ -698,15 +698,15 @@ It is also important to note that this design makes persistent session unique pe
 distinct routes, one with path prefix `/foo` and the other with `/bar`, both target the same service, the persistent
 session won't be shared between these two paths.
 
-Conversely, if the `SessionPersistencePolicy` policy is attached to a service, the `Path` attribute should be left
+Conversely, if the `SessionPersistencePolicy` policy is attached to a service, the `Path` attribute MUST be left
 unset. This is because multiple routes can target a single service. If the `Path` cookie attribute is configured in this
 scenario, it could result in problems due to the possibility of different paths being taken for the same cookie.
-Implementations should also handle the case where client is a browser making requests to multiple persistent services
+Implementations MUST also handle the case where the client is a browser making requests to multiple persistent services
 from the same page.
 
 #### Secure, HttpOnly, SameSite
 
-The `Secure`, `HttpOnly`, and `SameSite` cookie attributes are security-related. The API implementers should follow the
+The `Secure`, `HttpOnly`, and `SameSite` cookie attributes are security-related. The API implementers SHOULD follow the
 security-by-default principle and configure these attributes accordingly. This means enabling `Secure` and `HttpOnly`,
 and setting `SameSite` to `Strict`. However, in certain implementation use cases such as service mesh, secure values
 might not function as expected. In such cases, it's acceptable to make appropriate adjustments.
@@ -726,11 +726,11 @@ session persistence needs in GAMMA and service mesh scenarios.
 As illustrated in the examples provided in [Session Persistence Initiation](#session-persistence-initiation),
 implementations must consider how to manage sessions initiated by other components. As mentioned in [Backend Initiated Session Example](#backend-initiated-session-example),
 this GEP does not support configuring backend-initiated persistent sessions. We leave the decision of handling existing
-sessions with each specific implementation. In the case of cookie-based session persistence, an implementation has the
-freedom to either rewrite the cookie or insert an additional cookie, or to do nothing (resulting in the lack of a
+sessions with each specific implementation. In the case of cookie-based session persistence, an implementation MAY
+either rewrite the cookie or insert an additional cookie, or to do nothing (resulting in the lack of a
 persistent session). In general, inserting an additional cookie is a generally safe option, but it's important for
 implementations to exercise their own discretion. However, regardless of the implementation's design choice, the
-implementation must be able to handle multiple cookies.
+implementation MUST be able to handle multiple cookies.
 
 ### Expected API Behavior
 
@@ -808,8 +808,8 @@ spec:
   type: HTTPCookie
 ```
 
-When persistent sessions are established, the persistence to a single backend should override the traffic splitting
-configuration.
+When persistent sessions are established, the persistence to a single backend MUST override the traffic splitting
+configuration. This is also described in [Traffic Splitting](#traffic-splitting).
 
 #### Traffic Splitting with two Backends and one with Weight 0
 
@@ -851,7 +851,7 @@ A potentially unexpected situation occurs when:
 1. Curl to `/a` which establishes a persistent session with `servicev1`
 2. Curl to `/b` routes to `servicev1` due to route persistence despite `weight: 0` configuration
 
-In this scenario, implementations should give precedence to session persistence, regardless of the `weight`
+In this scenario, implementations MUST give precedence to session persistence, regardless of the `weight`
 configuration.
 
 #### A Service's Selector is Dynamically Updated
@@ -868,7 +868,7 @@ spec:
     app.kubernetes.io/name: MyApp # Service selector can change
 ```
 
-The expected behavior is that the gateway will retain existing persistent sessions, even if the pod is no longer
+The expected behavior is that the gateway SHOULD retain existing persistent sessions, even if the pod is no longer
 selected, and establish new persistent sessions after a selector update. This use case is uncommon and may not be
 supported by some implementations due to their current designs.
 
