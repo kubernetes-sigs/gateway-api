@@ -401,6 +401,14 @@ type SessionPersistencePolicySpec struct {
     // +kubebuilder:default=Cookie
     Type *SessionPersistenceType `json:"type,omitempty"`
 
+    // CookieConfig provides configuration settings that are specific
+    // to cookie-based session persistence.
+    //
+    // Support: Core
+    //
+    // +optional
+    CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+
     // SessionName defines the name of the persistent session token
     // (e.g. a cookie name).
     //
@@ -426,6 +434,48 @@ const (
     //
     // Support: Extended
     HeaderBasedSessionPersistence   SessionPersistenceType = "Header"
+)
+
+// CookieConfig defines the configuration for cookie-based session persistence.
+type CookieConfig struct {
+    // LifetimeType specifies whether the cookie has a permanent or
+    // session-based lifetime. A permanent cookie persists until its
+    // specified expiry time, defined by the Expires or Max-Age cookie
+    // attributes, while a session cookie is deleted when the current
+    // session ends.
+    //
+    // When set to "Permanent", AbsoluteTimeoutSeconds indicates the
+    // cookie's lifetime via the Expires or Max-Age cookie attributes
+    // and is required.
+    //
+    // When set to "Session", AbsoluteTimeoutSeconds indicates the
+    // absolute lifetime of the cookie tracked by the gateway and
+    // is optional.
+    //
+    // Support: Core for "Session" type
+    //
+    // Support: Extended for "Permanent" type
+    //
+    // +optional
+    // +kubebuilder:default=Session
+    LifetimeType *CookieLifetimeType `json:"lifetimeType,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Permanent;Session
+type CookieLifetimeType string
+
+const (
+    // SessionCookieLifetimeType specifies the type for a session
+    // cookie.
+    //
+    // Support: Core
+    SessionCookieLifetimeType   CookieLifetimeType = "Session"
+
+    // PermanentCookieLifetimeType specifies the type for a permanent
+    // cookie.
+    //
+    // Support: Extended
+    PermanentCookieLifetimeType  CookieLifetimeType = "Permanent"
 )
 
 // SessionPersistencePolicyStatus defines the observed state of SessionPersistencePolicy.
@@ -605,12 +655,24 @@ The `Name` cookie attribute can be configured via the `SessionName` field on `Se
 field is considered extended support level. This is because some implementations, such as ones supporting global load
 balancers, don't have the capability to configure the cookie name.
 
-#### TTL
+#### Expires / Max-Age
 
-The `TTL` cookie attribute may be influenced by the `AbsoluteTimeoutSeconds` field on `SessionPersistencePolicy`.
-However, it's important to understand that `AbsoluteTimeoutSeconds` represents the duration of the entire session, not
-just the cookie duration. Conversely, the cookie's `TTL` attribute does not have to be configured in order to implement
-`AbsoluteTimeoutSeconds`.
+The `Expires` and `Max-Age` cookie attributes are important in distinguishing between [session cookies and permanent
+cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#define_the_lifetime_of_a_cookie). Session cookies do
+not include either of these attributes, while permanent cookies will contain one of them. Session cookies can still
+have an expiration or timeout, but it will be accomplished through alternative mechanisms, such as the proxy tracking
+the cookie's lifetime via its value.
+
+The `LifetimeType` API field specifies whether a cookie should be a session or permanent cookie. Additionally, the lifetime
+or timeout for both session and permanent cookies is represented by `AbsoluteTimeoutSeconds`. In the case of
+`LifetimeType` being `Permanent`, `AbsoluteTimeoutSeconds` MUST configure the `Expires` or `Max-Age` cookie attributes.
+Conversely, if `LifetimeType` is `Session`, `AbsoluteTimeoutSeconds` MUST regulate the cookie's lifespan through a
+different mechanism, as mentioned above. If `LifetimeType` is set to `Permanent`, then `AbsoluteTimeoutSeconds` MUST
+also be set as well. This requirement is necessary because an expiration value is required to set `Expires` or `Max-Age`.
+`LifetimeType` of `Session` is core support level and the default, while `LifetimeType` of `Permanent` is extended.
+
+See [issue #2747](https://github.com/kubernetes-sigs/gateway-api/issues/2747) for more context regarding distinguishing
+between permanent and session cookies.
 
 #### Path
 
