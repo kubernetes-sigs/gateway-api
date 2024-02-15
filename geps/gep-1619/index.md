@@ -5,20 +5,28 @@
 
 (See status definitions [here](/geps/overview/#gep-states).)
 
-## Graduation Criteria for Implementable Status
+## Graduation Criteria
+
+### Implementable
 
 This GEP was accidentally merged as Provisional before the required approval
 from 2 maintainers had been received. Before this graduates to implementable,
 we need to get at least one of @robscott or @youngnick to also approve this GEP.
 
-There are some open questions that will need to be answered before this can
-graduate:
+Before this GEP graduates to Implementable, we must fulfill the following criteria:
 
-1. Should we leave room in this policy to add additional concepts in the future
-   such as Session Affinity? If so, how would we adjust the naming and overall
-   scope of this policy?
-2. Should we leave room for configuring different forms of Session Persistence?
-   If so, what would that look like?
+ 1. Should we leave room in this policy to add additional concepts in the future
+    such as Session Affinity? If so, how would we adjust the naming and overall
+    scope of this policy?
+ 2. Should we leave room for configuring different forms of Session Persistence?
+    If so, what would that look like?
+    - **Answer**: Yes. See the [API](#go) and the [API Granularity](#api-granularity) section for more details.
+
+### Standard
+
+Before this GEP graduates to the Standard channel, we must fulfill the following criteria:
+
+- Sign-off from the GAMMA leads to ensure service mesh gets fully considered.
 
 ## TLDR
 
@@ -381,6 +389,18 @@ type SessionPersistencePolicySpec struct {
     // +optional
     IdleTimeoutSeconds int64 `json:"idleTimeoutSeconds,omitempty"`
 
+    // Type defines the type of session persistence such as through
+    // the use a header or cookie. Defaults to cookie based session
+    // persistence.
+    //
+    // Support: Core for "Cookie" type
+    //
+    // Support: Extended for "Header" type
+    //
+    // +optional
+    // +kubebuilder:default=Cookie
+    Type *SessionPersistenceType `json:"type,omitempty"`
+
     // SessionName defines the name of the persistent session token
     // (e.g. a cookie name).
     //
@@ -388,8 +408,25 @@ type SessionPersistencePolicySpec struct {
     //
     // +optional
     // +kubebuilder:validation:MaxLength=4096
-    SessionName String `json:"sessionName,omitempty"`
+    SessionName *string `json:"sessionName,omitempty"`
 }
+
+// +kubebuilder:validation:Enum=Cookie;Header
+type SessionPersistenceType string
+
+const (
+    // CookieBasedSessionPersistence specifies cookie-based session
+    // persistence.
+    //
+    // Support: Core
+    CookieBasedSessionPersistence   SessionPersistenceType = "Cookie"
+
+    // HeaderBasedSessionPersistence specifies header-based session
+    // persistence.
+    //
+    // Support: Extended
+    HeaderBasedSessionPersistence   SessionPersistenceType = "Header"
+)
 
 // SessionPersistencePolicyStatus defines the observed state of SessionPersistencePolicy.
 type SessionPersistencePolicyStatus struct {
@@ -459,6 +496,11 @@ Tomcat servlets generating distinct cookies per server. In such scenarios, it is
 obstruct the existing use of cookies while enabling session persistence. Enabling particular low-level API
 configurations, like allowing customization of the cookie name, could prevent certain implementations from conforming to
 the spec. In other words, opting for a higher-level API provides better interoperability among our implementations.
+
+However, this API spec does allow specifying specific forms or types of session persistence through the `Type` field in
+the `SessionPersistence` struct, including options for cookie-based or header-based session persistence. This API field
+accommodates implementations that offer multiple methods of session persistence, while also allowing users to specify 
+their preferred form of session persistence if desired.
 
 ### Target Persona
 
