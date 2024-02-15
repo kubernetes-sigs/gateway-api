@@ -3,7 +3,7 @@
 * Issue: [#1619](https://github.com/kubernetes-sigs/gateway-api/issues/1619)
 * Status: Provisional
 
-(See definitions in [GEP Status][/contributing/gep#status].)
+(See status definitions [here](/geps/overview/#gep-states).)
 
 ## Graduation Criteria for Implementable Status
 
@@ -49,6 +49,7 @@ session affinity, as this design is expected to be addressed within a separate G
 Session persistence is when a client request is directed to the same backend server for the duration of a "session". It is achieved when a client directly provides information, such as a header, that a proxy uses as a reference to direct traffic to a specific server. Persistence is an exception to load balancing: a persistent client request bypasses the proxy's load balancing algorithm, going directly to a backend server it has previously established a session with.
 
 Session persistence enables more efficient application workflows:
+
 1. Better performance: Maintaining a single session allows a server to cache information about a client locally reducing the need for servers to exchange session data and overall storage needs.
 2. Seamless client experience: Clients can reconnect to the same server without re-authenticating or re-entering their information.
 
@@ -95,9 +96,10 @@ sources, including the gateway, intermediary gateway, backend, a sidecar in a ba
 component.
 
 Let's consider a simple implementation comprised of gateways and backends. The following rules apply based on who initiates the session:
+
 - If the gateway initiates the session, the backend will be presented with session attributes regardless if it enabled them.
 - If the backend initiates the session, the gateway should allow this and not force persistent connections, unless
-  specifically configured to[^1]. The gateway may decode and alter the cookie established by the backend to achieve
+  specifically configured to. The gateway may decode and alter the cookie established by the backend to achieve
   session persistence.
 
 It's important to note that we can have more complex implementations which involve traversing global load balancers,
@@ -211,8 +213,8 @@ sequenceDiagram
     R->>R: Initiates session by<br>adding set-cookie header
     R-->>-G: Response<br>[set-cookie]
     G->>G: Add or modify<br>set-cookie header
-    G-->>-C: Response<br>[set-cookie]
-    Note right of G: [set-cookie] indicates a response<br> with a set-cookie header.<br>May include other set-cookie<br>headers from backend or GLB.
+    G-->>-C: Response<br>[set-cookie*]
+    Note right of G: [set-cookie] indicates a response<br> with a set-cookie header<br>[set-cookie*] indicates a response with a<br>modified or additional set-cookie header
     C->>C: Create Cookie<br>from set-cookie header
     Note right of C: [cookie] indicates a request<br> with one or more cookies
     C->>+G: Request Web Page<br>[cookie]
@@ -220,7 +222,8 @@ sequenceDiagram
     G->>+R: Request<br>[cookie]
     R->>R: Consistent lookup of backend<br>using cookie value
     R->>+B: Request<br>[cookie]
-    B-->>-G: Response
+    B-->>-R: Response
+    R-->>-G: Response
     G-->>-C: Response
 ```
 
@@ -248,15 +251,18 @@ persistent connections to the same backend server.
 Session affinity can be achieved by deterministic load balancing algorithms or a proxy feature that tracks IP-to-backend associations such as [HAProxy's stick tables](https://www.haproxy.com/blog/introduction-to-haproxy-stick-tables/) or [Cilium's session affinity](https://docs.cilium.io/en/v1.12/gettingstarted/kubeproxy-free/#id2).
 
 We can also examine how session persistence and session affinity functionally work together, by framing the relationship into a two tiered logical decision made by the data plane:
+
 1. If the request contains a session persistence identity (e.g. a cookie or header), then route it directly to the backend it has previously established a session with.
 2. If no session persistence identity is present, load balance as per load balancing configuration, taking into account the session affinity configuration (e.g. by utilizing a hashing algorithm that is deterministic).
 
 This tiered decision-based logic is consistent with the idea that session persistence is an exception to load balancing. Though there are different ways to frame this relationship, this design will influence the separation between persistence and affinity API design.
 
 ### Implementations
+
 In this section, we will describe how implementations achieve session persistence, along with a breakdown of related configuration options. Input from implementations is appreciated to complete this information.
 
 In the following tables, we will example two types of APIs:
+
 1. Dataplane APIs
 2. Implementation APIs
 
@@ -444,7 +450,7 @@ the spec. In other words, opting for a higher-level API provides better interope
 
 ### Target Persona
 
-Referring to the [Gateway API Security Model](https://gateway-api.sigs.k8s.io/concepts/security-model/#roles-and-personas),
+Referring to the [Gateway API Security Model](/concepts/security-model/#roles-and-personas),
 the target kubernetes role/persona for session persistence are application developers, as mentioned in the [When does an application require session persistence?](#when-does-an-application-require-session-persistence)
 section. It is the responsibility of the application developers to adjust the persistence configuration to ensure the
 functionality of their applications.
@@ -520,6 +526,7 @@ A cookie is composed of various attributes, each represented as key=value pairs.
 values, the cookie name attribute is the only mandatory one, and the rest are considered optional.
 
 The cookie attributes defined by [RFC6265](https://www.rfc-editor.org/rfc/rfc6265#section-5.2) are:
+
 - Name=_value_
 - Expires=_date_
 - Max-Age=_number_
@@ -530,6 +537,7 @@ The cookie attributes defined by [RFC6265](https://www.rfc-editor.org/rfc/rfc626
 
 Other cookie attributes not defined by RFC6265, but are captured in draft RFCs and could be considered de facto
 standards due to wide acceptance are:
+
 - SameSite=[Strict|Lax|None]
 - Partitioned
 
@@ -584,9 +592,9 @@ might not function as expected. In such cases, it's acceptable to make appropria
 
 ### Session Persistence API with GAMMA
 
-The object of the [GAMMA (Gateway API for Mesh Management and Administration)](https://gateway-api.sigs.k8s.io/contributing/gamma/)
+The object of the [GAMMA (Gateway API for Mesh Management and Administration)](/mesh/gamma)
 initiative is to provide support for service mesh and mesh-adjacent use-cases with Gateway API. GAMMA is focused on
-defining how Gateway API could also be used for inter-service or [east/west](https://gateway-api.sigs.k8s.io/concepts/glossary/#eastwest-traffic)
+defining how Gateway API could also be used for inter-service or [east/west](/concepts/glossary/#eastwest-traffic)
 traffic within the same cluster.
 
 Given that service meshes commonly have session persistence requirements, this API design should take into consideration
@@ -656,6 +664,7 @@ graph TB
 
 Consider the scenario where a route is traffic splitting between two backends, and additionally, a
 `SessionPersistencePolicy` is attached to the route:
+
 ```yaml
 kind: HTTPRoute
 metadata:
@@ -685,6 +694,7 @@ configuration.
 
 Consider the scenario where a route has two path matches, but one of those paths involves traffic splitting with a
 backendRef that has a weight of 0, and additionally, a `SessionPersistencePolicy` is attached to the route:
+
 ```yaml
 kind: HTTPRoute
 metadata:
@@ -716,6 +726,7 @@ spec:
 ```
 
 A potentially unexpected situation occurs when:
+
 1. Curl to `/a` which establishes a persistent session with `servicev1`
 2. Curl to `/b` routes to `servicev1` due to route persistence despite `weight: 0` configuration
 
@@ -916,6 +927,6 @@ Though session persistence is a ubiquitous name, session affinity is more incons
 - [Kube-Proxy Session Affinity](https://kubernetes.io/docs/reference/networking/virtual-ips/#session-affinity)
 - [GEP-713: Metaresources and PolicyAttachment](/geps/gep-713/)
 - [RFC6265](https://www.rfc-editor.org/rfc/rfc6265)
-- [Policy Attachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/#direct-policy-attachment)
+- [Policy Attachment](/reference/policy-attachment)
 - [Envoy Session Persistence Design Doc](https://docs.google.com/document/d/1IU4b76AgOXijNa4sew1gfBfSiOMbZNiEt5Dhis8QpYg/edit#heading=h.sobqsca7i45e)
 - [Envoy Session Persistence Issue](https://github.com/envoyproxy/envoy/issues/16698)
