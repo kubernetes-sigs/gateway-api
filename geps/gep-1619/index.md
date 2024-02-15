@@ -732,6 +732,13 @@ persistent session). In general, inserting an additional cookie is a generally s
 implementations to exercise their own discretion. However, regardless of the implementation's design choice, the
 implementation MUST be able to handle multiple cookies.
 
+### Session Persistence Failure Behavior
+
+In a situation where session persistence is configured and the backend becomes unhealthy, this GEP doesn't specify a
+prescribed fallback behavior mechanism or HTTP status code. Implementations MAY exhibit different behaviors depending
+on whether active health checking is enabled. Data planes MAY fall back to available backends, disregarding the broken
+session, and reestablish session persistence when the backend becomes available again.
+
 ### Expected API Behavior
 
 Implementing session persistence is complex and involves many edge cases. In this section, we will outline API
@@ -874,17 +881,18 @@ supported by some implementations due to their current designs.
 
 ### Open Questions
 
-- What happens when session persistence is broken because the backend is not up or healthy? If that's an error case, how should that be handled? Should the API dictate the http error code? Or should the API dictate fall back behavior?
 - What happens when session persistence causes traffic splitting scenarios to overload a backend?
 - Should we add status somewhere when a user gets in to a "risky" configuration with session persistence?
 - Should there be an API configuration field that specifies how already established sessions are handled?
+- How do implementations drain established sessions during backend upgrades without disruption?
+    - Do we need a "session draining timeout" as documented by [A55: xDS-Based Stateful Session Affinity for Proxyless gRPC](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md#background)
+      defined in this API?
 
 ## TODO
-The following are items that we intend to resolve before we consider this GEP implementable:
 
-- We need to identify and document requirements regarding session draining and migration. How do implementations drain established sessions during backend upgrades without disruption?
-  - Do we need a "session draining timeout" as documented by [A55: xDS-Based Stateful Session Affinity for Proxyless gRPC](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md#background)
-    defined in this API?
+The following are items that we intend to resolve in future revisions:
+
+- We need to identify and document requirements regarding session draining and migration.
 - We need to document sessions with Java in greater detail. Java standardized the API and behavior of session persistence long ago and would be worth examining.
 - We need to add a small section on compliance regarding the browser and client relationship.
 - We need to finish enumerating all the edge cases in [Expected API Behavior](#expected-api-behavior) and identify
