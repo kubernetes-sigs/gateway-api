@@ -147,12 +147,12 @@ Gateway API has the following primary extension points:
 * *External references.* A feature (field) of a Gateway API resource can
   reference a custom resource specific to the Gateway implementation that
   configures that feature. For example:
-    * [HTTPRouteFilter](/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteFilter)
+    * [HTTPRouteFilter](/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteFilter)
       can reference an external resource via the `extensionRef` field, thus
       configuring an implementation-specific filter.
-    * [BackendObjectReference](/reference/spec/#gateway.networking.k8s.io/v1beta1.BackendObjectReference)
+    * [BackendObjectReference](/reference/spec/#gateway.networking.k8s.io/v1.BackendObjectReference)
       supports resources other than Services.
-    * [SecretObjectReference](/reference/spec/#gateway.networking.k8s.io/v1beta1.SecretObjectReference)
+    * [SecretObjectReference](/reference/spec/#gateway.networking.k8s.io/v1.SecretObjectReference)
       supports resources other than Secrets.
 * *Custom implementations*. For some features, it is left up to an
   implementation to define how to support them. Those features correspond to the
@@ -160,7 +160,7 @@ Gateway API has the following primary extension points:
   (custom)  [conformance level](/concepts/conformance/#2-support-levels). For
   example:
     * The `RegularExpression` type of
-      the [HTTPPathMatch](/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPPathMatch).
+      the [HTTPPathMatch](/reference/spec/#gateway.networking.k8s.io/v1.HTTPPathMatch).
 * *Policies.* A Gateway implementation can define custom resources called
   Policies for exposing data plane features like authentication. Gateway API
   does not prescribe the details of those resources. However, it prescribes a
@@ -194,7 +194,7 @@ resource will get dedicated entry points.
 In Gateway API, entry points must be explicitly defined in
 a [Gateway](/api-types/gateway/) resource. For example, if you want the data
 plane to handle HTTP traffic on port 80, you need to define
-a [listener](/reference/spec/#gateway.networking.k8s.io/v1beta1.Listener) for
+a [listener](/reference/spec/#gateway.networking.k8s.io/v1.Listener) for
 that traffic. Typically, a Gateway implementation provides a dedicated data
 plane for each Gateway resource.
 
@@ -207,7 +207,7 @@ the [TLS section](https://kubernetes.io/docs/concepts/services-networking/ingres
 where the TLS certificate and key are stored in a Secret.
 
 In Gateway API, TLS termination is a property of
-the [Gateway listener](/reference/spec/#gateway.networking.k8s.io/v1beta1.Listener),
+the [Gateway listener](/reference/spec/#gateway.networking.k8s.io/v1.Listener),
 and similarly to the Ingress, a TLS certificate and key are also stored in a
 Secret.
 
@@ -218,21 +218,21 @@ application admin own TLS termination.
 
 The [path-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#path-types)
 of the Ingress resource map directly to
-the [routing rules](/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteRule)
+the [routing rules](/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteRule)
 of the [HTTPRoute](/api-types/httproute/).
 
 The [host-header-based routing rules](https://kubernetes.io/docs/concepts/services-networking/ingress/#name-based-virtual-hosting)
 map to
-the [hostnames](/reference/spec/#gateway.networking.k8s.io/v1beta1.Hostname) of
+the [hostnames](/reference/spec/#gateway.networking.k8s.io/v1.Hostname) of
 the HTTPRoute. However, note that in the Ingress, each hostname has separate
 routing rules, while in the HTTPRoute the routing rules apply to all hostnames.
 
 > The Ingress API uses the term host while Gateway API uses the hostname.
 > This guide will use Gateway API term to refer to the Ingress host.
 
-> The `hostnames` of an HTTPRoute must match the `hostname` of the [Gateway listener](/reference/spec/#gateway.networking.k8s.io/v1beta1.Listener).
+> The `hostnames` of an HTTPRoute must match the `hostname` of the [Gateway listener](/reference/spec/#gateway.networking.k8s.io/v1.Listener).
 > Otherwise, the listener will ignore the routing rules for the unmatched
-> hostnames. See the [HTTPRoute documentation](/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteSpec).
+> hostnames. See the [HTTPRoute documentation](/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteSpec).
 
 HTTPRoutes are owned by the application developer.
 
@@ -270,7 +270,7 @@ An Ingress resource must specify
 a [class](https://kubernetes.io/docs/concepts/services-networking/ingress/#ingress-class)
 to select which Ingress controller to use. An HTTPRoute must specify which
 Gateway (or Gateways) to attach to via
-a [parentRef](/reference/spec/#gateway.networking.k8s.io/v1beta1.ParentRef).
+a [parentRef](/reference/spec/#gateway.networking.k8s.io/v1.ParentRef).
 
 ### Implementation-Specific Ingress Features (Annotations)
 
