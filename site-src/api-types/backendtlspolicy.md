@@ -140,5 +140,5 @@ uses `PolicyAncestorStatus` to allow you to know which parentReference set that 
 [tls]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicy.TLS
 [caCertRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicyConfig.CACertRefs
 [wellKnownCACerts]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicyConfig.WellKnownCACerts
-[hostname]: /references/spec/#gateway.networking.k8s.io/v1beta1.PreciseHostname
+[hostname]: /references/spec/#gateway.networking.k8s.io/v1.PreciseHostname
 [targetRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference

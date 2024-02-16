@@ -240,7 +240,7 @@ A controller could create a matching selector-less `Service` (i.e. no endpoints)
 
 Ownership/trust would remain based on naming pattern: `serviceName.namespace.svc.[USER_DOMAIN]`
 
-Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1beta1.CommonRouteSpec), and keep similar patterns as `Service`.
+Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.CommonRouteSpec), and keep similar patterns as `Service`.
 
 ##### Drawbacks
 
@@ -298,7 +298,7 @@ spec:
     name: cool-mesh
 ```
 
-It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteSpec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
+It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteSpec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
 
 This approach is not entirely abandoned, as it could supplement the proposed approach if explicit attachment to a specific mesh is deemed necessary. Additionally, this approach may offer a future option for attaching an `HTTPRoute` to a mesh, but not a specific service (e.g. to implement mesh-wide egress functionality for all requests to a specific hostname).
 
@@ -319,7 +319,7 @@ spec:
 
 * Would require separate `HTTPRoute` resources to explicitly define _different_ traffic routing rules for the same service on different meshes.
 
-#### Nested `services` and `hostnames` fields in [`ParentReference`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1beta1.ParentReference)
+#### Nested `services` and `hostnames` fields in [`ParentReference`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)
 
 In core conformance, the `services` would only be valid for `Mesh` types, and `hostnames` field only for `Gateway`. Mesh implementations could still use a `Host` header match if they wanted limit rules to specific hostnames.
 
@@ -359,7 +359,7 @@ This is done by configuring the `parentRef`, to point to the `istio` `Mesh`. Thi
 
 ### New field on `HTTPRoute` for `Service` binding
 
-A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1beta1.HTTPRouteMatch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
+A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
 
 ```
 spec:
