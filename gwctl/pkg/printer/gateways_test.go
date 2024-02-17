@@ -19,19 +19,91 @@ package printer
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
+
+func TestGatewaysPrinter_Print(t *testing.T) {
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-gatewayclass",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-gateway",
+				CreationTimestamp: metav1.Time{
+					Time: time.Now().Add(-time.Second),
+				},
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "foo-gatewayclass",
+				Listeners: []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http-1"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
+					},
+				},
+			},
+			Status: gatewayv1.GatewayStatus{
+				Addresses: []gatewayv1.GatewayStatusAddress{
+					{
+						Value: "10.0.0.1",
+					},
+				},
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Programmed",
+						Status: metav1.ConditionTrue,
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	gp := &GatewaysPrinter{
+		Out: params.Out,
+	}
+	gp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAME         CLASS             ADDRESSES  PORTS  PROGRAMMED  AGE
+foo-gateway  foo-gatewayclass  10.0.0.1   80     True        1s
+`
+
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
 
 func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	objects := []runtime.Object{
