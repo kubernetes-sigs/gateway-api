@@ -80,6 +80,6 @@ been considered.
 {% include 'experimental/v1alpha2/grpc-routing/reflection-grpcroute.yaml' %}
 ```
 
-[gateway]: /reference/spec/#gateway.networking.k8s.io/v1beta1.Gateway
+[gateway]: /reference/spec/#gateway.networking.k8s.io/v1.Gateway
 [spec]: /reference/spec/#gateway.networking.k8s.io%2fv1alpha2.GRPCRouteSpec
 [svc]:https://kubernetes.io/docs/concepts/services-networking/service/
