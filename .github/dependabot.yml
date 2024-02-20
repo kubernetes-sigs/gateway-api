@@ -14,6 +14,34 @@ updates:
       - dependencies
       - ok-to-test
 
+  # Dependencies listed in gwctl/go.mod
+  - package-ecosystem: "gomod"
+    directory: "/gwctl" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    groups:
+      k8s.io: # Group k8s.io golang dependencies updates
+        patterns:
+          - "k8s.io/*"
+    labels:
+      - go
+      - dependencies
+      - ok-to-test
+
+  # Dependencies listed in conformance/echo-basic/go.mod
+  - package-ecosystem: "gomod"
+    directory: "/conformance/echo-basic/" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    groups:
+      k8s.io: # Group k8s.io golang dependencies updates
+        patterns:
+          - "k8s.io/*"
+    labels:
+      - go
+      - dependencies
+      - ok-to-test
+
   # Dependencies listed in .github/workflows/*.yml
   - package-ecosystem: "github-actions"
     directory: "/"
