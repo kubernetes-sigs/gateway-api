@@ -187,21 +187,21 @@ func isTestExtended(profile ConformanceProfile, test ConformanceTest) bool {
 }
 
 // buildSummary creates a human-readable message about each profile's test outcomes.
-func buildSummary(report confv1a1.ProfileReport) string {
-	reportMessage := fmt.Sprintf("Core tests %s", buildReportMessage(report.Core))
+func buildSummary(report confv1a1.ProfileReport) (reportSummary string) {
+	reportSummary = fmt.Sprintf("Core tests %s", buildReportSummary(report.Core))
 	if report.Extended != nil {
-		reportMessage = fmt.Sprintf("%s. Extended tests %s", reportMessage, buildReportMessage(report.Extended.Status))
+		reportSummary = fmt.Sprintf("%s. Extended tests %s", reportSummary, buildReportSummary(report.Extended.Status))
 	}
-	return fmt.Sprintf("%s.", reportMessage)
+	return fmt.Sprintf("%s.", reportSummary)
 }
 
-func buildReportMessage(status confv1a1.Status) string {
+func buildReportSummary(status confv1a1.Status) string {
 	var message string
 	switch status.Result {
 	case confv1a1.Success:
-		message = "succedeed"
+		message = "succeeded"
 	case confv1a1.Partial:
-		message = fmt.Sprintf("partially succedeed with %d test skips", status.Statistics.Skipped)
+		message = fmt.Sprintf("partially succeeded with %d test skips", status.Statistics.Skipped)
 	case confv1a1.Failure:
 		message = fmt.Sprintf("failed with %d test failures", status.Statistics.Failed)
 	}

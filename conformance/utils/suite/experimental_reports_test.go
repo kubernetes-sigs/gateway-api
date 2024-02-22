@@ -45,7 +45,7 @@ func TestBuildSummary(t *testing.T) {
 			expectedSummary: "Core tests failed with 3 test failures.",
 		},
 		{
-			name: "core tests succedeed, extended tests failed",
+			name: "core tests succeeded, extended tests failed",
 			report: confv1a1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
 				Core: confv1a1.Status{
@@ -64,10 +64,10 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 			},
-			expectedSummary: "Core tests succedeed. Extended tests failed with 1 test failures.",
+			expectedSummary: "Core tests succeeded. Extended tests failed with 1 test failures.",
 		},
 		{
-			name: "core tests partially succedeed, extended tests succedeed",
+			name: "core tests partially succeeded, extended tests succeeded",
 			report: confv1a1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
 				Core: confv1a1.Status{
@@ -86,10 +86,10 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 			},
-			expectedSummary: "Core tests partially succedeed with 2 test skips. Extended tests succedeed.",
+			expectedSummary: "Core tests partially succeeded with 2 test skips. Extended tests succeeded.",
 		},
 		{
-			name: "core tests succedeed, extended tests partially succedeed",
+			name: "core tests succeeded, extended tests partially succeeded",
 			report: confv1a1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
 				Core: confv1a1.Status{
@@ -108,7 +108,7 @@ func TestBuildSummary(t *testing.T) {
 					},
 				},
 			},
-			expectedSummary: "Core tests succedeed. Extended tests partially succedeed with 1 test skips.",
+			expectedSummary: "Core tests succeeded. Extended tests partially succeeded with 1 test skips.",
 		},
 	}
 
