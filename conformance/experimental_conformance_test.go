@@ -20,6 +20,7 @@ import (
 	"os"
 	"testing"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -68,6 +69,7 @@ func TestExperimentalConformance(t *testing.T) {
 	v1alpha2.AddToScheme(mgrClient.Scheme())
 	v1beta1.AddToScheme(mgrClient.Scheme())
 	gatewayv1.AddToScheme(mgrClient.Scheme())
+	apiextensionsv1.AddToScheme(mgrClient.Scheme())
 
 	// standard conformance flags
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
