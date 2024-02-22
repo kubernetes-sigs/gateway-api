@@ -45,6 +45,7 @@ var (
 	namespaceLabels      map[string]string
 	namespaceAnnotations map[string]string
 	implementation       *confv1a1.Implementation
+	mode                 string
 	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
 	skipTests            []string
 )
@@ -77,6 +78,7 @@ func TestExperimentalConformance(t *testing.T) {
 
 	// experimental conformance flags
 	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
+	mode = *flags.Mode
 
 	if conformanceProfiles.Len() > 0 {
 		// if some conformance profiles have been set, run the experimental conformance suite...
@@ -119,6 +121,7 @@ func testExperimentalConformance(t *testing.T) {
 				NamespaceAnnotations:       namespaceAnnotations,
 				SkipTests:                  skipTests,
 			},
+			Mode:                mode,
 			Implementation:      *implementation,
 			ConformanceProfiles: conformanceProfiles,
 		})

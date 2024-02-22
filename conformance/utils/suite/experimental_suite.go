@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
@@ -46,6 +47,10 @@ import (
 // the two of them will be merged.
 type ExperimentalConformanceTestSuite struct {
 	ConformanceTestSuite
+
+	// mode is the operating mode of the implementation.
+	// The default value for it is "default".
+	mode string
 
 	// implementation contains the details of the implementation, such as
 	// organization, project, etc.
@@ -78,6 +83,7 @@ type ExperimentalConformanceTestSuite struct {
 type ExperimentalConformanceOptions struct {
 	Options
 
+	Mode                string
 	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
@@ -91,12 +97,18 @@ func NewExperimentalConformanceTestSuite(s ExperimentalConformanceOptions) (*Exp
 		roundTripper = &roundtripper.DefaultRoundTripper{Debug: s.Debug, TimeoutConfig: s.TimeoutConfig}
 	}
 
+	mode := flags.DefaultMode
+	if s.Mode != "" {
+		mode = s.Mode
+	}
+
 	suite := &ExperimentalConformanceTestSuite{
 		results:                     make(map[string]testResult),
 		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
 		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
 		conformanceProfiles:         s.ConformanceProfiles,
 		implementation:              s.Implementation,
+		mode:                        mode,
 	}
 
 	// test suite callers are required to provide a conformance profile OR at
@@ -281,6 +293,7 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 			Kind:       "ConformanceReport",
 		},
 		Date:              time.Now().Format(time.RFC3339),
+		Mode:              suite.mode,
 		Implementation:    suite.implementation,
 		GatewayAPIVersion: "TODO",
 		ProfileReports:    profileReports.list(),
