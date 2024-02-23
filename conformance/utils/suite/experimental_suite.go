@@ -97,9 +97,14 @@ type ExperimentalConformanceOptions struct {
 	Options
 
 	Mode                string
+	AllowCRDsMismatch   bool
 	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
+
+const (
+	undefinedKeyword = "UNDEFINED"
+)
 
 // NewExperimentalConformanceTestSuite is a helper to use for creating a new ExperimentalConformanceTestSuite.
 func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions) (*ExperimentalConformanceTestSuite, error) {
@@ -117,7 +122,14 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 	}
 	apiVersion, apiChannel, err := getAPIVersionAndChannel(installedCRDs.Items)
 	if err != nil {
-		return nil, err
+		// in case an error is returned and the AllowCRDsMismatch flag is false, the suite fails.
+		// This is the default behavior but can be customized in case one wants to experiment
+		// with mixed versions/channels of the API.
+		if !options.AllowCRDsMismatch {
+			return nil, err
+		}
+		apiVersion = undefinedKeyword
+		apiChannel = undefinedKeyword
 	}
 
 	mode := flags.DefaultMode
@@ -395,5 +407,9 @@ func getAPIVersionAndChannel(crds []apiextensionsv1.CustomResourceDefinition) (v
 	if version == "" || channel == "" {
 		return "", "", errors.New("no Gateway API CRDs with the proper annotations found in the cluster")
 	}
+	if version != consts.BundleVersion {
+		return "", "", errors.New("the installed CRDs version is different from the suite version")
+	}
+
 	return version, channel, nil
 }

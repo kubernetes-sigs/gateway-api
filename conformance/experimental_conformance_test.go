@@ -47,6 +47,7 @@ var (
 	namespaceAnnotations map[string]string
 	implementation       *confv1a1.Implementation
 	mode                 string
+	allowCRDsMismatch    bool
 	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
 	skipTests            []string
 )
@@ -81,6 +82,7 @@ func TestExperimentalConformance(t *testing.T) {
 	// experimental conformance flags
 	conformanceProfiles = suite.ParseConformanceProfiles(*flags.ConformanceProfiles)
 	mode = *flags.Mode
+	allowCRDsMismatch = *flags.AllowCRDsMismatch
 
 	if conformanceProfiles.Len() > 0 {
 		// if some conformance profiles have been set, run the experimental conformance suite...
@@ -124,6 +126,7 @@ func testExperimentalConformance(t *testing.T) {
 				SkipTests:                  skipTests,
 			},
 			Mode:                mode,
+			AllowCRDsMismatch:   allowCRDsMismatch,
 			Implementation:      *implementation,
 			ConformanceProfiles: conformanceProfiles,
 		})

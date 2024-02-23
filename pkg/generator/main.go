@@ -32,12 +32,6 @@ import (
 	"sigs.k8s.io/gateway-api/pkg/consts"
 )
 
-const (
-	// These values must be updated during the release process
-	bundleVersion = "v1.0.0"
-	approvalLink  = "https://github.com/kubernetes-sigs/gateway-api/pull/2466"
-)
-
 var standardKinds = map[string]bool{
 	"GatewayClass":   true,
 	"Gateway":        true,
@@ -103,9 +97,9 @@ func main() {
 			if crdRaw.ObjectMeta.Annotations == nil {
 				crdRaw.ObjectMeta.Annotations = map[string]string{}
 			}
-			crdRaw.ObjectMeta.Annotations[consts.BundleVersionAnnotation] = bundleVersion
+			crdRaw.ObjectMeta.Annotations[consts.BundleVersionAnnotation] = consts.BundleVersion
 			crdRaw.ObjectMeta.Annotations[consts.ChannelAnnotation] = channel
-			crdRaw.ObjectMeta.Annotations[apiext.KubeAPIApprovedAnnotation] = approvalLink
+			crdRaw.ObjectMeta.Annotations[apiext.KubeAPIApprovedAnnotation] = consts.ApprovalLink
 
 			// Prevent the top level metadata for the CRD to be generated regardless of the intention in the arguments
 			crd.FixTopLevelMetadata(crdRaw)

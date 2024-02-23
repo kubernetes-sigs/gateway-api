@@ -20,7 +20,16 @@ const (
 	// BundleVersionAnnotation is the annotation key used in the Gateway API CRDs to specify
 	// the installed Gateway API version.
 	BundleVersionAnnotation = "gateway.networking.k8s.io/bundle-version"
+
 	// ChannelAnnotation is the annotation key used in the Gateway API CRDs to specify
 	// the installed Gateway API channel.
 	ChannelAnnotation = "gateway.networking.k8s.io/channel"
+
+	// BundleVersion is the value used for the "gateway.networking.k8s.io/bundle-version" annotation.
+	// These value must be updated during the release process.
+	BundleVersion = "v1.0.0"
+
+	// ApprovalLink is the value used for the "api-approved.kubernetes.io" annotation.
+	// These value must be updated during the release process.
+	ApprovalLink = "https://github.com/kubernetes-sigs/gateway-api/pull/2466"
 )
