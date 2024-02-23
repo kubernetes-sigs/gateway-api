@@ -27,13 +27,6 @@ like APIs delivered in the core Kubernetes binaries, each time a release happens
 the APIs have been reviewed by upstream Kubernetes reviewers, just like the APIs
 delivered in the core binaries.
 
-### API Semantics
-
-Gateway API MUST follow the Kubernetes API semantics. 
-The concepts are documented [here](https://kubernetes.io/docs/reference/using-api/api-concepts/).
-[Server-Side Apply](https://kubernetes.io/docs/reference/using-api/server-side-apply/) should also be 
-supported as it allows multiple client appliers to collaborate on a single object. 
-
 ### Gateway API is delivered using CRDs
 
 Gateway API is supplied as a set of CRDs, version controlled using our [versioning
