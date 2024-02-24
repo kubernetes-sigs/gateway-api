@@ -35,6 +35,7 @@ var (
 	ImplementationVersion      = flag.String("version", "", "Implementation's version to issue conformance to")
 	ImplementationContact      = flag.String("contact", "", "Comma-separated list of contact information for the maintainers")
 	Mode                       = flag.String("mode", DefaultMode, "The operating mode of the implementation.")
+	AllowCRDsMismatch          = flag.Bool("allow-crds-mismatch", false, "Flag to allow the suite not to fail in case there is a mismatch between CRDs versions and channels.")
 	ConformanceProfiles        = flag.String("conformance-profiles", "", "Comma-separated list of the conformance profiles to run")
 	ReportOutput               = flag.String("report-output", "", "The file where to write the conformance report")
 )
