@@ -29,6 +29,19 @@ import (
 
 func init() {
 	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirror)
+	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirrorBackend)
+}
+
+var HTTPRouteRequestMirrorBackend = suite.ConformanceTest{
+	ShortName:   "HTTPRouteRequestMirrorBackend",
+	Description: "An HTTPRoute with request mirror filter on the backendRef",
+	Manifests:   []string{"tests/httproute-request-mirror-backend.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportHTTPRoute,
+		suite.SupportHTTPRouteRequestMirrorBackend,
+	},
+	Test: HTTPRouteRequestMirror.Test,
 }
 
 var HTTPRouteRequestMirror = suite.ConformanceTest{
@@ -62,32 +75,6 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 					Namespace: ns,
 				}},
 				Namespace: ns,
-			},
-			{
-				Request: http.Request{
-					Path: "/mirror-and-modify-headers",
-					Headers: map[string]string{
-						"X-Header-Remove":     "remove-val",
-						"X-Header-Add-Append": "append-val-1",
-					},
-				},
-				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/mirror-and-modify-headers",
-						Headers: map[string]string{
-							"X-Header-Add":        "header-val-1",
-							"X-Header-Add-Append": "append-val-1,header-val-2",
-							"X-Header-Set":        "set-overwrites-values",
-						},
-					},
-					AbsentHeaders: []string{"X-Header-Remove"},
-				},
-				Namespace: ns,
-				Backend:   "infra-backend-v1",
-				MirroredTo: []http.BackendRef{{
-					Name:      "infra-backend-v2",
-					Namespace: ns,
-				}},
 			},
 		}
 		for i := range testCases {
