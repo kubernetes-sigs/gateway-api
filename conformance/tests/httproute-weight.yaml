@@ -1,4 +1,3 @@
-
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -8,13 +7,13 @@ spec:
   parentRefs:
   - name: same-namespace
   rules:
-    - backendRefs:
-      - name: infra-backend-v1
-        port: 8080
-        weight: 70
-      - name: infra-backend-v2
-        port: 8080
-        weight: 30
-      - name: infra-backend-v3
-        port: 8080
-        weight: 0
+  - backendRefs:
+    - name: infra-backend-v1
+      port: 8080
+      weight: 70
+    - name: infra-backend-v2
+      port: 8080
+      weight: 30
+    - name: infra-backend-v3
+      port: 8080
+      weight: 0
