@@ -251,12 +251,16 @@ Spec:
 }
 
 func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&apiextensionsv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "healthcheckpolicies.foo.com",
 				Labels: map[string]string{
 					gatewayv1alpha2.PolicyLabelKey: "inherited",
+				},
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-24 * 24 * time.Hour),
 				},
 			},
 			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
@@ -300,6 +304,9 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 				Labels: map[string]string{
 					gatewayv1alpha2.PolicyLabelKey: "direct",
 				},
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-5 * time.Minute),
+				},
 			},
 			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
 				Scope:    apiextensionsv1.NamespaceScoped,
@@ -332,15 +339,16 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
 	pp := &PoliciesPrinter{
-		Out: &bytes.Buffer{},
+		Out:   &bytes.Buffer{},
+		Clock: fakeClock,
 	}
 	pp.PrintCRDs(params.PolicyManager.GetCRDs())
 
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
-NAME                         GROUP    KIND               POLICY TYPE  SCOPE
-healthcheckpolicies.foo.com  foo.com  HealthCheckPolicy  Inherited    Cluster
-timeoutpolicies.bar.com      bar.com  TimeoutPolicy      Direct       Namespaced
+NAME                         POLICY TYPE  SCOPE       AGE
+healthcheckpolicies.foo.com  Inherited    Cluster     24d
+timeoutpolicies.bar.com      Direct       Namespaced  5m
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
