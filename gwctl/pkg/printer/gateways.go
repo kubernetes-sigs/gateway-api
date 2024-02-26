@@ -19,7 +19,6 @@ package printer
 import (
 	"fmt"
 	"io"
-	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
@@ -63,7 +62,7 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 
 		var ports []string
 		for _, listener := range gatewayNode.Gateway.Spec.Listeners {
-			ports = append(ports, strconv.Itoa(int(listener.Port)))
+			ports = append(ports, fmt.Sprintf("%d", int(listener.Port)))
 		}
 		portsOutput := strings.Join(ports, ",")
 
