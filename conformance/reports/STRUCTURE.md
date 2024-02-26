@@ -41,7 +41,7 @@ General information about the Acme/operator project
 |             |                        |      |        |
 |             |                        |      |        |
 
-## To reproduce
+## Reproduce
 
 Instructions on how to reproduce the claimed report.
 ```
@@ -60,9 +60,9 @@ is structured as follows:
   It MUST correspond to the `gatewayAPIChannel` field specified in the related report.
 - Report: the link to the related report. It MUST be in the form of `[link](./report.yaml)`
 
-### To Reproduce
+### Reproduce
 
-The "To Reproduce" sections MUST exist and contain the manual or automatic steps
+The "Reproduce" sections MUST exist and contain the manual or automatic steps
 to reproduce the results claimed by the uploaded conformance reports. In case
 different implementation versions have different reproduction steps, this section
 can have multiple sub-sections, each related to a specific or a subset of implementation
@@ -71,7 +71,7 @@ versions.
 ## Reports
 
 The reports MUST be uploaded exactly as they have been created by the conformance
-suite, without any modifications. The "To reproduce" section allows checking
+suite, without any modifications. The "Reproduce" section allows checking
 any diff between the claimed report and the actual one. The reports must be named
 according to the following pattern: `<API Channel>-<Implementation version>-<mode>-report.yaml`.
 
@@ -90,5 +90,5 @@ to Gateway API v1.0.0 or prior benefits from the following rules' exceptions:
 - The reports are named according to the pattern `<Implementation version>-report.yaml`.
 - The implementation version can be different from a semver (for example, they can
   be commit hashes or pull request links).
-- The "To Reproduce" section is optional; implementations can decide whether to provide
+- The "Reproduce" section is optional; implementations can decide whether to provide
   reproduction steps for those versions.

@@ -6,4 +6,4 @@
 |-----------|----------------------|----|------|
 |x|[v1.26.0](https://github.com/projectcontour/contour/releases/tag/v1.26.0)|x|[link](./v1.26.0-report.yaml)|
 
-## To Reproduce
+## Reproduce
