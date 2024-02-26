@@ -7,14 +7,14 @@ spec:
   parentRefs:
   - name: same-namespace
   rules:
-  - filters:
-    - type: RequestMirror
-      requestMirror:
-        backendRef:
-          name: infra-backend-v2
-          namespace: gateway-conformance-infra
-          port: 8080
-    backendRefs:
+  - backendRefs:
     - name: infra-backend-v1
-      port: 8080
       namespace: gateway-conformance-infra
+      port: 8080
+      filters:
+      - type: RequestMirror
+        requestMirror:
+          backendRef:
+            name: infra-backend-v2
+            namespace: gateway-conformance-infra
+            port: 8080
