@@ -99,7 +99,7 @@ var HTTPRouteCoreFeatures = sets.New(
 
 const (
 	// This option indicates support for HTTPRoute backend request header modification
-	SupportHTTPRouteRequestHeaderModificationBackend SupportedFeature = "HTTPRouteRequestHeaderModificationBackend"
+	SupportHTTPRouteBackendRequestHeaderModification SupportedFeature = "HTTPRouteBackendRequestHeaderModification"
 
 	// This option indicates support for HTTPRoute query param matching (extended conformance).
 	SupportHTTPRouteQueryParamMatching SupportedFeature = "HTTPRouteQueryParamMatching"
@@ -158,7 +158,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteRequestTimeout,
 	SupportHTTPRouteBackendTimeout,
 	SupportHTTPRouteParentRefPort,
-	SupportHTTPRouteRequestHeaderModificationBackend,
+	SupportHTTPRouteBackendRequestHeaderModification,
 )
 
 // -----------------------------------------------------------------------------

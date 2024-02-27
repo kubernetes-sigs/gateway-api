@@ -27,17 +27,19 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestHeaderModifier)
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestHeaderModifierBackend)
+	ConformanceTests = append(ConformanceTests,
+		HTTPRouteRequestHeaderModifier,
+		HTTPRouteBackendRequestHeaderModifier,
+	)
 }
 
-var HTTPRouteRequestHeaderModifierBackend = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestHeaderModifierBackend",
+var HTTPRouteBackendRequestHeaderModifier = suite.ConformanceTest{
+	ShortName:   "HTTPRouteBackendRequestHeaderModifier",
 	Description: "An HTTPRoute backend has request header modifier filters applied correctly",
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteRequestHeaderModificationBackend,
+		suite.SupportHTTPRouteBackendRequestHeaderModification,
 	},
 	Manifests: []string{"tests/httproute-request-header-modifier-backend.yaml"},
 	Test:      HTTPRouteRequestHeaderModifier.Test,
