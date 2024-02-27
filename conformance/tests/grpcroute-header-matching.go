@@ -1,5 +1,5 @@
 /*
-Copyright 2022 The Kubernetes Authors.
+Copyright 2024 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -36,6 +36,10 @@ var GRPCRouteHeaderMatching = suite.ConformanceTest{
 	ShortName:   "GRPCRouteHeaderMatching",
 	Description: "A single GRPCRoute with header matching for different backends",
 	Manifests:   []string{"tests/grpcroute-header-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportGRPCRoute,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "header-matching", Namespace: ns}

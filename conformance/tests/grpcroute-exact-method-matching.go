@@ -1,5 +1,5 @@
 /*
-Copyright 2023 The Kubernetes Authors.
+Copyright 2024 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -31,13 +31,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, GRPCExactMethoMatching)
+	ConformanceTests = append(ConformanceTests, GRPCExactMethodMatching)
 }
 
-var GRPCExactMethoMatching = suite.ConformanceTest{
+var GRPCExactMethodMatching = suite.ConformanceTest{
 	ShortName:   "GRPCExactMethodMatching",
 	Description: "A single GRPCRoute with exact method matching for different backends",
 	Manifests:   []string{"tests/grpcroute-exact-method-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportGRPCRoute,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "exact-matching", Namespace: ns}

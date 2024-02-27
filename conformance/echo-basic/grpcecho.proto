@@ -16,6 +16,7 @@ syntax = "proto3";
 
 option go_package = "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver";
 
+// This package name should in general be kept in sync with the directory in which it lives.
 package gateway_api_conformance.echo_basic.grpcecho;
 
 message Header {

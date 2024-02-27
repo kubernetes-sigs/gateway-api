@@ -1,5 +1,5 @@
 /*
-Copyright 2023 The Kubernetes Authors.
+Copyright 2024 The Kubernetes Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -37,6 +37,10 @@ var GRPCRouteListenerHostnameMatching = suite.ConformanceTest{
 	ShortName:   "GRPCRouteListenerHostnameMatching",
 	Description: "Multiple GRPC listeners with the same port and different hostnames, each with a different GRPCRoute",
 	Manifests:   []string{"tests/grpcroute-listener-hostname-matching.yaml"},
+	Features: []suite.SupportedFeature{
+		suite.SupportGateway,
+		suite.SupportGRPCRoute,
+	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 

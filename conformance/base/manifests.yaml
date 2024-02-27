@@ -540,7 +540,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v1
-        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
         image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME
@@ -589,7 +589,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v2
-        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
         image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME
@@ -638,7 +638,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v3
-        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
         image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME

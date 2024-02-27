@@ -321,6 +321,15 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
 }
 
+// GatewayAndRoutesMustBeAccepted waits until:
+//  1. The specified Gateway has an IP address assigned to it.
+//  2. The route has a ParentRef referring to the Gateway.
+//  3. All the gateway's listeners have the following conditions set to true:
+//     - ListenerConditionResolvedRefs
+//     - ListenerConditionAccepted
+//     - ListenerConditionProgrammed
+//
+// The test will fail if these conditions are not met before the timeouts.
 func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
