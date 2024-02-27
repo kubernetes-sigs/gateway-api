@@ -15,13 +15,8 @@ require (
 	k8s.io/utils v0.0.0-20240102154912-e7106e64919e
 	sigs.k8s.io/controller-runtime v0.16.3
 	sigs.k8s.io/controller-tools v0.14.0
-	sigs.k8s.io/gateway-api/conformance/grpc-echo v0.0.0-00010101000000-000000000000
 	sigs.k8s.io/yaml v1.4.0
 )
-
-// Needed because of the go.sum and go.mod used for Dockerfile
-// The same generated code is reused in the conformance tests.
-replace sigs.k8s.io/gateway-api/conformance/grpc-echo => ./conformance/grpc-echo
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

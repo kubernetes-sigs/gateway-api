@@ -31,12 +31,12 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	pb "sigs.k8s.io/gateway-api/conformance/grpc-echo/grpcechoserver"
+	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 )
 
-const echoServerPackage = "gateway_api_conformance.grpc_echo.grpcecho"
+const echoServerPackage = "gateway_api_conformance.echo_basic.grpcecho"
 const echoServerService = "GrpcEcho"
 
 type Response struct {

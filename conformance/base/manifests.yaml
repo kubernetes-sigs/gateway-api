@@ -540,8 +540,8 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v1
-	# TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/grpcechoserver:alpha3
+        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME
           valueFrom:
@@ -551,6 +551,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: GRPC_ECHO_SERVER
+          value: "1"
         resources:
           requests:
             cpu: 10m
@@ -587,8 +589,8 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v2
-	# TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/grpcechoserver:alpha3
+        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME
           valueFrom:
@@ -598,6 +600,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: GRPC_ECHO_SERVER
+          value: "1"
         resources:
           requests:
             cpu: 10m
@@ -634,8 +638,8 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v3
-	# TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/grpcechoserver:alpha3
+        # TODO: Migate to gcr.io/k8s-staging-gateway-api once possible
+        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
         env:
         - name: POD_NAME
           valueFrom:
@@ -645,6 +649,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        - name: GRPC_ECHO_SERVER
+          value: "1"
         resources:
           requests:
             cpu: 10m

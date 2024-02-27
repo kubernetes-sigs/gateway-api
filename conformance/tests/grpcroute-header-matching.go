@@ -21,7 +21,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/types"
   	"google.golang.org/grpc/codes"
-	pb "sigs.k8s.io/gateway-api/conformance/grpc-echo/grpcechoserver"
+	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"

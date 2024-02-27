@@ -33,6 +33,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/net/websocket"
+
+	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -77,6 +79,11 @@ type Context struct {
 var context Context
 
 func main() {
+	if os.Getenv("GRPC_ECHO_SERVER") != "" {
+		g.GRPCMain()
+		return
+	}
+
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "3000"

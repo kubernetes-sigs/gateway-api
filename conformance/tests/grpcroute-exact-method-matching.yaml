@@ -9,14 +9,14 @@ spec:
   rules:
   - matches:
     - method:
-        service: gateway_api_conformance.grpc_echo.grpcecho.GrpcEcho
+        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
         method: Echo
     backendRefs:
     - name: grpc-infra-backend-v1
       port: 8080
   - matches:
     - method:
-        service: gateway_api_conformance.grpc_echo.grpcecho.GrpcEcho
+        service: gateway_api_conformance.echo_basic.grpcecho.GrpcEcho
         method: EchoTwo
     backendRefs:
     - name: grpc-infra-backend-v2
