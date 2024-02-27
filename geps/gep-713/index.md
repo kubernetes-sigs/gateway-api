@@ -1,13 +1,7 @@
 # GEP-713: Metaresources and Policy Attachment
 
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
-* Status: Experimental
-
-> **Note**: This GEP is exempt from the [Probationary Period][expprob] rules of
-> our GEP overview as it existed before those rules did, and so it has been
-> explicitly grandfathered in.
-
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+* Status: Memorandum
 
 ## TLDR
 
@@ -145,7 +139,7 @@ small examples. Please see the separated GEPs for more examples.
 
 **BackendTLSPolicy** is the canonical example of a Direct Attached Policy because
 it _only_ affects the Service that the Policy attaches to, and affects how that
-Service is consumed. BUt you can know everything you need to about the Service
+Service is consumed. But you can know everything you need to about the Service
 and BackendTLSPolicy just by looking at those two objects.
 
 **Hypothetical max body size Policy**: Kate Osborn

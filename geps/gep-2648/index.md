@@ -3,7 +3,7 @@
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
 * Status: Experimental
 
-(See status definitions [here](overview.md#status).)
+(See status definitions [here](/geps/overview/#gep-states)
 
 ## TLDR
 
@@ -11,15 +11,6 @@ Describe and specify a design pattern for a class of metaresource that can
 affect specific settings across a single target object.
 
 This is a design for a _pattern_, not an API field or new object.
-
-## WIP TODO
-
-- Add changelog including the original PRs plus Flynn's one
-- Add details about how Direct is more specific and so overrides Inherited, NOT
-  MERGED
-- Update example to be BackendTLSPolicy
-- Specify some requirements for status (basically, do what we did for TLSBackendPolicy)
-
 
 ## Goals
 
@@ -35,7 +26,7 @@ This is a design for a _pattern_, not an API field or new object.
 
 GEP-713 defines two classes of Policy Attachment: Direct and Inherited.
 
-Direct Attached Policies (or Direct Policies) _only)_ affect the object they are
+Direct Attached Policies (or Direct Policies) _only_ affect the object they are
 attached to; that is, the object specified in their `targetRef`.
 
 Note that as soon as the Policy affects more objects than the referenced object,
@@ -44,6 +35,7 @@ it is an Inherited Policy.
 ## Direct Policy Attachment requirements in brief
 
 The following parts of GEP-713 also apply here. Direct Policy Attachments:
+
 - MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
 - MUST include both `spec` and `status` stanzas
 - MUST have the `status` stanza include a `conditions` section using the standard
@@ -70,16 +62,19 @@ used to connect to that Service when it is used as a backend by a Route.
 
 See GEP-1897 for all the details of this Policy object.
 
-## Direct Policy design guidelines
+## Direct Policy design rules
 
-With this example in mind, here are some guidelines for when to consider
-using Direct Policy Attachment:
+With this example in mind, here are some rules for when a Policy is a Direct
+Policy:
 
-* The number or scope of objects is exactly _one_ object.
+* The number or scope of objects is exactly _one_ object. No label selectors or
+  lists of `targetRef` are allowed.
 * The modifications to be made to the objects don’t have any transitive information -
   that is, the modifications MUST only affect the single object that the targeted
   metaresource is bound to, and MUST NOT have ramifications that flow beyond that
-  object.
+  object. No attaching a Policy to a Gateway and affecting settings in Routes or
+  backends. If a Direct Attached Policy attaches to an object, it can only affect
+  properties _of that object_.
 * In terms of status, it SHOULD be reasonably easy for a user to understand that
   everything is working - basically, as long as the targeted object exists, and
   the modifications are valid, the metaresource is valid, and this should be
@@ -99,9 +94,11 @@ using Direct Policy Attachment:
 The `sectionName` field of `targetRef` can be used to target a specific section of other resources:
 
 * Service.Ports.Name
-* xRoute.Rules.Name
+* Gateway.Listners.Name
+* HTTPRoute.Rules.Name (once they are added in GEP-995, PR at https://github.com/kubernetes-sigs/gateway-api/pull/2593)
 
 For example, the RetryPolicy below applies to a RouteRule inside an HTTPRoute.
+(or rather, it will when GEP-995 merges).
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -136,16 +133,17 @@ spec:
     sectionName: bar
 ```
 
-If a `sectionName` is specified, but does not exist on the targeted object, the Policy must fail to attach,
-and the policy implementation should record a `resolvedRefs` or similar Condition in the Policy's status.
+If a `sectionName` is specified, but does not exist on the targeted object, the
+Policy must fail to attach, and the policy implementation should record a
+`resolvedRefs` or similar Condition in the Policy's status.
 
-When multiple Policies of the same type target the same object, one with a `sectionName` specified, and one without,
-the one with a `sectionName` is more specific, and so will have all its settings apply. The less-specific Policy will
-not attach to the target.
-
-## Interactions with other Policy objects and settings
-
-TODO: See the discussion on https://github.com/kubernetes-sigs/gateway-api/pull/2442
+When multiple Policies of the same type target the same object, one with a
+`sectionName` and one without, the more specific policy (i.e., the one with a
+`sectionName`) will have its entire `spec` applied to the named section.
+The less specific policy will also have its `spec` applied to the target but
+MUST not affect the named section. The less specific policy will have its `spec`
+applied to all other sections of the target that are not targeted by any other
+more specific policies.
 
 ## User discoverability and status
 
@@ -244,6 +242,7 @@ implementation-specific domain prefix) added instead.
 
 Because these Conditions or annotations are namespaced per-implementation,
 implementations SHOULD:
+
 - Add the Condition or annotation if an object is policy affected when it is not
   already present
 - Remove the Condition or annotation when the last policy object stops referencing
@@ -379,9 +378,10 @@ type PolicyStatus struct {
 
 ## Examples
 
-### Direct Policy Attachment
+### Hypothetical TLSMinimumVersionPolicy
 
-The following Policy sets the minimum TLS version required on a Gateway Listener:
+The following hypothetical Policy sets the minimum TLS version required on a
+Gateway Listener:
 
 ```yaml
 apiVersion: networking.example.io/v1alpha1
@@ -403,3 +403,13 @@ Gateway `spec`, this is an example of a non-field Policy.
 This is an example of a Direct Attached Policy because it affects a field on the
 Gateway itself, rather than fields or behavior associated with Routes attached
 to that Gateway.
+
+### BackendTLSPolicy
+
+BackendTLSPolicy, introduced in [GEP-1897](https://gateway-api.sigs.k8s.io/geps/gep-1897/)
+allows backends to set the TLS details that a Gateway implementation must use
+to connect to that backend.
+
+It does this using a Direct Attached Policy that attaches to a Service.
+
+Work on this Policy is still ongoing, please see GEP-1897 for details.

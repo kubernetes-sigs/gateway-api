@@ -3,7 +3,7 @@
 * Issue: [#2649](https://github.com/kubernetes-sigs/gateway-api/issues/2649)
 * Status: Experimental
 
-(See status definitions [here](overview.md#status).)
+(See status definitions [here](/geps/overview/#gep-states)
 
 ## TLDR
 
@@ -25,6 +25,7 @@ This is a design for a _pattern_, not an API field or new object.
 ## Inherited Policy Attachment requirements in brief
 
 The following parts of GEP-713 also apply here. Inherited Policy Attachments:
+
 - MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
 - MUST include both `spec` and `status` stanzas
 - MUST have the `status` stanza include a `conditions` section using the standard
@@ -35,6 +36,7 @@ kind is a Policy, and SHOULD use the `Policy` suffix at the end of the Kind and
 `policies` at the end of the Resource names).
 
 Additionally, Inherited Policy Attachment:
+
 - MAY specify a `defaults` stanza, an `overrides` stanza, or both. If it does not,
   it MUST specify if its fields are defaults or overrides in each field's godoc.
 
@@ -116,33 +118,28 @@ this document.
   specifies a value, the _object's_ value wins.
 * Policies interact with the fields they are controlling in a "replace value"
   fashion.
-  * For fields where the `value` is a scalar, (like a string or a number)
-    MUST have their value _replaced_ by the value in the Policy if it wins.
-    Notably, this means that a `default` will only ever replace an empty or unset
-    value in an object.
-  * For fields where the value is an object, the Policy should include the fields
-    in the object in its definition, so that the replacement can be performed
-    on each field inside the object as a simple field rather than the object as
-    a whole.
-  * For fields where the final value is non-scalar, but is not an _object_ with
-    fields of its own, the value MUST be entirely replaced, _not_ merged. This
-    means that lists of strings or lists of ints specified in a Policy overwrite
-    the empty list (in the case of a `default`) or any specified list (in the case
-    of an `override`). The same applies to `map[string]string` fields. An example
-    here would be a field that stores a map of annotations - specifying a Policy
-    that overrides annotations will mean that a final object specifying those
-    annotations will have its value _entirely replaced_ by an `override` setting.
+    * For fields where the `value` is a scalar, (like a string or a number)
+      MUST have their value _replaced_ by the value in the Policy if it wins.
+      Notably, this means that a `default` will only ever replace an empty or unset
+      value in an object. Note also that, as in Go, the empty string value is _only_
+      a string of length 0, generally represented as `""`.
+    * For fields where the value is an object, the Policy should include the fields
+      in the object in its definition, so that the replacement can be performed
+      on each field inside the object as a simple field rather than the object as
+      a whole.
+    * For fields where the final value is non-scalar, but is not an _object_ with
+      fields of its own, the value MUST be entirely replaced, _not_ merged. This
+      means that lists of strings or lists of ints specified in a Policy overwrite
+      the empty list (in the case of a `default`) or any specified list (in the case
+      of an `override`). The same applies to `map[string]string` fields. An example
+      here would be a field that stores a map of annotations - specifying a Policy
+      that overrides annotations will mean that a final object specifying those
+      annotations will have its value _entirely replaced_ by an `override` setting.
 * In the case that two Policies of the same type specify different fields, then
   _all_ of the specified fields MUST take effect on the affected object, using
   the precedence rules given above.
 
 Examples to further illustrate these rules are given below.
-
-#### Supported Resources
-It is important to note that not every implementation will be able to support
-policy attachment to each resource described in the hierarchy above. When that
-is the case, implementations MUST clearly document which resources a policy may
-be attached to.
 
 #### Attaching Policy to GatewayClass
 GatewayClass may be the trickiest resource to attach policy to. Policy
@@ -207,22 +204,38 @@ but also borrows some concepts from the [ServicePolicy
 proposal](https://github.com/kubernetes-sigs/gateway-api/issues/611).
 
 ### Policy Attachment for Ingress
-Attaching a Directly Attached Policy to Gateway resources for ingress use cases
-is relatively straightforward. A policy can reference the resource it wants to
-apply to.
+When talking about Direct Attached Policy attaching to Gateway resources for
+ingress use cases (as discussed in GEP-2648), the flow is relatively 
+straightforward. A policy can reference the resource it wants to apply to, and
+only affects that resource.
 
-Access is granted with RBAC - anyone that has access to create a RetryPolicy in
-a given namespace can attach it to any resource within that namespace.
 
 ![Simple Ingress Example](images/2649-ingress-simple.png)
 
-An Inherited Policy can attach to a parent resource, and then each policy
+However, an Inherited Policy can attach to a parent resource, and then each policy
 applies to the referenced resource and everything below it in terms of hierarchy.
-Although this example is likely more complex than many real world
+
+In the simple example above, the TimeoutPolicy _attaches_ to the Gateway but
+_affects_ the HTTPRoute. That's the very thing that makes this an Inherited
+Policy.
+
+Although the next example is likely more complex than many real world
 use cases, it helps demonstrate how policy attachment can work across
 namespaces.
 
 ![Complex Ingress Example](images/2649-ingress-complex.png)
+
+In this example, the Gateway has a TimeoutPolicy attached, which affects the
+HTTPRoute in the App namespace. That HTTPRoute also has the Direct Attached 
+RetryPolicy attached, which affects the HTTPRoute itself, and one of the backends
+has a HealthCheckPolicy attached to the Service, which is also a Direct Attached
+Policy.
+
+This shows how Direct and Inherited Policies can be attached to varied objects
+and still apply the relevant configuration.
+
+As a preview of a later section though, ask yourself: If I was the owner of the
+HTTPRoute, how would I know what Policy was affecting it at any point in time?
 
 ### Policy Attachment for Mesh
 Although there is a great deal of overlap between ingress and mesh use cases,
@@ -410,6 +423,12 @@ Also note how the different resources interact - fields that are not common acro
 objects _may_ both end up affecting the final object.
 
 ![Inherited Policy Example](images/2649-policy-hierarchy.png)
+
+#### Supported Resources
+It is important to note that not every implementation will be able to support
+policy attachment to each resource described in the hierarchy above. When that
+is the case, implementations MUST clearly document which resources a policy may
+be attached to.
 
 ## Examples
 
