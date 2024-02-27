@@ -17,16 +17,14 @@ limitations under the License.
 package get
 
 import (
-	"context"
 	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils/printer"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 type getFlags struct {
@@ -38,7 +36,7 @@ func NewGetCommand(params *utils.CmdParams) *cobra.Command {
 	flags := &getFlags{}
 
 	cmd := &cobra.Command{
-		Use:   "get {policies|policycrds|httproutes}",
+		Use:   "get {gateways|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -58,11 +56,26 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		ns = ""
 	}
 
-	epc := effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager)
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	gwPrinter := &printer.GatewaysPrinter{Out: params.Out}
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, EPC: epc}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
 
 	switch kind {
+	case "gateway", "gateways":
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForGateway(filter)
+		if err != nil {
+			panic(err)
+		}
+		gwPrinter.Print(resourceModel)
+
 	case "policy", "policies":
 		list := params.PolicyManager.GetPolicies()
 		policiesPrinter.Print(list)
@@ -72,11 +85,15 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		policiesPrinter.PrintCRDs(list)
 
 	case "httproute", "httproutes":
-		list, err := resourcehelpers.ListHTTPRoutes(context.TODO(), params.K8sClients, ns)
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(filter)
 		if err != nil {
 			panic(err)
 		}
-		httpRoutesPrinter.Print(list)
+		httpRoutesPrinter.Print(resourceModel)
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unrecognized RESOURCE_TYPE\n")

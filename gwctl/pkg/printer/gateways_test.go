@@ -18,32 +18,129 @@ package printer
 
 import (
 	"bytes"
-	"context"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common/resourcehelpers"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/effectivepolicy"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
-func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
+func TestGatewaysPrinter_Print(t *testing.T) {
 	objects := []runtime.Object{
-		&gatewayv1beta1.GatewayClass{
+		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gatewayclass",
 			},
-			Spec: gatewayv1beta1.GatewayClassSpec{
+			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: "example.net/gateway-controller",
 				Description:    common.PtrTo("random"),
+			},
+		},
+
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-gateway",
+				CreationTimestamp: metav1.Time{
+					Time: time.Now().Add(-time.Second),
+				},
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "foo-gatewayclass",
+				Listeners: []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http-1"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(80),
+					},
+				},
+			},
+			Status: gatewayv1.GatewayStatus{
+				Addresses: []gatewayv1.GatewayStatusAddress{
+					{
+						Value: "10.0.0.1",
+					},
+				},
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Programmed",
+						Status: metav1.ConditionTrue,
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	gp := &GatewaysPrinter{
+		Out: params.Out,
+	}
+	gp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAME         CLASS             ADDRESSES  PORTS  PROGRAMMED  AGE
+foo-gateway  foo-gatewayclass  10.0.0.1   80     True        1s
+`
+
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-gatewayclass",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-gateway",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "foo-gatewayclass",
+			},
+		},
+
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "healthcheckpolicies.foo.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "inherited",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "foo.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "healthcheckpolicies",
+					Kind:   "HealthCheckPolicy",
+				},
 			},
 		},
 		&unstructured.Unstructured{
@@ -71,16 +168,6 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 				},
 			},
 		},
-
-		&gatewayv1beta1.Gateway{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "foo-gateway",
-				Namespace: "default",
-			},
-			Spec: gatewayv1beta1.GatewaySpec{
-				GatewayClassName: "foo-gatewayclass",
-			},
-		},
 		&unstructured.Unstructured{
 			Object: map[string]interface{}{
 				"apiVersion": "foo.com/v1",
@@ -102,57 +189,6 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 						"name":      "foo-gateway",
 						"namespace": "default",
 					},
-				},
-			},
-		},
-
-		&gatewayv1beta1.HTTPRoute{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "foo-httproute",
-			},
-			Spec: gatewayv1beta1.HTTPRouteSpec{
-				CommonRouteSpec: gatewayv1beta1.CommonRouteSpec{
-					ParentRefs: []gatewayv1beta1.ParentReference{{
-						Kind:  common.PtrTo(gatewayv1beta1.Kind("Gateway")),
-						Group: common.PtrTo(gatewayv1beta1.Group("gateway.networking.k8s.io")),
-						Name:  "foo-gateway",
-					}},
-				},
-			},
-		},
-		&unstructured.Unstructured{
-			Object: map[string]interface{}{
-				"apiVersion": "bar.com/v1",
-				"kind":       "TimeoutPolicy",
-				"metadata": map[string]interface{}{
-					"name": "timeout-policy-httproute",
-				},
-				"spec": map[string]interface{}{
-					"condition": "path=/def",
-					"seconds":   int64(60),
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "HTTPRoute",
-						"name":  "foo-httproute",
-					},
-				},
-			},
-		},
-
-		&apiextensionsv1.CustomResourceDefinition{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "healthcheckpolicies.foo.com",
-				Labels: map[string]string{
-					gatewayv1alpha2.PolicyLabelKey: "inherited",
-				},
-			},
-			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-				Scope:    apiextensionsv1.ClusterScoped,
-				Group:    "foo.com",
-				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
-				Names: apiextensionsv1.CustomResourceDefinitionNames{
-					Plural: "healthcheckpolicies",
-					Kind:   "HealthCheckPolicy",
 				},
 			},
 		},
@@ -194,39 +230,38 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	httpRoutes, err := resourcehelpers.ListHTTPRoutes(context.Background(), params.K8sClients, "")
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to List HTTPRoutespkg/resources/httproutes/httproutes_test.go: %v", err)
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
-	hp := &HTTPRoutesPrinter{
+	gp := &GatewaysPrinter{
 		Out: params.Out,
-		EPC: effectivepolicy.NewCalculator(params.K8sClients, params.PolicyManager),
 	}
-	hp.PrintDescribeView(context.Background(), httpRoutes)
+	gp.PrintDescribeView(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
-Name: foo-httproute
-ParentRefs:
-- group: gateway.networking.k8s.io
-  kind: Gateway
-  name: foo-gateway
+Name: foo-gateway
+GatewayClass: foo-gatewayclass
 DirectlyAttachedPolicies:
-- Group: bar.com
-  Kind: TimeoutPolicy
-  Name: timeout-policy-httproute
+- Group: foo.com
+  Kind: HealthCheckPolicy
+  Name: health-check-gateway
 EffectivePolicies:
-  default/foo-gateway:
-    HealthCheckPolicy.foo.com:
-      key1: value-parent-1
-      key2: value-child-2
-      key3: value-parent-3
-      key4: value-parent-4
-      key5: value-parent-5
-    TimeoutPolicy.bar.com:
-      condition: path=/def
-      seconds: 60
+  HealthCheckPolicy.foo.com:
+    key1: value-parent-1
+    key2: value-child-2
+    key3: value-parent-3
+    key4: value-parent-4
+    key5: value-parent-5
+  TimeoutPolicy.bar.com:
+    condition: path=/abc
+    seconds: 30
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

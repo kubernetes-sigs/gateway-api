@@ -24,6 +24,7 @@ cover, and documentation to help users get started.
 - [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
+- [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (GA)
@@ -80,6 +81,7 @@ cover, and documentation to help users get started.
 [29]:#tyk
 [30]:#easegress
 [31]:#avi-kubernetes-operator
+[32]:#haproxy-kubernetes-ingress-controller
 
 [gamma]:/concepts/gamma/
 
@@ -175,13 +177,13 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.1-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.1/projectcontour-contour.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour.yaml)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.27.0][contour-release] implements Gateway API v0.8.1, supporting the v1alpha2 and v1beta1 API versions.
-All [Standard channel][contour-standard] resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus TLSRoute, TCPRoute, and GRPCRoute, are supported.
-Contour's implementation passes all core and most extended Gateway API conformance tests included in the v0.8.1 release.
+Contour [v1.28.1][contour-release] implements Gateway API v1.0.0.
+All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
+Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.0.0 release.
 
 See the [Contour Gateway API Guide][contour-guide] for information on how to deploy and use Contour's Gateway API implementation.
 
@@ -190,9 +192,9 @@ For help and support with Contour's implementation, [create an issue][contour-is
 _Some "extended" functionality is not implemented yet, [contributions welcome!][contour-contrib]._
 
 [contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.27.0
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.28.1
 [contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
-[contour-guide]:https://projectcontour.io/docs/1.27/guides/gateway-api/
+[contour-guide]:https://projectcontour.io/docs/1.28/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
 [contour-slack]:https://kubernetes.slack.com/archives/C8XRH2R4J
 [contour-contrib]:https://github.com/projectcontour/contour/blob/main/CONTRIBUTING.md
@@ -281,6 +283,13 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 [h1]:https://haproxy-ingress.github.io/
 [h2]:https://haproxy-ingress.github.io/docs/configuration/gateway-api/
 
+### HAProxy Kubernetes Ingress Controller
+
+HAProxy Kubernetes Ingress Controller is an open-source project maintained by HAProxy Technologies that provides fast and efficient traffic management, routing, and observability for Kubernetes. It has built-in support for the Gateway API since version 1.10. The same deployment of the ingress controller will allow you to use both the Ingress API and Gateway API. See the [documentation][haproxytech-docs-gw] for more details. In the [GitHub repository][haproxytech-github-gw], you will also find additional information about supported API resources.
+
+[haproxytech-docs-gw]:https://www.haproxy.com/documentation/kubernetes-ingress/gateway-api/enable-gateway-api/
+[haproxytech-github-gw]:https://github.com/haproxytech/kubernetes-ingress/blob/master/documentation/gateway-api.md
+
 ### HashiCorp Consul
 
 [Consul][consul], by [HashiCorp][hashicorp], is an open source control plane for multi-cloud networking. A single Consul deployment can span bare metal, VM and container environments.
@@ -336,7 +345,7 @@ For help and support with Kong's implementations please feel free to [create an 
 
 ### Kuma
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v0.8.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v0.8.0/kumahq-kuma.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Kuma-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/kumahq-kuma.yaml)
 
 [Kuma][kuma] is an open source service mesh.
 
