@@ -129,7 +129,7 @@ const (
 	SupportHTTPRouteRequestMirror SupportedFeature = "HTTPRouteRequestMirror"
 
 	// This option indicates support for HTTPRoute backend request mirror (extended conformance).
-	SupportHTTPRouteRequestMirrorBackend SupportedFeature = "HTTPRouteRequestMirrorBackend"
+	SupportHTTPRouteBackendRequestMirror SupportedFeature = "HTTPRouteBackendRequestMirror"
 
 	// This option indicates support for multiple RequestMirror filters within the same HTTPRoute rule (extended conformance).
 	SupportHTTPRouteRequestMultipleMirrors SupportedFeature = "HTTPRouteRequestMultipleMirrors"
@@ -157,7 +157,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteHostRewrite,
 	SupportHTTPRoutePathRewrite,
 	SupportHTTPRouteRequestMirror,
-	SupportHTTPRouteRequestMirrorBackend,
+	SupportHTTPRouteBackendRequestMirror,
 	SupportHTTPRouteRequestMultipleMirrors,
 	SupportHTTPRouteRequestTimeout,
 	SupportHTTPRouteBackendTimeout,

@@ -28,18 +28,20 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirror)
-	ConformanceTests = append(ConformanceTests, HTTPRouteRequestMirrorBackend)
+	ConformanceTests = append(ConformanceTests,
+		HTTPRouteRequestMirror,
+		HTTPRouteBackendRequestMirror,
+	)
 }
 
-var HTTPRouteRequestMirrorBackend = suite.ConformanceTest{
-	ShortName:   "HTTPRouteRequestMirrorBackend",
-	Description: "An HTTPRoute with request mirror filter on the backendRef",
+var HTTPRouteBackendRequestMirror = suite.ConformanceTest{
+	ShortName:   "HTTPRouteBackendRequestMirror",
+	Description: "An HTTPRoute backendRef with request mirror filter",
 	Manifests:   []string{"tests/httproute-request-mirror-backend.yaml"},
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteRequestMirrorBackend,
+		suite.SupportHTTPRouteBackendRequestMirror,
 	},
 	Test: HTTPRouteRequestMirror.Test,
 }
