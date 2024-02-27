@@ -111,7 +111,7 @@ const (
 	SupportHTTPRouteResponseHeaderModification SupportedFeature = "HTTPRouteResponseHeaderModification"
 
 	// This option indicates support for HTTPRoute backendRef response header modification (extended conformance).
-	SupportHTTPRouteResponseHeaderModificationBackend SupportedFeature = "HTTPRouteResponseHeaderModificationBackend"
+	SupportHTTPRouteBackendResponseHeaderModification SupportedFeature = "HTTPRouteResponseHeaderModification"
 
 	// This option indicates support for HTTPRoute port redirect (extended conformance).
 	SupportHTTPRoutePortRedirect SupportedFeature = "HTTPRoutePortRedirect"
@@ -151,7 +151,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteQueryParamMatching,
 	SupportHTTPRouteMethodMatching,
 	SupportHTTPRouteResponseHeaderModification,
-	SupportHTTPRouteResponseHeaderModificationBackend,
+	SupportHTTPRouteBackendResponseHeaderModification,
 	SupportHTTPRoutePortRedirect,
 	SupportHTTPRouteSchemeRedirect,
 	SupportHTTPRoutePathRedirect,
