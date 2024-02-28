@@ -19,8 +19,9 @@ package tests
 import (
 	"testing"
 
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
-  	"google.golang.org/grpc/codes"
+
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"

@@ -19,15 +19,15 @@ package tests
 import (
 	"testing"
 
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
-  	"google.golang.org/grpc/codes"
 
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 func init() {
@@ -51,15 +51,15 @@ var GRPCExactMethodMatching = suite.ConformanceTest{
 		testCases := []grpc.ExpectedResponse{
 			{
 				EchoRequest: &pb.EchoRequest{},
-				Backend:   "grpc-infra-backend-v1",
-				Namespace: ns,
+				Backend:     "grpc-infra-backend-v1",
+				Namespace:   ns,
 			}, {
 				EchoTwoRequest: &pb.EchoRequest{},
-				Backend:   "grpc-infra-backend-v2",
-				Namespace: ns,
+				Backend:        "grpc-infra-backend-v2",
+				Namespace:      ns,
 			}, {
 				EchoThreeRequest: &pb.EchoRequest{},
-				Response: grpc.Response{Code: codes.Unimplemented},
+				Response:         grpc.Response{Code: codes.Unimplemented},
 			},
 		}
 

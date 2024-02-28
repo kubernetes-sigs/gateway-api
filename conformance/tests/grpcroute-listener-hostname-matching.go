@@ -19,8 +19,8 @@ package tests
 import (
 	"testing"
 
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
-  	"google.golang.org/grpc/codes"
 
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
 
@@ -61,55 +61,55 @@ var GRPCRouteListenerHostnameMatching = suite.ConformanceTest{
 		)
 
 		testCases := []grpc.ExpectedResponse{{
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "bar.com",
 			},
 			Backend:   "grpc-infra-backend-v1",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "foo.bar.com",
 			},
 			Backend:   "grpc-infra-backend-v2",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "baz.bar.com",
 			},
 			Backend:   "grpc-infra-backend-v3",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "boo.bar.com",
 			},
 			Backend:   "grpc-infra-backend-v3",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "multiple.prefixes.bar.com",
 			},
 			Backend:   "grpc-infra-backend-v3",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "multiple.prefixes.foo.com",
 			},
 			Backend:   "grpc-infra-backend-v3",
 			Namespace: ns,
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "foo.com",
 			},
 			Response: grpc.Response{Code: codes.Unimplemented},
 		}, {
-			EchoRequest:   &pb.EchoRequest{},
+			EchoRequest: &pb.EchoRequest{},
 			RequestMetadata: &grpc.RequestMetadata{
 				Authority: "no.matching.host",
 			},

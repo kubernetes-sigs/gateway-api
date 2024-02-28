@@ -29,6 +29,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
+	"google.golang.org/protobuf/encoding/prototext"
 	"google.golang.org/protobuf/proto"
 
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
@@ -37,17 +38,19 @@ import (
 const ServerAddress = "127.0.0.1"
 
 // Let the kernel resolve an open port so multiple test instances can run concurrently.
-const ServerHTTPPort = 0
-const ServerHTTPSPort = 0
-const RPCTimeout = 10 * time.Second
+const (
+	ServerHTTPPort  = 0
+	ServerHTTPSPort = 0
+	RPCTimeout      = 10 * time.Second
+)
 
 const letters = "abcdefghijklmnopqrstuvwxyz0123456789"
 
-func randStr(length int) string {
+func randStr(length int) string { //nolint:unparam
 	s := ""
 	for i := 0; i < length; i++ {
-		letter := letters[rand.Int()%len(letters)]
-		s = s + string([]byte{letter})
+		letter := letters[rand.Int()%len(letters)] //nolint:gosec // This is test code.
+		s += string([]byte{letter})
 	}
 	return s
 }
@@ -56,7 +59,7 @@ type methodFunc = func(context.Context, pb.GrpcEchoClient, *pb.EchoRequest) (*pb
 
 func clientAndServer(t *testing.T) (pb.GrpcEchoClient, serverConfig, string) {
 	t.Helper()
-	podContext := pb.Context{
+	podContext := &pb.Context{
 		Namespace:   randStr(12),
 		Ingress:     randStr(12),
 		ServiceName: randStr(12),
@@ -86,7 +89,8 @@ func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
 
 	const testHeaderKey = "foo"
 	testHeaderValue := randStr(12)
-	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), RPCTimeout)
+	defer cancel()
 	ctx = metadata.AppendToOutgoingContext(ctx, testHeaderKey, testHeaderValue)
 
 	req := pb.EchoRequest{}
@@ -103,7 +107,7 @@ func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
 	}
 
 	if !proto.Equal(&echoedReq, &req) {
-		t.Fatalf("echoed request did not equal sent request. expected: %v\ngot: %v\n", req, echoedReq)
+		t.Fatalf("echoed request did not equal sent request. expected: %s\ngot: %s\n", prototext.Format(&req), prototext.Format(&echoedReq))
 	}
 
 	if resp.GetAssertions() == nil {
@@ -120,8 +124,8 @@ func testEchoMethod(t *testing.T, methodName string, f methodFunc) {
 		t.Fatalf("serverTarget wrong. expected: %s, got: %s", resp.GetAssertions().GetAuthority(), serverTarget)
 	}
 
-	if resp.GetAssertions().GetContext() == nil || !proto.Equal(resp.GetAssertions().GetContext(), &config.PodContext) {
-		t.Fatalf("podContext wrong. expected %v\ngot: %v", config.PodContext, resp.GetAssertions().GetContext())
+	if resp.GetAssertions().GetContext() == nil || !proto.Equal(resp.GetAssertions().GetContext(), config.PodContext) {
+		t.Fatalf("podContext wrong. expected %s\ngot: %s", prototext.Format(config.PodContext), prototext.Format(resp.GetAssertions().GetContext()))
 	}
 
 	echoedTestHeaderValues := []string{}
@@ -156,7 +160,8 @@ func TestEchoTwoMethod(t *testing.T) {
 
 func TestEchoThreeMethod(t *testing.T) {
 	stub, _, _ := clientAndServer(t)
-	ctx, _ := context.WithTimeout(context.Background(), RPCTimeout)
+	ctx, cancel := context.WithTimeout(context.Background(), RPCTimeout)
+	defer cancel()
 	req := pb.EchoRequest{}
 	resp, err := stub.EchoThree(ctx, &req)
 	if err == nil {

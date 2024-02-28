@@ -46,7 +46,7 @@ type serverConfig struct {
 	//   - INGRESS_NAME
 	//   - SERVICE_NAME
 	//   - POD_NAME
-	PodContext pb.Context
+	PodContext *pb.Context
 
 	// Controlled by TLS_SERVER_CERT env var
 	TLSServerCert string
@@ -62,7 +62,7 @@ type echoServer struct {
 	pb.UnimplementedGrpcEchoServer
 	fullService string
 	tls         bool
-	podContext  pb.Context
+	podContext  *pb.Context
 }
 
 func fullMethod(svc, method string) string {
@@ -73,7 +73,7 @@ func (s *echoServer) fullMethod(method string) string {
 	return fullMethod(s.fullService, method)
 }
 
-func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoRequest) (*pb.EchoResponse, error) {
+func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoRequest) (*pb.EchoResponse, error) { //nolint:revive // Method signature is determined by gRPC.
 	connectionType := "plaintext"
 	if s.tls {
 		connectionType = "TLS"
@@ -82,7 +82,7 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 	mdElems, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		msg := "Failed to retrieve metadata from incoming request.\n"
-		fmt.Printf(msg)
+		fmt.Print(msg)
 		return nil, fmt.Errorf(msg)
 	}
 	authority := ""
@@ -103,7 +103,7 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 			FullyQualifiedMethod: s.fullMethod(methodName),
 			Headers:              headers,
 			Authority:            authority,
-			Context:              &s.podContext,
+			Context:              s.podContext,
 		},
 	}
 	if s.tls {
@@ -112,13 +112,13 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 		p, ok := peer.FromContext(ctx)
 		if !ok {
 			msg := "Failed to retrieve auth info from request\n"
-			fmt.Printf(msg)
+			fmt.Print(msg)
 			return nil, fmt.Errorf(msg)
 		}
 		tlsInfo, ok := p.AuthInfo.(credentials.TLSInfo)
 		if !ok {
 			msg := "Failed to retrieve TLS info from request\n"
-			fmt.Printf(msg)
+			fmt.Print(msg)
 			return nil, fmt.Errorf(msg)
 		}
 		switch tlsInfo.State.Version {
@@ -139,11 +139,15 @@ func (s *echoServer) doEcho(methodName string, ctx context.Context, in *pb.EchoR
 		// Convert peer certificates to PEM blocks.
 		for _, c := range tlsInfo.State.PeerCertificates {
 			var out strings.Builder
-			pem.Encode(&out, &pem.Block{
+			err := pem.Encode(&out, &pem.Block{
 				Type:  "CERTIFICATE",
 				Bytes: c.Raw,
 			})
-			tlsAssertions.PeerCertificates = append(tlsAssertions.PeerCertificates, out.String())
+			if err != nil {
+				fmt.Printf("failed to encode certificate: %v\n", err)
+			} else {
+				tlsAssertions.PeerCertificates = append(tlsAssertions.PeerCertificates, out.String())
+			}
 		}
 		resp.Assertions.TlsAssertions = tlsAssertions
 	}
@@ -158,7 +162,7 @@ func (s *echoServer) EchoTwo(ctx context.Context, in *pb.EchoRequest) (*pb.EchoR
 	return s.doEcho("EchoTwo", ctx, in)
 }
 
-func runServer(config serverConfig) (int, int) {
+func runServer(config serverConfig) (int, int) { //nolint:unparam
 	svcs := pb.File_grpcecho_proto.Services()
 	svcd := svcs.ByName("GrpcEcho")
 	if svcd == nil {
@@ -173,16 +177,21 @@ func runServer(config serverConfig) (int, int) {
 		fmt.Printf("failed to listen: %v\n", err)
 		os.Exit(1)
 	}
-	resolvedHttpPort := lis.Addr().(*net.TCPAddr).Port
+	resolvedHTTPPort := lis.Addr().(*net.TCPAddr).Port
 	s := grpc.NewServer()
 	pb.RegisterGrpcEchoServer(s, &echoServer{fullService: fullService, tls: false, podContext: config.PodContext})
 	reflection.Register(s)
 
 	fmt.Printf("plaintext server listening at %v\n", lis.Addr())
 
-	go s.Serve(lis)
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			fmt.Printf("failed to serve: %v\n", err)
+			os.Exit(1)
+		}
+	}()
 
-	resolvedHttpsPort := -1
+	resolvedHTTPSPort := -1
 	if config.TLSServerCert != "" && config.TLSServerPrivKey != "" {
 		// Set up TLS server.
 		creds, err := credentials.NewServerTLSFromFile(config.TLSServerCert, config.TLSServerPrivKey)
@@ -195,20 +204,26 @@ func runServer(config serverConfig) (int, int) {
 			fmt.Printf("failed to listen: %v\n", err)
 			os.Exit(1)
 		}
-		resolvedHttpsPort = secureListener.Addr().(*net.TCPAddr).Port
+		resolvedHTTPSPort = secureListener.Addr().(*net.TCPAddr).Port
 		secureServer := grpc.NewServer(grpc.Creds(creds))
 		pb.RegisterGrpcEchoServer(secureServer, &echoServer{fullService: fullService, tls: true, podContext: config.PodContext})
 		reflection.Register(secureServer)
 
 		fmt.Printf("secure server listening at %v\n", secureListener.Addr())
-		go secureServer.Serve(secureListener)
+		go func() {
+			err := secureServer.Serve(secureListener)
+			if err != nil {
+				fmt.Printf("failed to serve: %v\n", err)
+				os.Exit(1)
+			}
+		}()
 	}
 
-	return resolvedHttpPort, resolvedHttpsPort
+	return resolvedHTTPPort, resolvedHTTPSPort
 }
 
-func GRPCMain() {
-	podContext := pb.Context{
+func Main() {
+	podContext := &pb.Context{
 		Namespace:   os.Getenv("NAMESPACE"),
 		Ingress:     os.Getenv("INGRESS_NAME"),
 		ServiceName: os.Getenv("SERVICE_NAME"),

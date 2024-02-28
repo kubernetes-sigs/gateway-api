@@ -36,8 +36,10 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 )
 
-const echoServerPackage = "gateway_api_conformance.echo_basic.grpcecho"
-const echoServerService = "GrpcEcho"
+const (
+	echoServerPackage = "gateway_api_conformance.echo_basic.grpcecho"
+	echoServerService = "GrpcEcho"
+)
 
 type Response struct {
 	Code     codes.Code
@@ -77,12 +79,12 @@ type ExpectedResponse struct {
 }
 
 func getMethodName(expected *ExpectedResponse) string {
-	if expected.EchoRequest != nil {
+	switch {
+	case expected.EchoRequest != nil:
 		return "Echo"
-	} else if expected.EchoTwoRequest != nil {
+	case expected.EchoTwoRequest != nil:
 		return "EchoTwo"
-
-	} else {
+	default:
 		return "EchoThree"
 	}
 }
@@ -185,16 +187,16 @@ func (c *client) SendRPC(t *testing.T, address string, expected ExpectedResponse
 	stub := pb.NewGrpcEchoClient(c.Conn)
 	var err error
 	t.Logf("Sending RPC")
-	if expected.EchoRequest != nil {
+
+	switch {
+	case expected.EchoRequest != nil:
 		resp.Response, err = stub.Echo(ctx, expected.EchoRequest, grpc.Header(resp.Headers), grpc.Trailer(resp.Trailers))
-	} else if expected.EchoTwoRequest != nil {
+	case expected.EchoTwoRequest != nil:
 		resp.Response, err = stub.EchoTwo(ctx, expected.EchoTwoRequest, grpc.Header(resp.Headers), grpc.Trailer(resp.Trailers))
-
-	} else if expected.EchoThreeRequest != nil {
+	case expected.EchoThreeRequest != nil:
 		resp.Response, err = stub.EchoThree(ctx, expected.EchoThreeRequest, grpc.Header(resp.Headers), grpc.Trailer(resp.Trailers))
-
-	} else {
-		return resp, fmt.Errorf("No request specified.")
+	default:
+		return resp, fmt.Errorf("no request specified")
 	}
 
 	if err != nil {

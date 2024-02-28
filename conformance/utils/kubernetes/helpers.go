@@ -388,7 +388,6 @@ func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig
 	return gwAddr
 }
 
-
 // GatewayAndHTTPRoutesMustBeAccepted waits until:
 //  1. The specified Gateway has an IP address assigned to it.
 //  2. The route has a ParentRef referring to the Gateway.
