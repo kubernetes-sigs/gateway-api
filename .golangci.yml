@@ -27,7 +27,6 @@ linters:
   - whitespace
   disable:
   - scopelint
-  - testifylint # To many false positives https://github.com/Antonboom/testifylint/issues/67
   disable-all: false
   presets:
   - bugs
@@ -66,5 +65,9 @@ issues:
         - gocyclo
         - errcheck
         - dupl
+     # To many false positives - for examples see: https://github.com/Antonboom/testifylint/issues/67
+    - linters:
+      - testifylint
+      text: "require must only be used in the goroutine running the test function"
   exclude:
     - Using the variable on range scope `tc` in function literal
