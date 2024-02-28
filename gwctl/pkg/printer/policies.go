@@ -19,6 +19,7 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -125,7 +126,8 @@ func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Fprint(pp.Out, string(b))
 		}
