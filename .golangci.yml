@@ -27,6 +27,7 @@ linters:
   - whitespace
   disable:
   - scopelint
+  - testifylint # To many false positives https://github.com/Antonboom/testifylint/issues/67
   disable-all: false
   presets:
   - bugs
