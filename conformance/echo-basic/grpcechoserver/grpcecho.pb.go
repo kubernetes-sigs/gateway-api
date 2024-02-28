@@ -18,6 +18,8 @@
 // 	protoc        v4.22.2
 // source: grpcecho.proto
 
+// This package name should in general be kept in sync with the directory in which it lives.
+
 package grpcechoserver
 
 import (
