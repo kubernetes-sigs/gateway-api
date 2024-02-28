@@ -6,7 +6,7 @@ metadata:
   name: cross-namespace-tls-gateway
   namespace: gateway-api-example-ns1
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   listeners:
   - name: https
     protocol: HTTPS

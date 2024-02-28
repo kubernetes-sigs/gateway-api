@@ -3,7 +3,7 @@ kind: Gateway
 metadata:
   name: invalid-listener-name
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   listeners:
   - name: bad>
     protocol: HTTP
