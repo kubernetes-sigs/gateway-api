@@ -94,10 +94,8 @@ var HTTPRouteListenerPortMatching = suite.ConformanceTest{
 					switch hostport[1] {
 					case "8080":
 						gwAddr = gwAddr8080
-						break
 					case "8090":
 						gwAddr = gwAddr8090
-						break
 					}
 				}
 				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
