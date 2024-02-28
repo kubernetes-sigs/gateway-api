@@ -65,7 +65,7 @@ issues:
         - gocyclo
         - errcheck
         - dupl
-     # To many false positives - for examples see: https://github.com/Antonboom/testifylint/issues/67
+     # Too many false positives - for examples see: https://github.com/Antonboom/testifylint/issues/67
     - linters:
       - testifylint
       text: "require must only be used in the goroutine running the test function"
