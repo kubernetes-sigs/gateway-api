@@ -60,7 +60,7 @@ var HTTPRouteTimeoutBackendRequest = suite.ConformanceTest{
 				Response:  http.Response{StatusCode: 504},
 				Namespace: ns,
 			}, {
-				Request:   http.Request{Path: "/disable-backend-timeout?delay=2s"},
+				Request:   http.Request{Path: "/disable-backend-timeout?delay=1s"},
 				Response:  http.Response{StatusCode: 200},
 				Namespace: ns,
 			},
