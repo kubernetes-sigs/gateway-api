@@ -205,7 +205,7 @@ func TestValidateGateway(t *testing.T) {
 			wantErrors: []string{"hostname must not be specified for protocols ['TCP', 'UDP']"},
 		},
 		{
-			desc: "certificateRefs not set with https protocol and TLS terminate mode",
+			desc: "certificateRefs not set with HTTPS protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1.Gateway) {
 				tlsMode := gatewayv1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1.Listener{
@@ -219,9 +219,10 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
+			wantErrors: []string{"certificateRefs or options must be specified when mode is Terminate"},
 		},
 		{
-			desc: "certificateRefs not set with tls protocol and TLS terminate mode",
+			desc: "certificateRefs not set with TLS protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1.Gateway) {
 				tlsMode := gatewayv1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1.Listener{
@@ -235,9 +236,29 @@ func TestValidateGateway(t *testing.T) {
 					},
 				}
 			},
+			wantErrors: []string{"certificateRefs or options must be specified when mode is Terminate"},
 		},
 		{
-			desc: "certificateRefs set with tls protocol and TLS terminate mode",
+			desc: "certificateRefs set with HTTPS protocol and TLS terminate mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
+							Mode: &tlsMode,
+							CertificateRefs: []gatewayv1.SecretObjectReference{
+								{Name: gatewayv1.ObjectName("foo")},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			desc: "certificateRefs set with TLS protocol and TLS terminate mode",
 			mutate: func(gw *gatewayv1.Gateway) {
 				tlsMode := gatewayv1.TLSModeType("Terminate")
 				gw.Spec.Listeners = []gatewayv1.Listener{
@@ -249,6 +270,44 @@ func TestValidateGateway(t *testing.T) {
 							Mode: &tlsMode,
 							CertificateRefs: []gatewayv1.SecretObjectReference{
 								{Name: gatewayv1.ObjectName("foo")},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			desc: "options set with HTTPS protocol and TLS terminate mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("https"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
+							Mode: &tlsMode,
+							Options: map[gatewayv1.AnnotationKey]gatewayv1.AnnotationValue{
+								"networking.example.com/tls-version": "1.2",
+							},
+						},
+					},
+				}
+			},
+		},
+		{
+			desc: "options set with tls protocol and TLS terminate mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
+							Mode: &tlsMode,
+							Options: map[gatewayv1.AnnotationKey]gatewayv1.AnnotationValue{
+								"networking.example.com/tls-version": "1.2",
 							},
 						},
 					},

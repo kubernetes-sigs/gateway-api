@@ -672,6 +672,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs or options must be specified when
+                          mode is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 || size(self.options) > 0 : true'
                   required:
                   - name
                   - port
@@ -1698,6 +1703,11 @@ spec:
                           maxProperties: 16
                           type: object
                       type: object
+                      x-kubernetes-validations:
+                      - message: certificateRefs or options must be specified when
+                          mode is Terminate
+                        rule: 'self.mode == ''Terminate'' ? size(self.certificateRefs)
+                          > 0 || size(self.options) > 0 : true'
                   required:
                   - name
                   - port

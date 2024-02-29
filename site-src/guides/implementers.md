@@ -211,7 +211,7 @@ certificate stored by the external `vendor.example.com` TLS Certificate
 provider.
 
 #### 2. Automatically generated TLS certs that are populated later
-Many users would prefer that TLS certs were automatically generated on their
+Many users would prefer that TLS certs will be automatically generated on their
 behalf. One potential implementation of that would involve a controller that
 watches Gateways and HTTPRoutes, generates TLS certs, and attaches them to the
 Gateway. Depending on the implementation details, Gateway owners may need to
