@@ -251,6 +251,15 @@ We plan on introducing a new type `GatewayStatusAddress` and change Gateway's `s
 It is RECOMMENDED that in-cluster gateways SHOULD NOT support 'Private' routability. Kubernetes doesn't have
 a concept of 'Private' routability for Services. In the future this may change upstream.
 
+#### Interaction with Multi-Network Kubernetes
+
+[Multi-Network Kubernetes](https://github.com/kubernetes/enhancements/pull/3700) 
+is a sibling SIG working on adding multi-network support to Pods. After reaching out and having a discussion with about this GEP
+the consensus is that a Gateway most likely in the future can be tied to a single PodNetwork. Defining this is out of scope for this GEP.
+
+A second consensus is the Routabilities defined in this GEP don't impact PodNetworks but instead are indicators to LB implementations
+on how they should behave.
+
 ## Examples
 
 #### 1. Request a GatewayAddress that is routable within the same cluster
