@@ -546,7 +546,7 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 func RouteTypeMustHaveParentsField(t *testing.T, routeType any) string {
 	t.Helper()
 	routeTypePointerObj := reflect.TypeOf(routeType)
-	require.Equal(t, routeTypePointerObj.Kind(), reflect.Pointer)
+	require.Equal(t, reflect.Pointer, routeTypePointerObj.Kind())
 
 	routeTypeObj := routeTypePointerObj.Elem()
 	routeTypeName := routeTypeObj.Name()
