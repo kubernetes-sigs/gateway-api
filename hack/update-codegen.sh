@@ -171,6 +171,7 @@ echo "GOPATH: $GOPATH"
 echo "PATH: $PATH"
 
 (cd conformance/echo-basic && \
+  export PATH="$PATH:$GOPATH/bin" && \
   "${PROTOC_BINARY}" --go_out=grpcechoserver --go_opt=paths=source_relative \
     --go-grpc_out=grpcechoserver --go-grpc_opt=paths=source_relative \
     grpcecho.proto
