@@ -260,6 +260,31 @@ func TestValidateGateway(t *testing.T) {
 			},
 		},
 		{
+			desc: "ClientValidation and CertificateRefs set with tls protocol and TLS terminate mode",
+			mutate: func(gw *gatewayv1.Gateway) {
+				tlsMode := gatewayv1.TLSModeType("Terminate")
+				gw.Spec.Listeners = []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("tls"),
+						Protocol: gatewayv1.TLSProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+						TLS: &gatewayv1.GatewayTLSConfig{
+							Mode: &tlsMode,
+							CertificateRefs: []gatewayv1.SecretObjectReference{
+								{Name: gatewayv1.ObjectName("foo")},
+							},
+							ClientValidation: &gatewayv1.ClientValidationContext{
+								CACertificateRefs: []gatewayv1.SecretObjectReference{
+									{Name: gatewayv1.ObjectName("bar")},
+								},
+								SubjectAltNames: []string{"some-id"},
+							},
+						},
+					},
+				}
+			},
+		},
+		{
 			desc: "names are not unique within the Gateway",
 			mutate: func(gw *gatewayv1.Gateway) {
 				gw.Spec.Listeners = []gatewayv1.Listener{

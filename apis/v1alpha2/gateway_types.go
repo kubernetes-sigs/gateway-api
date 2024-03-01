@@ -94,6 +94,11 @@ type ProtocolType = v1.ProtocolType
 // +k8s:deepcopy-gen=false
 type GatewayTLSConfig = v1.GatewayTLSConfig
 
+// ClientValidationContext holds configuration that can be used to validate the client intiating the TLS connection
+// to the Gateway.
+// +k8s:deepcopy-gen=false
+type ClientValidationContext = v1.ClientValidationContext
+
 // TLSModeType type defines how a Gateway handles TLS sessions.
 //
 // Note that values may be added to this enum, implementations
