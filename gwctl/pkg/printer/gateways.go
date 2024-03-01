@@ -21,18 +21,18 @@ import (
 	"io"
 	"strings"
 	"text/tabwriter"
-	"time"
-
-	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
+	"sigs.k8s.io/yaml"
+	
 	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 )
 
 type GatewaysPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 type gatewayDescribeView struct {
@@ -74,7 +74,7 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			}
 		}
 
-		age := duration.HumanDuration(time.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
+		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
 
 		row := []string{
 			gatewayNode.Gateway.GetName(),
