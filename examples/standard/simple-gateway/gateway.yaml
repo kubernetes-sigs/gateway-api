@@ -6,7 +6,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   listeners:
   - protocol: HTTP
     port: 80
