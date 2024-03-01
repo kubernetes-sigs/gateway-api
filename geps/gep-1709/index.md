@@ -667,7 +667,7 @@ The following are items that **MUST** be resolved to move this GEP to
     phase. In the same timespan the Network Policy group has started using our
     test suite and APIs as well, so it seems the overall approach has obvious
     merit, and doesn't appear to be redundant.
-- [ ] Finalize the report organization structure based on feedback during the
+- [x] Finalize the report organization structure based on feedback during the
   experimental phase.
 - [ ] Base documentation must exist for implementations to run the tests via
   the CLI and via the Golang library.

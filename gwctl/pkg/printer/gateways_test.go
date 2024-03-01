@@ -26,6 +26,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	testingclock "k8s.io/utils/clock/testing"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
@@ -35,6 +36,7 @@ import (
 )
 
 func TestGatewaysPrinter_Print(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -50,7 +52,7 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gateway",
 				CreationTimestamp: metav1.Time{
-					Time: time.Now().Add(-time.Second),
+					Time: fakeClock.Now().Add(-time.Second),
 				},
 			},
 			Spec: gatewayv1.GatewaySpec{
@@ -90,7 +92,8 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Out: params.Out,
+		Out:   params.Out,
+		Clock: fakeClock,
 	}
 	gp.Print(resourceModel)
 
@@ -106,6 +109,7 @@ foo-gateway  foo-gatewayclass  10.0.0.1   80     True        1s
 }
 
 func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -240,7 +244,8 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Out: params.Out,
+		Out:   params.Out,
+		Clock: fakeClock,
 	}
 	gp.PrintDescribeView(resourceModel)
 

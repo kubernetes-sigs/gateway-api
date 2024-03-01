@@ -22,6 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/utils/clock"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
@@ -66,7 +68,8 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		K8sClients:    params.K8sClients,
 		PolicyManager: params.PolicyManager,
 	}
-	gwPrinter := &printer.GatewaysPrinter{Out: params.Out}
+	realClock := clock.RealClock{}
+	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
 
