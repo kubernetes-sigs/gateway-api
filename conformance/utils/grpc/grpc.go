@@ -226,16 +226,16 @@ func compareResponse(expected *ExpectedResponse, response *Response) error {
 	}
 	if response.Code == codes.OK {
 		expectedFullyQualifiedMethod := getFullyQualifiedMethod(expected)
-		if expectedFullyQualifiedMethod != response.Response.Assertions.FullyQualifiedMethod {
-			return fmt.Errorf("expected path to be %s, got %s ", expectedFullyQualifiedMethod, response.Response.Assertions.FullyQualifiedMethod)
+		if expectedFullyQualifiedMethod != response.Response.GetAssertions().GetFullyQualifiedMethod() {
+			return fmt.Errorf("expected path to be %s, got %s ", expectedFullyQualifiedMethod, response.Response.GetAssertions().GetFullyQualifiedMethod())
 		}
 
-		if expected.Namespace != "" && expected.Namespace != response.Response.Assertions.Context.Namespace {
-			return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, response.Response.Assertions.Context.Namespace)
+		if expected.Namespace != "" && expected.Namespace != response.Response.GetAssertions().GetContext().GetNamespace() {
+			return fmt.Errorf("expected namespace to be %s, got %s", expected.Namespace, response.Response.GetAssertions().GetContext().GetNamespace())
 		}
 
-		if !strings.HasPrefix(response.Response.Assertions.Context.Pod, expected.Backend) {
-			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, response.Response.Assertions.Context.Pod)
+		if !strings.HasPrefix(response.Response.GetAssertions().GetContext().GetPod(), expected.Backend) {
+			return fmt.Errorf("expected pod name to start with %s, got %s", expected.Backend, response.Response.GetAssertions().GetContext().GetPod())
 		}
 	}
 	return nil
