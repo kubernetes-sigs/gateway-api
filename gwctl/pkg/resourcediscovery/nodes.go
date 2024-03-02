@@ -248,11 +248,14 @@ func (b *BackendNode) ID() backendID {
 	)
 }
 
-// HTTPRouteNode models the relationships and dependencies of a Namespace.
+// NamespaceNode models the relationships and dependencies of a Namespace.
 type NamespaceNode struct {
 	// NamespaceName identifies the Namespace.
 	NamespaceName string
 
+	Labels      map[string]string
+	Annotations map[string]string
+	Status      string
 	// Gateways lists Gateways deployed within the Namespace.
 	Gateways map[gatewayID]*GatewayNode
 	// HTTPRoutes lists HTTPRoutes configured within the Namespace.
@@ -269,6 +272,8 @@ func NewNamespaceNode(namespaceName string) *NamespaceNode {
 	}
 	return &NamespaceNode{
 		NamespaceName: namespaceName,
+		Labels:        make(map[string]string),
+		Annotations:   make(map[string]string),
 		Gateways:      make(map[gatewayID]*GatewayNode),
 		HTTPRoutes:    make(map[httpRouteID]*HTTPRouteNode),
 		Backends:      make(map[backendID]*BackendNode),

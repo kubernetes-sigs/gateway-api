@@ -18,6 +18,7 @@ package resourcediscovery
 
 import (
 	"context"
+	"fmt"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -128,6 +129,36 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	d.discoverPolicies(ctx, resourceModel)
 
 	resourceModel.calculateEffectivePolicies()
+
+	return resourceModel, nil
+}
+
+func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel, error) {
+	ctx := context.Background()
+	resourceModel := &ResourceModel{}
+
+	namespaces, err := fetchNamespace(ctx, d.K8sClients, filter)
+	if err != nil {
+		return resourceModel, err
+	}
+
+	fmt.Println("Fetched namespaces: ", namespaces)
+	var namespaceNameList []string
+	for _, namespace := range namespaces {
+		for key, value := range namespace.Object {
+			if key == "metadata" {
+				metadata, _ := value.(map[string]interface{})
+				namespaceName, _ := metadata["name"].(string)
+				namespaceNameList = append(namespaceNameList, namespaceName)
+			}
+		}
+	}
+	resourceModel.addNamespace(namespaceNameList...)
+
+	// d.discoverNamespaces(ctx, resourceModel)
+	// d.discoverPolicies(ctx, resourceModel)
+
+	// resourceModel.calculateEffectivePolicies()
 
 	return resourceModel, nil
 }
@@ -355,4 +386,34 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 	}
 
 	return backendsList.Items, nil
+}
+
+// fetchNamespace fetches Namespaces based on a filter.
+func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]unstructured.Unstructured, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    "",
+		Version:  "v1",
+		Resource: "namespaces",
+	}
+
+	if filter.Name != "" {
+		// Use Get call
+		namespace, err := k8sClients.DC.Resource(gvr).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
+			return []unstructured.Unstructured{}, err
+		}
+		return []unstructured.Unstructured{*namespace}, nil
+	}
+
+	// Use List call.
+	listOptions := metav1.ListOptions{
+		LabelSelector: labels.SelectorFromSet(filter.Labels).String(),
+	}
+	var namespacesList *unstructured.UnstructuredList
+	namespacesList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	if err != nil {
+		return nil, err
+	}
+
+	return namespacesList.Items, nil
 }
