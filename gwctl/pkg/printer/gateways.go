@@ -19,13 +19,14 @@ package printer
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 	"sigs.k8s.io/yaml"
-	
+
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 )
@@ -50,7 +51,19 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
 	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 
+	gatewayNodes := make([]*resourcediscovery.GatewayNode, 0, len(resourceModel.Gateways))
 	for _, gatewayNode := range resourceModel.Gateways {
+		gatewayNodes = append(gatewayNodes, gatewayNode)
+	}
+
+	sort.Slice(gatewayNodes, func(i, j int) bool {
+		if gatewayNodes[i].Gateway.GetName() != gatewayNodes[j].Gateway.GetName() {
+			return gatewayNodes[i].Gateway.GetName() < gatewayNodes[j].Gateway.GetName()
+		}
+		return gatewayNodes[i].Gateway.Spec.GatewayClassName < gatewayNodes[j].Gateway.Spec.GatewayClassName
+	})
+
+	for _, gatewayNode := range gatewayNodes {
 		var addresses []string
 		for _, address := range gatewayNode.Gateway.Status.Addresses {
 			addresses = append(addresses, address.Value)
