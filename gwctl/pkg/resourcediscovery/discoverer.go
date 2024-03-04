@@ -18,7 +18,6 @@ package resourcediscovery
 
 import (
 	"context"
-	"fmt"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -26,6 +25,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/relations"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
@@ -133,6 +133,7 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	return resourceModel, nil
 }
 
+// DiscoverResourcesForNamespace discovers resources related to a Namespace.
 func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel, error) {
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
@@ -142,23 +143,9 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 		return resourceModel, err
 	}
 
-	fmt.Println("Fetched namespaces: ", namespaces)
-	var namespaceNameList []string
-	for _, namespace := range namespaces {
-		for key, value := range namespace.Object {
-			if key == "metadata" {
-				metadata, _ := value.(map[string]interface{})
-				namespaceName, _ := metadata["name"].(string)
-				namespaceNameList = append(namespaceNameList, namespaceName)
-			}
-		}
-	}
-	resourceModel.addNamespace(namespaceNameList...)
+	resourceModel.addNamespaceWithLabelsAnnotationsStatus(namespaces...)
 
-	// d.discoverNamespaces(ctx, resourceModel)
-	// d.discoverPolicies(ctx, resourceModel)
-
-	// resourceModel.calculateEffectivePolicies()
+	d.discoverPolicies(ctx, resourceModel)
 
 	return resourceModel, nil
 }
@@ -269,6 +256,9 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 		resourceModel.addNamespace(backendNode.Backend.GetNamespace())
 		resourceModel.connectBackendWithNamespace(backendID, NamespaceID(backendNode.Backend.GetNamespace()))
 	}
+	// for namespaceID, namespaceNode := range resourceModel.Namespaces {
+	// 	fmt.Println("namespace fire:", namespaceID, namespaceNode, "\n")
+	// }
 }
 
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
@@ -389,30 +379,26 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 }
 
 // fetchNamespace fetches Namespaces based on a filter.
-func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]unstructured.Unstructured, error) {
-	gvr := schema.GroupVersionResource{
-		Group:    "",
-		Version:  "v1",
-		Resource: "namespaces",
-	}
-
+func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]corev1.Namespace, error) {
 	if filter.Name != "" {
-		// Use Get call
-		namespace, err := k8sClients.DC.Resource(gvr).Get(ctx, filter.Name, metav1.GetOptions{})
+		// Use Get call.
+		namespace := &corev1.Namespace{}
+		nn := apimachinerytypes.NamespacedName{Name: filter.Name}
+		err := k8sClients.Client.Get(ctx, nn, namespace)
 		if err != nil {
-			return []unstructured.Unstructured{}, err
+			return []corev1.Namespace{}, err
 		}
-		return []unstructured.Unstructured{*namespace}, nil
+		return []corev1.Namespace{*namespace}, nil
 	}
 
 	// Use List call.
-	listOptions := metav1.ListOptions{
-		LabelSelector: labels.SelectorFromSet(filter.Labels).String(),
+	options := &client.ListOptions{
+		Namespace:     filter.Namespace,
+		LabelSelector: labels.SelectorFromSet(filter.Labels),
 	}
-	var namespacesList *unstructured.UnstructuredList
-	namespacesList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
-	if err != nil {
-		return nil, err
+	namespacesList := &corev1.NamespaceList{}
+	if err := k8sClients.Client.List(ctx, namespacesList, options); err != nil {
+		return []corev1.Namespace{}, err
 	}
 
 	return namespacesList.Items, nil

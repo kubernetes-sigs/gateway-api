@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/klog/v2"
 )
@@ -255,7 +256,8 @@ type NamespaceNode struct {
 
 	Labels      map[string]string
 	Annotations map[string]string
-	Status      string
+	Status      corev1.NamespaceStatus
+
 	// Gateways lists Gateways deployed within the Namespace.
 	Gateways map[gatewayID]*GatewayNode
 	// HTTPRoutes lists HTTPRoutes configured within the Namespace.

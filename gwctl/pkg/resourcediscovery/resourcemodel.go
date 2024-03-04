@@ -73,6 +73,21 @@ func (rm *ResourceModel) addNamespace(namespaces ...string) {
 	}
 }
 
+func (rm *ResourceModel) addNamespaceWithLabelsAnnotationsStatus(namespaces ...corev1.Namespace) {
+	if rm.Namespaces == nil {
+		rm.Namespaces = make(map[namespaceID]*NamespaceNode)
+	}
+	for _, namespace := range namespaces {
+		namespaceNode := NewNamespaceNode(namespace.Name)
+		namespaceNode.Labels = namespace.GetLabels()
+		namespaceNode.Annotations = namespace.GetAnnotations()
+		namespaceNode.Status = namespace.Status
+		if _, ok := rm.Namespaces[namespaceNode.ID()]; !ok {
+			rm.Namespaces[namespaceNode.ID()] = namespaceNode
+		}
+	}
+}
+
 // addGateways adds nodes for Gateways.
 func (rm *ResourceModel) addGateways(gateways ...gatewayv1.Gateway) {
 	if rm.Gateways == nil {
