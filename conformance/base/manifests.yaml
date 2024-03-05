@@ -48,6 +48,19 @@ spec:
         kind: Secret
         name: tls-validity-checks-certificate
         namespace: gateway-conformance-infra
+  - name: https-with-hostname
+    port: 443
+    hostname: second-example.org
+    protocol: HTTPS
+    allowedRoutes:
+      namespaces:
+        from: Same
+    tls:
+      certificateRefs:
+      - group: ""
+        kind: Secret
+        name: tls-validity-checks-certificate
+        namespace: gateway-conformance-infra
 ---
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
