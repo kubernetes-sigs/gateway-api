@@ -30,12 +30,12 @@ cover, and documentation to help users get started.
 - [Kong][10] (GA)
 - [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
+- [ngrok][33] (beta)
 - [NGINX Gateway Fabric][12] (GA)
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
 - [WSO2 APK][25] (GA)
-- [ngrok][33] (beta)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
