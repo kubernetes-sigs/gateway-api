@@ -64,6 +64,23 @@ var GatewayExtendedFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
+// Features - Gateway Conformance (Experimental)
+// -----------------------------------------------------------------------------
+
+const (
+	// SupportGatewayInfrastructureMetadata option indicates that the Gateway is capable
+	// having annotations and labels which are propagated to underlying resources
+	SupportGatewayInfrastructureMetadata SupportedFeature = "GatewayInfrastructureMetadata"
+)
+
+// GatewayExperimentalFeatures includes all the supported experimental features, currently only
+// available in our experimental release channel.
+// Implementations have the flexibility to opt-in for either specific features or the entire set.
+var GatewayExperimentalFeatures = sets.New(
+	SupportGatewayInfrastructureMetadata,
+)
+
+// -----------------------------------------------------------------------------
 // Features - ReferenceGrant Conformance (Core)
 // -----------------------------------------------------------------------------
 
@@ -255,6 +272,7 @@ var GRPCRouteCoreFeatures = sets.New(
 // NOTE: as new feature sets are added they should be inserted into this set.
 var AllFeatures = sets.New[SupportedFeature]().
 	Insert(GatewayCoreFeatures.UnsortedList()...).
+	Insert(GatewayExperimentalFeatures.UnsortedList()...).
 	Insert(GatewayExtendedFeatures.UnsortedList()...).
 	Insert(ReferenceGrantCoreFeatures.UnsortedList()...).
 	Insert(HTTPRouteCoreFeatures.UnsortedList()...).
