@@ -1,0 +1,17 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: gateway-infra-metadata
+  namespace: gateway-conformance-infra
+spec:
+  gatewayClassName: "{GATEWAY_CLASS_NAME}"
+  infrastructure:
+    labels:
+      label-key: label-value
+    annotations:
+      annotation-key: annotation-value
+  listeners:
+  - name: http
+    port: 8080
+    protocol: HTTP
