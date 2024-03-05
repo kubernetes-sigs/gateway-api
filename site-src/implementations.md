@@ -404,8 +404,8 @@ You can read our [docs][ngrok-k8s-gwapi-docs] or [quickstart guide][ngrok-k8s-gw
 
 [ngrok-k8s-operator]:https://github.com/ngrok/kubernetes-ingress-controller
 [ngrok]:https://ngrok.com
-[ngrok-k8s-gwapi-docs]:https://ngrok.com
-[ngrok-k8s-gwapi-qs]:https://ngrok.com
+[ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
+[ngrok-k8s-gwapi-qs]:https://ngrok.com/docs/k8s/
 [ngrok-issue-new]: https://github.com/ngrok/kubernetes-ingress-controller/issues/new
 [ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
