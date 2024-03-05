@@ -28,17 +28,17 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteTLSListener)
+	ConformanceTests = append(ConformanceTests, HTTPRouteHTTPSListener)
 }
 
-var HTTPRouteTLSListener = suite.ConformanceTest{
-	ShortName:   "HTTPRouteTLSListener",
-	Description: "HTTPRoute attaches to a Gateway's TLS listener in the same namespace",
+var HTTPRouteHTTPSListener = suite.ConformanceTest{
+	ShortName:   "HTTPRouteHTTPSListener",
+	Description: "HTTPRoute attaches to a Gateway's HTTPS listener in the same namespace",
 	Features: []suite.SupportedFeature{
 		suite.SupportGateway,
 		suite.SupportHTTPRoute,
 	},
-	Manifests: []string{"tests/httproute-tls-listener.yaml"},
+	Manifests: []string{"tests/httproute-https-listener.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "httproute-https-test", Namespace: ns}
