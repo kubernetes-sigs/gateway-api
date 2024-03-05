@@ -1,0 +1,96 @@
+// Copyright 2024 The Kubernetes Authors.
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+syntax = "proto3";
+
+option go_package = "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver";
+
+// This package name should in general be kept in sync with the directory in which it lives.
+package gateway_api_conformance.echo_basic.grpcecho;
+
+message Header {
+	string key = 1;
+	string value = 2;
+}
+
+message Context {
+	// The Kubernetes namespace in which this server is running. Populated by the
+	// NAMESPACE environment variable.
+	string namespace = 1;
+
+	// The name of the ingress controller under test. Populated by the INGRESS_NAME
+	// environment variable.
+	string ingress = 2;
+
+	// The name service cannot be used here since it is a reserved word. Populated by the
+	// SERVICE_NAME environment variable.
+	string service_name = 3;
+
+	// The name of the pod in which this server is running. Populated by the POD_NAME
+	// environment variable.
+	string pod = 4;
+}
+
+message TLSAssertions {
+	// The TLS version used by the connection, e.g. "TLSv1.3"
+	string version = 1;
+
+	// The negotatiated protocol.
+	string negotiated_protocol = 2;
+
+	// The server name indication extension sent by the client.
+	string server_name = 3;
+
+	// The cipher suite negotatiated for the connection, e.g. "TLS_EDCHE_ECDSA_WITH_AES_128_GCM_SHA256"
+	string cipher_suite = 4;
+
+	// The parsed certificates sent by the peer, in the order in which they were sent.
+	repeated string peer_certificates = 5;
+}
+
+message Assertions {
+	// The fully qualified method of the current RPC, e.g.
+	// "/gateway_api_conformance.echo_basic.grpcecho.GrpcEcho/Echo"
+	string fully_qualified_method = 1;
+
+	// The headers present in the request.
+	repeated Header headers = 2;
+
+	// The :authority pseudo-header of the request.
+	string authority = 3;
+
+	// Information associated with the conformance server deployment.
+	Context context = 4;
+
+	// Information related to the TLS connection between the client and the server.
+	TLSAssertions tls_assertions = 5;
+}
+
+message EchoRequest {}
+
+message EchoResponse {
+	Assertions assertions = 1;
+	EchoRequest request = 2;
+}
+
+service GrpcEcho {
+	rpc Echo(EchoRequest) returns (EchoResponse) {}
+
+	// Behaves identically to Echo, but lives at a different method to
+	// emulate the service having more than one method.
+	rpc EchoTwo(EchoRequest) returns (EchoResponse) {}
+
+	// An intentionally unimplemented method.
+	rpc EchoThree(EchoRequest) returns (EchoResponse) {}
+}
