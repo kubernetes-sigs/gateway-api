@@ -35,6 +35,7 @@ cover, and documentation to help users get started.
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
 - [WSO2 APK][25] (GA)
+- [ngrok][33] (beta)
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
@@ -82,6 +83,7 @@ cover, and documentation to help users get started.
 [30]:#easegress
 [31]:#avi-kubernetes-operator
 [32]:#haproxy-kubernetes-ingress-controller
+[33]:#ngrok-kubernetes-operator
 
 [gamma]:/concepts/gamma/
 
