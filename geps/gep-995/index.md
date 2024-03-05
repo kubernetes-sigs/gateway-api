@@ -9,7 +9,7 @@ Add a new optional `name` field to the route rule types ([GRPCRouteRule](https:/
 
 ## Goals
 
-* Support referencing individual route rules by name from other resources, such as from metaresources as suggested in [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/#apply-policies-to-sections-of-a-resource).
+* Support referencing individual route rules by name from other resources, such as from metaresources ([GEP-2648](https://gateway-api.sigs.k8s.io/geps/gep-2648/#apply-policies-to-sections-of-a-resource).)
 * Support referencing individual route rules by name from condition messages propagated in the status stanza of route resources as suggested in https://github.com/kubernetes-sigs/gateway-api/issues/1696#issuecomment-1666258188.
 * Support referencing individual route rules by name at other observability and networking tools that are part of the ecosystem based on Gateway API.
 * Provide a rather intuitive API for users of Kubernetes who are familiar with the same pattern employed already by other kinds of resources where lists of complex elements can be declared – e.g. service [ports](https://kubernetes.io/docs/reference/kubernetes-api/service-resources/service-v1/#ServiceSpec), pod [containers](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#containers) and pod [volumes](https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#volumes).
