@@ -30,21 +30,17 @@ import (
 )
 
 var (
-	kubeConfigPath    string
-	namespaceFlag     string
-	allNamespacesFlag bool
+	kubeConfigPath string
 )
 
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "gwctl",
-		Short: "gwctl is a tool to improve the usability of the Gateway API.",
-		Long: `gwctl allows you to view all Gateway API policy types that are present in a cluster, as well as all "policy bindings" in a namespace (or across all namespaces).
-
-It also shows you the attached policies when you view any Gateway resource (like HTTPRoute, Gateway, GatewayClass, etc.)`,
+		Short: "gwctl is a command-line tool for exploring Gateway API resources.",
+		Long:  `gwctl provides a familiar kubectl-like interface for navigating the Kubernetes Gateway API's multi-resource model, offering visibility into resource relationships and the policies that affect them.`,
 	}
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "config", "", "path to kubeconfig file (default is $HOME/.kube/config)")
+	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "path to kubeconfig file (default is the KUBECONFIG environment variable and if it isn't set, falls back to $HOME/.kube/config)")
 
 	rootCmd.AddCommand(NewGetCommand())
 	rootCmd.AddCommand(NewDescribeCommand())

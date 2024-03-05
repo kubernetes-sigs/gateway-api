@@ -32,6 +32,9 @@ import (
 
 func NewDescribeCommand() *cobra.Command {
 
+	var namespaceFlag string
+	var allNamespacesFlag bool
+
 	cmd := &cobra.Command{
 		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends} RESOURCE_NAME",
 		Short: "Show details of a specific resource or group of resources",

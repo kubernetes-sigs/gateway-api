@@ -31,6 +31,9 @@ import (
 
 func NewGetCommand() *cobra.Command {
 
+	var namespaceFlag string
+	var allNamespacesFlag bool
+
 	cmd := &cobra.Command{
 		Use:   "get {gateways|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
