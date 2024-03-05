@@ -33,7 +33,6 @@ import (
 	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
-	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/pkg/consts"
@@ -132,7 +131,7 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 		apiChannel = undefinedKeyword
 	}
 
-	mode := flags.DefaultMode
+	mode := "default"
 	if options.Mode != "" {
 		mode = options.Mode
 	}
