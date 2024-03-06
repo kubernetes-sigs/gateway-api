@@ -64,7 +64,7 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 	}
 	realClock := clock.RealClock{}
 	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
-	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
+	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out, Clock: realClock}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
