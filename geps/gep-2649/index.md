@@ -161,7 +161,7 @@ into an existing object's fields somehow, particularly for Inherited policies.
 When merging into an existing fields inside an object, Policy objects should
 merge values at a scalar level, not at a struct or object level.
 
-For example, in the `CDNCachingPolicy` example above, the `cdn` struct contains
+For example, in the `CDNCachingPolicy` example below, the `cdn` struct contains
 a `cachePolicy` struct that contains fields. If an implementation was merging
 this configuration into an existing object that contained the same fields, it
 should merge the fields at a scalar level, with the `includeHost`,
@@ -183,6 +183,15 @@ value, the _entire value_ must be overwritten by the value from the Policy. No
 merging should take place. This mainly applies to `overrides`, since for
 `defaults`, there should be no value present in a field on the final object.
 
+There is one exception here: the listMapType list. These are lists of structs
+that, in their API definitions, define one string in the struct as a key, and
+are defined to be treated the same as a map (only one entry for each value in
+the key can be present, and patches that duplicate the key overwrite the rest
+of the struct).
+
+For these values, and these values _only_, implementations SHOULD treat the list
+like a map and merge values into the corresponding entry, by the key field.
+
 This table shows how this works for various types:
 
 |Type|Object config|Override Policy config|Result|
@@ -190,6 +199,8 @@ This table shows how this works for various types:
 |string| `key: "foo"` | `key: "bar"`  | `key: "bar"` |
 |list| `key: ["a","b"]` | `key: ["c","d"]` | `key: ["c","d"]` |
 |`map[string]string`| `key: {"foo": "a", "bar": "b"}` | `key: {"foo": "c", "bar": "d"}` | `key: {"foo": "c", "bar": "d"}` |
+|listMapType| `listMaps: [{"name": "o1", "foo": "a", "bar": "b"},{"name": "o2", "foo": "c", "bar": "d"}]` | `listMaps: [{"name": "o1", "foo": "e", "bar": "f", "baz": "g"}]` | `listMaps: [{"name": "o1", "foo": "e", "bar": "f", "baz": "g"},{"name": "o2", "foo": "c", "bar": "d"}]` |
+
 
 ### Conflict Resolution
 
