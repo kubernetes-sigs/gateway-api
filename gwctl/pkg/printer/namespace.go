@@ -3,6 +3,7 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
@@ -28,14 +29,14 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 
 		views := []namespaceDescribeView{
 			{
-				Name: namespaceNode.NamespaceName,
+				Name: namespaceNode.Namespace.Name,
 			},
 			{
-				Annotations: namespaceNode.Annotations,
-				Labels:      namespaceNode.Labels,
+				Annotations: namespaceNode.Namespace.Annotations,
+				Labels:      namespaceNode.Namespace.Labels,
 			},
 			{
-				Status: string(namespaceNode.Status.Phase),
+				Status: string(namespaceNode.Namespace.Status.Phase),
 			},
 		}
 
@@ -48,7 +49,8 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Fprint(nsp.Out, string(b))
 		}

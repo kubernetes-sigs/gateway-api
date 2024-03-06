@@ -18,6 +18,8 @@ package resourcediscovery
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -143,7 +145,7 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 		return resourceModel, err
 	}
 
-	resourceModel.addNamespaceWithLabelsAnnotationsStatus(namespaces...)
+	resourceModel.addNamespace(namespaces...)
 
 	d.discoverPolicies(ctx, resourceModel)
 
@@ -244,21 +246,29 @@ func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resource
 // discoverNamespaces adds Namespaces for resources that exist in the
 // resourceModel.
 func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *ResourceModel) {
+	namespacesList := &corev1.NamespaceList{}
+	if err := d.K8sClients.Client.List(ctx, namespacesList, &client.ListOptions{}); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to fetch list of namespaces: %v\n", err)
+		os.Exit(1)
+	}
+
+	namespaceMap := make(map[string]corev1.Namespace)
+	for _, namespace := range namespacesList.Items {
+		namespaceMap[namespace.Name] = namespace
+	}
+
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
-		resourceModel.addNamespace(gatewayNode.Gateway.GetNamespace())
+		resourceModel.addNamespace(namespaceMap[gatewayNode.Gateway.GetNamespace()])
 		resourceModel.connectGatewayWithNamespace(gatewayID, NamespaceID(gatewayNode.Gateway.GetNamespace()))
 	}
 	for httpRouteID, httpRouteNode := range resourceModel.HTTPRoutes {
-		resourceModel.addNamespace(httpRouteNode.HTTPRoute.GetNamespace())
+		resourceModel.addNamespace(namespaceMap[httpRouteNode.HTTPRoute.GetNamespace()])
 		resourceModel.connectHTTPRouteWithNamespace(httpRouteID, NamespaceID(httpRouteNode.HTTPRoute.GetNamespace()))
 	}
 	for backendID, backendNode := range resourceModel.Backends {
-		resourceModel.addNamespace(backendNode.Backend.GetNamespace())
+		resourceModel.addNamespace(namespaceMap[backendNode.Backend.GetNamespace()])
 		resourceModel.connectBackendWithNamespace(backendID, NamespaceID(backendNode.Backend.GetNamespace()))
 	}
-	// for namespaceID, namespaceNode := range resourceModel.Namespaces {
-	// 	fmt.Println("namespace fire:", namespaceID, namespaceNode, "\n")
-	// }
 }
 
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
@@ -385,6 +395,7 @@ func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter F
 		namespace := &corev1.Namespace{}
 		nn := apimachinerytypes.NamespacedName{Name: filter.Name}
 		err := k8sClients.Client.Get(ctx, nn, namespace)
+
 		if err != nil {
 			return []corev1.Namespace{}, err
 		}
