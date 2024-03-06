@@ -19,15 +19,21 @@ package printer
 import (
 	"fmt"
 	"io"
-
-	"sigs.k8s.io/yaml"
+	"sort"
+	"strings"
+	"text/tabwriter"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/yaml"
+
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 )
 
 type GatewayClassesPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 type gatewayClassDescribeView struct {
@@ -37,6 +43,44 @@ type gatewayClassDescribeView struct {
 	// GatewayClass description
 	Description              string                 `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
+}
+
+func (gcp *GatewayClassesPrinter) Print(model *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(gcp.Out, 0, 0, 2, ' ', 0)
+	row := []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
+	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+
+	gatewayClassNodes := make([]*resourcediscovery.GatewayClassNode, 0, len(model.GatewayClasses))
+	for _, gatewayClassNode := range model.GatewayClasses {
+		gatewayClassNodes = append(gatewayClassNodes, gatewayClassNode)
+	}
+
+	sort.Slice(gatewayClassNodes, func(i, j int) bool {
+		if gatewayClassNodes[i].GatewayClass.GetName() != gatewayClassNodes[j].GatewayClass.GetName() {
+			return gatewayClassNodes[i].GatewayClass.GetName() < gatewayClassNodes[j].GatewayClass.GetName()
+		}
+		return string(gatewayClassNodes[i].GatewayClass.Spec.ControllerName) < string(gatewayClassNodes[j].GatewayClass.Spec.ControllerName)
+	})
+
+	for _, gatewayClassNode := range gatewayClassNodes {
+		accepted := "Unknown"
+		for _, condition := range gatewayClassNode.GatewayClass.Status.Conditions {
+			if condition.Type == "Accepted" {
+				accepted = string(condition.Status)
+			}
+		}
+
+		age := duration.HumanDuration(gcp.Clock.Since(gatewayClassNode.GatewayClass.GetCreationTimestamp().Time))
+
+		row := []string{
+			gatewayClassNode.GatewayClass.GetName(),
+			string(gatewayClassNode.GatewayClass.Spec.ControllerName),
+			accepted,
+			age,
+		}
+		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	}
+	tw.Flush()
 }
 
 func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
