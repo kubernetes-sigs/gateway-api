@@ -12,6 +12,9 @@ relationships:
     - number: 713
       name: Metaresources and Policy Attachment
       description: Defines metaresource and policy attachment API
+    - number: 2257
+      name: Gateway API Duration Format
+      description: Defines the Duration API field
 changelog:
   - "https://github.com/kubernetes-sigs/gateway-api/pull/1643"
   - "https://github.com/kubernetes-sigs/gateway-api/pull/1889"

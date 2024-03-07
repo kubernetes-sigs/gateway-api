@@ -370,24 +370,23 @@ type SessionPersistencePolicySpec struct {
     //
     TargetRef gatewayv1a2.PolicyTargetReference `json:"targetRef"`
 
-    // AbsoluteTimeoutSeconds defines the absolute timeout of the
-    // persistent session measured in seconds. Once
-    // AbsoluteTimeoutSeconds has elapsed, the session becomes invalid.
+    // AbsoluteTimeout defines the absolute timeout of the persistent
+    // session. Once the AbsoluteTimeout duration has elapsed, the
+    // session becomes invalid.
     //
-    // Support: Core
+    // Support: Extended
     //
     // +optional
-    AbsoluteTimeoutSeconds int64 `json:"absoluteTimeoutSeconds,omitempty"`
+    AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
 
-    // IdleTimeoutSeconds defines the idle timeout of the
-    // persistent session measured in seconds. Once the session
-    // has been idle for more than specified IdleTimeoutSeconds
-    // duration, the session becomes invalid.
+    // IdleTimeout defines the idle timeout of the persistent session.
+    // Once the session has been idle for more than the specified
+    // IdleTimeout duration, the session becomes invalid.
     //
-    // Support: Core
+    // Support: Extended
     //
     // +optional
-    IdleTimeoutSeconds int64 `json:"idleTimeoutSeconds,omitempty"`
+    IdleTimeout *Duration `json:"idleTimeout,omitempty"`
 
     // Type defines the type of session persistence such as through
     // the use a header or cookie. Defaults to cookie based session
@@ -419,6 +418,12 @@ type SessionPersistencePolicySpec struct {
     SessionName *string `json:"sessionName,omitempty"`
 }
 
+// Duration is a string value representing a duration in time. The format is as specified
+// in GEP-2257, a strict subset of the syntax parsed by Golang time.ParseDuration.
+//
+// +kubebuilder:validation:Pattern=`^([0-9]{1,5}(h|m|s|ms)){1,4}$`
+type Duration string
+
 // +kubebuilder:validation:Enum=Cookie;Header
 type SessionPersistenceType string
 
@@ -444,11 +449,11 @@ type CookieConfig struct {
     // attributes, while a session cookie is deleted when the current
     // session ends.
     //
-    // When set to "Permanent", AbsoluteTimeoutSeconds indicates the
+    // When set to "Permanent", AbsoluteTimeout indicates the
     // cookie's lifetime via the Expires or Max-Age cookie attributes
     // and is required.
     //
-    // When set to "Session", AbsoluteTimeoutSeconds indicates the
+    // When set to "Session", AbsoluteTimeout indicates the
     // absolute lifetime of the cookie tracked by the gateway and
     // is optional.
     //
@@ -664,10 +669,10 @@ have an expiration or timeout, but it will be accomplished through alternative m
 the cookie's lifetime via its value.
 
 The `LifetimeType` API field specifies whether a cookie should be a session or permanent cookie. Additionally, the lifetime
-or timeout for both session and permanent cookies is represented by `AbsoluteTimeoutSeconds`. In the case of
-`LifetimeType` being `Permanent`, `AbsoluteTimeoutSeconds` MUST configure the `Expires` or `Max-Age` cookie attributes.
-Conversely, if `LifetimeType` is `Session`, `AbsoluteTimeoutSeconds` MUST regulate the cookie's lifespan through a
-different mechanism, as mentioned above. If `LifetimeType` is set to `Permanent`, then `AbsoluteTimeoutSeconds` MUST
+or timeout for both session and permanent cookies is represented by `AbsoluteTimeout`. In the case of
+`LifetimeType` being `Permanent`, `AbsoluteTimeout` MUST configure the `Expires` or `Max-Age` cookie attributes.
+Conversely, if `LifetimeType` is `Session`, `AbsoluteTimeout` MUST regulate the cookie's lifespan through a
+different mechanism, as mentioned above. If `LifetimeType` is set to `Permanent`, then `AbsoluteTimeout` MUST
 also be set as well. This requirement is necessary because an expiration value is required to set `Expires` or `Max-Age`.
 `LifetimeType` of `Session` is core support level and the default, while `LifetimeType` of `Permanent` is extended.
 
