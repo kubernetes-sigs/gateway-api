@@ -55,37 +55,27 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 			t.Fatalf("unexpected error finding TLS secret: %v", err)
 		}
 
-		t.Run("Simple HTTPS request should reach infra-backend", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, "example.org", http.ExpectedResponse{
-				Request:   http.Request{Host: "example.org", Path: "/"},
-				Response:  http.Response{StatusCode: 200},
-				Backend:   "infra-backend-v1",
+		cases := []struct {
+			host       string
+			statusCode int
+			backend    string
+		}{
+			{host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
+			{host: "unknown-example.org", statusCode: 404},
+			{host: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
+			{host: "unknown-example.org", statusCode: 404},
+		}
+
+		for i, tc := range cases {
+			expected := http.ExpectedResponse{
+				Request:   http.Request{Host: tc.host, Path: "/"},
+				Response:  http.Response{StatusCode: tc.statusCode},
+				Backend:   tc.backend,
 				Namespace: "gateway-conformance-infra",
+			}
+			t.Run(expected.GetTestCaseName(i), func(t *testing.T) {
+				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, tc.host, expected)
 			})
-		})
-		t.Run("Unknown host should return an 404", func(t *testing.T) {
-			tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, "unknown-example.org", http.ExpectedResponse{
-				Request:  http.Request{Host: "second-example.org", Path: "/"},
-				Response: http.Response{StatusCode: 404},
-			})
-		})
-
-		t.Run("Gateway with hostname", func(t *testing.T) {
-			t.Run("Simple HTTPS request should reach infra-backend", func(t *testing.T) {
-				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, "second-example.org", http.ExpectedResponse{
-					Request:   http.Request{Host: "second-example.org", Path: "/"},
-					Response:  http.Response{StatusCode: 200},
-					Backend:   "infra-backend-v1",
-					Namespace: "gateway-conformance-infra",
-				})
-			})
-
-			t.Run("Unknown hostname should return an 404", func(t *testing.T) {
-				tls.MakeTLSRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, cPem, keyPem, "unknown-example.org", http.ExpectedResponse{
-					Request:  http.Request{Host: "unknown-example.org", Path: "/"},
-					Response: http.Response{StatusCode: 404},
-				})
-			})
-		})
+		}
 	},
 }

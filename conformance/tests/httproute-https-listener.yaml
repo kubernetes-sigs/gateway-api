@@ -24,5 +24,5 @@ spec:
     sectionName: https-with-hostname
   rules:
   - backendRefs:
-    - name: infra-backend-v1
+    - name: infra-backend-v2
       port: 8080
