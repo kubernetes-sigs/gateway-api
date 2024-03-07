@@ -509,7 +509,6 @@ spec:
             cpu: 10m
 ---
 apiVersion: v1
-<<<<<<< HEAD
 kind: Service
 metadata:
   name: grpc-infra-backend-v1
@@ -521,34 +520,10 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 3000
-=======
-kind: Namespace
-metadata:
-  name: gateway-conformance-udp
-  labels:
-    gateway-conformance: udp
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: coredns
-  namespace: gateway-conformance-udp
-  labels:
-    app: udp
-spec:
-  ports:
-  - name: udp-dns
-    port: 53
-    protocol: UDP
-    targetPort: 53
-  selector:
-    app: udp
->>>>>>> f4857153 (conformance: initial UDPRoute test)
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-<<<<<<< HEAD
   name: grpc-infra-backend-v1
   namespace: gateway-conformance-infra
   labels:
@@ -679,9 +654,28 @@ spec:
         resources:
           requests:
             cpu: 10m
-=======
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: coredns
-  namespace: gateway-conformance-udp
+  namespace: gateway-conformance-infra
+  labels:
+    app: udp
+spec:
+  ports:
+  - name: udp-dns
+    port: 53
+    protocol: UDP
+    targetPort: 53
+  selector:
+    app: udp
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coredns
+  namespace: gateway-conformance-infra
   labels:
     app: udp
 spec:
@@ -712,7 +706,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: coredns
-  namespace: gateway-conformance-udp
+  namespace: gateway-conformance-infra
 data:
   Corefile: |
     .:53 {
@@ -720,7 +714,6 @@ data:
         log
         errors
     }
-
     foo.bar.com:53 {
       whoami
     }
@@ -729,7 +722,7 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: Gateway
 metadata:
   name: udp-gateway
-  namespace: gateway-conformance-udp
+  namespace: gateway-conformance-infra
 spec:
   gatewayClassName: "{GATEWAY_CLASS_NAME}"
   listeners:
@@ -739,4 +732,3 @@ spec:
     allowedRoutes:
       kinds:
       - kind: UDPRoute
->>>>>>> f4857153 (conformance: initial UDPRoute test)
