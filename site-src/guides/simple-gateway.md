@@ -12,11 +12,18 @@ match all HTTP traffic and directs it to a single Service named `foo-svc`.
 {% include 'standard/simple-gateway/gateway.yaml' %}
 ```
 
-The Gateway represents the instantiation of a logical load balancer. It's
-templated from a hypothetical `acme-lb` GatewayClass. The Gateway listens for
-HTTP traffic on port 80. This particular GatewayClass automatically assigns an
-IP address which will be shown in the `Gateway.status` after it has been
-deployed. 
+The Gateway represents the instantiation of a logical load balancer and the
+GatewayClass defines the load balancer template when users create a Gateway.
+The example Gateway is templated from a hypothetical `example`
+GatewayClass, which is meant to be a placeholder and substitued by users. Here
+is a list of available
+[Gateway Implementation](https://gateway-api.sigs.k8s.io/implementations/) that
+can be used to determine the correct GatewayClass based on the specific
+infrastructure provider.
+
+The Gateway listens for HTTP traffic on port 80. This particular GatewayClass
+automatically assigns an IP address which will be shown in the `Gateway.status`
+after it has been deployed. 
 
 Route resources specify the Gateways they want to attach to using `ParentRefs`. As long as 
 the Gateway allows this attachment (by default Routes from the same namespace are trusted),

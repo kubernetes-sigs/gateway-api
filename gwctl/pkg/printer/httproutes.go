@@ -19,36 +19,66 @@ package printer
 import (
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/yaml"
-
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/yaml"
+
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 )
 
 type HTTPRoutesPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
 	tw := tabwriter.NewWriter(hp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "HOSTNAMES"}
+	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
 	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 
+	httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, 0, len(resourceModel.HTTPRoutes))
 	for _, httpRouteNode := range resourceModel.HTTPRoutes {
+		httpRouteNodes = append(httpRouteNodes, httpRouteNode)
+	}
+
+	sort.Slice(httpRouteNodes, func(i, j int) bool {
+		if httpRouteNodes[i].HTTPRoute.GetNamespace() != httpRouteNodes[j].HTTPRoute.GetNamespace() {
+			return httpRouteNodes[i].HTTPRoute.GetNamespace() < httpRouteNodes[j].HTTPRoute.GetNamespace()
+		}
+		return httpRouteNodes[i].HTTPRoute.GetName() < httpRouteNodes[j].HTTPRoute.GetName()
+	})
+
+	for _, httpRouteNode := range httpRouteNodes {
 		var hostNames []string
 		for _, hostName := range httpRouteNode.HTTPRoute.Spec.Hostnames {
 			hostNames = append(hostNames, string(hostName))
 		}
-		hostNamesOutput := strings.Join(hostNames, ",")
-		if cnt := len(hostNames); cnt > 2 {
-			hostNamesOutput = fmt.Sprintf("%v + %v more", strings.Join(hostNames[:2], ","), cnt-2)
+		hostNamesOutput := "None"
+		if hostNamesCount := len(hostNames); hostNamesCount > 0 {
+			if hostNamesCount > 2 {
+				hostNamesOutput = fmt.Sprintf("%v + %v more", strings.Join(hostNames[:2], ","), hostNamesCount-2)
+			} else {
+				hostNamesOutput = strings.Join(hostNames, ",")
+			}
 		}
 
-		row := []string{httpRouteNode.HTTPRoute.Name, hostNamesOutput}
+		parentRefsCount := fmt.Sprintf("%d", len(httpRouteNode.HTTPRoute.Spec.ParentRefs))
+
+		age := duration.HumanDuration(hp.Clock.Since(httpRouteNode.HTTPRoute.GetCreationTimestamp().Time))
+
+		row := []string{
+			httpRouteNode.HTTPRoute.GetNamespace(),
+			httpRouteNode.HTTPRoute.GetName(),
+			hostNamesOutput,
+			parentRefsCount,
+			age,
+		}
 		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	}
 	tw.Flush()

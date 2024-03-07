@@ -22,6 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/utils/clock"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
@@ -36,7 +38,7 @@ func NewGetCommand(params *utils.CmdParams) *cobra.Command {
 	flags := &getFlags{}
 
 	cmd := &cobra.Command{
-		Use:   "get {policies|policycrds|httproutes}",
+		Use:   "get {gateways|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -56,10 +58,27 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		ns = ""
 	}
 
-	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	realClock := clock.RealClock{}
+	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
+	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out, Clock: realClock}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
+	case "gateway", "gateways":
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForGateway(filter)
+		if err != nil {
+			panic(err)
+		}
+		gwPrinter.Print(resourceModel)
+
 	case "policy", "policies":
 		list := params.PolicyManager.GetPolicies()
 		policiesPrinter.Print(list)
@@ -69,10 +88,6 @@ func runGet(args []string, params *utils.CmdParams, flags *getFlags) {
 		policiesPrinter.PrintCRDs(list)
 
 	case "httproute", "httproutes":
-		discoverer := resourcediscovery.Discoverer{
-			K8sClients:    params.K8sClients,
-			PolicyManager: params.PolicyManager,
-		}
 		filter := resourcediscovery.Filter{Namespace: ns}
 		if len(args) > 1 {
 			filter.Name = args[1]

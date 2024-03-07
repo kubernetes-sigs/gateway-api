@@ -1463,9 +1463,7 @@ type RouteRule struct {
 If a `sectionName` is specified, but does not exist on the targeted object, the Policy must fail to attach,
 and the policy implementation should record a `resolvedRefs` or similar Condition in the Policy's status.
 
-When multiple Policies of the same type target the same object, one with a `sectionName` specified, and one without,
-the one with a `sectionName` is more specific, and so will have all its settings apply. The less-specific Policy will
-not attach to the target.
+When multiple Policies of the same type target the same object, one with a `sectionName` and one without, the more specific policy (i.e., the one with a `sectionName`) will have its entire `spec` applied to the named section. The less specific policy will also have its `spec` applied to the target but MUST not affect the named section. The less specific policy will have its `spec` applied to all other sections of the target that are not targeted by any other more specific policies. 
 
 Note that the `sectionName` is currently intended to be used only for Direct Policy Attachment when references to
 SectionName are actually needed. Inherited Policies are always applied to the entire object. 

@@ -19,15 +19,21 @@ package printer
 import (
 	"fmt"
 	"io"
-
-	"sigs.k8s.io/yaml"
+	"sort"
+	"strings"
+	"text/tabwriter"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/yaml"
+
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 )
 
 type GatewaysPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 type gatewayDescribeView struct {
@@ -38,6 +44,62 @@ type gatewayDescribeView struct {
 	GatewayClass             string                                             `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef                             `json:",omitempty"`
 	EffectivePolicies        map[policymanager.PolicyCrdID]policymanager.Policy `json:",omitempty"`
+}
+
+func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(gp.Out, 0, 0, 2, ' ', 0)
+	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
+	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+
+	gatewayNodes := make([]*resourcediscovery.GatewayNode, 0, len(resourceModel.Gateways))
+	for _, gatewayNode := range resourceModel.Gateways {
+		gatewayNodes = append(gatewayNodes, gatewayNode)
+	}
+
+	sort.Slice(gatewayNodes, func(i, j int) bool {
+		if gatewayNodes[i].Gateway.GetName() != gatewayNodes[j].Gateway.GetName() {
+			return gatewayNodes[i].Gateway.GetName() < gatewayNodes[j].Gateway.GetName()
+		}
+		return gatewayNodes[i].Gateway.Spec.GatewayClassName < gatewayNodes[j].Gateway.Spec.GatewayClassName
+	})
+
+	for _, gatewayNode := range gatewayNodes {
+		var addresses []string
+		for _, address := range gatewayNode.Gateway.Status.Addresses {
+			addresses = append(addresses, address.Value)
+		}
+		addressesOutput := strings.Join(addresses, ",")
+		if cnt := len(addresses); cnt > 2 {
+			addressesOutput = fmt.Sprintf("%v + %v more", strings.Join(addresses[:2], ","), cnt-2)
+		}
+
+		var ports []string
+		for _, listener := range gatewayNode.Gateway.Spec.Listeners {
+			ports = append(ports, fmt.Sprintf("%d", int(listener.Port)))
+		}
+		portsOutput := strings.Join(ports, ",")
+
+		programmedStatus := "Unknown"
+		for _, condition := range gatewayNode.Gateway.Status.Conditions {
+			if condition.Type == "Programmed" {
+				programmedStatus = string(condition.Status)
+				break
+			}
+		}
+
+		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
+
+		row := []string{
+			gatewayNode.Gateway.GetName(),
+			string(gatewayNode.Gateway.Spec.GatewayClassName),
+			addressesOutput,
+			portsOutput,
+			programmedStatus,
+			age,
+		}
+		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	}
+	tw.Flush()
 }
 
 func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

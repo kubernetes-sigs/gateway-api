@@ -1346,6 +1346,7 @@ func TestHTTPPathModifier(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
+			pathModifier := tc.pathModifier
 			route := &gatewayv1.HTTPRoute{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
@@ -1358,7 +1359,7 @@ func TestHTTPPathModifier(t *testing.T) {
 								{
 									Type: gatewayv1.HTTPRouteFilterRequestRedirect,
 									RequestRedirect: &gatewayv1.HTTPRequestRedirectFilter{
-										Path: &tc.pathModifier,
+										Path: &pathModifier,
 									},
 								},
 							},

@@ -19,19 +19,23 @@ package printer
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	testingclock "k8s.io/utils/clock/testing"
 
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&apiextensionsv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
@@ -55,7 +59,8 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"apiVersion": "foo.com/v1",
 				"kind":       "HealthCheckPolicy",
 				"metadata": map[string]interface{}{
-					"name": "health-check-gatewayclass",
+					"name":              "health-check-gatewayclass",
+					"creationTimestamp": fakeClock.Now().Add(-6 * 24 * time.Hour).Format(time.RFC3339),
 				},
 				"spec": map[string]interface{}{
 					"override": map[string]interface{}{
@@ -80,7 +85,8 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"apiVersion": "foo.com/v1",
 				"kind":       "HealthCheckPolicy",
 				"metadata": map[string]interface{}{
-					"name": "health-check-gateway",
+					"name":              "health-check-gateway",
+					"creationTimestamp": fakeClock.Now().Add(-20 * 24 * time.Hour).Format(time.RFC3339),
 				},
 				"spec": map[string]interface{}{
 					"override": map[string]interface{}{
@@ -122,7 +128,8 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"apiVersion": "bar.com/v1",
 				"kind":       "TimeoutPolicy",
 				"metadata": map[string]interface{}{
-					"name": "timeout-policy-namespace",
+					"name":              "timeout-policy-namespace",
+					"creationTimestamp": fakeClock.Now().Add(-5 * time.Minute).Format(time.RFC3339),
 				},
 				"spec": map[string]interface{}{
 					"condition": "path=/abc",
@@ -139,7 +146,8 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 				"apiVersion": "bar.com/v1",
 				"kind":       "TimeoutPolicy",
 				"metadata": map[string]interface{}{
-					"name": "timeout-policy-httproute",
+					"name":              "timeout-policy-httproute",
+					"creationTimestamp": fakeClock.Now().Add(-13 * time.Minute).Format(time.RFC3339),
 				},
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
@@ -157,17 +165,18 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
 
 	pp := &PoliciesPrinter{
-		Out: &bytes.Buffer{},
+		Out:   &bytes.Buffer{},
+		Clock: fakeClock,
 	}
 
 	pp.Print(params.PolicyManager.GetPolicies())
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
-POLICY NAME                POLICY KIND        TARGET NAME       TARGET KIND   POLICY TYPE
-health-check-gateway       HealthCheckPolicy  foo-gateway       Gateway       Inherited
-health-check-gatewayclass  HealthCheckPolicy  foo-gatewayclass  GatewayClass  Inherited
-timeout-policy-httproute   TimeoutPolicy      foo-httproute     HTTPRoute     Direct
-timeout-policy-namespace   TimeoutPolicy      default           Namespace     Direct
+NAME                       KIND                       TARGET NAME       TARGET KIND   POLICY TYPE  AGE
+health-check-gateway       HealthCheckPolicy.foo.com  foo-gateway       Gateway       Inherited    20d
+health-check-gatewayclass  HealthCheckPolicy.foo.com  foo-gatewayclass  GatewayClass  Inherited    6d
+timeout-policy-httproute   TimeoutPolicy.bar.com      foo-httproute     HTTPRoute     Direct       13m
+timeout-policy-namespace   TimeoutPolicy.bar.com      default           Namespace     Direct       5m
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Print: Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

@@ -19,21 +19,205 @@ package printer
 import (
 	"bytes"
 	"testing"
+	"time"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 
 	"github.com/google/go-cmp/cmp"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	testingclock "k8s.io/utils/clock/testing"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
+func TestHTTPRoutesPrinter_Print(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "demo-gatewayclass-1",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "demo-gatewayclass-2",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "demo-gateway-1",
+				Namespace: "default",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "demo-gatewayclass-1",
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "demo-gateway-2",
+				Namespace: "ns2",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "demo-gatewayclass-2",
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "demo-gateway-200",
+				Namespace: "default",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "demo-gatewayclass-1",
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "demo-gateway-345",
+				Namespace: "ns1",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "demo-gatewayclass-2",
+			},
+		},
+		&gatewayv1.HTTPRoute{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "foo-httproute-1",
+				Namespace: "default",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-24 * time.Hour),
+				},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				Hostnames: []gatewayv1.Hostname{"example.com", "example2.com", "example3.com"},
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Kind:      common.PtrTo(gatewayv1.Kind("Gateway")),
+							Group:     common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+							Namespace: common.PtrTo(gatewayv1.Namespace("ns2")),
+							Name:      "demo-gateway-2",
+						},
+					},
+				},
+			},
+		},
+		&gatewayv1.HTTPRoute{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "qmn-httproute-100",
+				Namespace: "default",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-11 * time.Hour),
+				},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				Hostnames: []gatewayv1.Hostname{"example.com"},
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+							Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+							Name:  "demo-gateway-1",
+						},
+						{
+							Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+							Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+							Name:  "demo-gateway-200",
+						},
+					},
+				},
+			},
+		},
+		&gatewayv1.HTTPRoute{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "bar-route-21",
+				Namespace: "ns1",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-9 * time.Hour),
+				},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				Hostnames: []gatewayv1.Hostname{"foo.com", "bar.com", "example.com", "example2.com", "example3.com", "example4.com", "example5.com"},
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Kind:      common.PtrTo(gatewayv1.Kind("Gateway")),
+							Group:     common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+							Namespace: common.PtrTo(gatewayv1.Namespace("default")),
+							Name:      "demo-gateway-200",
+						},
+					},
+				},
+			},
+		},
+		&gatewayv1.HTTPRoute{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "bax-httproute-18777",
+				Namespace: "ns2",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-5 * time.Minute),
+				},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Kind:      common.PtrTo(gatewayv1.Kind("Gateway")),
+							Group:     common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+							Namespace: common.PtrTo(gatewayv1.Namespace("ns1")),
+							Name:      "demo-gateway-345",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	hp := &HTTPRoutesPrinter{
+		Out:   params.Out,
+		Clock: fakeClock,
+	}
+
+	hp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAMESPACE  NAME                 HOSTNAMES                          PARENT REFS  AGE
+default    foo-httproute-1      example.com,example2.com + 1 more  1            24h
+default    qmn-httproute-100    example.com                        2            11h
+ns1        bar-route-21         foo.com,bar.com + 5 more           1            9h
+ns2        bax-httproute-18777  None                               1            5m
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
 func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
@@ -202,7 +386,8 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out: params.Out,
+		Out:   params.Out,
+		Clock: fakeClock,
 	}
 	hp.PrintDescribeView(resourceModel)
 

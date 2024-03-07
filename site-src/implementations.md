@@ -24,6 +24,7 @@ cover, and documentation to help users get started.
 - [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
 - [HAProxy Ingress][7] (alpha)
+- [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (GA)
@@ -80,6 +81,7 @@ cover, and documentation to help users get started.
 [29]:#tyk
 [30]:#easegress
 [31]:#avi-kubernetes-operator
+[32]:#haproxy-kubernetes-ingress-controller
 
 [gamma]:/concepts/gamma/
 
@@ -280,6 +282,13 @@ HAProxy Ingress v0.13 partially supports the Gateway API's v1alpha1 specificatio
 
 [h1]:https://haproxy-ingress.github.io/
 [h2]:https://haproxy-ingress.github.io/docs/configuration/gateway-api/
+
+### HAProxy Kubernetes Ingress Controller
+
+HAProxy Kubernetes Ingress Controller is an open-source project maintained by HAProxy Technologies that provides fast and efficient traffic management, routing, and observability for Kubernetes. It has built-in support for the Gateway API since version 1.10. The same deployment of the ingress controller will allow you to use both the Ingress API and Gateway API. See the [documentation][haproxytech-docs-gw] for more details. In the [GitHub repository][haproxytech-github-gw], you will also find additional information about supported API resources.
+
+[haproxytech-docs-gw]:https://www.haproxy.com/documentation/kubernetes-ingress/gateway-api/enable-gateway-api/
+[haproxytech-github-gw]:https://github.com/haproxytech/kubernetes-ingress/blob/master/documentation/gateway-api.md
 
 ### HashiCorp Consul
 
