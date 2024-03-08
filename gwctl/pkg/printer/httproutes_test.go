@@ -26,6 +26,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -55,6 +56,22 @@ func TestHTTPRoutesPrinter_Print(t *testing.T) {
 			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: "example.net/gateway-controller",
 				Description:    common.PtrTo("random"),
+			},
+		},
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "ns1",
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceActive,
+			},
+		},
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "ns2",
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceActive,
 			},
 		},
 		&gatewayv1.Gateway{
