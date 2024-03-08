@@ -24,7 +24,6 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
-	cobraflag "github.com/spf13/pflag"
 	"k8s.io/klog/v2"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -45,6 +44,13 @@ func newRootCmd() *cobra.Command {
 	cobra.OnInitialize(initConfig)
 	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "path to kubeconfig file (default is the KUBECONFIG environment variable and if it isn't set, falls back to $HOME/.kube/config)")
 
+	// initialize logging flags in a new flag set
+	// otherwise it conflicts with cobra's flags
+	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
+	klog.InitFlags(klogFlags)
+
+	rootCmd.PersistentFlags().AddGoFlagSet(klogFlags)
+
 	rootCmd.AddCommand(NewGetCommand())
 	rootCmd.AddCommand(NewDescribeCommand())
 
@@ -52,11 +58,6 @@ func newRootCmd() *cobra.Command {
 }
 
 func Execute() {
-	// initialize logging flags and add it cobra's flag set
-	klog.InitFlags(nil)
-	flag.Parse()
-	cobraflag.CommandLine.AddGoFlagSet(flag.CommandLine)
-
 	rootCmd := newRootCmd()
 	err := rootCmd.Execute()
 	if err != nil {
