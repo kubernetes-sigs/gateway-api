@@ -18,11 +18,14 @@ package cmd
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 	"path"
 
 	"github.com/spf13/cobra"
+	cobraflag "github.com/spf13/pflag"
+	"k8s.io/klog/v2"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -49,6 +52,11 @@ func newRootCmd() *cobra.Command {
 }
 
 func Execute() {
+	// initialize logging flags and add it cobra's flag set
+	klog.InitFlags(nil)
+	flag.Parse()
+	cobraflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+
 	rootCmd := newRootCmd()
 	err := rootCmd.Execute()
 	if err != nil {
