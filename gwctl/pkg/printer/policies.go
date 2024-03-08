@@ -77,7 +77,7 @@ func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
 	})
 
 	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "GROUP", "KIND", "POLICY TYPE", "SCOPE"}
+	row := []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"}
 	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 
 	for _, policyCRD := range policyCRDs {
@@ -85,12 +85,14 @@ func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
 		if policyCRD.IsInherited() {
 			policyType = "Inherited"
 		}
+
+		age := duration.HumanDuration(pp.Clock.Since(policyCRD.CRD().GetCreationTimestamp().Time))
+
 		row := []string{
 			policyCRD.CRD().Name,
-			policyCRD.CRD().Spec.Group,
-			policyCRD.CRD().Spec.Names.Kind,
 			policyType,
 			string(policyCRD.CRD().Spec.Scope),
+			age,
 		}
 		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	}
