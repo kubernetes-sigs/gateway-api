@@ -30,7 +30,7 @@ cover, and documentation to help users get started.
 - [Kong][10] (GA)
 - [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
-- [ngrok][33] (beta)
+- [ngrok][33] (preview)
 - [NGINX Gateway Fabric][12] (GA)
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
