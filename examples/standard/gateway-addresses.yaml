@@ -3,7 +3,7 @@ kind: Gateway
 metadata:
   name: gateway-addresses
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   addresses:
   - value: 1200:0000:AB00:1234:0000:2552:7777:1313
   - value: 21DA:D3:0:2F3B:2AA:FF:FE28:9C5A

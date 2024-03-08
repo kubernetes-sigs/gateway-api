@@ -35,7 +35,7 @@ func NewGetCommand() *cobra.Command {
 	var allNamespacesFlag bool
 
 	cmd := &cobra.Command{
-		Use:   "get {gateways|policies|policycrds|httproutes}",
+		Use:   "get {gateways|gatewayclasses|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -73,8 +73,9 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	}
 	realClock := clock.RealClock{}
 	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
+	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out, Clock: realClock}
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
 	case "gateway", "gateways":
@@ -88,6 +89,18 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			os.Exit(1)
 		}
 		gwPrinter.Print(resourceModel)
+
+	case "gatewayclass", "gatewayclasses":
+		filter := resourcediscovery.Filter{Namespace: ns}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(filter)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to discover GatewayClass resources: %v\n", err)
+			os.Exit(1)
+		}
+		gwcPrinter.Print(resourceModel)
 
 	case "policy", "policies":
 		list := params.PolicyManager.GetPolicies()

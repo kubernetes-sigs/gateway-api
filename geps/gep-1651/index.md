@@ -206,7 +206,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   infrastructure:
     routability: Public
   listeners:
@@ -270,7 +270,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   infrastructure:
     routability: Cluster
   listeners:
@@ -285,7 +285,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   infrastructure:
     routability: Cluster
   listeners:
@@ -302,7 +302,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   infrastructure:
     routability: Public
   listeners:
@@ -317,7 +317,7 @@ kind: Gateway
 metadata:
   name: prod-web
 spec:
-  gatewayClassName: acme-lb
+  gatewayClassName: example
   infrastructure:
     routability: Private
   listeners:

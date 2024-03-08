@@ -40,26 +40,79 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "foo-gatewayclass",
+				Name: "internal-class",
 			},
 			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: "example.net/gateway-controller",
 				Description:    common.PtrTo("random"),
 			},
 		},
-
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "external-class",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "regional-internal-class",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "foo-gateway",
+				Name: "abc-gateway-12345",
 				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-time.Second),
+					Time: fakeClock.Now().Add(-20 * 24 * time.Hour),
 				},
 			},
 			Spec: gatewayv1.GatewaySpec{
-				GatewayClassName: "foo-gatewayclass",
+				GatewayClassName: "internal-class",
 				Listeners: []gatewayv1.Listener{
 					{
-						Name:     gatewayv1.SectionName("http-1"),
+						Name:     gatewayv1.SectionName("https-443"),
+						Protocol: gatewayv1.HTTPSProtocolType,
+						Port:     gatewayv1.PortNumber(443),
+					},
+					{
+						Name:     gatewayv1.SectionName("http-8080"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8080),
+					},
+				},
+			},
+			Status: gatewayv1.GatewayStatus{
+				Addresses: []gatewayv1.GatewayStatusAddress{
+					{
+						Value: "192.168.100.5",
+					},
+				},
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Programmed",
+						Status: "False",
+					},
+				},
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "demo-gateway-2",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-5 * 24 * time.Hour),
+				},
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "external-class",
+				Listeners: []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http-80"),
 						Protocol: gatewayv1.HTTPProtocolType,
 						Port:     gatewayv1.PortNumber(80),
 					},
@@ -70,11 +123,48 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 					{
 						Value: "10.0.0.1",
 					},
+					{
+						Value: "10.0.0.2",
+					},
+					{
+						Value: "10.0.0.3",
+					},
 				},
 				Conditions: []metav1.Condition{
 					{
 						Type:   "Programmed",
-						Status: metav1.ConditionTrue,
+						Status: "True",
+					},
+				},
+			},
+		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "random-gateway",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-3 * time.Second),
+				},
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "regional-internal-class",
+				Listeners: []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http-8443"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+					},
+				},
+			},
+			Status: gatewayv1.GatewayStatus{
+				Addresses: []gatewayv1.GatewayStatusAddress{
+					{
+						Value: "10.11.12.13",
+					},
+				},
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Programmed",
+						Status: "Unknown",
 					},
 				},
 			},
@@ -99,8 +189,10 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
-NAME         CLASS             ADDRESSES  PORTS  PROGRAMMED  AGE
-foo-gateway  foo-gatewayclass  10.0.0.1   80     True        1s
+NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE
+abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d
+demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d
+random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s
 `
 
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {

@@ -160,7 +160,6 @@ func (rm *ResourceModel) addPolicyIfTargetExists(policies ...policymanager.Polic
 				policyNode.HTTPRoute = httpRouteNode
 				httpRouteNode.Policies[policyNode.ID()] = policyNode
 			}
-
 		} else if policy.TargetRef().Group == corev1.GroupName && policy.TargetRef().Kind == "Namespace" {
 			namespaceID := NamespaceID(policy.TargetRef().Name)
 			namespaceNode, ok := rm.Namespaces[namespaceID]

@@ -24,13 +24,16 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 )
 
 type PoliciesPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
@@ -41,7 +44,7 @@ func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
 	})
 
 	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"POLICY NAME", "POLICY KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE"}
+	row := []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"}
 	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 
 	for _, policy := range policies {
@@ -49,12 +52,18 @@ func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
 		if policy.IsInherited() {
 			policyType = "Inherited"
 		}
+
+		kind := fmt.Sprintf("%v.%v", policy.Unstructured().GroupVersionKind().Kind, policy.Unstructured().GroupVersionKind().Group)
+
+		age := duration.HumanDuration(pp.Clock.Since(policy.Unstructured().GetCreationTimestamp().Time))
+
 		row := []string{
 			policy.Unstructured().GetName(),
-			policy.Unstructured().GroupVersionKind().Kind,
+			kind,
 			policy.TargetRef().Name,
 			policy.TargetRef().Kind,
 			policyType,
+			age,
 		}
 		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	}
@@ -69,7 +78,7 @@ func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
 	})
 
 	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "GROUP", "KIND", "POLICY TYPE", "SCOPE"}
+	row := []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"}
 	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 
 	for _, policyCRD := range policyCRDs {
@@ -77,12 +86,14 @@ func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
 		if policyCRD.IsInherited() {
 			policyType = "Inherited"
 		}
+
+		age := duration.HumanDuration(pp.Clock.Since(policyCRD.CRD().GetCreationTimestamp().Time))
+
 		row := []string{
 			policyCRD.CRD().Name,
-			policyCRD.CRD().Spec.Group,
-			policyCRD.CRD().Spec.Names.Kind,
 			policyType,
 			string(policyCRD.CRD().Spec.Scope),
+			age,
 		}
 		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	}

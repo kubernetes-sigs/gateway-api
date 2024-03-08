@@ -5,7 +5,7 @@ metadata:
 spec:
   controllerName: acme.io/gateway-controller
   parametersRef:
-    name: acme-lb
+    name: example
     group: acme.io
     kind: Parameters
 ---

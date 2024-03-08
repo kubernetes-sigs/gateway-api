@@ -36,12 +36,14 @@ type resourceID struct {
 	Name      string
 }
 
-type gatewayClassID resourceID
-type namespaceID resourceID
-type gatewayID resourceID
-type httpRouteID resourceID
-type backendID resourceID
-type policyID resourceID
+type (
+	gatewayClassID resourceID
+	namespaceID    resourceID
+	gatewayID      resourceID
+	httpRouteID    resourceID
+	backendID      resourceID
+	policyID       resourceID
+)
 
 // GatewayClassID returns an ID for a GatewayClass.
 func GatewayClassID(gatewayClassName string) gatewayClassID {
