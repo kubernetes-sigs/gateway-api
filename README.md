@@ -44,7 +44,7 @@ For a complete API reference, please refer to:
 
 ## Gateway API conformance
 
-If you are a Gateway API implementation and want to run conformance tests against
+If you are developing a Gateway API implementation and want to run conformance tests against
 your project and eventually submit the proof of conformance, visit the [conformance
 documentation][conformance-docs]. If you are a user who wants to explore the features
 supported by the various implementations, navigate the [conformance reports][conformance-reports]
