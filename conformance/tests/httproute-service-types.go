@@ -21,6 +21,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	discoveryv1 "k8s.io/api/discovery/v1"
@@ -74,24 +75,17 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		deployment := &appsv1.Deployment{}
-		if err := suite.Client.Get(ctx, client.ObjectKey{Namespace: ns, Name: "infra-backend-v1"}, deployment); err != nil {
-			t.Fatal("Failed to list Deployment 'infra-backend-v1':", err)
-		}
+		err := suite.Client.Get(ctx, client.ObjectKey{Namespace: ns, Name: "infra-backend-v1"}, deployment)
+		require.NoError(t, err, "Failed to fetch Deployment 'infra-backend-v1'")
 
 		selector, err := metav1.LabelSelectorAsSelector(deployment.Spec.Selector)
-		if err != nil {
-			t.Fatal("Failed to parse Deployment selector", err)
-		}
+		require.NoError(t, err, "Failed to parse Deployment selector")
 
 		// Setup Manual Endpoints
 		pods := &corev1.PodList{}
-		if err := suite.Client.List(ctx, pods, client.MatchingLabelsSelector{Selector: selector}, client.InNamespace(ns)); err != nil {
-			t.Fatal("Failed to list infra-backend-v1 Pods:", err)
-		}
-
-		if len(pods.Items) == 0 {
-			t.Fatal("Expected infra-backend-v1 to have running Pods")
-		}
+		err = suite.Client.List(ctx, pods, client.MatchingLabelsSelector{Selector: selector}, client.InNamespace(ns))
+		require.NoError(t, err, "Failed to list 'infra-backend-v1' Pods")
+		require.NotEmpty(t, pods, "Expected 'infra-backend-v1' to have running Pods")
 
 		setupEndpoints(t, suite.Client, typeManualEndpoints, ns, pods)
 		setupEndpointSlices(t, suite.Client, typeManualEndpointSlices, ns, pods)
@@ -115,9 +109,8 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 func setupEndpoints(t *testing.T, klient client.Client, endpointNames []string, ns string, pods *corev1.PodList) {
 	for _, endpointName := range endpointNames {
 		endpoints := &corev1.Endpoints{}
-		if err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpoints); err != nil {
-			t.Fatalf("Unable to fetch Endpoint %q: %v", endpointName, err)
-		}
+		err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpoints)
+		require.NoErrorf(t, err, "Unable to fetch Endpoint %q", endpointName)
 
 		patch := client.MergeFrom(endpoints.DeepCopy())
 
@@ -142,18 +135,16 @@ func setupEndpoints(t *testing.T, klient client.Client, endpointNames []string, 
 				},
 			}
 		}
-		if err := klient.Patch(context.TODO(), endpoints, patch); err != nil {
-			t.Fatalf("Failed to patch Endpoint %q: %v", endpointName, err)
-		}
+		err = klient.Patch(context.TODO(), endpoints, patch)
+		require.NoErrorf(t, err, "Failed to patch Endpoint %q", endpointName)
 	}
 }
 
 func setupEndpointSlices(t *testing.T, klient client.Client, endpointNames []string, ns string, pods *corev1.PodList) {
 	for _, endpointName := range endpointNames {
 		endpointSlice := &discoveryv1.EndpointSlice{}
-		if err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpointSlice); err != nil {
-			t.Fatalf("Unable to fetch EndpointSlice %q: %v", endpointName, err)
-		}
+		err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpointSlice)
+		require.NoErrorf(t, err, "Unable to fetch EndpointSlice %q", endpointName)
 
 		patch := client.MergeFrom(endpointSlice.DeepCopy())
 
@@ -176,8 +167,7 @@ func setupEndpointSlices(t *testing.T, klient client.Client, endpointNames []str
 				},
 			}
 		}
-		if err := klient.Patch(context.TODO(), endpointSlice, patch); err != nil {
-			t.Fatalf("Failed to patch EndpointSlice %q: %v", endpointName, err)
-		}
+		err = klient.Patch(context.TODO(), endpointSlice, patch)
+		require.NoErrorf(t, err, "Failed to patch EndpointSlice %q", endpointName)
 	}
 }
