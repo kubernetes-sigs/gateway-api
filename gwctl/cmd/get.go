@@ -74,7 +74,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	realClock := clock.RealClock{}
 	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
 	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out, Clock: realClock}
-	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
+	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out, Clock: realClock}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
