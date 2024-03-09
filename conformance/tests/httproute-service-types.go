@@ -18,6 +18,8 @@ package tests
 
 import (
 	"context"
+	"fmt"
+	"net/netip"
 	"slices"
 	"testing"
 
@@ -49,11 +51,6 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 	Manifests: []string{"tests/httproute-service-types.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		var (
-			typeManualEndpoints = []string{
-				"manual-endpoints",
-				"headless-manual-endpoints",
-			}
-
 			typeManualEndpointSlices = []string{
 				"manual-endpointslices",
 				"headless-manual-endpointslices",
@@ -63,7 +60,7 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 				"headless",
 			}
 
-			serviceTypes = slices.Concat(typeManaged, typeManualEndpoints, typeManualEndpointSlices)
+			serviceTypes = slices.Concat(typeManaged, typeManualEndpointSlices)
 
 			ctx     = context.TODO()
 			ns      = "gateway-conformance-infra"
@@ -87,7 +84,6 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 		require.NoError(t, err, "Failed to list 'infra-backend-v1' Pods")
 		require.NotEmpty(t, pods, "Expected 'infra-backend-v1' to have running Pods")
 
-		setupEndpoints(t, suite.Client, typeManualEndpoints, ns, pods)
 		setupEndpointSlices(t, suite.Client, typeManualEndpointSlices, ns, pods)
 
 		for i, path := range serviceTypes {
@@ -106,68 +102,63 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 	},
 }
 
-func setupEndpoints(t *testing.T, klient client.Client, endpointNames []string, ns string, pods *corev1.PodList) {
-	for _, endpointName := range endpointNames {
-		endpoints := &corev1.Endpoints{}
-		err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpoints)
-		require.NoErrorf(t, err, "Unable to fetch Endpoint %q", endpointName)
+func setupEndpointSlices(t *testing.T, klient client.Client, endpointPrefixes []string, ns string, pods *corev1.PodList) {
+	ipFamilies := []struct {
+		endpointSuffix string
+		isMember       func(ip netip.Addr) bool
+	}{{
+		endpointSuffix: "ip4",
+		isMember:       netip.Addr.Is4,
+	}, {
+		endpointSuffix: "ip6",
+		isMember:       netip.Addr.Is6,
+	}}
 
-		patch := client.MergeFrom(endpoints.DeepCopy())
+	for _, ipFamily := range ipFamilies {
+		for _, endpointPrefix := range endpointPrefixes {
+			endpointName := fmt.Sprintf("%s-%s", endpointPrefix, ipFamily.endpointSuffix)
+			endpointSlice := &discoveryv1.EndpointSlice{}
 
-		endpoints.Subsets = []corev1.EndpointSubset{{
-			Addresses: make([]corev1.EndpointAddress, len(pods.Items)),
-			Ports: []corev1.EndpointPort{{
-				Name:     "first-port",
-				Protocol: corev1.ProtocolTCP,
-				Port:     3000,
-			}},
-		}}
+			err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpointSlice)
+			require.NoErrorf(t, err, "Unable to fetch EndpointSlice %q", endpointName)
 
-		for i, pod := range pods.Items {
-			endpoints.Subsets[0].Addresses[i] = corev1.EndpointAddress{
-				IP:       pod.Status.PodIP,
-				NodeName: ptr.To(pod.Spec.NodeName),
-				TargetRef: &corev1.ObjectReference{
-					Kind:      "Pod",
-					Name:      pod.GetName(),
-					Namespace: pod.GetNamespace(),
-					UID:       pod.GetUID(),
-				},
+			patch := client.MergeFrom(endpointSlice.DeepCopy())
+			endpointSlice.Endpoints = make([]discoveryv1.Endpoint, 0, len(pods.Items))
+
+			for _, pod := range pods.Items {
+				for _, podIP := range pod.Status.PodIPs {
+					ip, err := netip.ParseAddr(podIP.IP) //nolint:govet
+					require.NoErrorf(t, err, "Pod IP %q was not valid", podIP.IP)
+
+					if !ipFamily.isMember(ip) {
+						continue
+					}
+
+					endpoint := discoveryv1.Endpoint{
+						Addresses: []string{pod.Status.PodIP},
+						Conditions: discoveryv1.EndpointConditions{
+							Ready:       ptr.To(true),
+							Serving:     ptr.To(true),
+							Terminating: ptr.To(false),
+						},
+						NodeName: ptr.To(pod.Spec.NodeName),
+						TargetRef: &corev1.ObjectReference{
+							Kind:      "Pod",
+							Name:      pod.GetName(),
+							Namespace: pod.GetNamespace(),
+							UID:       pod.GetUID(),
+						},
+					}
+					endpointSlice.Endpoints = append(endpointSlice.Endpoints, endpoint)
+				}
 			}
-		}
-		err = klient.Patch(context.TODO(), endpoints, patch)
-		require.NoErrorf(t, err, "Failed to patch Endpoint %q", endpointName)
-	}
-}
 
-func setupEndpointSlices(t *testing.T, klient client.Client, endpointNames []string, ns string, pods *corev1.PodList) {
-	for _, endpointName := range endpointNames {
-		endpointSlice := &discoveryv1.EndpointSlice{}
-		err := klient.Get(context.TODO(), client.ObjectKey{Name: endpointName, Namespace: ns}, endpointSlice)
-		require.NoErrorf(t, err, "Unable to fetch EndpointSlice %q", endpointName)
-
-		patch := client.MergeFrom(endpointSlice.DeepCopy())
-
-		endpointSlice.Endpoints = make([]discoveryv1.Endpoint, len(pods.Items))
-
-		for i, pod := range pods.Items {
-			endpointSlice.Endpoints[i] = discoveryv1.Endpoint{
-				Addresses: []string{pod.Status.PodIP},
-				Conditions: discoveryv1.EndpointConditions{
-					Ready:       ptr.To(true),
-					Serving:     ptr.To(true),
-					Terminating: ptr.To(false),
-				},
-				NodeName: ptr.To(pod.Spec.NodeName),
-				TargetRef: &corev1.ObjectReference{
-					Kind:      "Pod",
-					Name:      pod.GetName(),
-					Namespace: pod.GetNamespace(),
-					UID:       pod.GetUID(),
-				},
+			if len(endpointSlice.Endpoints) == 0 {
+				continue
 			}
+
+			err = klient.Patch(context.TODO(), endpointSlice, patch)
+			require.NoErrorf(t, err, "Failed to patch EndpointSlice %q", endpointName)
 		}
-		err = klient.Patch(context.TODO(), endpointSlice, patch)
-		require.NoErrorf(t, err, "Failed to patch EndpointSlice %q", endpointName)
 	}
 }
