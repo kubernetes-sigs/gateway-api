@@ -86,6 +86,7 @@ nav:
       - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
       - HTTP header modifier: guides/http-header-modifier.md
       - HTTP traffic splitting: guides/traffic-splitting.md
+      - HTTP request mirroring: guides/http-request-mirroring.md
       - Cross-Namespace routing: guides/multiple-ns.md
       - TLS: guides/tls.md
       - TCP routing: guides/tcp.md
