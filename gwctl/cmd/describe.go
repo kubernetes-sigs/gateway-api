@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package describe
+package cmd
 
 import (
 	"fmt"
@@ -22,40 +22,50 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-type describeFlags struct {
-	namespace     string
-	allNamespaces bool
-}
+func NewDescribeCommand() *cobra.Command {
 
-func NewDescribeCommand(params *utils.CmdParams) *cobra.Command {
-	flags := &describeFlags{}
+	var namespaceFlag string
+	var allNamespacesFlag bool
 
 	cmd := &cobra.Command{
 		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends} RESOURCE_NAME",
 		Short: "Show details of a specific resource or group of resources",
 		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
-			runDescribe(args, params, flags)
+			params := getParams(kubeConfigPath)
+			runDescribe(cmd, args, params)
 		},
 	}
-	cmd.Flags().StringVarP(&flags.namespace, "namespace", "n", "default", "")
-	cmd.Flags().BoolVarP(&flags.allNamespaces, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
+	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
+	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
 
 	return cmd
 }
 
-func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
+func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	kind := args[0]
-	ns := flags.namespace
-	if flags.allNamespaces {
+
+	ns, err := cmd.Flags().GetString("namespace")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to read flag \"namespace\": %v\n", err)
+		os.Exit(1)
+	}
+
+	allNs, err := cmd.Flags().GetBool("all-namespaces")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to read flag \"all-namespaces\": %v\n", err)
+		os.Exit(1)
+	}
+
+	if allNs {
 		ns = metav1.NamespaceAll
 	}
 
@@ -93,7 +103,8 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 		}
 		resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(filter)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "failed to discover HTTPRoute resources: %v\n", err)
+			os.Exit(1)
 		}
 		httpRoutesPrinter.PrintDescribeView(resourceModel)
 
@@ -104,7 +115,8 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 		}
 		resourceModel, err := discoverer.DiscoverResourcesForGateway(filter)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "failed to discover Gateway resources: %v\n", err)
+			os.Exit(1)
 		}
 		gwPrinter.PrintDescribeView(resourceModel)
 
@@ -115,7 +127,8 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 		}
 		resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(filter)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "failed to discover GatewayClass resources: %v\n", err)
+			os.Exit(1)
 		}
 		gwcPrinter.PrintDescribeView(resourceModel)
 
@@ -128,7 +141,8 @@ func runDescribe(args []string, params *utils.CmdParams, flags *describeFlags) {
 		}
 		resourceModel, err := discoverer.DiscoverResourcesForBackend(filter)
 		if err != nil {
-			panic(err)
+			fmt.Fprintf(os.Stderr, "failed to discover resources related to Backend: %v\n", err)
+			os.Exit(1)
 		}
 		backendsPrinter.PrintDescribeView(resourceModel)
 

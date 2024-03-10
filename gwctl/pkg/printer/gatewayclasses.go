@@ -19,13 +19,16 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
+
 	"sort"
 	"strings"
 	"text/tabwriter"
 
+	"sigs.k8s.io/yaml"
+
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-	"sigs.k8s.io/yaml"
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
@@ -106,7 +109,8 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Fprint(gcp.Out, string(b))
 		}
