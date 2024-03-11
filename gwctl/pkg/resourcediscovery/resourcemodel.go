@@ -61,7 +61,7 @@ func (rm *ResourceModel) addGatewayClasses(gatewayClasses ...gatewayv1.GatewayCl
 }
 
 // addNamespace adds nodes for Namespace.
-func (rm *ResourceModel) addNamespace(namespaces ...string) {
+func (rm *ResourceModel) addNamespace(namespaces ...corev1.Namespace) {
 	if rm.Namespaces == nil {
 		rm.Namespaces = make(map[namespaceID]*NamespaceNode)
 	}

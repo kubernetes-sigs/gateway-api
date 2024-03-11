@@ -23,6 +23,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/klog/v2"
@@ -248,10 +249,10 @@ func (b *BackendNode) ID() backendID {
 	)
 }
 
-// HTTPRouteNode models the relationships and dependencies of a Namespace.
+// NamespaceNode models the relationships and dependencies of a Namespace.
 type NamespaceNode struct {
 	// NamespaceName identifies the Namespace.
-	NamespaceName string
+	Namespace *corev1.Namespace
 
 	// Gateways lists Gateways deployed within the Namespace.
 	Gateways map[gatewayID]*GatewayNode
@@ -263,25 +264,25 @@ type NamespaceNode struct {
 	Policies map[policyID]*PolicyNode
 }
 
-func NewNamespaceNode(namespaceName string) *NamespaceNode {
-	if namespaceName == "" {
-		namespaceName = metav1.NamespaceDefault
+func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
+	if namespace.Name == "" {
+		namespace.Name = metav1.NamespaceDefault
 	}
 	return &NamespaceNode{
-		NamespaceName: namespaceName,
-		Gateways:      make(map[gatewayID]*GatewayNode),
-		HTTPRoutes:    make(map[httpRouteID]*HTTPRouteNode),
-		Backends:      make(map[backendID]*BackendNode),
-		Policies:      make(map[policyID]*PolicyNode),
+		Namespace:  &namespace,
+		Gateways:   make(map[gatewayID]*GatewayNode),
+		HTTPRoutes: make(map[httpRouteID]*HTTPRouteNode),
+		Backends:   make(map[backendID]*BackendNode),
+		Policies:   make(map[policyID]*PolicyNode),
 	}
 }
 
 func (n *NamespaceNode) ID() namespaceID {
-	if n.NamespaceName == "" {
+	if n.Namespace.Name == "" {
 		klog.V(0).ErrorS(nil, "returning empty ID since Namespace is empty")
 		return namespaceID(resourceID{})
 	}
-	return NamespaceID(n.NamespaceName)
+	return NamespaceID(n.Namespace.Name)
 }
 
 // PolicyNode models the relationships and dependencies of a Policy resource

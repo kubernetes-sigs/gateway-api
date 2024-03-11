@@ -36,7 +36,7 @@ func NewDescribeCommand() *cobra.Command {
 	var allNamespacesFlag bool
 
 	cmd := &cobra.Command{
-		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends} RESOURCE_NAME",
+		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends|namespace} RESOURCE_NAME",
 		Short: "Show details of a specific resource or group of resources",
 		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -78,6 +78,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	gwPrinter := &printer.GatewaysPrinter{Out: params.Out}
 	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out}
 	backendsPrinter := &printer.BackendsPrinter{Out: params.Out}
+	namespacesPrinter := &printer.NamespacesPrinter{Out: params.Out}
 
 	switch kind {
 	case "policy", "policies":
@@ -145,6 +146,19 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			os.Exit(1)
 		}
 		backendsPrinter.PrintDescribeView(resourceModel)
+
+	case "namespace", "namespaces":
+		filter := resourcediscovery.Filter{}
+		if len(args) > 1 {
+			filter.Name = args[1]
+		}
+		
+		resourceModel, err := discoverer.DiscoverResourcesForNamespace(filter)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
+			os.Exit(1)
+		}
+		namespacesPrinter.PrintDescribeView(resourceModel)
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unrecognized RESOURCE_TYPE\n")
