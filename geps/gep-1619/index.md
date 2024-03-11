@@ -616,9 +616,12 @@ weights when selecting a backend after route matching. It's important to note th
 the process of route matching.
 
 When using multiple backends in traffic splitting, all backend services should have session persistence enabled.
-Nonetheless, implementations MUST also support traffic splitting scenarios in which one service has persistence
-enabled while the other does not. This support is necessary, particularly in scenarios where users are transitioning
-to or from an implementation version designed with or without persistence.
+Nonetheless, implementations MUST carefully consider how to manage traffic splitting scenarios in which one service has
+persistence enabled while the other does not. This includes scenarios where users are transitioning to or from an
+implementation version designed with or without persistence. For traffic splitting scenario within a single route rule,
+this GEP leaves the decision to the implementation. Implementations MAY choose to apply session persistence to all
+backends equally, reject the session persistence configuration entirely, or apply session persistence only for the
+backends with it configured.
 
 See [Edge Case Behavior](#edge-case-behavior) for more use cases on traffic splitting.
 
@@ -877,12 +880,18 @@ spec:
     type: Cookie
 ```
 
-When persistent sessions are established, the persistence to a single backend MUST override the traffic splitting
-configuration. This is also described in [Traffic Splitting](#traffic-splitting).
+In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
+implementation MAY choose to:
+
+1. Apply session persistence configured in `BackendLBPolicy` to `servicev1` and `servicev2` equally
+2. Reject the session persistence configured in `BackendLBPolicy` so that `servicev1` does not have session persistence
+3. Apply session persistence for only `servicev1`, potentially causing all traffic to eventually migrate to `servicev1`
+
+This is also described in [Traffic Splitting](#traffic-splitting).
 
 #### Traffic Splitting with two Backends and one with Weight 0
 
-Consider the scenario where a route has two path matches, but one of those paths involves traffic splitting with a
+Consider the scenario where a route has two rules, but one of those rules involves traffic splitting with a
 backendRef that has a weight of 0, and additionally, a `BackendLBPolicy` is attached to one of the services:
 
 ```yaml
@@ -922,8 +931,8 @@ A potentially unexpected situation occurs when:
 1. Curl to `/a` which establishes a persistent session with `servicev1`
 2. Curl to `/b` routes to `servicev1` due to route persistence despite `weight: 0` configuration
 
-In this scenario, implementations MUST give precedence to session persistence, regardless of the `weight`
-configuration.
+In this scenario which spans two route rules, implementations MUST give precedence to session persistence, regardless of
+the `weight` configuration.
 
 #### A Service's Selector is Dynamically Updated
 
