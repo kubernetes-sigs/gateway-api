@@ -33,9 +33,10 @@ This table highlights the support. Please feel free to add any missing implement
 
 ### API
 
-* Introduce a `clientValidation` field of type `ClientValidationContext` within [GatewayTLSConfig][] that can be used to validate the client initiating the TLS connection
+* Introduce a `Client` field of type `TLSClientContext` within [GatewayTLSConfig][] to hold TLS configuration specific to the client.
+* Introduce a `Validation` field of type `TLSValidationContext` within the `Client` field that can be used to validate the peer with which the TLS connection is being made.
 to the Gateway.
-* Introduce a `caCertificateRefs` field within `ClientValidationContext` that can be used to specify a list of CA Certificates that
+* Introduce a `caCertificateRefs` field within `ValidationContext` that can be used to specify a list of CA Certificates that
 can be used as a trust anchor to validate the certificates presented by the client.
 * This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the peer on the connection between the Gateway and the downstream client.
 * Introduce an optional `subjectAltNames` field within `ClientValidationContext` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. The maximum number of alternate names that can be specified is implementation defined.
@@ -43,10 +44,17 @@ can be used as a trust anchor to validate the certificates presented by the clie
 #### GO
 
 ```go
-// ClientValidationContext holds configuration that can be used to validate the client intiating the TLS connection
-// to the Gateway.
-// By default, no client specific configuration is validated.
-type ClientValidationContext struct {
+// TLSClientContext holds configuration specific to the client initiating the TLS connection.
+type TLSClientContext struct {
+    // Validation holds configuration around validating the client initiating the TLS connection.
+    //
+    // +optional
+    Validation *TLSValidationContext `json:"validation,omitempty"`
+}
+
+
+// TLSValidationContext holds configuration that can be used to validate the peer in the TLS connection
+type TLSValidationContext struct {
     // CACertificateRefs contains one or more references to
     // Kubernetes objects that contain TLS certificates of
     // the Certificate Authorities that can be used
@@ -71,7 +79,7 @@ type ClientValidationContext struct {
     //
     // +kubebuilder:validation:MaxItems=8
     // +kubebuilder:validation:MinItems=1
-    CACertificateRefs []SecretObjectReference `json:”caCertificateRefs,omitempty”`
+    CACertificateRefs []SecretObjectReference `json:"caCertificateRefs,omitempty"`
     // SubjectAltNames contains one or more alternate names to verify
     // the subject identity in the certificate presented by the client.
     //
@@ -103,11 +111,12 @@ spec:
       - kind: Secret
         group: ""
         name: foo-example-com-cert
-      clientValidation:
-        caCertificateRefs:
-        - kind: ConfigMap
-          group: ""
-          name: foo-example-com-ca-cert
+      client:
+        validation:
+          caCertificateRefs:
+          - kind: ConfigMap
+            group: ""
+            name: foo-example-com-ca-cert
 ```
 
 ## Deferred
@@ -115,6 +124,7 @@ spec:
 This section highlights use cases that may be covered in a future iteration of this GEP
 
 * Using system CA certificates as the trust anchor to validate the certificates presented by the client.
+* Supporting a permissive TLS mode where untrusted clients are allowed in, useful for debugging and migrating to strict TLS.
 
 ## References
 
