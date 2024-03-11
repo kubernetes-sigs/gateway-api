@@ -29,6 +29,7 @@ const (
 )
 
 var (
+	EndUser                    = flag.Bool("end-user", false, "Disable implementation validation checks allowing end users to run tests")
 	ImplementationOrganization = flag.String("organization", "", "Implementation's Organization to issue conformance to")
 	ImplementationProject      = flag.String("project", "", "Implementation's project to issue conformance to")
 	ImplementationURL          = flag.String("url", "", "Implementation's url to issue conformance to")

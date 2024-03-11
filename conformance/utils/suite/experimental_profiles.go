@@ -93,6 +93,14 @@ var (
 	}
 )
 
+func RegisterConformanceProfile(p ConformanceProfile) {
+	_, ok := conformanceProfileMap[p.Name]
+	if ok {
+		panic(fmt.Sprintf("ConformanceProfile named %q is already registered", p.Name))
+	}
+	conformanceProfileMap[p.Name] = p
+}
+
 // -----------------------------------------------------------------------------
 // Conformance Profiles - Private Profile Mapping Helpers
 // -----------------------------------------------------------------------------

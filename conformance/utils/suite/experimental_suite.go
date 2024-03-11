@@ -30,7 +30,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
@@ -100,6 +99,8 @@ type ExperimentalConformanceOptions struct {
 	AllowCRDsMismatch   bool
 	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
+	ReportOutputPath    string
+	EndUser             bool
 }
 
 const (
@@ -196,10 +197,6 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 
 	for feature := range options.ExemptFeatures {
 		options.SupportedFeatures.Delete(feature)
-	}
-
-	if options.FS == nil {
-		options.FS = &conformance.Manifests
 	}
 
 	suite.ConformanceTestSuite = ConformanceTestSuite{
@@ -340,33 +337,36 @@ func (suite *ExperimentalConformanceTestSuite) Report() (*confv1a1.ConformanceRe
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) (*confv1a1.Implementation, error) {
-	if org == "" {
-		return nil, errors.New("implementation's organization can not be empty")
-	}
-	if project == "" {
-		return nil, errors.New("implementation's project can not be empty")
-	}
-	if url == "" {
-		return nil, errors.New("implementation's url can not be empty")
-	}
-	if version == "" {
-		return nil, errors.New("implementation's version can not be empty")
-	}
+func ParseImplementation(org, project, url, version, contact string) confv1a1.Implementation {
 	contacts := strings.Split(contact, ",")
-	if len(contacts) == 0 {
-		return nil, errors.New("implementation's contact can not be empty")
-	}
-
-	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
-
-	return &confv1a1.Implementation{
+	i := confv1a1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,
 		Version:      version,
 		Contact:      contacts,
-	}, nil
+	}
+	return i
+}
+
+func ValidateImplementation(i confv1a1.Implementation) error {
+	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
+	if i.Organization == "" {
+		return errors.New("implementation's organization can not be empty")
+	}
+	if i.Project == "" {
+		return errors.New("implementation's project can not be empty")
+	}
+	if i.URL == "" {
+		return errors.New("implementation's url can not be empty")
+	}
+	if i.Version == "" {
+		return errors.New("implementation's version can not be empty")
+	}
+	if len(i.Contact) == 0 {
+		return errors.New("implementation's contact can not be empty")
+	}
+	return nil
 }
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
