@@ -100,7 +100,6 @@ type ExperimentalConformanceOptions struct {
 	Implementation      confv1a1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 	ReportOutputPath    string
-	EndUser             bool
 }
 
 const (

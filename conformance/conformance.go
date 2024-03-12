@@ -40,7 +40,6 @@ func DefaultOptions(t *testing.T) *suite.ExperimentalConformanceOptions {
 		AllowCRDsMismatch:   *flags.AllowCRDsMismatch,
 		ConformanceProfiles: suite.ParseConformanceProfiles(*flags.ConformanceProfiles),
 		ReportOutputPath:    *flags.ReportOutput,
-		EndUser:             *flags.EndUser,
 		Implementation: suite.ParseImplementation(
 			*flags.ImplementationOrganization,
 			*flags.ImplementationProject,
@@ -64,7 +63,7 @@ func RunConformance(t *testing.T, opts *suite.ExperimentalConformanceOptions) {
 	}
 
 	// Validate implementation if we are not an end user
-	if !opts.EndUser {
+	if opts.ReportOutputPath != "" {
 		err := suite.ValidateImplementation(opts.Implementation)
 		require.NoError(t, err, "Error parsing implementation's details")
 	}
