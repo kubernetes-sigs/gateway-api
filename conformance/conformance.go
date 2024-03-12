@@ -29,6 +29,10 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// DefaultOptions will parse the test binary flags and create a configuration
+// that can be used to run Gateway API conformance tests.
+//
+// End-users downstream can override options after instantiation
 func DefaultOptions(t *testing.T) *suite.ExperimentalConformanceOptions {
 	return &suite.ExperimentalConformanceOptions{
 		Options:             *DefaultLegacyOptions(t),
@@ -47,6 +51,8 @@ func DefaultOptions(t *testing.T) *suite.ExperimentalConformanceOptions {
 	}
 }
 
+// RunConformance will run the Gateway API conformance tests given the supplied options.
+// If options is nil then the DefaultOptions will be instantiated
 func RunConformance(t *testing.T, opts *suite.ExperimentalConformanceOptions) {
 	if opts == nil {
 		opts = DefaultOptions(t)

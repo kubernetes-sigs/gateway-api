@@ -93,6 +93,10 @@ var (
 	}
 )
 
+// RegisterConformanceProfile allows downstream tests to register unique profiles that
+// define their own set of core features.
+//
+// If a conformance profile with the same name exists this function will panic
 func RegisterConformanceProfile(p ConformanceProfile) {
 	_, ok := conformanceProfileMap[p.Name]
 	if ok {
