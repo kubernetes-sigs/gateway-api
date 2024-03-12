@@ -72,16 +72,15 @@ func RunConformance(t *testing.T, opts *suite.ExperimentalConformanceOptions) {
 	}
 
 	cSuite.Setup(t)
-	cSuite.Run(t, tests.ConformanceTests)
-	report, err := cSuite.Report()
-	if err != nil {
-		t.Fatalf("error generating conformance profile report: %v", err)
-	}
+	require.NoError(t, cSuite.Run(t, tests.ConformanceTests))
 
+	report, err := cSuite.Report()
+	require.NoError(t, err, "error generating conformance profile report")
 	require.NoError(t, writeReport(t.Logf, *report, opts.ReportOutputPath), "error writing report")
 }
 
 func writeReport(logf func(string, ...any), report confv1a1.ConformanceReport, output string) error {
+	//nolint:musttag // the linter is complaining report doesn't have yaml tags - but it has json ones
 	rawReport, err := yaml.Marshal(report)
 	if err != nil {
 		return err
