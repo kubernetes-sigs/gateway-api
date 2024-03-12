@@ -169,7 +169,7 @@ go test ./conformance/... --run TestConformance/<ShortName>
 #### Network Policies
 
 In clusters that use [Container Network Interface (CNI) plugins][network_plugins]
-which which enforce network policies some conformance tests might require custom
+which enforce network policies some conformance tests might require custom
 [`NetworkPolicy`][netpol] resources to be added to the cluster in order to allow
 the traffic to reach the required destinations.
 
