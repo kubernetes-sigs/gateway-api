@@ -177,6 +177,19 @@ feature) to run a very specific test by name. This can be done using the
 go test ./conformance/... --run TestConformance/<ShortName>
 ```
 
+#### Network Policies
+
+In clusters that use [Container Network Interface (CNI) plugins][network_plugins]
+which enforce network policies some conformance tests might require custom
+[`NetworkPolicy`][netpol] resources to be added to the cluster in order to allow
+the traffic to reach the required destinations.
+
+Users are expected to add those required network policies so that their
+implementations pass those tests.
+
+[network_plugins]: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
+[netpol]: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
 ## Contributing to Conformance
 
 Many implementations run conformance tests as part of their full e2e test suite.
