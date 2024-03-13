@@ -33,6 +33,8 @@ import (
 	"sigs.k8s.io/gateway-api/conformance"
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
+	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/pkg/consts"
@@ -81,11 +83,11 @@ type ExperimentalConformanceTestSuite struct {
 
 	// extendedSupportedFeatures is a compiled list of named features that were
 	// marked as supported, and is used for reporting the test results.
-	extendedSupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
+	extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.SupportedFeature]
 
 	// extendedUnsupportedFeatures is a compiled list of named features that were
 	// marked as not supported, and is used for reporting the test results.
-	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
+	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[features.SupportedFeature]
 
 	// lock is a mutex to help ensure thread safety of the test suite object.
 	lock sync.RWMutex
@@ -131,15 +133,15 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 		apiChannel = undefinedKeyword
 	}
 
-	mode := "default"
+	mode := flags.DefaultMode
 	if options.Mode != "" {
 		mode = options.Mode
 	}
 
 	suite := &ExperimentalConformanceTestSuite{
 		results:                     make(map[string]testResult),
-		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
-		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
+		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[features.SupportedFeature]),
+		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[features.SupportedFeature]),
 		conformanceProfiles:         options.ConformanceProfiles,
 		implementation:              options.Implementation,
 		mode:                        mode,
@@ -157,9 +159,9 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 	// cover all features, if they don't they'll need to have provided a
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = AllFeatures
+		options.SupportedFeatures = features.AllFeatures
 	} else if options.SupportedFeatures == nil {
-		options.SupportedFeatures = sets.New[SupportedFeature]()
+		options.SupportedFeatures = sets.New[features.SupportedFeature]()
 	}
 
 	for _, conformanceProfileName := range options.ConformanceProfiles.UnsortedList() {
@@ -177,12 +179,12 @@ func NewExperimentalConformanceTestSuite(options ExperimentalConformanceOptions)
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
 			if options.SupportedFeatures.Has(f) {
 				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[features.SupportedFeature]()
 				}
 				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
 			} else {
 				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[features.SupportedFeature]()
 				}
 				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}
