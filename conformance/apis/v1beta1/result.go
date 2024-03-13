@@ -14,19 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package v1beta1
 
-// Statistics includes numerical summaries of the number of conformance tests
-// that passed, failed or were intentionally skipped.
-type Statistics struct {
-	// Passed indicates how many tests completed successfully.
-	Passed uint32
+// Result is a simple high-level summary describing the conclusion of a test
+// run.
+type Result string
 
-	// Skipped indicates how many tests were intentionally not run, whether due
-	// to lack of feature support or whether they were explicitly disabled in
-	// the test suite.
-	Skipped uint32
+var (
+	// Success indicates that the test run concluded in all required tests
+	// passing.
+	Success Result = "success"
 
-	// Failed indicates how many tests were unsuccessful.
-	Failed uint32
-}
+	// Partial indicates that the test run concluded in some of the required
+	// tests passing without any failures, but some were skipped.
+	Partial Result = "partial"
+
+	// Failure indicates that the test run concluded in one ore more tests
+	// failing to complete successfully.
+	Failure Result = "failure"
+)
