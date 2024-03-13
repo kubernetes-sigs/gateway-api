@@ -25,11 +25,11 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/features"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 )
