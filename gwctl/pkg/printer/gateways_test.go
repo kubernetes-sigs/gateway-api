@@ -30,9 +30,9 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/cmd/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
 func TestGatewaysPrinter_Print(t *testing.T) {

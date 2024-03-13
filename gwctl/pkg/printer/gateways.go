@@ -19,6 +19,7 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -129,7 +130,8 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Fprint(gp.Out, string(b))
 		}

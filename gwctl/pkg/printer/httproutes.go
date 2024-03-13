@@ -19,6 +19,7 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -122,7 +123,8 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
 			fmt.Fprint(hp.Out, string(b))
 		}

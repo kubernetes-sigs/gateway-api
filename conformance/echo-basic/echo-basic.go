@@ -33,6 +33,8 @@ import (
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 	"golang.org/x/net/websocket"
+
+	g "sigs.k8s.io/gateway-api/conformance/echo-basic/grpc"
 )
 
 // RequestAssertions contains information about the request and the Ingress
@@ -62,7 +64,7 @@ type preserveSlashes struct {
 }
 
 func (s *preserveSlashes) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.URL.Path = strings.Replace(r.URL.Path, "//", "/", -1)
+	r.URL.Path = strings.ReplaceAll(r.URL.Path, "//", "/")
 	s.mux.ServeHTTP(w, r)
 }
 
@@ -77,6 +79,11 @@ type Context struct {
 var context Context
 
 func main() {
+	if os.Getenv("GRPC_ECHO_SERVER") != "" {
+		g.Main()
+		return
+	}
+
 	httpPort := os.Getenv("HTTP_PORT")
 	if httpPort == "" {
 		httpPort = "3000"
@@ -109,7 +116,7 @@ func main() {
 
 	go func() {
 		fmt.Printf("Starting server, listening on port %s (http)\n", httpPort)
-		err := http.ListenAndServe(fmt.Sprintf(":%s", httpPort), httpHandler)
+		err := http.ListenAndServe(fmt.Sprintf(":%s", httpPort), httpHandler) //nolint:gosec
 		if err != nil {
 			errchan <- err
 		}
@@ -137,12 +144,12 @@ func wsHandler(ws *websocket.Conn) {
 	fmt.Println("established websocket connection", ws.RemoteAddr())
 	// Echo websocket frames from the connection back to the client
 	// until io.EOF
-	io.Copy(ws, ws)
+	_, _ = io.Copy(ws, ws)
 }
 
-func healthHandler(w http.ResponseWriter, r *http.Request) {
+func healthHandler(w http.ResponseWriter, r *http.Request) { //nolint:revive
 	w.WriteHeader(200)
-	w.Write([]byte(`OK`))
+	_, _ = w.Write([]byte(`OK`))
 }
 
 func statusHandler(w http.ResponseWriter, r *http.Request) {
@@ -224,7 +231,7 @@ func echoHandler(w http.ResponseWriter, r *http.Request) {
 	writeEchoResponseHeaders(w, r.Header)
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
-	w.Write(js)
+	_, _ = w.Write(js)
 }
 
 func writeEchoResponseHeaders(w http.ResponseWriter, headers http.Header) {
@@ -242,7 +249,7 @@ func writeEchoResponseHeaders(w http.ResponseWriter, headers http.Header) {
 	}
 }
 
-func processError(w http.ResponseWriter, err error, code int) {
+func processError(w http.ResponseWriter, err error, code int) { //nolint:unparam
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	body, err := json.Marshal(struct {
@@ -257,7 +264,7 @@ func processError(w http.ResponseWriter, err error, code int) {
 	}
 
 	w.WriteHeader(code)
-	w.Write(body)
+	_, _ = w.Write(body)
 }
 
 func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, clientCA string, handler http.Handler) error {
@@ -280,7 +287,7 @@ func listenAndServeTLS(addr string, serverCert string, serverPrivKey string, cli
 		config.ClientCAs = certPool
 	}
 
-	srv := &http.Server{
+	srv := &http.Server{ //nolint:gosec
 		Addr:      addr,
 		Handler:   handler,
 		TLSConfig: &config,
@@ -311,11 +318,15 @@ func tlsStateToAssertions(connectionState *tls.ConnectionState) *TLSAssertions {
 		// Convert peer certificates to PEM blocks.
 		for _, c := range connectionState.PeerCertificates {
 			var out strings.Builder
-			pem.Encode(&out, &pem.Block{
+			err := pem.Encode(&out, &pem.Block{
 				Type:  "CERTIFICATE",
 				Bytes: c.Raw,
 			})
-			state.PeerCertificates = append(state.PeerCertificates, out.String())
+			if err != nil {
+				fmt.Printf("failed to encode certificate: %v\n", err)
+			} else {
+				state.PeerCertificates = append(state.PeerCertificates, out.String())
+			}
 		}
 
 		return &state

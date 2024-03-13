@@ -19,4 +19,4 @@ deps:
 
 build: deps
 	@echo "Building gwctl..."
-	@go build -o bin/gwctl cmd/main.go
+	@go build -o bin/gwctl main.go

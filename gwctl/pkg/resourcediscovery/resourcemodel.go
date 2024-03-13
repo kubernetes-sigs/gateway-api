@@ -61,7 +61,7 @@ func (rm *ResourceModel) addGatewayClasses(gatewayClasses ...gatewayv1.GatewayCl
 }
 
 // addNamespace adds nodes for Namespace.
-func (rm *ResourceModel) addNamespace(namespaces ...string) {
+func (rm *ResourceModel) addNamespace(namespaces ...corev1.Namespace) {
 	if rm.Namespaces == nil {
 		rm.Namespaces = make(map[namespaceID]*NamespaceNode)
 	}
@@ -160,7 +160,6 @@ func (rm *ResourceModel) addPolicyIfTargetExists(policies ...policymanager.Polic
 				policyNode.HTTPRoute = httpRouteNode
 				httpRouteNode.Policies[policyNode.ID()] = policyNode
 			}
-
 		} else if policy.TargetRef().Group == corev1.GroupName && policy.TargetRef().Kind == "Namespace" {
 			namespaceID := NamespaceID(policy.TargetRef().Name)
 			namespaceNode, ok := rm.Namespaces[namespaceID]

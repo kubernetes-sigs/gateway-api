@@ -434,7 +434,6 @@ func TestMergePoliciesOfDifferentHierarchy(t *testing.T) {
 			if diff := cmp.Diff(policySliceToMap(tc.wantMergedPolicies), gotMergedPolicies, cmpopts); diff != "" {
 				t.Errorf("MergePoliciesOfDifferentHierarchy returned unexpected diff (-want, +got):\n%v", diff)
 			}
-
 		})
 	}
 }

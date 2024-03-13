@@ -29,7 +29,7 @@ import (
 
 func TestHealthHandler(t *testing.T) {
 	// Test a valid health check
-	req, err := http.NewRequest("GET", "/health", nil)
+	req, err := http.NewRequest("GET", "/health", nil) //nolint:noctx
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -50,7 +50,7 @@ func TestHealthHandler(t *testing.T) {
 
 func TestDelayResponse(t *testing.T) {
 	// Test with a valid delay integer value
-	req, err := http.NewRequest("GET", "/?delay=1s", nil)
+	req, err := http.NewRequest("GET", "/?delay=1s", nil) //nolint:noctx
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func TestDelayResponse(t *testing.T) {
 	}
 
 	// Test with a valid delay decimal value
-	req, err = http.NewRequest("GET", "/?delay=0.1s", nil)
+	req, err = http.NewRequest("GET", "/?delay=0.1s", nil) //nolint:noctx
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -72,7 +72,7 @@ func TestDelayResponse(t *testing.T) {
 	}
 
 	// Test with an invalid delay value
-	req, err = http.NewRequest("GET", "/?delay=invalid", nil)
+	req, err = http.NewRequest("GET", "/?delay=invalid", nil) //nolint:noctx
 	if err != nil {
 		t.Fatal(err)
 	}
