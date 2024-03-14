@@ -91,6 +91,11 @@ func (p *PolicyManager) GetCRDs() []PolicyCRD {
 	return result
 }
 
+func (p *PolicyManager) GetCRD(name string) (PolicyCRD, bool) {
+	policyCrd, ok := p.policyCRDs[PolicyCrdID(name)]
+	return policyCrd, ok
+}
+
 func (p *PolicyManager) GetPolicies() []Policy {
 	var result []Policy
 	for _, policy := range p.policies {
@@ -194,6 +199,36 @@ func (p PolicyCRD) CRD() *apiextensionsv1.CustomResourceDefinition {
 // be used to target a cluster scoped resource like GatewayClass.
 func (p PolicyCRD) IsClusterScoped() bool {
 	return p.crd.Spec.Scope == apiextensionsv1.ClusterScoped
+}
+
+func (p PolicyCRD) Spec() map[string]interface{} {
+	spec := p.crd.Spec
+
+	var result map[string]interface{}
+	marshalledSpec, _ := json.Marshal(spec)
+	json.Unmarshal(marshalledSpec, &result)
+
+	return result
+}
+
+func (p PolicyCRD) Metadata() map[string]interface{} {
+	om := p.crd.ObjectMeta
+
+	var result map[string]interface{}
+	marshalledMetadata, _ := json.Marshal(om)
+	json.Unmarshal(marshalledMetadata, &result)
+
+	return result
+}
+
+func (p PolicyCRD) Status() map[string]interface{} {
+	status := p.crd.Status
+
+	var result map[string]interface{}
+	marshalledStatus, _ := json.Marshal(status)
+	json.Unmarshal(marshalledStatus, &result)
+
+	return result
 }
 
 type Policy struct {

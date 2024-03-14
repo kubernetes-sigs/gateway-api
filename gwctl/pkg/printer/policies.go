@@ -27,6 +27,8 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/yaml"
 
+	_ "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	_ "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 )
@@ -144,6 +146,68 @@ func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
 		}
 
 		if i+1 != len(policies) {
+			fmt.Fprintf(pp.Out, "\n\n")
+		}
+	}
+}
+
+type policyCrdDescribeView struct {
+	// PolicyCrd   *apiextensionsv1.CustomResourceDefinition `json:",omitempty"`
+	Name        string                 `json:",omitempty"`
+	Namespace   string                 `json:",omitempty"`
+	Labels      map[string]string      `json:",omitempty"`
+	Annotations map[string]string      `json:",omitempty"`
+	APIVersion  string                 `json:",omitempty"`
+	Kind        string                 `json:",omitempty"`
+	Metadata    map[string]interface{} `json:",omitempty"`
+	Spec        map[string]interface{} `json:",omitempty"`
+	Status      map[string]interface{} `json:",omitempty"`
+}
+
+func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanager.PolicyCRD) {
+	sort.Slice(policyCrds, func(i, j int) bool {
+		a := fmt.Sprintf("%v/%v", policyCrds[i].CRD().GetNamespace(), policyCrds[i].CRD().GetName())
+		b := fmt.Sprintf("%v/%v", policyCrds[j].CRD().GetNamespace(), policyCrds[j].CRD().GetName())
+		return a < b
+	})
+
+	for i, policyCrd := range policyCrds {
+		crd := policyCrd.CRD()
+
+		views := []policyCrdDescribeView{
+			{
+				Name:      crd.Name,
+				Namespace: crd.Namespace,
+			},
+			{
+				Labels:      crd.Labels,
+				Annotations: crd.Annotations,
+			},
+			{
+				APIVersion: crd.APIVersion,
+				Kind:       crd.Kind,
+			},
+			{
+				Metadata: policyCrd.Metadata(),
+			},
+			{
+				Spec: policyCrd.Spec(),
+			},
+			{
+				Status: policyCrd.Status(),
+			},
+		}
+
+		for _, view := range views {
+			b, err := yaml.Marshal(view)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Fprint(pp.Out, string(b))
+		}
+
+		if i+1 != len(policyCrds) {
 			fmt.Fprintf(pp.Out, "\n\n")
 		}
 	}
