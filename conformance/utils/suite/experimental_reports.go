@@ -23,7 +23,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	confv1a1 "sigs.k8s.io/gateway-api/conformance/apis/v1alpha1"
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 // -----------------------------------------------------------------------------

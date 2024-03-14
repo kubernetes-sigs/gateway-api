@@ -22,7 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/features"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func TestParseSupportedFeatures(t *testing.T) {
@@ -33,11 +33,11 @@ func TestParseSupportedFeatures(t *testing.T) {
 	}
 
 	s1 := sets.Set[features.SupportedFeature]{}
-	s1.Insert(features.SupportedFeature("a"))
+	s1.Insert("a")
 	s2 := sets.Set[features.SupportedFeature]{}
-	s2.Insert(features.SupportedFeature("b"))
-	s2.Insert(features.SupportedFeature("c"))
-	s2.Insert(features.SupportedFeature("d"))
+	s2.Insert("b")
+	s2.Insert("c")
+	s2.Insert("d")
 	features := []sets.Set[features.SupportedFeature]{nil, s1, s2}
 
 	for i, f := range flags {
