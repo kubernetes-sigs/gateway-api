@@ -401,7 +401,7 @@ spec:
                             this resource type, it\nMUST set the \"ResolvedRefs\"
                             condition to False for this Listener with the\n\"InvalidRouteKinds\"
                             reason.\n\n\nSupport: Core\n\n\nThe following list states
-                            the Route kinds compatible for each protocolType\nFor
+                            the Route kinds compatible for each protocolType\nfor
                             route kinds and protocolTypes included in Gateway API\n\n\nHTTP:
                             HTTPRoutes, GRPCRoutes\nHTTPS: HTTPRoutes, GRPCRoutes,
                             TLSRoute\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
@@ -1492,7 +1492,7 @@ spec:
                             this resource type, it\nMUST set the \"ResolvedRefs\"
                             condition to False for this Listener with the\n\"InvalidRouteKinds\"
                             reason.\n\n\nSupport: Core\n\n\nThe following list states
-                            the Route kinds compatible for each protocolType\nFor
+                            the Route kinds compatible for each protocolType\nfor
                             route kinds and protocolTypes included in Gateway API\n\n\nHTTP:
                             HTTPRoutes, GRPCRoutes\nHTTPS: HTTPRoutes, GRPCRoutes,
                             TLSRoute\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
