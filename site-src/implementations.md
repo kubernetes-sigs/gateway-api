@@ -401,7 +401,6 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 
 You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
-
 [ngrok-k8s-operator]:https://github.com/ngrok/kubernetes-ingress-controller
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
