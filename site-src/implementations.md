@@ -399,13 +399,12 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 
 [ngrok Kubernetes Operator][ngrok-k8s-operator] provides an implementation of the Gateway API that uses [ngrok's ingress-as-a-service][ngrok]. This project uses the Gateway API to support routing traffic from ngrok's global network to applications running on Kubernetes clusters. This easily adds the benefits of ngrok, like security, network policy, and a global presence with the simplicity of cloud service. The operator contains both a Gateway API implementation as well as a controller using Kubernetes Ingress. The Gateway API implementation is currently under development and supports only the Gateway, GatewayClass and HTTPRoute. As the TLSRoute and TCPRoute move from experimental to stable, they will also be implemented.
 
-You can read our [docs][ngrok-k8s-gwapi-docs] or [quickstart guide][ngrok-k8s-gwapi-qs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
+You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
 
 
 [ngrok-k8s-operator]:https://github.com/ngrok/kubernetes-ingress-controller
 [ngrok]:https://ngrok.com
 [ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
-[ngrok-k8s-gwapi-qs]:https://ngrok.com/docs/k8s/
 [ngrok-issue-new]: https://github.com/ngrok/kubernetes-ingress-controller/issues/new
 [ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
