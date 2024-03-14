@@ -485,7 +485,7 @@ type AllowedRoutes struct {
 	// +kubebuilder:validation:MaxItems=8
 	//
 	// The following list states the Route kinds compatible for each protocolType
-	// For route kinds and protocolTypes included in Gateway API
+	// for route kinds and protocolTypes included in Gateway API
 	//
 	// HTTP: HTTPRoutes, GRPCRoutes
 	// HTTPS: HTTPRoutes, GRPCRoutes, TLSRoute
