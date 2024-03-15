@@ -107,8 +107,7 @@ type ChildrenNamespaces struct {
 // GatewayObjectReference identifies an API object including its namespace,
 // defaulting to Gateway.
 type GatewayObjectReference struct {
-	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
-	// When unspecified or empty string, core API group is inferred.
+	// Group is the group of the referent.
 	//
 	// +optional
 	// +kubebuilder:default="gateway.networking.k8s.io"
