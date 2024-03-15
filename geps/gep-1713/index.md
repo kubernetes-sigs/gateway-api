@@ -25,7 +25,7 @@ There can be O(1000) Knative Services in the cluster which means we have O(1000)
 Thus updating a single Gateway resource with this many certificates is a contention point and inhibits horizontal scaling of our controllers.
 [Istio Ambient](https://istio.io/v1.15/blog/2022/introducing-ambient-mesh/), similarly, creates a listener per Kubernetes service.
 
-More broadly, large scale gateway users often expose O(1000) domains, but are currently limited by the maximum of 16 `listeners`.
+More broadly, large scale gateway users often expose O(1000) domains, but are currently limited by the maximum of 64 `listeners`.
 
 The spec currently has language to indicate implementations `MAY` merge Gateways resources but the mechanic isn't defined.
 https://github.com/kubernetes-sigs/gateway-api/blob/541e9fc2b3c2f62915cb58dc0ee5e43e4096b3e2/apis/v1beta1/gateway_types.go#L76-L78
