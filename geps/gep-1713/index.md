@@ -111,7 +111,7 @@ type GatewayObjectReference struct {
 	// When unspecified or empty string, core API group is inferred.
 	//
 	// +optional
-	// +kubebuilder:default=""
+	// +kubebuilder:default="gateway.networking.k8s.io"
 	Group *Group `json:"group"`
 
 	// Kind is kind of the referent. For example "Gateway".
