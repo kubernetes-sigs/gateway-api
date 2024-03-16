@@ -21,22 +21,22 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	confv1b1 "sigs.k8s.io/gateway-api/conformance/apis/v1beta1"
+	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 )
 
 func TestBuildSummary(t *testing.T) {
 	testCases := []struct {
 		name            string
-		report          confv1b1.ProfileReport
+		report          confv1.ProfileReport
 		expectedSummary string
 	}{
 		{
 			name: "core tests failed, no extended tests",
-			report: confv1b1.ProfileReport{
+			report: confv1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
-				Core: confv1b1.Status{
-					Result: confv1b1.Failure,
-					Statistics: confv1b1.Statistics{
+				Core: confv1.Status{
+					Result: confv1.Failure,
+					Statistics: confv1.Statistics{
 						Passed: 5,
 						Failed: 3,
 					},
@@ -46,18 +46,18 @@ func TestBuildSummary(t *testing.T) {
 		},
 		{
 			name: "core tests succeeded, extended tests failed",
-			report: confv1b1.ProfileReport{
+			report: confv1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
-				Core: confv1b1.Status{
-					Result: confv1b1.Success,
-					Statistics: confv1b1.Statistics{
+				Core: confv1.Status{
+					Result: confv1.Success,
+					Statistics: confv1.Statistics{
 						Passed: 8,
 					},
 				},
-				Extended: &confv1b1.ExtendedStatus{
-					Status: confv1b1.Status{
-						Result: confv1b1.Failure,
-						Statistics: confv1b1.Statistics{
+				Extended: &confv1.ExtendedStatus{
+					Status: confv1.Status{
+						Result: confv1.Failure,
+						Statistics: confv1.Statistics{
 							Passed: 2,
 							Failed: 1,
 						},
@@ -68,19 +68,19 @@ func TestBuildSummary(t *testing.T) {
 		},
 		{
 			name: "core tests partially succeeded, extended tests succeeded",
-			report: confv1b1.ProfileReport{
+			report: confv1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
-				Core: confv1b1.Status{
-					Result: confv1b1.Partial,
-					Statistics: confv1b1.Statistics{
+				Core: confv1.Status{
+					Result: confv1.Partial,
+					Statistics: confv1.Statistics{
 						Passed:  6,
 						Skipped: 2,
 					},
 				},
-				Extended: &confv1b1.ExtendedStatus{
-					Status: confv1b1.Status{
-						Result: confv1b1.Success,
-						Statistics: confv1b1.Statistics{
+				Extended: &confv1.ExtendedStatus{
+					Status: confv1.Status{
+						Result: confv1.Success,
+						Statistics: confv1.Statistics{
 							Passed: 2,
 						},
 					},
@@ -90,18 +90,18 @@ func TestBuildSummary(t *testing.T) {
 		},
 		{
 			name: "core tests succeeded, extended tests partially succeeded",
-			report: confv1b1.ProfileReport{
+			report: confv1.ProfileReport{
 				Name: string(HTTPConformanceProfileName),
-				Core: confv1b1.Status{
-					Result: confv1b1.Success,
-					Statistics: confv1b1.Statistics{
+				Core: confv1.Status{
+					Result: confv1.Success,
+					Statistics: confv1.Statistics{
 						Passed: 8,
 					},
 				},
-				Extended: &confv1b1.ExtendedStatus{
-					Status: confv1b1.Status{
-						Result: confv1b1.Partial,
-						Statistics: confv1b1.Statistics{
+				Extended: &confv1.ExtendedStatus{
+					Status: confv1.Status{
+						Result: confv1.Partial,
+						Statistics: confv1.Statistics{
 							Passed:  2,
 							Skipped: 1,
 						},

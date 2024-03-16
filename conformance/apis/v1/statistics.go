@@ -14,10 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// v1beta1 includes beta maturity API types and utilities for creating and
-// handling the results of conformance test runs. These types are _only_
-// intended for use by the conformance test suite OR external test suites that
-// are written in Golang and execute the conformance test suite as a Golang
-// library.
+package v1
 
-package v1beta1
+// Statistics includes numerical summaries of the number of conformance tests
+// that passed, failed or were intentionally skipped.
+type Statistics struct {
+	// Passed indicates how many tests completed successfully.
+	Passed uint32
+
+	// Skipped indicates how many tests were intentionally not run, whether due
+	// to lack of feature support or whether they were explicitly disabled in
+	// the test suite.
+	Skipped uint32
+
+	// Failed indicates how many tests were unsuccessful.
+	Failed uint32
+}

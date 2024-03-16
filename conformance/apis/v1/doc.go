@@ -14,22 +14,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1beta1
+// v1 includes GA maturity API types and utilities for creating and
+// handling the results of conformance test runs. These types are _only_
+// intended for use by the conformance test suite OR external test suites that
+// are written in Golang and execute the conformance test suite as a Golang
+// library.
 
-// Result is a simple high-level summary describing the conclusion of a test
-// run.
-type Result string
-
-var (
-	// Success indicates that the test run concluded in all required tests
-	// passing.
-	Success Result = "success"
-
-	// Partial indicates that the test run concluded in some of the required
-	// tests passing without any failures, but some were skipped.
-	Partial Result = "partial"
-
-	// Failure indicates that the test run concluded in one ore more tests
-	// failing to complete successfully.
-	Failure Result = "failure"
-)
+package v1

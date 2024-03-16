@@ -36,7 +36,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance"
-	confv1b1 "sigs.k8s.io/gateway-api/conformance/apis/v1beta1"
+	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
@@ -77,7 +77,7 @@ type ConformanceTestSuite struct {
 
 	// implementation contains the details of the implementation, such as
 	// organization, project, etc.
-	implementation confv1b1.Implementation
+	implementation confv1.Implementation
 
 	// apiVersion is the version of the Gateway API installed in the cluster
 	// and is extracted by the annotation gateway.networking.k8s.io/bundle-version
@@ -93,7 +93,9 @@ type ConformanceTestSuite struct {
 	// conformance against.
 	conformanceProfiles sets.Set[ConformanceProfileName]
 
-	// running indicates whether the test suite is currently running
+	// running indicates whether the test suite is currently running.
+	// Through this flag we prevent a Run() execution to happen in case
+	// another Run() is ongoing.
 	running bool
 
 	// results stores the pass or fail results of each test that was run by
@@ -151,11 +153,14 @@ type ConformanceOptions struct {
 
 	Mode                string
 	AllowCRDsMismatch   bool
-	Implementation      confv1b1.Implementation
+	Implementation      confv1.Implementation
 	ConformanceProfiles sets.Set[ConformanceProfileName]
 }
 
 const (
+	// undefinedKeyword is set in the ConformanceReport "GatewayAPIVersion" and
+	// "GatewayAPIChannel" fields in case it's not possible to figure out the actual
+	// values in the cluster, due to multiple versions of CRDs installed.
 	undefinedKeyword = "UNDEFINED"
 )
 
@@ -394,7 +399,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 
 // Report emits a ConformanceReport for the previously completed test run.
 // If no run completed prior to running the report, and error is emitted.
-func (suite *ConformanceTestSuite) Report() (*confv1b1.ConformanceReport, error) {
+func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 	suite.lock.RLock()
 	if suite.running {
 		suite.lock.RUnlock()
@@ -421,7 +426,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1b1.ConformanceReport, error)
 
 	profileReports.compileResults(suite.extendedSupportedFeatures, suite.extendedUnsupportedFeatures)
 
-	return &confv1b1.ConformanceReport{
+	return &confv1.ConformanceReport{
 		TypeMeta: v1.TypeMeta{
 			APIVersion: "gateway.networking.k8s.io/v1alpha1",
 			Kind:       "ConformanceReport",
@@ -437,7 +442,7 @@ func (suite *ConformanceTestSuite) Report() (*confv1b1.ConformanceReport, error)
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) (*confv1b1.Implementation, error) {
+func ParseImplementation(org, project, url, version, contact string) (*confv1.Implementation, error) {
 	if org == "" {
 		return nil, errors.New("implementation's organization can not be empty")
 	}
@@ -457,7 +462,7 @@ func ParseImplementation(org, project, url, version, contact string) (*confv1b1.
 
 	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
 
-	return &confv1b1.Implementation{
+	return &confv1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,

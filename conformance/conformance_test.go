@@ -30,7 +30,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
-	confv1b1 "sigs.k8s.io/gateway-api/conformance/apis/v1beta1"
+	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -44,7 +44,7 @@ var (
 	exemptFeatures       sets.Set[suite.SupportedFeature]
 	namespaceLabels      map[string]string
 	namespaceAnnotations map[string]string
-	implementation       *confv1b1.Implementation
+	implementation       *confv1.Implementation
 	mode                 string
 	allowCRDsMismatch    bool
 	conformanceProfiles  sets.Set[suite.ConformanceProfileName]
@@ -134,7 +134,7 @@ func testConformance(t *testing.T) {
 	writeReport(t.Logf, *report, *flags.ReportOutput)
 }
 
-func writeReport(logf func(string, ...any), report confv1b1.ConformanceReport, output string) error {
+func writeReport(logf func(string, ...any), report confv1.ConformanceReport, output string) error {
 	rawReport, err := yaml.Marshal(report)
 	if err != nil {
 		return err
