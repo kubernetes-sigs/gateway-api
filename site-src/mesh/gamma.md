@@ -18,7 +18,7 @@ their technology stack or proxy.
 
 ## Deliverables
 
-The work of the GAMMA intiative will be captured in [Gateway Enhancement
+The work of the GAMMA initiative will be captured in [Gateway Enhancement
 Proposals][geps] that extend or refine the Gateway API specification to cover
 mesh and mesh-adjacent use cases. To date, these have been relatively small
 changes (albeit sometimes with relatively large impacts!) and we expect that to
