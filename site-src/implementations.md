@@ -19,7 +19,7 @@ cover, and documentation to help users get started.
 - [Contour][3] (beta)
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
-- [Envoy Gateway][18] (beta)
+- [Envoy Gateway][18] (GA)
 - [Flomesh Service Mesh][17] (beta)
 - [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
