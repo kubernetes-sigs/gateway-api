@@ -19,7 +19,7 @@ cover, and documentation to help users get started.
 - [Contour][3] (beta)
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
-- [Envoy Gateway][18] (beta)
+- [Envoy Gateway][18] (GA)
 - [Flomesh Service Mesh][17] (beta)
 - [Gloo Gateway 2.0][5] (beta)
 - [Google Kubernetes Engine][6] (GA)
@@ -231,8 +231,8 @@ few simple steps.
 
 [eg-home]:https://gateway.envoyproxy.io/
 [envoy-org]:https://github.com/envoyproxy
-[eg-supported]: https://gateway.envoyproxy.io/v0.6.0/user/gatewayapi-support
-[eg-quickstart]:https://gateway.envoyproxy.io/v0.6.0/user/quickstart
+[eg-supported]: https://gateway.envoyproxy.io/v1.0.0/user/traffic/gatewayapi-support/
+[eg-quickstart]:https://gateway.envoyproxy.io/v1.0.0/user/quickstart
 
 ### Flomesh Service Mesh (FSM)
 
