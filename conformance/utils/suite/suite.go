@@ -31,6 +31,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 // ConformanceTestSuite defines the test suite used to run Gateway API
@@ -48,7 +49,7 @@ type ConformanceTestSuite struct {
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
-	SupportedFeatures        sets.Set[SupportedFeature]
+	SupportedFeatures        sets.Set[features.SupportedFeature]
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	RunTest                  string
@@ -73,8 +74,8 @@ type Options struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          sets.Set[SupportedFeature]
-	ExemptFeatures             sets.Set[SupportedFeature]
+	SupportedFeatures          sets.Set[features.SupportedFeature]
+	ExemptFeatures             sets.Set[features.SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -106,11 +107,11 @@ func New(s Options) *ConformanceTestSuite {
 
 	switch {
 	case s.EnableAllSupportedFeatures:
-		s.SupportedFeatures = AllFeatures
+		s.SupportedFeatures = features.AllFeatures
 	case s.SupportedFeatures == nil:
-		s.SupportedFeatures = GatewayCoreFeatures
+		s.SupportedFeatures = features.GatewayCoreFeatures
 	default:
-		for feature := range GatewayCoreFeatures {
+		for feature := range features.GatewayCoreFeatures {
 			s.SupportedFeatures.Insert(feature)
 		}
 	}
@@ -164,7 +165,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.Applier.UsableNetworkAddresses = suite.UsableNetworkAddresses
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
 
-	if suite.SupportedFeatures.Has(SupportGateway) {
+	if suite.SupportedFeatures.Has(features.SupportGateway) {
 		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
 		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
@@ -192,7 +193,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		}
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-	if suite.SupportedFeatures.Has(SupportMesh) {
+	if suite.SupportedFeatures.Has(features.SupportMesh) {
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
 		t.Logf("Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
@@ -219,7 +220,7 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) {
 type ConformanceTest struct {
 	ShortName   string
 	Description string
-	Features    []SupportedFeature
+	Features    []features.SupportedFeature
 	Manifests   []string
 	Slow        bool
 	Parallel    bool
@@ -256,13 +257,13 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 
 // ParseSupportedFeatures parses flag arguments and converts the string to
 // sets.Set[suite.SupportedFeature]
-func ParseSupportedFeatures(f string) sets.Set[SupportedFeature] {
+func ParseSupportedFeatures(f string) sets.Set[features.SupportedFeature] {
 	if f == "" {
 		return nil
 	}
-	res := sets.Set[SupportedFeature]{}
+	res := sets.Set[features.SupportedFeature]{}
 	for _, value := range strings.Split(f, ",") {
-		res.Insert(SupportedFeature(value))
+		res.Insert(features.SupportedFeature(value))
 	}
 	return res
 }

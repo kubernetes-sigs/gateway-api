@@ -20,6 +20,8 @@ import (
 	"fmt"
 
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 // -----------------------------------------------------------------------------
@@ -33,8 +35,8 @@ import (
 // For more details see the relevant GEP: https://gateway-api.sigs.k8s.io/geps/gep-1709/
 type ConformanceProfile struct {
 	Name             ConformanceProfileName
-	CoreFeatures     sets.Set[SupportedFeature]
-	ExtendedFeatures sets.Set[SupportedFeature]
+	CoreFeatures     sets.Set[features.SupportedFeature]
+	ExtendedFeatures sets.Set[features.SupportedFeature]
 }
 
 type ConformanceProfileName string
@@ -63,11 +65,11 @@ var (
 	HTTPConformanceProfile = ConformanceProfile{
 		Name: HTTPConformanceProfileName,
 		CoreFeatures: sets.New(
-			SupportGateway,
-			SupportReferenceGrant,
-			SupportHTTPRoute,
+			features.SupportGateway,
+			features.SupportReferenceGrant,
+			features.SupportHTTPRoute,
 		),
-		ExtendedFeatures: HTTPRouteExtendedFeatures,
+		ExtendedFeatures: features.HTTPRouteExtendedFeatures,
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS
@@ -75,9 +77,9 @@ var (
 	TLSConformanceProfile = ConformanceProfile{
 		Name: TLSConformanceProfileName,
 		CoreFeatures: sets.New(
-			SupportGateway,
-			SupportReferenceGrant,
-			SupportTLSRoute,
+			features.SupportGateway,
+			features.SupportReferenceGrant,
+			features.SupportTLSRoute,
 		),
 	}
 
@@ -86,10 +88,10 @@ var (
 	MeshConformanceProfile = ConformanceProfile{
 		Name: MeshConformanceProfileName,
 		CoreFeatures: sets.New(
-			SupportMesh,
-			SupportHTTPRoute,
+			features.SupportMesh,
+			features.SupportHTTPRoute,
 		),
-		ExtendedFeatures: HTTPRouteExtendedFeatures,
+		ExtendedFeatures: features.HTTPRouteExtendedFeatures,
 	}
 )
 
