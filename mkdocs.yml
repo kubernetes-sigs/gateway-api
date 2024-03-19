@@ -5,6 +5,9 @@ site_dir: site
 docs_dir: site-src
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - js/implementations.js
 hooks:
 - hack/mkdocs-copy-geps.py
 watch:

@@ -7,6 +7,8 @@ Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
 cover, and documentation to help users get started.
 
+[View a table to quickly compare supported features of projects](/implementation-table)
+
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1]
@@ -84,6 +86,8 @@ cover, and documentation to help users get started.
 [32]:#haproxy-kubernetes-ingress-controller
 
 [gamma]:/concepts/gamma/
+
+
 
 ## Implementations
 

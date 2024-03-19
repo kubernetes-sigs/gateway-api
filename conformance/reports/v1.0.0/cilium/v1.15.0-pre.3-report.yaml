@@ -38,7 +38,7 @@ profiles:
         - HTTPRouteRequestTimeout
         - HTTPRouteResponseHeaderModification
         - HTTPRouteSchemeRedirect
-      name: HTTP
+    name: HTTP
   - core:
       result: success
       statistics:
