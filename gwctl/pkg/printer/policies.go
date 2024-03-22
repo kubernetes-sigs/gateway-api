@@ -17,6 +17,7 @@ limitations under the License.
 package printer
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -152,11 +153,8 @@ func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
 }
 
 type policyCrdDescribeView struct {
-	// PolicyCrd   *apiextensionsv1.CustomResourceDefinition `json:",omitempty"`
 	Name        string                 `json:",omitempty"`
 	Namespace   string                 `json:",omitempty"`
-	Labels      map[string]string      `json:",omitempty"`
-	Annotations map[string]string      `json:",omitempty"`
 	APIVersion  string                 `json:",omitempty"`
 	Kind        string                 `json:",omitempty"`
 	Metadata    map[string]interface{} `json:",omitempty"`
@@ -180,21 +178,17 @@ func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanage
 				Namespace: crd.Namespace,
 			},
 			{
-				Labels:      crd.Labels,
-				Annotations: crd.Annotations,
-			},
-			{
 				APIVersion: crd.APIVersion,
 				Kind:       crd.Kind,
 			},
 			{
-				Metadata: policyCrd.Metadata(),
+				Metadata: policyCrdMetadata(policyCrd),
 			},
 			{
-				Spec: policyCrd.Spec(),
+				Spec: policyCrdSpec(policyCrd),
 			},
 			{
-				Status: policyCrd.Status(),
+				Status: policyCrdStatus(policyCrd),
 			},
 		}
 
@@ -211,4 +205,34 @@ func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanage
 			fmt.Fprintf(pp.Out, "\n\n")
 		}
 	}
+}
+
+func policyCrdSpec(p policymanager.PolicyCRD) map[string]interface{} {
+	spec := p.CRD().Spec
+
+	var result map[string]interface{}
+	marshalledSpec, _ := json.Marshal(spec)
+	json.Unmarshal(marshalledSpec, &result)
+
+	return result
+}
+
+func policyCrdMetadata(p policymanager.PolicyCRD) map[string]interface{} {
+	om := p.CRD().ObjectMeta
+
+	var result map[string]interface{}
+	marshalledMetadata, _ := json.Marshal(om)
+	json.Unmarshal(marshalledMetadata, &result)
+
+	return result
+}
+
+func policyCrdStatus(p policymanager.PolicyCRD) map[string]interface{} {
+	status := p.CRD().Status
+
+	var result map[string]interface{}
+	marshalledStatus, _ := json.Marshal(status)
+	json.Unmarshal(marshalledStatus, &result)
+
+	return result
 }
