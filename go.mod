@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
+	github.com/miekg/dns v1.1.57
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.20.0
 	google.golang.org/grpc v1.61.0

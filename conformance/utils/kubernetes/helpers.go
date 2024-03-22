@@ -401,6 +401,14 @@ func GatewayAndHTTPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCo
 	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &gatewayv1.HTTPRoute{}, routeNNs...)
 }
 
+// GatewayAndUDPRoutesMustBeAccepted waits until the specified Gateway has an IP
+// address assigned to it and the UDPRoute has a ParentRef referring to the
+// Gateway. The test will fail if these conditions are not met before the
+// timeouts.
+func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeNNs ...types.NamespacedName) string {
+	return GatewayAndRoutesMustBeAccepted(t, c, timeoutConfig, controllerName, gw, &v1alpha2.UDPRoute{}, routeNNs...)
+}
+
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
 // status of the specified Gateway.
 func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) (string, error) {
@@ -597,6 +605,13 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 // if the specified timeout is exceeded.
 func HTTPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
 	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &gatewayv1.HTTPRoute{})
+}
+
+// UDPRouteMustHaveParents waits for the specified UDPRoute to have parents
+// in status that match the expected parents. This will cause the test to halt
+// if the specified timeout is exceeded.
+func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []gatewayv1.RouteParentStatus, namespaceRequired bool) {
+	RouteMustHaveParents(t, client, timeoutConfig, routeName, parents, namespaceRequired, &v1alpha2.UDPRoute{})
 }
 
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
