@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -95,11 +94,19 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 			{
 				Name: gatewayClassNode.GatewayClass.GetName(),
 			},
-			{
+		}
+
+		if gatewayClassNode.GatewayClass.Spec.Description != nil {
+			views = append(views, gatewayClassDescribeView{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
 				Description:    *gatewayClassNode.GatewayClass.Spec.Description,
-			},
+			})
+		} else {
+			views = append(views, gatewayClassDescribeView{
+				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
+			})
 		}
+
 		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
 			views = append(views, gatewayClassDescribeView{
 				DirectlyAttachedPolicies: policyRefs,
