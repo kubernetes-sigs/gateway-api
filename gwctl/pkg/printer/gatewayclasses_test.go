@@ -26,6 +26,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
@@ -197,6 +198,109 @@ DirectlyAttachedPolicies:
 - Group: foo.com
   Kind: HealthCheckPolicy
   Name: policy-name
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+func TestGatewayClassesPrinter_Label(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "bar-com-internal-gateway-class",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-365 * 24 * time.Hour),
+				},
+				Labels: map[string]string{
+					"app": "bar",
+				},
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "bar.baz/internal-gateway-class",
+			},
+			Status: gatewayv1.GatewayClassStatus{
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Accepted",
+						Status: "True",
+					},
+				},
+			},
+		},
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-com-external-gateway-class",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-100 * 24 * time.Hour),
+				},
+				Labels: map[string]string{
+					"app": "foo",
+				},
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "foo.com/external-gateway-class",
+			},
+			Status: gatewayv1.GatewayClassStatus{
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Accepted",
+						Status: "False",
+					},
+				},
+			},
+		},
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-com-internal-gateway-class",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-24 * time.Minute),
+				},
+				Labels: map[string]string{
+					"app": "foo",
+				},
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "foo.com/internal-gateway-class",
+			},
+			Status: gatewayv1.GatewayClassStatus{
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Accepted",
+						Status: "Unknown",
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	labelSelector := "app=foo"
+	selector, err := labels.Parse(labelSelector)
+	if err != nil {
+		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{Labels: selector})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	gcp := &GatewayClassesPrinter{
+		Out:   params.Out,
+		Clock: fakeClock,
+	}
+	gcp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAME                            CONTROLLER                      ACCEPTED  AGE
+foo-com-external-gateway-class  foo.com/external-gateway-class  False     100d
+foo-com-internal-gateway-class  foo.com/internal-gateway-class  Unknown   24m
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

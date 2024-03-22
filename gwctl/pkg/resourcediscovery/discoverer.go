@@ -40,7 +40,7 @@ import (
 type Filter struct {
 	Namespace string
 	Name      string
-	Labels    map[string]string
+	Labels    labels.Selector
 }
 
 // Discoverer orchestrates the discovery of resources and their associated
@@ -292,7 +292,7 @@ func fetchGatewayClasses(ctx context.Context, k8sClients *common.K8sClients, fil
 	// Use List call.
 	options := &client.ListOptions{
 		Namespace:     filter.Namespace,
-		LabelSelector: labels.SelectorFromSet(filter.Labels),
+		LabelSelector: filter.Labels,
 	}
 	gatewayClassList := &gatewayv1.GatewayClassList{}
 	if err := k8sClients.Client.List(ctx, gatewayClassList, options); err != nil {
@@ -318,7 +318,7 @@ func fetchGateways(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 	// Use List call.
 	options := &client.ListOptions{
 		Namespace:     filter.Namespace,
-		LabelSelector: labels.SelectorFromSet(filter.Labels),
+		LabelSelector: filter.Labels,
 	}
 	gatewayList := &gatewayv1.GatewayList{}
 	if err := k8sClients.Client.List(ctx, gatewayList, options); err != nil {
@@ -344,7 +344,7 @@ func fetchHTTPRoutes(ctx context.Context, k8sClients *common.K8sClients, filter 
 	// Use List call.
 	options := &client.ListOptions{
 		Namespace:     filter.Namespace,
-		LabelSelector: labels.SelectorFromSet(filter.Labels),
+		LabelSelector: filter.Labels,
 	}
 	httpRouteList := &gatewayv1.HTTPRouteList{}
 	if err := k8sClients.Client.List(ctx, httpRouteList, options); err != nil {
@@ -377,7 +377,7 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 
 	// Use List call.
 	listOptions := metav1.ListOptions{
-		LabelSelector: labels.SelectorFromSet(filter.Labels).String(),
+		LabelSelector: filter.Labels.String(),
 	}
 	var backendsList *unstructured.UnstructuredList
 	backendsList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
@@ -405,7 +405,7 @@ func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter F
 	// Use List call.
 	options := &client.ListOptions{
 		Namespace:     filter.Namespace,
-		LabelSelector: labels.SelectorFromSet(filter.Labels),
+		LabelSelector: filter.Labels,
 	}
 	namespacesList := &corev1.NamespaceList{}
 	if err := k8sClients.Client.List(ctx, namespacesList, options); err != nil {
