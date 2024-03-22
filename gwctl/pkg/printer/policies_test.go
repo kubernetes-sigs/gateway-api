@@ -356,7 +356,6 @@ timeoutpolicies.bar.com      Direct       Namespaced  5m
 }
 
 func TestPolicyCrd_PrintDescribeView(t *testing.T) {
-	// fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&apiextensionsv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
@@ -439,15 +438,12 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
 	pp := &PoliciesPrinter{
 		Out:   &bytes.Buffer{},
-		// Clock: fakeClock,
 	}
 	pp.PolicyCrd_PrintDescribeView(params.PolicyManager.GetCRDs())
 
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
 Name: healthcheckpolicies.foo.com
-Labels:
-  gateway.networking.k8s.io/policy: inherited
 APIVersion: apiextensions.k8s.io/v1
 Kind: CustomResourceDefinition
 Metadata:
@@ -475,8 +471,6 @@ Status:
 
 
 Name: timeoutpolicies.bar.com
-Labels:
-  gateway.networking.k8s.io/policy: direct
 APIVersion: apiextensions.k8s.io/v1
 Kind: CustomResourceDefinition
 Metadata:
