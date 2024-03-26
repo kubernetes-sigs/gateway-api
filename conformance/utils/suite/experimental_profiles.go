@@ -48,6 +48,10 @@ const (
 	// which covers TLS stream functionality, such as the TLSRoute API.
 	TLSConformanceProfileName ConformanceProfileName = "TLS"
 
+	// GRPCConformanceProfileName indicates the name of the conformance profile
+	// which covers GRPC functionality, such as the GRPCRoute API.
+	GRPCConformanceProfileName ConformanceProfileName = "GRPC"
+
 	// MeshConformanceProfileName indicates the name of the conformance profile
 	// which covers service mesh functionality.
 	MeshConformanceProfileName ConformanceProfileName = "MESH"
@@ -81,6 +85,17 @@ var (
 		),
 	}
 
+	// GRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
+	// related functionality with Gateways.
+	GRPCConformanceProfile = ConformanceProfile{
+		Name: GRPCConformanceProfileName,
+		CoreFeatures: sets.New(
+			SupportGateway,
+			SupportReferenceGrant,
+			SupportGRPCRoute,
+		),
+	}
+
 	// MeshConformanceProfile is a ConformanceProfile that covers testing
 	// service mesh related functionality.
 	MeshConformanceProfile = ConformanceProfile{
@@ -102,6 +117,7 @@ var (
 var conformanceProfileMap = map[ConformanceProfileName]ConformanceProfile{
 	HTTPConformanceProfileName: HTTPConformanceProfile,
 	TLSConformanceProfileName:  TLSConformanceProfile,
+	GRPCConformanceProfileName: GRPCConformanceProfile,
 	MeshConformanceProfileName: MeshConformanceProfile,
 }
 
