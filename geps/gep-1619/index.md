@@ -59,6 +59,62 @@ session affinity, as this design is expected to be addressed within a separate G
 
 ## Introduction
 
+### Naming
+
+Naming is hard. We've had lots of [discussion](https://github.com/kubernetes-sigs/gateway-api/discussions/2893) on the
+topic of naming session persistence. Adding to the complexity, the Gateway API implementations do not have a consensus
+on a naming convention for session persistence or affinity.
+
+To start this discussion, lets establish the idea of strong session affinity (what this GEP calls session persistence)
+and weak session affinity (what this GEP calls session affinity) which we will define further in
+[The Relationship of Session Persistence and Session Affinity](#the-relationship-of-session-persistence-and-session-affinity).
+In this context, "strong" implies a guarantee, while "weak" indicates a best-effort approach.
+
+Here's a survey of how some implementations refers to these ideas:
+
+| Implementation  | Name for Strong Session Affinity | Name for Weak Session Affinity |
+| ------------- | ------------- | ------------- |
+| Apache APISIX | [Sticky Sessions](https://apisix.apache.org/docs/ingress-controller/concepts/apisix_upstream/) | N/A |
+| Avi Kubernetes Operator | [Session Persistence](https://docs.vmware.com/en/VMware-NSX-T-Data-Center/3.2/administration/GUID-8B5C8D64-2B69-4C95-86A5-C5396CB9E51F.html) | [Session Persistence](https://docs.vmware.com/en/VMware-NSX-T-Data-Center/3.2/administration/GUID-8B5C8D64-2B69-4C95-86A5-C5396CB9E51F.html) |
+| Azure Application Gateway for Containers | [Session Affinity](https://learn.microsoft.com/en-us/azure/application-gateway/for-containers/session-affinity?tabs=session-affinity-gateway-api) | N/A |
+| Cilium | N/A | [Session Affinity](https://docs.cilium.io/en/stable/network/kubernetes/kubeproxy-free/#session-affinity) |
+| Contour | [Session Affinity / Sticky Sessions](https://projectcontour.io/docs/1.24/config/request-routing/#session-affinity) | N/A |
+| Envoy | [Session Stickiness / Stateful Sessions](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/stateful_session_filter) (Strong) | [Session Stickiness / Stateful Sessions](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/stateful_session_filter) (Weak) |
+| Emissary-Ingress (Ambassador API Gateway) | [Sticky Sessions / Session Affinity](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#cookie) | [Sticky Sessions / Session Affinity](https://www.getambassador.io/docs/emissary/latest/topics/running/load-balancer#cookie) |
+| Gloo Gateway 2.0 | [Session Affinity / Sticky Sessions](https://docs.solo.io/gloo-edge/latest/installation/advanced_configuration/session_affinity/) | [Session Affinity / Sticky Sessions](https://docs.solo.io/gloo-edge/latest/installation/advanced_configuration/session_affinity/) |
+| Google Kubernetes Engine | [Session Affinity](https://cloud.google.com/load-balancing/docs/backend-service#session_affinity) | [Session Affinity](https://cloud.google.com/load-balancing/docs/backend-service#session_affinity) |
+| HAProxy Ingress | [Affinity](https://haproxy-ingress.github.io/docs/configuration/keys/#affinity) | N/A |
+| HAProxy Kubernetes Ingress Controller | [Session Persistence](https://www.haproxy.com/documentation/haproxy-runtime-api/reference/enable-dynamic-cookie-backend/#sidebar) | N/A |
+| Istio | [Strong Session Affinity](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB) | [Soft Session Affinity](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB) |
+| Kong | [Persistent Session](https://docs.konghq.com/hub/kong-inc/saml/configuration/#config-session_remember) | N/A |
+| Nginx (Proxy) | [Session Persistence](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#enabling-session-persistence) | [Session Persistence](https://docs.nginx.com/nginx/admin-guide/load-balancer/http-load-balancer/#enabling-session-persistence) |
+| Traefik | [Sticky Sessions](https://doc.traefik.io/traefik/routing/services/#sticky-sessions) | N/A |
+
+Visualizing the result for what implementations call "Strong Session Affinity" (aka Session Persistence), it's mostly
+inconclusive:
+
+```mermaid
+pie title  What Implementations Call "Strong Session Affinity"?
+    "Session Affinity" : 5
+    "Sticky Sessions" : 5
+    "Session Persistence" : 3
+    "Persistent Session": 1
+    "Strong Session Affinity": 1
+    "Affinity": 1
+    "Session Stickiness": 1
+    "Stateful Sessions": 1
+```
+
+This GEP chooses to use "session persistence" as the preferred definition of strong session affinity (guaranteed) while
+reserving "session affinity" to mean weak session affinity (best-effort).  We selected these names because "session
+persistence" and "session affinity" share a symmetry that indicates to users that there is a relationship between them.
+The term "Persistence" implies a sense of strong consistency or recurring behavior, whereas "Affinity" carries a weaker
+connotation related to liking or attraction.
+
+**Note**: One concern for using the name "session persistence" is that it may be confused the idea of persisting a
+session to storage. This confusion is particularly common among Java developers, as Java defines session persistence as
+storing a session to disk.
+
 ### Defining Session Persistence
 
 Session persistence is when a client request is directed to the same backend server for the duration of a "session". It is achieved when a client directly provides information, such as a header, that a proxy uses as a reference to direct traffic to a specific server. Persistence is an exception to load balancing: a persistent client request bypasses the proxy's load balancing algorithm, going directly to a backend server it has previously established a session with.
@@ -256,23 +312,37 @@ for aspects like load shedding, draining, and session migration as a part of the
 
 ### The Relationship of Session Persistence and Session Affinity
 
-Though this GEP's intention is not to define a spec for session affinity, it is important to recognize and understand
-its distinction with session persistence. While session persistence uses attributes in the application layer, session
-affinity often uses, but is not limited to, attributes below the application layer. Session affinity doesn't require a
-session identifier like session persistence (e.g. a cookie), but instead uses existing connection attributes to
-establish a consistent hashing load balancing algorithm. It is important to note the session affinity doesn't guarantee
-persistent connections to the same backend server.
+As discussed in [Naming](#naming), we defined session persistence as "strong" and session affinity as "weak". Though
+this GEP's intention is not to define an API for session affinity, let's understand its distinction with session
+persistence.
 
-Session affinity can be achieved by deterministic load balancing algorithms or a proxy feature that tracks IP-to-backend associations such as [HAProxy's stick tables](https://www.haproxy.com/blog/introduction-to-haproxy-stick-tables/) or [Cilium's session affinity](https://docs.cilium.io/en/v1.12/gettingstarted/kubeproxy-free/#id2).
+While session persistence uses attributes in the application layer, session affinity can also use attributes below the
+application layer. Session affinity doesn't require a specific backend identifier to be encoded in a cookie or header;
+instead, it can use any existing connection attributes to establish a consistent hashing load balancing algorithm. This
+implies session affinity can use cookies or headers, as seen in Istio's [ConsistentHashLB](https://istio.io/latest/docs/reference/config/networking/destination-rule/#LoadBalancerSettings-ConsistentHashLB). With session
+affinity, the cookie or header will be hashed on its arbitrary value.
 
-We can also examine how session persistence and session affinity functionally work together, by framing the relationship into a two tiered logical decision made by the data plane:
+It is important to note the session affinity is less reliable and doesn't guarantee persistent connections to the same
+backend server. If a proxy or load balancer restarts, or if backends are added to the backend pool, the session affinity
+mechanism will likely redirect the user's connection to a new backend. In contrast, session persistence encodes a
+backend identifier in a cookie or header, so as long as the backend still exists, it will be unaffected by proxy
+restarts or changes in the backend pool.
 
-1. If the request contains a session persistence identity (e.g. a cookie or header), then route it directly to the backend it has previously established a session with.
-2. If no session persistence identity is present, load balance as per load balancing configuration, taking into account the session affinity configuration (e.g. by utilizing a hashing algorithm that is deterministic).
+Session affinity can be achieved by deterministic load balancing algorithms or a proxy feature that tracks IP-to-backend
+associations such as [HAProxy's stick tables](https://www.haproxy.com/blog/introduction-to-haproxy-stick-tables/) or
+[Cilium's session affinity](https://docs.cilium.io/en/v1.12/gettingstarted/kubeproxy-free/#id2).
 
-This tiered decision-based logic is consistent with the idea that session persistence is an exception to load balancing. Though there are different ways to frame this relationship, this design will influence the separation between persistence and affinity API design.
-We acknowledge the discrepancies in the definitions of session persistence and session affinity in the industry.
-However, for the purpose of establishing a common language for this GEP, we have opted to utilize these definitions.
+We can also examine how session persistence and session affinity functionally work together, by framing the relationship
+into a two tiered logical decision made by the data plane:
+
+1. If the request contains a session persistence identity (e.g. in a cookie or header), then route it directly to the
+   backend it has previously established a session with.
+2. If no session persistence identity is present, load balance as per load balancing configuration, taking into account
+   the session affinity configuration (e.g. by utilizing a hashing algorithm that is deterministic).
+
+This tiered decision-based logic is consistent with the idea that session persistence is an exception to load balancing.
+Though there are different ways to frame this relationship, this design will influence the separation between
+persistence and affinity API design.
 
 ### Implementations
 
