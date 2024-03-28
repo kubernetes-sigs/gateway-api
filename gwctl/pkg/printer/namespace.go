@@ -21,6 +21,11 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
+	"text/tabwriter"
+
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
@@ -28,7 +33,8 @@ import (
 )
 
 type NamespacesPrinter struct {
-	Out io.Writer
+	Out   io.Writer
+	Clock clock.Clock
 }
 
 type namespaceDescribeView struct {
@@ -37,6 +43,32 @@ type namespaceDescribeView struct {
 	Annotations              map[string]string      `json:",omitempty"`
 	Status                   string                 `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
+}
+
+func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(nsp.Out, 0, 0, 2, ' ', 0)
+	row := []string{"NAME", "STATUS", "AGE"}
+	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+
+	namespaceNodes := make([]*resourcediscovery.NamespaceNode, 0, len(resourceModel.Namespaces))
+	for _, namespaceNode := range resourceModel.Namespaces {
+		namespaceNodes = append(namespaceNodes, namespaceNode)
+	}
+
+	sort.Slice(namespaceNodes, func(i, j int) bool {
+		return namespaceNodes[i].Namespace.Name < namespaceNodes[j].Namespace.Name
+	})
+
+	for _, namespaceNode := range namespaceNodes {
+		age := duration.HumanDuration(nsp.Clock.Since(namespaceNode.Namespace.CreationTimestamp.Time))
+		row := []string{
+			namespaceNode.Namespace.Name,
+			string(namespaceNode.Namespace.Status.Phase),
+			age,
+		}
+		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	}
+	tw.Flush()
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

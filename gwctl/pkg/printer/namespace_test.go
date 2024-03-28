@@ -19,20 +19,92 @@ package printer
 import (
 	"bytes"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
+
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
+	testingclock "k8s.io/utils/clock/testing"
+
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
+func TestNamespacePrinter_Print(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	objects := []runtime.Object{
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "default",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-46 * 24 * time.Hour),
+				},
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceActive,
+			},
+		},
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "kube-system",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-46 * 24 * time.Hour),
+				},
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceActive,
+			},
+		},
+		&corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "ns1",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-10 * time.Minute),
+				},
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceTerminating,
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	nsp := &NamespacesPrinter{
+		Out:   params.Out,
+		Clock: fakeClock,
+	}
+	nsp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAME         STATUS       AGE
+default      Active       46d
+kube-system  Active       46d
+ns1          Terminating  10m
+`
+
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
 func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		// Defining a Namespace called development
 		&corev1.Namespace{
@@ -153,7 +225,8 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Out: params.Out,
+		Out:   params.Out,
+		Clock: fakeClock,
 	}
 	nsp.PrintDescribeView(resourceModel)
 
