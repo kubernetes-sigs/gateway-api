@@ -43,7 +43,7 @@ type gatewayClassDescribeView struct {
 	Name           string `json:",omitempty"`
 	ControllerName string `json:",omitempty"`
 	// GatewayClass description
-	Description              string                 `json:",omitempty"`
+	Description              *string                `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
 }
 
@@ -94,17 +94,12 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 			{
 				Name: gatewayClassNode.GatewayClass.GetName(),
 			},
-		}
-
-		if gatewayClassNode.GatewayClass.Spec.Description != nil {
-			views = append(views, gatewayClassDescribeView{
+			{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
-				Description:    *gatewayClassNode.GatewayClass.Spec.Description,
-			})
-		} else {
-			views = append(views, gatewayClassDescribeView{
-				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
-			})
+			},
+			{
+				Description: gatewayClassNode.GatewayClass.Spec.Description,
+			},
 		}
 
 		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
