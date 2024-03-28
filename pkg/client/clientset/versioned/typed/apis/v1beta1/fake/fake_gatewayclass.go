@@ -20,12 +20,15 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -125,6 +128,49 @@ func (c *FakeGatewayClasses) DeleteCollection(ctx context.Context, opts v1.Delet
 func (c *FakeGatewayClasses) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.GatewayClass, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewRootPatchSubresourceAction(gatewayclassesResource, name, pt, data, subresources...), &v1beta1.GatewayClass{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.GatewayClass), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied gatewayClass.
+func (c *FakeGatewayClasses) Apply(ctx context.Context, gatewayClass *apisv1beta1.GatewayClassApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.GatewayClass, err error) {
+	if gatewayClass == nil {
+		return nil, fmt.Errorf("gatewayClass provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(gatewayClass)
+	if err != nil {
+		return nil, err
+	}
+	name := gatewayClass.Name
+	if name == nil {
+		return nil, fmt.Errorf("gatewayClass.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(gatewayclassesResource, *name, types.ApplyPatchType, data), &v1beta1.GatewayClass{})
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.GatewayClass), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeGatewayClasses) ApplyStatus(ctx context.Context, gatewayClass *apisv1beta1.GatewayClassApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.GatewayClass, err error) {
+	if gatewayClass == nil {
+		return nil, fmt.Errorf("gatewayClass provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(gatewayClass)
+	if err != nil {
+		return nil, err
+	}
+	name := gatewayClass.Name
+	if name == nil {
+		return nil, fmt.Errorf("gatewayClass.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewRootPatchSubresourceAction(gatewayclassesResource, *name, types.ApplyPatchType, data, "status"), &v1beta1.GatewayClass{})
 	if obj == nil {
 		return nil, err
 	}

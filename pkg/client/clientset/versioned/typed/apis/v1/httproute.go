@@ -20,12 +20,15 @@ package v1
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 	"time"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	rest "k8s.io/client-go/rest"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	scheme "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/scheme"
 )
@@ -47,6 +50,8 @@ type HTTPRouteInterface interface {
 	List(ctx context.Context, opts metav1.ListOptions) (*v1.HTTPRouteList, error)
 	Watch(ctx context.Context, opts metav1.ListOptions) (watch.Interface, error)
 	Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts metav1.PatchOptions, subresources ...string) (result *v1.HTTPRoute, err error)
+	Apply(ctx context.Context, hTTPRoute *apisv1.HTTPRouteApplyConfiguration, opts metav1.ApplyOptions) (result *v1.HTTPRoute, err error)
+	ApplyStatus(ctx context.Context, hTTPRoute *apisv1.HTTPRouteApplyConfiguration, opts metav1.ApplyOptions) (result *v1.HTTPRoute, err error)
 	HTTPRouteExpansion
 }
 
@@ -188,6 +193,62 @@ func (c *hTTPRoutes) Patch(ctx context.Context, name string, pt types.PatchType,
 		Name(name).
 		SubResource(subresources...).
 		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied hTTPRoute.
+func (c *hTTPRoutes) Apply(ctx context.Context, hTTPRoute *apisv1.HTTPRouteApplyConfiguration, opts metav1.ApplyOptions) (result *v1.HTTPRoute, err error) {
+	if hTTPRoute == nil {
+		return nil, fmt.Errorf("hTTPRoute provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(hTTPRoute)
+	if err != nil {
+		return nil, err
+	}
+	name := hTTPRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("hTTPRoute.Name must be provided to Apply")
+	}
+	result = &v1.HTTPRoute{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("httproutes").
+		Name(*name).
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
+		Body(data).
+		Do(ctx).
+		Into(result)
+	return
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *hTTPRoutes) ApplyStatus(ctx context.Context, hTTPRoute *apisv1.HTTPRouteApplyConfiguration, opts metav1.ApplyOptions) (result *v1.HTTPRoute, err error) {
+	if hTTPRoute == nil {
+		return nil, fmt.Errorf("hTTPRoute provided to Apply must not be nil")
+	}
+	patchOpts := opts.ToPatchOptions()
+	data, err := json.Marshal(hTTPRoute)
+	if err != nil {
+		return nil, err
+	}
+
+	name := hTTPRoute.Name
+	if name == nil {
+		return nil, fmt.Errorf("hTTPRoute.Name must be provided to Apply")
+	}
+
+	result = &v1.HTTPRoute{}
+	err = c.client.Patch(types.ApplyPatchType).
+		Namespace(c.ns).
+		Resource("httproutes").
+		Name(*name).
+		SubResource("status").
+		VersionedParams(&patchOpts, scheme.ParameterCodec).
 		Body(data).
 		Do(ctx).
 		Into(result)
