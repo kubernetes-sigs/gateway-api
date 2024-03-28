@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/utils/clock"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
@@ -33,6 +34,7 @@ func NewGetCommand() *cobra.Command {
 
 	var namespaceFlag string
 	var allNamespacesFlag bool
+	var labelSelector string
 
 	cmd := &cobra.Command{
 		Use:   "get {gateways|gatewayclasses|policies|policycrds|httproutes}",
@@ -45,6 +47,7 @@ func NewGetCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
+	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Label selector.")
 
 	return cmd
 }
@@ -60,6 +63,12 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	allNs, err := cmd.Flags().GetBool("all-namespaces")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to read flag \"all-namespaces\": %v\n", err)
+		os.Exit(1)
+	}
+
+	labelSelector, err := cmd.Flags().GetString("selector")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to read flag \"selector\": %v\n", err)
 		os.Exit(1)
 	}
 
@@ -79,7 +88,12 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 
 	switch kind {
 	case "gateway", "gateways":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -91,7 +105,12 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwPrinter.Print(resourceModel)
 
 	case "gatewayclass", "gatewayclasses":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -111,7 +130,12 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		policiesPrinter.PrintCRDs(list)
 
 	case "httproute", "httproutes":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
