@@ -20,6 +20,7 @@ import (
 	"os"
 	"testing"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
@@ -28,8 +29,8 @@ import (
 	"sigs.k8s.io/yaml"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
@@ -66,9 +67,10 @@ func TestConformance(t *testing.T) {
 		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
 	}
 
-	v1alpha2.AddToScheme(mgrClient.Scheme())
-	v1beta1.AddToScheme(mgrClient.Scheme())
+	gatewayv1alpha2.AddToScheme(mgrClient.Scheme())
+	gatewayv1beta1.AddToScheme(mgrClient.Scheme())
 	gatewayv1.AddToScheme(mgrClient.Scheme())
+	apiextensionsv1.AddToScheme(mgrClient.Scheme())
 
 	// conformance flags
 	supportedFeatures = suite.ParseSupportedFeatures(*flags.SupportedFeatures)
@@ -116,6 +118,7 @@ func testConformance(t *testing.T) {
 			NamespaceLabels:            namespaceLabels,
 			NamespaceAnnotations:       namespaceAnnotations,
 			SkipTests:                  skipTests,
+			RunTest:                    *flags.RunTest,
 			Mode:                       mode,
 			AllowCRDsMismatch:          allowCRDsMismatch,
 			Implementation:             *implementation,
