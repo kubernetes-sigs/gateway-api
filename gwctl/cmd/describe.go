@@ -94,7 +94,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 				policyList = []policymanager.Policy{policy}
 			}
 		}
-		policiesPrinter.PrintDescribeView(policyList)
+		policiesPrinter.PrintPoliciesDescribeView(policyList)
 	
 	case "policycrd", "policycrds":
 		var policyCrdList []policymanager.PolicyCRD
@@ -107,11 +107,9 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 				fmt.Fprintf(os.Stderr, "failed to find PolicyCrd: %v\n", err)
 				os.Exit(1)
 			}
-			if found {
-				policyCrdList = []policymanager.PolicyCRD{policyCrd}
-			}
+			policyCrdList = []policymanager.PolicyCRD{policyCrd}
 		}
-		policiesPrinter.PolicyCrd_PrintDescribeView(policyCrdList)
+		policiesPrinter.PrintPolicyCRDsDescribeView(policyCrdList)
 
 	case "httproute", "httproutes":
 		filter := resourcediscovery.Filter{Namespace: ns}

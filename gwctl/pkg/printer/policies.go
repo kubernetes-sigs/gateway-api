@@ -17,7 +17,6 @@ limitations under the License.
 package printer
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -28,8 +27,8 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/yaml"
 
-	_ "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	_ "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 )
@@ -39,7 +38,7 @@ type PoliciesPrinter struct {
 	Clock clock.Clock
 }
 
-func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
+func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy) {
 	sort.Slice(policies, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
 		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
@@ -73,7 +72,7 @@ func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
 	tw.Flush()
 }
 
-func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
+func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.PolicyCRD) {
 	sort.Slice(policyCRDs, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policyCRDs[i].CRD().GetNamespace(), policyCRDs[i].CRD().GetName())
 		b := fmt.Sprintf("%v/%v", policyCRDs[j].CRD().GetNamespace(), policyCRDs[j].CRD().GetName())
@@ -112,7 +111,7 @@ type policyDescribeView struct {
 	Spec      map[string]interface{} `json:",omitempty"`
 }
 
-func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
+func (pp *PoliciesPrinter) PrintPoliciesDescribeView(policies []policymanager.Policy) {
 	sort.Slice(policies, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
 		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
@@ -153,16 +152,16 @@ func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
 }
 
 type policyCrdDescribeView struct {
-	Name        string                 `json:",omitempty"`
-	Namespace   string                 `json:",omitempty"`
-	APIVersion  string                 `json:",omitempty"`
-	Kind        string                 `json:",omitempty"`
-	Metadata    map[string]interface{} `json:",omitempty"`
-	Spec        map[string]interface{} `json:",omitempty"`
-	Status      map[string]interface{} `json:",omitempty"`
+	Name       string                                          `json:",omitempty"`
+	Namespace  string                                          `json:",omitempty"`
+	APIVersion string                                          `json:",omitempty"`
+	Kind       string                                          `json:",omitempty"`
+	Metadata   *metav1.ObjectMeta                              `json:",omitempty"`
+	Spec       *apiextensionsv1.CustomResourceDefinitionSpec   `json:",omitempty"`
+	Status     *apiextensionsv1.CustomResourceDefinitionStatus `json:",omitempty"`
 }
 
-func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanager.PolicyCRD) {
+func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanager.PolicyCRD) {
 	sort.Slice(policyCrds, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policyCrds[i].CRD().GetNamespace(), policyCrds[i].CRD().GetName())
 		b := fmt.Sprintf("%v/%v", policyCrds[j].CRD().GetNamespace(), policyCrds[j].CRD().GetName())
@@ -182,13 +181,13 @@ func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanage
 				Kind:       crd.Kind,
 			},
 			{
-				Metadata: policyCrdMetadata(policyCrd),
+				Metadata: &crd.ObjectMeta,
 			},
 			{
-				Spec: policyCrdSpec(policyCrd),
+				Spec: &crd.Spec,
 			},
 			{
-				Status: policyCrdStatus(policyCrd),
+				Status: &crd.Status,
 			},
 		}
 
@@ -205,34 +204,4 @@ func (pp *PoliciesPrinter) PolicyCrd_PrintDescribeView(policyCrds []policymanage
 			fmt.Fprintf(pp.Out, "\n\n")
 		}
 	}
-}
-
-func policyCrdSpec(p policymanager.PolicyCRD) map[string]interface{} {
-	spec := p.CRD().Spec
-
-	var result map[string]interface{}
-	marshalledSpec, _ := json.Marshal(spec)
-	json.Unmarshal(marshalledSpec, &result)
-
-	return result
-}
-
-func policyCrdMetadata(p policymanager.PolicyCRD) map[string]interface{} {
-	om := p.CRD().ObjectMeta
-
-	var result map[string]interface{}
-	marshalledMetadata, _ := json.Marshal(om)
-	json.Unmarshal(marshalledMetadata, &result)
-
-	return result
-}
-
-func policyCrdStatus(p policymanager.PolicyCRD) map[string]interface{} {
-	status := p.CRD().Status
-
-	var result map[string]interface{}
-	marshalledStatus, _ := json.Marshal(status)
-	json.Unmarshal(marshalledStatus, &result)
-
-	return result
 }
