@@ -18,8 +18,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/utils/clock"
