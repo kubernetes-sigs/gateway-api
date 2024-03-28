@@ -333,7 +333,7 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
-	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
+	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 	ns := gatewayv1.Namespace(gw.Namespace)
@@ -411,13 +411,13 @@ func GatewayAndUDPRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 
 // WaitForGatewayAddress waits until at least one IP Address has been set in the
 // status of the specified Gateway.
-func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwName types.NamespacedName) (string, error) {
+func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, gwRef GatewayRef) (string, error) {
 	t.Helper()
 
 	var ipAddr, port string
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.GatewayMustHaveAddress, true, func(ctx context.Context) (bool, error) {
 		gw := &gatewayv1.Gateway{}
-		err := client.Get(ctx, gwName, gw)
+		err := client.Get(ctx, gwRef.NamespacedName, gw)
 		if err != nil {
 			t.Logf("error fetching Gateway: %v", err)
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
@@ -428,7 +428,17 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 			return false, nil
 		}
 
-		port = strconv.FormatInt(int64(gw.Spec.Listeners[0].Port), 10)
+		listener := gw.Spec.Listeners[0]
+		if len(gwRef.listenerNames) != 0 {
+			name := *gwRef.listenerNames[0]
+			for _, l := range gw.Spec.Listeners {
+				if l.Name == name {
+					listener = l
+					break
+				}
+			}
+		}
+		port = strconv.FormatInt(int64(listener.Port), 10)
 
 		for _, address := range gw.Status.Addresses {
 			if address.Type != nil && (*address.Type == gatewayv1.IPAddressType || *address.Type == v1alpha2.HostnameAddressType) {
@@ -764,7 +774,7 @@ func GatewayAndTLSRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutCon
 
 	var hostnames []gatewayv1.Hostname
 
-	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw.NamespacedName)
+	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 	ns := gatewayv1.Namespace(gw.Namespace)
