@@ -27,6 +27,7 @@ readonly GO111MODULE="on"
 readonly GOFLAGS="-mod=readonly"
 readonly GOPATH="$(mktemp -d)"
 readonly MIN_REQUIRED_GO_VER="$(go list -m -f '{{.GoVersion}}')"
+readonly YEAR=$(date +%Y)
 
 function go_version_matches {
   go version | perl -ne "exit 1 unless m{go version go([0-9]+.[0-9]+)}; exit 1 if (\$1 < ${MIN_REQUIRED_GO_VER})"
@@ -93,7 +94,7 @@ do
 
   echo "Generating ${VERSION} deepcopy at ${APIS_PKG}/apis/${VERSION}"
   go run sigs.k8s.io/controller-tools/cmd/controller-gen \
-    object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
+    object:headerFile="${SCRIPT_ROOT}/hack/boilerplate/boilerplate.go.txt",year=${YEAR} \
     paths="${APIS_PKG}/apis/${VERSION}"
 
 done
