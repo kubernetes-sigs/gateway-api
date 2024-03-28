@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
@@ -39,8 +40,18 @@ type namespaceDescribeView struct {
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	index := 0
+	namespaceNodes := make([]*resourcediscovery.NamespaceNode, 0, len(resourceModel.Namespaces))
+
 	for _, namespaceNode := range resourceModel.Namespaces {
+		namespaceNodes = append(namespaceNodes, namespaceNode)
+	}
+
+	sort.Slice(namespaceNodes, func(i, j int) bool {
+		return namespaceNodes[i].Namespace.Name < namespaceNodes[j].Namespace.Name
+	})
+
+	index := 0
+	for _, namespaceNode := range namespaceNodes {
 		index++
 
 		views := []namespaceDescribeView{
@@ -61,7 +72,7 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 				DirectlyAttachedPolicies: policyRefs,
 			})
 		}
-		
+
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
