@@ -1,4 +1,4 @@
-# Nginxnc Nginx Network Fabric
+# Nginxinc NGINX Gateway Fabric
 
 ## Table of Contents
 
