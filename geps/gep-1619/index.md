@@ -28,6 +28,7 @@ Before this GEP graduates to Implementable, we must fulfill the following criter
       related to load balancing, and isn't too long.
  4. Finish designing the [Route Rule API](#route-rule-api) and document edge cases in [Edge Case Behavior](#edge-case-behavior)
     for configuring session persistence on both `BackendLBPolicy` and route rules.
+    - **Answer**: Yes. See [Route Rule API](#route-rule-api) and [Edge Case Behavior](#edge-case-behavior) for more details.
 
 ### Standard
 
@@ -529,14 +530,27 @@ const (
 
 ### Route Rule API
 
-To support route-level configuration, this GEP also introduces an API as inline fields within HTTPRoute and GRPCRoute.
-Any configuration that is specified at Route level will override configuration that is attached at the backend level.
-This route-level API for enabling session persistence currently uses the same `SessionPersistence` struct from the
-`BackendLBPolicy` API. However, this API should be reevaluated in a future update to this GEP, considering the
-associated edge cases when configuring both routes and backends.
+To support route rule level configuration, this GEP also introduces an API as inline fields within HTTPRouteRule and GRPCRouteRule.
+Any configuration that is specified at Route Rule level MUST override configuration that is attached at the backend level because route rule have a more global view and responsibility for the overall traffic routing.
+This route rule level API for enabling session persistence currently uses the same `SessionPersistence` struct from the
+`BackendLBPolicy` API.
 
 ```go
 type HTTPRouteRule struct {
+    [...]
+
+    // SessionPersistence defines and configures session persistence
+    // for the route rule.
+    //
+    // Support: Extended
+    //
+    // +optional
+    SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+}
+```
+
+```go
+type GRPCRouteRule struct {
     [...]
 
     // SessionPersistence defines and configures session persistence
@@ -604,8 +618,8 @@ and/or [GEP-2648](/geps/gep-2648) for more specific details on how to handle ove
 Edge cases will arise when implementing session persistence support for both backends and route rules through
 `BackendLBPolicy` and the route rule's `sessionPersistence` field. For guidance on addressing conflicting
 attachments, please consult the [Edge Case Behavior](#edge-case-behavior) section, which outlines API
-use cases. Only a subset of implementations have already designed their data plane to incorporate route-level session
-persistence, making it likely that route-level session persistence will be less widely implemented.
+use cases. Only a subset of implementations have already designed their data plane to incorporate route rule level session
+persistence, making it likely that route rule level session persistence will be less widely implemented.
 
 ### Traffic Splitting
 
@@ -851,7 +865,33 @@ This is an invalid configuration as two separate sessions cannot have the same c
 address this scenario in manner they deem appropriate. Implementations MAY choose to reject the configuration, or they
 MAY non-deterministicly allow one cookie to work (e.g. whichever cookie is configured first).
 
-#### Traffic Splitting Simple
+#### Traffic Splitting with route rule inline sessionPersistence field
+
+Consider the scenario where a route is traffic splitting between two backends, and additionally, an inline route rule `sessionPersistence` config is applied:
+
+```yaml
+kind: HTTPRoute
+metadata:
+  name: split-route
+spec:
+  rules:
+  - backendRefs:
+    - name: servicev1
+      weight: 50
+    - name: servicev2
+      weight: 50
+    sessionPersistence:
+      sessionName: split-route-cookie
+      type: Cookie
+```
+
+In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
+
+That is to say, traffic routing to `servicev1` previously will continue to be routed to `servicev1` when cookie is present, and traffic routing to `servicev2` previously will continue to be routed to `servicev2` when cookie is present.
+
+When cookie is not present, such as, a new session, it will be routed based on the `weight` configuration and choose one of the services.
+
+#### Traffic Splitting with BackendLBPolicy attached to some Backends (not all)
 
 Consider the scenario where a route is traffic splitting between two backends, and additionally, a
 `BackendLBPolicy` with `sessionPersistence` config is attached to one of the services:
@@ -888,51 +928,6 @@ implementation MAY choose to:
 3. Apply session persistence for only `servicev1`, potentially causing all traffic to eventually migrate to `servicev1`
 
 This is also described in [Traffic Splitting](#traffic-splitting).
-
-#### Traffic Splitting with two Backends and one with Weight 0
-
-Consider the scenario where a route has two rules, but one of those rules involves traffic splitting with a
-backendRef that has a weight of 0, and additionally, a `BackendLBPolicy` is attached to one of the services:
-
-```yaml
-kind: HTTPRoute
-metadata:
-  name: split-route
-spec:
-  rules:
-  - matches:
-    - path:
-      value: /a
-    backendRefs:
-    - name: servicev1
-  - matches:
-    - path:
-      value: /b
-    backendRefs:
-    - name: servicev1
-      weight: 0
-    - name: servicev2
-      weight: 100
----
-kind: BackendLBPolicy
-metadata:
-  name: lbp-split-route
-spec:
-  targetRef:
-    kind: Service
-    Name: servicev1
-  sessionPersistence:
-    sessionName: split-route-cookie
-    type: Cookie
-```
-
-A potentially unexpected situation occurs when:
-
-1. Curl to `/a` which establishes a persistent session with `servicev1`
-2. Curl to `/b` routes to `servicev1` due to route persistence despite `weight: 0` configuration
-
-In this scenario which spans two route rules, implementations MUST give precedence to session persistence, regardless of
-the `weight` configuration.
 
 #### A Service's Selector is Dynamically Updated
 
