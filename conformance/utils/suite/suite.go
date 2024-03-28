@@ -27,7 +27,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
-	"sigs.k8s.io/gateway-api/conformance"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
@@ -117,10 +116,6 @@ func New(s Options) *ConformanceTestSuite {
 
 	for feature := range s.ExemptFeatures {
 		s.SupportedFeatures.Delete(feature)
-	}
-
-	if s.FS == nil {
-		s.FS = &conformance.Manifests
 	}
 
 	suite := &ConformanceTestSuite{
