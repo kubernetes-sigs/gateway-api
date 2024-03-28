@@ -21,7 +21,21 @@ theme:
     - navigation.top
     - navigation.expand
   palette:
-    primary: custom
+    - media: (prefers-color-scheme)
+      primary: custom
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
   custom_dir: site-src/overrides
 edit_uri: edit/main/site-src/
 plugins:
