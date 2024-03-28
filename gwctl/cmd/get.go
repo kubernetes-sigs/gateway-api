@@ -104,11 +104,11 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 
 	case "policy", "policies":
 		list := params.PolicyManager.GetPolicies()
-		policiesPrinter.Print(list)
+		policiesPrinter.PrintPoliciesGetView(list)
 
-	case "policycrds":
+	case "policycrd", "policycrds":
 		list := params.PolicyManager.GetCRDs()
-		policiesPrinter.PrintCRDs(list)
+		policiesPrinter.PrintPolicyCRDsGetView(list)
 
 	case "httproute", "httproutes":
 		filter := resourcediscovery.Filter{Namespace: ns}

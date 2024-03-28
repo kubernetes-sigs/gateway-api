@@ -91,6 +91,16 @@ func (p *PolicyManager) GetCRDs() []PolicyCRD {
 	return result
 }
 
+func (p *PolicyManager) GetCRD(name string) (PolicyCRD, bool) {
+	for _, policyCrd := range p.policyCRDs {
+		if name == policyCrd.CRD().Name {
+			return policyCrd, true
+		}
+	}
+
+	return PolicyCRD{}, false
+}
+
 func (p *PolicyManager) GetPolicies() []Policy {
 	var result []Policy
 	for _, policy := range p.policies {
