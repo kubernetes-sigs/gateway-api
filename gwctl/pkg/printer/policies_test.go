@@ -169,7 +169,7 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 		Clock: fakeClock,
 	}
 
-	pp.Print(params.PolicyManager.GetPolicies())
+	pp.PrintPoliciesGetView(params.PolicyManager.GetPolicies())
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
 NAME                       KIND                       TARGET NAME       TARGET KIND   POLICY TYPE  AGE
@@ -183,7 +183,7 @@ timeout-policy-namespace   TimeoutPolicy.bar.com      default           Namespac
 	}
 
 	pp.Out = &bytes.Buffer{}
-	pp.PrintDescribeView(params.PolicyManager.GetPolicies())
+	pp.PrintPoliciesDescribeView(params.PolicyManager.GetPolicies())
 	got = pp.Out.(*bytes.Buffer).String()
 	want = `
 Name: health-check-gateway
@@ -342,7 +342,7 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 		Out:   &bytes.Buffer{},
 		Clock: fakeClock,
 	}
-	pp.PrintCRDs(params.PolicyManager.GetCRDs())
+	pp.PrintPolicyCRDsGetView(params.PolicyManager.GetCRDs())
 
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
@@ -437,9 +437,9 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
 	pp := &PoliciesPrinter{
-		Out:   &bytes.Buffer{},
+		Out: &bytes.Buffer{},
 	}
-	pp.PolicyCrd_PrintDescribeView(params.PolicyManager.GetCRDs())
+	pp.PrintPolicyCRDsDescribeView(params.PolicyManager.GetCRDs())
 
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
