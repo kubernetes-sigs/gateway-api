@@ -1,13 +1,7 @@
 # GEP-1426: xRoutes Mesh Binding
 
 * Issue: [#1294](https://github.com/kubernetes-sigs/gateway-api/issues/1294)
-* Status: Experimental
-
-> **Note**: This GEP is exempt from the [Probationary Period][expprob] rules
-> of our GEP overview as it existed before those rules did, and so it has been
-> explicitly grandfathered in.
-
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+* Status: Standard
 
 ## Overview
 
