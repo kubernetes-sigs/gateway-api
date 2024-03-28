@@ -71,7 +71,9 @@ var (
 			SupportReferenceGrant,
 			SupportHTTPRoute,
 		),
-		ExtendedFeatures: HTTPRouteExtendedFeatures,
+		ExtendedFeatures: sets.New[SupportedFeature]().
+			Insert(GatewayExtendedFeatures.UnsortedList()...).
+			Insert(HTTPRouteExtendedFeatures.UnsortedList()...),
 	}
 
 	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS
@@ -83,6 +85,7 @@ var (
 			SupportReferenceGrant,
 			SupportTLSRoute,
 		),
+		ExtendedFeatures: GatewayExtendedFeatures,
 	}
 
 	// GRPCConformanceProfile is a ConformanceProfile that covers testing GRPC

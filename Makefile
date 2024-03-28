@@ -87,12 +87,7 @@ test:
 .PHONY: conformance
 conformance:
 	go test ${GO_TEST_FLAGS} -v ./conformance -run TestConformance -args ${CONFORMANCE_FLAGS}
-
-# Run experimental conformance tests against controller implementation
-.PHONY: conformance.experimental
-conformance.experimental:
-	go test ${GO_TEST_FLAGS} -v ./conformance -run TestExperimentalConformance -args ${CONFORMANCE_FLAGS}
-
+	
 # Install CRD's and example resources to a pre-existing cluster.
 .PHONY: install
 install: crd example
