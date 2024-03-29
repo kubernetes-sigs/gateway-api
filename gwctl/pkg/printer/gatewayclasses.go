@@ -97,9 +97,11 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 			{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
 			},
-			{
+		}
+		if gatewayClassNode.GatewayClass.Spec.Description != nil {
+			views = append(views, gatewayClassDescribeView{
 				Description: gatewayClassNode.GatewayClass.Spec.Description,
-			},
+			})
 		}
 
 		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
