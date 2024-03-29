@@ -37,7 +37,7 @@ func NewGetCommand() *cobra.Command {
 	var labelSelector string
 
 	cmd := &cobra.Command{
-		Use:   "get {gateways|gatewayclasses|policies|policycrds|httproutes}",
+		Use:   "get {namespaces|gateways|gatewayclasses|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -81,12 +81,21 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		PolicyManager: params.PolicyManager,
 	}
 	realClock := clock.RealClock{}
+	nsPrinter := &printer.NamespacesPrinter{Out: params.Out, Clock: realClock}
 	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: realClock}
 	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out, Clock: realClock}
 	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out, Clock: realClock}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
+	case "namespace", "namespaces":
+		resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
+			os.Exit(1)
+		}
+		nsPrinter.Print(resourceModel)
+
 	case "gateway", "gateways":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
