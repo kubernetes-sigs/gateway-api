@@ -19,10 +19,10 @@ package kubernetes
 import (
 	"bytes"
 	"context"
-	"embed"
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"strings"
 	"testing"
@@ -51,8 +51,8 @@ type Applier struct {
 	// ControllerName will be used as the spec.controllerName when applying GatewayClass resources
 	ControllerName string
 
-	// FS is the filesystem to use when reading manifests.
-	FS embed.FS
+	// ManifestFS is the filesystem to use when reading manifests.
+	ManifestFS fs.FS
 
 	// UsableNetworkAddresses is a list of addresses that are expected to be
 	// supported AND usable for Gateways in the underlying implementation.
@@ -245,7 +245,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 // provided YAML file and registers a cleanup function for resources it created.
 // Note that this does not remove resources that already existed in the cluster.
 func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, location string, cleanup bool) {
-	data, err := getContentsFromPathOrURL(a.FS, location, timeoutConfig)
+	data, err := getContentsFromPathOrURL(a.ManifestFS, location, timeoutConfig)
 	require.NoError(t, err)
 
 	decoder := yaml.NewYAMLOrJSONDecoder(data, 4096)
@@ -308,7 +308,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 // getContentsFromPathOrURL takes a string that can either be a local file
 // path or an https:// URL to YAML manifests and provides the contents.
-func getContentsFromPathOrURL(fs embed.FS, location string, timeoutConfig config.TimeoutConfig) (*bytes.Buffer, error) {
+func getContentsFromPathOrURL(manifestFS fs.FS, location string, timeoutConfig config.TimeoutConfig) (*bytes.Buffer, error) {
 	if strings.HasPrefix(location, "http://") {
 		return nil, fmt.Errorf("data can't be retrieved from %s: http is not supported, use https", location)
 	} else if strings.HasPrefix(location, "https://") {
@@ -337,7 +337,7 @@ func getContentsFromPathOrURL(fs embed.FS, location string, timeoutConfig config
 		}
 		return manifests, nil
 	}
-	b, err := fs.ReadFile(location)
+	b, err := fs.ReadFile(manifestFS, location)
 	if err != nil {
 		return nil, err
 	}

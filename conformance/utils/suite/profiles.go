@@ -111,6 +111,16 @@ var (
 	}
 )
 
+// RegisterConformanceProfile allows downstream tests to register unique profiles that
+// define their own set of features
+func RegisterConformanceProfile(p ConformanceProfile) {
+	_, ok := conformanceProfileMap[p.Name]
+	if ok {
+		panic(fmt.Sprintf("ConformanceProfile named %q is already registered", p.Name))
+	}
+	conformanceProfileMap[p.Name] = p
+}
+
 // -----------------------------------------------------------------------------
 // Conformance Profiles - Private Profile Mapping Helpers
 // -----------------------------------------------------------------------------
