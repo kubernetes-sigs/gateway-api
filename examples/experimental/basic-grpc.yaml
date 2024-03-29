@@ -1,7 +1,7 @@
 #$ Used in:
 #$ - site-src/api-types/grpcroute.md
-apiVersion: gateway.networking.k8s.io/v1
-kind: GatewayClass
+apiVersion: gateway.networking.x-k8s.io/v1
+kind: XGatewayClass
 metadata:
   name: example
 spec:
@@ -11,8 +11,8 @@ spec:
     group: acme.io
     kind: Parameters
 ---
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
+apiVersion: gateway.networking.x-k8s.io/v1
+kind: XGateway
 metadata:
   name: my-gateway
 spec:
@@ -27,8 +27,8 @@ spec:
         group: ""
         name: example-com-cert
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: GRPCRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XGRPCRoute
 metadata:
   name: grpc-app-1
 spec:

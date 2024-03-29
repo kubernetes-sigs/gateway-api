@@ -35,6 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/wait"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	gatewayxv1a2 "sigs.k8s.io/gateway-api/apis/experimental/v1alpha2"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
@@ -627,11 +628,11 @@ func UDPRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig c
 // TLSRouteMustHaveParents waits for the specified TLSRoute to have parents
 // in status that match the expected parents, and also returns the TLSRoute.
 // This will cause the test to halt if the specified timeout is exceeded.
-func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) v1alpha2.TLSRoute {
+func TLSRouteMustHaveParents(t *testing.T, client client.Client, timeoutConfig config.TimeoutConfig, routeName types.NamespacedName, parents []v1alpha2.RouteParentStatus, namespaceRequired bool) gatewayxv1a2.XTLSRoute {
 	t.Helper()
 
 	var actual []gatewayv1.RouteParentStatus
-	var route v1alpha2.TLSRoute
+	var route gatewayxv1a2.XTLSRoute
 
 	waitErr := wait.PollUntilContextTimeout(context.Background(), 1*time.Second, timeoutConfig.RouteMustHaveParents, true, func(ctx context.Context) (bool, error) {
 		err := client.Get(ctx, routeName, &route)

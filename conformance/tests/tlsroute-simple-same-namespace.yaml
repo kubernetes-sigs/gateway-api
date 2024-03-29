@@ -1,5 +1,5 @@
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TLSRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XTLSRoute
 metadata:
   name: gateway-conformance-infra-test
   namespace: gateway-conformance-infra

@@ -28,6 +28,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/yaml"
 
+	gatewayxv1alpha2 "sigs.k8s.io/gateway-api/apis/experimental/v1alpha2"
+	gatewayxv1beta1 "sigs.k8s.io/gateway-api/apis/experimental/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
@@ -67,6 +69,8 @@ func TestConformance(t *testing.T) {
 		t.Fatalf("Error initializing Kubernetes REST client: %v", err)
 	}
 
+	gatewayxv1alpha2.AddToScheme(mgrClient.Scheme())
+	gatewayxv1beta1.AddToScheme(mgrClient.Scheme())
 	gatewayv1alpha2.AddToScheme(mgrClient.Scheme())
 	gatewayv1beta1.AddToScheme(mgrClient.Scheme())
 	gatewayv1.AddToScheme(mgrClient.Scheme())
@@ -82,6 +86,7 @@ func TestConformance(t *testing.T) {
 	if len(conformanceProfiles) == 0 {
 		t.Fatal("conformance profiles need to be given")
 	}
+
 	mode = *flags.Mode
 	allowCRDsMismatch = *flags.AllowCRDsMismatch
 
@@ -95,6 +100,7 @@ func TestConformance(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error parsing implementation's details: %v", err)
 	}
+
 	testConformance(t)
 }
 

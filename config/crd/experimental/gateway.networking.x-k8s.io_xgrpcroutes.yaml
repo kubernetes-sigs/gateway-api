@@ -6,16 +6,16 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v1.0.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: grpcroutes.gateway.networking.k8s.io
+  name: xgrpcroutes.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api
-    kind: GRPCRoute
-    listKind: GRPCRouteList
-    plural: grpcroutes
-    singular: grpcroute
+    kind: XGRPCRoute
+    listKind: XGRPCRouteList
+    plural: xgrpcroutes
+    singular: xgrpcroute
   scope: Namespaced
   versions:
   - additionalPrinterColumns:

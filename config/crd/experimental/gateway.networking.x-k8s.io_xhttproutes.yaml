@@ -6,16 +6,16 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v1.0.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: httproutes.gateway.networking.k8s.io
+  name: xhttproutes.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api
-    kind: HTTPRoute
-    listKind: HTTPRouteList
-    plural: httproutes
-    singular: httproute
+    kind: XHTTPRoute
+    listKind: XHTTPRouteList
+    plural: xhttproutes
+    singular: xhttproute
   scope: Namespaced
   versions:
   - additionalPrinterColumns:

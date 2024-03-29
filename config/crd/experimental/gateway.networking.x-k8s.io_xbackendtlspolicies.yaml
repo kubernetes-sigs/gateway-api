@@ -8,18 +8,18 @@ metadata:
   creationTimestamp: null
   labels:
     gateway.networking.k8s.io/policy: Direct
-  name: backendtlspolicies.gateway.networking.k8s.io
+  name: xbackendtlspolicies.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api
-    kind: BackendTLSPolicy
-    listKind: BackendTLSPolicyList
-    plural: backendtlspolicies
+    kind: XBackendTLSPolicy
+    listKind: XBackendTLSPolicyList
+    plural: xbackendtlspolicies
     shortNames:
     - btlspolicy
-    singular: backendtlspolicy
+    singular: xbackendtlspolicy
   scope: Namespaced
   versions:
   - additionalPrinterColumns:

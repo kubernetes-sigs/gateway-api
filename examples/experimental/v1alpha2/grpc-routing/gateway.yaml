@@ -1,7 +1,7 @@
 #$ Used in:
 #$ - site-src/guides/grpc-routing.md
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
+apiVersion: gateway.networking.x-k8s.io/v1
+kind: XGateway
 metadata:
   name: example-gateway
 spec:
@@ -16,8 +16,8 @@ spec:
         group: ""
         name: example-com-cert
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: GRPCRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XGRPCRoute
 metadata:
   name: example-route
 spec:

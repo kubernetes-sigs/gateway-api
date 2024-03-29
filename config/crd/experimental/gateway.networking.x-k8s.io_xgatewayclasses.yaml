@@ -6,18 +6,18 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v1.0.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: gatewayclasses.gateway.networking.k8s.io
+  name: xgatewayclasses.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api
-    kind: GatewayClass
-    listKind: GatewayClassList
-    plural: gatewayclasses
+    kind: XGatewayClass
+    listKind: XGatewayClassList
+    plural: xgatewayclasses
     shortNames:
     - gc
-    singular: gatewayclass
+    singular: xgatewayclass
   scope: Cluster
   versions:
   - additionalPrinterColumns:

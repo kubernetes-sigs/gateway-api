@@ -39,6 +39,14 @@ var standardKinds = map[string]bool{
 	"ReferenceGrant": true,
 }
 
+const (
+	channelExperimental     string = "experimental"
+	groupExperimental       string = "gateway.networking.x-k8s.io"
+	prefixExperimentalLow   string = "x"
+	prefixExperimentalUpper string = "X"
+	channelStandard         string = "standard"
+)
+
 // This generation code is largely copied from
 // github.com/kubernetes-sigs/controller-tools/blob/ab52f76cc7d167925b2d5942f24bf22e30f49a02/pkg/crd/gen.go
 func main() {
@@ -81,10 +89,10 @@ func main() {
 		log.Fatalf("no objects in the roots")
 	}
 
-	channels := []string{"standard", "experimental"}
+	channels := []string{channelStandard, channelExperimental}
 	for _, channel := range channels {
 		for _, groupKind := range kubeKinds {
-			if channel == "standard" && !standardKinds[groupKind.Kind] {
+			if channel == channelStandard && !standardKinds[groupKind.Kind] {
 				continue
 			}
 
@@ -93,6 +101,14 @@ func main() {
 			parser.NeedCRDFor(groupKind, nil)
 			crdRaw := parser.CustomResourceDefinitions[groupKind]
 
+			if channel == channelExperimental {
+				crdRaw.Spec.Group = groupExperimental
+				crdRaw.Spec.Names.Plural = prefixExperimentalLow + crdRaw.Spec.Names.Plural
+				crdRaw.Spec.Names.Singular = prefixExperimentalLow + crdRaw.Spec.Names.Singular
+				crdRaw.Spec.Names.Kind = prefixExperimentalUpper + crdRaw.Spec.Names.Kind
+				crdRaw.Spec.Names.ListKind = prefixExperimentalUpper + crdRaw.Spec.Names.ListKind
+				crdRaw.Name = crdRaw.Spec.Names.Plural + "." + crdRaw.Spec.Group
+			}
 			// Inline version of "addAttribution(&crdRaw)" ...
 			if crdRaw.ObjectMeta.Annotations == nil {
 				crdRaw.ObjectMeta.Annotations = map[string]string{}
@@ -159,7 +175,7 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 			}}
 		}
 
-		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
+		if channel == channelStandard && strings.Contains(jsonProps.Description, "<gateway:experimental>") {
 			delete(props, name)
 			continue
 		}
@@ -204,7 +220,7 @@ func gatewayTweaks(channel string, props map[string]apiext.JSONSchemaProps) map[
 		startTag := "<gateway:experimental:description>"
 		endTag := "</gateway:experimental:description>"
 		regexPattern := regexp.QuoteMeta(startTag) + `(?s:(.*?))` + regexp.QuoteMeta(endTag)
-		if channel == "standard" && strings.Contains(jsonProps.Description, "<gateway:experimental:description>") {
+		if channel == channelStandard && strings.Contains(jsonProps.Description, "<gateway:experimental:description>") {
 			re := regexp.MustCompile(regexPattern)
 			match := re.FindStringSubmatch(jsonProps.Description)
 			if len(match) != 2 {

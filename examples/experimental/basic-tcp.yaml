@@ -1,7 +1,7 @@
 #$ Used in:
 #$ - site-src/v1alpha2/guides/tcp.md
-apiVersion: gateway.networking.k8s.io/v1
-kind: Gateway
+apiVersion: gateway.networking.x-k8s.io/v1
+kind: XGateway
 metadata:
   name: my-tcp-gateway
 spec:
@@ -12,16 +12,16 @@ spec:
     port: 8080
     allowedRoutes:
       kinds:
-      - kind: TCPRoute
+      - kind: XTCPRoute
   - name: bar
     protocol: TCP
     port: 8090
     allowedRoutes:
       kinds:
-      - kind: TCPRoute
+      - kind: XTCPRoute
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XTCPRoute
 metadata:
   name: tcp-app-1
 spec:
@@ -33,8 +33,8 @@ spec:
     - name: my-foo-service
       port: 6000
 ---
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TCPRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XTCPRoute
 metadata:
   name: tcp-app-2
 spec:

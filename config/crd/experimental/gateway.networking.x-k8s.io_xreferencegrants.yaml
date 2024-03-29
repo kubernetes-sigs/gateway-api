@@ -6,18 +6,18 @@ metadata:
     gateway.networking.k8s.io/bundle-version: v1.0.0
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
-  name: referencegrants.gateway.networking.k8s.io
+  name: xreferencegrants.gateway.networking.x-k8s.io
 spec:
-  group: gateway.networking.k8s.io
+  group: gateway.networking.x-k8s.io
   names:
     categories:
     - gateway-api
-    kind: ReferenceGrant
-    listKind: ReferenceGrantList
-    plural: referencegrants
+    kind: XReferenceGrant
+    listKind: XReferenceGrantList
+    plural: xreferencegrants
     shortNames:
     - refgrant
-    singular: referencegrant
+    singular: xreferencegrant
   scope: Namespaced
   versions:
   - additionalPrinterColumns:

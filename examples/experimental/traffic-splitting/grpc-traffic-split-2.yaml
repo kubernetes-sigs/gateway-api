@@ -1,7 +1,7 @@
 #$ Used in:
 #$ - site-src/api-types/grpcroute.md
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: GRPCRoute
+apiVersion: gateway.networking.x-k8s.io/v1alpha2
+kind: XGRPCRoute
 metadata:
   name: foo-route
   labels:

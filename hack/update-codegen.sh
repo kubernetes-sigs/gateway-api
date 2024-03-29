@@ -83,7 +83,7 @@ go run k8s.io/code-generator/cmd/informer-gen \
   --output-package "${OUTPUT_PKG}/informers" \
   ${COMMON_FLAGS}
 
-for VERSION in v1alpha2 v1beta1 v1
+for VERSION in experimental/v1alpha2 experimental/v1beta1 v1alpha2 v1beta1 v1
 do
   echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
   go run k8s.io/code-generator/cmd/register-gen \
