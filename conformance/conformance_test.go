@@ -35,14 +35,15 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/tests"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 var (
 	cfg                  *rest.Config
 	k8sClientset         *kubernetes.Clientset
 	mgrClient            client.Client
-	supportedFeatures    sets.Set[suite.SupportedFeature]
-	exemptFeatures       sets.Set[suite.SupportedFeature]
+	supportedFeatures    sets.Set[features.SupportedFeature]
+	exemptFeatures       sets.Set[features.SupportedFeature]
 	namespaceLabels      map[string]string
 	namespaceAnnotations map[string]string
 	implementation       *confv1.Implementation

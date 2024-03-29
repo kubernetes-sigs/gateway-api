@@ -42,6 +42,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
 	"sigs.k8s.io/gateway-api/pkg/consts"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 // -----------------------------------------------------------------------------
@@ -63,7 +64,7 @@ type ConformanceTestSuite struct {
 	BaseManifests            string
 	MeshManifests            string
 	Applier                  kubernetes.Applier
-	SupportedFeatures        sets.Set[SupportedFeature]
+	SupportedFeatures        sets.Set[features.SupportedFeature]
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	RunTest                  string
@@ -104,11 +105,11 @@ type ConformanceTestSuite struct {
 
 	// extendedSupportedFeatures is a compiled list of named features that were
 	// marked as supported, and is used for reporting the test results.
-	extendedSupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
+	extendedSupportedFeatures map[ConformanceProfileName]sets.Set[features.SupportedFeature]
 
 	// extendedUnsupportedFeatures is a compiled list of named features that were
 	// marked as not supported, and is used for reporting the test results.
-	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[SupportedFeature]
+	extendedUnsupportedFeatures map[ConformanceProfileName]sets.Set[features.SupportedFeature]
 
 	// lock is a mutex to help ensure thread safety of the test suite object.
 	lock sync.RWMutex
@@ -130,8 +131,8 @@ type ConformanceOptions struct {
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
 	CleanupBaseResources       bool
-	SupportedFeatures          sets.Set[SupportedFeature]
-	ExemptFeatures             sets.Set[SupportedFeature]
+	SupportedFeatures          sets.Set[features.SupportedFeature]
+	ExemptFeatures             sets.Set[features.SupportedFeature]
 	EnableAllSupportedFeatures bool
 	TimeoutConfig              config.TimeoutConfig
 	// SkipTests contains all the tests not to be run and can be used to opt out
@@ -213,9 +214,9 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	// cover all features, if they don't they'll need to have provided a
 	// conformance profile or at least some specific features they support.
 	if options.EnableAllSupportedFeatures {
-		options.SupportedFeatures = AllFeatures
+		options.SupportedFeatures = features.AllFeatures
 	} else if options.SupportedFeatures == nil {
-		options.SupportedFeatures = sets.New[SupportedFeature]()
+		options.SupportedFeatures = sets.New[features.SupportedFeature]()
 	}
 
 	for feature := range options.ExemptFeatures {
@@ -244,8 +245,8 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
 		results:                     make(map[string]testResult),
-		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
-		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[SupportedFeature]),
+		extendedUnsupportedFeatures: make(map[ConformanceProfileName]sets.Set[features.SupportedFeature]),
+		extendedSupportedFeatures:   make(map[ConformanceProfileName]sets.Set[features.SupportedFeature]),
 		conformanceProfiles:         options.ConformanceProfiles,
 		implementation:              options.Implementation,
 		mode:                        mode,
@@ -268,12 +269,12 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		for _, f := range conformanceProfile.ExtendedFeatures.UnsortedList() {
 			if options.SupportedFeatures.Has(f) {
 				if suite.extendedSupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					suite.extendedSupportedFeatures[conformanceProfileName] = sets.New[features.SupportedFeature]()
 				}
 				suite.extendedSupportedFeatures[conformanceProfileName].Insert(f)
 			} else {
 				if suite.extendedUnsupportedFeatures[conformanceProfileName] == nil {
-					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[SupportedFeature]()
+					suite.extendedUnsupportedFeatures[conformanceProfileName] = sets.New[features.SupportedFeature]()
 				}
 				suite.extendedUnsupportedFeatures[conformanceProfileName].Insert(f)
 			}
@@ -306,7 +307,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.Applier.UsableNetworkAddresses = suite.UsableNetworkAddresses
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
 
-	if suite.SupportedFeatures.Has(SupportGateway) {
+	if suite.SupportedFeatures.Has(features.SupportGateway) {
 		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
 		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
@@ -334,7 +335,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		}
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-	if suite.SupportedFeatures.Has(SupportMesh) {
+	if suite.SupportedFeatures.Has(features.SupportMesh) {
 		t.Logf("Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
 		t.Logf("Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
