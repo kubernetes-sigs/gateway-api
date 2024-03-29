@@ -633,7 +633,7 @@ When using multiple backends in traffic splitting, all backend services should h
 Nonetheless, implementations MUST carefully consider how to manage traffic splitting scenarios in which one service has
 persistence enabled while the other does not. This includes scenarios where users are transitioning to or from an
 implementation version designed with or without persistence. For traffic splitting scenario within a single route rule,
-this GEP leaves the decision to the implementation. Implementations MAY choose to apply session persistence to all
+this GEP leaves the decision to the implementation. Implementations MUST choose to apply session persistence to all
 backends equally, reject the session persistence configuration entirely, or apply session persistence only for the
 backends with it configured.
 
@@ -959,6 +959,8 @@ TODO
 - How do implementations drain established sessions during backend upgrades without disruption?
     - Do we need a "session draining timeout" as documented by [A55: xDS-Based Stateful Session Affinity for Proxyless gRPC](https://github.com/grpc/proposal/blob/master/A55-xds-stateful-session-affinity.md#background)
       defined in this API?
+- How do we provide a standard way to communicate that an implementation does not support Route Rule API?
+    - Do we want something conceptually similar to the `IncompatibleFilters` reason?
 
 ## TODO
 
