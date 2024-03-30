@@ -129,68 +129,58 @@ foo-com-internal-gateway-class  foo.com/internal-gateway-class  Unknown   24m
 
 func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
-	objects := []runtime.Object{
-		&gatewayv1.GatewayClass{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "foo-gatewayclass",
-			},
-			Spec: gatewayv1.GatewayClassSpec{
-				ControllerName: "example.net/gateway-controller",
-				Description:    common.PtrTo("random"),
-			},
-		},
-		&apiextensionsv1.CustomResourceDefinition{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "healthcheckpolicies.foo.com",
-				Labels: map[string]string{
-					gatewayv1alpha2.PolicyLabelKey: "true",
+
+	testcases := []struct {
+		name    string
+		objects []runtime.Object
+		want    string
+	}{
+		{
+			name: "GatewayClass with description and policy",
+			objects: []runtime.Object{
+				&gatewayv1.GatewayClass{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "foo-gatewayclass",
+					},
+					Spec: gatewayv1.GatewayClassSpec{
+						ControllerName: "example.net/gateway-controller",
+						Description:    common.PtrTo("random"),
+					},
 				},
-			},
-			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-				Group:    "foo.com",
-				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
-				Names: apiextensionsv1.CustomResourceDefinitionNames{
-					Plural: "healthcheckpolicies",
-					Kind:   "HealthCheckPolicy",
+				&apiextensionsv1.CustomResourceDefinition{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "healthcheckpolicies.foo.com",
+						Labels: map[string]string{
+							gatewayv1alpha2.PolicyLabelKey: "true",
+						},
+					},
+					Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+						Group:    "foo.com",
+						Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+						Names: apiextensionsv1.CustomResourceDefinitionNames{
+							Plural: "healthcheckpolicies",
+							Kind:   "HealthCheckPolicy",
+						},
+					},
 				},
-			},
-		},
-		&unstructured.Unstructured{
-			Object: map[string]interface{}{
-				"apiVersion": "foo.com/v1",
-				"kind":       "HealthCheckPolicy",
-				"metadata": map[string]interface{}{
-					"name": "policy-name",
-				},
-				"spec": map[string]interface{}{
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "foo-gatewayclass",
+				&unstructured.Unstructured{
+					Object: map[string]interface{}{
+						"apiVersion": "foo.com/v1",
+						"kind":       "HealthCheckPolicy",
+						"metadata": map[string]interface{}{
+							"name": "policy-name",
+						},
+						"spec": map[string]interface{}{
+							"targetRef": map[string]interface{}{
+								"group": "gateway.networking.k8s.io",
+								"kind":  "GatewayClass",
+								"name":  "foo-gatewayclass",
+							},
+						},
 					},
 				},
 			},
-		},
-	}
-
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
-	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
-	}
-
-	gcp := &GatewayClassesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
-	}
-	gcp.PrintDescribeView(resourceModel)
-
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
+			want: `
 Name: foo-gatewayclass
 ControllerName: example.net/gateway-controller
 Description: random
@@ -198,9 +188,51 @@ DirectlyAttachedPolicies:
 - Group: foo.com
   Kind: HealthCheckPolicy
   Name: policy-name
-`
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+`,
+		},
+		{
+			name: "GatewayClass with no description",
+			objects: []runtime.Object{
+				&gatewayv1.GatewayClass{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "foo-gatewayclass",
+					},
+					Spec: gatewayv1.GatewayClassSpec{
+						ControllerName: "example.net/gateway-controller",
+					},
+				},
+			},
+			want: `
+Name: foo-gatewayclass
+ControllerName: example.net/gateway-controller
+`,
+		},
+	}
+
+	for _, tc := range testcases {
+		tc := tc
+		t.Run(tc.name, func(t *testing.T) {
+			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			discoverer := resourcediscovery.Discoverer{
+				K8sClients:    params.K8sClients,
+				PolicyManager: params.PolicyManager,
+			}
+			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
+			if err != nil {
+				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+			}
+
+			gcp := &GatewayClassesPrinter{
+				Out:   params.Out,
+				Clock: fakeClock,
+			}
+			gcp.PrintDescribeView(resourceModel)
+
+			got := params.Out.(*bytes.Buffer).String()
+			if diff := cmp.Diff(common.YamlString(tc.want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+				t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, tc.want, diff)
+			}
+		})
 	}
 }
 
