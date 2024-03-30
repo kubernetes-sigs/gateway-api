@@ -488,7 +488,7 @@ type AllowedRoutes struct {
 	// for route kinds and protocolTypes included in Gateway API
 	//
 	// HTTP: HTTPRoutes, GRPCRoutes
-	// HTTPS: HTTPRoutes, GRPCRoutes, TLSRoute
+	// HTTPS: HTTPRoutes, GRPCRoutes, TLSRoutes
 	// TLS: TLSRoutes, TCPRoutes
 	// TCP: TCPRoutes
 	// UDP:	UDPRoutes

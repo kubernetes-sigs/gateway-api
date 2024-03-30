@@ -261,7 +261,7 @@ The following table shows the **Route kinds** compatible for each **protocolType
 |protocolType|core kind/s compatible|
 |------------|----------------------|
 | HTTP | HTTPRoutes, GRPCRoutes |
-| HTTPS |	HTTPRoutes, GRPCRoutes, TLSRoute |
+| HTTPS |	HTTPRoutes, GRPCRoutes, TLSRoutes |
 | TLS	| TLSRoutes, TCPRoutes |
 | TCP |	TCPRoutes |
 | UDP |	UDPRoutes |

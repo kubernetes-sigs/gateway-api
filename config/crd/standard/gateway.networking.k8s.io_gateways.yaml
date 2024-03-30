@@ -346,7 +346,7 @@ spec:
                             the Route kinds compatible for each protocolType\nfor
                             route kinds and protocolTypes included in Gateway API\n\n\nHTTP:
                             HTTPRoutes, GRPCRoutes\nHTTPS: HTTPRoutes, GRPCRoutes,
-                            TLSRoute\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
+                            TLSRoutes\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
                           items:
                             description: RouteGroupKind indicates the group and kind
                               of a Route resource.
@@ -1379,7 +1379,7 @@ spec:
                             the Route kinds compatible for each protocolType\nfor
                             route kinds and protocolTypes included in Gateway API\n\n\nHTTP:
                             HTTPRoutes, GRPCRoutes\nHTTPS: HTTPRoutes, GRPCRoutes,
-                            TLSRoute\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
+                            TLSRoutes\nTLS: TLSRoutes, TCPRoutes\nTCP: TCPRoutes\nUDP:\tUDPRoutes"
                           items:
                             description: RouteGroupKind indicates the group and kind
                               of a Route resource.
