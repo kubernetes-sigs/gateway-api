@@ -395,7 +395,6 @@ func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter F
 		namespace := &corev1.Namespace{}
 		nn := apimachinerytypes.NamespacedName{Name: filter.Name}
 		err := k8sClients.Client.Get(ctx, nn, namespace)
-
 		if err != nil {
 			return []corev1.Namespace{}, err
 		}
