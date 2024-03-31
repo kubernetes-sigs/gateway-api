@@ -89,7 +89,12 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 
 	switch kind {
 	case "namespace", "namespaces":
-		resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{Labels: selector})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
 			os.Exit(1)
