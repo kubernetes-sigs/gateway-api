@@ -20,6 +20,8 @@ package v1alpha2
 
 type BackendTLSPolicyExpansion interface{}
 
+type GRPCRouteExpansion interface{}
+
 type ReferenceGrantExpansion interface{}
 
 type TCPRouteExpansion interface{}

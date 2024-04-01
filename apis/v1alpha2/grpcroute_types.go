@@ -18,9 +18,11 @@ package v1alpha2
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
+// +genclient
 // +kubebuilder:object:root=true
 // +kubebuilder:deprecatedversion:warning="The v1alpha2 version of GRPCRoute has been deprecated and will be removed in a future release of the API. Please upgrade to v1."
 type GRPCRoute v1.GRPCRoute
