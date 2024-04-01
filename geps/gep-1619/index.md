@@ -887,7 +887,7 @@ spec:
 
 In this scenario, session persistence is enabled at route rule level and all services in the traffic split have persistent session.
 
-That is to say, traffic routing to `servicev1` previously will continue to be routed to `servicev1` when cookie is present, and traffic routing to `servicev2` previously will continue to be routed to `servicev2` when cookie is present.
+That is to say, traffic routing to `servicev1` previously MUST continue to be routed to `servicev1` when cookie is present, and traffic routing to `servicev2` previously MUST continue to be routed to `servicev2` when cookie is present.
 
 When cookie is not present, such as, a new session, it will be routed based on the `weight` configuration and choose one of the services.
 
