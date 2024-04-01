@@ -35,6 +35,7 @@ import (
 var standardKinds = map[string]bool{
 	"GatewayClass":   true,
 	"Gateway":        true,
+	"GRPCRoute":      true,
 	"HTTPRoute":      true,
 	"ReferenceGrant": true,
 }
@@ -105,7 +106,10 @@ func main() {
 			crd.FixTopLevelMetadata(crdRaw)
 
 			channelCrd := crdRaw.DeepCopy()
-			for _, version := range channelCrd.Spec.Versions {
+			for i, version := range channelCrd.Spec.Versions {
+				if channel == "standard" && strings.Contains(version.Name, "alpha") {
+					channelCrd.Spec.Versions[i].Served = false
+				}
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
 			}
 
