@@ -623,9 +623,9 @@ persistence, making it likely that route rule level session persistence will be 
 
 ### Traffic Splitting
 
-In scenarios involving traffic splitting, session persistence impacts load balancing done after routing. When a
-persistent session is established and traffic splitting is configured across services, the persistence to a single
-backend MUST be maintained across services. Consequently, a persistent session takes precedence over traffic split
+In scenarios involving traffic splitting, session persistence impacts load balancing done after routing.
+When a persistent session is established and traffic splitting is configured across services, the persistence to a single backend MUST be maintained across services, even if the weight is set to 0.
+Consequently, a persistent session takes precedence over traffic split
 weights when selecting a backend after route matching. It's important to note that session persistence does not impact
 the process of route matching.
 
