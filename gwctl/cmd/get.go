@@ -88,7 +88,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: realClock}
 
 	switch kind {
-	case "namespace", "namespaces":
+	case "namespace", "namespaces", "ns":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)

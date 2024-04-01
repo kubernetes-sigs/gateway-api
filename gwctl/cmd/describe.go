@@ -147,12 +147,12 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		}
 		backendsPrinter.PrintDescribeView(resourceModel)
 
-	case "namespace", "namespaces":
+	case "namespace", "namespaces", "ns":
 		filter := resourcediscovery.Filter{}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
-		
+
 		resourceModel, err := discoverer.DiscoverResourcesForNamespace(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
