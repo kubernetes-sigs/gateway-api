@@ -22,9 +22,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/types"
 
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	pb "sigs.k8s.io/gateway-api/conformance/echo-basic/grpcechoserver"
-
-	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -46,7 +45,7 @@ var GRPCExactMethodMatching = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "exact-matching", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &v1alpha2.GRPCRoute{}, routeNN)
+		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &v1.GRPCRoute{}, routeNN)
 
 		testCases := []grpc.ExpectedResponse{
 			{

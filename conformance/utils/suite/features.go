@@ -231,7 +231,7 @@ var MeshCoreFeatures = sets.New(
 )
 
 // -----------------------------------------------------------------------------
-// Features - GRPCRoute Conformance (Experimental)
+// Features - GRPCRoute Conformance
 // -----------------------------------------------------------------------------
 
 const (
