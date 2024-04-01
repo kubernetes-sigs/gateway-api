@@ -921,7 +921,7 @@ spec:
 ```
 
 In this traffic splitting scenario within a single route rule, this GEP leaves the decision to the implementation. An
-implementation MAY choose to:
+implementation MUST choose one of the following:
 
 1. Apply session persistence configured in `BackendLBPolicy` to `servicev1` and `servicev2` equally
 2. Reject the session persistence configured in `BackendLBPolicy` so that `servicev1` does not have session persistence
