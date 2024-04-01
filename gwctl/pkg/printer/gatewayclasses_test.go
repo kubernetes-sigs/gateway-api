@@ -247,7 +247,8 @@ func TestGatewayClassesPrinter_LabelSelector(t *testing.T) {
 				Labels: labels,
 				CreationTimestamp: metav1.Time{
 					Time: fakeClock.Now().Add(-365 * 24 * time.Hour),
-				}},
+				},
+			},
 			Spec: gatewayv1.GatewayClassSpec{
 				ControllerName: gatewayv1.GatewayController(name + "/controller"),
 			},

@@ -31,7 +31,6 @@ import (
 )
 
 func NewDescribeCommand() *cobra.Command {
-
 	var namespaceFlag string
 	var allNamespacesFlag bool
 
@@ -152,7 +151,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
-		
+
 		resourceModel, err := discoverer.DiscoverResourcesForNamespace(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
