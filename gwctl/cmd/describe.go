@@ -31,7 +31,6 @@ import (
 )
 
 func NewDescribeCommand() *cobra.Command {
-
 	var namespaceFlag string
 	var allNamespacesFlag bool
 
