@@ -68,7 +68,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 }
 
 // ParseSupportedFeatures parses flag arguments and converts the string to
-// sets.Set[suite.SupportedFeature]
+// sets.Set[features.SupportedFeature]
 func ParseSupportedFeatures(f string) sets.Set[features.SupportedFeature] {
 	if f == "" {
 		return nil
