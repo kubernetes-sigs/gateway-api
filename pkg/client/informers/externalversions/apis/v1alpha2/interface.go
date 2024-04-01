@@ -28,12 +28,6 @@ type Interface interface {
 	BackendTLSPolicies() BackendTLSPolicyInformer
 	// GRPCRoutes returns a GRPCRouteInformer.
 	GRPCRoutes() GRPCRouteInformer
-	// Gateways returns a GatewayInformer.
-	Gateways() GatewayInformer
-	// GatewayClasses returns a GatewayClassInformer.
-	GatewayClasses() GatewayClassInformer
-	// HTTPRoutes returns a HTTPRouteInformer.
-	HTTPRoutes() HTTPRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
 	ReferenceGrants() ReferenceGrantInformer
 	// TCPRoutes returns a TCPRouteInformer.
@@ -63,21 +57,6 @@ func (v *version) BackendTLSPolicies() BackendTLSPolicyInformer {
 // GRPCRoutes returns a GRPCRouteInformer.
 func (v *version) GRPCRoutes() GRPCRouteInformer {
 	return &gRPCRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// Gateways returns a GatewayInformer.
-func (v *version) Gateways() GatewayInformer {
-	return &gatewayInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
-}
-
-// GatewayClasses returns a GatewayClassInformer.
-func (v *version) GatewayClasses() GatewayClassInformer {
-	return &gatewayClassInformer{factory: v.factory, tweakListOptions: v.tweakListOptions}
-}
-
-// HTTPRoutes returns a HTTPRouteInformer.
-func (v *version) HTTPRoutes() HTTPRouteInformer {
-	return &hTTPRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReferenceGrants returns a ReferenceGrantInformer.

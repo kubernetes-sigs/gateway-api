@@ -380,7 +380,7 @@ type GRPCHeaderMatch struct {
 	//
 	// +optional
 	// +kubebuilder:default=Exact
-	Type *HeaderMatchType `json:"type,omitempty"`
+	Type *v1.HeaderMatchType `json:"type,omitempty"`
 
 	// Name is the name of the gRPC Header to be matched.
 	//
@@ -513,7 +513,7 @@ type GRPCRouteFilter struct {
 	// Support: Core
 	//
 	// +optional
-	RequestHeaderModifier *HTTPHeaderFilter `json:"requestHeaderModifier,omitempty"`
+	RequestHeaderModifier *v1.HTTPHeaderFilter `json:"requestHeaderModifier,omitempty"`
 
 	// ResponseHeaderModifier defines a schema for a filter that modifies response
 	// headers.
@@ -521,7 +521,7 @@ type GRPCRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	ResponseHeaderModifier *HTTPHeaderFilter `json:"responseHeaderModifier,omitempty"`
+	ResponseHeaderModifier *v1.HTTPHeaderFilter `json:"responseHeaderModifier,omitempty"`
 
 	// RequestMirror defines a schema for a filter that mirrors requests.
 	// Requests are sent to the specified destination, but responses from
@@ -534,7 +534,7 @@ type GRPCRouteFilter struct {
 	// Support: Extended
 	//
 	// +optional
-	RequestMirror *HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
+	RequestMirror *v1.HTTPRequestMirrorFilter `json:"requestMirror,omitempty"`
 
 	// ExtensionRef is an optional, implementation-specific extension to the
 	// "filter" behavior.  For example, resource "myroutefilter" in group

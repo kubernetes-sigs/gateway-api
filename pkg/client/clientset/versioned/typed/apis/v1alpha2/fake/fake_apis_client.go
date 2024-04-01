@@ -36,18 +36,6 @@ func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInt
 	return &FakeGRPCRoutes{c, namespace}
 }
 
-func (c *FakeGatewayV1alpha2) Gateways(namespace string) v1alpha2.GatewayInterface {
-	return &FakeGateways{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) GatewayClasses() v1alpha2.GatewayClassInterface {
-	return &FakeGatewayClasses{c}
-}
-
-func (c *FakeGatewayV1alpha2) HTTPRoutes(namespace string) v1alpha2.HTTPRouteInterface {
-	return &FakeHTTPRoutes{c, namespace}
-}
-
 func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {
 	return &FakeReferenceGrants{c, namespace}
 }
