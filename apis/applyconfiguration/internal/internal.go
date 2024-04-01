@@ -1112,6 +1112,27 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicyConfig
       default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
+      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
   map:
     fields:

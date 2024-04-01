@@ -26,6 +26,8 @@ import (
 type Interface interface {
 	// BackendTLSPolicies returns a BackendTLSPolicyInformer.
 	BackendTLSPolicies() BackendTLSPolicyInformer
+	// GRPCRoutes returns a GRPCRouteInformer.
+	GRPCRoutes() GRPCRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
 	ReferenceGrants() ReferenceGrantInformer
 	// TCPRoutes returns a TCPRouteInformer.
@@ -50,6 +52,11 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 // BackendTLSPolicies returns a BackendTLSPolicyInformer.
 func (v *version) BackendTLSPolicies() BackendTLSPolicyInformer {
 	return &backendTLSPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+}
+
+// GRPCRoutes returns a GRPCRouteInformer.
+func (v *version) GRPCRoutes() GRPCRouteInformer {
+	return &gRPCRouteInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // ReferenceGrants returns a ReferenceGrantInformer.

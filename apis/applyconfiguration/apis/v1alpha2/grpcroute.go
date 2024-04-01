@@ -23,8 +23,9 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // GRPCRouteApplyConfiguration represents an declarative configuration of the GRPCRoute type for use
@@ -32,8 +33,8 @@ import (
 type GRPCRouteApplyConfiguration struct {
 	v1.TypeMetaApplyConfiguration    `json:",inline"`
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
-	Spec                             *GRPCRouteSpecApplyConfiguration   `json:"spec,omitempty"`
-	Status                           *GRPCRouteStatusApplyConfiguration `json:"status,omitempty"`
+	Spec                             *apisv1.GRPCRouteSpecApplyConfiguration   `json:"spec,omitempty"`
+	Status                           *apisv1.GRPCRouteStatusApplyConfiguration `json:"status,omitempty"`
 }
 
 // GRPCRoute constructs an declarative configuration of the GRPCRoute type for use with
@@ -58,18 +59,18 @@ func GRPCRoute(name, namespace string) *GRPCRouteApplyConfiguration {
 // Note that an extracted apply configuration will contain fewer fields than what the fieldManager previously
 // applied if another fieldManager has updated or force applied any of the previously applied fields.
 // Experimental!
-func ExtractGRPCRoute(gRPCRoute *apisv1alpha2.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
+func ExtractGRPCRoute(gRPCRoute *v1alpha2.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
 	return extractGRPCRoute(gRPCRoute, fieldManager, "")
 }
 
 // ExtractGRPCRouteStatus is the same as ExtractGRPCRoute except
 // that it extracts the status subresource applied configuration.
 // Experimental!
-func ExtractGRPCRouteStatus(gRPCRoute *apisv1alpha2.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
+func ExtractGRPCRouteStatus(gRPCRoute *v1alpha2.GRPCRoute, fieldManager string) (*GRPCRouteApplyConfiguration, error) {
 	return extractGRPCRoute(gRPCRoute, fieldManager, "status")
 }
 
-func extractGRPCRoute(gRPCRoute *apisv1alpha2.GRPCRoute, fieldManager string, subresource string) (*GRPCRouteApplyConfiguration, error) {
+func extractGRPCRoute(gRPCRoute *v1alpha2.GRPCRoute, fieldManager string, subresource string) (*GRPCRouteApplyConfiguration, error) {
 	b := &GRPCRouteApplyConfiguration{}
 	err := managedfields.ExtractInto(gRPCRoute, internal.Parser().Type("io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute"), fieldManager, b, subresource)
 	if err != nil {
@@ -244,7 +245,7 @@ func (b *GRPCRouteApplyConfiguration) ensureObjectMetaApplyConfigurationExists()
 // WithSpec sets the Spec field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Spec field is set to the value of the last call.
-func (b *GRPCRouteApplyConfiguration) WithSpec(value *GRPCRouteSpecApplyConfiguration) *GRPCRouteApplyConfiguration {
+func (b *GRPCRouteApplyConfiguration) WithSpec(value *apisv1.GRPCRouteSpecApplyConfiguration) *GRPCRouteApplyConfiguration {
 	b.Spec = value
 	return b
 }
@@ -252,7 +253,7 @@ func (b *GRPCRouteApplyConfiguration) WithSpec(value *GRPCRouteSpecApplyConfigur
 // WithStatus sets the Status field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Status field is set to the value of the last call.
-func (b *GRPCRouteApplyConfiguration) WithStatus(value *GRPCRouteStatusApplyConfiguration) *GRPCRouteApplyConfiguration {
+func (b *GRPCRouteApplyConfiguration) WithStatus(value *apisv1.GRPCRouteStatusApplyConfiguration) *GRPCRouteApplyConfiguration {
 	b.Status = value
 	return b
 }

@@ -45,11 +45,7 @@ var GRPCRouteHeaderMatching = suite.ConformanceTest{
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "grpc-header-matching", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-<<<<<<< HEAD
-		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &v1alpha2.GRPCRoute{}, routeNN)
-=======
 		gwAddr := kubernetes.GatewayAndRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), &v1.GRPCRoute{}, routeNN)
->>>>>>> 565708a6 (Updating GRPCRoute conformance tests to use v1)
 
 		testCases := []grpc.ExpectedResponse{{
 			EchoRequest: &pb.EchoRequest{},
