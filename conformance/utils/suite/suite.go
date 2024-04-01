@@ -66,7 +66,7 @@ type ConformanceTestSuite struct {
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	RunTest                  string
-	ManifestFS               fs.FS
+	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewayAddress
 	UnusableNetworkAddresses []v1beta1.GatewayAddress
 
@@ -140,7 +140,7 @@ type ConformanceOptions struct {
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest string
 
-	ManifestFS fs.FS
+	ManifestFS []fs.FS
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.

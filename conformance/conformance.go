@@ -17,6 +17,7 @@ limitations under the License.
 package conformance
 
 import (
+	"io/fs"
 	"os"
 	"testing"
 
@@ -77,7 +78,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 		Debug:                      *flags.ShowDebug,
 		EnableAllSupportedFeatures: *flags.EnableAllSupportedFeatures,
 		ExemptFeatures:             exemptFeatures,
-		ManifestFS:                 &Manifests,
+		ManifestFS:                 []fs.FS{&Manifests},
 		GatewayClassName:           *flags.GatewayClassName,
 		Implementation:             implementation,
 		Mode:                       *flags.Mode,
