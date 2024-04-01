@@ -61,6 +61,24 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.GatewayStatusAddressApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("GatewayTLSConfig"):
 		return &apisv1.GatewayTLSConfigApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCBackendRef"):
+		return &apisv1.GRPCBackendRefApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
+		return &apisv1.GRPCHeaderMatchApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCMethodMatch"):
+		return &apisv1.GRPCMethodMatchApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRoute"):
+		return &apisv1.GRPCRouteApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRouteFilter"):
+		return &apisv1.GRPCRouteFilterApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRouteMatch"):
+		return &apisv1.GRPCRouteMatchApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRouteRule"):
+		return &apisv1.GRPCRouteRuleApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRouteSpec"):
+		return &apisv1.GRPCRouteSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
+		return &apisv1.GRPCRouteStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPBackendRef"):
 		return &apisv1.HTTPBackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("HTTPHeader"):
@@ -125,24 +143,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.BackendTLSPolicyConfigApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
 		return &apisv1alpha2.BackendTLSPolicySpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCBackendRef"):
-		return &apisv1alpha2.GRPCBackendRefApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
-		return &apisv1alpha2.GRPCHeaderMatchApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCMethodMatch"):
-		return &apisv1alpha2.GRPCMethodMatchApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
-		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteFilter"):
-		return &apisv1alpha2.GRPCRouteFilterApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteMatch"):
-		return &apisv1alpha2.GRPCRouteMatchApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteRule"):
-		return &apisv1alpha2.GRPCRouteRuleApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteSpec"):
-		return &apisv1alpha2.GRPCRouteSpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
-		return &apisv1alpha2.GRPCRouteStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
 		return &apisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):

@@ -4,7 +4,7 @@ metadata:
   annotations:
     api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2466
     gateway.networking.k8s.io/bundle-version: v1.0.0
-    gateway.networking.k8s.io/channel: experimental
+    gateway.networking.k8s.io/channel: standard
   creationTimestamp: null
   name: grpcroutes.gateway.networking.k8s.io
 spec:
@@ -231,17 +231,6 @@ spec:
 
 
 
-                  ParentRefs from a Route to a Service in the same namespace are "producer"
-                  routes, which apply default routing rules to inbound connections from
-                  any namespace to the Service.
-
-
-                  ParentRefs from a Route to a Service in a different namespace are
-                  "consumer" routes, and these routing rules are only applied to outbound
-                  connections originating from the same namespace as the Route, for which
-                  the intended destination of the connections are a Service targeted as a
-                  ParentRef of the Route.
-
 
 
 
@@ -319,17 +308,6 @@ spec:
 
 
 
-                        ParentRefs from a Route to a Service in the same namespace are "producer"
-                        routes, which apply default routing rules to inbound connections from
-                        any namespace to the Service.
-
-
-                        ParentRefs from a Route to a Service in a different namespace are
-                        "consumer" routes, and these routing rules are only applied to outbound
-                        connections originating from the same namespace as the Route, for which
-                        the intended destination of the connections are a Service targeted as a
-                        ParentRef of the Route.
-
 
 
                         Support: Core
@@ -352,10 +330,6 @@ spec:
                         must match both specified values.
 
 
-
-                        When the parent resource is a Service, this targets a specific port in the
-                        Service spec. When both Port (experimental) and SectionName are specified,
-                        the name and port of the selected port must match both specified values.
 
 
 
@@ -418,28 +392,25 @@ spec:
                 maxItems: 32
                 type: array
                 x-kubernetes-validations:
-                - message: sectionName or port must be specified when parentRefs includes
+                - message: sectionName must be specified when parentRefs includes
                     2 or more references to the same parent
                   rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
                     == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
                     == '''')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
-                    p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName)
+                    p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName)
                     || p1.sectionName == '''') == (!has(p2.sectionName) || p2.sectionName
-                    == '''') && (!has(p1.port) || p1.port == 0) == (!has(p2.port)
-                    || p2.port == 0)): true))'
-                - message: sectionName or port must be unique when parentRefs includes
-                    2 or more references to the same parent
+                    == '''')) : true))'
+                - message: sectionName must be unique when parentRefs includes 2 or
+                    more references to the same parent
                   rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
                     == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__
                     == '')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
                     p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName)
                     || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName
-                    == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
-                    == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port)
-                    || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
-                    == p2.port))))
+                    == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
+                    == p2.sectionName))))
               rules:
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
@@ -2139,17 +2110,6 @@ spec:
 
 
 
-                            ParentRefs from a Route to a Service in the same namespace are "producer"
-                            routes, which apply default routing rules to inbound connections from
-                            any namespace to the Service.
-
-
-                            ParentRefs from a Route to a Service in a different namespace are
-                            "consumer" routes, and these routing rules are only applied to outbound
-                            connections originating from the same namespace as the Route, for which
-                            the intended destination of the connections are a Service targeted as a
-                            ParentRef of the Route.
-
 
 
                             Support: Core
@@ -2172,10 +2132,6 @@ spec:
                             must match both specified values.
 
 
-
-                            When the parent resource is a Service, this targets a specific port in the
-                            Service spec. When both Port (experimental) and SectionName are specified,
-                            the name and port of the selected port must match both specified values.
 
 
 
@@ -2458,17 +2414,6 @@ spec:
 
 
 
-                  ParentRefs from a Route to a Service in the same namespace are "producer"
-                  routes, which apply default routing rules to inbound connections from
-                  any namespace to the Service.
-
-
-                  ParentRefs from a Route to a Service in a different namespace are
-                  "consumer" routes, and these routing rules are only applied to outbound
-                  connections originating from the same namespace as the Route, for which
-                  the intended destination of the connections are a Service targeted as a
-                  ParentRef of the Route.
-
 
 
 
@@ -2546,17 +2491,6 @@ spec:
 
 
 
-                        ParentRefs from a Route to a Service in the same namespace are "producer"
-                        routes, which apply default routing rules to inbound connections from
-                        any namespace to the Service.
-
-
-                        ParentRefs from a Route to a Service in a different namespace are
-                        "consumer" routes, and these routing rules are only applied to outbound
-                        connections originating from the same namespace as the Route, for which
-                        the intended destination of the connections are a Service targeted as a
-                        ParentRef of the Route.
-
 
 
                         Support: Core
@@ -2579,10 +2513,6 @@ spec:
                         must match both specified values.
 
 
-
-                        When the parent resource is a Service, this targets a specific port in the
-                        Service spec. When both Port (experimental) and SectionName are specified,
-                        the name and port of the selected port must match both specified values.
 
 
 
@@ -2645,28 +2575,25 @@ spec:
                 maxItems: 32
                 type: array
                 x-kubernetes-validations:
-                - message: sectionName or port must be specified when parentRefs includes
+                - message: sectionName must be specified when parentRefs includes
                     2 or more references to the same parent
                   rule: 'self.all(p1, self.all(p2, p1.group == p2.group && p1.kind
                     == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '''') && (!has(p2.__namespace__) || p2.__namespace__
                     == '''')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
-                    p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName)
+                    p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName)
                     || p1.sectionName == '''') == (!has(p2.sectionName) || p2.sectionName
-                    == '''') && (!has(p1.port) || p1.port == 0) == (!has(p2.port)
-                    || p2.port == 0)): true))'
-                - message: sectionName or port must be unique when parentRefs includes
-                    2 or more references to the same parent
+                    == '''')) : true))'
+                - message: sectionName must be unique when parentRefs includes 2 or
+                    more references to the same parent
                   rule: self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind
                     == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__)
                     || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__
                     == '')) || (has(p1.__namespace__) && has(p2.__namespace__) &&
                     p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName)
                     || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName
-                    == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
-                    == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port)
-                    || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port
-                    == p2.port))))
+                    == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName
+                    == p2.sectionName))))
               rules:
                 description: Rules are a list of GRPC matchers, filters and actions.
                 items:
@@ -4366,17 +4293,6 @@ spec:
 
 
 
-                            ParentRefs from a Route to a Service in the same namespace are "producer"
-                            routes, which apply default routing rules to inbound connections from
-                            any namespace to the Service.
-
-
-                            ParentRefs from a Route to a Service in a different namespace are
-                            "consumer" routes, and these routing rules are only applied to outbound
-                            connections originating from the same namespace as the Route, for which
-                            the intended destination of the connections are a Service targeted as a
-                            ParentRef of the Route.
-
 
 
                             Support: Core
@@ -4399,10 +4315,6 @@ spec:
                             must match both specified values.
 
 
-
-                            When the parent resource is a Service, this targets a specific port in the
-                            Service spec. When both Port (experimental) and SectionName are specified,
-                            the name and port of the selected port must match both specified values.
 
 
 
@@ -4472,7 +4384,7 @@ spec:
             - parents
             type: object
         type: object
-    served: true
+    served: false
     storage: false
 status:
   acceptedNames:

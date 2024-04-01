@@ -87,6 +87,16 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                     schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                 schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                            schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRoute":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCRoute(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteList":                              schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteMatch(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule":                              schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec":                              schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.Gateway":                                    schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayAddress":                             schema_sigsk8sio_gateway_api_apis_v1_GatewayAddress(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GatewayClass":                               schema_sigsk8sio_gateway_api_apis_v1_GatewayClass(ref),
@@ -132,16 +142,8 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTLSPolicyConfig":               schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTLSPolicyConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTLSPolicyList":                 schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTLSPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendTLSPolicySpec":                 schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTLSPolicySpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCBackendRef":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCBackendRef(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCHeaderMatch":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCHeaderMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCMethodMatch":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCMethodMatch(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteFilter":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteFilter(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteList":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteMatch":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteMatch(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteRule":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteRule(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteSpec":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteSpec(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteStatus":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyAncestorStatus":                 schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus":                         schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyTargetReference(ref),
@@ -2767,6 +2769,484 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCBackendRef defines how a GRPCRoute forwards a gRPC request.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\n<gateway:experimental:description>\n\nWhen the BackendRef points to a Kubernetes Service, implementations SHOULD honor the appProtocol field if it is set for the target Service Port.\n\nImplementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols defined in KEP-3726.\n\nIf a Service appProtocol isn't specified, an implementation MAY infer the backend protocol through its own means. Implementations MAY infer the protocol from the Route type referring to the backend Service.\n\nIf a Route is not able to send traffic to the backend using the specified protocol then the backend is considered invalid. Implementations MUST set the \"ResolvedRefs\" condition to \"False\" with the \"UnsupportedProtocol\" reason.\n\n</gateway:experimental:description>",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When unspecified or empty string, core API group is inferred.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is the Kubernetes resource kind of the referent. For example \"Service\".\n\nDefaults to \"Service\" when not specified.\n\nExternalName services can refer to CNAME DNS records that may live outside of the cluster and as such are difficult to reason about in terms of conformance. They also may not be safe to forward to (see CVE-2021-25740 for more information). Implementations SHOULD NOT support ExternalName Services.\n\nSupport: Core (Services with a type other than ExternalName)\n\nSupport: Implementation-specific (Services with type ExternalName)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the backend. When unspecified, the local namespace is inferred.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nSupport: Core",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"port": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Port specifies the destination port number to use for this resource. Port is required when the referent is a Kubernetes Service. In this case, the port number is the service port number, not the target port. For other resources, destination port might be derived from the referent resource or this field.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"weight": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Weight specifies the proportion of requests forwarded to the referenced backend. This is computed as weight/(sum of all weights in this BackendRefs list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports. Weight is not a percentage and the sum of weights does not need to equal 100.\n\nIf only one backend is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend. If weight is set to 0, no traffic should be forwarded for this entry. If unspecified, weight defaults to 1.\n\nSupport for this field varies based on the context where used.",
+							Type:        []string{"integer"},
+							Format:      "int32",
+						},
+					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters defined at this level MUST be executed if and only if the request is being forwarded to the backend defined here.\n\nSupport: Implementation-specific (For broader support of filters, use the Filters field in GRPCRouteRule.)",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCHeaderMatch describes how to select a gRPC route by matching gRPC request headers.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type specifies how to match against the value of the header.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the gRPC Header to be matched.\n\nIf multiple entries specify equivalent header names, only the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"value": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Value is the value of the gRPC Header to be matched.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"name", "value"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type specifies how to match against the service and/or method. Support: Core (Exact with service and method specified)\n\nSupport: Implementation-specific (Exact with method specified but no service specified)\n\nSupport: Implementation-specific (RegularExpression)",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"service": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Value of the service to match against. If left empty or omitted, will match any service.\n\nAt least one of Service and Method MUST be a non-empty string.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"method": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Value of the method to match against. If left empty or omitted, will match all services.\n\nAt least one of Service and Method MUST be a non-empty string.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRoute provides a way to route gRPC requests. This includes the capability to match requests by hostname, gRPC service, gRPC method, or HTTP/2 header. Filters can be used to specify additional processing steps. Backends specify where matching requests will be routed.\n\nGRPCRoute falls under extended support within the Gateway API. Within the following specification, the word \"MUST\" indicates that an implementation supporting GRPCRoute must conform to the indicated requirement, but an implementation not supporting this route type need not follow the requirement unless explicitly indicated.\n\nImplementations supporting `GRPCRoute` with the `HTTPS` `ProtocolType` MUST accept HTTP/2 connections without an initial upgrade from HTTP/1.1, i.e. via ALPN. If the implementation does not support this, then it MUST set the \"Accepted\" condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\".  Implementations MAY also accept HTTP/2 connections with an upgrade from HTTP/1.\n\nImplementations supporting `GRPCRoute` with the `HTTP` `ProtocolType` MUST support HTTP/2 over cleartext TCP (h2c, https://www.rfc-editor.org/rfc/rfc7540#section-3.1) without an initial upgrade from HTTP/1.1, i.e. with prior knowledge (https://www.rfc-editor.org/rfc/rfc7540#section-3.4). If the implementation does not support this, then it MUST set the \"Accepted\" condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\". Implementations MAY also accept HTTP/2 connections with an upgrade from HTTP/1, i.e. without prior knowledge.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of GRPCRoute.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of GRPCRoute.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteFilter defines processing steps that must be completed during the request or response lifecycle. GRPCRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels:\n\n- Core: Filter types and their corresponding configuration defined by\n  \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All\n  implementations supporting GRPCRoute MUST support core filters.\n\n- Extended: Filter types and their corresponding configuration defined by\n  \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers\n  are encouraged to support extended filters.\n\n- Implementation-specific: Filters that are defined and supported by specific vendors.\n  In the future, filters showing convergence in behavior across multiple\n  implementations will be considered for inclusion in extended or core\n  conformance levels. Filter-specific configuration for such filters\n  is specified using the ExtensionRef field. `Type` MUST be set to\n  \"ExtensionRef\" for custom filters.\n\nImplementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior.\n\nIf a reference to a custom filter type cannot be resolved, the filter MUST NOT be skipped. Instead, requests that would have been processed by that filter MUST receive a HTTP error response.\n\n<gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"requestHeaderModifier": {
+						SchemaProps: spec.SchemaProps{
+							Description: "RequestHeaderModifier defines a schema for a filter that modifies request headers.\n\nSupport: Core",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter"),
+						},
+					},
+					"responseHeaderModifier": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ResponseHeaderModifier defines a schema for a filter that modifies response headers.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter"),
+						},
+					},
+					"requestMirror": {
+						SchemaProps: spec.SchemaProps{
+							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
+						},
+					},
+					"extensionRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.example.net\"). ExtensionRef MUST NOT be used for core and extended filters.\n\nSupport: Implementation-specific\n\nThis filter can be used multiple times within the same rule.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
+						},
+					},
+				},
+				Required: []string{"type"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteList contains a list of GRPCRoute.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRoute"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1.GRPCRoute"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a gRPC request only if its service is `foo` AND it contains the `version: v1` header:\n\n``` matches:\n  - method:\n    type: Exact\n    service: \"foo\"\n    headers:\n  - name: \"version\"\n    value \"v1\"\n\n```",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"method": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Method specifies a gRPC request service/method matcher. If this field is not specified, all services and methods will match.",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch"),
+						},
+					},
+					"headers": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "Headers specifies gRPC request header matchers. Multiple match values are ANDed together, meaning, a request MUST match all the specified headers to select the route.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch", "sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"matches": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Matches define conditions used for matching the rule against incoming gRPC requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied.\n\nFor example, take the following matches configuration:\n\n``` matches: - method:\n    service: foo.bar\n  headers:\n    values:\n      version: 2\n- method:\n    service: foo.bar.v2\n```\n\nFor a request to match against this rule, it MUST satisfy EITHER of the two conditions:\n\n- service of foo.bar AND contains the header `version: 2` - service of foo.bar.v2\n\nSee the documentation for GRPCRouteMatch on how to specify multiple match conditions to be ANDed together.\n\nIf no matches are specified, the implementation MUST match every gRPC request.\n\nProxy or Load Balancer routing configuration generated from GRPCRoutes MUST prioritize rules based on the following criteria, continuing on ties. Merging MUST not be done between GRPCRoutes and HTTPRoutes. Precedence MUST be given to the rule with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname. * Characters in a matching service. * Characters in a matching method. * Header matches.\n\nIf ties still exist across multiple Routes, matching precedence MUST be determined in order of the following criteria, continuing on ties:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nIf ties still exist within the Route that has been given precedence, matching precedence MUST be granted to the first matching rule meeting the above criteria.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch"),
+									},
+								},
+							},
+						},
+					},
+					"filters": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Filters define the filters that are applied to requests that match this rule.\n\nThe effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations that support\n  GRPCRoute.\n- Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nIf an implementation can not support a combination of filters, it must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter"),
+									},
+								},
+							},
+						},
+					},
+					"backendRefs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "BackendRefs defines the backend(s) where matching requests should be sent.\n\nFailure behavior here depends on how many BackendRefs are specified and how many are invalid.\n\nIf *all* entries in BackendRefs are invalid, and there are also no filters specified in this route rule, *all* traffic which matches this rule MUST receive an `UNAVAILABLE` status.\n\nSee the GRPCBackendRef definition for the rules about what makes a single GRPCBackendRef invalid.\n\nWhen a GRPCBackendRef is invalid, `UNAVAILABLE` statuses MUST be returned for requests that would have otherwise been routed to an invalid backend. If multiple backends are specified, and some are invalid, the proportion of requests that would otherwise have been routed to an invalid backend MUST receive an `UNAVAILABLE` status.\n\nFor example, if two backends are specified with equal weights, and one is invalid, 50 percent of traffic MUST receive an `UNAVAILABLE` status. Implementations may choose how that 50 percent is determined.\n\nSupport: Core for Kubernetes Service\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteSpec defines the desired state of GRPCRoute",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"parentRefs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
+									},
+								},
+							},
+						},
+					},
+					"hostnames": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Hostnames defines a set of hostnames to match against the GRPC Host header to select a GRPCRoute to process the request. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label MUST appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and GRPCRoute, there MUST be at least one intersecting hostname for the GRPCRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `test.example.com` and `*.example.com` would both match. On the other\n  hand, `example.com` and `test.example.net` would not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and GRPCRoute have specified hostnames, any GRPCRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the GRPCRoute specified `test.example.com` and `test.example.net`, `test.example.net` MUST NOT be considered for a match.\n\nIf both the Listener and GRPCRoute have specified hostnames, and none match with the criteria above, then the GRPCRoute MUST NOT be accepted by the implementation. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIf a Route (A) of type HTTPRoute or GRPCRoute is attached to a Listener and that listener already has another Route (B) of the other type attached and the intersection of the hostnames of A and B is non-empty, then the implementation MUST accept exactly one of these two routes, determined by the following criteria, in order:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nThe rejected Route MUST raise an 'Accepted' condition with a status of 'False' in the corresponding RouteParentStatus.\n\nSupport: Core",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: "",
+										Type:    []string{"string"},
+										Format:  "",
+									},
+								},
+							},
+						},
+					},
+					"rules": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Rules are a list of GRPC matchers, filters and actions.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.GRPCRouteRule", "sigs.k8s.io/gateway-api/apis/v1.ParentReference"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "GRPCRouteStatus defines the observed state of GRPCRoute.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"parents": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Parents is a list of parent resources (usually Gateways) that are associated with the route, and the status of the route with respect to each parent. When this route attaches to a parent, the controller that manages the parent must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route or gateway is modified.\n\nNote that parent references that cannot be resolved by an implementation of this API will not be added to this list. Implementations of this API can only populate Route status for the Gateways/parent resources they are responsible for.\n\nA maximum of 32 Gateways will be represented in this list. An empty list means the route has not been attached to any Gateway.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"parents"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4851,156 +5331,11 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendTLSPolicySpec(ref common.
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCBackendRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCBackendRef defines how a GRPCRoute forwards a gRPC request.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\n<gateway:experimental:description>\n\nWhen the BackendRef points to a Kubernetes Service, implementations SHOULD honor the appProtocol field if it is set for the target Service Port.\n\nImplementations supporting appProtocol SHOULD recognize the Kubernetes Standard Application Protocols defined in KEP-3726.\n\nIf a Service appProtocol isn't specified, an implementation MAY infer the backend protocol through its own means. Implementations MAY infer the protocol from the Route type referring to the backend Service.\n\nIf a Route is not able to send traffic to the backend using the specified protocol then the backend is considered invalid. Implementations MUST set the \"ResolvedRefs\" condition to \"False\" with the \"UnsupportedProtocol\" reason.\n\n</gateway:experimental:description>",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"group": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When unspecified or empty string, core API group is inferred.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is the Kubernetes resource kind of the referent. For example \"Service\".\n\nDefaults to \"Service\" when not specified.\n\nExternalName services can refer to CNAME DNS records that may live outside of the cluster and as such are difficult to reason about in terms of conformance. They also may not be safe to forward to (see CVE-2021-25740 for more information). Implementations SHOULD NOT support ExternalName Services.\n\nSupport: Core (Services with a type other than ExternalName)\n\nSupport: Implementation-specific (Services with type ExternalName)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the referent.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"namespace": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Namespace is the namespace of the backend. When unspecified, the local namespace is inferred.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nSupport: Core",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"port": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Port specifies the destination port number to use for this resource. Port is required when the referent is a Kubernetes Service. In this case, the port number is the service port number, not the target port. For other resources, destination port might be derived from the referent resource or this field.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"weight": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Weight specifies the proportion of requests forwarded to the referenced backend. This is computed as weight/(sum of all weights in this BackendRefs list). For non-zero values, there may be some epsilon from the exact proportion defined here depending on the precision an implementation supports. Weight is not a percentage and the sum of weights does not need to equal 100.\n\nIf only one backend is specified and it has a weight greater than 0, 100% of the traffic is forwarded to that backend. If weight is set to 0, no traffic should be forwarded for this entry. If unspecified, weight defaults to 1.\n\nSupport for this field varies based on the context where used.",
-							Type:        []string{"integer"},
-							Format:      "int32",
-						},
-					},
-					"filters": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Filters defined at this level MUST be executed if and only if the request is being forwarded to the backend defined here.\n\nSupport: Implementation-specific (For broader support of filters, use the Filters field in GRPCRouteRule.)",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteFilter"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"name"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteFilter"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCHeaderMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCHeaderMatch describes how to select a gRPC route by matching gRPC request headers.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type specifies how to match against the value of the header.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"name": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Name is the name of the gRPC Header to be matched.\n\nIf multiple entries specify equivalent header names, only the first entry with an equivalent name MUST be considered for a match. Subsequent entries with an equivalent header name MUST be ignored. Due to the case-insensitivity of header names, \"foo\" and \"Foo\" are considered equivalent.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"value": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Value is the value of the gRPC Header to be matched.",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-				Required: []string{"name", "value"},
-			},
-		},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCMethodMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCMethodMatch describes how to select a gRPC route by matching the gRPC request service and/or method.\n\nAt least one of Service and Method MUST be a non-empty string.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type specifies how to match against the service and/or method. Support: Core (Exact with service and method specified)\n\nSupport: Implementation-specific (Exact with method specified but no service specified)\n\nSupport: Implementation-specific (RegularExpression)",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"service": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Value of the service to match against. If left empty or omitted, will match any service.\n\nAt least one of Service and Method MUST be a non-empty string.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"method": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Value of the method to match against. If left empty or omitted, will match all services.\n\nAt least one of Service and Method MUST be a non-empty string.",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-				},
-			},
-		},
-	}
-}
-
 func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRoute provides a way to route gRPC requests. This includes the capability to match requests by hostname, gRPC service, gRPC method, or HTTP/2 header. Filters can be used to specify additional processing steps. Backends specify where matching requests will be routed.\n\nGRPCRoute falls under extended support within the Gateway API. Within the following specification, the word \"MUST\" indicates that an implementation supporting GRPCRoute must conform to the indicated requirement, but an implementation not supporting this route type need not follow the requirement unless explicitly indicated.\n\nImplementations supporting `GRPCRoute` with the `HTTPS` `ProtocolType` MUST accept HTTP/2 connections without an initial upgrade from HTTP/1.1, i.e. via ALPN. If the implementation does not support this, then it MUST set the \"Accepted\" condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\".  Implementations MAY also accept HTTP/2 connections with an upgrade from HTTP/1.\n\nImplementations supporting `GRPCRoute` with the `HTTP` `ProtocolType` MUST support HTTP/2 over cleartext TCP (h2c, https://www.rfc-editor.org/rfc/rfc7540#section-3.1) without an initial upgrade from HTTP/1.1, i.e. with prior knowledge (https://www.rfc-editor.org/rfc/rfc7540#section-3.4). If the implementation does not support this, then it MUST set the \"Accepted\" condition to \"False\" for the affected listener with a reason of \"UnsupportedProtocol\". Implementations MAY also accept HTTP/2 connections with an upgrade from HTTP/1, i.e. without prior knowledge.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -5026,69 +5361,21 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref common.ReferenceCa
 						SchemaProps: spec.SchemaProps{
 							Description: "Spec defines the desired state of GRPCRoute.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteSpec"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec"),
 						},
 					},
 					"status": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Status defines the current state of GRPCRoute.",
 							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteStatus"),
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"),
 						},
 					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteSpec", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteFilter(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteFilter defines processing steps that must be completed during the request or response lifecycle. GRPCRouteFilters are meant as an extension point to express processing that may be done in Gateway implementations. Some examples include request or response modification, implementing authentication strategies, rate-limiting, and traffic shaping. API guarantee/conformance is defined based on the type of the filter.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"type": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Type identifies the type of filter to apply. As with other API fields, types are classified into three conformance levels:\n\n- Core: Filter types and their corresponding configuration defined by\n  \"Support: Core\" in this package, e.g. \"RequestHeaderModifier\". All\n  implementations supporting GRPCRoute MUST support core filters.\n\n- Extended: Filter types and their corresponding configuration defined by\n  \"Support: Extended\" in this package, e.g. \"RequestMirror\". Implementers\n  are encouraged to support extended filters.\n\n- Implementation-specific: Filters that are defined and supported by specific vendors.\n  In the future, filters showing convergence in behavior across multiple\n  implementations will be considered for inclusion in extended or core\n  conformance levels. Filter-specific configuration for such filters\n  is specified using the ExtensionRef field. `Type` MUST be set to\n  \"ExtensionRef\" for custom filters.\n\nImplementers are encouraged to define custom implementation types to extend the core API with implementation-specific behavior.\n\nIf a reference to a custom filter type cannot be resolved, the filter MUST NOT be skipped. Instead, requests that would have been processed by that filter MUST receive a HTTP error response.\n\n<gateway:experimental:validation:Enum=ResponseHeaderModifier;RequestHeaderModifier;RequestMirror;ExtensionRef>",
-							Default:     "",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"requestHeaderModifier": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RequestHeaderModifier defines a schema for a filter that modifies request headers.\n\nSupport: Core",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter"),
-						},
-					},
-					"responseHeaderModifier": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ResponseHeaderModifier defines a schema for a filter that modifies response headers.\n\nSupport: Extended",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter"),
-						},
-					},
-					"requestMirror": {
-						SchemaProps: spec.SchemaProps{
-							Description: "RequestMirror defines a schema for a filter that mirrors requests. Requests are sent to the specified destination, but responses from that destination are ignored.\n\nThis filter can be used multiple times within the same rule. Note that not all implementations will be able to support mirroring to multiple backends.\n\nSupport: Extended",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter"),
-						},
-					},
-					"extensionRef": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ExtensionRef is an optional, implementation-specific extension to the \"filter\" behavior.  For example, resource \"myroutefilter\" in group \"networking.example.net\"). ExtensionRef MUST NOT be used for core and extended filters.\n\nSupport: Implementation-specific\n\nThis filter can be used multiple times within the same rule.",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"),
-						},
-					},
-				},
-				Required: []string{"type"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPHeaderFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRequestMirrorFilter", "sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteSpec", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteStatus"},
 	}
 }
 
@@ -5096,8 +5383,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref common.Referen
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteList contains a list of GRPCRoute.",
-				Type:        []string{"object"},
+				Type: []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
 						SchemaProps: spec.SchemaProps{
@@ -5138,194 +5424,6 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref common.Referen
 		},
 		Dependencies: []string{
 			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteMatch(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteMatch defines the predicate used to match requests to a given action. Multiple match types are ANDed together, i.e. the match will evaluate to true only if all conditions are satisfied.\n\nFor example, the match below will match a gRPC request only if its service is `foo` AND it contains the `version: v1` header:\n\n``` matches:\n  - method:\n    type: Exact\n    service: \"foo\"\n    headers:\n  - name: \"version\"\n    value \"v1\"\n\n```",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"method": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Method specifies a gRPC request service/method matcher. If this field is not specified, all services and methods will match.",
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCMethodMatch"),
-						},
-					},
-					"headers": {
-						VendorExtensible: spec.VendorExtensible{
-							Extensions: spec.Extensions{
-								"x-kubernetes-list-map-keys": []interface{}{
-									"name",
-								},
-								"x-kubernetes-list-type": "map",
-							},
-						},
-						SchemaProps: spec.SchemaProps{
-							Description: "Headers specifies gRPC request header matchers. Multiple match values are ANDed together, meaning, a request MUST match all the specified headers to select the route.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCHeaderMatch"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCHeaderMatch", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCMethodMatch"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteRule(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteRule defines the semantics for matching a gRPC request based on conditions (matches), processing it (filters), and forwarding the request to an API object (backendRefs).",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"matches": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Matches define conditions used for matching the rule against incoming gRPC requests. Each match is independent, i.e. this rule will be matched if **any** one of the matches is satisfied.\n\nFor example, take the following matches configuration:\n\n``` matches: - method:\n    service: foo.bar\n  headers:\n    values:\n      version: 2\n- method:\n    service: foo.bar.v2\n```\n\nFor a request to match against this rule, it MUST satisfy EITHER of the two conditions:\n\n- service of foo.bar AND contains the header `version: 2` - service of foo.bar.v2\n\nSee the documentation for GRPCRouteMatch on how to specify multiple match conditions to be ANDed together.\n\nIf no matches are specified, the implementation MUST match every gRPC request.\n\nProxy or Load Balancer routing configuration generated from GRPCRoutes MUST prioritize rules based on the following criteria, continuing on ties. Merging MUST not be done between GRPCRoutes and HTTPRoutes. Precedence MUST be given to the rule with the largest number of:\n\n* Characters in a matching non-wildcard hostname. * Characters in a matching hostname. * Characters in a matching service. * Characters in a matching method. * Header matches.\n\nIf ties still exist across multiple Routes, matching precedence MUST be determined in order of the following criteria, continuing on ties:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nIf ties still exist within the Route that has been given precedence, matching precedence MUST be granted to the first matching rule meeting the above criteria.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteMatch"),
-									},
-								},
-							},
-						},
-					},
-					"filters": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Filters define the filters that are applied to requests that match this rule.\n\nThe effects of ordering of multiple behaviors are currently unspecified. This can change in the future based on feedback during the alpha stage.\n\nConformance-levels at this level are defined based on the type of filter:\n\n- ALL core filters MUST be supported by all implementations that support\n  GRPCRoute.\n- Implementers are encouraged to support extended filters. - Implementation-specific custom filters have no API guarantees across\n  implementations.\n\nSpecifying the same filter multiple times is not supported unless explicitly indicated in the filter.\n\nIf an implementation can not support a combination of filters, it must clearly document that limitation. In cases where incompatible or unsupported filters are specified and cause the `Accepted` condition to be set to status `False`, implementations may use the `IncompatibleFilters` reason to specify this configuration error.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteFilter"),
-									},
-								},
-							},
-						},
-					},
-					"backendRefs": {
-						SchemaProps: spec.SchemaProps{
-							Description: "BackendRefs defines the backend(s) where matching requests should be sent.\n\nFailure behavior here depends on how many BackendRefs are specified and how many are invalid.\n\nIf *all* entries in BackendRefs are invalid, and there are also no filters specified in this route rule, *all* traffic which matches this rule MUST receive an `UNAVAILABLE` status.\n\nSee the GRPCBackendRef definition for the rules about what makes a single GRPCBackendRef invalid.\n\nWhen a GRPCBackendRef is invalid, `UNAVAILABLE` statuses MUST be returned for requests that would have otherwise been routed to an invalid backend. If multiple backends are specified, and some are invalid, the proportion of requests that would otherwise have been routed to an invalid backend MUST receive an `UNAVAILABLE` status.\n\nFor example, if two backends are specified with equal weights, and one is invalid, 50 percent of traffic MUST receive an `UNAVAILABLE` status. Implementations may choose how that 50 percent is determined.\n\nSupport: Core for Kubernetes Service\n\nSupport: Implementation-specific for any other resource\n\nSupport for weight: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCBackendRef"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCBackendRef", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteFilter", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteMatch"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteSpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteSpec defines the desired state of GRPCRoute",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parentRefs": {
-						SchemaProps: spec.SchemaProps{
-							Description: "ParentRefs references the resources (usually Gateways) that a Route wants to be attached to. Note that the referenced parent resource needs to allow this for the attachment to be complete. For Gateways, that means the Gateway needs to allow attachment from Routes of this kind and namespace. For Services, that means the Service must either be in the same namespace for a \"producer\" route, or the mesh implementation must support and allow \"consumer\" routes for the referenced Service. ReferenceGrant is not applicable for governing ParentRefs to Services - it is not possible to create a \"producer\" route for a Service in a different namespace from the Route.\n\nThere are two kinds of parent resources with \"Core\" support:\n\n* Gateway (Gateway conformance profile) * Service (Mesh conformance profile, ClusterIP Services only)\n\nThis API may be extended in the future to support additional kinds of parent resources.\n\nParentRefs must be _distinct_. This means either that:\n\n* They select different objects.  If this is the case, then parentRef\n  entries are distinct. In terms of fields, this means that the\n  multi-part key defined by `group`, `kind`, `namespace`, and `name` must\n  be unique across all parentRef entries in the Route.\n* They do not select different objects, but for each optional field used,\n  each ParentRef that selects the same object must set the same set of\n  optional fields to different values. If one ParentRef sets a\n  combination of optional fields, all must set the same combination.\n\nSome examples:\n\n* If one ParentRef sets `sectionName`, all ParentRefs referencing the\n  same object must also set `sectionName`.\n* If one ParentRef sets `port`, all ParentRefs referencing the same\n  object must also set `port`.\n* If one ParentRef sets `sectionName` and `port`, all ParentRefs\n  referencing the same object must also set `sectionName` and `port`.\n\nIt is possible to separately reference multiple distinct objects that may be collapsed by an implementation. For example, some implementations may choose to merge compatible Gateway Listeners together. If that is the case, the list of routes attached to those resources should also be merged.\n\nNote that for ParentRefs that cross namespace boundaries, there are specific rules. Cross-namespace references are only valid if they are explicitly allowed by something in the namespace they are referring to. For example, Gateway has the AllowedRoutes field, and ReferenceGrant provides a generic way to enable other kinds of cross-namespace reference.\n\n<gateway:experimental:description> ParentRefs from a Route to a Service in the same namespace are \"producer\" routes, which apply default routing rules to inbound connections from any namespace to the Service.\n\nParentRefs from a Route to a Service in a different namespace are \"consumer\" routes, and these routing rules are only applied to outbound connections originating from the same namespace as the Route, for which the intended destination of the connections are a Service targeted as a ParentRef of the Route. </gateway:experimental:description>\n\n<gateway:standard:validation:XValidation:message=\"sectionName must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '')) : true))\"> <gateway:standard:validation:XValidation:message=\"sectionName must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || (has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName))))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be specified when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.all(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__)) ? ((!has(p1.sectionName) || p1.sectionName == '') == (!has(p2.sectionName) || p2.sectionName == '') && (!has(p1.port) || p1.port == 0) == (!has(p2.port) || p2.port == 0)): true))\"> <gateway:experimental:validation:XValidation:message=\"sectionName or port must be unique when parentRefs includes 2 or more references to the same parent\",rule=\"self.all(p1, self.exists_one(p2, p1.group == p2.group && p1.kind == p2.kind && p1.name == p2.name && (((!has(p1.__namespace__) || p1.__namespace__ == '') && (!has(p2.__namespace__) || p2.__namespace__ == '')) || (has(p1.__namespace__) && has(p2.__namespace__) && p1.__namespace__ == p2.__namespace__ )) && (((!has(p1.sectionName) || p1.sectionName == '') && (!has(p2.sectionName) || p2.sectionName == '')) || ( has(p1.sectionName) && has(p2.sectionName) && p1.sectionName == p2.sectionName)) && (((!has(p1.port) || p1.port == 0) && (!has(p2.port) || p2.port == 0)) || (has(p1.port) && has(p2.port) && p1.port == p2.port))))\">",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ParentReference"),
-									},
-								},
-							},
-						},
-					},
-					"hostnames": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Hostnames defines a set of hostnames to match against the GRPC Host header to select a GRPCRoute to process the request. This matches the RFC 1123 definition of a hostname with 2 notable exceptions:\n\n1. IPs are not allowed. 2. A hostname may be prefixed with a wildcard label (`*.`). The wildcard\n   label MUST appear by itself as the first label.\n\nIf a hostname is specified by both the Listener and GRPCRoute, there MUST be at least one intersecting hostname for the GRPCRoute to be attached to the Listener. For example:\n\n* A Listener with `test.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames, or have specified at\n  least one of `test.example.com` or `*.example.com`.\n* A Listener with `*.example.com` as the hostname matches GRPCRoutes\n  that have either not specified any hostnames or have specified at least\n  one hostname that matches the Listener hostname. For example,\n  `test.example.com` and `*.example.com` would both match. On the other\n  hand, `example.com` and `test.example.net` would not match.\n\nHostnames that are prefixed with a wildcard label (`*.`) are interpreted as a suffix match. That means that a match for `*.example.com` would match both `test.example.com`, and `foo.test.example.com`, but not `example.com`.\n\nIf both the Listener and GRPCRoute have specified hostnames, any GRPCRoute hostnames that do not match the Listener hostname MUST be ignored. For example, if a Listener specified `*.example.com`, and the GRPCRoute specified `test.example.com` and `test.example.net`, `test.example.net` MUST NOT be considered for a match.\n\nIf both the Listener and GRPCRoute have specified hostnames, and none match with the criteria above, then the GRPCRoute MUST NOT be accepted by the implementation. The implementation MUST raise an 'Accepted' Condition with a status of `False` in the corresponding RouteParentStatus.\n\nIf a Route (A) of type HTTPRoute or GRPCRoute is attached to a Listener and that listener already has another Route (B) of the other type attached and the intersection of the hostnames of A and B is non-empty, then the implementation MUST accept exactly one of these two routes, determined by the following criteria, in order:\n\n* The oldest Route based on creation timestamp. * The Route appearing first in alphabetical order by\n  \"{namespace}/{name}\".\n\nThe rejected Route MUST raise an 'Accepted' condition with a status of 'False' in the corresponding RouteParentStatus.\n\nSupport: Core",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
-									},
-								},
-							},
-						},
-					},
-					"rules": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Rules are a list of GRPC matchers, filters and actions.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteRule"),
-									},
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.ParentReference", "sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteRule"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GRPCRouteStatus defines the observed state of GRPCRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"parents": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Parents is a list of parent resources (usually Gateways) that are associated with the route, and the status of the route with respect to each parent. When this route attaches to a parent, the controller that manages the parent must add an entry to this list when the controller first sees the route and should update the entry as appropriate when the route or gateway is modified.\n\nNote that parent references that cannot be resolved by an implementation of this API will not be added to this list. Implementations of this API can only populate Route status for the Gateways/parent resources they are responsible for.\n\nA maximum of 32 Gateways will be represented in this list. An empty list means the route has not been attached to any Gateway.",
-							Type:        []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"parents"},
-			},
-		},
-		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus"},
 	}
 }
 
