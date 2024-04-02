@@ -10,6 +10,15 @@
 Describe and specify a design pattern for a class of metaresource that can
 affect specific settings across a single target object.
 
+This is a strict subset of all Policy objects that meet a set of criteria
+designed to be easier to understand for users than Inherited Policy, and so to
+not require solving the much harder problem of communicating Inherited Policy
+to users.
+
+This will allow the graduation of this _limited_ subcategory of Policy objects
+_separately_ to solving the larger problem of communicating status for Inherited
+Policy.
+
 This is a design for a _pattern_, not an API field or new object.
 
 ## Goals
@@ -39,7 +48,9 @@ The following parts of GEP-713 also apply here. Direct Policy Attachments:
 - MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
 - MUST include both `spec` and `status` stanzas
 - MUST have the `status` stanza include a `conditions` section using the standard
-  upstream Condition type
+  upstream Condition type. This includes using reasons such as `Conflicted` (for
+  when a Policy cannot be accepted because another Policy is targeting the same
+  object) or `TargetNotFound` when the Policy targets a nonexistent object.
 - MUST use the `targetRef` struct to specify their target resource.
 - MUST follow the naming requirements (MUST be named to clearly indicate that the
 kind is a Policy, and SHOULD use the `Policy` suffix at the end of the Kind and
@@ -55,28 +66,53 @@ A Direct Policy Attachment is tightly bound to one instance of a particular
 Kind within a single namespace (or to an instance of a single Kind at cluster scope),
 and only modifies the behavior of the object that matches its binding.
 
-As an example, the BackendTLSPolicy is specified in GEP-1897, BackendTLSPolicy -
-Explicit Backend TLS Connection Configuration. This Policy attaches to the
-Service object and tells Gateway API implementations what TLS settings should be
-used to connect to that Service when it is used as a backend by a Route.
+As an example, the BackendTLSPolicy is specified in [GEP-1897](https://gateway-api.sigs.k8s.io/geps/gep-1897/),
+BackendTLSPolicy - Explicit Backend TLS Connection Configuration. This Policy
+attaches to the Service object and tells Gateway API implementations what TLS
+settings should be used to connect to that Service when it is used as a backend
+by a Route.
 
 See GEP-1897 for all the details of this Policy object.
 
 ## Direct Policy design rules
 
-With this example in mind, here are some rules for when a Policy is a Direct
-Policy:
+In these rules, "affects" means to change properties of an object that are
+relevant in objects that are stored in the storage medium of the objects in the
+hierarchy. If the combination of objects in the object hierarchy cause the creation
+of some other object in the object store (usually, the Kubernetes API),
+differences in that object do not count as "affecting" for the purposes of these
+rules. For example, if you take a GatewayClass -> Gateway -> Route
+-> Service hierarchy, and attach a Policy somewhere, which leads to the creation
+of a DataplaneConfig object that will be different because of the inclusion of
+the Policy object, the DataplaneConfig object does not affect if the Policy is
+a Direct one or not. This is because _a user can understand the state of the
+hierarchy by looking at all the objects in the hierarchy_. DataplaneConfig is
+_outside_ the hierarchy in terms of understanding the state of the Policy.
+Direct Attacthed Policy is intended as a way to _manage the complexity_ of
+Policy objects and allow a _limited_ set of Policies to follow vastly more
+simple design patterns _if they meet a set of criteria_.
+
+With that background and the previous example in mind, here are some rules for
+when a Policy is a Direct Attached Policy:
+
 
 * The number or scope of objects is exactly _one_ object. No label selectors or
   lists of `targetRef` are allowed.
-* The modifications to be made to the objects don’t have any transitive information -
-  that is, the modifications MUST only affect the single object that the targeted
+* The Policy can only be attached at exactly _one_ layer in the hierarchy. Any Policy
+  that can be attached at multiple levels must necessarily have some defaulting
+  behavior in the case that two of the same kind are attached at different points
+  in the same hierarchy, so it cannot be Direct.
+* The Policy can have effects only at the layer it attaches to. That is, the
+  behavior modifications MUST only affect the single object that the targeted
   metaresource is bound to, and MUST NOT have ramifications that flow beyond that
   object. No attaching a Policy to a Gateway and affecting settings in Routes or
   backends. If a Direct Attached Policy attaches to an object, it can only affect
-  properties _of that object_.
+  properties _of that object_ and _at that layer_ of the hierarchy.
+* The Policy can have effects only on the object it attaches to within the layer
+  of the hierarchy it attaches to. A Direct Attached Policy cannot affect sibling
+  objects in the same hierarchy directly.
 * In terms of status, it SHOULD be reasonably easy for a user to understand that
-  everything is working - basically, as long as the targeted object exists, and
+  everything is working - basically, as long as the targeted object exists,
   the modifications are valid, the metaresource is valid, and this should be
   straightforward to communicate in one or two Conditions. The `status` stanza
   in BackendTLSPolicy is an example of one of the recommended ways to achieve this.
@@ -91,10 +127,11 @@ Policy:
 
 ## Apply Policies to Sections of a Resource
 
-The `sectionName` field of `targetRef` can be used to target a specific section of other resources:
+The `sectionName` field of `targetRef` can be used to target a specific section
+of other resources, for example:
 
 * Service.Ports.Name
-* Gateway.Listners.Name
+* Gateway.Listeners.Name
 * HTTPRoute.Rules.Name (once they are added in GEP-995, PR at https://github.com/kubernetes-sigs/gateway-api/pull/2593)
 
 For example, the RetryPolicy below applies to a RouteRule inside an HTTPRoute.
@@ -135,7 +172,7 @@ spec:
 
 If a `sectionName` is specified, but does not exist on the targeted object, the
 Policy must fail to attach, and the policy implementation should record a
-`resolvedRefs` or similar Condition in the Policy's status.
+`resolvedRefs` failure or similar Condition in the Policy's status.
 
 When multiple Policies of the same type target the same object, one with a
 `sectionName` and one without, the more specific policy (i.e., the one with a
@@ -144,6 +181,10 @@ The less specific policy will also have its `spec` applied to the target but
 MUST not affect the named section. The less specific policy will have its `spec`
 applied to all other sections of the target that are not targeted by any other
 more specific policies.
+
+When more than one object matches the same object _and_ `sectionName`, the usual
+conflict-resolution rules (as defined in GEP-713 should be used). These boil down
+to "oldest by creation date wins".
 
 ## User discoverability and status
 
@@ -173,9 +214,9 @@ reconciling the Policy type.
 #### On `Policy` objects
 
 Each Direct Attached Policy MUST populate the `Accepted` condition and reasons
-as defined in the Go spec, a snapshot of which is included below. The canonical
-representation is in the actual Go files. (At the time of writing, this is in
-`apis/v1alpha2/policy_types.go`)
+as defined in the PolicyCondition API, a snapshot of which is included below.
+The canonical representation is in the actual Go files. (At the time of writing,
+this is in `apis/v1alpha2/policy_types.go`)
 
 ```go
 // PolicyConditionType is a type of condition for a policy.
@@ -236,16 +277,16 @@ Implementations SHOULD use their own unique domain prefix for this Condition
 domain for implementations that do not use GatewayClass).
 
 For objects that do _not_ have a `status.Conditions` field available (`Secret`
-is a good example), that object SHOULD instead have an annotation of
+is a good example), that object SHOULD instead have a label of
 `gateway.networking.k8s.io/PolicyAffected: true` (or with an
 implementation-specific domain prefix) added instead.
 
-Because these Conditions or annotations are namespaced per-implementation,
+Because these Conditions or labels are namespaced per-implementation,
 implementations SHOULD:
 
-- Add the Condition or annotation if an object is policy affected when it is not
+- Add the Condition or label if an object is policy affected when it is not
   already present
-- Remove the Condition or annotation when the last policy object stops referencing
+- Remove the Condition or label when the last policy object stops referencing
   the targeted object.
 
 ### Other Status designs
@@ -255,8 +296,6 @@ is a SHOULD rather than a MUST, as this design is still not final.
 
 
 #### Standard status struct
-
-Status: Experimental
 
 This design is not final and we invite feedback on any use of it in implementations.
 
@@ -268,8 +307,10 @@ is a representative version.
 This pattern enables different conditions to be set for different "Ancestors"
 of the target resource. This is particularly helpful for policies that may be
 implemented by multiple controllers or attached to resources with different
-capabilities. This pattern also provides a clear view of what resources a
-policy is affecting.
+effects or capabilities. For example a Policy that could attach to Route or Service
+to set load balancing properties may be reconciled by multiple controllers, and
+so needs further namespacing of its status. This pattern also provides a clear
+view of what resources a policy is affecting.
 
 For the best integration with community tooling and consistency across
 the broader community, we recommend that all implementations transition 
@@ -388,7 +429,9 @@ apiVersion: networking.example.io/v1alpha1
 kind: TLSMinimumVersionPolicy
 metadata:
   name: minimum12
-  namespace: appns
+  namespace: appns  
+  labels:
+    "gateway.networking.k8s.io/policy": "direct"
 spec:
   minimumTLSVersion: 1.2
   targetRef:

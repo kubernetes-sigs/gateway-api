@@ -34,11 +34,25 @@ Individual policy APIs:
 - Policy objects that affect _only_ the object specified in the `targetRef` are
   Direct Attached Policies (or more simply, Direct Policies.)
 
+The biggest difference between the two types of Policy is that Direct Attached
+Policies are a strict subset of Policy objects with criteria designed to make
+it _much_ easier to understand the state of the system, and so are simpler to
+use and can use a more simple `status` design.
+
+However, Inherited Policies, because of the nature of the useful feature of having
+settings cascade across multiple objects in a hierarchy, require knowledge of
+more resources, and are consequently harder to understand and require a more
+complex status design.
+
+Splitting these two design patterns apart into separate GEPs is intended to
+allow proceeding with stablizing the simpler (Direct) case while we work on
+solving the status problem for the more complex (Inherited) case.
+
 Direct Attached Policies are further specified in the addendum GEP GEP-2648,
 Direct Policy Attachment.
 
-Inherited Policies are further specified in the addendem GEP-2649, Inherited
-Policy Attachment. This GEP also describes a set of expected behaviors
+Inherited Policies are further specified in the addendum GEP-2649, Inherited
+Policy Attachment. GEP-2649 also describes a set of expected behaviors
 for how settings can flow across a defined hierarchy.
 
 
@@ -63,6 +77,14 @@ for how settings can flow across a defined hierarchy.
 * Provide a consistent specification that will ensure familiarity between both
   included and implementation-specific policies so they can both be interpreted
   the same way.
+
+## Deferred Goals and Discussions
+
+* Should Policy objects be able to target more than one object? At the time of
+  writing, the answer to this is _no_, in the interests of managing complexity
+  in one change. But this rule can and should be discussed and reexamined in
+  light of community feedback that users _really_ want this. Any discussion will
+  need to consider the complexity tradeoffs here.
 
 ## Out of scope
 
@@ -112,6 +134,16 @@ In either case, a Policy may either affect an object by controlling the value
 of one of the existing _fields_ in the `spec` of an object, or it may add
 additional fields that are _not_ in the `spec` of the object.
 
+### Why use Policy Attachment at all?
+
+
+Consistent UX across GW implementations
+
+Support for common tooling such as gwctl that can compute and display effective policies at each layer
+
+Avoid annotation hell
+
+
 ### Direct Policy Attachment
 
 For more description of the details of Direct Policy Attachment,
@@ -125,7 +157,7 @@ see [GEP-2649](https://gateway-api.sigs.k8s.io/geps/gep-2649/).
 ### How to determine if a Policy is a Direct or Inherited one
 
 The basic rule here is "Does the Policy affect _any_ other object aside from
-the one it targets?" If not, it's Direct. If so, it's inherited.
+the one it targets?" If not, it's Direct. If so, it's Inherited.
 
 The reason for this is that Direct Attached Policies make it _much_ easier to
 understand the state of the system, and so can use a more simple `status` design.
@@ -175,7 +207,7 @@ without a _very_ good reason.
 ### Targeting Virtual Types
 In some cases (likely limited to mesh) we may want to apply policies to requests
 to external services. To accomplish this, implementations MAY choose to support
-a reference to a virtual resource type:
+a reference to a virtual resource type. For example:
 
 ```yaml
 apiVersion: networking.acme.io/v1alpha1
@@ -205,9 +237,9 @@ ties:
   only come up in exceptional circumstances.
 * Inside Inherited Policies, the same setting in `overrides` beats the one in
   `defaults`.
-* The oldest Policy based on creation timestamp. For example, a Policy with a
-  creation timestamp of "2021-07-15 01:02:03" MUST be given precedence over a
-  Policy with a creation timestamp of "2021-07-15 01:02:04".
+* The oldest Policy based on creation timestamp beats a newer one. For example,
+  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
+  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
 * The Policy appearing first in alphabetical order by `{namespace}/{name}`. For
   example, foo/bar is given precedence over foo/baz.
 
@@ -687,6 +719,8 @@ However, a version of this proposal is now included in the Direct Policy
 Attachment GEP.
 
 This solution requires definition in a GEP of its own to become binding.
+[GEP-2923](https://github.com/kubernetes-sigs/gateway-api/issues/2923) has been
+opened to cover some aspects of this work.
 
 **The description included here is intended to illustrate the sort of solution
 that an eventual GEP will need to provide, _not to be a binding design.**

@@ -6,8 +6,8 @@ status: Experimental
 # Any authors who contribute to the GEP in any way should be listed here using
 # their Github handle.
 authors:
-  - robscott
   - youngnick
+  - robscott
 relationships:
   extends:
     - name: Metaresources and Policy Attachment

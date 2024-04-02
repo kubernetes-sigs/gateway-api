@@ -116,8 +116,9 @@ this document.
 * For `defaults`, the _most specific_ value is the one _inside the object_ that
   the Policy applies to; that is, if a Policy specifies a `default`, and an object
   specifies a value, the _object's_ value wins.
-* Policies interact with the fields they are controlling in a "replace value"
-  fashion.
+* When Policies interact with _fields_ in other objects (for example, if they
+  set a default or override for a field in a HTTPRoute), they MUST do so in a
+  "replace value" fashion.
     * For fields where the `value` is a scalar, (like a string or a number)
       MUST have their value _replaced_ by the value in the Policy if it wins.
       Notably, this means that a `default` will only ever replace an empty or unset
@@ -736,9 +737,42 @@ const (
   PolicyReasonTargetNotFound PolicyConditionReason = "TargetNotFound"
 )
 ```
+#### On targeted resources
+
+Implementations that use Inherited Policy objects SHOULD put a Condition into
+`status.Conditions` of any objects affected by a Inherited Policy, if that field
+is present.
+
+If they do, that Condition MUST have a `type` ending in `PolicyAffected` (like
+`gateway.networking.k8s.io/PolicyAffected`),
+and have the optional `observedGeneration` field kept up to date when the `spec`
+of the Policy-attached object changes.
+
+Implementations SHOULD use their own unique domain prefix for this Condition
+`type` - it is recommended that implementations use the same domain as in the
+`controllerName` field on GatewayClass (or some other implementation-unique
+domain for implementations that do not use GatewayClass).
+
+For objects that do _not_ have a `status.Conditions` field available (`Secret`
+is a good example), that object SHOULD instead have a label of
+`gateway.networking.k8s.io/PolicyAffected: true` (or with an
+implementation-specific domain prefix) added instead.
+
+Because these Conditions or labels are namespaced per-implementation,
+implementations SHOULD:
+
+- Add the Condition or label if an object is policy affected when it is not
+  already present
+- Remove the Condition or label when the last policy object stops referencing
+  the targeted object.
+
+The intent here is to give _some_ feedback that the object is affected by a Policy,
+even if the details are difficult to communicate.
 
 #### Further status design
 
-Further status design for Inherited Policy is currently up for discussion.
+Further status design for Inherited Policy is required, but needs to solve the
+complexity and fanout problems listed above. Further design is therefore currently
+up for discussion.
 
 Community members are encouraged to submit updates to this GEP with further patterns.
