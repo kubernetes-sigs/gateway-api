@@ -18,9 +18,9 @@ package suite
 
 import (
 	"context"
-	"embed"
 	"errors"
 	"fmt"
+	"io/fs"
 	"sort"
 	"strings"
 	"sync"
@@ -35,7 +35,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
-	"sigs.k8s.io/gateway-api/conformance"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
@@ -67,7 +66,7 @@ type ConformanceTestSuite struct {
 	TimeoutConfig            config.TimeoutConfig
 	SkipTests                sets.Set[string]
 	RunTest                  string
-	FS                       embed.FS
+	ManifestFS               []fs.FS
 	UsableNetworkAddresses   []v1beta1.GatewayAddress
 	UnusableNetworkAddresses []v1beta1.GatewayAddress
 
@@ -126,6 +125,7 @@ type ConformanceOptions struct {
 	MeshManifests        string
 	NamespaceLabels      map[string]string
 	NamespaceAnnotations map[string]string
+	ReportOutputPath     string
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -140,7 +140,7 @@ type ConformanceOptions struct {
 	// RunTest is a single test to run, mostly for development/debugging convenience.
 	RunTest string
 
-	FS *embed.FS
+	ManifestFS []fs.FS
 
 	// UsableNetworkAddresses is an optional pool of usable addresses for
 	// Gateways for tests which need to test manual address assignments.
@@ -166,8 +166,8 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	if err := apiextensionsv1.AddToScheme(options.Client.Scheme()); err != nil {
-		return nil, err
+	if len(options.ConformanceProfiles) == 0 {
+		return nil, errors.New("conformance profiles need to be given")
 	}
 
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
@@ -197,10 +197,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	mode := flags.DefaultMode
 	if options.Mode != "" {
 		mode = options.Mode
-	}
-
-	if options.FS == nil {
-		options.FS = &conformance.Manifests
 	}
 
 	// test suite callers are required to provide a conformance profile OR at
@@ -240,7 +236,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 		TimeoutConfig:               options.TimeoutConfig,
 		SkipTests:                   sets.New(options.SkipTests...),
 		RunTest:                     options.RunTest,
-		FS:                          *options.FS,
+		ManifestFS:                  options.ManifestFS,
 		UsableNetworkAddresses:      options.UsableNetworkAddresses,
 		UnusableNetworkAddresses:    options.UnusableNetworkAddresses,
 		results:                     make(map[string]testResult),
@@ -302,7 +298,7 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T) {
-	suite.Applier.FS = suite.FS
+	suite.Applier.ManifestFS = suite.ManifestFS
 	suite.Applier.UsableNetworkAddresses = suite.UsableNetworkAddresses
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
 
@@ -443,33 +439,14 @@ func (suite *ConformanceTestSuite) Report() (*confv1.ConformanceReport, error) {
 
 // ParseImplementation parses implementation-specific flag arguments and
 // creates a *confv1a1.Implementation.
-func ParseImplementation(org, project, url, version, contact string) (*confv1.Implementation, error) {
-	if org == "" {
-		return nil, errors.New("implementation's organization can not be empty")
-	}
-	if project == "" {
-		return nil, errors.New("implementation's project can not be empty")
-	}
-	if url == "" {
-		return nil, errors.New("implementation's url can not be empty")
-	}
-	if version == "" {
-		return nil, errors.New("implementation's version can not be empty")
-	}
-	contacts := strings.Split(contact, ",")
-	if len(contacts) == 0 {
-		return nil, errors.New("implementation's contact can not be empty")
-	}
-
-	// TODO: add data validation https://github.com/kubernetes-sigs/gateway-api/issues/2178
-
-	return &confv1.Implementation{
+func ParseImplementation(org, project, url, version, contact string) confv1.Implementation {
+	return confv1.Implementation{
 		Organization: org,
 		Project:      project,
 		URL:          url,
 		Version:      version,
-		Contact:      contacts,
-	}, nil
+		Contact:      strings.Split(contact, ","),
+	}
 }
 
 // ParseConformanceProfiles parses flag arguments and converts the string to
