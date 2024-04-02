@@ -333,7 +333,9 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 func GatewayAndRoutesMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.TimeoutConfig, controllerName string, gw GatewayRef, routeType any, routeNNs ...types.NamespacedName) string {
 	t.Helper()
 
+	RouteTypeMustHaveParentsField(t, routeType)
 	gwAddr, err := WaitForGatewayAddress(t, c, timeoutConfig, gw)
+
 	require.NoErrorf(t, err, "timed out waiting for Gateway address to be assigned")
 
 	ns := gatewayv1.Namespace(gw.Namespace)
