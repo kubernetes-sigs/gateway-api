@@ -150,7 +150,6 @@ type ParentReference struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Port *PortNumber `json:"port,omitempty"`
 }
 

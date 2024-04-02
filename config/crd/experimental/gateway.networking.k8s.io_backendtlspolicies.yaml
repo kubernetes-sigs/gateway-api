@@ -391,7 +391,7 @@ spec:
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         port:
-                          description: |+
+                          description: |-
                             Port is the network port this Route targets. It can be interpreted
                             differently based on the type of parent resource.
 
@@ -427,8 +427,6 @@ spec:
 
 
                             Support: Extended
-
-
                           format: int32
                           maximum: 65535
                           minimum: 1
