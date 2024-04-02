@@ -38,6 +38,9 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
+// DefaultOptions will parse command line flags to populate a
+// ConformanceOptions struct. It will also initialize the various clients
+// required by the tests.
 func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	cfg, err := config.GetConfig()
 	require.NoError(t, err, "error loading Kubernetes config")
@@ -45,7 +48,8 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	require.NoError(t, err, "error initializing Kubernetes client")
 
 	// This clientset is needed in addition to the client only because
-	// controller-runtime client doesn't support non CRUD sub-resources yet (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
+	// controller-runtime client doesn't support non CRUD sub-resources yet
+	// (https://github.com/kubernetes-sigs/controller-runtime/issues/452).
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
 
@@ -93,10 +97,14 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	}
 }
 
+// RunConformance will run the Gateway API Conformance tests
+// using the default ConformanceOptions computed from command line flags.
 func RunConformance(t *testing.T) {
 	RunConformanceWithOptions(t, DefaultOptions(t))
 }
 
+// RunConformanceWithOptions will run the Gateway API Conformance tests
+// with the supplied options
 func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 	if err := opts.Implementation.Validate(); err != nil && opts.ReportOutputPath != "" {
 		require.NoError(t, err, "supplied Implementation details are not valid")
