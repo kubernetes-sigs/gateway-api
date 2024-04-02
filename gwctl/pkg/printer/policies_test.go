@@ -446,10 +446,10 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 Name: healthcheckpolicies.foo.com
 APIVersion: apiextensions.k8s.io/v1
 Kind: CustomResourceDefinition
+Labels:
+  gateway.networking.k8s.io/policy: inherited
 Metadata:
   creationTimestamp: null
-  labels:
-    gateway.networking.k8s.io/policy: inherited
   name: healthcheckpolicies.foo.com
   resourceVersion: "999"
 Spec:
@@ -473,10 +473,10 @@ Status:
 Name: timeoutpolicies.bar.com
 APIVersion: apiextensions.k8s.io/v1
 Kind: CustomResourceDefinition
+Labels:
+  gateway.networking.k8s.io/policy: direct
 Metadata:
   creationTimestamp: null
-  labels:
-    gateway.networking.k8s.io/policy: direct
   name: timeoutpolicies.bar.com
   resourceVersion: "999"
 Spec:
