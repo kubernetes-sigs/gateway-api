@@ -21,12 +21,14 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/require"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -167,8 +169,16 @@ const (
 
 // NewConformanceTestSuite is a helper to use for creating a new ConformanceTestSuite.
 func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite, error) {
-	if len(options.ConformanceProfiles) == 0 {
-		return nil, errors.New("conformance profiles need to be given")
+	// test suite callers are required to provide either:
+	// - one conformance profile via the flag '-conformance-profiles'
+	// - a list of supported features via the flag '-supported-features'
+	// - an explicit test to run via the flag '-run-test'
+	// - all features are being tested via the flag '-all-features'
+	if options.SupportedFeatures.Len() == 0 &&
+		options.ConformanceProfiles.Len() == 0 &&
+		!options.EnableAllSupportedFeatures &&
+		options.RunTest == "" {
+		return nil, fmt.Errorf("no conformance profile, supported features, explicit tests were provided so no tests could be selected")
 	}
 
 	config.SetupTimeoutConfig(&options.TimeoutConfig)
@@ -198,12 +208,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	mode := flags.DefaultMode
 	if options.Mode != "" {
 		mode = options.Mode
-	}
-
-	// test suite callers are required to provide a conformance profile OR at
-	// minimum a list of features which they support.
-	if options.SupportedFeatures == nil && options.ConformanceProfiles.Len() == 0 && !options.EnableAllSupportedFeatures {
-		return nil, fmt.Errorf("no conformance profile was selected for test run, and no supported features were provided so no tests could be selected")
 	}
 
 	// test suite callers can potentially just run all tests by saying they
@@ -298,12 +302,29 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
-func (suite *ConformanceTestSuite) Setup(t *testing.T) {
+func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) {
 	suite.Applier.ManifestFS = suite.ManifestFS
 	suite.Applier.UsableNetworkAddresses = suite.UsableNetworkAddresses
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
 
-	if suite.SupportedFeatures.Has(SupportGateway) {
+	supportsGateway := suite.SupportedFeatures.Has(SupportGateway)
+	supportsMesh := suite.SupportedFeatures.Has(SupportMesh)
+
+	if suite.RunTest != "" {
+		idx := slices.IndexFunc(tests, func(t ConformanceTest) bool {
+			return t.ShortName == suite.RunTest
+		})
+
+		if idx == -1 {
+			require.FailNow(t, fmt.Sprintf("Test %q does not exist", suite.RunTest))
+		}
+
+		test := tests[idx]
+		supportsGateway = supportsGateway || slices.Contains(test.Features, SupportGateway)
+		supportsMesh = supportsMesh || slices.Contains(test.Features, SupportMesh)
+	}
+
+	if supportsGateway {
 		tlog.Logf(t, "Test Setup: Ensuring GatewayClass has been accepted")
 		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
@@ -331,7 +352,8 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		}
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
-	if suite.SupportedFeatures.Has(SupportMesh) {
+
+	if supportsMesh {
 		tlog.Logf(t, "Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
 		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
