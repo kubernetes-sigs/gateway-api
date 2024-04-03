@@ -44,7 +44,7 @@ var HTTPRouteBackendResponseHeaderModifier = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-response-header-modifier-backend.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseHeaderModifierTestCases...)
+		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseHeaderModifierTestCases)
 	},
 }
 
@@ -58,12 +58,12 @@ var HTTPRouteResponseHeaderModifier = suite.ConformanceTest{
 	},
 	Manifests: []string{"tests/httproute-response-header-modifier.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseHeaderModifierTestCases...)
-		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseAndRequestHeaderModifierTestCases...)
+		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseHeaderModifierTestCases)
+		RunHTTPRouteReponseHeaderModifierTest(t, suite, HTTPRouteResponseAndRequestHeaderModifierTestCases)
 	},
 }
 
-func RunHTTPRouteReponseHeaderModifierTest(t *testing.T, suite *suite.ConformanceTestSuite, testCases ...http.ExpectedResponse) {
+func RunHTTPRouteReponseHeaderModifierTest(t *testing.T, suite *suite.ConformanceTestSuite, testCases []http.ExpectedResponse) {
 	routeNN := types.NamespacedName{Name: "response-header-modifier", Namespace: "gateway-conformance-infra"}
 	gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 	gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
