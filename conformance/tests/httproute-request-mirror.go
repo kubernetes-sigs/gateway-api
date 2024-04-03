@@ -43,7 +43,9 @@ var HTTPRouteBackendRequestMirror = suite.ConformanceTest{
 		suite.SupportHTTPRoute,
 		suite.SupportHTTPRouteBackendRequestMirror,
 	},
-	Test: HTTPRouteRequestMirror.Test,
+	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
+		RunHTTPRouteRequestMirrorTest(t, suite, HTTPRouteRequestMirrorTestCases)
+	},
 }
 
 var HTTPRouteRequestMirror = suite.ConformanceTest{
@@ -56,38 +58,70 @@ var HTTPRouteRequestMirror = suite.ConformanceTest{
 		features.SupportHTTPRouteRequestMirror,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
-		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "request-mirror", Namespace: ns}
-		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
-		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
-
-		testCases := []http.ExpectedResponse{
-			{
-				Request: http.Request{
-					Path: "/mirror",
-				},
-				ExpectedRequest: &http.ExpectedRequest{
-					Request: http.Request{
-						Path: "/mirror",
-					},
-				},
-				Backend: "infra-backend-v1",
-				MirroredTo: []http.BackendRef{{
-					Name:      "infra-backend-v2",
-					Namespace: ns,
-				}},
-				Namespace: ns,
-			},
-		}
-		for i := range testCases {
-			// Declare tc here to avoid loop variable
-			// reuse issues across parallel tests.
-			tc := testCases[i]
-			t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
-				t.Parallel()
-				http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
-				http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
-			})
-		}
+		RunHTTPRouteRequestMirrorTest(t, suite, HTTPRouteRequestMirrorTestCases)
+		RunHTTPRouteRequestMirrorTest(t, suite, HTTPRouteRequestMirrorAndModifyRequestHeaderTestCases)
 	},
 }
+
+func RunHTTPRouteRequestMirrorTest(t *testing.T, suite *suite.ConformanceTestSuite, testCases []http.ExpectedResponse) {
+	ns := "gateway-conformance-infra"
+	routeNN := types.NamespacedName{Name: "request-mirror", Namespace: ns}
+	gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
+	gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
+
+	for i := range testCases {
+		// Declare tc here to avoid loop variable
+		// reuse issues across parallel tests.
+		tc := testCases[i]
+		t.Run(tc.GetTestCaseName(i), func(t *testing.T) {
+			t.Parallel()
+			http.MakeRequestAndExpectEventuallyConsistentResponse(t, suite.RoundTripper, suite.TimeoutConfig, gwAddr, tc)
+			http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
+		})
+	}
+
+}
+
+var HTTPRouteRequestMirrorTestCases = []http.ExpectedResponse{{
+	Request: http.Request{
+		Path: "/mirror",
+	},
+	ExpectedRequest: &http.ExpectedRequest{
+		Request: http.Request{
+			Path: "/mirror",
+		},
+	},
+	Backend: "infra-backend-v1",
+	MirroredTo: []http.BackendRef{{
+		Name:      "infra-backend-v2",
+		Namespace: "gateway-conformance-infra",
+	}},
+	Namespace: "gateway-conformance-infra",
+}}
+
+var HTTPRouteRequestMirrorAndModifyRequestHeaderTestCases = []http.ExpectedResponse{{
+	Request: http.Request{
+		Path: "/mirror-and-modify-headers",
+		Headers: map[string]string{
+			"X-Header-Remove":     "remove-val",
+			"X-Header-Add-Append": "append-val-1",
+		},
+	},
+	ExpectedRequest: &http.ExpectedRequest{
+		Request: http.Request{
+			Path: "/mirror-and-modify-headers",
+			Headers: map[string]string{
+				"X-Header-Add":        "header-val-1",
+				"X-Header-Add-Append": "append-val-1,header-val-2",
+				"X-Header-Set":        "set-overwrites-values",
+			},
+		},
+		AbsentHeaders: []string{"X-Header-Remove"},
+	},
+	Namespace: "gateway-conformance-infra",
+	Backend:   "infra-backend-v1",
+	MirroredTo: []http.BackendRef{{
+		Name:      "infra-backend-v2",
+		Namespace: "gateway-conformance-infra",
+	}},
+}}
