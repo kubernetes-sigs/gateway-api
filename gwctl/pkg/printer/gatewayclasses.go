@@ -19,7 +19,10 @@ package printer
 import (
 	"fmt"
 	"io"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"os"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -38,12 +41,47 @@ type GatewayClassesPrinter struct {
 	Clock clock.Clock
 }
 
+//Name: foo-com-external-gateway-class
+//Labels: <none>
+//Annotations <none>
+//API Version gateway.networking.k8s.io/v1beta1
+//Kind: GatewayClass
+//Metadata:
+//creationTimestamp: "2023-06-28T17:33:03Z"
+//generation: 1
+//resourceVersion: "108322484"
+//uid: 80cea521-5416-41c4-b5d1-2ee30f5366a6
+//ControllerName: foo.com/external-gateway-class
+//Description: Create an external load balancer
+//Status:
+//conditions:
+//- lastTransitionTime: "2023-05-22T17:29:47Z"
+//message: ""
+//observedGeneration: 1
+//reason: Accepted
+//status: "True"
+//type: Accepted
+//DirectlyAttachedPolicies:
+//TYPE                   NAME
+//----                   ----
+//TimeoutPolicy.bar.com  demo-timeout-policy-on-gatewayclass
+
 type gatewayClassDescribeView struct {
 	// GatewayClass name
-	Name           string `json:",omitempty"`
+	Name string `json:",omitempty"`
+
+	Labels *map[string]string `json:"Labels,omitempty"`
+
+	Annotations *map[string]string `json:"Annotations,omitempty"`
+	APIVersion  string             `json:",omitempty"`
+	Kind        string             `json:",omitempty"`
+	Metadata    *metav1.ObjectMeta `json:"Metadata,omitempty"`
+
 	ControllerName string `json:",omitempty"`
 	// GatewayClass description
-	Description              *string                `json:",omitempty"`
+	Description *string `json:",omitempty"`
+
+	Status                   *v1.GatewayClassStatus `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
 }
 
@@ -89,6 +127,8 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 	index := 0
 	for _, gatewayClassNode := range resourceModel.GatewayClasses {
 		index++
+		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
+		metadata := gatewayClassNode.GatewayClass.GetObjectMeta()
 
 		views := []gatewayClassDescribeView{
 			{
@@ -96,6 +136,29 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 			},
 			{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
+			},
+			{
+				Labels: utils.ToPtr(gatewayClassNode.GatewayClass.GetLabels()),
+			},
+			{
+				Annotations: utils.ToPtr(gatewayClassNode.GatewayClass.GetAnnotations()),
+			},
+			{
+				APIVersion: apiVersion,
+			},
+			{
+				Kind: kind,
+			},
+			{
+				Metadata: &metav1.ObjectMeta{
+					CreationTimestamp: metadata.GetCreationTimestamp(),
+					Generation:        metadata.GetGeneration(),
+					ResourceVersion:   metadata.GetResourceVersion(),
+					UID:               metadata.GetUID(),
+				},
+			},
+			{
+				Status: &gatewayClassNode.GatewayClass.Status,
 			},
 		}
 		if gatewayClassNode.GatewayClass.Spec.Description != nil {

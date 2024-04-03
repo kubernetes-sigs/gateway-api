@@ -43,3 +43,15 @@ func MustParamsForTest(t *testing.T, fakeClients *common.K8sClients) *CmdParams 
 		Out:           &bytes.Buffer{},
 	}
 }
+
+func ToPtr[T any](obj T) *T {
+	return &obj
+}
+
+func FromPtr[T any](obj *T) T {
+	if obj == nil {
+		var zero T
+		return zero
+	}
+	return *obj
+}
