@@ -39,29 +39,29 @@ def create_md(reports):
     # getting rid of some columns
     reports = reports.drop(columns=['implementation']) 
     
-    tests = reports[["project","version","name", "extended.supportedFeatures"]]
-    tests = tests.groupby(['project']).apply(lambda x: x)
+    tests = reports[["organization","version","name", "extended.supportedFeatures"]]
+    tests = tests.groupby(['organization']).apply(lambda x: x)
 
     testNames = tests['name'].unique() # HTTP, TLS, MESH, etc.
     df =tests
 
-    table= reports.groupby(["project"], as_index=False).name.apply(' '.join).apply(lambda x: x)
+    table= reports.groupby(["organization"], as_index=False).name.apply(' '.join).apply(lambda x: x)
 
     for n in testNames:
         temp = df.loc[df['name']==n]
         temp.rename(columns={"extended.supportedFeatures":n+': Supported Features'},inplace=True)
-        temp=temp.drop(["name","project"],axis=1)
+        temp=temp.drop(["name","organization"],axis=1)
         temp.reset_index(inplace=True)
         temp = temp.drop(["level_1"],axis=1)
         table = table.merge(temp, how="left")
 
     # dropping TLS supportedFeatures column since no implementation has listed any supported features
     table = table.drop(["TLS: Supported Features"], axis=1)
-    table.rename(columns={"project":"Project", "name":"Protocol Profile","version":"Version" }, inplace=True)
+    table.rename(columns={"organization":"Organization", "name":"Protocol Profile","version":"Version" }, inplace=True)
     table = table.fillna("N/A")
     # Output markdown table
     with open('site-src/implementation-table.md','w') as f:
-        f.write("This table is populated from the conformance reports uploaded by project implmentations.\n\n")
+        f.write("This table is populated from the conformance reports uploaded by project implementations.\n\n")
         f.write(table.to_markdown(index=False)+'\n')
 
 
@@ -72,9 +72,12 @@ def getYaml():
     log.info("parsing conformance reports ============================")
     yamls = []
 
-    for p in glob.glob(conformance_path, recursive=True):
+    # reports must be named according to the following pattern : <API Channel>-<Implementation version>-<mode>-report.yaml
+
+    for p in glob.glob(conformance_path, recursive=True): # getting all the paths in conforamnce
 
         if fnmatch(p, "*.yaml"):
+            
             x = load_yaml(p)
             profiles = pandas.json_normalize(x, record_path='profiles',meta=["implementation"] ) 
             

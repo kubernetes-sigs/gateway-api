@@ -31,9 +31,7 @@ import (
 	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-var (
-	kubeConfigPath string
-)
+var kubeConfigPath string
 
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{

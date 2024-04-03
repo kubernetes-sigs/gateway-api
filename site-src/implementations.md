@@ -33,6 +33,7 @@ cover, and documentation to help users get started.
 - [Kuma][11] (beta)
 - [LiteSpeed Ingress Controller][19]
 - [NGINX Gateway Fabric][12] (GA)
+- [ngrok][33] (preview)
 - [STUNner][21] (beta)
 - [Traefik][13] (alpha)
 - [Tyk][29] (work in progress)
@@ -84,6 +85,7 @@ cover, and documentation to help users get started.
 [30]:#easegress
 [31]:#avi-kubernetes-operator
 [32]:#haproxy-kubernetes-ingress-controller
+[33]:#ngrok-kubernetes-operator
 
 [gamma]:/concepts/gamma/
 
@@ -181,11 +183,11 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour/v1.28.2-report.yaml)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.28.1][contour-release] implements Gateway API v1.0.0.
+Contour [v1.28.2][contour-release] implements Gateway API v1.0.0.
 All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
 Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.0.0 release.
 
@@ -196,7 +198,7 @@ For help and support with Contour's implementation, [create an issue][contour-is
 _Some "extended" functionality is not implemented yet, [contributions welcome!][contour-contrib]._
 
 [contour]:https://projectcontour.io
-[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.28.1
+[contour-release]:https://github.com/projectcontour/contour/releases/tag/v1.28.2
 [contour-standard]:https://gateway-api.sigs.k8s.io/concepts/versioning/#release-channels-eg-experimental-standard
 [contour-guide]:https://projectcontour.io/docs/1.28/guides/gateway-api/
 [contour-issue-new]:https://github.com/projectcontour/contour/issues/new/choose
@@ -395,6 +397,19 @@ If you have any suggestions or experience issues with NGINX Gateway Fabric, plea
 [nginx-issue-new]:https://github.com/nginxinc/nginx-gateway-fabric/issues/new
 [nginx-disc-new]:https://github.com/nginxinc/nginx-gateway-fabric/discussions/new
 [nginx-slack]:https://nginxcommunity.slack.com/channels/nginx-gateway-fabric
+
+
+### ngrok Kubernetes Operator
+
+[ngrok Kubernetes Operator][ngrok-k8s-operator] provides an implementation of the Gateway API that uses [ngrok's ingress-as-a-service][ngrok]. This project uses the Gateway API to support routing traffic from ngrok's global network to applications running on Kubernetes clusters. This easily adds the benefits of ngrok, like security, network policy, and a global presence with the simplicity of cloud service. The operator contains both a Gateway API implementation as well as a controller using Kubernetes Ingress. The Gateway API implementation is currently under development and supports only the Gateway, GatewayClass and HTTPRoute. As the TLSRoute and TCPRoute move from experimental to stable, they will also be implemented.
+
+You can read our [docs][ngrok-k8s-gwapi-docs] for more information. If you have any feature requests or bug reports, please [create an issue][ngrok-issue-new]. You can also reach out for help on [Slack][ngrok-slack]
+
+[ngrok-k8s-operator]:https://github.com/ngrok/kubernetes-ingress-controller
+[ngrok]:https://ngrok.com
+[ngrok-k8s-gwapi-docs]:https://ngrok.com/docs/k8s/
+[ngrok-issue-new]: https://github.com/ngrok/kubernetes-ingress-controller/issues/new
+[ngrok-slack]:https://ngrokcommunity.slack.com/channels/general
 
 ### STUNner
 
