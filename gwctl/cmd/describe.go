@@ -28,11 +28,13 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
 )
 
 func NewDescribeCommand() *cobra.Command {
 	var namespaceFlag string
 	var allNamespacesFlag bool
+	var labelSelector string
 
 	cmd := &cobra.Command{
 		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends|namespace} RESOURCE_NAME",
@@ -45,6 +47,7 @@ func NewDescribeCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
+	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Label selector.")
 
 	return cmd
 }
@@ -61,6 +64,12 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	allNs, err := cmd.Flags().GetBool("all-namespaces")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to read flag \"all-namespaces\": %v\n", err)
+		os.Exit(1)
+	}
+
+	labelSelector, err := cmd.Flags().GetString("selector")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to read flag \"selector\": %v\n", err)
 		os.Exit(1)
 	}
 
@@ -97,7 +106,15 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		policiesPrinter.PrintDescribeView(policyList)
 
 	case "httproute", "httproutes":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			Labels:    selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -109,7 +126,15 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		httpRoutesPrinter.PrintDescribeView(resourceModel)
 
 	case "gateway", "gateways":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			Labels:    selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -121,7 +146,15 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwPrinter.PrintDescribeView(resourceModel)
 
 	case "gatewayclass", "gatewayclasses":
-		filter := resourcediscovery.Filter{}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			Labels:    selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -147,7 +180,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		backendsPrinter.PrintDescribeView(resourceModel)
 
 	case "namespace", "namespaces", "ns":
-		filter := resourcediscovery.Filter{}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Labels: selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
