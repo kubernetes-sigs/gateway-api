@@ -41,41 +41,16 @@ type GatewayClassesPrinter struct {
 	Clock clock.Clock
 }
 
-//Name: foo-com-external-gateway-class
-//Labels: <none>
-//Annotations <none>
-//API Version gateway.networking.k8s.io/v1beta1
-//Kind: GatewayClass
-//Metadata:
-//creationTimestamp: "2023-06-28T17:33:03Z"
-//generation: 1
-//resourceVersion: "108322484"
-//uid: 80cea521-5416-41c4-b5d1-2ee30f5366a6
-//ControllerName: foo.com/external-gateway-class
-//Description: Create an external load balancer
-//Status:
-//conditions:
-//- lastTransitionTime: "2023-05-22T17:29:47Z"
-//message: ""
-//observedGeneration: 1
-//reason: Accepted
-//status: "True"
-//type: Accepted
-//DirectlyAttachedPolicies:
-//TYPE                   NAME
-//----                   ----
-//TimeoutPolicy.bar.com  demo-timeout-policy-on-gatewayclass
-
 type gatewayClassDescribeView struct {
+	APIVersion string             `json:",omitempty"`
+	Kind       string             `json:",omitempty"`
+	Metadata   *metav1.ObjectMeta `json:",omitempty"`
+
+	Labels      *map[string]string `json:",omitempty"`
+	Annotations *map[string]string `json:",omitempty"`
+
 	// GatewayClass name
 	Name string `json:",omitempty"`
-
-	Labels *map[string]string `json:"Labels,omitempty"`
-
-	Annotations *map[string]string `json:"Annotations,omitempty"`
-	APIVersion  string             `json:",omitempty"`
-	Kind        string             `json:",omitempty"`
-	Metadata    *metav1.ObjectMeta `json:"Metadata,omitempty"`
 
 	ControllerName string `json:",omitempty"`
 	// GatewayClass description
@@ -130,12 +105,10 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
 		metadata := gatewayClassNode.GatewayClass.GetObjectMeta()
 
+		// views ordered with respect to https://deploy-preview-2723--kubernetes-sigs-gateway-api.netlify.app/geps/gep-2722/#:~:text=gwctl%20describe%20gatewayclass%20foo%2Dcom%2Dexternal%2Dgateway%2Dclass
 		views := []gatewayClassDescribeView{
 			{
 				Name: gatewayClassNode.GatewayClass.GetName(),
-			},
-			{
-				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
 			},
 			{
 				Labels: utils.ToPtr(gatewayClassNode.GatewayClass.GetLabels()),
@@ -158,7 +131,7 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				},
 			},
 			{
-				Status: &gatewayClassNode.GatewayClass.Status,
+				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
 			},
 		}
 		if gatewayClassNode.GatewayClass.Spec.Description != nil {
@@ -166,6 +139,9 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				Description: gatewayClassNode.GatewayClass.Spec.Description,
 			})
 		}
+		views = append(views, gatewayClassDescribeView{
+			Status: &gatewayClassNode.GatewayClass.Status,
+		})
 
 		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
 			views = append(views, gatewayClassDescribeView{
