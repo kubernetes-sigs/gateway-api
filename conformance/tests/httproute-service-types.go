@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"net/netip"
-	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -60,13 +59,16 @@ var HTTPRouteServiceTypes = suite.ConformanceTest{
 				"headless",
 			}
 
-			serviceTypes = slices.Concat(typeManaged, typeManualEndpointSlices)
+			serviceTypes = make([]string, 0, len(typeManualEndpointSlices)+len(typeManaged))
 
 			ctx     = context.TODO()
 			ns      = "gateway-conformance-infra"
 			routeNN = types.NamespacedName{Name: "service-types", Namespace: ns}
 			gwNN    = types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		)
+
+		serviceTypes = append(serviceTypes, typeManualEndpointSlices...)
+		serviceTypes = append(serviceTypes, typeManaged...)
 
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
