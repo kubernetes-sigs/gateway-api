@@ -10,7 +10,7 @@ Just like HTTP route based on header and query parameter is common, it’d be he
 ## Goals
 
 * Support cookie matching in a `HTTPRoute`
-* Add a new match type `list`
+* Add a new match type `List`
 
 ## Introduction
 
