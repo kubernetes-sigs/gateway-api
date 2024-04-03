@@ -206,11 +206,11 @@ spec:
 ## Prior Art
 Some implementations already support HTTP cookie match.
 
-### Ingress-nginx supports this with a annotation nginx.ingress.kubernetes.io/canary-by-cookie
+### Ingress-nginx supports this with an annotation nginx.ingress.kubernetes.io/canary-by-cookie
 
 * The cookie to use for notifying the Ingress to route the request to the service specified in the Canary Ingress. When the cookie value of this annotation is set to always, it will be routed to the canary. When the cookie value of the annotation is set to never, it will never be routed to the canary.
 
-If the Cookie header has a cookie-pair "cookie-test=always", the request will be forwarded to the backend service "cookie-test-service:80".
+For example, if the Cookie header has a cookie-pair "cookie-test=always", the request will be forwarded to the backend service "cookie-test-service:80".
 
 ```yaml
 apiVersion: networking.k8s.io/v1
