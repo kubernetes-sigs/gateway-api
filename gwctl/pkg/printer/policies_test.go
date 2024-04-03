@@ -363,6 +363,7 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 				Labels: map[string]string{
 					gatewayv1alpha2.PolicyLabelKey: "inherited",
 				},
+				CreationTimestamp: metav1.NewTime(time.Date(2024, time.Month(2), 1, 13, 9, 0, 0, time.UTC)),
 			},
 			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
 				Scope:    apiextensionsv1.ClusterScoped,
@@ -405,6 +406,7 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 				Labels: map[string]string{
 					gatewayv1alpha2.PolicyLabelKey: "direct",
 				},
+				CreationTimestamp: metav1.NewTime(time.Date(2023, time.Month(11), 9, 4, 56, 0, 0, time.UTC)),
 			},
 			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
 				Scope:    apiextensionsv1.NamespaceScoped,
@@ -449,8 +451,7 @@ Kind: CustomResourceDefinition
 Labels:
   gateway.networking.k8s.io/policy: inherited
 Metadata:
-  creationTimestamp: null
-  name: healthcheckpolicies.foo.com
+  creationTimestamp: "2024-02-01T13:09:00Z"
   resourceVersion: "999"
 Spec:
   group: foo.com
@@ -476,8 +477,7 @@ Kind: CustomResourceDefinition
 Labels:
   gateway.networking.k8s.io/policy: direct
 Metadata:
-  creationTimestamp: null
-  name: timeoutpolicies.bar.com
+  creationTimestamp: "2023-11-09T04:56:00Z"
   resourceVersion: "999"
 Spec:
   group: bar.com

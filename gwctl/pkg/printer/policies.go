@@ -28,6 +28,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 )
@@ -157,7 +158,7 @@ type policyCrdDescribeView struct {
 	Kind        string                                          `json:",omitempty"`
 	Labels      map[string]string                               `json:",omitempty"`
 	Annotations map[string]string                               `json:",omitempty"`
-	Metadata    interface{}                                     `json:",omitempty"`
+	Metadata    *metav1.ObjectMeta                              `json:",omitempty"`
 	Spec        *apiextensionsv1.CustomResourceDefinitionSpec   `json:",omitempty"`
 	Status      *apiextensionsv1.CustomResourceDefinitionStatus `json:",omitempty"`
 }
@@ -172,12 +173,11 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanage
 	for i, policyCrd := range policyCrds {
 		crd := policyCrd.CRD()
 
-		excludedFieldsFromMetadata := map[string]bool{
-			"Labels":      true,
-			"Annotations": true,
-		}
-
-		modifiedMetadata := ExcludeFieldsFromStruct(crd.ObjectMeta, excludedFieldsFromMetadata)
+		metadata := crd.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
 
 		views := []policyCrdDescribeView{
 			{
@@ -189,11 +189,11 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanage
 				Kind:       crd.Kind,
 			},
 			{
-				Labels: crd.Labels,
+				Labels:      crd.Labels,
 				Annotations: crd.Annotations,
 			},
 			{
-				Metadata: modifiedMetadata,
+				Metadata: metadata,
 			},
 			{
 				Spec: &crd.Spec,
