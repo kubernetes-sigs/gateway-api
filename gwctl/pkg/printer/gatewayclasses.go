@@ -155,7 +155,12 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(gcp.Out, string(b))
+			output := string(b)
+
+			emptyOutput := strings.TrimSpace(output) == "{}"
+			if !emptyOutput {
+				fmt.Fprint(gcp.Out, output)
+			}
 		}
 
 		if index+1 <= len(resourceModel.GatewayClasses) {

@@ -182,8 +182,14 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 			},
 			want: `
 Name: foo-gatewayclass
+Labels: null
+Annotations: null
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
 ControllerName: example.net/gateway-controller
 Description: random
+Status: {}
 DirectlyAttachedPolicies:
 - Group: foo.com
   Kind: HealthCheckPolicy
@@ -204,7 +210,13 @@ DirectlyAttachedPolicies:
 			},
 			want: `
 Name: foo-gatewayclass
+Labels: null
+Annotations: null
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
 ControllerName: example.net/gateway-controller
+Status: {}
 `,
 		},
 	}
