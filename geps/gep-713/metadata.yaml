@@ -20,6 +20,7 @@ relationships:
 references:
   - "https://github.com/kubernetes-sigs/gateway-api/issues/611"
   - "https://docs.google.com/document/d/13fyptUtO9NV_ZAgkoJlfukcBf2PVGhsKWG37yLkppJo/edit?resourcekey=0-Urhtj9gBkGBkSL1gHgbWKw"
+  - "https://github.com/kubernetes-sigs/gateway-api/discussions/2927"
 changelog:
   - "https://github.com/kubernetes-sigs/gateway-api/pull/715"
   - "https://github.com/kubernetes-sigs/gateway-api/pull/1565"

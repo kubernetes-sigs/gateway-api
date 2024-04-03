@@ -1,7 +1,7 @@
 # GEP-2648: Direct Policy Attachment
 
 * Issue: [#2648](https://github.com/kubernetes-sigs/gateway-api/issues/2648)
-* Status: Experimental
+* Status: Provisional
 
 (See status definitions [here](/geps/overview/#gep-states)
 
@@ -20,6 +20,13 @@ _separately_ to solving the larger problem of communicating status for Inherited
 Policy.
 
 This is a design for a _pattern_, not an API field or new object.
+
+!!! danger
+    This GEP is in the process of being updated.
+    Please see the discussion at https://github.com/kubernetes-sigs/gateway-api/discussions/2927
+    and expect further changes.
+    Some options under discussion there may make the distinction between Direct
+    and Inherited Policies moot, which would require a rework.
 
 ## Goals
 

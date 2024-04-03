@@ -115,6 +115,8 @@ nav:
       - geps/gep-1619/index.md
       - geps/gep-1651/index.md
       - geps/gep-1867/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
     # - Implementable:
     #   -
     - Experimental:
@@ -127,8 +129,6 @@ nav:
       - geps/gep-1911/index.md
       - geps/gep-2162/index.md
       - geps/gep-2257/index.md
-      - geps/gep-2648/index.md
-      - geps/gep-2649/index.md
     - Standard:
       - geps/gep-709/index.md
       - geps/gep-718/index.md

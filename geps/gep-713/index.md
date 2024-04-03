@@ -5,6 +5,14 @@
 
 ## TLDR
 
+!!! danger
+    This GEP is in the process of being updated.
+    Please see the discussion at https://github.com/kubernetes-sigs/gateway-api/discussions/2927
+    and expect further changes, although they will not be as extensive as the
+    more focussed GEP-2648 and GEP-2649.
+    Some options under discussion there may make the distinction between Direct
+    and Inherited Policies moot, which would require a rework.
+
 This GEP aims to standardize terminology and processes around using one Kubernetes
 object to modify the functions of one or more other objects.
 
