@@ -46,7 +46,7 @@ func NewGetCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
-	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Label selector.")
+	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching objects must satisfy all of the specified label constraints.")
 
 	return cmd
 }

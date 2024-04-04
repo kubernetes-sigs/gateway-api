@@ -47,7 +47,7 @@ func NewDescribeCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
-	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Label selector.")
+	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching objects must satisfy all of the specified label constraints.")
 
 	return cmd
 }
@@ -152,8 +152,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{
-			Namespace: ns,
-			Labels:    selector,
+			Labels: selector,
 		}
 		if len(args) > 1 {
 			filter.Name = args[1]
