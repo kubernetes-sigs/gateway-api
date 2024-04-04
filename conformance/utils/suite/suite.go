@@ -40,6 +40,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/flags"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/roundtripper"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/consts"
 )
 
@@ -303,16 +304,16 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 	suite.Applier.UnusableNetworkAddresses = suite.UnusableNetworkAddresses
 
 	if suite.SupportedFeatures.Has(SupportGateway) {
-		t.Logf("Test Setup: Ensuring GatewayClass has been accepted")
+		tlog.Logf(t, "Test Setup: Ensuring GatewayClass has been accepted")
 		suite.ControllerName = kubernetes.GWCMustHaveAcceptedConditionTrue(t, suite.Client, suite.TimeoutConfig, suite.GatewayClassName)
 
 		suite.Applier.GatewayClass = suite.GatewayClassName
 		suite.Applier.ControllerName = suite.ControllerName
 
-		t.Logf("Test Setup: Applying base manifests")
+		tlog.Logf(t, "Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.BaseManifests, suite.Cleanup)
 
-		t.Logf("Test Setup: Applying programmatic resources")
+		tlog.Logf(t, "Test Setup: Applying programmatic resources")
 		secret := kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-web-backend", "certificate", []string{"*"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-infra", "tls-validity-checks-certificate", []string{"*", "*.org"})
@@ -322,7 +323,7 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-app-backend", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 
-		t.Logf("Test Setup: Ensuring Gateways and Pods from base manifests are ready")
+		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 		namespaces := []string{
 			"gateway-conformance-infra",
 			"gateway-conformance-app-backend",
@@ -331,9 +332,9 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T) {
 		kubernetes.NamespacesMustBeReady(t, suite.Client, suite.TimeoutConfig, namespaces)
 	}
 	if suite.SupportedFeatures.Has(SupportMesh) {
-		t.Logf("Test Setup: Applying base manifests")
+		tlog.Logf(t, "Test Setup: Applying base manifests")
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, suite.MeshManifests, suite.Cleanup)
-		t.Logf("Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
+		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from mesh manifests are ready")
 		namespaces := []string{
 			"gateway-conformance-mesh",
 			"gateway-conformance-mesh-consumer",
