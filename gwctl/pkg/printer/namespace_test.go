@@ -27,6 +27,7 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
@@ -253,6 +254,61 @@ DirectlyAttachedPolicies:
   Kind: TimeoutPolicy
   Name: timeout-policy-namespace
 `
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+// TestNamespacesPrinter_LabelSelector tests label selector filtering for Namespaces in 'get' command.
+func TestNamespacesPrinter_LabelSelector(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	namespace := func(name string, labels map[string]string) *corev1.Namespace {
+		return &corev1.Namespace{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: name,
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-46 * 24 * time.Hour),
+				},
+				Labels: labels,
+			},
+			Status: corev1.NamespaceStatus{
+				Phase: corev1.NamespaceActive,
+			},
+		}
+	}
+
+	objects := []runtime.Object{
+		namespace("namespace-1", map[string]string{"app": "foo"}),
+		namespace("namespace-2", map[string]string{"app": "foo", "env": "internal"}),
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	labelSelector := "env=internal"
+	selector, err := labels.Parse(labelSelector)
+	if err != nil {
+		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{Labels: selector})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	nsp := &NamespacesPrinter{
+		Out:   params.Out,
+		Clock: fakeClock,
+	}
+	nsp.Print(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+NAME         STATUS  AGE
+namespace-2  Active  46d
+`
+
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
 	}

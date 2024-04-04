@@ -59,6 +59,11 @@ def create_md(reports):
     table = table.drop(["TLS: Supported Features"], axis=1)
     table.rename(columns={"organization":"Organization", "name":"Protocol Profile","version":"Version" }, inplace=True)
     table = table.fillna("N/A")
+    
+    # keep the latest version in the table
+    table.sort_values(['Organization','Version'], inplace=True)
+    table.drop_duplicates(subset="Organization", inplace=True,keep='last')
+
     # Output markdown table
     with open('site-src/implementation-table.md','w') as f:
         f.write("This table is populated from the conformance reports uploaded by project implementations.\n\n")

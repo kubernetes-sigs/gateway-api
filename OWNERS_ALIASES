@@ -44,6 +44,8 @@ aliases:
   gateway-api-gep-reviewers:
     - candita
     - gcs278
+    - LiorLieberman
+    - mlavacca
 
   gwctl-approvers:
     - gauravkghildiyal
