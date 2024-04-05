@@ -7,7 +7,7 @@
 
 ## TLDR
 
-This GEP proposes a way to validate the TLS certificate presented by the downstream client to the server
+This GEP proposes a way to validate the TLS certificate presented by the frontend client to the server
 (Gateway Listener in this case) during a [TLS Handshake Protocol][].
 
 ## Goals
@@ -35,26 +35,27 @@ This table highlights the support. Please feel free to add any missing implement
 
 ### API
 
-* Introduce a `FrontendValidation` field of type `FrontEndTLSValidationContext` within [GatewayTLSConfig][] that can be used to validate the peer(frontend) with which the TLS connection is being made.
-* Introduce a `caCertificateRefs` field within `FrontEndTLSValidationContext` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
-* This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the peer on the connection between the Gateway and the frontend (downstream client).
+* Introduce a `FrontendValidation` field of type `FrontendTLSValidation` within [GatewayTLSConfig][] that can be used to validate the peer (frontend) with which the TLS connection is being made.
+* Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
+* This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the backend peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the frontend client on the connection between the Gateway and the frontend. Both these configurations can coexist at the same time without affecting one another.
 
 #### GO
 
 ```go
 
 type GatewayTLSConfig struct {
-......
-    // FrontendValidation holds configuration for validating the frontend (client).
+    ......
+    // FrontendValidation holds configuration information for validating the frontend (client).
     // Setting this field will require clients to send a client certificate
-    // required for validation. In browsers this may result in a dialog appearing 
+    // required for validation during the TLS handshake. In browsers this may result in a dialog appearing 
     // that requests a user to specify the client certificate.
     // The maximum depth of a certificate chain accepted in verification is Implementation specific.
-    FrontendValidation *FrontEndTLSValidationContext `json:"frontEndValidation,omitempty"`
+    FrontendValidation *FrontendTLSValidation `json:"frontendValidation,omitempty"`
 }
 
-// FrontEndTLSValidationContext holds configuration that can be used to validate the frontend in the TLS connection
-type FrontEndTLSValidationContext struct {
+// FrontendTLSValidation holds configuration information that can be used to validate
+// the frontend initiating the TLS connection
+type FrontendTLSValidationContext struct {
     // CACertificateRefs contains one or more references to
     // Kubernetes objects that contain TLS certificates of
     // the Certificate Authorities that can be used
@@ -103,7 +104,7 @@ spec:
       - kind: Secret
         group: ""
         name: foo-example-com-cert
-      frontEndValidation:
+      frontendValidation:
         caCertificateRefs:
         - kind: ConfigMap
           group: ""
@@ -114,10 +115,10 @@ spec:
 
 This section highlights use cases that may be covered in a future iteration of this GEP
 
-* Using system CA certificates as the trust anchor to validate the certificates presented by the client.
+* Using system CA certificates as the trust anchor to validate the certificates presented by the frontend client.
 * Supporting a mode where validating client certficates is optional, useful for debugging and migrating to strict TLS.
-* Supporting an optional `subjectAltNames` field within `ClientValidationContext` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. This field falls under authorization and will be revisited when authorization is tackled as a whole in the project.
-* Specifying the verification depth in the client certificates chain
+* Supporting an optional `subjectAltNames` field within `FrontendTLSValidation` that can be used to specify one or more alternate names to verify the subject identity in the certificate presented by the client. This field falls under Authorization, the initial focus here is on Client Authentication and will be revisited when Authorization is tackled as a whole in the project.
+* Specifying the verification depth in the client certificate chain. This is being deferred because the default verification depth differs across implementations.
 
 
 ## References
