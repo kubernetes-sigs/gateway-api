@@ -38,10 +38,43 @@ This table highlights the support. Please feel free to add any missing implement
 * Introduce a `FrontendValidation` field of type `FrontendTLSValidation` within [GatewayTLSConfig][] that can be used to validate the peer (frontend) with which the TLS connection is being made.
 * Introduce a `caCertificateRefs` field within `FrontendTLSValidation` that can be used to specify a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 * This new field is mutually exclusive with the [BackendTLSPolicy][] configuation which is used to validate the TLS certificate presented by the backend peer on the connection between the Gateway and the backend, and this GEP is adding support for validating the TLS certificate presented by the frontend client on the connection between the Gateway and the frontend. Both these configurations can coexist at the same time without affecting one another.
+* Also introduce a `ObjectReference` structure that can be used to specify `caCertificateRefs` references.
 
 #### GO
 
 ```go
+// ObjectReference identifies an API object including its namespace.
+//
+// The API object must be valid in the cluster; the Group and Kind must
+// be registered in the cluster for this reference to be valid.
+//
+// References to objects with invalid Group and Kind are not valid, and must
+// be rejected by the implementation, with appropriate Conditions set
+// on the containing object.
+type ObjectReference struct {
+	// Group is the group of the referent. For example, "gateway.networking.k8s.io".
+	// When unspecified or empty string, core API group is inferred.
+	Group Group `json:"group"`
+
+	// Kind is kind of the referent. For example "ConfigMap" or "Service".
+	Kind Kind `json:"kind"`
+
+	// Name is the name of the referent.
+	Name ObjectName `json:"name"`
+
+	// Namespace is the namespace of the referenced object. When unspecified, the local
+	// namespace is inferred.
+	//
+	// Note that when a namespace different than the local namespace is specified,
+	// a ReferenceGrant object is required in the referent namespace to allow that
+	// namespace's owner to accept the reference. See the ReferenceGrant
+	// documentation for details.
+	//
+	// Support: Core
+	//
+	// +optional
+	Namespace *Namespace `json:"namespace,omitempty"`
+}
 
 type GatewayTLSConfig struct {
     ......
@@ -80,7 +113,7 @@ type FrontendTLSValidationContext struct {
     //
     // +kubebuilder:validation:MaxItems=8
     // +kubebuilder:validation:MinItems=1
-    CACertificateRefs []SecretObjectReference `json:"caCertificateRefs,omitempty"`
+    CACertificateRefs []ObjectReference `json:"caCertificateRefs,omitempty"`
 }
 
 ```
