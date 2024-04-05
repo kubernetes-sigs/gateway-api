@@ -38,6 +38,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
 // GatewayExcludedFromReadinessChecks is an annotation that can be placed on a
@@ -99,7 +100,7 @@ func gwcMustBeAccepted(t *testing.T, c client.Client, timeoutConfig config.Timeo
 		controllerName = string(gwc.Spec.ControllerName)
 
 		if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
-			t.Log("GatewayClass", err)
+			tlog.Log(t, "GatewayClass", err)
 			return false, nil
 		}
 
@@ -124,7 +125,7 @@ func GatewayMustHaveLatestConditions(t *testing.T, c client.Client, timeoutConfi
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Logf("Gateway %s latest conditions not set yet: %v", gwNN.String(), err)
+			tlog.Logf(t, "Gateway %s latest conditions not set yet: %v", gwNN.String(), err)
 			return false, nil
 		}
 
@@ -140,7 +141,7 @@ func GatewayClassMustHaveLatestConditions(t *testing.T, gwc *gatewayv1.GatewayCl
 	t.Helper()
 
 	if err := ConditionsHaveLatestObservedGeneration(gwc, gwc.Status.Conditions); err != nil {
-		t.Fatalf("GatewayClass %v", err)
+		tlog.Fatalf(t, "GatewayClass %v", err)
 	}
 }
 
@@ -151,7 +152,7 @@ func HTTPRouteMustHaveLatestConditions(t *testing.T, r *gatewayv1.HTTPRoute) {
 
 	for _, parent := range r.Status.Parents {
 		if err := ConditionsHaveLatestObservedGeneration(r, parent.Conditions); err != nil {
-			t.Fatalf("HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
+			tlog.Fatalf(t, "HTTPRoute(controller=%v, parentRef=%#v) %v", parent.ControllerName, parent, err)
 		}
 	}
 }
@@ -202,30 +203,30 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			gwList := &gatewayv1.GatewayList{}
 			err := c.List(ctx, gwList, client.InNamespace(ns))
 			if err != nil {
-				t.Errorf("Error listing Gateways: %v", err)
+				tlog.Errorf(t, "Error listing Gateways: %v", err)
 			}
 			for _, gw := range gwList.Items {
 				gw := gw
 
 				if val, ok := gw.Annotations[GatewayExcludedFromReadinessChecks]; ok && val == "true" {
-					t.Logf("Gateway %s/%s is skipped for setup and wont be tested", ns, gw.Name)
+					tlog.Logf(t, "Gateway %s/%s is skipped for setup and wont be tested", ns, gw.Name)
 					continue
 				}
 
 				if err = ConditionsHaveLatestObservedGeneration(&gw, gw.Status.Conditions); err != nil {
-					t.Logf("Gateway %s/%s %v", ns, gw.Name, err)
+					tlog.Logf(t, "Gateway %s/%s %v", ns, gw.Name, err)
 					return false, nil
 				}
 
 				// Passing an empty string as the Reason means that any Reason will do.
 				if !findConditionInList(t, gw.Status.Conditions, string(gatewayv1.GatewayConditionAccepted), "True", "") {
-					t.Logf("%s/%s Gateway not Accepted yet", ns, gw.Name)
+					tlog.Logf(t, "%s/%s Gateway not Accepted yet", ns, gw.Name)
 					return false, nil
 				}
 
 				// Passing an empty string as the Reason means that any Reason will do.
 				if !findConditionInList(t, gw.Status.Conditions, string(gatewayv1.GatewayConditionProgrammed), "True", "") {
-					t.Logf("%s/%s Gateway not Programmed yet", ns, gw.Name)
+					tlog.Logf(t, "%s/%s Gateway not Programmed yet", ns, gw.Name)
 					return false, nil
 				}
 			}
@@ -233,18 +234,18 @@ func NamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig config.T
 			podList := &v1.PodList{}
 			err = c.List(ctx, podList, client.InNamespace(ns))
 			if err != nil {
-				t.Errorf("Error listing Pods: %v", err)
+				tlog.Errorf(t, "Error listing Pods: %v", err)
 			}
 			for _, pod := range podList.Items {
 				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
 					pod.Status.Phase != v1.PodSucceeded &&
 					pod.DeletionTimestamp == nil {
-					t.Logf("%s/%s Pod not ready yet", ns, pod.Name)
+					tlog.Logf(t, "%s/%s Pod not ready yet", ns, pod.Name)
 					return false, nil
 				}
 			}
 		}
-		t.Logf("Gateways and Pods in %s namespaces ready", strings.Join(namespaces, ", "))
+		tlog.Logf(t, "Gateways and Pods in %s namespaces ready", strings.Join(namespaces, ", "))
 		return true, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
@@ -304,18 +305,18 @@ func MeshNamespacesMustBeReady(t *testing.T, c client.Client, timeoutConfig conf
 			podList := &v1.PodList{}
 			err := c.List(ctx, podList, client.InNamespace(ns))
 			if err != nil {
-				t.Errorf("Error listing Pods: %v", err)
+				tlog.Errorf(t, "Error listing Pods: %v", err)
 			}
 			for _, pod := range podList.Items {
 				if !findPodConditionInList(t, pod.Status.Conditions, "Ready", "True") &&
 					pod.Status.Phase != v1.PodSucceeded &&
 					pod.DeletionTimestamp == nil {
-					t.Logf("%s/%s Pod not ready yet", ns, pod.Name)
+					tlog.Logf(t, "%s/%s Pod not ready yet", ns, pod.Name)
 					return false, nil
 				}
 			}
 		}
-		t.Logf("Pods in %s namespaces ready", strings.Join(namespaces, ", "))
+		tlog.Logf(t, "Pods in %s namespaces ready", strings.Join(namespaces, ", "))
 		return true, nil
 	})
 	require.NoErrorf(t, waitErr, "error waiting for %s namespaces to be ready", strings.Join(namespaces, ", "))
@@ -421,12 +422,12 @@ func WaitForGatewayAddress(t *testing.T, client client.Client, timeoutConfig con
 		gw := &gatewayv1.Gateway{}
 		err := client.Get(ctx, gwRef.NamespacedName, gw)
 		if err != nil {
-			t.Logf("error fetching Gateway: %v", err)
+			tlog.Logf(t, "error fetching Gateway: %v", err)
 			return false, fmt.Errorf("error fetching Gateway: %w", err)
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Log("Gateway", err)
+			tlog.Log(t, "Gateway", err)
 			return false, nil
 		}
 
@@ -469,7 +470,7 @@ func GatewayListenersMustHaveConditions(t *testing.T, client client.Client, time
 		for _, condition := range conditions {
 			for _, listener := range gw.Status.Listeners {
 				if !findConditionInList(t, listener.Conditions, condition.Type, string(condition.Status), condition.Reason) {
-					t.Logf("gateway %s doesn't have %s condition set to %s on %s listener", gwName, condition.Type, condition.Status, listener.Name)
+					tlog.Logf(t, "gateway %s doesn't have %s condition set to %s on %s listener", gwName, condition.Type, condition.Status, listener.Name)
 					return false, nil
 				}
 			}
@@ -493,7 +494,7 @@ func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig
 		require.NoError(t, err, "error fetching Gateway")
 
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Log("Gateway ", err)
+			tlog.Log(t, "Gateway ", err)
 			return false, nil
 		}
 
@@ -512,7 +513,7 @@ func GatewayMustHaveZeroRoutes(t *testing.T, client client.Client, timeoutConfig
 		return false, nil
 	})
 	if waitErr != nil {
-		t.Errorf("Error waiting for gateway, got Gateway Status %v, want zero listeners or exactly 1 listener with zero routes", gotStatus)
+		tlog.Errorf(t, "Error waiting for gateway, got Gateway Status %v, want zero listeners or exactly 1 listener with zero routes", gotStatus)
 	}
 }
 
@@ -548,7 +549,7 @@ func HTTPRouteMustHaveNoAcceptedParents(t *testing.T, client client.Client, time
 
 		for _, parent := range actual {
 			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				t.Logf("HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
+				tlog.Logf(t, "HTTPRoute(controller=%v,ref=%#v) %v", parent.ControllerName, parent, err)
 				return false, nil
 			}
 		}
@@ -601,7 +602,7 @@ func RouteMustHaveParents(t *testing.T, cli client.Client, timeoutConfig config.
 
 		for _, parent := range actual {
 			if err := ConditionsHaveLatestObservedGeneration(metaObj, parent.Conditions); err != nil {
-				t.Logf("%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
+				tlog.Logf(t, "%s(controller=%v,ref=%#v) %v", routeTypeName, parent.ControllerName, parent, err)
 				return false, nil
 			}
 		}
@@ -654,7 +655,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 	t.Helper()
 
 	if len(expected) != len(actual) {
-		t.Logf("Route %s/%s expected %d Parents got %d", routeName.Namespace, routeName.Name, len(expected), len(actual))
+		tlog.Logf(t, "Route %s/%s expected %d Parents got %d", routeName.Namespace, routeName.Name, len(expected), len(actual))
 		return false
 	}
 
@@ -662,24 +663,24 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 	for i, eParent := range expected {
 		aParent := actual[i]
 		if aParent.ControllerName != eParent.ControllerName {
-			t.Logf("Route %s/%s ControllerName doesn't match", routeName.Namespace, routeName.Name)
+			tlog.Logf(t, "Route %s/%s ControllerName doesn't match", routeName.Namespace, routeName.Name)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Group, eParent.ParentRef.Group) {
-			t.Logf("Route %s/%s expected ParentReference.Group to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Group, aParent.ParentRef.Group)
+			tlog.Logf(t, "Route %s/%s expected ParentReference.Group to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Group, aParent.ParentRef.Group)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Kind, eParent.ParentRef.Kind) {
-			t.Logf("Route %s/%s expected ParentReference.Kind to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Kind, aParent.ParentRef.Kind)
+			tlog.Logf(t, "Route %s/%s expected ParentReference.Kind to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Kind, aParent.ParentRef.Kind)
 			return false
 		}
 		if aParent.ParentRef.Name != eParent.ParentRef.Name {
-			t.Logf("Route %s/%s ParentReference.Name doesn't match", routeName.Namespace, routeName.Name)
+			tlog.Logf(t, "Route %s/%s ParentReference.Name doesn't match", routeName.Namespace, routeName.Name)
 			return false
 		}
 		if !reflect.DeepEqual(aParent.ParentRef.Namespace, eParent.ParentRef.Namespace) {
 			if namespaceRequired || aParent.ParentRef.Namespace != nil {
-				t.Logf("Route %s/%s expected ParentReference.Namespace to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
+				tlog.Logf(t, "Route %s/%s expected ParentReference.Namespace to be %v, got %v", routeName.Namespace, routeName.Name, eParent.ParentRef.Namespace, aParent.ParentRef.Namespace)
 				return false
 			}
 		}
@@ -688,7 +689,7 @@ func parentsForRouteMatch(t *testing.T, routeName types.NamespacedName, expected
 		}
 	}
 
-	t.Logf("Route %s/%s Parents matched expectations", routeName.Namespace, routeName.Name)
+	tlog.Logf(t, "Route %s/%s Parents matched expectations", routeName.Namespace, routeName.Name)
 	return true
 }
 
@@ -707,7 +708,7 @@ func GatewayStatusMustHaveListeners(t *testing.T, client client.Client, timeoutC
 		}
 
 		if err := ConditionsHaveLatestObservedGeneration(gw, gw.Status.Conditions); err != nil {
-			t.Log("Gateway", err)
+			tlog.Log(t, "Gateway", err)
 			return false, nil
 		}
 
@@ -733,7 +734,7 @@ func HTTPRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfi
 		var conditionFound bool
 		for _, parent := range parents {
 			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				t.Logf("HTTPRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
+				tlog.Logf(t, "HTTPRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
 				return false, nil
 			}
 
@@ -831,7 +832,7 @@ func TLSRouteMustHaveCondition(t *testing.T, client client.Client, timeoutConfig
 		var conditionFound bool
 		for _, parent := range parents {
 			if err := ConditionsHaveLatestObservedGeneration(route, parent.Conditions); err != nil {
-				t.Logf("TLSRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
+				tlog.Logf(t, "TLSRoute(parentRef=%v) %v", parentRefToString(parent.ParentRef), err)
 				return false, nil
 			}
 
@@ -853,7 +854,7 @@ func listenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) b
 	t.Helper()
 
 	if len(expected) != len(actual) {
-		t.Logf("Expected %d Gateway status listeners, got %d", len(expected), len(actual))
+		tlog.Logf(t, "Expected %d Gateway status listeners, got %d", len(expected), len(actual))
 		return false
 	}
 
@@ -866,12 +867,12 @@ func listenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) b
 			}
 		}
 		if aListener == nil {
-			t.Logf("Expected status for listener %s to be present", eListener.Name)
+			tlog.Logf(t, "Expected status for listener %s to be present", eListener.Name)
 			return false
 		}
 
 		if len(eListener.SupportedKinds) == 0 && len(aListener.SupportedKinds) != 0 {
-			t.Logf("Expected list of SupportedKinds was empty, but the actual list for comparison was not:  %v",
+			tlog.Logf(t, "Expected list of SupportedKinds was empty, but the actual list for comparison was not:  %v",
 				aListener.SupportedKinds)
 			return false
 		}
@@ -896,22 +897,22 @@ func listenersMatch(t *testing.T, expected, actual []gatewayv1.ListenerStatus) b
 				}
 			}
 			if !found {
-				t.Logf("Expected Group:%s Kind:%s to be present in SupportedKinds", *eKind.Group, eKind.Kind)
+				tlog.Logf(t, "Expected Group:%s Kind:%s to be present in SupportedKinds", *eKind.Group, eKind.Kind)
 				return false
 			}
 		}
 
 		if aListener.AttachedRoutes != eListener.AttachedRoutes {
-			t.Logf("Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
+			tlog.Logf(t, "Expected AttachedRoutes to be %v, got %v", eListener.AttachedRoutes, aListener.AttachedRoutes)
 			return false
 		}
 		if !conditionsMatch(t, eListener.Conditions, aListener.Conditions) {
-			t.Logf("Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
+			tlog.Logf(t, "Expected Conditions to be %v, got %v", eListener.Conditions, aListener.Conditions)
 			return false
 		}
 	}
 
-	t.Logf("Gateway status listeners matched expectations")
+	tlog.Logf(t, "Gateway status listeners matched expectations")
 	return true
 }
 
@@ -919,7 +920,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 	t.Helper()
 
 	if len(actual) < len(expected) {
-		t.Logf("Expected more conditions to be present")
+		tlog.Logf(t, "Expected more conditions to be present")
 		return false
 	}
 	for _, condition := range expected {
@@ -928,7 +929,7 @@ func conditionsMatch(t *testing.T, expected, actual []metav1.Condition) bool {
 		}
 	}
 
-	t.Logf("Conditions matched expectations")
+	tlog.Logf(t, "Conditions matched expectations")
 	return true
 }
 
@@ -946,14 +947,14 @@ func findConditionInList(t *testing.T, conditions []metav1.Condition, condName, 
 				if expectedReason == "" || cond.Reason == expectedReason {
 					return true
 				}
-				t.Logf("%s condition Reason set to %s, expected %s", condName, cond.Reason, expectedReason)
+				tlog.Logf(t, "%s condition Reason set to %s, expected %s", condName, cond.Reason, expectedReason)
 			}
 
-			t.Logf("%s condition set to Status %s with Reason %v, expected Status %s", condName, cond.Status, cond.Reason, expectedStatus)
+			tlog.Logf(t, "%s condition set to Status %s with Reason %v, expected Status %s", condName, cond.Status, cond.Reason, expectedStatus)
 		}
 	}
 
-	t.Logf("%s was not in conditions list [%v]", condName, conditions)
+	tlog.Logf(t, "%s was not in conditions list [%v]", condName, conditions)
 	return false
 }
 
@@ -965,10 +966,10 @@ func findPodConditionInList(t *testing.T, conditions []v1.PodCondition, condName
 			if cond.Status == v1.ConditionStatus(condValue) {
 				return true
 			}
-			t.Logf("%s condition set to %s, expected %s", condName, cond.Status, condValue)
+			tlog.Logf(t, "%s condition set to %s, expected %s", condName, cond.Status, condValue)
 		}
 	}
 
-	t.Logf("%s was not in conditions list", condName)
+	tlog.Logf(t, "%s was not in conditions list", condName)
 	return false
 }

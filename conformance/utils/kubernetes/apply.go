@@ -37,6 +37,7 @@ import (
 
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/conformance/utils/config"
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 )
 
 // Applier prepares manifests depending on the available options and applies
@@ -119,15 +120,15 @@ func (a Applier) prepareGateway(t *testing.T, uObj *unstructured.Unstructured) {
 
 		var primOverlayAddrs []interface{}
 		if len(specialAddrs) > 0 {
-			t.Logf("the test provides %d special addresses that will be kept", len(specialAddrs))
+			tlog.Logf(t, "the test provides %d special addresses that will be kept", len(specialAddrs))
 			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(specialAddrs)...)
 		}
 		if overlayUnusable {
-			t.Logf("address pool of %d unusable addresses will be overlaid", len(a.UnusableNetworkAddresses))
+			tlog.Logf(t, "address pool of %d unusable addresses will be overlaid", len(a.UnusableNetworkAddresses))
 			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UnusableNetworkAddresses)...)
 		}
 		if overlayUsable {
-			t.Logf("address pool of %d usable addresses will be overlaid", len(a.UsableNetworkAddresses))
+			tlog.Logf(t, "address pool of %d usable addresses will be overlaid", len(a.UsableNetworkAddresses))
 			primOverlayAddrs = append(primOverlayAddrs, convertGatewayAddrsToPrimitives(a.UsableNetworkAddresses)...)
 		}
 
@@ -220,7 +221,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 		ctx, cancel := context.WithTimeout(context.Background(), timeoutConfig.CreateTimeout)
 		defer cancel()
 
-		t.Logf("Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+		tlog.Logf(t, "Creating %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 
 		err := c.Create(ctx, resource)
 		if err != nil {
@@ -233,7 +234,7 @@ func (a Applier) MustApplyObjectsWithCleanup(t *testing.T, c client.Client, time
 			t.Cleanup(func() {
 				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
-				t.Logf("Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
+				tlog.Logf(t, "Deleting %s %s", resource.GetName(), resource.GetObjectKind().GroupVersionKind().Kind)
 				err = c.Delete(ctx, resource)
 				require.NoErrorf(t, err, "error deleting resource")
 			})
@@ -252,7 +253,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 
 	resources, err := a.prepareResources(t, decoder)
 	if err != nil {
-		t.Logf("manifest: %s", data.String())
+		tlog.Logf(t, "manifest: %s", data.String())
 		require.NoErrorf(t, err, "error parsing manifest")
 	}
 
@@ -269,7 +270,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 			if !apierrors.IsNotFound(err) {
 				require.NoErrorf(t, err, "error getting resource")
 			}
-			t.Logf("Creating %s %s", uObj.GetName(), uObj.GetKind())
+			tlog.Logf(t, "Creating %s %s", uObj.GetName(), uObj.GetKind())
 			err = c.Create(ctx, uObj)
 			require.NoErrorf(t, err, "error creating resource")
 
@@ -277,7 +278,7 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 				t.Cleanup(func() {
 					ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 					defer cancel()
-					t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
+					tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
 					err = c.Delete(ctx, uObj)
 					if !apierrors.IsNotFound(err) {
 						require.NoErrorf(t, err, "error deleting resource")
@@ -288,14 +289,14 @@ func (a Applier) MustApplyWithCleanup(t *testing.T, c client.Client, timeoutConf
 		}
 
 		uObj.SetResourceVersion(fetchedObj.GetResourceVersion())
-		t.Logf("Updating %s %s", uObj.GetName(), uObj.GetKind())
+		tlog.Logf(t, "Updating %s %s", uObj.GetName(), uObj.GetKind())
 		err = c.Update(ctx, uObj)
 
 		if cleanup {
 			t.Cleanup(func() {
 				ctx, cancel = context.WithTimeout(context.Background(), timeoutConfig.DeleteTimeout)
 				defer cancel()
-				t.Logf("Deleting %s %s", uObj.GetName(), uObj.GetKind())
+				tlog.Logf(t, "Deleting %s %s", uObj.GetName(), uObj.GetKind())
 				err = c.Delete(ctx, uObj)
 				if !apierrors.IsNotFound(err) {
 					require.NoErrorf(t, err, "error deleting resource")

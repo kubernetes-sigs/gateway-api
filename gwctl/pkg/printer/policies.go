@@ -27,6 +27,8 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/yaml"
 
+	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 )
@@ -36,7 +38,7 @@ type PoliciesPrinter struct {
 	Clock clock.Clock
 }
 
-func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
+func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy) {
 	sort.Slice(policies, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
 		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
@@ -70,7 +72,7 @@ func (pp *PoliciesPrinter) Print(policies []policymanager.Policy) {
 	tw.Flush()
 }
 
-func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD) {
+func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.PolicyCRD) {
 	sort.Slice(policyCRDs, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policyCRDs[i].CRD().GetNamespace(), policyCRDs[i].CRD().GetName())
 		b := fmt.Sprintf("%v/%v", policyCRDs[j].CRD().GetNamespace(), policyCRDs[j].CRD().GetName())
@@ -109,7 +111,7 @@ type policyDescribeView struct {
 	Spec      map[string]interface{} `json:",omitempty"`
 }
 
-func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
+func (pp *PoliciesPrinter) PrintPoliciesDescribeView(policies []policymanager.Policy) {
 	sort.Slice(policies, func(i, j int) bool {
 		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
 		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
@@ -144,6 +146,73 @@ func (pp *PoliciesPrinter) PrintDescribeView(policies []policymanager.Policy) {
 		}
 
 		if i+1 != len(policies) {
+			fmt.Fprintf(pp.Out, "\n\n")
+		}
+	}
+}
+
+type policyCrdDescribeView struct {
+	Name        string                                          `json:",omitempty"`
+	Namespace   string                                          `json:",omitempty"`
+	APIVersion  string                                          `json:",omitempty"`
+	Kind        string                                          `json:",omitempty"`
+	Labels      map[string]string                               `json:",omitempty"`
+	Annotations map[string]string                               `json:",omitempty"`
+	Metadata    *metav1.ObjectMeta                              `json:",omitempty"`
+	Spec        *apiextensionsv1.CustomResourceDefinitionSpec   `json:",omitempty"`
+	Status      *apiextensionsv1.CustomResourceDefinitionStatus `json:",omitempty"`
+}
+
+func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanager.PolicyCRD) {
+	sort.Slice(policyCrds, func(i, j int) bool {
+		a := fmt.Sprintf("%v/%v", policyCrds[i].CRD().GetNamespace(), policyCrds[i].CRD().GetName())
+		b := fmt.Sprintf("%v/%v", policyCrds[j].CRD().GetNamespace(), policyCrds[j].CRD().GetName())
+		return a < b
+	})
+
+	for i, policyCrd := range policyCrds {
+		crd := policyCrd.CRD()
+
+		metadata := crd.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+
+		views := []policyCrdDescribeView{
+			{
+				Name:      crd.Name,
+				Namespace: crd.Namespace,
+			},
+			{
+				APIVersion: crd.APIVersion,
+				Kind:       crd.Kind,
+			},
+			{
+				Labels:      crd.Labels,
+				Annotations: crd.Annotations,
+			},
+			{
+				Metadata: metadata,
+			},
+			{
+				Spec: &crd.Spec,
+			},
+			{
+				Status: &crd.Status,
+			},
+		}
+
+		for _, view := range views {
+			b, err := yaml.Marshal(view)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
+			}
+			fmt.Fprint(pp.Out, string(b))
+		}
+
+		if i+1 != len(policyCrds) {
 			fmt.Fprintf(pp.Out, "\n\n")
 		}
 	}

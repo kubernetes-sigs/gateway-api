@@ -54,11 +54,11 @@ resources), in the same cluster.
 
 ## Gateway API for Service Mesh (the [GAMMA initiative](/mesh/gamma)) <a name="for-service-mesh"></a>
 
-??? example "Experimental in v0.8.0+"
+??? example "Standard in v1.2.0+"
 
     The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
-    is _experimental_ in `v0.8.0`+. It is possible that it will change; we do
-    not recommend it in production at this point.
+    is part of the Standard Channel of Gateway API since v1.2.0 and are considered stable APIs. For more
+    information refer to our [versioning guide](/concepts/versioning).
 
 Things are a bit different when using Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
@@ -73,9 +73,6 @@ To date, [GAMMA](/mesh/gamma) has been able to support mesh functionality with
 fairly minimal changes to Gateway API. One particular area that has
 rapidly become critical for GAMMA, though, is the definition of the different
 [facets of the Service resource][service-facets].
-
-Support for service mesh is **experimental**. We encourage working with it and
-providing feedback, but you **must** be prepared for change in the GAMMA APIs.
 
 [gamma]:/concepts/gamma/
 [service-mesh]:/concepts/glossary#service-mesh

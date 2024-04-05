@@ -169,7 +169,7 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 		Clock: fakeClock,
 	}
 
-	pp.Print(params.PolicyManager.GetPolicies())
+	pp.PrintPoliciesGetView(params.PolicyManager.GetPolicies())
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
 NAME                       KIND                       TARGET NAME       TARGET KIND   POLICY TYPE  AGE
@@ -183,7 +183,7 @@ timeout-policy-namespace   TimeoutPolicy.bar.com      default           Namespac
 	}
 
 	pp.Out = &bytes.Buffer{}
-	pp.PrintDescribeView(params.PolicyManager.GetPolicies())
+	pp.PrintPoliciesDescribeView(params.PolicyManager.GetPolicies())
 	got = pp.Out.(*bytes.Buffer).String()
 	want = `
 Name: health-check-gateway
@@ -342,13 +342,159 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 		Out:   &bytes.Buffer{},
 		Clock: fakeClock,
 	}
-	pp.PrintCRDs(params.PolicyManager.GetCRDs())
+	pp.PrintPolicyCRDsGetView(params.PolicyManager.GetCRDs())
 
 	got := pp.Out.(*bytes.Buffer).String()
 	want := `
 NAME                         POLICY TYPE  SCOPE       AGE
 healthcheckpolicies.foo.com  Inherited    Cluster     24d
 timeoutpolicies.bar.com      Direct       Namespaced  5m
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+func TestPolicyCrd_PrintDescribeView(t *testing.T) {
+	objects := []runtime.Object{
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "healthcheckpolicies.foo.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "inherited",
+				},
+				CreationTimestamp: metav1.NewTime(time.Date(2024, time.Month(2), 1, 13, 9, 0, 0, time.UTC)),
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "foo.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "healthcheckpolicies",
+					Kind:   "HealthCheckPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "foo.com/v1",
+				"kind":       "HealthCheckPolicy",
+				"metadata": map[string]interface{}{
+					"name": "health-check-gateway",
+				},
+				"spec": map[string]interface{}{
+					"override": map[string]interface{}{
+						"key1": "value-child-1",
+					},
+					"default": map[string]interface{}{
+						"key2": "value-child-2",
+						"key5": "value-child-5",
+					},
+					"targetRef": map[string]interface{}{
+						"group":     "gateway.networking.k8s.io",
+						"kind":      "Gateway",
+						"name":      "foo-gateway",
+						"namespace": "default",
+					},
+				},
+			},
+		},
+
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "timeoutpolicies.bar.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "direct",
+				},
+				CreationTimestamp: metav1.NewTime(time.Date(2023, time.Month(11), 9, 4, 56, 0, 0, time.UTC)),
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.NamespaceScoped,
+				Group:    "bar.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "timeoutpolicies",
+					Kind:   "TimeoutPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "bar.com/v1",
+				"kind":       "TimeoutPolicy",
+				"metadata": map[string]interface{}{
+					"name": "timeout-policy-namespace",
+				},
+				"spec": map[string]interface{}{
+					"condition": "path=/abc",
+					"seconds":   int64(30),
+					"targetRef": map[string]interface{}{
+						"kind": "Namespace",
+						"name": "default",
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	pp := &PoliciesPrinter{
+		Out: &bytes.Buffer{},
+	}
+	pp.PrintPolicyCRDsDescribeView(params.PolicyManager.GetCRDs())
+
+	got := pp.Out.(*bytes.Buffer).String()
+	want := `
+Name: healthcheckpolicies.foo.com
+APIVersion: apiextensions.k8s.io/v1
+Kind: CustomResourceDefinition
+Labels:
+  gateway.networking.k8s.io/policy: inherited
+Metadata:
+  creationTimestamp: "2024-02-01T13:09:00Z"
+  resourceVersion: "999"
+Spec:
+  group: foo.com
+  names:
+    kind: HealthCheckPolicy
+    plural: healthcheckpolicies
+  scope: Cluster
+  versions:
+  - name: v1
+    served: false
+    storage: false
+Status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null
+
+
+Name: timeoutpolicies.bar.com
+APIVersion: apiextensions.k8s.io/v1
+Kind: CustomResourceDefinition
+Labels:
+  gateway.networking.k8s.io/policy: direct
+Metadata:
+  creationTimestamp: "2023-11-09T04:56:00Z"
+  resourceVersion: "999"
+Spec:
+  group: bar.com
+  names:
+    kind: TimeoutPolicy
+    plural: timeoutpolicies
+  scope: Namespaced
+  versions:
+  - name: v1
+    served: false
+    storage: false
+Status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: null
+  storedVersions: null
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
