@@ -120,7 +120,7 @@ nav:
     # - Implementable:
     #   -
     - Experimental:
-      - geps/gep-713/index.md
+      - geps/gep-957/index.md
       - geps/gep-1016/index.md
       - geps/gep-1742/index.md
       - geps/gep-1748/index.md
@@ -144,6 +144,7 @@ nav:
       - geps/gep-1686/index.md
       - geps/gep-1709/index.md
     - Memorandum:
+      - geps/gep-713/index.md
       - geps/gep-917/index.md
       - geps/gep-922/index.md
       - geps/gep-1324/index.md

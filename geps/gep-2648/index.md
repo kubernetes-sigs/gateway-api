@@ -141,6 +141,11 @@ of other resources, for example:
 * Gateway.Listeners.Name
 * HTTPRoute.Rules.Name (once they are added in GEP-995, PR at https://github.com/kubernetes-sigs/gateway-api/pull/2593)
 
+Implementations SHOULD NOT use the name of a `backendRef` for applying Policy,
+since the `backendRef` both is not guaranteed to be unique across a Route's rules,
+and also the `backendRef` is also a link to another object. Target the policy
+at the thing the `backendRef` points to instead.
+
 For example, the RetryPolicy below applies to a RouteRule inside an HTTPRoute.
 (or rather, it will when GEP-995 merges).
 
@@ -271,7 +276,8 @@ const (
 
 Implementations that use Direct Policy objects SHOULD put a Condition into
 `status.Conditions` of any objects affected by a Direct Policy, if that field
-is present.
+is present. Ideally, there should be a set of Conditions that can be namespaced
+by the implementing controller, but if that is not posisble, use the guidance below.
 
 If they do, that Condition MUST have a `type` ending in `PolicyAffected` (like
 `gateway.networking.k8s.io/PolicyAffected`),
