@@ -119,8 +119,6 @@ nav:
     - Experimental:
       - geps/gep-713/index.md
       - geps/gep-1016/index.md
-      - geps/gep-1426/index.md
-      - geps/gep-1686/index.md
       - geps/gep-1709/index.md
       - geps/gep-1742/index.md
       - geps/gep-1748/index.md
@@ -140,6 +138,8 @@ nav:
       - geps/gep-957/index.md
       - geps/gep-1323/index.md
       - geps/gep-1364/index.md
+      - geps/gep-1426/index.md
+      - geps/gep-1686/index.md
     - Memorandum:
       - geps/gep-917/index.md
       - geps/gep-922/index.md
