@@ -255,8 +255,8 @@ type Namespace = v1.Namespace
 //
 // In the following resources, SectionName is interpreted as the following:
 //
-// * Gateway: Listener Name.
-// * Service: Port Name.
+// * Gateway: Listener name
+// * Service: Port name
 //
 // Section names can have a variety of forms, including RFC 1123 subdomains,
 // RFC 1123 labels, or RFC 1035 labels.
