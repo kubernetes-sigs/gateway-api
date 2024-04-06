@@ -88,7 +88,7 @@ type GatewayTLSConfig struct {
 
 // FrontendTLSValidation holds configuration information that can be used to validate
 // the frontend initiating the TLS connection
-type FrontendTLSValidationContext struct {
+type FrontendTLSValidation struct {
     // CACertificateRefs contains one or more references to
     // Kubernetes objects that contain TLS certificates of
     // the Certificate Authorities that can be used
@@ -99,8 +99,8 @@ type FrontendTLSValidationContext struct {
     // Implementations MAY choose to support attaching multiple CA certificates to
     // a Listener, but this behavior is implementation-specific.
     //
-    // Support: Core - An optional single reference to a single Kubernetes Secret
-    // and to a single Kubernetes ConfigMap with the CA certificate in a key named `ca.crt`.
+    // Support: Core - A single reference to a single Kubernetes ConfigMap
+    // with the CA certificate in a key named `ca.crt`.
     //
     // Support: Implementation-specific (More than one reference, or other kinds
     // of resources).
