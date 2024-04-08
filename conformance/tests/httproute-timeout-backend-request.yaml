@@ -19,7 +19,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /disabled-backend-timeout
+        value: /disable-backend-timeout
     backendRefs:
     - name: infra-backend-v1
       port: 8080
