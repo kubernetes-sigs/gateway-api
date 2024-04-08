@@ -125,10 +125,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.BackendTLSPolicyConfigApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
 		return &apisv1alpha2.BackendTLSPolicySpecApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("Gateway"):
-		return &apisv1alpha2.GatewayApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("GatewayClass"):
-		return &apisv1alpha2.GatewayClassApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCBackendRef"):
 		return &apisv1alpha2.GRPCBackendRefApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCHeaderMatch"):
@@ -147,8 +143,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.GRPCRouteSpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRouteStatus"):
 		return &apisv1alpha2.GRPCRouteStatusApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("HTTPRoute"):
-		return &apisv1alpha2.HTTPRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("PolicyAncestorStatus"):
 		return &apisv1alpha2.PolicyAncestorStatusApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("PolicyStatus"):

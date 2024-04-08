@@ -26,6 +26,7 @@ import (
 	"testing"
 	"time"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -41,9 +42,9 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "valid GRPCRouteFilterRequestHeaderModifier route filter",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type: gatewayv1a2.GRPCRouteFilterRequestHeaderModifier,
-				RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-					Set:    []gatewayv1a2.HTTPHeader{{Name: "name", Value: "foo"}},
-					Add:    []gatewayv1a2.HTTPHeader{{Name: "add", Value: "foo"}},
+				RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+					Set:    []gatewayv1.HTTPHeader{{Name: "name", Value: "foo"}},
+					Add:    []gatewayv1.HTTPHeader{{Name: "add", Value: "foo"}},
 					Remove: []string{"remove"},
 				},
 			},
@@ -52,7 +53,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "invalid GRPCRouteFilterRequestHeaderModifier type filter with non-matching field",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type:          gatewayv1a2.GRPCRouteFilterRequestHeaderModifier,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestHeaderModifier must be specified for RequestHeaderModifier filter.type", "filter.requestMirror must be nil if the filter.type is not RequestMirror"},
 		},
@@ -67,9 +68,9 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "valid GRPCRouteFilterResponseHeaderModifier route filter",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type: gatewayv1a2.GRPCRouteFilterResponseHeaderModifier,
-				ResponseHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-					Set:    []gatewayv1a2.HTTPHeader{{Name: "name", Value: "foo"}},
-					Add:    []gatewayv1a2.HTTPHeader{{Name: "add", Value: "foo"}},
+				ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+					Set:    []gatewayv1.HTTPHeader{{Name: "name", Value: "foo"}},
+					Add:    []gatewayv1.HTTPHeader{{Name: "add", Value: "foo"}},
 					Remove: []string{"remove"},
 				},
 			},
@@ -78,7 +79,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "invalid GRPCRouteFilterResponseHeaderModifier type filter with non-matching field",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type:          gatewayv1a2.GRPCRouteFilterResponseHeaderModifier,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.responseHeaderModifier must be specified for ResponseHeaderModifier filter.type", "filter.requestMirror must be nil if the filter.type is not RequestMirror"},
 		},
@@ -93,7 +94,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "valid GRPCRouteFilterRequestMirror route filter",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type: gatewayv1a2.GRPCRouteFilterRequestMirror,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{BackendRef: gatewayv1a2.BackendObjectReference{
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{BackendRef: gatewayv1a2.BackendObjectReference{
 					Group:     ptrTo(gatewayv1a2.Group("group")),
 					Kind:      ptrTo(gatewayv1a2.Kind("kind")),
 					Name:      "name",
@@ -106,7 +107,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "invalid GRPCRouteFilterRequestMirror type filter with non-matching field",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type:                  gatewayv1a2.GRPCRouteFilterRequestMirror,
-				RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{},
+				RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{},
 			},
 			wantErrors: []string{"filter.requestHeaderModifier must be nil if the filter.type is not RequestHeaderModifier", "filter.requestMirror must be specified for RequestMirror filter.type"},
 		},
@@ -132,7 +133,7 @@ func TestGRPCRouteFilter(t *testing.T) {
 			name: "invalid GRPCRouteFilterExtensionRef type filter with non-matching field",
 			routeFilter: gatewayv1a2.GRPCRouteFilter{
 				Type:          gatewayv1a2.GRPCRouteFilterExtensionRef,
-				RequestMirror: &gatewayv1a2.HTTPRequestMirrorFilter{},
+				RequestMirror: &gatewayv1.HTTPRequestMirrorFilter{},
 			},
 			wantErrors: []string{"filter.requestMirror must be nil if the filter.type is not RequestMirror", "filter.extensionRef must be specified for ExtensionRef filter.type"},
 		},
@@ -237,8 +238,8 @@ func TestGRPCRouteRule(t *testing.T) {
 					Filters: []gatewayv1a2.GRPCRouteFilter{
 						{
 							Type: gatewayv1a2.GRPCRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-								Set: []gatewayv1a2.HTTPHeader{
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{
 									{
 										Name:  "special-header",
 										Value: "foo",
@@ -248,8 +249,8 @@ func TestGRPCRouteRule(t *testing.T) {
 						},
 						{
 							Type: gatewayv1a2.GRPCRouteFilterRequestHeaderModifier,
-							RequestHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-								Add: []gatewayv1a2.HTTPHeader{
+							RequestHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Add: []gatewayv1.HTTPHeader{
 									{
 										Name:  "my-header",
 										Value: "bar",
@@ -259,8 +260,8 @@ func TestGRPCRouteRule(t *testing.T) {
 						},
 						{
 							Type: gatewayv1a2.GRPCRouteFilterResponseHeaderModifier,
-							ResponseHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-								Set: []gatewayv1a2.HTTPHeader{
+							ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Set: []gatewayv1.HTTPHeader{
 									{
 										Name:  "special-header",
 										Value: "foo",
@@ -270,8 +271,8 @@ func TestGRPCRouteRule(t *testing.T) {
 						},
 						{
 							Type: gatewayv1a2.GRPCRouteFilterResponseHeaderModifier,
-							ResponseHeaderModifier: &gatewayv1a2.HTTPHeaderFilter{
-								Add: []gatewayv1a2.HTTPHeader{
+							ResponseHeaderModifier: &gatewayv1.HTTPHeaderFilter{
+								Add: []gatewayv1.HTTPHeader{
 									{
 										Name:  "my-header",
 										Value: "bar",
