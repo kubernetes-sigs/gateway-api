@@ -371,6 +371,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpec
   map:
     fields:
@@ -779,6 +782,21 @@ var schemaYAML = typed.YAMLObject(`types:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteGroupKind
           elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
   map:
     fields:
     - name: group

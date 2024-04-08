@@ -101,6 +101,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.ListenerStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("LocalObjectReference"):
 		return &apisv1.LocalObjectReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("LocalParametersReference"):
+		return &apisv1.LocalParametersReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ParametersReference"):
 		return &apisv1.ParametersReferenceApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("ParentReference"):

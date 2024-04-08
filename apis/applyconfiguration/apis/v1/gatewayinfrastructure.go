@@ -25,8 +25,9 @@ import (
 // GatewayInfrastructureApplyConfiguration represents an declarative configuration of the GatewayInfrastructure type for use
 // with apply.
 type GatewayInfrastructureApplyConfiguration struct {
-	Labels      map[v1.AnnotationKey]v1.AnnotationValue `json:"labels,omitempty"`
-	Annotations map[v1.AnnotationKey]v1.AnnotationValue `json:"annotations,omitempty"`
+	Labels        map[v1.AnnotationKey]v1.AnnotationValue     `json:"labels,omitempty"`
+	Annotations   map[v1.AnnotationKey]v1.AnnotationValue     `json:"annotations,omitempty"`
+	ParametersRef *LocalParametersReferenceApplyConfiguration `json:"parametersRef,omitempty"`
 }
 
 // GatewayInfrastructureApplyConfiguration constructs an declarative configuration of the GatewayInfrastructure type for use with
@@ -60,5 +61,13 @@ func (b *GatewayInfrastructureApplyConfiguration) WithAnnotations(entries map[v1
 	for k, v := range entries {
 		b.Annotations[k] = v
 	}
+	return b
+}
+
+// WithParametersRef sets the ParametersRef field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the ParametersRef field is set to the value of the last call.
+func (b *GatewayInfrastructureApplyConfiguration) WithParametersRef(value *LocalParametersReferenceApplyConfiguration) *GatewayInfrastructureApplyConfiguration {
+	b.ParametersRef = value
 	return b
 }

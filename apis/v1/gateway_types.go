@@ -654,6 +654,37 @@ type GatewayInfrastructure struct {
 	// +optional
 	// +kubebuilder:validation:MaxProperties=8
 	Annotations map[AnnotationKey]AnnotationValue `json:"annotations,omitempty"`
+
+	// ParametersRef is a reference to a resource that contains the configuration
+	// parameters corresponding to the Gateway. This is optional if the
+	// controller does not require any additional configuration.
+	//
+	// This follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis
+	//
+	// The Gateway's GatewayClass may provide its own `parametersRef`. When both are specified,
+	// the merging behavior is implementation specific.
+	// It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	ParametersRef *LocalParametersReference `json:"parametersRef,omitempty"`
+}
+
+// LocalParametersReference identifies an API object containing controller-specific
+// configuration resource within the namespace.
+type LocalParametersReference struct {
+	// Group is the group of the referent.
+	Group Group `json:"group"`
+
+	// Kind is kind of the referent.
+	Kind Kind `json:"kind"`
+
+	// Name is the name of the referent.
+	//
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:MaxLength=253
+	Name string `json:"name"`
 }
 
 // GatewayConditionType is a type of condition associated with a
@@ -756,6 +787,7 @@ const (
 	// Possible reasons for this condition to be False are:
 	//
 	// * "Invalid"
+	// * "InvalidParameters"
 	// * "NotReconciled"
 	// * "UnsupportedAddress"
 	// * "ListenersNotValid"
@@ -789,6 +821,11 @@ const (
 	// Gateway could not be accepted because an address that was provided is a
 	// type which is not supported by the implementation.
 	GatewayReasonUnsupportedAddress GatewayConditionReason = "UnsupportedAddress"
+
+	// This reason is used with the "Accepted" condition when the
+	// Gateway was not accepted because the parametersRef field
+	// was invalid, with more detail in the message.
+	GatewayReasonInvalidParameters GatewayConditionReason = "InvalidParameters"
 )
 
 const (
