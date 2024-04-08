@@ -163,8 +163,8 @@ spec:
 
 
                   * Gateway (Gateway conformance profile)
+                  * Service (Mesh conformance profile, ClusterIP Services only)
 
-                  * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 
                   This API may be extended in the future to support additional kinds of parent
                   resources.
@@ -233,7 +233,7 @@ spec:
 
 
                     * Gateway (Gateway conformance profile)
-                    * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                    * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                     This API may be extended in the future to support additional kinds of parent
@@ -266,7 +266,7 @@ spec:
 
 
                         * Gateway (Gateway conformance profile)
-                        * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                        * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                         Support for other resources is Implementation-Specific.
@@ -316,7 +316,7 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                     port:
-                      description: |+
+                      description: |-
                         Port is the network port this Route targets. It can be interpreted
                         differently based on the type of parent resource.
 
@@ -352,8 +352,6 @@ spec:
 
 
                         Support: Extended
-
-
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -369,9 +367,7 @@ spec:
                         both specified values.
                         * Service: Port Name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
-                        both specified values. Note that attaching Routes to Services as Parents
-                        is part of experimental Mesh support and is not supported for any other
-                        purpose.
+                        both specified values.
 
 
                         Implementations MAY choose to support attaching Routes to other resources.
@@ -2992,7 +2988,7 @@ spec:
 
 
                             * Gateway (Gateway conformance profile)
-                            * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                            * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                             Support for other resources is Implementation-Specific.
@@ -3042,7 +3038,7 @@ spec:
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         port:
-                          description: |+
+                          description: |-
                             Port is the network port this Route targets. It can be interpreted
                             differently based on the type of parent resource.
 
@@ -3078,8 +3074,6 @@ spec:
 
 
                             Support: Extended
-
-
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -3095,9 +3089,7 @@ spec:
                             both specified values.
                             * Service: Port Name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
-                            both specified values. Note that attaching Routes to Services as Parents
-                            is part of experimental Mesh support and is not supported for any other
-                            purpose.
+                            both specified values.
 
 
                             Implementations MAY choose to support attaching Routes to other resources.
@@ -3284,8 +3276,8 @@ spec:
 
 
                   * Gateway (Gateway conformance profile)
+                  * Service (Mesh conformance profile, ClusterIP Services only)
 
-                  * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 
                   This API may be extended in the future to support additional kinds of parent
                   resources.
@@ -3354,7 +3346,7 @@ spec:
 
 
                     * Gateway (Gateway conformance profile)
-                    * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                    * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                     This API may be extended in the future to support additional kinds of parent
@@ -3387,7 +3379,7 @@ spec:
 
 
                         * Gateway (Gateway conformance profile)
-                        * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                        * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                         Support for other resources is Implementation-Specific.
@@ -3437,7 +3429,7 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                     port:
-                      description: |+
+                      description: |-
                         Port is the network port this Route targets. It can be interpreted
                         differently based on the type of parent resource.
 
@@ -3473,8 +3465,6 @@ spec:
 
 
                         Support: Extended
-
-
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -3490,9 +3480,7 @@ spec:
                         both specified values.
                         * Service: Port Name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
-                        both specified values. Note that attaching Routes to Services as Parents
-                        is part of experimental Mesh support and is not supported for any other
-                        purpose.
+                        both specified values.
 
 
                         Implementations MAY choose to support attaching Routes to other resources.
@@ -6113,7 +6101,7 @@ spec:
 
 
                             * Gateway (Gateway conformance profile)
-                            * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                            * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                             Support for other resources is Implementation-Specific.
@@ -6163,7 +6151,7 @@ spec:
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         port:
-                          description: |+
+                          description: |-
                             Port is the network port this Route targets. It can be interpreted
                             differently based on the type of parent resource.
 
@@ -6199,8 +6187,6 @@ spec:
 
 
                             Support: Extended
-
-
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -6216,9 +6202,7 @@ spec:
                             both specified values.
                             * Service: Port Name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
-                            both specified values. Note that attaching Routes to Services as Parents
-                            is part of experimental Mesh support and is not supported for any other
-                            purpose.
+                            both specified values.
 
 
                             Implementations MAY choose to support attaching Routes to other resources.

@@ -22,6 +22,7 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	"sigs.k8s.io/gateway-api/conformance/utils/tlog"
 	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
@@ -60,7 +61,7 @@ func (test *ConformanceTest) Run(t *testing.T, suite *ConformanceTestSuite) {
 	}
 
 	for _, manifestLocation := range test.Manifests {
-		t.Logf("Applying %s", manifestLocation)
+		tlog.Logf(t, "Applying %s", manifestLocation)
 		suite.Applier.MustApplyWithCleanup(t, suite.Client, suite.TimeoutConfig, manifestLocation, true)
 	}
 
