@@ -1,0 +1,19 @@
+apiVersion: v2
+type: application
+version: 0.0.1-alpha3
+name: gateway-api-crds
+icon: https://avatars.githubusercontent.com/u/36015203?s=400&v=4
+description: |
+  A Helm chart that collects custom resource definitions (CRDs) from the Kubernetes Gateway API,
+  allowing for seamless integration with GitOps tools
+keywords:
+  - kubernetes
+  - gateway-api
+  - crds
+appVersion: 1.0.0
+home: https://gateway-api.sigs.k8s.io
+sources:
+  - https://github.com/kubernetes-sigs/gateway-api
+maintainers:
+  - name: vac
+    email: dot.fun@protonmail.com
