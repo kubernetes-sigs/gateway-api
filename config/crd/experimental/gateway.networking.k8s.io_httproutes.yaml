@@ -362,10 +362,10 @@ spec:
                         following resources, SectionName is interpreted as the following:
 
 
-                        * Gateway: Listener Name. When both Port (experimental) and SectionName
+                        * Gateway: Listener name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
-                        * Service: Port Name. When both Port (experimental) and SectionName
+                        * Service: Port name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
 
@@ -3084,10 +3084,10 @@ spec:
                             following resources, SectionName is interpreted as the following:
 
 
-                            * Gateway: Listener Name. When both Port (experimental) and SectionName
+                            * Gateway: Listener name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
-                            * Service: Port Name. When both Port (experimental) and SectionName
+                            * Service: Port name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
 
@@ -3475,10 +3475,10 @@ spec:
                         following resources, SectionName is interpreted as the following:
 
 
-                        * Gateway: Listener Name. When both Port (experimental) and SectionName
+                        * Gateway: Listener name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
-                        * Service: Port Name. When both Port (experimental) and SectionName
+                        * Service: Port name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
 
@@ -6197,10 +6197,10 @@ spec:
                             following resources, SectionName is interpreted as the following:
 
 
-                            * Gateway: Listener Name. When both Port (experimental) and SectionName
+                            * Gateway: Listener name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
-                            * Service: Port Name. When both Port (experimental) and SectionName
+                            * Service: Port name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
 
