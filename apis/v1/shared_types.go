@@ -91,10 +91,10 @@ type ParentReference struct {
 	// SectionName is the name of a section within the target resource. In the
 	// following resources, SectionName is interpreted as the following:
 	//
-	// * Gateway: Listener Name. When both Port (experimental) and SectionName
+	// * Gateway: Listener name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
-	// * Service: Port Name. When both Port (experimental) and SectionName
+	// * Service: Port name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
 	//
@@ -605,6 +605,7 @@ type Namespace string
 // In the following resources, SectionName is interpreted as the following:
 //
 // * Gateway: Listener name
+// * HTTPRoute: HTTPRouteRule name
 // * Service: Port name
 //
 // Section names can have a variety of forms, including RFC 1123 subdomains,
