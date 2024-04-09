@@ -371,6 +371,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpec
   map:
     fields:
@@ -793,6 +796,21 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1.ParametersReference
   map:
     fields:
@@ -1094,69 +1112,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
           elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.Gateway
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewaySpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GatewayClass
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayClassSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayClassStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.HTTPRoute
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteStatus
-      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
   map:
     fields:

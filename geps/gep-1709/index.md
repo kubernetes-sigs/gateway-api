@@ -1,8 +1,17 @@
 # GEP-1709: Conformance Profiles
 
 * Issue: [#1709](https://github.com/kubernetes-sigs/gateway-api/issues/1709)
-* Status: Experimental
-* Probationary Period: Re-evaluate in April 2024
+* Status: Standard
+
+## Important Notes
+
+Unlike our APIs, CRDs, or `gwctl` conformance profiles and their reports are
+not user facing in the traditional sense. As trends in Gateway API utilization
+grow and change, it may make sense to adjust how profiles work to align better
+with what implementations are doing. As such conformance profiles (that is,
+the test suite and the reports) might be subject to backwards incompatible
+changes at times in ways the rest of the API wouldn't be (e.g. significant
+features may need to be added or removed on a profile).
 
 ## TLDR
 
@@ -669,7 +678,7 @@ The following are items that **MUST** be resolved to move this GEP to
     merit, and doesn't appear to be redundant.
 - [x] Finalize the report organization structure based on feedback during the
   experimental phase.
-- [ ] Base documentation must exist for implementations to run the tests via
+- [x] Base documentation must exist for implementations to run the tests via
   the CLI and via the Golang library.
 
 [sig-arch-feedback]:https://groups.google.com/g/kubernetes-sig-architecture/c/YjrVZ4NJQiA/m/7Qg7ScddBwAJ

@@ -120,6 +120,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.Listener":                                   schema_sigsk8sio_gateway_api_apis_v1_Listener(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference":                       schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference":                   schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ParametersReference":                        schema_sigsk8sio_gateway_api_apis_v1_ParametersReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                            schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                             schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
@@ -141,12 +142,6 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteRule":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteRule(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteSpec":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteSpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteStatus":                      schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteStatus(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.Gateway":                              schema_sigsk8sio_gateway_api_apis_v1alpha2_Gateway(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GatewayClass":                         schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayClass(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GatewayClassList":                     schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayClassList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.GatewayList":                          schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayList(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.HTTPRoute":                            schema_sigsk8sio_gateway_api_apis_v1alpha2_HTTPRoute(ref),
-		"sigs.k8s.io/gateway-api/apis/v1alpha2.HTTPRouteList":                        schema_sigsk8sio_gateway_api_apis_v1alpha2_HTTPRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyAncestorStatus":                 schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus":                         schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyTargetReference(ref),
@@ -2967,7 +2962,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassSpec(ref common.ReferenceC
 					},
 					"parametersRef": {
 						SchemaProps: spec.SchemaProps{
-							Description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the GatewayClass. This is optional if the controller does not require any additional configuration.\n\nParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap, or an implementation-specific custom resource. The resource can be cluster-scoped or namespace-scoped.\n\nIf the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true.\n\nSupport: Implementation-specific",
+							Description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the GatewayClass. This is optional if the controller does not require any additional configuration.\n\nParametersRef can reference a standard Kubernetes resource, i.e. ConfigMap, or an implementation-specific custom resource. The resource can be cluster-scoped or namespace-scoped.\n\nIf the referent cannot be found, the GatewayClass's \"InvalidParameters\" status condition will be true.\n\nA Gateway for this GatewayClass may provide its own `parametersRef`. When both are specified, the merging behavior is implementation specific. It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.\n\nSupport: Implementation-specific",
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.ParametersReference"),
 						},
 					},
@@ -3083,9 +3078,17 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayInfrastructure(ref common.Refer
 							},
 						},
 					},
+					"parametersRef": {
+						SchemaProps: spec.SchemaProps{
+							Description: "ParametersRef is a reference to a resource that contains the configuration parameters corresponding to the Gateway. This is optional if the controller does not require any additional configuration.\n\nThis follows the same semantics as GatewayClass's `parametersRef`, but on a per-Gateway basis\n\nThe Gateway's GatewayClass may provide its own `parametersRef`. When both are specified, the merging behavior is implementation specific. It is generally recommended that GatewayClass provides defaults that can be overridden by a Gateway.\n\nSupport: Implementation-specific",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference"),
+						},
+					},
 				},
 			},
 		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference"},
 	}
 }
 
@@ -4351,6 +4354,44 @@ func schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref common.Refere
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "LocalParametersReference identifies an API object containing controller-specific configuration resource within the namespace.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is kind of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind", "name"},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_ParametersReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -4434,7 +4475,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref common.ReferenceCa
 					},
 					"sectionName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SectionName is the name of a section within the target resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener Name. When both Port (experimental) and SectionName are specified, the name and port of the selected listener must match both specified values. * Service: Port Name. When both Port (experimental) and SectionName are specified, the name and port of the selected listener must match both specified values.\n\nImplementations MAY choose to support attaching Routes to other resources. If that is the case, they MUST clearly document how SectionName is interpreted.\n\nWhen unspecified (empty string), this will reference the entire resource. For the purpose of status, an attachment is considered successful if at least one section in the parent resource accepts it. For example, Gateway listeners can restrict which Routes can attach to them by Route kind, namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from the referencing Route, the Route MUST be considered successfully attached. If no Gateway listeners accept attachment from this Route, the Route MUST be considered detached from the Gateway.\n\nSupport: Core",
+							Description: "SectionName is the name of a section within the target resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name. When both Port (experimental) and SectionName are specified, the name and port of the selected listener must match both specified values. * Service: Port name. When both Port (experimental) and SectionName are specified, the name and port of the selected listener must match both specified values.\n\nImplementations MAY choose to support attaching Routes to other resources. If that is the case, they MUST clearly document how SectionName is interpreted.\n\nWhen unspecified (empty string), this will reference the entire resource. For the purpose of status, an attachment is considered successful if at least one section in the parent resource accepts it. For example, Gateway listeners can restrict which Routes can attach to them by Route kind, namespace, or hostname. If 1 of 2 Gateway listeners accept attachment from the referencing Route, the Route MUST be considered successfully attached. If no Gateway listeners accept attachment from this Route, the Route MUST be considered detached from the Gateway.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
@@ -5288,303 +5329,6 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteStatus(ref common.Refer
 	}
 }
 
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_Gateway(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "Gateway represents an instance of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of Gateway.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewaySpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of Gateway.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1.GatewaySpec", "sigs.k8s.io/gateway-api/apis/v1.GatewayStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayClass(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GatewayClass describes a class of Gateways available to the user for creating Gateway resources.\n\nIt is recommended that this resource be used as a template for Gateways. This means that a Gateway is based on the state of the GatewayClass at the time it was created and changes to the GatewayClass or associated parameters are not propagated down to existing Gateways. This recommendation is intended to limit the blast radius of changes to GatewayClass or associated parameters. If implementations choose to propagate GatewayClass changes to existing Gateways, that MUST be clearly documented by the implementation.\n\nWhenever one or more Gateways are using a GatewayClass, implementations SHOULD add the `gateway-exists-finalizer.gateway.networking.k8s.io` finalizer on the associated GatewayClass. This ensures that a GatewayClass associated with a Gateway is not deleted while in use.\n\nGatewayClass is a Cluster level resource.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of GatewayClass.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of GatewayClass.\n\nImplementations MUST populate status on all GatewayClass resources which specify their controller name.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.GatewayClassStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1.GatewayClassSpec", "sigs.k8s.io/gateway-api/apis/v1.GatewayClassStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayClassList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GatewayClassList contains a list of GatewayClass",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.GatewayClass"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.GatewayClass"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_GatewayList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "GatewayList contains a list of Gateways.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.Gateway"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.Gateway"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_HTTPRoute(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRoute provides a way to route HTTP requests. This includes the capability to match requests by hostname, path, header, or query param. Filters can be used to specify additional processing steps. Backends specify where matching requests should be routed.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
-						},
-					},
-					"spec": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Spec defines the desired state of HTTPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec"),
-						},
-					},
-					"status": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Status defines the current state of HTTPRoute.",
-							Default:     map[string]interface{}{},
-							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus"),
-						},
-					},
-				},
-				Required: []string{"spec"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteSpec", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteStatus"},
-	}
-}
-
-func schema_sigsk8sio_gateway_api_apis_v1alpha2_HTTPRouteList(ref common.ReferenceCallback) common.OpenAPIDefinition {
-	return common.OpenAPIDefinition{
-		Schema: spec.Schema{
-			SchemaProps: spec.SchemaProps{
-				Description: "HTTPRouteList contains a list of HTTPRoute.",
-				Type:        []string{"object"},
-				Properties: map[string]spec.Schema{
-					"kind": {
-						SchemaProps: spec.SchemaProps{
-							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"apiVersion": {
-						SchemaProps: spec.SchemaProps{
-							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
-							Type:        []string{"string"},
-							Format:      "",
-						},
-					},
-					"metadata": {
-						SchemaProps: spec.SchemaProps{
-							Default: map[string]interface{}{},
-							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
-						},
-					},
-					"items": {
-						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
-							Items: &spec.SchemaOrArray{
-								Schema: &spec.Schema{
-									SchemaProps: spec.SchemaProps{
-										Default: map[string]interface{}{},
-										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.HTTPRoute"),
-									},
-								},
-							},
-						},
-					},
-				},
-				Required: []string{"items"},
-			},
-		},
-		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.HTTPRoute"},
-	}
-}
-
 func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyAncestorStatus(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -5753,7 +5497,7 @@ func schema_sigsk8sio_gateway_api_apis_v1alpha2_PolicyTargetReferenceWithSection
 					},
 					"sectionName": {
 						SchemaProps: spec.SchemaProps{
-							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener Name * Service: Port Name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
+							Description: "SectionName is the name of a section within the target resource. When unspecified, this targetRef targets the entire resource. In the following resources, SectionName is interpreted as the following:\n\n* Gateway: Listener name * HTTPRoute: HTTPRouteRule name * Service: Port name\n\nIf a SectionName is specified, but does not exist on the targeted object, the Policy must fail to attach, and the policy implementation should record a `ResolvedRefs` or similar Condition in the Policy's status.",
 							Type:        []string{"string"},
 							Format:      "",
 						},
