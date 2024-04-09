@@ -20,12 +20,15 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -133,6 +136,51 @@ func (c *FakeBackendTLSPolicies) DeleteCollection(ctx context.Context, opts v1.D
 func (c *FakeBackendTLSPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.BackendTLSPolicy, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, name, pt, data, subresources...), &v1alpha2.BackendTLSPolicy{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha2.BackendTLSPolicy), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied backendTLSPolicy.
+func (c *FakeBackendTLSPolicies) Apply(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+	if backendTLSPolicy == nil {
+		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(backendTLSPolicy)
+	if err != nil {
+		return nil, err
+	}
+	name := backendTLSPolicy.Name
+	if name == nil {
+		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.BackendTLSPolicy{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1alpha2.BackendTLSPolicy), err
+}
+
+// ApplyStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
+func (c *FakeBackendTLSPolicies) ApplyStatus(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+	if backendTLSPolicy == nil {
+		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(backendTLSPolicy)
+	if err != nil {
+		return nil, err
+	}
+	name := backendTLSPolicy.Name
+	if name == nil {
+		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err

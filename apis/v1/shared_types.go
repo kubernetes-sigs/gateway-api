@@ -25,7 +25,7 @@ import (
 // with "Core" support:
 //
 // * Gateway (Gateway conformance profile)
-// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+// * Service (Mesh conformance profile, ClusterIP Services only)
 //
 // This API may be extended in the future to support additional kinds of parent
 // resources.
@@ -49,7 +49,7 @@ type ParentReference struct {
 	// There are two kinds of parent resources with "Core" support:
 	//
 	// * Gateway (Gateway conformance profile)
-	// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+	// * Service (Mesh conformance profile, ClusterIP Services only)
 	//
 	// Support for other resources is Implementation-Specific.
 	//
@@ -91,14 +91,12 @@ type ParentReference struct {
 	// SectionName is the name of a section within the target resource. In the
 	// following resources, SectionName is interpreted as the following:
 	//
-	// * Gateway: Listener Name. When both Port (experimental) and SectionName
+	// * Gateway: Listener name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
 	// both specified values.
-	// * Service: Port Name. When both Port (experimental) and SectionName
+	// * Service: Port name. When both Port (experimental) and SectionName
 	// are specified, the name and port of the selected listener must match
-	// both specified values. Note that attaching Routes to Services as Parents
-	// is part of experimental Mesh support and is not supported for any other
-	// purpose.
+	// both specified values.
 	//
 	// Implementations MAY choose to support attaching Routes to other resources.
 	// If that is the case, they MUST clearly document how SectionName is
@@ -150,7 +148,6 @@ type ParentReference struct {
 	// Support: Extended
 	//
 	// +optional
-	// <gateway:experimental>
 	Port *PortNumber `json:"port,omitempty"`
 }
 
@@ -171,9 +168,8 @@ type CommonRouteSpec struct {
 	// There are two kinds of parent resources with "Core" support:
 	//
 	// * Gateway (Gateway conformance profile)
-	// <gateway:experimental:description>
-	// * Service (Mesh conformance profile, experimental, ClusterIP Services only)
-	// </gateway:experimental:description>
+	// * Service (Mesh conformance profile, ClusterIP Services only)
+	//
 	// This API may be extended in the future to support additional kinds of parent
 	// resources.
 	//
@@ -576,7 +572,7 @@ type Group string
 type Kind string
 
 // ObjectName refers to the name of a Kubernetes object.
-// Object names can have a variety of forms, including RFC1123 subdomains,
+// Object names can have a variety of forms, including RFC 1123 subdomains,
 // RFC 1123 labels, or RFC 1035 labels.
 //
 // +kubebuilder:validation:MinLength=1
@@ -606,11 +602,22 @@ type Namespace string
 
 // SectionName is the name of a section in a Kubernetes resource.
 //
+// In the following resources, SectionName is interpreted as the following:
+//
+// * Gateway: Listener name
+// * HTTPRoute: HTTPRouteRule name
+// * Service: Port name
+//
+// Section names can have a variety of forms, including RFC 1123 subdomains,
+// RFC 1123 labels, or RFC 1035 labels.
+//
 // This validation is based off of the corresponding Kubernetes validation:
 // https://github.com/kubernetes/apimachinery/blob/02cfb53916346d085a6c6c7c66f882e3c6b0eca6/pkg/util/validation/validation.go#L208
 //
 // Valid values include:
 //
+// * "example"
+// * "foo-example"
 // * "example.com"
 // * "foo.example.com"
 //

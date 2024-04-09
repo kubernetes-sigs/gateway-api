@@ -34,26 +34,6 @@ type GRPCRouteListerExpansion interface{}
 // GRPCRouteNamespaceLister.
 type GRPCRouteNamespaceListerExpansion interface{}
 
-// GatewayListerExpansion allows custom methods to be added to
-// GatewayLister.
-type GatewayListerExpansion interface{}
-
-// GatewayNamespaceListerExpansion allows custom methods to be added to
-// GatewayNamespaceLister.
-type GatewayNamespaceListerExpansion interface{}
-
-// GatewayClassListerExpansion allows custom methods to be added to
-// GatewayClassLister.
-type GatewayClassListerExpansion interface{}
-
-// HTTPRouteListerExpansion allows custom methods to be added to
-// HTTPRouteLister.
-type HTTPRouteListerExpansion interface{}
-
-// HTTPRouteNamespaceListerExpansion allows custom methods to be added to
-// HTTPRouteNamespaceLister.
-type HTTPRouteNamespaceListerExpansion interface{}
-
 // ReferenceGrantListerExpansion allows custom methods to be added to
 // ReferenceGrantLister.
 type ReferenceGrantListerExpansion interface{}

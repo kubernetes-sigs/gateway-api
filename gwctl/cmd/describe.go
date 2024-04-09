@@ -31,12 +31,11 @@ import (
 )
 
 func NewDescribeCommand() *cobra.Command {
-
 	var namespaceFlag string
 	var allNamespacesFlag bool
 
 	cmd := &cobra.Command{
-		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends|namespace} RESOURCE_NAME",
+		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends|namespace|policycrd} RESOURCE_NAME",
 		Short: "Show details of a specific resource or group of resources",
 		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
@@ -95,7 +94,22 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 				policyList = []policymanager.Policy{policy}
 			}
 		}
-		policiesPrinter.PrintDescribeView(policyList)
+		policiesPrinter.PrintPoliciesDescribeView(policyList)
+	
+	case "policycrd", "policycrds":
+		var policyCrdList []policymanager.PolicyCRD
+		if len(args) == 1 {
+			policyCrdList = params.PolicyManager.GetCRDs()
+		} else {
+			var found bool
+			policyCrd, found := params.PolicyManager.GetCRD(args[1])
+			if !found {
+				fmt.Fprintf(os.Stderr, "failed to find PolicyCrd: %v\n", err)
+				os.Exit(1)
+			}
+			policyCrdList = []policymanager.PolicyCRD{policyCrd}
+		}
+		policiesPrinter.PrintPolicyCRDsDescribeView(policyCrdList)
 
 	case "httproute", "httproutes":
 		filter := resourcediscovery.Filter{Namespace: ns}
@@ -147,12 +161,12 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		}
 		backendsPrinter.PrintDescribeView(resourceModel)
 
-	case "namespace", "namespaces":
+	case "namespace", "namespaces", "ns":
 		filter := resourcediscovery.Filter{}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
-		
+
 		resourceModel, err := discoverer.DiscoverResourcesForNamespace(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)

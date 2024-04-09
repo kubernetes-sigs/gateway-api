@@ -101,9 +101,9 @@ The following runs all the tests relevant to `Gateway`, `HTTPRoute`, and
 `ReferenceGrant`:
 
 ```shell
-go test ./conformance/... -args \
-    -gateway-class=my-gateway-class \
-    -supported-features=Gateway,HTTPRoute
+go test ./conformance -run TestConformance -args \
+    --gateway-class=my-gateway-class \
+    --supported-features=Gateway,HTTPRoute
 ```
 
 Other useful flags may be found in [conformance flags][cflags].
@@ -115,7 +115,7 @@ Other useful flags may be found in [conformance flags][cflags].
 Mesh tests can be run by simply enabling the `Mesh` feature:
 
 ```shell
-go test ./conformance/... -args -supported-features=Mesh
+go test ./conformance -run TestConformance -args --supported-features=Mesh
 ```
 
 If your mesh also includes ingress support with an API such as `HTTPRoute`, you
@@ -123,7 +123,7 @@ can run the relevant tests in the same test run by enabling the `Gateway`
 feature and any relevant API features, e.g:
 
 ```shell
-go test ./conformance/... -args -supported-features=Mesh,Gateway,HTTPRoute
+go test ./conformance -run TestConformance -args --supported-features=Mesh,Gateway,HTTPRoute
 ```
 
 #### Namespace Labels and Annotations
@@ -138,9 +138,9 @@ workloads, for example, to enable sidecar injection.
 As an example, when testing Linkerd, you might run
 
 ```shell
-go test ./conformance/... -args \
+go test ./conformance -run TestConformance -args \
    ...
-   -namespace-annotations=linkerd.io/inject=enabled
+   --namespace-annotations=linkerd.io/inject=enabled
 ```
 
 so that the test namespaces are correctly injected into the mesh.
@@ -154,28 +154,21 @@ the `-exempt-features` flag. For example, to run only the `Mesh` tests,
 and nothing else:
 
 ```shell
-go test ./conformance/... -args \
-    -supported-features=Mesh \
-    -exempt-features=Gateway,ReferenceGrant
+go test ./conformance -run TestConformance -args \
+    --supported-features=Mesh \
+    --exempt-features=Gateway,ReferenceGrant
 ```
 
 #### Suite Level Options
 
 When running tests of any kind you may not want the test suite to cleanup the
 test resources when it completes (i.e. so that you can inspect the cluster
-state in the event of a failure). You can skip cleanup with:
-
-```shell
-go test ./conformance/... -args -cleanup-base-resources=false
-```
+state in the event of a failure). You can skip cleanup by setting the `--cleanup-base-resources=false`
+flag.
 
 It may be helpful (particularly when working on implementing a specific
-feature) to run a very specific test by name. This can be done using the
-`ShortName` of that test:
-
-```shell
-go test ./conformance/... --run TestConformance/<ShortName>
-```
+feature) to run a very specific test by name. This can be done by setting the
+`--run-test` flag.
 
 #### Network Policies
 
@@ -189,6 +182,24 @@ implementations pass those tests.
 
 [network_plugins]: https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/
 [netpol]: https://kubernetes.io/docs/concepts/services-networking/network-policies/
+
+### Conformance Profiles
+
+The Conformance profiles are a tool to group multiple supported features, with the
+goal of certifying their support, through the conformance reports. The supported
+profiles can be configured with the `--conformance-profiles=PROFILE1,PROFILE2`
+flag.
+
+## Conformance Reports
+
+In case the suite has been configured to run a set of conformance profiles, and
+all the Conformance reports fields have been properly set according to [this guide][conformance-guide],
+the conformance report can be uploaded into [this folder][reports-folder] through
+a PR. Follow the [guide][conformance-guide] to have all the details on how to structure
+and submit reports for a specific implementation.
+
+[reports-folder]: ./conformance/reports/
+[conformance-guide]: ./conformance/reports/README.md
 
 ## Contributing to Conformance
 
