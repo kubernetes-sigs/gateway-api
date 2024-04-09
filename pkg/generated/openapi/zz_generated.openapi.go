@@ -87,6 +87,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                     schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                 schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                            schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                      schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                             schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCMethodMatch":                            schema_sigsk8sio_gateway_api_apis_v1_GRPCMethodMatch(ref),
@@ -131,6 +132,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.ListenerStatus":                             schema_sigsk8sio_gateway_api_apis_v1_ListenerStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.LocalObjectReference":                       schema_sigsk8sio_gateway_api_apis_v1_LocalObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.LocalParametersReference":                   schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.ObjectReference":                            schema_sigsk8sio_gateway_api_apis_v1_ObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ParametersReference":                        schema_sigsk8sio_gateway_api_apis_v1_ParametersReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.ParentReference":                            schema_sigsk8sio_gateway_api_apis_v1_ParentReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteGroupKind":                             schema_sigsk8sio_gateway_api_apis_v1_RouteGroupKind(ref),
@@ -2769,6 +2771,35 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "FrontendTLSValidation holds configuration information that can be used to validate the frontend initiating the TLS connection",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"caCertificateRefs": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CACertificateRefs contains one or more references to Kubernetes objects that contain TLS certificates of the Certificate Authorities that can be used as a trust anchor to validate the certificates presented by the client.\n\nA single CA certificate reference to a Kubernetes ConfigMap has \"Core\" support. Implementations MAY choose to support attaching multiple CA certificates to a Listener, but this behavior is implementation-specific.\n\nSupport: Core - A single reference to a Kubernetes ConfigMap with the CA certificate in a key named `ca.crt`.\n\nSupport: Implementation-specific (More than one reference, or other kinds of resources).\n\nReferences to a resource in a different namespace are invalid UNLESS there is a ReferenceGrant in the target namespace that allows the certificate to be attached. If a ReferenceGrant does not allow this reference, the \"ResolvedRefs\" condition MUST be set to False for this listener with the \"RefNotPermitted\" reason.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.ObjectReference"),
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.ObjectReference"},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3817,6 +3848,12 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 							},
 						},
 					},
+					"frontendValidation": {
+						SchemaProps: spec.SchemaProps{
+							Description: "FrontendValidation holds configuration information for validating the frontend (client). Setting this field will require clients to send a client certificate required for validation during the TLS handshake. In browsers this may result in a dialog appearing that requests a user to specify the client certificate. The maximum depth of a certificate chain accepted in verification is Implementation specific.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation"),
+						},
+					},
 					"options": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Options are a list of key/value pairs to enable extended TLS configuration for each implementation. For example, configuring the minimum TLS version or supported cipher suites.\n\nA set of common keys MAY be defined by the API in the future. To avoid any ambiguity, implementation-specific definitions MUST use domain-prefixed names, such as `example.com/my-custom-option`. Un-prefixed names are reserved for key names defined by Gateway API.\n\nSupport: Implementation-specific",
@@ -3837,7 +3874,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayTLSConfig(ref common.ReferenceC
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"},
+			"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation", "sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference"},
 	}
 }
 
@@ -4861,6 +4898,51 @@ func schema_sigsk8sio_gateway_api_apis_v1_LocalParametersReference(ref common.Re
 						SchemaProps: spec.SchemaProps{
 							Description: "Name is the name of the referent.",
 							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+				Required: []string{"group", "kind", "name"},
+			},
+		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_ObjectReference(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "ObjectReference identifies an API object including its namespace.\n\nThe API object must be valid in the cluster; the Group and Kind must be registered in the cluster for this reference to be valid.\n\nReferences to objects with invalid Group and Kind are not valid, and must be rejected by the implementation, with appropriate Conditions set on the containing object.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"group": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Group is the group of the referent. For example, \"gateway.networking.k8s.io\". When unspecified or empty string, core API group is inferred.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is kind of the referent. For example \"ConfigMap\" or \"Service\".",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Name is the name of the referent.",
+							Default:     "",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"namespace": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Namespace is the namespace of the referenced object. When unspecified, the local namespace is inferred.\n\nNote that when a namespace different than the local namespace is specified, a ReferenceGrant object is required in the referent namespace to allow that namespace's owner to accept the reference. See the ReferenceGrant documentation for details.\n\nSupport: Core",
 							Type:        []string{"string"},
 							Format:      "",
 						},
