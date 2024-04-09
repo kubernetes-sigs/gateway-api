@@ -821,6 +821,44 @@ this by the following commands:
 2. Curl to `/b` routes MUST direct traffic to `servicev2` since the persistent session established earlier is not
    shared with this route path.
 
+#### Route Rules Referencing to a Session Persistent Enabled Service Must Not Share Sessions
+
+Consider the situation in which two different route paths are going to the same service, and session persistence is enabled with the service via `BackendLBPolicy`:
+
+```yaml
+kind: HTTPRoute
+metadata:
+  name: routeX
+spec:
+  rules:
+  - matches:
+    - path:
+      value: /a
+    backendRefs:
+    - name: servicev1
+  - matches:
+    - path:
+      value: /b
+    backendRefs:
+    - name: servicev1
+---
+kind: BackendLBPolicy
+metadata:
+  name: lbp
+spec:
+  targetRef:
+    kind: Service
+    Name: servicev1
+  sessionPersistence:
+    sessionName: service-cookie
+    type: Cookie
+```
+
+Route rules referencing the same service MUST NOT share persistent sessions (i.e. the same cookie), even if the session persistence is attached to the service via `BackendLBPolicy`, and each route rule should have different persistent sessions.
+
+1. Curl to `/a` which establishes a persistent session with `servicev1`
+2. Curl to `/b` which establishes another persistent session with `servicev1` since the previous session established earlier is not shared with this route path.
+
 #### Session Naming Collision
 
 Consider the situation in which two different services have cookie-based session persistence configured with the
