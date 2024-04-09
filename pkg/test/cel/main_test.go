@@ -24,6 +24,7 @@ import (
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 
 	"k8s.io/client-go/tools/clientcmd"
@@ -47,6 +48,7 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing Kubernetes client: %v", err))
 	}
+	v1alpha3.AddToScheme(k8sClient.Scheme())
 	v1alpha2.AddToScheme(k8sClient.Scheme())
 	v1beta1.AddToScheme(k8sClient.Scheme())
 	v1.AddToScheme(k8sClient.Scheme())

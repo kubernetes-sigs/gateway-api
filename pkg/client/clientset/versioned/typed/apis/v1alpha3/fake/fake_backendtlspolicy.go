@@ -28,35 +28,35 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
-	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha3"
+	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 )
 
 // FakeBackendTLSPolicies implements BackendTLSPolicyInterface
 type FakeBackendTLSPolicies struct {
-	Fake *FakeGatewayV1alpha2
+	Fake *FakeGatewayV1alpha3
 	ns   string
 }
 
-var backendtlspoliciesResource = v1alpha2.SchemeGroupVersion.WithResource("backendtlspolicies")
+var backendtlspoliciesResource = v1alpha3.SchemeGroupVersion.WithResource("backendtlspolicies")
 
-var backendtlspoliciesKind = v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicy")
+var backendtlspoliciesKind = v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicy")
 
 // Get takes name of the backendTLSPolicy, and returns the corresponding backendTLSPolicy object, and an error if there is any.
-func (c *FakeBackendTLSPolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) Get(ctx context.Context, name string, options v1.GetOptions) (result *v1alpha3.BackendTLSPolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewGetAction(backendtlspoliciesResource, c.ns, name), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewGetAction(backendtlspoliciesResource, c.ns, name), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // List takes label and field selectors, and returns the list of BackendTLSPolicies that match those selectors.
-func (c *FakeBackendTLSPolicies) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha2.BackendTLSPolicyList, err error) {
+func (c *FakeBackendTLSPolicies) List(ctx context.Context, opts v1.ListOptions) (result *v1alpha3.BackendTLSPolicyList, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewListAction(backendtlspoliciesResource, backendtlspoliciesKind, c.ns, opts), &v1alpha2.BackendTLSPolicyList{})
+		Invokes(testing.NewListAction(backendtlspoliciesResource, backendtlspoliciesKind, c.ns, opts), &v1alpha3.BackendTLSPolicyList{})
 
 	if obj == nil {
 		return nil, err
@@ -66,8 +66,8 @@ func (c *FakeBackendTLSPolicies) List(ctx context.Context, opts v1.ListOptions) 
 	if label == nil {
 		label = labels.Everything()
 	}
-	list := &v1alpha2.BackendTLSPolicyList{ListMeta: obj.(*v1alpha2.BackendTLSPolicyList).ListMeta}
-	for _, item := range obj.(*v1alpha2.BackendTLSPolicyList).Items {
+	list := &v1alpha3.BackendTLSPolicyList{ListMeta: obj.(*v1alpha3.BackendTLSPolicyList).ListMeta}
+	for _, item := range obj.(*v1alpha3.BackendTLSPolicyList).Items {
 		if label.Matches(labels.Set(item.Labels)) {
 			list.Items = append(list.Items, item)
 		}
@@ -83,43 +83,43 @@ func (c *FakeBackendTLSPolicies) Watch(ctx context.Context, opts v1.ListOptions)
 }
 
 // Create takes the representation of a backendTLSPolicy and creates it.  Returns the server's representation of the backendTLSPolicy, and an error, if there is any.
-func (c *FakeBackendTLSPolicies) Create(ctx context.Context, backendTLSPolicy *v1alpha2.BackendTLSPolicy, opts v1.CreateOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) Create(ctx context.Context, backendTLSPolicy *v1alpha3.BackendTLSPolicy, opts v1.CreateOptions) (result *v1alpha3.BackendTLSPolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewCreateAction(backendtlspoliciesResource, c.ns, backendTLSPolicy), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewCreateAction(backendtlspoliciesResource, c.ns, backendTLSPolicy), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // Update takes the representation of a backendTLSPolicy and updates it. Returns the server's representation of the backendTLSPolicy, and an error, if there is any.
-func (c *FakeBackendTLSPolicies) Update(ctx context.Context, backendTLSPolicy *v1alpha2.BackendTLSPolicy, opts v1.UpdateOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) Update(ctx context.Context, backendTLSPolicy *v1alpha3.BackendTLSPolicy, opts v1.UpdateOptions) (result *v1alpha3.BackendTLSPolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateAction(backendtlspoliciesResource, c.ns, backendTLSPolicy), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewUpdateAction(backendtlspoliciesResource, c.ns, backendTLSPolicy), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // UpdateStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
-func (c *FakeBackendTLSPolicies) UpdateStatus(ctx context.Context, backendTLSPolicy *v1alpha2.BackendTLSPolicy, opts v1.UpdateOptions) (*v1alpha2.BackendTLSPolicy, error) {
+func (c *FakeBackendTLSPolicies) UpdateStatus(ctx context.Context, backendTLSPolicy *v1alpha3.BackendTLSPolicy, opts v1.UpdateOptions) (*v1alpha3.BackendTLSPolicy, error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewUpdateSubresourceAction(backendtlspoliciesResource, "status", c.ns, backendTLSPolicy), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewUpdateSubresourceAction(backendtlspoliciesResource, "status", c.ns, backendTLSPolicy), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // Delete takes name of the backendTLSPolicy and deletes it. Returns an error if one occurs.
 func (c *FakeBackendTLSPolicies) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteActionWithOptions(backendtlspoliciesResource, c.ns, name, opts), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewDeleteActionWithOptions(backendtlspoliciesResource, c.ns, name, opts), &v1alpha3.BackendTLSPolicy{})
 
 	return err
 }
@@ -128,23 +128,23 @@ func (c *FakeBackendTLSPolicies) Delete(ctx context.Context, name string, opts v
 func (c *FakeBackendTLSPolicies) DeleteCollection(ctx context.Context, opts v1.DeleteOptions, listOpts v1.ListOptions) error {
 	action := testing.NewDeleteCollectionAction(backendtlspoliciesResource, c.ns, listOpts)
 
-	_, err := c.Fake.Invokes(action, &v1alpha2.BackendTLSPolicyList{})
+	_, err := c.Fake.Invokes(action, &v1alpha3.BackendTLSPolicyList{})
 	return err
 }
 
 // Patch applies the patch and returns the patched backendTLSPolicy.
-func (c *FakeBackendTLSPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1alpha3.BackendTLSPolicy, err error) {
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, name, pt, data, subresources...), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, name, pt, data, subresources...), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // Apply takes the given apply declarative configuration, applies it and returns the applied backendTLSPolicy.
-func (c *FakeBackendTLSPolicies) Apply(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) Apply(ctx context.Context, backendTLSPolicy *apisv1alpha3.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha3.BackendTLSPolicy, err error) {
 	if backendTLSPolicy == nil {
 		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
 	}
@@ -157,17 +157,17 @@ func (c *FakeBackendTLSPolicies) Apply(ctx context.Context, backendTLSPolicy *ap
 		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }
 
 // ApplyStatus was generated because the type contains a Status member.
 // Add a +genclient:noStatus comment above the type to avoid generating ApplyStatus().
-func (c *FakeBackendTLSPolicies) ApplyStatus(ctx context.Context, backendTLSPolicy *apisv1alpha2.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha2.BackendTLSPolicy, err error) {
+func (c *FakeBackendTLSPolicies) ApplyStatus(ctx context.Context, backendTLSPolicy *apisv1alpha3.BackendTLSPolicyApplyConfiguration, opts v1.ApplyOptions) (result *v1alpha3.BackendTLSPolicy, err error) {
 	if backendTLSPolicy == nil {
 		return nil, fmt.Errorf("backendTLSPolicy provided to Apply must not be nil")
 	}
@@ -180,10 +180,10 @@ func (c *FakeBackendTLSPolicies) ApplyStatus(ctx context.Context, backendTLSPoli
 		return nil, fmt.Errorf("backendTLSPolicy.Name must be provided to Apply")
 	}
 	obj, err := c.Fake.
-		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha2.BackendTLSPolicy{})
+		Invokes(testing.NewPatchSubresourceAction(backendtlspoliciesResource, c.ns, *name, types.ApplyPatchType, data, "status"), &v1alpha3.BackendTLSPolicy{})
 
 	if obj == nil {
 		return nil, err
 	}
-	return obj.(*v1alpha2.BackendTLSPolicy), err
+	return obj.(*v1alpha3.BackendTLSPolicy), err
 }

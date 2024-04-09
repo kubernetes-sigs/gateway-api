@@ -45,6 +45,7 @@ var standardKinds = map[string]bool{
 func main() {
 	roots, err := loader.LoadRoots(
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
+		"sigs.k8s.io/gateway-api/apis/v1alpha3",
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
 		"sigs.k8s.io/gateway-api/apis/v1",

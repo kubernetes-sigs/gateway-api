@@ -14,12 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha2
+package v1alpha3
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
 // +genclient
@@ -42,11 +43,11 @@ type BackendTLSPolicy struct {
 	Spec BackendTLSPolicySpec `json:"spec"`
 
 	// Status defines the current state of BackendTLSPolicy.
-	Status PolicyStatus `json:"status,omitempty"`
+	Status v1alpha2.PolicyStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
 // BackendTLSPolicyList contains a list of BackendTLSPolicies
+// +kubebuilder:object:root=true
 type BackendTLSPolicyList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -57,7 +58,7 @@ type BackendTLSPolicyList struct {
 //
 // Support: Extended
 type BackendTLSPolicySpec struct {
-	// TargetRef identifies an API object to apply the policy to.
+	// TargetRefs identifies an API object to apply the policy to.
 	// Only Services have Extended support. Implementations MAY support
 	// additional objects, with Implementation Specific support.
 	// Note that this config applies to the entire referenced resource
@@ -68,30 +69,31 @@ type BackendTLSPolicySpec struct {
 	//
 	// Support: Implementation-specific for any other resource
 	//
-	TargetRef LocalPolicyTargetReferenceWithSectionName `json:"targetRef"`
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	TargetRefs []v1alpha2.LocalPolicyTargetReferenceWithSectionName `json:"targetRefs"`
 
-	// TLS contains backend TLS policy configuration.
-	TLS BackendTLSPolicyConfig `json:"tls"`
+	// Validation contains backend TLS validation configuration.
+	Validation BackendTLSPolicyValidation `json:"validation"`
 }
 
-// BackendTLSPolicyConfig contains backend TLS policy configuration.
-// +kubebuilder:validation:XValidation:message="must not contain both CACertRefs and WellKnownCACerts",rule="!(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
-// +kubebuilder:validation:XValidation:message="must specify either CACertRefs or WellKnownCACerts",rule="(has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts) && self.wellKnownCACerts != \"\")"
-type BackendTLSPolicyConfig struct {
-	// CACertRefs contains one or more references to Kubernetes objects that
+// BackendTLSPolicyValidation contains backend TLS validation configuration.
+// +kubebuilder:validation:XValidation:message="must not contain both CACertificateRefs and WellKnownCACertificates",rule="!(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+// +kubebuilder:validation:XValidation:message="must specify either CACertificateRefs or WellKnownCACertificates",rule="(has(self.caCertificateRefs) && size(self.caCertificateRefs) > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates != \"\")"
+type BackendTLSPolicyValidation struct {
+	// CACertificateRefs contains one or more references to Kubernetes objects that
 	// contain a PEM-encoded TLS CA certificate bundle, which is used to
 	// validate a TLS handshake between the Gateway and backend Pod.
 	//
-	// If CACertRefs is empty or unspecified, then WellKnownCACerts must be
-	// specified. Only one of CACertRefs or WellKnownCACerts may be specified,
-	// not both. If CACertRefs is empty or unspecified, the configuration for
-	// WellKnownCACerts MUST be honored instead if supported by the
-	// implementation.
+	// If CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be
+	// specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
+	// not both. If CACertifcateRefs is empty or unspecified, the configuration for
+	// WellKnownCACertificates MUST be honored instead if supported by the implementation.
 	//
 	// References to a resource in a different namespace are invalid for the
 	// moment, although we will revisit this in the future.
 	//
-	// A single CACertRef to a Kubernetes ConfigMap kind has "Core" support.
+	// A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
 	// Implementations MAY choose to support attaching multiple certificates to
 	// a backend, but this behavior is implementation-specific.
 	//
@@ -103,22 +105,22 @@ type BackendTLSPolicyConfig struct {
 	//
 	// +kubebuilder:validation:MaxItems=8
 	// +optional
-	CACertRefs []v1beta1.LocalObjectReference `json:"caCertRefs,omitempty"`
+	CACertificateRefs []v1.LocalObjectReference `json:"caCertificateRefs,omitempty"`
 
-	// WellKnownCACerts specifies whether system CA certificates may be used in
+	// WellKnownCACertificates specifies whether system CA certificates may be used in
 	// the TLS handshake between the gateway and backend pod.
 	//
-	// If WellKnownCACerts is unspecified or empty (""), then CACertRefs must be
-	// specified with at least one entry for a valid configuration. Only one of
-	// CACertRefs or WellKnownCACerts may be specified, not both. If an
-	// implementation does not support the WellKnownCACerts field or the value
+	// If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
+	// must be specified with at least one entry for a valid configuration. Only one of
+	// CACertificateRefs or WellKnownCACertificates may be specified, not both. If an
+	// implementation does not support the WellKnownCACertificates field or the value
 	// supplied is not supported, the Status Conditions on the Policy MUST be
 	// updated to include an Accepted: False Condition with Reason: Invalid.
 	//
 	// Support: Implementation-specific
 	//
 	// +optional
-	WellKnownCACerts *WellKnownCACertType `json:"wellKnownCACerts,omitempty"`
+	WellKnownCACertificates *WellKnownCACertificatesType `json:"wellKnownCACertificates,omitempty"`
 
 	// Hostname is used for two purposes in the connection between Gateways and
 	// backends:
@@ -128,15 +130,15 @@ type BackendTLSPolicyConfig struct {
 	//    served by the matching backend.
 	//
 	// Support: Core
-	Hostname v1beta1.PreciseHostname `json:"hostname"`
+	Hostname v1.PreciseHostname `json:"hostname"`
 }
 
-// WellKnownCACertType is the type of CA certificate that will be used when
+// WellKnownCACertificatesType is the type of CA certificate that will be used when
 // the TLS.caCertRefs is unspecified.
 // +kubebuilder:validation:Enum=System
-type WellKnownCACertType string
+type WellKnownCACertificatesType string
 
 const (
-	// Indicates that well known system CA certificates should be used.
-	WellKnownCACertSystem WellKnownCACertType = "System"
+	// WellKnownCACertificatesSystem indicates that well known system CA certificates should be used.
+	WellKnownCACertificatesSystem WellKnownCACertificatesType = "System"
 )

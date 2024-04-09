@@ -26,7 +26,7 @@ spec:
     - jsonPath: .metadata.creationTimestamp
       name: Age
       type: date
-    name: v1alpha2
+    name: v1alpha3
     schema:
       openAPIV3Schema:
         description: |-
@@ -53,9 +53,9 @@ spec:
           spec:
             description: Spec defines the desired state of BackendTLSPolicy.
             properties:
-              targetRef:
+              targetRefs:
                 description: |-
-                  TargetRef identifies an API object to apply the policy to.
+                  TargetRefs identifies an API object to apply the policy to.
                   Only Services have Extended support. Implementations MAY support
                   additional objects, with Implementation Specific support.
                   Note that this config applies to the entire referenced resource
@@ -67,69 +67,83 @@ spec:
 
 
                   Support: Implementation-specific for any other resource
+                items:
+                  description: |-
+                    LocalPolicyTargetReferenceWithSectionName identifies an API object to apply a
+                    direct policy to. This should be used as part of Policy resources that can
+                    target single resources. For more information on how this policy attachment
+                    mode works, and a sample Policy resource, refer to the policy attachment
+                    documentation for Gateway API.
+
+
+                    Note: This should only be used for direct policy attachment when references
+                    to SectionName are actually needed. In all other cases,
+                    LocalPolicyTargetReference should be used.
+                  properties:
+                    group:
+                      description: Group is the group of the target resource.
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                    kind:
+                      description: Kind is kind of the target resource.
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
+                    name:
+                      description: Name is the name of the target resource.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                    sectionName:
+                      description: |-
+                        SectionName is the name of a section within the target resource. When
+                        unspecified, this targetRef targets the entire resource. In the following
+                        resources, SectionName is interpreted as the following:
+
+
+                        * Gateway: Listener name
+                        * HTTPRoute: HTTPRouteRule name
+                        * Service: Port name
+
+
+                        If a SectionName is specified, but does not exist on the targeted object,
+                        the Policy must fail to attach, and the policy implementation should record
+                        a `ResolvedRefs` or similar Condition in the Policy's status.
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                  required:
+                  - group
+                  - kind
+                  - name
+                  type: object
+                maxItems: 16
+                minItems: 1
+                type: array
+              validation:
+                description: Validation contains backend TLS validation configuration.
                 properties:
-                  group:
-                    description: Group is the group of the target resource.
-                    maxLength: 253
-                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                    type: string
-                  kind:
-                    description: Kind is kind of the target resource.
-                    maxLength: 63
-                    minLength: 1
-                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                    type: string
-                  name:
-                    description: Name is the name of the target resource.
-                    maxLength: 253
-                    minLength: 1
-                    type: string
-                  sectionName:
+                  caCertificateRefs:
                     description: |-
-                      SectionName is the name of a section within the target resource. When
-                      unspecified, this targetRef targets the entire resource. In the following
-                      resources, SectionName is interpreted as the following:
-
-
-                      * Gateway: Listener name
-                      * HTTPRoute: HTTPRouteRule name
-                      * Service: Port name
-
-
-                      If a SectionName is specified, but does not exist on the targeted object,
-                      the Policy must fail to attach, and the policy implementation should record
-                      a `ResolvedRefs` or similar Condition in the Policy's status.
-                    maxLength: 253
-                    minLength: 1
-                    pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                    type: string
-                required:
-                - group
-                - kind
-                - name
-                type: object
-              tls:
-                description: TLS contains backend TLS policy configuration.
-                properties:
-                  caCertRefs:
-                    description: |-
-                      CACertRefs contains one or more references to Kubernetes objects that
+                      CACertificateRefs contains one or more references to Kubernetes objects that
                       contain a PEM-encoded TLS CA certificate bundle, which is used to
                       validate a TLS handshake between the Gateway and backend Pod.
 
 
-                      If CACertRefs is empty or unspecified, then WellKnownCACerts must be
-                      specified. Only one of CACertRefs or WellKnownCACerts may be specified,
-                      not both. If CACertRefs is empty or unspecified, the configuration for
-                      WellKnownCACerts MUST be honored instead if supported by the
-                      implementation.
+                      If CACertificateRefs is empty or unspecified, then WellKnownCACertificates must be
+                      specified. Only one of CACertificateRefs or WellKnownCACertificates may be specified,
+                      not both. If CACertifcateRefs is empty or unspecified, the configuration for
+                      WellKnownCACertificates MUST be honored instead if supported by the implementation.
 
 
                       References to a resource in a different namespace are invalid for the
                       moment, although we will revisit this in the future.
 
 
-                      A single CACertRef to a Kubernetes ConfigMap kind has "Core" support.
+                      A single CACertificateRef to a Kubernetes ConfigMap kind has "Core" support.
                       Implementations MAY choose to support attaching multiple certificates to
                       a backend, but this behavior is implementation-specific.
 
@@ -194,16 +208,16 @@ spec:
                     minLength: 1
                     pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                     type: string
-                  wellKnownCACerts:
+                  wellKnownCACertificates:
                     description: |-
-                      WellKnownCACerts specifies whether system CA certificates may be used in
+                      WellKnownCACertificates specifies whether system CA certificates may be used in
                       the TLS handshake between the gateway and backend pod.
 
 
-                      If WellKnownCACerts is unspecified or empty (""), then CACertRefs must be
-                      specified with at least one entry for a valid configuration. Only one of
-                      CACertRefs or WellKnownCACerts may be specified, not both. If an
-                      implementation does not support the WellKnownCACerts field or the value
+                      If WellKnownCACertificates is unspecified or empty (""), then CACertificateRefs
+                      must be specified with at least one entry for a valid configuration. Only one of
+                      CACertificateRefs or WellKnownCACertificates may be specified, not both. If an
+                      implementation does not support the WellKnownCACertificates field or the value
                       supplied is not supported, the Status Conditions on the Policy MUST be
                       updated to include an Accepted: False Condition with Reason: Invalid.
 
@@ -216,15 +230,17 @@ spec:
                 - hostname
                 type: object
                 x-kubernetes-validations:
-                - message: must not contain both CACertRefs and WellKnownCACerts
-                  rule: '!(has(self.caCertRefs) && size(self.caCertRefs) > 0 && has(self.wellKnownCACerts)
-                    && self.wellKnownCACerts != "")'
-                - message: must specify either CACertRefs or WellKnownCACerts
-                  rule: (has(self.caCertRefs) && size(self.caCertRefs) > 0 || has(self.wellKnownCACerts)
-                    && self.wellKnownCACerts != "")
+                - message: must not contain both CACertificateRefs and WellKnownCACertificates
+                  rule: '!(has(self.caCertificateRefs) && size(self.caCertificateRefs)
+                    > 0 && has(self.wellKnownCACertificates) && self.wellKnownCACertificates
+                    != "")'
+                - message: must specify either CACertificateRefs or WellKnownCACertificates
+                  rule: (has(self.caCertificateRefs) && size(self.caCertificateRefs)
+                    > 0 || has(self.wellKnownCACertificates) && self.wellKnownCACertificates
+                    != "")
             required:
-            - targetRef
-            - tls
+            - targetRefs
+            - validation
             type: object
           status:
             description: Status defines the current state of BackendTLSPolicy.

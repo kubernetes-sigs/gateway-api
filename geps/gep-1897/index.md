@@ -186,7 +186,7 @@ sharing to BackendTLSPolicy, even if they don't for other cross-namespace sharin
 One of the areas of concern for this API is that we need to indicate how and when the API implementations should use the
 backend destination certificate authority.  This solution proposes, as introduced in
 [GEP-713](https://gateway-api.sigs.k8s.io/geps/gep-713/), that the implementation
-should watch the connections to a specified TargetRef (Service), and if the Service matches a BackendTLSPolicy, then
+should watch the connections to the specified TargetRefs (Services), and if a Service matches a BackendTLSPolicy, then
 assume the connection is TLS, and verify that the TargetRef’s certificate can be validated by the client (Gateway) using
 the provided certificates and hostname before the connection is made. On the question of how to signal
 that there was a failure in the certificate validation, this is left up to the implementation to return a response error
@@ -194,31 +194,31 @@ that is appropriate, such as one of the HTTP error codes: 400 (Bad Request), 401
 other signal that makes the failure sufficiently clear to the requester without revealing too much about the transaction,
 based on established security requirements.
 
-All policy resources must include `TargetRef` with the fields specified
+All policy resources must include `TargetRefs` with the fields specified
 [here](https://github.com/kubernetes-sigs/gateway-api/blob/a33a934af9ec6997b34fd9b00d2ecd13d143e48b/apis/v1alpha2/policy_types.go#L24-L41).
-In an upcoming [extension](https://github.com/kubernetes-sigs/gateway-api/issues/2147) to TargetRef, policy resources
-_may_ also choose to include `SectionName` and/or `Port` in the TargetRef following the same mechanics as `ParentRef`.
+In an upcoming [extension](https://github.com/kubernetes-sigs/gateway-api/issues/2147) to TargetRefs, policy resources
+_may_ also choose to include `SectionName` and/or `Port` in the target reference following the same mechanics as `ParentRef`.
 
-BackendTLSPolicySpec contains the `TargetRef` and `TLS` fields.  The `TLS` field is a `BackendTLSPolicyConfig` and
-contains `CertRefs`, `StandardCerts`, and `Hostname`.
+BackendTLSPolicySpec contains the `TargetRefs` and `Validation` fields.  The `Validation` field is a
+`BackendTLSPolicyValidation` and contains `CACertificateRefs`, `WellKnownCACertificates`, and `Hostname`.
 The names of the fields were chosen to facilitate discussion, but may be substituted without blocking acceptance of the
-content of the API change.
+content of the API change. In fact, the `CertRefs` field name was changed to CACertRefs and then to
+CACertificateRefs as of April 2024.
 
-The `CertRefs` and `StandardCerts` fields are both optional, but one of them must be set for a valid TLS configuration.
-CertRefs is a slice of
-named config maps, each containing a single cert. We originally proposed to follow the convention established by the
+The `CACertificateRefs` and `WellKnownCACertificates` fields are both optional, but one of them must be set for a valid TLS
+configuration. CACertificateRefs is an implementation-specific slice of
+named object references, each containing a single cert. We originally proposed to follow the convention established by the
 [CertificateRefs field on Gateway](https://github.com/kubernetes-sigs/gateway-api/blob/18e79909f7310aafc625ba7c862dfcc67b385250/apis/v1beta1/gateway_types.go#L340)
 , but the CertificateRef requires both a tls.key and tls.crt and a certificate reference only requires the tls.crt.
-StandardCerts is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
-Gateway (StandardCerts specified as "System"), or to use the existing CertRefs (StandardCerts specified as "").  The use
-
-and definition of system certificates is implementation-dependent, and the intent is that these certificates are obtained
-from the underlying operating system. CertRefs contains one or more references to Kubernetes objects that
-contain PEM-encoded TLS certificates, which are used to establish a TLS handshake between the gateway and backend pod.
-References to a resource in a different namespace are invalid.
-If CertRefs is unspecified, then StandardCerts must be set to "System" for a valid configuration.
-If StandardCerts is unspecified, then CertRefs must be specified with at least one entry for a valid configuration.
-If StandardCerts is set to "System" and there are no system trusted certificates or the implementation doesn't define system
+WellKnownCACertificates is an optional enum that allows users to specify whether to use the set of CA certificates trusted by the
+Gateway (WellKnownCACertificates specified as "System"), or to use the existing CACertificateRefs (WellKnownCACertificates
+specified as "").  The use and definition of system certificates is implementation-dependent, and the intent is that
+these certificates are obtained from the underlying operating system. CACertificateRefs contains one or more
+references to Kubernetes objects that contain PEM-encoded TLS certificates, which are used to establish a TLS handshake
+between the gateway and backend pod. References to a resource in a different namespace are invalid.
+If ClientCertifcateRefs is unspecified, then WellKnownCACertificates must be set to "System" for a valid configuration.
+If WellKnownCACertificates is unspecified, then CACertificateRefs must be specified with at least one entry for a valid configuration.
+If WellKnownCACertficates is set to "System" and there are no system trusted certificates or the implementation doesn't define system
 trusted certificates, then the associated TLS connection must fail.
 
 The `Hostname` field is required and is to be used to configure the SNI the Gateway should use to connect to the backend.
@@ -233,200 +233,7 @@ the first round](https://github.com/kubernetes-sigs/gateway-api/pull/2113#issuec
 Thus, the following additions would be made to the Gateway API:
 
 ```go
-import "sigs.k8s.io/gateway-api/apis/v1beta1"
-
-// BackendTLSPolicy provides a way to publish TLS configuration
-// that enables a gateway client to connect to a backend pod.
-type BackendTLSPolicy struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of BackendTLSPolicy.
-    Spec BackendTLSPolicySpec `json:"spec"`
-
-    // Status defines the current state of BackendTLSPolicy.
-    Status PolicyStatus `json:"status,omitempty"`
-}
-
-// BackendTLSPolicySpec defines the desired state of
-// BackendTLSPolicy.
-// Note: there is no Override or Default policy configuration.
-//
-// Support: Core
-type BackendTLSPolicySpec struct {
-    // TargetRef identifies an API object to apply policy to.
-    // Services are the only valid API target references.
-    // Note that this config applies to the entire referenced resource
-    // by default, but this default may change in the future to provide
-    // a more granular application of the policy.
-    TargetRef gatewayv1a2.PolicyTargetReference `json:"targetRef"`
-
-    // TLS contains backend TLS policy configuration.
-    TLS *BackendTLSPolicyConfig `json:”tls”`
-}
-
-// BackendTLSPolicyConfig contains backend TLS policy configuration.
-// +kubebuilder:validation:XValidation:message="must not contain both CertRefs and StandardCerts",rule="(has(self.certRefs) && size(self.certRefs > 0) && has(self.standardCerts) && self.standardCerts != "")"
-// +kubebuilder:validation:XValidation:message="must specify either CertRefs or StandardCerts",rule="!(has(self.certRefs) && size(self.certRefs > 0) || has(self.standardCerts) && self.standardCerts != "")"
-type BackendTLSPolicyConfig struct {
-    // CertRefs contains one or more references to
-    // Kubernetes objects that contain PEM-encoded TLS certificates,
-    // which are used to establish a TLS handshake between the gateway
-    // and backend pod.
-    //
-    // If CertRefs is empty or unspecified, then StandardCerts must
-    // be specified.  Only one of CertRefs or StandardCerts may be
-    // specified, not both.
-    //
-    // If CertRefs is empty or unspecified, then system trusted
-    // certificates should be used. If there are none, or the
-    // implementation doesn't define system trusted certificates,
-    // then a TLS connection must fail.
-    //
-    // References to a resource in a different namespace are
-    // invalid.
-    //
-    // A single CertRef to a Kubernetes ConfigMap kind has "Core"
-    // support.  Implementations MAY choose to support attaching
-    // multiple certificates to a backend, but this behavior is
-    // implementation-specific.  Also implementation-specific is
-    // a CertRef of other object kinds, e.g. Secret.
-    // 
-    // Support: Core - An optional single reference to a Kubernetes
-    // ConfigMap.
-    //
-    // Support: Implementation-specific (No reference, more than one
-    // reference, or resource types other than ConfigMaps.
-    // Service mesh may ignore.)
-    //
-    // +kubebuilder:validation:MaxItems=8
-    // +optional
-    CertRefs []ConfigMapObjectReference `json:”certRefs,omitempty”`
-
-    // StandardCerts specifies whether system CA certificates may
-    // be used in the TLS handshake between the gateway and
-    // backend pod.
-    // 
-    // If StandardCerts is unspecified or set to "", then CertRefs must
-    // be specified with at least one entry for a valid configuration.
-    // If StandardCerts is unspecified or set to "", then CertRefs must
-    // be specified.  Only one of CertRefs or StandardCerts may be
-    // specified, not both.
-    //
-    // StandardCerts must be set to "System" when CertRefs is unspecified.
-    //
-    // If StandardCerts is set to "System", then the system trusted
-    // certificates should be used. If there are none, or the
-    // implementation doesn't define system trusted certificates,
-    // then a TLS connection must fail.
-    //
-    // Support: Core - An optional value to specify whether to use
-    // system certificates or not.
-    //
-    // Support: Implementation-specific (In the absence of support
-    // for usable system certs, may be ignored. Service mesh may ignore.)
-    //
-    // +optional
-    StandardCerts *StandardCertType `json:"standardCerts,omitempty"`
-
-    // Hostname is the Server Name Indication that the Gateway uses to
-    // connect to the backend.  It represents the fully qualified domain
-    // name of a network host, as defined by RFC1123 - except that numeric
-    // IP addresses are not allowed. Each label of the FQDN must consist
-    // of lower case alphanumeric characters or '-', and must start and
-    // end with an alphanumeric character.  No other punctuation is allowed.
-    // Wildcard domain names are specifically disallowed.
-    //
-    // It specifies the hostname that may authenticate, and must be in the
-    // certificate served by the matching backend.
-    //
-    // Support: Core - A required value used by the Gateway to connect to
-    // the backend when a BackendTLSPolicy is specified.
-    Hostname v1beta1.PreciseHostname `json:"hostname"`
-}
-
-// StandardCertType is the type of CA certificate that will be used when
-// the TLS.certRefs is unspecified.
-// +kubebuilder:validation:Enum=System
-type StandardCertType string
-
-const (
-    StandardCertSystem StandardCertType = "System"
-)
-
-// ConfigMapObjectReference identifies an API object including its namespace,
-// defaulting to ConfigMap.
-//
-// The API object must be valid in the cluster; the Group and Kind must
-// be registered in the cluster for this reference to be valid.
-//
-// References to objects with invalid Group and Kind are not valid, and must
-// be rejected by the implementation, with appropriate Conditions set
-// on the containing object.
-type ConfigMapObjectReference struct {
-    // Group is the group of the referent.  For example, "gateway.networking.k8s.io".
-    // When unspecified or empty string, core API group is inferred.
-    //
-    // +optional
-    // +kubebuilder:default=""
-    Group *Group `json:"group"`
-
-    // Kind is the kind of the referent.  For example, "ConfigMap".
-    //
-    // +optional
-    // +kubebuilder:default=ConfigMap
-    Kind *Kind `json:"kind"`
-
-    // Name is the metadata.name of the referenced config map.
-    // +kubebuilder:validation:Required
-    Name ObjectName `json"name"`
-
-    // Namespace is the namespace of the referenced object. When unspecified, the local
-    // namespace is inferred.
-    //
-    // Note that when a namespace different than the local namespace is specified,
-    // a ReferenceGrant object is required in the referent namespace to allow that
-    // namespace's owner to accept the reference. See the ReferenceGrant
-    // documentation for details.
-    //
-    // Support: Core
-    //
-    // +optional
-    Namespace *Namespace `json:"namespace,omitempty"`
-}
-
-// BackendTLSPolicyConditionType is the type of a condition used
-// as a signal by BackendTLSPolicy.  This type should be used with
-// the BackendTLSPolicyStatus.Conditions field.
-type BackendTLSPolicyConditionType string
-
-//  BackendTLSPolicyConditionReason is a reason that explains why a
-// particular BackendTLSPolicyConditionType was generated.
-type BackendTLSPolicyConditionReason string
-
-const (
-    // This condition indicates that the BackendTLSPolicy has been
-    // accepted as valid.
-    // Possible reason for this condition to be True is:
-    //
-    // * “Accepted” 
-    // 
-    // Possible reasons for this condition to be False are:
-    //
-    // * “Invalid”
-    // * “Pending”
-    BackendTLSPolicyConditionAccepted BackendTLSPolicyConditionType = “Accepted”
-
-    // This reason is used with the “Accepted” condition when the condition is true.
-    BackendTLSPolicyReasonAccepted BackendTLSPolicyConditionReason = “Valid”
-
-    // This reason is used with the “Accepted” condition when the BackendTLSPolicy is invalid,
-    // e.g. use of a CertRef that crosses namespace boundaries.
-    BackendTLSPolicyReasonInvalid BackendTLSPolicyConditionReason = “Invalid”
-
-    // This reason is used with the “Accepted” condition when the BackendTLSPolicy is pending validation.
-    BackendTLSPolicyReasonPending BackendTLSPolicyConditionReason = “Pending”
-)
+//TODO: Will update this section once API changes from PR 2955 are approved.
 ```
 
 ## How a client behaves
@@ -472,17 +279,17 @@ reverse proxy. This is shown as **bolded** additions in step 6 below.
 4. Optionally, the reverse proxy can perform request header and/or path matching based on match rules of the HTTPRoute.
 5. Optionally, the reverse proxy can modify the request, i.e. add/remove headers, based on filter rules of the HTTPRoute.
 6. Lastly, the reverse proxy **optionally performs a TLS handshake** and forwards the request to one or more objects,
-i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and TLSTargetRef of the BackendTLSPolicy**.
+i.e. Service, in the cluster based on backendRefs rules of the HTTPRoute **and the TargetRefs of the BackendTLSPolicy**.
 
 ## Alternatives
-Most alternatives are enumerated in the section on the history of backend TLS above.  A couple of additional
+Most alternatives are enumerated in the section "The history of backend TLS".  A couple of additional
 alternatives are also listed here.
 
 1. Expand BackendRef, which is already an expansion point.  At first, it seems logical that since listeners are handling
 the client-gateway certs, BackendRefs could handle the gateway-backend certs.  However, when multiple Routes to target
 the same Service, there would be unnecessary copying of the BackendRef every time the Service was targeted.  As well,
 there could be multiple bBackendRefs with multiple rules on a rRoute, each of which might need the gateway-backend cert
-configuration so it is not the appropriate pattern.
+configuration, so it is not the appropriate pattern.
 2. Extend HTTPRoute to indicate TLS backend support. Extending HTTPRoute would interfere with deployed implementations
 too much to be a practical solution.
 3. Add a new type of Route for backend TLS.  This is impractical because we might want to enable backend TLS on other
