@@ -14,10 +14,8 @@
 
 import shutil
 import logging
-from sys import implementation, meta_path
 from mkdocs import plugins
 import yaml
-import os
 import pandas
 from fnmatch import fnmatch
 import glob
