@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -48,7 +47,7 @@ var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: "gateway-conformance-infra"}
 
 		t.Run("observedGeneration should increment", func(t *testing.T) {
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			ctx, cancel := context.WithTimeout(context.Background(), suite.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 
 			namespaces := []string{"gateway-conformance-infra"}

@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
@@ -52,7 +51,7 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// Sanity check
 			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.LatestObservedGenerationSet)
 			defer cancel()
 			original := &v1.Gateway{}
 			err := s.Client.Get(ctx, gwNN, original)

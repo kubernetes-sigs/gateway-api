@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -69,7 +68,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 			Name:      "gateway-static-addresses",
 			Namespace: "gateway-conformance-infra",
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
 
 		t.Logf("waiting for namespace %s and Gateway %s to be ready for testing", gwNN.Namespace, gwNN.Name)
