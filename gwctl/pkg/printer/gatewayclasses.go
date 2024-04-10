@@ -20,9 +20,9 @@ import (
 	"fmt"
 	"io"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	"os"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -42,16 +42,14 @@ type GatewayClassesPrinter struct {
 }
 
 type gatewayClassDescribeView struct {
-	APIVersion string             `json:",omitempty"`
-	Kind       string             `json:",omitempty"`
-	Metadata   *metav1.ObjectMeta `json:",omitempty"`
-
+	APIVersion  string             `json:",omitempty"`
+	Kind        string             `json:",omitempty"`
+	Metadata    *metav1.ObjectMeta `json:",omitempty"`
 	Labels      *map[string]string `json:",omitempty"`
 	Annotations *map[string]string `json:",omitempty"`
 
 	// GatewayClass name
-	Name string `json:",omitempty"`
-
+	Name           string `json:",omitempty"`
 	ControllerName string `json:",omitempty"`
 	// GatewayClass description
 	Description *string `json:",omitempty"`
@@ -111,10 +109,10 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				Name: gatewayClassNode.GatewayClass.GetName(),
 			},
 			{
-				Labels: utils.ToPtr(gatewayClassNode.GatewayClass.GetLabels()),
+				Labels: ptr.To(gatewayClassNode.GatewayClass.GetLabels()),
 			},
 			{
-				Annotations: utils.ToPtr(gatewayClassNode.GatewayClass.GetAnnotations()),
+				Annotations: ptr.To(gatewayClassNode.GatewayClass.GetAnnotations()),
 			},
 			{
 				APIVersion: apiVersion,
