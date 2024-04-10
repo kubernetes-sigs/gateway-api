@@ -16,7 +16,7 @@ cover, and documentation to help users get started.
 - [Azure Application Gateway for Containers][27] (preview)
 - [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
-- [Contour][3] (beta)
+- [Contour][3] (GA)
 - [Easegress][30] (GA)
 - [Emissary-Ingress (Ambassador API Gateway)][4] (alpha)
 - [Envoy Gateway][18] (GA)
@@ -179,11 +179,11 @@ effort, check out the #development channel or join our [weekly developer meeting
 
 ### Contour
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour/v1.28.2-report.yaml)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Contour-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/projectcontour-contour/v1.28.3-report.yaml)
 
 [Contour][contour] is a CNCF open source Envoy-based ingress controller for Kubernetes.
 
-Contour [v1.28.2][contour-release] implements Gateway API v1.0.0.
+Contour [v1.28.3][contour-release] implements Gateway API v1.0.0.
 All [Standard channel][contour-standard] v1 API group resources (GatewayClass, Gateway, HTTPRoute, ReferenceGrant), plus most v1alpha2 API group resources (TLSRoute, TCPRoute, GRPCRoute, ReferenceGrant, and BackendTLSPolicy) are supported.
 Contour's implementation passes all core and most extended Gateway API conformance tests included in the v1.0.0 release.
 
