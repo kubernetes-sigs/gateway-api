@@ -569,8 +569,8 @@ Name: gateway-2
 GatewayClass: gatewayclass-1
 EffectivePolicies:
   HealthCheckPolicy.foo.com:
-	key1: value-parent-1
-	key2: value-parent-2
+    key1: value-parent-1
+    key2: value-parent-2
 `
 
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
