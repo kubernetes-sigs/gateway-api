@@ -407,7 +407,7 @@ the implementation would be required to fully implement the policy or mark the b
 
 [Policy Attachment](https://gateway-api.sigs.k8s.io/reference/policy-attachment/#direct-policy-attachment)
 
-[Gateway API TLS](https://gateway-api.sigs.k8s.io/v1alpha2/guides/tls/)
+[Gateway API TLS](https://gateway-api.sigs.k8s.io/guides/tls/)
 
 [SIG-NET Gateway API: TLS to the K8s.Service/Backend](https://docs.google.com/document/d/1RTYh2brg_vLX9o3pTcrWxtZSsf8Y5NQvIG52lpFcZlo)
 
