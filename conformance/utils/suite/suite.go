@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"net"
 	"slices"
 	"sort"
 	"strings"
@@ -118,17 +119,18 @@ type ConformanceTestSuite struct {
 
 // Options can be used to initialize a ConformanceTestSuite.
 type ConformanceOptions struct {
-	Client               client.Client
-	Clientset            clientset.Interface
-	RestConfig           *rest.Config
-	GatewayClassName     string
-	Debug                bool
-	RoundTripper         roundtripper.RoundTripper
-	BaseManifests        string
-	MeshManifests        string
-	NamespaceLabels      map[string]string
-	NamespaceAnnotations map[string]string
-	ReportOutputPath     string
+	Client                  client.Client
+	Clientset               clientset.Interface
+	RestConfig              *rest.Config
+	GatewayClassName        string
+	Debug                   bool
+	RoundTripperDialContext func(context.Context, string, string) (net.Conn, error)
+	RoundTripper            roundtripper.RoundTripper
+	BaseManifests           string
+	MeshManifests           string
+	NamespaceLabels         map[string]string
+	NamespaceAnnotations    map[string]string
+	ReportOutputPath        string
 
 	// CleanupBaseResources indicates whether or not the base test
 	// resources such as Gateways should be cleaned up after the run.
@@ -185,7 +187,11 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 
 	roundTripper := options.RoundTripper
 	if roundTripper == nil {
-		roundTripper = &roundtripper.DefaultRoundTripper{Debug: options.Debug, TimeoutConfig: options.TimeoutConfig}
+		roundTripper = &roundtripper.DefaultRoundTripper{
+			Debug:             options.Debug,
+			TimeoutConfig:     options.TimeoutConfig,
+			CustomDialContext: options.RoundTripperDialContext,
+		}
 	}
 
 	installedCRDs := &apiextensionsv1.CustomResourceDefinitionList{}
