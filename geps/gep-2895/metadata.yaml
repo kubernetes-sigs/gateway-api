@@ -1,0 +1,7 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2895
+name: Query Parameter Filter
+status: Experimental
+authors:
+  - lianglli
