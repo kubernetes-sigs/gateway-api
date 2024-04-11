@@ -1136,7 +1136,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: targetRef
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyTargetReferenceWithSectionName
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
       default: {}
     - name: tls
       type:
@@ -1163,6 +1163,24 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
       default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: sectionName
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
   map:
     fields:
@@ -1191,27 +1209,6 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
           elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyTargetReferenceWithSectionName
-  map:
-    fields:
-    - name: group
-      type:
-        scalar: string
-      default: ""
-    - name: kind
-      type:
-        scalar: string
-      default: ""
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-    - name: sectionName
-      type:
-        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.ReferenceGrant
   map:
     fields:

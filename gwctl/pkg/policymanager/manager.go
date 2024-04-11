@@ -232,7 +232,7 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		metav1.TypeMeta   `json:",inline"`
 		metav1.ObjectMeta `json:"metadata,omitempty"`
 		Spec              struct {
-			TargetRef gatewayv1alpha2.PolicyTargetReference
+			TargetRef gatewayv1alpha2.NamespacedPolicyTargetReference
 		}
 	}
 	structuredPolicy := &genericPolicy{}
@@ -246,7 +246,7 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		Namespace: structuredPolicy.GetNamespace(),
 	}
 	if result.targetRef.Namespace == "" {
-		result.targetRef.Namespace = "default"
+		result.targetRef.Namespace = result.u.GetNamespace()
 	}
 	if structuredPolicy.Spec.TargetRef.Namespace != nil {
 		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
