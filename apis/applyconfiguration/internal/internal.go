@@ -276,6 +276,15 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: weight
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
+  map:
+    fields:
+    - name: caCertificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCBackendRef
   map:
     fields:
@@ -601,6 +610,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.SecretObjectReference
           elementRelationship: atomic
+    - name: frontendValidation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
     - name: mode
       type:
         scalar: string
@@ -970,6 +982,24 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ParametersReference
   map:
     fields:
