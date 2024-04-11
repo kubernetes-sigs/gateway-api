@@ -1,6 +1,6 @@
 # GEP 2895: Query Parameter Filter
 
-* Issue: [#2891](https://github.com/kubernetes-sigs/gateway-api/issues/2895)
+* Issue: [#2895](https://github.com/kubernetes-sigs/gateway-api/issues/2895)
 * Status: Experimental
 
 ## TLDR
