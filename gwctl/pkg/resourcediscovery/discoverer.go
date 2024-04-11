@@ -22,7 +22,7 @@ import (
 	"k8s.io/utils/ptr"
 	"os"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -288,7 +288,7 @@ func fetchGatewayClasses(ctx context.Context, k8sClients *common.K8sClients, fil
 		}
 
 		// because api-server doesn't return TypeMeta in `gatewayClass`
-		gcApplyConfig := apisv1alpha2.GatewayClass(gatewayClass.Name)
+		gcApplyConfig := apisv1beta1.GatewayClass(gatewayClass.Name)
 		gatewayClass.APIVersion = ptr.Deref(gcApplyConfig.APIVersion, "")
 		gatewayClass.Kind = ptr.Deref(gcApplyConfig.Kind, "")
 
