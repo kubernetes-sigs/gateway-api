@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v1.1.0-rc1](#v110-rc1)
 - [v1.0.0](#v100)
 - [v1.0.0-rc2](#v100-rc2)
 - [v1.0.0-rc1](#v100-rc1)
@@ -33,6 +34,100 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v1.1.0-rc1
+
+We expect that this release candidate is quite close to the final v1.1.0
+release. However, breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but we do not recommend
+shipping products based on a release candidate API due to the possibility of
+incompatible changes prior to the final release. The following represents the
+changes since v1.0.0:
+
+## Standard Channel
+
+### GRPCRoute has Graduated to GA 🎉
+
+GRPCRoute has graduated to GA (v1) and is now part of the Standard Channel. If
+you are already using the experimental version GRPCRoute, we recommend holding
+off on upgrading to the standard channel version of GRPCRoute until the
+controllers you're using have been updated to support GRPCRoute v1. Until then,
+it is safe to upgrade to the experimental channel version of GRPCRoute in v1.1
+that includes both v1alpha2 and v1 API versions.
+
+Leading Contributor: @gnossen
+
+### Mesh Support
+
+The standard for using Gateway API for Mesh has formally graduated to v1.0.
+
+Leading Contributors: @howardjohn, @keithmattix, @kflynn
+
+### Conformance Profiles and Reports
+
+The concept of conformance profiles and the corresponding reports have graduated
+to GA.
+
+Leading Contributors: @mlavacca, @shaneutt
+
+### Port in ParentRefs
+
+You can now use a `port` field in ParentRefs to attach to Gateways, Services, or
+other parent resources.
+
+Leading Contributor: @frankbu
+
+## Experimental Channel
+
+### Session Persistence + BackendLBPolicy
+Session Persistence is being introduced to Gateway API via a new policy
+(BackendLBPolicy) and Route-level configuration for both HTTPRoute and
+GRPCRoute.
+
+Leading Contributors: @gcs278, @ginayeh
+
+### Gateway Client Cert Verification
+Gateways can now configure client cert verification for each Gateway Listener.
+
+Leading Contributors: @arkodg
+
+### BackendTLSPolicy
+As part of a broader goal of making our TLS terminology more consistent
+throughout the API, we've introduced some breaking changes to BackendTLSPolicy.
+This has resulted in a new API version (v1alpha3) and will require any existing
+users of this policy to uninstall the v1alpha2 version before installing this
+newer version.
+
+Leading Contributors: @candita
+
+### Gateway Params
+Gateways now feature a new field that allows references to
+implementation-specific parameters, similar to GatewayClass.
+
+Leading Contributors: @howardjohn
+
+## Everything Else
+
+### Validation Changes
+- TLS Configuration is no longer required on Gateway Listeners to enable more
+  flexible TLS configuration. (#2721, @robscott)
+
+### Conformance
+
+- Fixed GatewayWithAttachedRoutes conformance test to not check that the
+  HTTPRoute status includes an "Accepted: False" condition because this is not
+  required by the specification. (#2548, @frankbu)
+
+### Cleanup
+
+- The validating webhook has been removed. CEL validation is now built-in to
+  CRDs and replaces the webhook. (#2595, @robscott)
+- BackendTLSPolicy WellKnownCACerts field has been updated to
+  implementation-specific support (#2741, @sunjayBhatia)
+- Clarify policy attachment by two of the same policy types when using section
+  names. (#2442, @maleck13)
+
 
 # v1.0.0
 
