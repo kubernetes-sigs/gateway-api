@@ -267,6 +267,15 @@ type GRPCRouteRule struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	BackendRefs []GRPCBackendRef `json:"backendRefs,omitempty"`
+
+	// SessionPersistence defines and configures session persistence
+	// for the route rule.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
 }
 
 // GRPCRouteMatch defines the predicate used to match requests to a given

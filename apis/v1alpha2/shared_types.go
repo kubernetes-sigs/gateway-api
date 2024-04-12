@@ -384,3 +384,8 @@ const (
 	// Support: Implementation-specific
 	NamedAddressType AddressType = "NamedAddress"
 )
+
+// SessionPersistence defines the desired state of
+// SessionPersistence.
+// +k8s:deepcopy-gen=false
+type SessionPersistence = v1.SessionPersistence

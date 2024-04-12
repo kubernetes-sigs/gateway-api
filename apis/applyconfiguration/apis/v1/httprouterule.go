@@ -21,10 +21,11 @@ package v1
 // HTTPRouteRuleApplyConfiguration represents an declarative configuration of the HTTPRouteRule type for use
 // with apply.
 type HTTPRouteRuleApplyConfiguration struct {
-	Matches     []HTTPRouteMatchApplyConfiguration   `json:"matches,omitempty"`
-	Filters     []HTTPRouteFilterApplyConfiguration  `json:"filters,omitempty"`
-	BackendRefs []HTTPBackendRefApplyConfiguration   `json:"backendRefs,omitempty"`
-	Timeouts    *HTTPRouteTimeoutsApplyConfiguration `json:"timeouts,omitempty"`
+	Matches            []HTTPRouteMatchApplyConfiguration    `json:"matches,omitempty"`
+	Filters            []HTTPRouteFilterApplyConfiguration   `json:"filters,omitempty"`
+	BackendRefs        []HTTPBackendRefApplyConfiguration    `json:"backendRefs,omitempty"`
+	Timeouts           *HTTPRouteTimeoutsApplyConfiguration  `json:"timeouts,omitempty"`
+	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
 // HTTPRouteRuleApplyConfiguration constructs an declarative configuration of the HTTPRouteRule type for use with
@@ -77,5 +78,13 @@ func (b *HTTPRouteRuleApplyConfiguration) WithBackendRefs(values ...*HTTPBackend
 // If called multiple times, the Timeouts field is set to the value of the last call.
 func (b *HTTPRouteRuleApplyConfiguration) WithTimeouts(value *HTTPRouteTimeoutsApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
 	b.Timeouts = value
+	return b
+}
+
+// WithSessionPersistence sets the SessionPersistence field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SessionPersistence field is set to the value of the last call.
+func (b *HTTPRouteRuleApplyConfiguration) WithSessionPersistence(value *SessionPersistenceApplyConfiguration) *HTTPRouteRuleApplyConfiguration {
+	b.SessionPersistence = value
 	return b
 }
