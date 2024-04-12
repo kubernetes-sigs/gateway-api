@@ -139,7 +139,7 @@ spec:
       containers:
       - name: infra-backend-v1
         # From https://github.com/kubernetes-sigs/ingress-controller-conformance/tree/master/images/echoserver
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -185,7 +185,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v2
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -231,7 +231,7 @@ spec:
     spec:
       containers:
       - name: infra-backend-v3
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -277,7 +277,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
@@ -346,7 +346,7 @@ spec:
     spec:
       containers:
       - name: tls-backend
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         volumeMounts:
         - name: secret-volume
           mountPath: /etc/secret-volume
@@ -408,7 +408,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v1
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -454,7 +454,7 @@ spec:
     spec:
       containers:
       - name: app-backend-v2
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -507,7 +507,7 @@ spec:
     spec:
       containers:
       - name: web-backend
-        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20231214-v1.0.0-140-gf544a46e
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -554,8 +554,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v1
-        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -604,8 +603,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v2
-        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
@@ -654,8 +652,7 @@ spec:
     spec:
       containers:
       - name: grpc-infra-backend-v3
-        # TODO: Migrate to gcr.io/k8s-staging-gateway-api once possible
-        image: us-docker.pkg.dev/grpc-testing/testing-images-public/gateway-api/echo-basic:alpha1
+        image: gcr.io/k8s-staging-gateway-api/echo-basic:v20240412-v1.0.0-394-g40c666fd
         env:
         - name: POD_NAME
           valueFrom:
