@@ -533,6 +533,7 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 3000
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -582,6 +583,7 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 3000
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -631,6 +633,7 @@ spec:
   - protocol: TCP
     port: 8080
     targetPort: 3000
+    appProtocol: kubernetes.io/h2c
 ---
 apiVersion: apps/v1
 kind: Deployment
