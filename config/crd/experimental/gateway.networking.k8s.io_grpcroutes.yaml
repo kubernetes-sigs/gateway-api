@@ -2022,6 +2022,11 @@ spec:
                           - Header
                           type: string
                       type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                   type: object
                 maxItems: 16
                 type: array
@@ -4344,6 +4349,11 @@ spec:
                           - Header
                           type: string
                       type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                   type: object
                 maxItems: 16
                 type: array

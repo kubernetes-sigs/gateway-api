@@ -746,6 +746,7 @@ const (
 
 // SessionPersistence defines the desired state of
 // SessionPersistence.
+// +kubebuilder:validation:XValidation:rule="!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)",message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent"
 type SessionPersistence struct {
 	// SessionName defines the name of the persistent session token
 	// which may be reflected in the cookie or the header. Users

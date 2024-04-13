@@ -2803,6 +2803,11 @@ spec:
                           - Header
                           type: string
                       type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
                       description: |+
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -6011,6 +6016,11 @@ spec:
                           - Header
                           type: string
                       type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
                       description: |+
                         Timeouts defines the timeouts that can be configured for an HTTP request.
