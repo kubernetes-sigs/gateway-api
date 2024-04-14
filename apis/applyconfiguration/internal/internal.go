@@ -276,6 +276,174 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: weight
       type:
         scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
+  map:
+    fields:
+    - name: caCertificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCBackendRef
+  map:
+    fields:
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteFilter
+          elementRelationship: atomic
+    - name: group
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
+    - name: port
+      type:
+        scalar: numeric
+    - name: weight
+      type:
+        scalar: numeric
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCHeaderMatch
+  map:
+    fields:
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: type
+      type:
+        scalar: string
+    - name: value
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCMethodMatch
+  map:
+    fields:
+    - name: method
+      type:
+        scalar: string
+    - name: service
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRoute
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteSpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteFilter
+  map:
+    fields:
+    - name: extensionRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+    - name: requestHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeaderFilter
+    - name: requestMirror
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRequestMirrorFilter
+    - name: responseHeaderModifier
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeaderFilter
+    - name: type
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteMatch
+  map:
+    fields:
+    - name: headers
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCHeaderMatch
+          elementRelationship: associative
+          keys:
+          - name
+    - name: method
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCMethodMatch
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteRule
+  map:
+    fields:
+    - name: backendRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCBackendRef
+          elementRelationship: atomic
+    - name: filters
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteFilter
+          elementRelationship: atomic
+    - name: matches
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteMatch
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteSpec
+  map:
+    fields:
+    - name: hostnames
+      type:
+        list:
+          elementType:
+            scalar: string
+          elementRelationship: atomic
+    - name: parentRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
+          elementRelationship: atomic
+    - name: rules
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteRule
+          elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
+  map:
+    fields:
+    - name: parents
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
+          elementRelationship: atomic
 - name: io.k8s.sigs.gateway-api.apis.v1.Gateway
   map:
     fields:
@@ -371,6 +539,9 @@ var schemaYAML = typed.YAMLObject(`types:
         map:
           elementType:
             scalar: string
+    - name: parametersRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
 - name: io.k8s.sigs.gateway-api.apis.v1.GatewaySpec
   map:
     fields:
@@ -439,6 +610,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.SecretObjectReference
           elementRelationship: atomic
+    - name: frontendValidation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.FrontendTLSValidation
     - name: mode
       type:
         scalar: string
@@ -793,6 +967,39 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         scalar: string
       default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.LocalParametersReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+- name: io.k8s.sigs.gateway-api.apis.v1.ObjectReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
+    - name: namespace
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1.ParametersReference
   map:
     fields:
@@ -935,60 +1142,6 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicyConfig
       default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCBackendRef
-  map:
-    fields:
-    - name: filters
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteFilter
-          elementRelationship: atomic
-    - name: group
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: namespace
-      type:
-        scalar: string
-    - name: port
-      type:
-        scalar: numeric
-    - name: weight
-      type:
-        scalar: numeric
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCHeaderMatch
-  map:
-    fields:
-    - name: name
-      type:
-        scalar: string
-      default: ""
-    - name: type
-      type:
-        scalar: string
-    - name: value
-      type:
-        scalar: string
-      default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCMethodMatch
-  map:
-    fields:
-    - name: method
-      type:
-        scalar: string
-    - name: service
-      type:
-        scalar: string
-    - name: type
-      type:
-        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
   map:
     fields:
@@ -1004,158 +1157,11 @@ var schemaYAML = typed.YAMLObject(`types:
       default: {}
     - name: spec
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteSpec
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteSpec
       default: {}
     - name: status
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteFilter
-  map:
-    fields:
-    - name: extensionRef
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
-    - name: requestHeaderModifier
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeaderFilter
-    - name: requestMirror
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRequestMirrorFilter
-    - name: responseHeaderModifier
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPHeaderFilter
-    - name: type
-      type:
-        scalar: string
-      default: ""
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteMatch
-  map:
-    fields:
-    - name: headers
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCHeaderMatch
-          elementRelationship: associative
-          keys:
-          - name
-    - name: method
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCMethodMatch
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteRule
-  map:
-    fields:
-    - name: backendRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCBackendRef
-          elementRelationship: atomic
-    - name: filters
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteFilter
-          elementRelationship: atomic
-    - name: matches
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteMatch
-          elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteSpec
-  map:
-    fields:
-    - name: hostnames
-      type:
-        list:
-          elementType:
-            scalar: string
-          elementRelationship: atomic
-    - name: parentRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.ParentReference
-          elementRelationship: atomic
-    - name: rules
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteRule
-          elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRouteStatus
-  map:
-    fields:
-    - name: parents
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
-          elementRelationship: atomic
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.Gateway
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewaySpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.GatewayClass
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayClassSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.GatewayClassStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.HTTPRoute
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteSpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteStatus
+        namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
       default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyAncestorStatus
   map:

@@ -28,6 +28,7 @@ import (
 
 type GatewayV1Interface interface {
 	RESTClient() rest.Interface
+	GRPCRoutesGetter
 	GatewaysGetter
 	GatewayClassesGetter
 	HTTPRoutesGetter
@@ -36,6 +37,10 @@ type GatewayV1Interface interface {
 // GatewayV1Client is used to interact with features provided by the gateway.networking.k8s.io group.
 type GatewayV1Client struct {
 	restClient rest.Interface
+}
+
+func (c *GatewayV1Client) GRPCRoutes(namespace string) GRPCRouteInterface {
+	return newGRPCRoutes(c, namespace)
 }
 
 func (c *GatewayV1Client) Gateways(namespace string) GatewayInterface {

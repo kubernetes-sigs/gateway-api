@@ -71,8 +71,9 @@ type PolicyTargetReferenceWithSectionName struct {
 	// unspecified, this targetRef targets the entire resource. In the following
 	// resources, SectionName is interpreted as the following:
 	//
-	// * Gateway: Listener Name
-	// * Service: Port Name
+	// * Gateway: Listener name
+	// * HTTPRoute: HTTPRouteRule name
+	// * Service: Port name
 	//
 	// If a SectionName is specified, but does not exist on the targeted object,
 	// the Policy must fail to attach, and the policy implementation should record

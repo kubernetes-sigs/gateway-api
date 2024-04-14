@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -52,7 +51,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			// verify that the implementation is tracking the most recent resource changes
 			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 			defer cancel()
 			original := &v1.Gateway{}
 			err := s.Client.Get(ctx, gwNN, original)
@@ -143,7 +142,7 @@ var GatewayModifyListeners = suite.ConformanceTest{
 			// verify that the implementation is tracking the most recent resource changes
 			kubernetes.GatewayMustHaveLatestConditions(t, s.Client, s.TimeoutConfig, gwNN)
 
-			ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+			ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 			defer cancel()
 			original := &v1.Gateway{}
 			err := s.Client.Get(ctx, gwNN, original)
