@@ -59,7 +59,7 @@ Add to that the ubiquity of Service in the Kubernetes ecosystem as well as the t
 
 Unfortunately, Service is a badly overloaded resource. It orchestrates not only IP address allocation and DNS but also endpoint collection and propagation, load balancing, etc. For this reason, it cannot be the only long-term answer for `parentRef` binding -- however, it is the only feasible option that mesh implementations have today, and as such the graduated GAMMA specification MUST support Service as a `parentRef`.
 
-We expect this situation to change -- and, indeed, we plan to be a part of that change. Luckily, `parentRef` is flexible enough to support additional resources in the future, which allows work on a replacement for Service in GAMMA to begin and continue in parallel with the graduation of this spec. In fact, we believe that GAMMA's use case can serve as an excellent basis for developing and trialing new, more composable mechanisms for managing IP address allocation and DNS.
+We expect this situation to change -- and, indeed, we plan to be a part of that change. Luckily, `parentRef` is flexible enough to support additional resources in the future, which allows work on adding a Service alternative in GAMMA to begin and continue in parallel with the graduation of this spec. In fact, we believe that GAMMA's use case can serve as an excellent basis for developing and trialing new, more composable mechanisms for managing IP address allocation and DNS.
 
 
 ## API
