@@ -44,13 +44,15 @@ weekly on all subsequent weeks each month on Mondays at 3pm Pacific Time
 
 Being the main meeting for Gateway API, the topics can vary here and often this
 is where new topics and ideas are discussed, including both ingress and service
-mesh use cases.
+mesh use cases. Meetings will be moderated by the [Gateway API maintainers][maintainers]
+with notes taken by a volunteer.
 
 * [Zoom link](https://zoom.us/j/441530404)
 * [Add to your calendar](https://calendar.google.com/calendar/u/0/r?cid=88fe1l3qfn2b6r11k8um5am76c@group.calendar.google.com)
 
 [8am-pst-convert]: http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29
 [3pm-pst-convert]: http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29
+[maintainers]:https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L12
 
 The calendar includes _all_ SIG Network meetings (which therefore includes all
 Gateway API meetings, in addition to other subgroup meetings).
