@@ -68,7 +68,7 @@ type BackendTLSPolicySpec struct {
 	//
 	// Support: Implementation-specific for any other resource
 	//
-	TargetRef PolicyTargetReferenceWithSectionName `json:"targetRef"`
+	TargetRef LocalPolicyTargetReferenceWithSectionName `json:"targetRef"`
 
 	// TLS contains backend TLS policy configuration.
 	TLS BackendTLSPolicyConfig `json:"tls"`

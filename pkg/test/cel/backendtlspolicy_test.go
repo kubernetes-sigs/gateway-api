@@ -111,12 +111,11 @@ func TestBackendTLSPolicyConfig(t *testing.T) {
 					Namespace: metav1.NamespaceDefault,
 				},
 				Spec: gatewayv1a2.BackendTLSPolicySpec{
-					TargetRef: gatewayv1a2.PolicyTargetReferenceWithSectionName{
-						PolicyTargetReference: gatewayv1a2.PolicyTargetReference{
-							Group:     "group",
-							Kind:      "kind",
-							Name:      "name",
-							Namespace: ptrTo(gatewayv1a2.Namespace("ns")),
+					TargetRef: gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{
+						LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
+							Group: "group",
+							Kind:  "kind",
+							Name:  "name",
 						},
 					},
 					TLS: tc.routeConfig,

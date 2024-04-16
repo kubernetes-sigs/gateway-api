@@ -102,9 +102,6 @@ simple design patterns _if they meet a set of criteria_.
 With that background and the previous example in mind, here are some rules for
 when a Policy is a Direct Attached Policy:
 
-
-* The number or scope of objects is exactly _one_ object. No label selectors or
-  lists of `targetRef` are allowed.
 * The Policy can only be attached at exactly _one_ layer in the hierarchy. Any Policy
   that can be attached at multiple levels must necessarily have some defaulting
   behavior in the case that two of the same kind are attached at different points
@@ -132,7 +129,33 @@ when a Policy is a Direct Attached Policy:
   of some sort, where the things outside the namespace can opt–out of the behavior.
   (Notably, this is the design that we used for ReferenceGrant).
 
-## Apply Policies to Sections of a Resource
+## Target References
+### Cross Namespace
+
+In all cases, Gateway API policies should only have an effect on the namespace
+they exist within. In the case of policies that could apply to mesh
+implementations, it may be desirable to have a policy that affects traffic
+originating from the local namespace but going to a separate namespace. Unless
+that specific case is desired, all policy target refs should be local and
+exclude the "namespace" field.
+
+### Multiple
+
+In some cases, it may be desirable for a policy to target more than one resource
+at a time. For example, a policy may apply to different variations of what is
+effectively the same Service (store, store-blue, and store-green). If this is
+desired, a policy can choose to support a `targetRefs` list instead of a
+singular `targetRef` field. This list can have a maximum of 16 entries, though
+it may be desirable to start with a lower limit depending on the policy.
+
+#### Migration from Single to Multiple Targets
+
+Existing policies with a single `targetRef` may want to transition to supporting
+multiple `targetRefs`. To accomplish this, we recommend adding CEL validation
+to your CRD to allow only one of the fields to be set. Users will be able to
+set `targetRefs` in the same update that they unset `targetRef`.
+
+### Section Names
 
 The `sectionName` field of `targetRef` can be used to target a specific section
 of other resources, for example:
@@ -326,7 +349,7 @@ so needs further namespacing of its status. This pattern also provides a clear
 view of what resources a policy is affecting.
 
 For the best integration with community tooling and consistency across
-the broader community, we recommend that all implementations transition 
+the broader community, we recommend that all implementations transition
 to Policy status with this kind of nested structure.
 
 This is an `Ancestor` status rather than a `Parent` status, as in the Route status
@@ -334,8 +357,8 @@ because for Policy attachment, the relevant object may or may not be the direct
 parent.
 
 For example, `BackendTLSPolicy` directly attaches to a Service, which may be included
-in multiple Routes, in multiple Gateways. However, for many implementations, 
-the status of the `BackendTLSPolicy` will be different only at the Gateway level, 
+in multiple Routes, in multiple Gateways. However, for many implementations,
+the status of the `BackendTLSPolicy` will be different only at the Gateway level,
 so Gateway is the relevant Ancestor for the status.
 
 Each Gateway that has a Route that includes a backend with an attached `BackendTLSPolicy`
@@ -355,16 +378,16 @@ itself (at the time of writing, this is in `apis/v1alpha2/policy_types.go`).
 //
 // Ancestors refer to objects that are either the Target of a policy or above it in terms
 // of object hierarchy. For example, if a policy targets a Service, an Ancestor could be
-// a Route or a Gateway. 
+// a Route or a Gateway.
 
 // In the context of policy attachment, the Ancestor is used to distinguish which
 // resource results in a distinct application of this policy. For example, if a policy
 // targets a Service, it may have a distinct result per attached Gateway.
-// 
-// Policies targeting the same resource may have different effects depending on the 
+//
+// Policies targeting the same resource may have different effects depending on the
 // ancestors of those resources. For example, different Gateways targeting the same
 // Service may have different capabilities, especially if they have different underlying
-// implementations. 
+// implementations.
 //
 // For example, in BackendTLSPolicy, the Policy attaches to a Service that is
 // used as a backend in a HTTPRoute that is itself attached to a Gateway.
@@ -417,7 +440,7 @@ type PolicyStatus struct {
 	// an important part of Policy design is designing the right object level at
 	// which to namespace this status.
 	//
-	// Note also that implementations MUST ONLY populate ancestor status for 
+	// Note also that implementations MUST ONLY populate ancestor status for
 	// the Ancestor resources they are responsible for. Implementations MUST
 	// use the ControllerName field to uniquely identify the entries in this list
 	// that they are responsible for.
@@ -442,7 +465,7 @@ apiVersion: networking.example.io/v1alpha1
 kind: TLSMinimumVersionPolicy
 metadata:
   name: minimum12
-  namespace: appns  
+  namespace: appns
   labels:
     "gateway.networking.k8s.io/policy": "direct"
 spec:
