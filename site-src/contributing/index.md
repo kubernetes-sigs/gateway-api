@@ -65,14 +65,13 @@ Gateway API meetings, in addition to other subgroup meetings).
 
 ### Meeting Notes and Recordings
 
-Meeting agendas and notes are maintained in the [meeting notes
-doc][meeting-notes]. Feel free to add topics for discussion at an upcoming
-meeting.
+Meeting agendas and notes are maintained in the [meeting notes] doc. Feel free
+to add topics for discussion at an upcoming meeting.
 
 All meetings are recorded and automatically uploaded to the
 [Gateway API meetings YouTube playlist][gateway-api-yt-playlist].
 
-[meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
+[meeting notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
 [gateway-api-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP1GgO7k02ipPGZUFpSzGaHH
 
 #### Early Meetings
