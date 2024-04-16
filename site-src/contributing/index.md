@@ -47,7 +47,7 @@ is where new topics and ideas are discussed, including both ingress and service
 mesh use cases. Meetings will be moderated by the [Gateway API maintainers][maintainers]
 with notes taken by a volunteer.
 
-* [Zoom link](https://zoom.us/j/441530404)
+* [Zoom link](https://zoom.us/j/441530404) (passcode in [meeting notes] doc)
 * [Add to your calendar](https://calendar.google.com/calendar/u/0/r?cid=88fe1l3qfn2b6r11k8um5am76c@group.calendar.google.com)
 
 [8am-pst-convert]: http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29
@@ -121,4 +121,4 @@ service mesh use cases can be found in a separate
 ## Code of conduct
 
 Participation in the Kubernetes community is governed by the [Kubernetes Code of
-Conduct](https://github.com/kubernetes/community/blob/master/code-of-conduct.md)
+Conduct](https://github.com/kubernetes/community/blob/master/code-of-conduct.md).
