@@ -90,7 +90,8 @@ timeouts, session name, session type, and cookie lifetime type.
 Leading Contributors: @gcs278, @ginayeh
 
 ### Gateway Client Cert Verification
-Gateways can now configure client cert verification for each Gateway Listener.
+Gateways can now configure client cert verification for each Gateway Listener by introducing a new field
+`frontendValidation` field within `tls`. This field supports configuring a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
 
 Leading Contributors: @arkodg
 
