@@ -82,8 +82,10 @@ Leading Contributor: @frankbu
 
 ### Session Persistence + BackendLBPolicy
 Session Persistence is being introduced to Gateway API via a new policy
-(BackendLBPolicy) and Route-level configuration for both HTTPRoute and
-GRPCRoute.
+(BackendLBPolicy) for Service-level configuration and as fields within HTTPRoute and
+GRPCRoute for Route-level configuration. The BackendLBPolicy and Route-level
+APIs provide the same session persistence configuration, including session
+timeouts, session name, session type, and cookie lifetime type.
 
 Leading Contributors: @gcs278, @ginayeh
 
