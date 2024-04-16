@@ -110,6 +110,11 @@ func RunConformanceWithOptions(t *testing.T, opts suite.ConformanceOptions) {
 		require.NoError(t, err, "supplied Implementation details are not valid")
 	}
 
+	// if no FS is provided, use the default Manifests FS
+	if opts.ManifestFS == nil {
+		opts.ManifestFS = []fs.FS{&Manifests}
+	}
+
 	t.Log("Running conformance tests with:")
 	logOptions(t, opts)
 

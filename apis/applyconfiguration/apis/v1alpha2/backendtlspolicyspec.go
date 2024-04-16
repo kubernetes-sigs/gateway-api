@@ -21,8 +21,8 @@ package v1alpha2
 // BackendTLSPolicySpecApplyConfiguration represents an declarative configuration of the BackendTLSPolicySpec type for use
 // with apply.
 type BackendTLSPolicySpecApplyConfiguration struct {
-	TargetRef *PolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRef,omitempty"`
-	TLS       *BackendTLSPolicyConfigApplyConfiguration               `json:"tls,omitempty"`
+	TargetRef *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration `json:"targetRef,omitempty"`
+	TLS       *BackendTLSPolicyConfigApplyConfiguration                    `json:"tls,omitempty"`
 }
 
 // BackendTLSPolicySpecApplyConfiguration constructs an declarative configuration of the BackendTLSPolicySpec type for use with
@@ -34,7 +34,7 @@ func BackendTLSPolicySpec() *BackendTLSPolicySpecApplyConfiguration {
 // WithTargetRef sets the TargetRef field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the TargetRef field is set to the value of the last call.
-func (b *BackendTLSPolicySpecApplyConfiguration) WithTargetRef(value *PolicyTargetReferenceWithSectionNameApplyConfiguration) *BackendTLSPolicySpecApplyConfiguration {
+func (b *BackendTLSPolicySpecApplyConfiguration) WithTargetRef(value *LocalPolicyTargetReferenceWithSectionNameApplyConfiguration) *BackendTLSPolicySpecApplyConfiguration {
 	b.TargetRef = value
 	return b
 }
