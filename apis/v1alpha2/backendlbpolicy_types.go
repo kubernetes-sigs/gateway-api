@@ -56,7 +56,7 @@ type BackendLBPolicySpec struct {
 	// Currently, Backends (i.e. Service, ServiceImport, or any
 	// implementation-specific backendRef) are the only valid API
 	// target references.
-	TargetRef PolicyTargetReference `json:"targetRef"`
+	TargetRef LocalPolicyTargetReference `json:"targetRef"`
 
 	// SessionPersistence defines and configures session persistence
 	// for the backend.

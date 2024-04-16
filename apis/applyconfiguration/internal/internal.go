@@ -420,6 +420,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteMatch
           elementRelationship: atomic
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
 - name: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteSpec
   map:
     fields:
@@ -858,6 +861,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteMatch
           elementRelationship: atomic
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
     - name: timeouts
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteTimeouts
@@ -1100,6 +1106,55 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: namespace
       type:
         scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
+  map:
+    fields:
+    - name: absoluteTimeout
+      type:
+        scalar: string
+    - name: cookieConfig
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.CookieConfig
+    - name: idleTimeout
+      type:
+        scalar: string
+    - name: sessionName
+      type:
+        scalar: string
+    - name: type
+      type:
+        scalar: string
+- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendLBPolicySpec
+  map:
+    fields:
+    - name: sessionPersistence
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
+    - name: targetRef
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
+      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicy
   map:
     fields:
@@ -1142,7 +1197,7 @@ var schemaYAML = typed.YAMLObject(`types:
     fields:
     - name: targetRef
       type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyTargetReferenceWithSectionName
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
       default: {}
     - name: tls
       type:
@@ -1169,6 +1224,21 @@ var schemaYAML = typed.YAMLObject(`types:
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteStatus
       default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReference
+  map:
+    fields:
+    - name: group
+      type:
+        scalar: string
+      default: ""
+    - name: kind
+      type:
+        scalar: string
+      default: ""
+    - name: name
+      type:
+        scalar: string
+      default: ""
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
   map:
     fields:
