@@ -66,8 +66,8 @@ Leading Contributors: @howardjohn, @keithmattix, @kflynn
 
 ### Conformance Profiles and Reports
 
-The concept of conformance profiles and the corresponding reports have graduated
-to GA.
+The Conformance Reports API and the corresponding test suite have been graduated to GA. The Conformance report API has been expanded with the `mode` field (intended to specify the working mode of the implementation), and the `gatewayAPIChannel` (standard or experimental). The `gatewayAPIVersion` and `gatewayAPIChannel` are now filled in automatically by the suite machinery, along with a brief description of the testing outcome.
+The Reports have been reorganized in a more structured way, and the implementations can now add information on how the tests have been run and provide reproduction steps.
 
 Leading Contributors: @mlavacca, @shaneutt
 
