@@ -45,7 +45,6 @@ Session.vim
 /_tmp/
 *.un~
 .vagrant
-vendor
 !vendor/**/zz_generated.*
 .vscode
 /www/test_out

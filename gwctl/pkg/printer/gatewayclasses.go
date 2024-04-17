@@ -101,9 +101,13 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 	for _, gatewayClassNode := range resourceModel.GatewayClasses {
 		index++
 		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
-		metadata := gatewayClassNode.GatewayClass.GetObjectMeta()
+		metadata := gatewayClassNode.GatewayClass.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
 
-		// views ordered with respect to https://deploy-preview-2723--kubernetes-sigs-gateway-api.netlify.app/geps/gep-2722/#:~:text=gwctl%20describe%20gatewayclass%20foo%2Dcom%2Dexternal%2Dgateway%2Dclass
+		// views ordered with respect to https://gateway-api.sigs.k8s.io/geps/gep-2722/
 		views := []gatewayClassDescribeView{
 			{
 				Name: gatewayClassNode.GatewayClass.GetName(),
@@ -121,12 +125,7 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				Kind: kind,
 			},
 			{
-				Metadata: &metav1.ObjectMeta{
-					CreationTimestamp: metadata.GetCreationTimestamp(),
-					Generation:        metadata.GetGeneration(),
-					ResourceVersion:   metadata.GetResourceVersion(),
-					UID:               metadata.GetUID(),
-				},
+				Metadata: metadata,
 			},
 			{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),

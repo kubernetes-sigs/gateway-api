@@ -202,6 +202,9 @@ DirectlyAttachedPolicies:
 				&gatewayv1.GatewayClass{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
+						Labels: map[string]string{
+							"foo": "bar",
+						},
 					},
 					Spec: gatewayv1.GatewayClassSpec{
 						ControllerName: "example.net/gateway-controller",
@@ -210,7 +213,8 @@ DirectlyAttachedPolicies:
 			},
 			want: `
 Name: foo-gatewayclass
-Labels: null
+Labels:
+  foo: bar
 Annotations: null
 Metadata:
   creationTimestamp: null
