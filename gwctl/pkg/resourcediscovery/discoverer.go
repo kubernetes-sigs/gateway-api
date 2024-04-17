@@ -285,7 +285,8 @@ func fetchGatewayClasses(ctx context.Context, k8sClients *common.K8sClients, fil
 			return []gatewayv1.GatewayClass{}, err
 		}
 
-		// because api-server doesn't return TypeMeta in `gatewayClass`
+		// Because the `TypeMeta` attribute doesn't get populated here
+		// Ref: https://github.com/kubernetes/kubernetes/issues/80609
 		gatewayClass.APIVersion = gatewayv1.GroupVersion.String()
 		gatewayClass.Kind = "GatewayClass"
 
