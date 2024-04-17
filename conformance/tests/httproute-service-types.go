@@ -34,6 +34,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -43,9 +44,9 @@ func init() {
 var HTTPRouteServiceTypes = suite.ConformanceTest{
 	ShortName:   "HTTPRouteServiceTypes",
 	Description: "A single HTTPRoute should be able to route traffic to various service type backends",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-service-types.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {

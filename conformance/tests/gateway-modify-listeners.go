@@ -28,6 +28,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -37,8 +38,8 @@ func init() {
 var GatewayModifyListeners = suite.ConformanceTest{
 	ShortName:   "GatewayModifyListeners",
 	Description: "A Gateway in the gateway-conformance-infra namespace should handle adding and removing listeners.",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
 	},
 	Manifests: []string{"tests/gateway-modify-listeners.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {

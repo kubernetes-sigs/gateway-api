@@ -27,6 +27,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/grpc"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -37,9 +38,9 @@ var GRPCRouteHeaderMatching = suite.ConformanceTest{
 	ShortName:   "GRPCRouteHeaderMatching",
 	Description: "A single GRPCRoute with header matching for different backends",
 	Manifests:   []string{"tests/grpcroute-header-matching.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportGRPCRoute,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportGRPCRoute,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"

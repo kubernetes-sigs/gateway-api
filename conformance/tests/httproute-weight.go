@@ -32,6 +32,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -42,9 +43,9 @@ var HTTPRouteWeight = suite.ConformanceTest{
 	ShortName:   "HTTPRouteWeight",
 	Description: "An HTTPRoute with weighted backends",
 	Manifests:   []string{"tests/httproute-weight.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		var (

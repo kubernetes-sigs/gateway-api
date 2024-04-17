@@ -28,6 +28,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -37,9 +38,9 @@ func init() {
 var HTTPRouteObservedGenerationBump = suite.ConformanceTest{
 	ShortName:   "HTTPRouteObservedGenerationBump",
 	Description: "A HTTPRoute in the gateway-conformance-infra namespace should update the observedGeneration in all of it's Status.Conditions after an update to the spec",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
 	},
 	Manifests: []string{"tests/httproute-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
