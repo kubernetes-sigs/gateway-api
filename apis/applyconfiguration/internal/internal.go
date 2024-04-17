@@ -420,6 +420,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.GRPCRouteMatch
           elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
     - name: sessionPersistence
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
@@ -863,6 +866,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.HTTPRouteMatch
           elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
     - name: sessionPersistence
       type:
         namedType: io.k8s.sigs.gateway-api.apis.v1.SessionPersistence
@@ -1299,6 +1305,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
           elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TCPRouteSpec
   map:
     fields:
@@ -1353,6 +1362,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
           elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.TLSRouteSpec
   map:
     fields:
@@ -1413,6 +1425,9 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.BackendRef
           elementRelationship: atomic
+    - name: name
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.UDPRouteSpec
   map:
     fields:
