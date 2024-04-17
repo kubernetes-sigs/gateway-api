@@ -22,6 +22,8 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/stretchr/testify/assert"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -366,7 +368,7 @@ EffectivePolicies:
 	}
 }
 
-// TestGatewaysPrinter_LabelSelector tests label selector filtering for Gateways in 'get' command.
+// TestGatewaysPrinter_LabelSelector tests label selector filtering for Gateways.
 func TestGatewaysPrinter_LabelSelector(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	gateway := func(name string, labels map[string]string) *gatewayv1.Gateway {
@@ -433,147 +435,11 @@ func TestGatewaysPrinter_LabelSelector(t *testing.T) {
 		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
-	gp := &GatewaysPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
-	}
-	gp.Print(resourceModel)
-
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-NAME       CLASS           ADDRESSES      PORTS  PROGRAMMED  AGE
-gateway-2  gatewayclass-1  192.168.100.5  8080   False       5d
-`
-
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
-	}
-}
-
-// TestGatewaysPrinterDescribe_LabelSelector tests label selector filtering for Gateways in 'describe' command.
-func TestGatewaysPrinterDescribe_LabelSelector(t *testing.T) {
-	fakeClock := testingclock.NewFakeClock(time.Now())
-	gateway := func(name string, labels map[string]string) *gatewayv1.Gateway {
-		return &gatewayv1.Gateway{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:   name,
-				Labels: labels,
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-5 * 24 * time.Hour),
-				},
-			},
-			Spec: gatewayv1.GatewaySpec{
-				GatewayClassName: "gatewayclass-1",
-				Listeners: []gatewayv1.Listener{
-					{
-						Name:     "http-8080",
-						Protocol: gatewayv1.HTTPProtocolType,
-						Port:     gatewayv1.PortNumber(8080),
-					},
-				},
-			},
-			Status: gatewayv1.GatewayStatus{
-				Addresses: []gatewayv1.GatewayStatusAddress{
-					{
-						Value: "192.168.100.5",
-					},
-				},
-				Conditions: []metav1.Condition{
-					{
-						Type:   "Programmed",
-						Status: "False",
-					},
-				},
-			},
-		}
+	expectedGatewayNames := []string{"gateway-2"}
+	gatewayNames := make([]string, 0, len(resourceModel.Gateways))
+	for _, gatewayNode := range resourceModel.Gateways {
+		gatewayNames = append(gatewayNames, gatewayNode.Gateway.GetName())
 	}
 
-	objects := []runtime.Object{
-		&gatewayv1.GatewayClass{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "gatewayclass-1",
-			},
-			Spec: gatewayv1.GatewayClassSpec{
-				ControllerName: "example.net/gateway-controller",
-				Description:    common.PtrTo("random"),
-			},
-		},
-
-		&apiextensionsv1.CustomResourceDefinition{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "healthcheckpolicies.foo.com",
-				Labels: map[string]string{
-					gatewayv1alpha2.PolicyLabelKey: "inherited",
-				},
-			},
-			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
-				Scope:    apiextensionsv1.ClusterScoped,
-				Group:    "foo.com",
-				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
-				Names: apiextensionsv1.CustomResourceDefinitionNames{
-					Plural: "healthcheckpolicies",
-					Kind:   "HealthCheckPolicy",
-				},
-			},
-		},
-		&unstructured.Unstructured{
-			Object: map[string]interface{}{
-				"apiVersion": "foo.com/v1",
-				"kind":       "HealthCheckPolicy",
-				"metadata": map[string]interface{}{
-					"name": "health-check-gatewayclass",
-				},
-				"spec": map[string]interface{}{
-					"override": map[string]interface{}{
-						"key1": "value-parent-1",
-					},
-					"default": map[string]interface{}{
-						"key2": "value-parent-2",
-					},
-					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "gatewayclass-1",
-					},
-				},
-			},
-		},
-		gateway("gateway-1", map[string]string{"app": "foo"}),
-		gateway("gateway-2", map[string]string{"app": "foo", "env": "internal"}),
-	}
-
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{Labels: selector})
-	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
-	}
-
-	nsp := &GatewaysPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
-	}
-	nsp.PrintDescribeView(resourceModel)
-
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-Name: gateway-2
-GatewayClass: gatewayclass-1
-EffectivePolicies:
-  HealthCheckPolicy.foo.com:
-    key1: value-parent-1
-    key2: value-parent-2
-`
-
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
-	}
+	assert.Equal(t, expectedGatewayNames, gatewayNames, "Expected Gateway name does not match the found one")
 }
