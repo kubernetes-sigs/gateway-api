@@ -468,7 +468,13 @@ type BackendLBPolicySpec struct {
     // Currently, Backends (i.e. Service, ServiceImport, or any
     // implementation-specific backendRef) are the only valid API
     // target references.
-    TargetRef gatewayv1a2.PolicyTargetReference `json:"targetRef"`
+    // +listType=map
+    // +listMapKey=group
+    // +listMapKey=kind
+    // +listMapKey=name
+    // +kubebuilder:validation:MinItems=1
+    // +kubebuilder:validation:MaxItems=16
+    TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
     // SessionPersistence defines and configures session persistence
     // for the backend.
@@ -481,6 +487,7 @@ type BackendLBPolicySpec struct {
 
 // SessionPersistence defines the desired state of
 // SessionPersistence.
+// +kubebuilder:validation:XValidation:rule="!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)",message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent"
 type SessionPersistence struct {
     // SessionName defines the name of the persistent session token
     // which may be reflected in the cookie or the header. Users
@@ -490,7 +497,7 @@ type SessionPersistence struct {
     // Support: Implementation-specific
     //
     // +optional
-    // +kubebuilder:validation:MaxLength=4096
+    // +kubebuilder:validation:MaxLength=128
     SessionName *string `json:"sessionName,omitempty"`
 
     // AbsoluteTimeout defines the absolute timeout of the persistent

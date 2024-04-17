@@ -56,7 +56,13 @@ type BackendLBPolicySpec struct {
 	// Currently, Backends (i.e. Service, ServiceImport, or any
 	// implementation-specific backendRef) are the only valid API
 	// target references.
-	TargetRef LocalPolicyTargetReference `json:"targetRef"`
+	// +listType=map
+	// +listMapKey=group
+	// +listMapKey=kind
+	// +listMapKey=name
+	// +kubebuilder:validation:MinItems=1
+	// +kubebuilder:validation:MaxItems=16
+	TargetRefs []LocalPolicyTargetReference `json:"targetRefs"`
 
 	// SessionPersistence defines and configures session persistence
 	// for the backend.

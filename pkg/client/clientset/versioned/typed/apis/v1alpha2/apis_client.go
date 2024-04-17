@@ -29,7 +29,6 @@ import (
 type GatewayV1alpha2Interface interface {
 	RESTClient() rest.Interface
 	BackendLBPoliciesGetter
-	BackendTLSPoliciesGetter
 	GRPCRoutesGetter
 	ReferenceGrantsGetter
 	TCPRoutesGetter
@@ -44,10 +43,6 @@ type GatewayV1alpha2Client struct {
 
 func (c *GatewayV1alpha2Client) BackendLBPolicies(namespace string) BackendLBPolicyInterface {
 	return newBackendLBPolicies(c, namespace)
-}
-
-func (c *GatewayV1alpha2Client) BackendTLSPolicies(namespace string) BackendTLSPolicyInterface {
-	return newBackendTLSPolicies(c, namespace)
 }
 
 func (c *GatewayV1alpha2Client) GRPCRoutes(namespace string) GRPCRouteInterface {

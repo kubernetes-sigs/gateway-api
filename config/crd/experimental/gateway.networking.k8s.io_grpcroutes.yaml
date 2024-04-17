@@ -2003,7 +2003,7 @@ spec:
 
 
                             Support: Implementation-specific
-                          maxLength: 4096
+                          maxLength: 128
                           type: string
                         type:
                           default: Cookie
@@ -4330,7 +4330,7 @@ spec:
 
 
                             Support: Implementation-specific
-                          maxLength: 4096
+                          maxLength: 128
                           type: string
                         type:
                           default: Cookie

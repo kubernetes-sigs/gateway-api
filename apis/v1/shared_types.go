@@ -744,9 +744,8 @@ const (
 	NamedAddressType AddressType = "NamedAddress"
 )
 
-// SessionPersistence defines the desired state of
-// SessionPersistence.
-// +kubebuilder:validation:XValidation:rule="!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)",message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent"
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
 type SessionPersistence struct {
 	// SessionName defines the name of the persistent session token
 	// which may be reflected in the cookie or the header. Users
@@ -756,7 +755,7 @@ type SessionPersistence struct {
 	// Support: Implementation-specific
 	//
 	// +optional
-	// +kubebuilder:validation:MaxLength=4096
+	// +kubebuilder:validation:MaxLength=128
 	SessionName *string `json:"sessionName,omitempty"`
 
 	// AbsoluteTimeout defines the absolute timeout of the persistent

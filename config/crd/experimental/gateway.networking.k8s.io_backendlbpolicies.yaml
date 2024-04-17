@@ -125,7 +125,7 @@ spec:
 
 
                       Support: Implementation-specific
-                    maxLength: 4096
+                    maxLength: 128
                     type: string
                   type:
                     default: Cookie
@@ -149,36 +149,51 @@ spec:
                     is Permanent
                   rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
                     != ''Permanent'' || has(self.absoluteTimeout)'
-              targetRef:
+              targetRefs:
                 description: |-
                   TargetRef identifies an API object to apply policy to.
                   Currently, Backends (i.e. Service, ServiceImport, or any
                   implementation-specific backendRef) are the only valid API
                   target references.
-                properties:
-                  group:
-                    description: Group is the group of the target resource.
-                    maxLength: 253
-                    pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
-                    type: string
-                  kind:
-                    description: Kind is kind of the target resource.
-                    maxLength: 63
-                    minLength: 1
-                    pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
-                    type: string
-                  name:
-                    description: Name is the name of the target resource.
-                    maxLength: 253
-                    minLength: 1
-                    type: string
-                required:
+                items:
+                  description: |-
+                    LocalPolicyTargetReference identifies an API object to apply a direct or
+                    inherited policy to. This should be used as part of Policy resources
+                    that can target Gateway API resources. For more information on how this
+                    policy attachment model works, and a sample Policy resource, refer to
+                    the policy attachment documentation for Gateway API.
+                  properties:
+                    group:
+                      description: Group is the group of the target resource.
+                      maxLength: 253
+                      pattern: ^$|^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
+                    kind:
+                      description: Kind is kind of the target resource.
+                      maxLength: 63
+                      minLength: 1
+                      pattern: ^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$
+                      type: string
+                    name:
+                      description: Name is the name of the target resource.
+                      maxLength: 253
+                      minLength: 1
+                      type: string
+                  required:
+                  - group
+                  - kind
+                  - name
+                  type: object
+                maxItems: 16
+                minItems: 1
+                type: array
+                x-kubernetes-list-map-keys:
                 - group
                 - kind
                 - name
-                type: object
+                x-kubernetes-list-type: map
             required:
-            - targetRef
+            - targetRefs
             type: object
           status:
             description: Status defines the current state of BackendLBPolicy.

@@ -25,8 +25,8 @@ import (
 // BackendLBPolicySpecApplyConfiguration represents an declarative configuration of the BackendLBPolicySpec type for use
 // with apply.
 type BackendLBPolicySpecApplyConfiguration struct {
-	TargetRef          *LocalPolicyTargetReferenceApplyConfiguration `json:"targetRef,omitempty"`
-	SessionPersistence *v1.SessionPersistenceApplyConfiguration      `json:"sessionPersistence,omitempty"`
+	TargetRefs         []LocalPolicyTargetReferenceApplyConfiguration `json:"targetRefs,omitempty"`
+	SessionPersistence *v1.SessionPersistenceApplyConfiguration       `json:"sessionPersistence,omitempty"`
 }
 
 // BackendLBPolicySpecApplyConfiguration constructs an declarative configuration of the BackendLBPolicySpec type for use with
@@ -35,11 +35,16 @@ func BackendLBPolicySpec() *BackendLBPolicySpecApplyConfiguration {
 	return &BackendLBPolicySpecApplyConfiguration{}
 }
 
-// WithTargetRef sets the TargetRef field in the declarative configuration to the given value
-// and returns the receiver, so that objects can be built by chaining "With" function invocations.
-// If called multiple times, the TargetRef field is set to the value of the last call.
-func (b *BackendLBPolicySpecApplyConfiguration) WithTargetRef(value *LocalPolicyTargetReferenceApplyConfiguration) *BackendLBPolicySpecApplyConfiguration {
-	b.TargetRef = value
+// WithTargetRefs adds the given value to the TargetRefs field in the declarative configuration
+// and returns the receiver, so that objects can be build by chaining "With" function invocations.
+// If called multiple times, values provided by each call will be appended to the TargetRefs field.
+func (b *BackendLBPolicySpecApplyConfiguration) WithTargetRefs(values ...*LocalPolicyTargetReferenceApplyConfiguration) *BackendLBPolicySpecApplyConfiguration {
+	for i := range values {
+		if values[i] == nil {
+			panic("nil value passed to WithTargetRefs")
+		}
+		b.TargetRefs = append(b.TargetRefs, *values[i])
+	}
 	return b
 }
 
