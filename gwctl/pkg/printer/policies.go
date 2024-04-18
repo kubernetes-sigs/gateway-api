@@ -25,12 +25,12 @@ import (
 	"text/tabwriter"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-	"sigs.k8s.io/yaml"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/yaml"
 )
 
 type PoliciesPrinter struct {
@@ -47,7 +47,11 @@ func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy)
 
 	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	for _, policy := range policies {
 		policyType := "Direct"
@@ -67,7 +71,11 @@ func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy)
 			policyType,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }
@@ -81,7 +89,11 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.Pol
 
 	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	for _, policyCRD := range policyCRDs {
 		policyType := "Direct"
@@ -97,7 +109,11 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.Pol
 			string(policyCRD.CRD().Spec.Scope),
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }

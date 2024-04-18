@@ -17,12 +17,11 @@ limitations under the License.
 package resourcediscovery
 
 import (
-	corev1 "k8s.io/api/core/v1"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"

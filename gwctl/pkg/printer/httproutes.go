@@ -27,10 +27,10 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-	"sigs.k8s.io/yaml"
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/yaml"
 )
 
 type HTTPRoutesPrinter struct {
@@ -41,7 +41,11 @@ type HTTPRoutesPrinter struct {
 func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
 	tw := tabwriter.NewWriter(hp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, 0, len(resourceModel.HTTPRoutes))
 	for _, httpRouteNode := range resourceModel.HTTPRoutes {
@@ -80,7 +84,11 @@ func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceMode
 			parentRefsCount,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }

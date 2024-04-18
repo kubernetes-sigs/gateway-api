@@ -19,21 +19,20 @@ package printer
 import (
 	"fmt"
 	"io"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/utils/ptr"
 	"os"
-	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sort"
 	"strings"
 	"text/tabwriter"
 
-	"sigs.k8s.io/yaml"
-
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"k8s.io/utils/ptr"
+	"sigs.k8s.io/yaml"
 )
 
 type GatewayClassesPrinter struct {
@@ -54,14 +53,18 @@ type gatewayClassDescribeView struct {
 	// GatewayClass description
 	Description *string `json:",omitempty"`
 
-	Status                   *v1.GatewayClassStatus `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
+	Status                   *gatewayv1.GatewayClassStatus `json:",omitempty"`
+	DirectlyAttachedPolicies []policymanager.ObjRef        `json:",omitempty"`
 }
 
 func (gcp *GatewayClassesPrinter) Print(model *resourcediscovery.ResourceModel) {
 	tw := tabwriter.NewWriter(gcp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	gatewayClassNodes := make([]*resourcediscovery.GatewayClassNode, 0, len(model.GatewayClasses))
 	for _, gatewayClassNode := range model.GatewayClasses {
@@ -91,7 +94,11 @@ func (gcp *GatewayClassesPrinter) Print(model *resourcediscovery.ResourceModel) 
 			accepted,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }

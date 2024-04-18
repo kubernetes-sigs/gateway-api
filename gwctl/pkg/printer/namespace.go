@@ -26,10 +26,10 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-	"sigs.k8s.io/yaml"
 )
 
 type NamespacesPrinter struct {
@@ -48,7 +48,11 @@ type namespaceDescribeView struct {
 func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
 	tw := tabwriter.NewWriter(nsp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "STATUS", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
+	}
 
 	namespaceNodes := make([]*resourcediscovery.NamespaceNode, 0, len(resourceModel.Namespaces))
 	for _, namespaceNode := range resourceModel.Namespaces {
@@ -66,7 +70,11 @@ func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceMod
 			string(namespaceNode.Namespace.Status.Phase),
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }

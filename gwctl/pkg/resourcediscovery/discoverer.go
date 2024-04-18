@@ -20,7 +20,7 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -33,6 +33,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Filter struct defines parameters for filtering resources
@@ -66,7 +67,7 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 	}
 	resourceModel.addGatewayClasses(gatewayClasses...)
 
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
 }
@@ -84,9 +85,11 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -105,9 +108,11 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -127,9 +132,11 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -146,7 +153,7 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 
 	resourceModel.addNamespace(namespaces...)
 
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
 }
@@ -166,8 +173,8 @@ func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, reso
 	}
 
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
-		gatewayClassID := GatewayClassID(relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway))
-		gatewayClass, ok := gatewayClassesByID[gatewayClassID]
+		gwcID := GatewayClassID(relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway))
+		gatewayClass, ok := gatewayClassesByID[gwcID]
 		if !ok {
 			klog.V(1).ErrorS(nil, "GatewayClass referenced in Gateway does not exist",
 				"gateway", gatewayNode.Gateway.GetNamespace()+"/"+gatewayNode.Gateway.GetName(),
@@ -176,7 +183,7 @@ func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, reso
 		}
 
 		resourceModel.addGatewayClasses(gatewayClass)
-		resourceModel.connectGatewayWithGatewayClass(gatewayID, gatewayClassID)
+		resourceModel.connectGatewayWithGatewayClass(gatewayID, gwcID)
 	}
 }
 
@@ -271,7 +278,7 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 }
 
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
-func (d Discoverer) discoverPolicies(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
 }
 
