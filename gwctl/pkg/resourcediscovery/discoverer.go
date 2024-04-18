@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -285,6 +284,11 @@ func fetchGatewayClasses(ctx context.Context, k8sClients *common.K8sClients, fil
 		if err := k8sClients.Client.Get(ctx, nn, gatewayClass); err != nil {
 			return []gatewayv1.GatewayClass{}, err
 		}
+
+		// Because the `TypeMeta` attribute doesn't get populated here
+		// Ref: https://github.com/kubernetes/kubernetes/issues/80609
+		gatewayClass.APIVersion = gatewayv1.GroupVersion.String()
+		gatewayClass.Kind = "GatewayClass"
 
 		return []gatewayv1.GatewayClass{*gatewayClass}, nil
 	}
