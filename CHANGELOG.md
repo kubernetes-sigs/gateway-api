@@ -138,7 +138,19 @@ Leading Contributors: @howardjohn
 - Clarify policy attachment by two of the same policy types when using section
   names. (#2442, @maleck13)
 
+### gwctl
 
+* We've extended the `get` command to support gateways, gatewayclasses, and
+  namespaces. (#2865, #2782, #2847, @jongwooo)
+* The `get` command now provides more detailed information for httproutes,
+  policies, and policycrds. (#2805, #2808, #2811, @jongwooo)
+* `describe` command now supports descriptions of policycrds and namespaces.
+  (#2872, #2836, @Devaansh-Kumar)
+* We've added the ability to filter resources using labels (through the `-l`
+  flag) with both the `get` and `describe` commands. (#2892, #2915, #2934,
+  @yeedove)
+* Bug fix: Prevent panic when describing gatewayclasses with no description
+  (#2894, @pmalek)
 # v1.0.0
 
 On behalf of Kubernetes SIG Network, we are pleased to announce the v1.0 release!
