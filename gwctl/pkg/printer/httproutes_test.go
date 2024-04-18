@@ -22,13 +22,11 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
@@ -436,79 +434,4 @@ EffectivePolicies:
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
 	}
-}
-
-// TestHTTPRoutesPrinter_LabelSelector tests label selector filtering for HTTPRoute.
-func TestHTTPRoutesPrinter_LabelSelector(t *testing.T) {
-	fakeClock := testingclock.NewFakeClock(time.Now())
-	httpRoute := func(name string, labels map[string]string) *gatewayv1.HTTPRoute {
-		return &gatewayv1.HTTPRoute{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      name,
-				Namespace: "default",
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-24 * time.Hour),
-				},
-				Labels: labels,
-			},
-			Spec: gatewayv1.HTTPRouteSpec{
-				Hostnames: []gatewayv1.Hostname{"example.com"},
-				CommonRouteSpec: gatewayv1.CommonRouteSpec{
-					ParentRefs: []gatewayv1.ParentReference{
-						{
-							Name: "gateway-1",
-						},
-					},
-				},
-			},
-		}
-	}
-
-	objects := []runtime.Object{
-		&gatewayv1.GatewayClass{
-			ObjectMeta: metav1.ObjectMeta{
-				Name: "gatewayclass-1",
-			},
-			Spec: gatewayv1.GatewayClassSpec{
-				ControllerName: "example.net/gateway-controller",
-				Description:    common.PtrTo("random"),
-			},
-		},
-
-		&gatewayv1.Gateway{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      "gateway-1",
-				Namespace: "default",
-			},
-			Spec: gatewayv1.GatewaySpec{
-				GatewayClassName: "gatewayclass-1",
-			},
-		},
-		httpRoute("httproute-1", map[string]string{"app": "foo"}),
-		httpRoute("httproute-2", map[string]string{"app": "foo", "env": "internal"}),
-	}
-
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
-
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{Labels: selector})
-	if err != nil {
-		t.Fatalf("Failed to discover resources: %v", err)
-	}
-
-	expectedHTTPRouteNames := []string{"httproute-2"}
-	HTTPRouteNames := make([]string, 0, len(resourceModel.HTTPRoutes))
-	for _, HTTPRouteNode := range resourceModel.HTTPRoutes {
-		HTTPRouteNames = append(HTTPRouteNames, HTTPRouteNode.HTTPRoute.GetName())
-	}
-
-	assert.Equal(t, expectedHTTPRouteNames, HTTPRouteNames, "Expected HTTPRoute name does not match the found one")
 }

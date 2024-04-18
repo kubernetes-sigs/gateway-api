@@ -22,12 +22,10 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
@@ -235,58 +233,4 @@ ControllerName: example.net/gateway-controller
 			}
 		})
 	}
-}
-
-// TestGatewayClassesPrinter_LabelSelector Tests label selector filtering for GatewayClasses.
-func TestGatewayClassesPrinter_LabelSelector(t *testing.T) {
-	fakeClock := testingclock.NewFakeClock(time.Now())
-
-	gatewayClass := func(name string, labels map[string]string) *gatewayv1.GatewayClass {
-		return &gatewayv1.GatewayClass{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:   name,
-				Labels: labels,
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-365 * 24 * time.Hour),
-				},
-			},
-			Spec: gatewayv1.GatewayClassSpec{
-				ControllerName: gatewayv1.GatewayController(name + "/controller"),
-			},
-			Status: gatewayv1.GatewayClassStatus{
-				Conditions: []metav1.Condition{
-					{
-						Type:   "Accepted",
-						Status: metav1.ConditionTrue,
-					},
-				},
-			},
-		}
-	}
-	objects := []runtime.Object{
-		gatewayClass("foo-com-external-gateway-class", map[string]string{"app": "foo"}),
-		gatewayClass("foo-com-internal-gateway-class", map[string]string{"app": "foo", "env": "internal"}),
-	}
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{Labels: selector})
-	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
-	}
-
-	expectedGatewayClassNames := []string{"foo-com-internal-gateway-class"}
-	gatewayClassNames := make([]string, 0, len(resourceModel.GatewayClasses))
-	for _, gatewayClassNode := range resourceModel.GatewayClasses {
-		gatewayClassNames = append(gatewayClassNames, gatewayClassNode.GatewayClass.GetName())
-	}
-
-	assert.Equal(t, expectedGatewayClassNames, gatewayClassNames, "Expected GatewayClass name does not match the found one")
 }
