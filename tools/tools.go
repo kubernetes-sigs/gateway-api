@@ -31,6 +31,7 @@ import (
 	_ "k8s.io/code-generator/cmd/informer-gen"
 	_ "k8s.io/code-generator/cmd/lister-gen"
 	_ "k8s.io/code-generator/cmd/register-gen"
+	_ "k8s.io/kube-openapi/cmd/openapi-gen"
 	_ "sigs.k8s.io/controller-runtime/pkg/scheme"
 	_ "sigs.k8s.io/controller-tools/cmd/controller-gen"
 )

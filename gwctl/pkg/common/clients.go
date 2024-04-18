@@ -53,16 +53,16 @@ func NewK8sClients(kubeconfig string) (*K8sClients, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Kubernetes client: %v", err)
 	}
-	if err := gatewayv1alpha3.AddToScheme(client.Scheme()); err != nil {
+	if err := gatewayv1alpha3.Install(client.Scheme()); err != nil {
 		return nil, err
 	}
-	if err := gatewayv1alpha2.AddToScheme(client.Scheme()); err != nil {
+	if err := gatewayv1alpha2.Install(client.Scheme()); err != nil {
 		return nil, err
 	}
-	if err := gatewayv1beta1.AddToScheme(client.Scheme()); err != nil {
+	if err := gatewayv1beta1.Install(client.Scheme()); err != nil {
 		return nil, err
 	}
-	if err := gatewayv1.AddToScheme(client.Scheme()); err != nil {
+	if err := gatewayv1.Install(client.Scheme()); err != nil {
 		return nil, err
 	}
 
@@ -77,16 +77,16 @@ func NewK8sClients(kubeconfig string) (*K8sClients, error) {
 
 func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8sClients {
 	scheme := scheme.Scheme
-	if err := gatewayv1alpha3.AddToScheme(scheme); err != nil {
+	if err := gatewayv1alpha3.Install(scheme); err != nil {
 		t.Fatal(err)
 	}
-	if err := gatewayv1alpha2.AddToScheme(scheme); err != nil {
+	if err := gatewayv1alpha2.Install(scheme); err != nil {
 		t.Fatal(err)
 	}
-	if err := gatewayv1beta1.AddToScheme(scheme); err != nil {
+	if err := gatewayv1beta1.Install(scheme); err != nil {
 		t.Fatal(err)
 	}
-	if err := gatewayv1.AddToScheme(scheme); err != nil {
+	if err := gatewayv1.Install(scheme); err != nil {
 		t.Fatal(err)
 	}
 	if err := apiextensionsv1.AddToScheme(scheme); err != nil {

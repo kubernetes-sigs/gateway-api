@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// From https://github.com/kubernetes/kubernetes/blob/0712728ee9caab4d04ec0a751855aca8c891b690/pkg/generated/openapi/cmd/models-schema/main.go
+// From https://github.com/kubernetes/kubernetes/blob/0e39ca84dc0224edf6b399772d6f4072b4fe8b9b/pkg/generated/openapi/cmd/models-schema/main.go
 
 package main
 
@@ -24,17 +24,17 @@ import (
 	"os"
 	"strings"
 
+	openapi "sigs.k8s.io/gateway-api/pkg/generated/openapi"
+
 	"k8s.io/kube-openapi/pkg/common"
 	"k8s.io/kube-openapi/pkg/validation/spec"
-
-	openapi "sigs.k8s.io/gateway-api/pkg/generated/openapi"
 )
 
 // Outputs openAPI schema JSON containing the schema definitions in zz_generated.openapi.go.
 func main() {
 	err := output()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed: %v\n", err)
+		os.Stderr.WriteString(fmt.Sprintf("Failed: %v", err))
 		os.Exit(1)
 	}
 }
@@ -43,9 +43,7 @@ func output() error {
 	refFunc := func(name string) spec.Ref {
 		return spec.MustCreateRef(fmt.Sprintf("#/definitions/%s", friendlyName(name)))
 	}
-
 	defs := openapi.GetOpenAPIDefinitions(refFunc)
-
 	schemaDefs := make(map[string]spec.Schema, len(defs))
 	for k, v := range defs {
 		// Replace top-level schema with v2 if a v2 schema is embedded
@@ -81,7 +79,7 @@ func output() error {
 	return nil
 }
 
-// From vendor/k8s.io/apiserver/pkg/endpoints/openapi/openapi.go
+// From k8s.io/apiserver/pkg/endpoints/openapi/openapi.go
 func friendlyName(name string) string {
 	nameParts := strings.Split(name, "/")
 	// Reverse first part. e.g., io.k8s... instead of k8s.io...

@@ -54,10 +54,10 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
 
-	require.NoError(t, v1alpha3.AddToScheme(client.Scheme()))
-	require.NoError(t, v1alpha2.AddToScheme(client.Scheme()))
-	require.NoError(t, v1beta1.AddToScheme(client.Scheme()))
-	require.NoError(t, v1.AddToScheme(client.Scheme()))
+	require.NoError(t, v1alpha3.Install(client.Scheme()))
+	require.NoError(t, v1alpha2.Install(client.Scheme()))
+	require.NoError(t, v1beta1.Install(client.Scheme()))
+	require.NoError(t, v1.Install(client.Scheme()))
 	require.NoError(t, apiextensionsv1.AddToScheme(client.Scheme()))
 
 	supportedFeatures := suite.ParseSupportedFeatures(*flags.SupportedFeatures)

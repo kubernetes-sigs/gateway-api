@@ -48,10 +48,10 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		panic(fmt.Sprintf("Error initializing Kubernetes client: %v", err))
 	}
-	v1alpha3.AddToScheme(k8sClient.Scheme())
-	v1alpha2.AddToScheme(k8sClient.Scheme())
-	v1beta1.AddToScheme(k8sClient.Scheme())
-	v1.AddToScheme(k8sClient.Scheme())
+	v1alpha3.Install(k8sClient.Scheme())
+	v1alpha2.Install(k8sClient.Scheme())
+	v1beta1.Install(k8sClient.Scheme())
+	v1.Install(k8sClient.Scheme())
 
 	os.Exit(m.Run())
 }

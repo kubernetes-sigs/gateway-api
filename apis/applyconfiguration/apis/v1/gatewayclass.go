@@ -23,6 +23,7 @@ import (
 	types "k8s.io/apimachinery/pkg/types"
 	managedfields "k8s.io/apimachinery/pkg/util/managedfields"
 	v1 "k8s.io/client-go/applyconfigurations/meta/v1"
+
 	internal "sigs.k8s.io/gateway-api/apis/applyconfiguration/internal"
 	gatewayapiapisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
