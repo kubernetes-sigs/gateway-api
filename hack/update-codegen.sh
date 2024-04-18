@@ -50,7 +50,7 @@ readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
 readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
-readonly VERSIONS=(v1alpha2 v1beta1 v1)
+readonly VERSIONS=(v1alpha2 v1alpha3 v1beta1 v1)
 
 GATEWAY_INPUT_DIRS=""
 for VERSION in "${VERSIONS[@]}"

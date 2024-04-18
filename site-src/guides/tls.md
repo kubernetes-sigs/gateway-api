@@ -119,15 +119,15 @@ backend and how the certificate served by the backend Pod(s) should be verified.
 
 ### TargetRefs and TLS
 
-BackendTLSPolicy contains specification for the `TargetRef` and `TLS`.  TargetRef is required and
-identifies the `Service` for which your HTTPRoute requires TLS. The `TLS` configuration contains a
-required `Hostname`, and either `CACertRefs` or `WellKnownCACerts`.
+BackendTLSPolicy contains specification for the `TargetRefs` and `Validation`.  TargetRefs is required and
+identifies one or more `Service`s for which your HTTPRoute requires TLS. The `Validation` configuration contains a
+required `Hostname`, and either `CACertificateRefs` or `WellKnownCACertificates`.
 
 Hostname refers to the SNI the Gateway should use to connect to the backend, and
 must match the certificate served by the backend pod.
 
-CACertRefs refer to one or more PEM-encoded TLS certificates. If there are no specific certificates
-to use, then you must set WellKnownCACerts to "System" to tell the Gateway to use a set of trusted
+CACertificateRefs refer to one or more PEM-encoded TLS certificates. If there are no specific certificates
+to use, then you must set WellKnownCACertificates to "System" to tell the Gateway to use a set of trusted
 CA Certificates. There may be some variation in which system certificates are used by each implementation.
 Refer to documentation from your implementation of choice for more information.
 
@@ -145,7 +145,7 @@ TLS-encrypted upstream connection where Pods backing the `dev` Service are expec
 certificate for `dev.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha2/backendtlspolicy-system-certs.yaml' %}
+{% include 'experimental/v1alpha3/backendtlspolicy-system-certs.yaml' %}
 ```
 
 #### Using Explicit CA Certificates
@@ -155,7 +155,7 @@ map `auth-cert` to connect with a TLS-encrypted upstream connection where Pods b
 are expected to serve a valid certificate for `auth.example.com`.
 
 ```yaml
-{% include 'experimental/v1alpha2/backendtlspolicy-ca-certs.yaml' %}
+{% include 'experimental/v1alpha3/backendtlspolicy-ca-certs.yaml' %}
 ```
 
 ## Extensions

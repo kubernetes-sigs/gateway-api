@@ -28,27 +28,28 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	gatewayv1a2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-	"sigs.k8s.io/gateway-api/apis/v1beta1"
+	gatewayv1a3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
+	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
-func TestBackendTLSPolicyConfig(t *testing.T) {
+func TestBackendTLSPolicyValidation(t *testing.T) {
 	tests := []struct {
 		name        string
 		wantErrors  []string
-		routeConfig gatewayv1a2.BackendTLSPolicyConfig
+		routeConfig gatewayv1a3.BackendTLSPolicyValidation
 	}{
 		{
-			name: "valid BackendTLSPolicyConfig with WellKnownCACerts",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{
-				WellKnownCACerts: ptrTo(gatewayv1a2.WellKnownCACertType("System")),
-				Hostname:         "foo.example.com",
+			name: "valid BackendTLSPolicyValidation with WellKnownCACertificates",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("System")),
+				Hostname:                "foo.example.com",
 			},
 			wantErrors: []string{},
 		},
 		{
-			name: "valid BackendTLSPolicyConfig with CACertRefs",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{
-				CACertRefs: []v1beta1.LocalObjectReference{
+			name: "valid BackendTLSPolicyValidation with CACertificateRefs",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
 						Kind:  "kind",
@@ -60,38 +61,38 @@ func TestBackendTLSPolicyConfig(t *testing.T) {
 			wantErrors: []string{},
 		},
 		{
-			name:        "invalid BackendTLSPolicyConfig with missing fields",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{},
-			wantErrors:  []string{"spec.tls.hostname in body should be at least 1 chars long", "must specify either CACertRefs or WellKnownCACerts"},
+			name:        "invalid BackendTLSPolicyValidation with missing fields",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{},
+			wantErrors:  []string{"spec.validation.hostname in body should be at least 1 chars long", "must specify either CACertificateRefs or WellKnownCACertificates"},
 		},
 		{
-			name: "invalid BackendTLSPolicyConfig with both CACertRefs and WellKnownCACerts",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{
-				CACertRefs: []v1beta1.LocalObjectReference{
+			name: "invalid BackendTLSPolicyValidation with both CACertificateRefs and WellKnownCACertificates",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
 						Kind:  "kind",
 						Name:  "name",
 					},
 				},
-				WellKnownCACerts: ptrTo(gatewayv1a2.WellKnownCACertType("System")),
-				Hostname:         "foo.example.com",
+				WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("System")),
+				Hostname:                "foo.example.com",
 			},
 
-			wantErrors: []string{"must not contain both CACertRefs and WellKnownCACerts"},
+			wantErrors: []string{"must not contain both CACertificateRefs and WellKnownCACertificates"},
 		},
 		{
-			name: "invalid BackendTLSPolicyConfig with Unsupported value for WellKnownCACerts",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{
-				WellKnownCACerts: ptrTo(gatewayv1a2.WellKnownCACertType("bar")),
-				Hostname:         "foo.example.com",
+			name: "invalid BackendTLSPolicyValidation with Unsupported value for WellKnownCACertificates",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				WellKnownCACertificates: ptrTo(gatewayv1a3.WellKnownCACertificatesType("bar")),
+				Hostname:                "foo.example.com",
 			},
 			wantErrors: []string{"supported values: \"System\""},
 		},
 		{
-			name: "invalid BackendTLSPolicyConfig with empty Hostname field",
-			routeConfig: gatewayv1a2.BackendTLSPolicyConfig{
-				CACertRefs: []v1beta1.LocalObjectReference{
+			name: "invalid BackendTLSPolicyValidation with empty Hostname field",
+			routeConfig: gatewayv1a3.BackendTLSPolicyValidation{
+				CACertificateRefs: []v1beta1.LocalObjectReference{
 					{
 						Group: "group",
 						Kind:  "kind",
@@ -100,25 +101,30 @@ func TestBackendTLSPolicyConfig(t *testing.T) {
 				},
 				Hostname: "",
 			},
-			wantErrors: []string{"spec.tls.hostname in body should be at least 1 chars long"},
+			wantErrors: []string{"spec.validation.hostname in body should be at least 1 chars long"},
 		},
 	}
+
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			route := &gatewayv1a2.BackendTLSPolicy{
+			route := &gatewayv1a3.BackendTLSPolicy{
 				ObjectMeta: metav1.ObjectMeta{
 					Name:      fmt.Sprintf("foo-%v", time.Now().UnixNano()),
 					Namespace: metav1.NamespaceDefault,
 				},
-				Spec: gatewayv1a2.BackendTLSPolicySpec{
-					TargetRef: gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{
-						LocalPolicyTargetReference: gatewayv1a2.LocalPolicyTargetReference{
-							Group: "group",
-							Kind:  "kind",
-							Name:  "name",
+				Spec: gatewayv1a3.BackendTLSPolicySpec{
+					TargetRefs: []gatewayv1a2.LocalPolicyTargetReferenceWithSectionName{
+						{
+							gatewayv1a2.LocalPolicyTargetReference{
+								Group: "group",
+								Kind:  "kind",
+								Name:  "name",
+							},
+							// SectionName cannot contain capital letters.
+							ptrTo(gatewayv1a2.SectionName("section")),
 						},
 					},
-					TLS: tc.routeConfig,
+					Validation: tc.routeConfig,
 				},
 			}
 			validateBackendTLSPolicy(t, route, tc.wantErrors)
@@ -126,7 +132,7 @@ func TestBackendTLSPolicyConfig(t *testing.T) {
 	}
 }
 
-func validateBackendTLSPolicy(t *testing.T, route *gatewayv1a2.BackendTLSPolicy, wantErrors []string) {
+func validateBackendTLSPolicy(t *testing.T, route *gatewayv1a3.BackendTLSPolicy, wantErrors []string) {
 	t.Helper()
 
 	ctx := context.Background()

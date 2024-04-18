@@ -1094,54 +1094,6 @@ var schemaYAML = typed.YAMLObject(`types:
     - name: namespace
       type:
         scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicy
-  map:
-    fields:
-    - name: apiVersion
-      type:
-        scalar: string
-    - name: kind
-      type:
-        scalar: string
-    - name: metadata
-      type:
-        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
-      default: {}
-    - name: spec
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicySpec
-      default: {}
-    - name: status
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
-      default: {}
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicyConfig
-  map:
-    fields:
-    - name: caCertRefs
-      type:
-        list:
-          elementType:
-            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
-          elementRelationship: atomic
-    - name: hostname
-      type:
-        scalar: string
-      default: ""
-    - name: wellKnownCACerts
-      type:
-        scalar: string
-- name: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicySpec
-  map:
-    fields:
-    - name: targetRef
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
-      default: {}
-    - name: tls
-      type:
-        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.BackendTLSPolicyConfig
-      default: {}
 - name: io.k8s.sigs.gateway-api.apis.v1alpha2.GRPCRoute
   map:
     fields:
@@ -1394,6 +1346,56 @@ var schemaYAML = typed.YAMLObject(`types:
           elementType:
             namedType: io.k8s.sigs.gateway-api.apis.v1.RouteParentStatus
           elementRelationship: atomic
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicy
+  map:
+    fields:
+    - name: apiVersion
+      type:
+        scalar: string
+    - name: kind
+      type:
+        scalar: string
+    - name: metadata
+      type:
+        namedType: io.k8s.apimachinery.pkg.apis.meta.v1.ObjectMeta
+      default: {}
+    - name: spec
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicySpec
+      default: {}
+    - name: status
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.PolicyStatus
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicySpec
+  map:
+    fields:
+    - name: targetRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1alpha2.LocalPolicyTargetReferenceWithSectionName
+          elementRelationship: atomic
+    - name: validation
+      type:
+        namedType: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicyValidation
+      default: {}
+- name: io.k8s.sigs.gateway-api.apis.v1alpha3.BackendTLSPolicyValidation
+  map:
+    fields:
+    - name: caCertificateRefs
+      type:
+        list:
+          elementType:
+            namedType: io.k8s.sigs.gateway-api.apis.v1.LocalObjectReference
+          elementRelationship: atomic
+    - name: hostname
+      type:
+        scalar: string
+      default: ""
+    - name: wellKnownCACertificates
+      type:
+        scalar: string
 - name: io.k8s.sigs.gateway-api.apis.v1beta1.Gateway
   map:
     fields:

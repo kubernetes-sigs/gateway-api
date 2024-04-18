@@ -21,36 +21,20 @@ package fake
 import (
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
-	v1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
+	v1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3"
 )
 
-type FakeGatewayV1alpha2 struct {
+type FakeGatewayV1alpha3 struct {
 	*testing.Fake
 }
 
-func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
-	return &FakeGRPCRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {
-	return &FakeReferenceGrants{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) TCPRoutes(namespace string) v1alpha2.TCPRouteInterface {
-	return &FakeTCPRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) TLSRoutes(namespace string) v1alpha2.TLSRouteInterface {
-	return &FakeTLSRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) UDPRoutes(namespace string) v1alpha2.UDPRouteInterface {
-	return &FakeUDPRoutes{c, namespace}
+func (c *FakeGatewayV1alpha3) BackendTLSPolicies(namespace string) v1alpha3.BackendTLSPolicyInterface {
+	return &FakeBackendTLSPolicies{c, namespace}
 }
 
 // RESTClient returns a RESTClient that is used to communicate
 // with API server by this client implementation.
-func (c *FakeGatewayV1alpha2) RESTClient() rest.Interface {
+func (c *FakeGatewayV1alpha3) RESTClient() rest.Interface {
 	var ret *rest.RESTClient
 	return ret
 }

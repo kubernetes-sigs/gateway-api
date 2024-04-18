@@ -23,6 +23,7 @@ import (
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/apis/v1alpha3"
 	"sigs.k8s.io/gateway-api/apis/v1beta1"
 	confv1 "sigs.k8s.io/gateway-api/conformance/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/tests"
@@ -53,6 +54,7 @@ func DefaultOptions(t *testing.T) suite.ConformanceOptions {
 	clientset, err := clientset.NewForConfig(cfg)
 	require.NoError(t, err, "error initializing Kubernetes clientset")
 
+	require.NoError(t, v1alpha3.AddToScheme(client.Scheme()))
 	require.NoError(t, v1alpha2.AddToScheme(client.Scheme()))
 	require.NoError(t, v1beta1.AddToScheme(client.Scheme()))
 	require.NoError(t, v1.AddToScheme(client.Scheme()))

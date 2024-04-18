@@ -22,9 +22,11 @@ import (
 	schema "k8s.io/apimachinery/pkg/runtime/schema"
 	apisv1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
 	apisv1alpha2 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha2"
+	apisv1alpha3 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1alpha3"
 	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	v1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	v1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -141,12 +143,6 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.SecretObjectReferenceApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
-		return &apisv1alpha2.BackendTLSPolicyApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicyConfig"):
-		return &apisv1alpha2.BackendTLSPolicyConfigApplyConfiguration{}
-	case v1alpha2.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
-		return &apisv1alpha2.BackendTLSPolicySpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
 		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):
@@ -183,6 +179,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1alpha2.UDPRouteSpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("UDPRouteStatus"):
 		return &apisv1alpha2.UDPRouteStatusApplyConfiguration{}
+
+		// Group=gateway.networking.k8s.io, Version=v1alpha3
+	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicy"):
+		return &apisv1alpha3.BackendTLSPolicyApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicySpec"):
+		return &apisv1alpha3.BackendTLSPolicySpecApplyConfiguration{}
+	case v1alpha3.SchemeGroupVersion.WithKind("BackendTLSPolicyValidation"):
+		return &apisv1alpha3.BackendTLSPolicyValidationApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1beta1
 	case v1beta1.SchemeGroupVersion.WithKind("Gateway"):
