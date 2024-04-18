@@ -103,12 +103,14 @@ throughout the API, we've introduced some breaking changes to BackendTLSPolicy.
 This has resulted in a new API version (v1alpha3) and will require any existing
 users of this policy to uninstall the v1alpha2 version before installing this
 newer version.
+
 Any references to v1alpha2 BackendTLSPolicy fields will need to be updated.  Specific changes include: 
-* the field TargetRef is changed to allow multiples: BackendTLSPolicySpec.TargetRef  becomes a slice named TargetRefs.
-* the field TLS is changed to Validation, and the type name changes from BackendTLSPolicyConfig to  BackendTLSPolicyValidation.
-* the field CACertRefs becomes CACertificateRefs in what is now BackendTLSPolicyValidation
-* the field WellKnownCACerts becomes WellKnownCACertificates and the type name changes from WellKnownCACertType to WellKnownCACertificatesType.
-* the constant WellKnownCACertSystem becomes WellKnownCACertificatesSystem
+- the field TargetRef is changed to allow multiples: BackendTLSPolicySpec.TargetRef  becomes a slice named TargetRefs.
+- the field TLS is changed to Validation, and the type name changes from BackendTLSPolicyConfig to  BackendTLSPolicyValidation.
+- the field CACertRefs becomes CACertificateRefs in what is now BackendTLSPolicyValidation
+- the field WellKnownCACerts becomes WellKnownCACertificates and the type name changes from WellKnownCACertType to WellKnownCACertificatesType.
+- the constant WellKnownCACertSystem becomes WellKnownCACertificatesSystem
+
 Leading Contributors: @candita
 
 ### Gateway Params
