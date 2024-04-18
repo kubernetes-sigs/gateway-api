@@ -25,6 +25,7 @@ import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -34,9 +35,9 @@ func init() {
 var GatewayInfraMetadata = suite.ConformanceTest{
 	ShortName:   "GatewayInfraMetadata",
 	Description: "A Gateway should accept infrastructure metadata",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportGatewayInfrastructureMetadata,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportGatewayInfrastructureMetadata,
 	},
 	Manifests: []string{
 		"tests/gateway-infrastructure-metadata.yaml",
