@@ -37,10 +37,10 @@ func init() {
 var HTTPRouteBackendResponseHeaderModifier = suite.ConformanceTest{
 	ShortName:   "HTTPRouteBackendResponseHeaderModifier",
 	Description: "An HTTPRoute backendRef has response header modifier filters applied correctly",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteBackendResponseHeaderModification,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
+		features.SupportHTTPRouteBackendResponseHeaderModification,
 	},
 	Manifests: []string{"tests/httproute-response-header-modifier-backend.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
