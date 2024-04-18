@@ -38,7 +38,7 @@
 # v1.1.0-rc1
 
 We expect that this release candidate is quite close to the final v1.1.0
-release. However, breaking API changes are still possible.
+release. However, subsequent breaking API changes are still possible.
 
 This release candidate is suitable for implementors, but we do not recommend
 shipping products based on a release candidate API due to the possibility of
