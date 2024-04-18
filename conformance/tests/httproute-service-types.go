@@ -138,7 +138,7 @@ func setupEndpointSlices(t *testing.T, klient client.Client, endpointPrefixes []
 					}
 
 					endpoint := discoveryv1.Endpoint{
-						Addresses: []string{pod.Status.PodIP},
+						Addresses: []string{podIP.IP},
 						Conditions: discoveryv1.EndpointConditions{
 							Ready:       ptr.To(true),
 							Serving:     ptr.To(true),
