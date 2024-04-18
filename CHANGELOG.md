@@ -123,7 +123,7 @@ Leading Contributors: @howardjohn
 - TLS Configuration is no longer required on Gateway Listeners to enable more
   flexible TLS configuration. (#2721, @robscott)
 
-### Conformance
+### Conformance Tests
 
 - Fixed GatewayWithAttachedRoutes conformance test to not check that the
   HTTPRoute status includes an "Accepted: False" condition because this is not
