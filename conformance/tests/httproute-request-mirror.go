@@ -38,10 +38,10 @@ var HTTPRouteBackendRequestMirror = suite.ConformanceTest{
 	ShortName:   "HTTPRouteBackendRequestMirror",
 	Description: "An HTTPRoute backendRef with request mirror filter",
 	Manifests:   []string{"tests/httproute-request-mirror-backend.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteBackendRequestMirror,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
+		features.SupportHTTPRouteBackendRequestMirror,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		RunHTTPRouteRequestMirrorTest(t, suite, HTTPRouteRequestMirrorTestCases)
@@ -79,7 +79,6 @@ func RunHTTPRouteRequestMirrorTest(t *testing.T, suite *suite.ConformanceTestSui
 			http.ExpectMirroredRequest(t, suite.Client, suite.Clientset, tc.MirroredTo, tc.Request.Path)
 		})
 	}
-
 }
 
 var HTTPRouteRequestMirrorTestCases = []http.ExpectedResponse{{
