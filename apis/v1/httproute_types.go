@@ -24,6 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
@@ -196,8 +197,19 @@ type HTTPRouteRule struct {
 	// Filters define the filters that are applied to requests that match
 	// this rule.
 	//
-	// The effects of ordering of multiple behaviors are currently unspecified.
-	// This can change in the future based on feedback during the alpha stage.
+	// Wherever possible, implementations SHOULD implement filters in the order
+	// they are specified.
+	//
+	// Implementations MAY choose to implement this ordering strictly, rejecting
+	// any combination or order of filters that can not be supported. If implementations
+	// choose a strict interpretation of filter ordering, they MUST clearly document
+	// that behavior.
+	//
+	// To reject an invalid combination or order of filters, implementations SHOULD
+	// consider the Route Rules with this configuration invalid. If all Route Rules
+	// in a Route are invalid, the entire Route would be considered invalid. If only
+	// a portion of Route Rules are invalid, implementations MUST set the
+	// "PartiallyInvalid" condition for the Route.
 	//
 	// Conformance-levels at this level are defined based on the type of filter:
 	//
@@ -270,6 +282,15 @@ type HTTPRouteRule struct {
 	// +optional
 	// <gateway:experimental>
 	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+
+	// SessionPersistence defines and configures session persistence
+	// for the route rule.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
 }
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
@@ -821,7 +842,7 @@ type HTTPHeader struct {
 // HTTPHeaderFilter defines a filter that modifies the headers of an HTTP
 // request or response. Only one action for a given header name is permitted.
 // Filters specifying multiple actions of the same or different type for any one
-// header name are invalid and will be rejected by the webhook if installed.
+// header name are invalid and will be rejected by CRD validation.
 // Configuration to set or add multiple values for a header must use RFC 7230
 // header value formatting, separating each value with a comma.
 type HTTPHeaderFilter struct {
