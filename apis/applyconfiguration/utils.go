@@ -43,6 +43,8 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.BackendRefApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("CommonRouteSpec"):
 		return &apisv1.CommonRouteSpecApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("CookieConfig"):
+		return &apisv1.CookieConfigApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("FrontendTLSValidation"):
 		return &apisv1.FrontendTLSValidationApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("Gateway"):
@@ -141,8 +143,14 @@ func ForKind(kind schema.GroupVersionKind) interface{} {
 		return &apisv1.RouteStatusApplyConfiguration{}
 	case v1.SchemeGroupVersion.WithKind("SecretObjectReference"):
 		return &apisv1.SecretObjectReferenceApplyConfiguration{}
+	case v1.SchemeGroupVersion.WithKind("SessionPersistence"):
+		return &apisv1.SessionPersistenceApplyConfiguration{}
 
 		// Group=gateway.networking.k8s.io, Version=v1alpha2
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicy"):
+		return &apisv1alpha2.BackendLBPolicyApplyConfiguration{}
+	case v1alpha2.SchemeGroupVersion.WithKind("BackendLBPolicySpec"):
+		return &apisv1alpha2.BackendLBPolicySpecApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("GRPCRoute"):
 		return &apisv1alpha2.GRPCRouteApplyConfiguration{}
 	case v1alpha2.SchemeGroupVersion.WithKind("LocalPolicyTargetReference"):

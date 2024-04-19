@@ -18,6 +18,8 @@ limitations under the License.
 
 package v1alpha2
 
+type BackendLBPolicyExpansion interface{}
+
 type GRPCRouteExpansion interface{}
 
 type ReferenceGrantExpansion interface{}

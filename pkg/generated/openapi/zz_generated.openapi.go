@@ -87,6 +87,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.BackendObjectReference":                          schema_sigsk8sio_gateway_api_apis_v1_BackendObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.BackendRef":                                      schema_sigsk8sio_gateway_api_apis_v1_BackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.CommonRouteSpec":                                 schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.CookieConfig":                                    schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.FrontendTLSValidation":                           schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef":                                  schema_sigsk8sio_gateway_api_apis_v1_GRPCBackendRef(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.GRPCHeaderMatch":                                 schema_sigsk8sio_gateway_api_apis_v1_GRPCHeaderMatch(ref),
@@ -140,6 +141,10 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.RouteParentStatus":                               schema_sigsk8sio_gateway_api_apis_v1_RouteParentStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.RouteStatus":                                     schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy":                           schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicy(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicyList":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref),
+		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRoute":                                 schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRoute(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.GRPCRouteList":                             schema_sigsk8sio_gateway_api_apis_v1alpha2_GRPCRouteList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference":                schema_sigsk8sio_gateway_api_apis_v1alpha2_LocalPolicyTargetReference(ref),
@@ -2772,6 +2777,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_CommonRouteSpec(ref common.ReferenceCa
 	}
 }
 
+func schema_sigsk8sio_gateway_api_apis_v1_CookieConfig(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "CookieConfig defines the configuration for cookie-based session persistence.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"lifetimeType": {
+						SchemaProps: spec.SchemaProps{
+							Description: "LifetimeType specifies whether the cookie has a permanent or session-based lifetime. A permanent cookie persists until its specified expiry time, defined by the Expires or Max-Age cookie attributes, while a session cookie is deleted when the current session ends.\n\nWhen set to \"Permanent\", AbsoluteTimeout indicates the cookie's lifetime via the Expires or Max-Age cookie attributes and is required.\n\nWhen set to \"Session\", AbsoluteTimeout indicates the absolute lifetime of the cookie tracked by the gateway and is optional.\n\nSupport: Core for \"Session\" type\n\nSupport: Extended for \"Permanent\" type",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_sigsk8sio_gateway_api_apis_v1_FrontendTLSValidation(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -3183,11 +3208,17 @@ func schema_sigsk8sio_gateway_api_apis_v1_GRPCRouteRule(ref common.ReferenceCall
 							},
 						},
 					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch"},
+			"sigs.k8s.io/gateway-api/apis/v1.GRPCBackendRef", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.GRPCRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
 	}
 }
 
@@ -4556,11 +4587,17 @@ func schema_sigsk8sio_gateway_api_apis_v1_HTTPRouteRule(ref common.ReferenceCall
 							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts"),
 						},
 					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence for the route rule.\n\nSupport: Extended\n\n<gateway:experimental>",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts"},
+			"sigs.k8s.io/gateway-api/apis/v1.HTTPBackendRef", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteFilter", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteMatch", "sigs.k8s.io/gateway-api/apis/v1.HTTPRouteTimeouts", "sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"},
 	}
 }
 
@@ -5237,6 +5274,200 @@ func schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref common.Refer
 				Required: []string{"name"},
 			},
 		},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "SessionPersistence defines the desired state of SessionPersistence.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"sessionName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionName defines the name of the persistent session token which may be reflected in the cookie or the header. Users should avoid reusing session names to prevent unintended consequences, such as rejection or unpredictable behavior.\n\nSupport: Implementation-specific",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"absoluteTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "AbsoluteTimeout defines the absolute timeout of the persistent session. Once the AbsoluteTimeout duration has elapsed, the session becomes invalid.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"idleTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Description: "IdleTimeout defines the idle timeout of the persistent session. Once the session has been idle for more than the specified IdleTimeout duration, the session becomes invalid.\n\nSupport: Extended",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"type": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Type defines the type of session persistence such as through the use a header or cookie. Defaults to cookie based session persistence.\n\nSupport: Core for \"Cookie\" type\n\nSupport: Extended for \"Header\" type",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"cookieConfig": {
+						SchemaProps: spec.SchemaProps{
+							Description: "CookieConfig provides configuration settings that are specific to cookie-based session persistence.\n\nSupport: Core",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.CookieConfig"),
+						},
+					},
+				},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicy(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendLBPolicy provides a way to define load balancing rules for a backend.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta"),
+						},
+					},
+					"spec": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Spec defines the desired state of BackendLBPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec"),
+						},
+					},
+					"status": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Status defines the current state of BackendLBPolicy.",
+							Default:     map[string]interface{}{},
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"),
+						},
+					},
+				},
+				Required: []string{"spec"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec", "sigs.k8s.io/gateway-api/apis/v1alpha2.PolicyStatus"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendLBPolicyList contains a list of BackendLBPolicies",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"kind": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"apiVersion": {
+						SchemaProps: spec.SchemaProps{
+							Description: "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"metadata": {
+						SchemaProps: spec.SchemaProps{
+							Default: map[string]interface{}{},
+							Ref:     ref("k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta"),
+						},
+					},
+					"items": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy"),
+									},
+								},
+							},
+						},
+					},
+				},
+				Required: []string{"items"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ListMeta", "sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "BackendLBPolicySpec defines the desired state of BackendLBPolicy. Note: there is no Override or Default policy configuration.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"targetRefs": {
+						VendorExtensible: spec.VendorExtensible{
+							Extensions: spec.Extensions{
+								"x-kubernetes-list-map-keys": []interface{}{
+									"group",
+									"kind",
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
+							},
+						},
+						SchemaProps: spec.SchemaProps{
+							Description: "TargetRef identifies an API object to apply policy to. Currently, Backends (i.e. Service, ServiceImport, or any implementation-specific backendRef) are the only valid API target references.",
+							Type:        []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"),
+									},
+								},
+							},
+						},
+					},
+					"sessionPersistence": {
+						SchemaProps: spec.SchemaProps{
+							Description: "SessionPersistence defines and configures session persistence for the backend.\n\nSupport: Extended",
+							Ref:         ref("sigs.k8s.io/gateway-api/apis/v1.SessionPersistence"),
+						},
+					},
+				},
+				Required: []string{"targetRefs"},
+			},
+		},
+		Dependencies: []string{
+			"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence", "sigs.k8s.io/gateway-api/apis/v1alpha2.LocalPolicyTargetReference"},
 	}
 }
 

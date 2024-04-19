@@ -112,7 +112,6 @@ nav:
     - Provisional:
       - geps/gep-91/index.md
       - geps/gep-995/index.md
-      - geps/gep-1619/index.md
       - geps/gep-1651/index.md
       - geps/gep-1867/index.md
       - geps/gep-2648/index.md
@@ -121,6 +120,7 @@ nav:
     #   -
     - Experimental:
       - geps/gep-1016/index.md
+      - geps/gep-1619/index.md
       - geps/gep-1742/index.md
       - geps/gep-1748/index.md
       - geps/gep-1762/index.md

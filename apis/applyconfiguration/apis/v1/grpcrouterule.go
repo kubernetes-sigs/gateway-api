@@ -21,9 +21,10 @@ package v1
 // GRPCRouteRuleApplyConfiguration represents an declarative configuration of the GRPCRouteRule type for use
 // with apply.
 type GRPCRouteRuleApplyConfiguration struct {
-	Matches     []GRPCRouteMatchApplyConfiguration  `json:"matches,omitempty"`
-	Filters     []GRPCRouteFilterApplyConfiguration `json:"filters,omitempty"`
-	BackendRefs []GRPCBackendRefApplyConfiguration  `json:"backendRefs,omitempty"`
+	Matches            []GRPCRouteMatchApplyConfiguration    `json:"matches,omitempty"`
+	Filters            []GRPCRouteFilterApplyConfiguration   `json:"filters,omitempty"`
+	BackendRefs        []GRPCBackendRefApplyConfiguration    `json:"backendRefs,omitempty"`
+	SessionPersistence *SessionPersistenceApplyConfiguration `json:"sessionPersistence,omitempty"`
 }
 
 // GRPCRouteRuleApplyConfiguration constructs an declarative configuration of the GRPCRouteRule type for use with
@@ -68,5 +69,13 @@ func (b *GRPCRouteRuleApplyConfiguration) WithBackendRefs(values ...*GRPCBackend
 		}
 		b.BackendRefs = append(b.BackendRefs, *values[i])
 	}
+	return b
+}
+
+// WithSessionPersistence sets the SessionPersistence field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the SessionPersistence field is set to the value of the last call.
+func (b *GRPCRouteRuleApplyConfiguration) WithSessionPersistence(value *SessionPersistenceApplyConfiguration) *GRPCRouteRuleApplyConfiguration {
+	b.SessionPersistence = value
 	return b
 }
