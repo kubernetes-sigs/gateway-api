@@ -30,44 +30,56 @@ def on_pre_build(config, **kwargs):
     # calling to get the conformance reports generated
     yamlReports = getYaml()
     
-    generate_tables(yamlReports)
+    generate_conformance_tables(yamlReports)
 
 
 
 # NOTE: will have to be updated if new features are added
 httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderModification',"HTTPRouteQueryParamMatching",'HTTPRouteMethodMatching',"HTTPRouteResponseHeaderModification","HTTPRoutePortRedirect","HTTPRouteSchemeRedirect","HTTPRoutePathRedirect","HTTPRouteHostRewrite","HTTPRoutePathRewrite","HTTPRouteRequestMirror","HTTPRouteRequestMultipleMirrors","HTTPRouteRequestTimeout", "HTTPRouteBackendTimeout","HTTPRouteParentRefPort"]
 
+def generate_conformance_tables(reports):
 
-def generate_tables(reports):
-  # experimant to making the gateway table
- 
-  projects = reports['organization']
+  gateway_http_table = generate_profiles_report(reports,'HTTP')
+  # gateway_tls_table = generate_profiles_report(reprots,'TLS') #currently no implementation has extended supported features listed. Can uncomment once a list is needed to keep track
+    
+  mesh_http_table = generate_profiles_report(reports,'MESH')  
 
-  http_reports = reports.loc[reports["name"]=='HTTP']
+
+  with open('site-src/implementation-table.md','w') as f:
+    f.write("The following tables are populated from the conformance reports uploaded by project implementations. They are separated into the extended features that each project supports listed in their reports.\n\n")
+
+    f.write("# Gateway Profile\n\n")
+    f.write("## HTTPRoute\n\n")
+    f.write(gateway_http_table.to_markdown()+'\n\n')
+
+    f.write("# Mesh Profile\n\n")
+    f.write("## HTTPRoute\n\n")
+    f.write(mesh_http_table.to_markdown())
+
+# reports: raw report passed , route: the x in xRoute
+def generate_profiles_report(reports, route): 
+
+  http_reports = reports.loc[reports["name"]==route]
+  projects = http_reports['organization']
   http_reports.set_index('organization')
   http_reports.sort_values(['organization','version'], inplace=True)
   http_reports.drop_duplicates(subset='organization', inplace=True, keep='last')
   
-  table = pandas.DataFrame(columns=http_reports['organization'])
-  table.insert(loc=0, column='Features', value=httproute_extended_conformance_features_list)
+  http_table = pandas.DataFrame(columns=http_reports['organization'])
+  http_table.insert(loc=0, column='Features', value=httproute_extended_conformance_features_list)
   http_reports= http_reports[["organization","extended.supportedFeatures"]] 
     
-  table.set_index('Features')
+  http_table.set_index('Features')
   for feat in  httproute_extended_conformance_features_list:
     
     for proj in projects: # for each project, check if the feature is supported
 
       if feat in http_reports.loc[http_reports["organization"]==proj]['extended.supportedFeatures'].to_list()[0]:
-        table.loc[table['Features']==feat,proj] = ':white_check_mark:'
+        http_table.loc[http_table['Features']==feat,proj] = ':white_check_mark:'
       else:
-        table.loc[table['Features']==feat,proj] = ':x:'
-
-  with open('site-src/implementation-table.md','w') as f:
-    f.write("The following tables are populated from the conformance reports uploaded by project implementations. They are separated into the extended features that each project supports listed in their reports.\n\n")
-    f.write(table.to_markdown(index=False)+'\n\n')
-
-    # f.write("# Mesh Comparison\n\n")
-    # f.write(table.to_markdown())
+        http_table.loc[http_table['Features']==feat,proj] = ':x:'
+  
+  return http_table.set_index('Features').T
 
 
 
