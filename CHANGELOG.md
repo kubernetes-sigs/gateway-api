@@ -75,8 +75,10 @@ Leading Contributors: @mlavacca, @shaneutt
 
 ### Port in ParentRefs
 
-You can now use a `port` field in ParentRefs to attach to Gateways, Services, or
-other parent resources.
+The `port` field in ParentRefs has graduated to GA (v1) and is now part of the Standard Channel.
+You can use the `port` field to attach resources to Gateways, Services, or other parent resources.
+For example, you can attach an HTTPRoute to one or more specific Listeners of a Gateway based
+on the Listener `port`, instead of `name` field.
 
 Leading Contributor: @frankbu
 
