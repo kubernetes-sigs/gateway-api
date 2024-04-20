@@ -69,5 +69,8 @@ issues:
     - linters:
       - testifylint
       text: "require must only be used in the goroutine running the test function"
+    - linters:
+      - testifylint
+      text: "contains assertions that must only be used in the goroutine running the test function"
   exclude:
     - Using the variable on range scope `tc` in function literal

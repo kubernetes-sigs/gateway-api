@@ -35,6 +35,7 @@ import (
 var standardKinds = map[string]bool{
 	"GatewayClass":   true,
 	"Gateway":        true,
+	"GRPCRoute":      true,
 	"HTTPRoute":      true,
 	"ReferenceGrant": true,
 }
@@ -44,6 +45,7 @@ var standardKinds = map[string]bool{
 func main() {
 	roots, err := loader.LoadRoots(
 		"k8s.io/apimachinery/pkg/runtime/schema", // Needed to parse generated register functions.
+		"sigs.k8s.io/gateway-api/apis/v1alpha3",
 		"sigs.k8s.io/gateway-api/apis/v1alpha2",
 		"sigs.k8s.io/gateway-api/apis/v1beta1",
 		"sigs.k8s.io/gateway-api/apis/v1",
@@ -105,7 +107,10 @@ func main() {
 			crd.FixTopLevelMetadata(crdRaw)
 
 			channelCrd := crdRaw.DeepCopy()
-			for _, version := range channelCrd.Spec.Versions {
+			for i, version := range channelCrd.Spec.Versions {
+				if channel == "standard" && strings.Contains(version.Name, "alpha") {
+					channelCrd.Spec.Versions[i].Served = false
+				}
 				version.Schema.OpenAPIV3Schema.Properties = gatewayTweaks(channel, version.Schema.OpenAPIV3Schema.Properties)
 			}
 

@@ -24,6 +24,7 @@ import (
 // +kubebuilder:object:root=true
 // +kubebuilder:resource:categories=gateway-api
 // +kubebuilder:subresource:status
+// +kubebuilder:storageversion
 // +kubebuilder:printcolumn:name="Hostnames",type=string,JSONPath=`.spec.hostnames`
 // +kubebuilder:printcolumn:name="Age",type=date,JSONPath=`.metadata.creationTimestamp`
 
@@ -281,6 +282,15 @@ type HTTPRouteRule struct {
 	// +optional
 	// <gateway:experimental>
 	Timeouts *HTTPRouteTimeouts `json:"timeouts,omitempty"`
+
+	// SessionPersistence defines and configures session persistence
+	// for the route rule.
+	//
+	// Support: Extended
+	//
+	// +optional
+	// <gateway:experimental>
+	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
 }
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.

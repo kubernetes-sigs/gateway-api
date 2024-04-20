@@ -25,9 +25,10 @@ import (
 // GatewayTLSConfigApplyConfiguration represents an declarative configuration of the GatewayTLSConfig type for use
 // with apply.
 type GatewayTLSConfigApplyConfiguration struct {
-	Mode            *v1.TLSModeType                           `json:"mode,omitempty"`
-	CertificateRefs []SecretObjectReferenceApplyConfiguration `json:"certificateRefs,omitempty"`
-	Options         map[v1.AnnotationKey]v1.AnnotationValue   `json:"options,omitempty"`
+	Mode               *v1.TLSModeType                           `json:"mode,omitempty"`
+	CertificateRefs    []SecretObjectReferenceApplyConfiguration `json:"certificateRefs,omitempty"`
+	FrontendValidation *FrontendTLSValidationApplyConfiguration  `json:"frontendValidation,omitempty"`
+	Options            map[v1.AnnotationKey]v1.AnnotationValue   `json:"options,omitempty"`
 }
 
 // GatewayTLSConfigApplyConfiguration constructs an declarative configuration of the GatewayTLSConfig type for use with
@@ -54,6 +55,14 @@ func (b *GatewayTLSConfigApplyConfiguration) WithCertificateRefs(values ...*Secr
 		}
 		b.CertificateRefs = append(b.CertificateRefs, *values[i])
 	}
+	return b
+}
+
+// WithFrontendValidation sets the FrontendValidation field in the declarative configuration to the given value
+// and returns the receiver, so that objects can be built by chaining "With" function invocations.
+// If called multiple times, the FrontendValidation field is set to the value of the last call.
+func (b *GatewayTLSConfigApplyConfiguration) WithFrontendValidation(value *FrontendTLSValidationApplyConfiguration) *GatewayTLSConfigApplyConfiguration {
+	b.FrontendValidation = value
 	return b
 }
 

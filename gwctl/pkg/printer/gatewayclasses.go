@@ -19,7 +19,10 @@ package printer
 import (
 	"fmt"
 	"io"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/ptr"
 	"os"
+	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sort"
 	"strings"
 	"text/tabwriter"
@@ -39,11 +42,19 @@ type GatewayClassesPrinter struct {
 }
 
 type gatewayClassDescribeView struct {
+	APIVersion  string             `json:",omitempty"`
+	Kind        string             `json:",omitempty"`
+	Metadata    *metav1.ObjectMeta `json:",omitempty"`
+	Labels      *map[string]string `json:",omitempty"`
+	Annotations *map[string]string `json:",omitempty"`
+
 	// GatewayClass name
 	Name           string `json:",omitempty"`
 	ControllerName string `json:",omitempty"`
 	// GatewayClass description
-	Description              *string                `json:",omitempty"`
+	Description *string `json:",omitempty"`
+
+	Status                   *v1.GatewayClassStatus `json:",omitempty"`
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
 }
 
@@ -89,10 +100,32 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 	index := 0
 	for _, gatewayClassNode := range resourceModel.GatewayClasses {
 		index++
+		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
+		metadata := gatewayClassNode.GatewayClass.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
 
+		// views ordered with respect to https://gateway-api.sigs.k8s.io/geps/gep-2722/
 		views := []gatewayClassDescribeView{
 			{
 				Name: gatewayClassNode.GatewayClass.GetName(),
+			},
+			{
+				Labels: ptr.To(gatewayClassNode.GatewayClass.GetLabels()),
+			},
+			{
+				Annotations: ptr.To(gatewayClassNode.GatewayClass.GetAnnotations()),
+			},
+			{
+				APIVersion: apiVersion,
+			},
+			{
+				Kind: kind,
+			},
+			{
+				Metadata: metadata,
 			},
 			{
 				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
@@ -103,6 +136,9 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				Description: gatewayClassNode.GatewayClass.Spec.Description,
 			})
 		}
+		views = append(views, gatewayClassDescribeView{
+			Status: &gatewayClassNode.GatewayClass.Status,
+		})
 
 		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
 			views = append(views, gatewayClassDescribeView{
@@ -116,7 +152,12 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(gcp.Out, string(b))
+			output := string(b)
+
+			emptyOutput := strings.TrimSpace(output) == "{}"
+			if !emptyOutput {
+				fmt.Fprint(gcp.Out, output)
+			}
 		}
 
 		if index+1 <= len(resourceModel.GatewayClasses) {

@@ -18,7 +18,7 @@ limitations under the License.
 
 package v1alpha2
 
-type BackendTLSPolicyExpansion interface{}
+type BackendLBPolicyExpansion interface{}
 
 type GRPCRouteExpansion interface{}
 

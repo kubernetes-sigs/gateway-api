@@ -30,33 +30,34 @@ All Gateway API Routes that point to a referenced Service should respect a confi
 
 The specification of a [BackendTLSPolicy][backendtlspolicy] consists of:
 
-- [TargetRef][targetRef] - Defines the targeted API object of the policy.  Only Service is allowed.
-- [TLS][tls] - Defines the configuration for TLS, including hostname, CACertRefs, and WellKnownCACerts.
+- [TargetRefs][targetRefs] - Defines the targeted API object of the policy.  Only Service is allowed.
+- [Validation][validation] - Defines the configuration for TLS, including hostname, CACertificateRefs, and
+WellKnownCACertificates.
 - [Hostname][hostname] - Defines the Server Name Indication (SNI) that the Gateway uses to connect to the backend.
-- [CACertRefs][caCertRefs] - Defines one or more references to objects that contain PEM-encoded TLS certificates,
-which are used to establish a TLS handshake between the Gateway and backend Pod.  Either CACertRefs or WellKnownCACerts
-may be specified, but not both.
-- [WellKnownCACerts][wellKnownCACerts] - Specifies whether system CA certificates may be used in the TLS
-handshake between the Gateway and backend Pod.  Either CACertRefs or WellKnownCACerts may be specified, but not both.
+- [CACertificateRefs][caCertificateRefs] - Defines one or more references to objects that contain PEM-encoded TLS certificates,
+which are used to establish a TLS handshake between the Gateway and backend Pod.  Either CACertficateRefs or
+WellKnownCACertificates may be specified, but not both.
+- [WellKnownCACertificates][wellKnownCACertificates] - Specifies whether system CA certificates may be used in the TLS
+handshake between the Gateway and backend Pod.  Either CACertficateRefs or WellKnownCACertificates may be specified, but not both.
 
 The following chart outlines the object definitions and relationship:
 ```mermaid
 flowchart LR
     backendTLSPolicy[["<b>backendTLSPolicy</b> <hr><align=left>BackendTLSPolicySpec: spec<br>PolicyStatus: status</align>"]]
-    spec[["<b>spec</b><hr>PolicyTargetReferenceWithSectionName: targetRef <br> BackendTLSPolicyConfig: tls"]]
+    spec[["<b>spec</b><hr>PolicyTargetReferenceWithSectionName: targetRefs <br> BackendTLSPolicyValidation: tls"]]
     status[["<b>status</b><hr>[ ]PolicyAncestorStatus: ancestors"]]
-    tls[["<b>tls</b><hr>LocalObjectReference: caCertRefs<br>wellKnownCACertType: wellKnownCACerts<br>PreciseHostname: hostname"]]
+    validation[["<b>tls</b><hr>LocalObjectReference: caCertificateRefs<br>wellKnownCACertificatesType: wellKnownCACertificates/<br>PreciseHostname: hostname"]]
     ancestorStatus[["<b>ancestors</b><hr>AncestorRef: parentReference<br>GatewayController: controllerName<br>[]Condition: conditions"]]
-    targetRef[[<b>targetRef</b><hr>]]
+    targetRefs[<b>targetRefs</b><hr>]]
     service["<b>service</>"]
     backendTLSPolicy -->spec
     backendTLSPolicy -->status
-    spec -->targetRef & tls
+    spec -->targetRefs & validation
     status -->ancestorStatus
-    targetRef -->service
-    note[<em>choose only one<hr> caCertRef OR wellKnownCACerts</em>]
+    targetRefs -->service
+    note[<em>choose only one<hr> caCerticateRefs OR wellKnownCACertificates</em>]
     style note fill:#fff
-    tls -.- note
+    validation -.- note
 ```
 
 The following illustrates a BackendTLSPolicy that configures TLS for a Service serving a backend:
@@ -81,17 +82,17 @@ flowchart LR
 
 ### Targeting backends
 
-A BackendTLSPolicy targets a backend Pod (or set of Pods) via a TargetRef to a Service.  This TargetRef is a
+A BackendTLSPolicy targets a backend Pod (or set of Pods) via one or more TargetRefs to a Service.  This TargetRef is a
 required object reference that specifies a Service by its Name, Kind (Service), and optionally its Namespace and Group.
-TargetRef identifies the Service for which your HTTPRoute requires TLS.
+TargetRefs identify the Service/s for which your HTTPRoute requires TLS.
 
 !!! info "Restrictions"
 
     - Cross-namespace certificate references are not allowed.
 
-### BackendTLSPolicyConfig
+### BackendTLSPolicyValidation
 
-A BackendTLSPolicyConfig is the specification for the BackendTLSPolicy and defines the configuration for TLS,
+A BackendTLSPolicyValidation is the specification for the BackendTLSPolicy and defines the configuration for TLS,
 including hostname (for server name indication) and certificates.
 
 #### Hostname
@@ -110,23 +111,23 @@ Also note:
 
 #### Certificates
 
-The BackendTLSPolicyConfig must contain a certificate reference of some kind, and contains two ways to configure the
-certificate to use for backend TLS, CACertRefs and WellKnownCACerts.  Only one of these may be used per
-BackendTLSPolicyConfig.
+The BackendTLSPolicyValidation must contain a certificate reference of some kind, and contains two ways to configure the
+certificate to use for backend TLS, CACertificateRefs and WellKnownCACertificates.  Only one of these may be used per
+BackendTLSPolicyValidation.
 
-##### CaCertRefs
+##### CACertficateRefs
 
-CACertRefs refer to one or more PEM-encoded TLS certificates.
+CACertificateRefs refer to one or more PEM-encoded TLS certificates.
 
 !!! info "Restrictions"
 
     - Cross-namespace certificate references are not allowed.
 
-##### WellKnownCACerts
+##### WellKnownCACertificates
 
 If you are working in an environment where specific TLS certificates are not required, and your Gateway API
 implementation allows system or default certificates to be used, e.g. in a development environment, you may
-set WellKnownCACerts to "System" to tell the Gateway to use a set of trusted CA Certificates. There may be
+set WellKnownCACertificates to "System" to tell the Gateway to use a set of trusted CA Certificates. There may be
 some variation in which system certificates are used by each implementation. Refer to documentation from your
 implementation of choice for more information.
 
@@ -136,9 +137,9 @@ Status defines the observed state of the BackendTLSPolicy and is not user-config
 way you do for other Gateway API objects to verify correct operation.  Note that the status in BackendTLSPolicy
 uses `PolicyAncestorStatus` to allow you to know which parentReference set that particular status.
 
-[backendtlspolicy]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicy
-[tls]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicy.TLS
-[caCertRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicyConfig.CACertRefs
-[wellKnownCACerts]: /references/spec/#gateway.networking.k8s.io/v1alpha2.BackendTLSPolicyConfig.WellKnownCACerts
+[backendtlspolicy]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy
+[validation]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicy.Validation
+[caCertificateRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.CACertificateRefs
+[wellKnownCACertificates]: /references/spec/#gateway.networking.k8s.io/v1alpha3.BackendTLSPolicyValidation.WellKnownCACertificates
 [hostname]: /references/spec/#gateway.networking.k8s.io/v1.PreciseHostname
-[targetRef]: /references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference
+[targetRefs]: /references/spec/#gateway.networking.k8s.io/v1alpha2.PolicyTargetReference

@@ -19,7 +19,6 @@ package tests
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -29,6 +28,7 @@ import (
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -57,9 +57,9 @@ func init() {
 var GatewayStaticAddresses = suite.ConformanceTest{
 	ShortName:   "GatewayStaticAddresses",
 	Description: "A Gateway in the gateway-conformance-infra namespace should be able to use previously determined addresses.",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportGatewayStaticAddresses,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportGatewayStaticAddresses,
 	},
 	Manifests: []string{
 		"tests/gateway-static-addresses.yaml",
@@ -69,7 +69,7 @@ var GatewayStaticAddresses = suite.ConformanceTest{
 			Name:      "gateway-static-addresses",
 			Namespace: "gateway-conformance-infra",
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), s.TimeoutConfig.DefaultTestTimeout)
 		defer cancel()
 
 		t.Logf("waiting for namespace %s and Gateway %s to be ready for testing", gwNN.Namespace, gwNN.Name)
