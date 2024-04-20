@@ -223,6 +223,24 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 			},
 		},
 
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				Kind: "HTTPRoute",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-httproute",
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{{
+						Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+						Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+						Name:  "foo-gateway",
+					}},
+				},
+			},
+		},
+
 		&apiextensionsv1.CustomResourceDefinition{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "healthcheckpolicies.foo.com",
@@ -345,11 +363,26 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
 Name: foo-gateway
-GatewayClass: foo-gatewayclass
+Namespace: ""
+Labels: null
+Annotations: null
+APIVersion: ""
+Kind: ""
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
+Spec:
+  gatewayClassName: foo-gatewayclass
+  listeners: null
+Status: {}
+AttachedRoutes:
+  Kind       Name
+  ----       ----
+  HTTPRoute  /foo-httproute
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: health-check-gateway
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  /health-check-gateway
 EffectivePolicies:
   HealthCheckPolicy.foo.com:
     key1: value-parent-1
