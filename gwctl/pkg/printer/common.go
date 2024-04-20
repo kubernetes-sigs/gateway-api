@@ -23,6 +23,9 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 	"sigs.k8s.io/yaml"
 )
 
@@ -121,4 +124,27 @@ func (t *Table) indentRow(row []string, indent int) []string {
 	newRow := append([]string{}, row...)
 	newRow[0] = fmt.Sprintf("%s%s", strings.Repeat(" ", indent), newRow[0])
 	return newRow
+}
+
+func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table {
+	table := &Table{
+		ColumnNames:  []string{"Type", "Reason", "Age", "From", "Message"},
+		UseSeparator: true,
+	}
+	for _, event := range events {
+		age := "Unknown"
+		if !event.FirstTimestamp.IsZero() {
+			age = duration.HumanDuration(clock.Since(event.FirstTimestamp.Time))
+		}
+
+		row := []string{
+			event.Type,             // Type
+			event.Reason,           // Reason
+			age,                    // Age
+			event.Source.Component, // From
+			event.Message,          // Message
+		}
+		table.Rows = append(table.Rows, row)
+	}
+	return table
 }

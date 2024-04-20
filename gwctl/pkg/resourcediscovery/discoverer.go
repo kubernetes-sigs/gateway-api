@@ -29,11 +29,18 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+)
+
+const (
+	// Maximum number of events to be fetched for each resource when constructing
+	// the resourceModel.
+	maxEventsPerResource = 10
 )
 
 // Filter struct defines parameters for filtering resources
@@ -82,6 +89,8 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 		return resourceModel, err
 	}
 	resourceModel.addGateways(gateways...)
+
+	d.discoverEventsForGateways(ctx, resourceModel)
 
 	d.discoverHTTPRoutesFromGateways(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
@@ -325,6 +334,29 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
 func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
+}
+
+// discoverEventsForGateways adds Events associated with Gateways that exist in
+// the resourceModel.
+func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel *ResourceModel) {
+	for _, gatewayNode := range resourceModel.Gateways {
+		eventList := &corev1.EventList{}
+		options := &client.ListOptions{
+			FieldSelector: fields.AndSelectors(
+				fields.OneTermEqualSelector("involvedObject.kind", "Gateway"),
+				fields.OneTermEqualSelector("involvedObject.name", gatewayNode.Gateway.Name),
+				fields.OneTermEqualSelector("involvedObject.namespace", gatewayNode.Gateway.Namespace),
+			),
+			Limit: maxEventsPerResource,
+		}
+		if err := d.K8sClients.Client.List(ctx, eventList, options); err != nil {
+			klog.V(1).ErrorS(err, "Failed to list events associated with Gateway",
+				"gateway", gatewayNode.Gateway.Namespace+"/"+gatewayNode.Gateway.Name)
+			continue
+		}
+
+		gatewayNode.Events = append(gatewayNode.Events, eventList.Items...)
+	}
 }
 
 // fetchGatewayClasses fetches GatewayClasses based on a filter.

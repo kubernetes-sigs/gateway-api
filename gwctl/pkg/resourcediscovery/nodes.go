@@ -151,6 +151,8 @@ type GatewayNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this Gateway,
 	// considering inheritance and hierarchy.
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
+	// Events contains the events associated with this Gateway.
+	Events []corev1.Event
 }
 
 func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
@@ -159,6 +161,7 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
+		Events:            []corev1.Event{},
 	}
 }
 

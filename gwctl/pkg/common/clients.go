@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/discovery"
@@ -93,7 +94,28 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 		t.Fatal(err)
 	}
 
-	fakeClient := fakeclient.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initRuntimeObjects...).Build()
+	// extractorFunc are used to build an index for Event objects. This is
+	// required to properly mock things like the following when listing Events
+	// associated with a resource:
+	//
+	// 	fields.OneTermEqualSelector("involvedObject.kind", "Gateway")
+	eventKindExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Kind}
+	}
+	eventNameExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Name}
+	}
+	eventNamespaceExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Namespace}
+	}
+
+	fakeClient := fakeclient.NewClientBuilder().
+		WithScheme(scheme).
+		WithRuntimeObjects(initRuntimeObjects...).
+		WithIndex(&corev1.Event{}, "involvedObject.kind", eventKindExtractorFunc).
+		WithIndex(&corev1.Event{}, "involvedObject.name", eventNameExtractorFunc).
+		WithIndex(&corev1.Event{}, "involvedObject.namespace", eventNamespaceExtractorFunc).
+		Build()
 	fakeDC := fakedynamicclient.NewSimpleDynamicClient(scheme, initRuntimeObjects...)
 	fakeDiscoveryClient := fakeclientset.NewSimpleClientset().Discovery()
 

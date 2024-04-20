@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -342,6 +343,22 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 				},
 			},
 		},
+
+		&corev1.Event{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "event-1",
+			},
+			Type:   corev1.EventTypeNormal,
+			Reason: "SYNC",
+			Source: corev1.EventSource{
+				Component: "my-gateway-controller",
+			},
+			InvolvedObject: corev1.ObjectReference{
+				Kind: "Gateway",
+				Name: "foo-gateway",
+			},
+			Message: "some random message",
+		},
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
@@ -393,6 +410,10 @@ EffectivePolicies:
   TimeoutPolicy.bar.com:
     condition: path=/abc
     seconds: 30
+Events:
+  Type    Reason  Age      From                   Message
+  ----    ------  ---      ----                   -------
+  Normal  SYNC    Unknown  my-gateway-controller  some random message
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
