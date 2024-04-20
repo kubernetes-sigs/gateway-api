@@ -83,6 +83,7 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 	}
 	resourceModel.addGateways(gateways...)
 
+	d.discoverHTTPRoutesFromGateways(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
@@ -216,6 +217,50 @@ func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resource
 	for httpRouteID, httpRouteNode := range resourceModel.HTTPRoutes {
 		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
 			resourceModel.connectHTTPRouteWithGateway(httpRouteID, GatewayID(gatewayRef.Namespace, gatewayRef.Name))
+		}
+	}
+}
+
+// discoverHTTPRoutesFromGateways will add HTTPRoutes that are attached to any
+// Gateway in the resourceModel.
+func (d Discoverer) discoverHTTPRoutesFromGateways(ctx context.Context, resourceModel *ResourceModel) {
+	httpRoutes, err := fetchHTTPRoutes(ctx, d.K8sClients, Filter{ /* all HTTPRoutes */ })
+	if err != nil {
+		klog.V(1).ErrorS(err, "Failed to list all HTTPRoutes")
+	}
+
+	// Loop through all HTTPRoutes and figure out which are linked to a Gateway
+	// that exists in the ResourceModel.
+	for _, httpRoute := range httpRoutes {
+		klog.V(1).InfoS("Evaluating whether HTTPRoute needs to be included in the resourceModel",
+			"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+		)
+		var isHTTPRouteAttachedToValidGateway bool
+
+		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(httpRoute) {
+			// Check if Gateway exists in the resourceModel.
+			gatewayID := GatewayID(gatewayRef.Namespace, gatewayRef.Name)
+			_, ok := resourceModel.Gateways[gatewayID]
+			if !ok {
+				continue
+			}
+
+			// At this point, we know that httpRoute is attached to a Gateway which
+			// exists in the resourceModel.
+			klog.V(1).InfoS("HTTPRoute included in the resource model because it is attached to a relevant Gateway",
+				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+				"gateway", gatewayRef.Namespace+"/"+gatewayRef.Name,
+			)
+			isHTTPRouteAttachedToValidGateway = true
+
+			resourceModel.addHTTPRoutes(httpRoute)
+			resourceModel.connectHTTPRouteWithGateway(HTTPRouteID(httpRoute.GetNamespace(), httpRoute.GetName()), gatewayID)
+		}
+
+		if !isHTTPRouteAttachedToValidGateway {
+			klog.V(1).InfoS("Skipping HTTPRoute since it does not reference any relevant Gateway",
+				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+			)
 		}
 	}
 }
