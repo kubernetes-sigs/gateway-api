@@ -23,11 +23,11 @@ theme:
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: custom
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: (prefers-color-scheme)
-      primary: custom
       toggle:
         icon: material/brightness-auto
         name: Switch to light mode
