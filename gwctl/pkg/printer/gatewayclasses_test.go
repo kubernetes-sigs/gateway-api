@@ -107,7 +107,7 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	gcp := &GatewayClassesPrinter{
@@ -236,7 +236,7 @@ Status: {}
 			}
 			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 			if err != nil {
-				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+				t.Fatalf("Failed to construct resourceModel: %v", err)
 			}
 
 			gcp := &GatewayClassesPrinter{

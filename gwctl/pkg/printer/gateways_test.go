@@ -182,7 +182,7 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	gp := &GatewaysPrinter{
@@ -372,7 +372,7 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	gp := &GatewaysPrinter{
