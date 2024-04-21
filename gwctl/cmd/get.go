@@ -87,10 +87,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		ns = ""
 	}
 
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
+	discoverer := resourcediscovery.NewDiscoverer(params.K8sClients, params.PolicyManager)
 	realClock := clock.RealClock{}
 
 	nsPrinter := &printer.NamespacesPrinter{Writer: params.Out, Clock: realClock}

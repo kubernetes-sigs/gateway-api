@@ -78,10 +78,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		ns = metav1.NamespaceAll
 	}
 
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
+	discoverer := resourcediscovery.NewDiscoverer(params.K8sClients, params.PolicyManager)
 
 	policiesPrinter := &printer.PoliciesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
