@@ -182,8 +182,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwcPrinter.PrintDescribeView(resourceModel)
 
 	case "backend", "backends":
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
 		filter := resourcediscovery.Filter{
 			Namespace: ns,
+			Labels:    selector,
 		}
 		if len(args) > 1 {
 			filter.Name = args[1]
