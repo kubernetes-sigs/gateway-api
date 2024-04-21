@@ -37,9 +37,9 @@ func NewGetCommand() *cobra.Command {
 	var outputFormat string
 
 	cmd := &cobra.Command{
-		Use:   "get {namespaces|gateways|gatewayclasses|policies|policycrds|httproutes}",
+		Use:   "get {namespaces|gateways|gatewayclasses|policies|policycrds|httproutes} RESOURCE_NAME",
 		Short: "Display one or many resources",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
 			params := getParams(kubeConfigPath)
 			runGet(cmd, args, params)
