@@ -104,7 +104,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			}
 		}
 		policiesPrinter.PrintPoliciesDescribeView(policyList)
-	
+
 	case "policycrd", "policycrds":
 		var policyCrdList []policymanager.PolicyCRD
 		if len(args) == 1 {

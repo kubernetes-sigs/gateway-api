@@ -192,7 +192,6 @@ func orderPolicyByPrecedence(a, b Policy) (Policy, Policy) {
 		if higherNN > lowerNN {
 			higherPolicy, lowerPolicy = lowerPolicy, higherPolicy
 		}
-
 	} else if higherPolicy.u.GetCreationTimestamp().Time.After(lowerPolicy.u.GetCreationTimestamp().Time) {
 		// Policies have difference creation time, so this will decide the precedence
 		higherPolicy, lowerPolicy = lowerPolicy, higherPolicy

@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -67,7 +68,9 @@ func (p *PolicyManager) Init(ctx context.Context) error {
 		return err
 	}
 	for _, unstrucutredPolicy := range allPolicies {
-		p.AddPolicy(unstrucutredPolicy)
+		if err := p.AddPolicy(unstrucutredPolicy); err != nil {
+			return err
+		}
 	}
 
 	return nil

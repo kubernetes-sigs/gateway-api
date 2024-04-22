@@ -72,5 +72,9 @@ issues:
     - linters:
       - testifylint
       text: "contains assertions that must only be used in the goroutine running the test function"
+    # It is valid usage to wrap errors without using %w to not make them part of
+    # the API contract.
+    - linters: ["errorlint"]
+      text: "non-wrapping format verb for fmt.Errorf. Use `%w` to format errors"
   exclude:
     - Using the variable on range scope `tc` in function literal

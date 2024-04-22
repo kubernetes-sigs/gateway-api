@@ -30,6 +30,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	fakeclient "sigs.k8s.io/controller-runtime/pkg/client/fake"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	gatewayv1alpha3 "sigs.k8s.io/gateway-api/apis/v1alpha3"
@@ -52,10 +53,18 @@ func NewK8sClients(kubeconfig string) (*K8sClients, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize Kubernetes client: %v", err)
 	}
-	gatewayv1alpha3.AddToScheme(client.Scheme())
-	gatewayv1alpha2.AddToScheme(client.Scheme())
-	gatewayv1beta1.AddToScheme(client.Scheme())
-	gatewayv1.AddToScheme(client.Scheme())
+	if err := gatewayv1alpha3.AddToScheme(client.Scheme()); err != nil {
+		return nil, err
+	}
+	if err := gatewayv1alpha2.AddToScheme(client.Scheme()); err != nil {
+		return nil, err
+	}
+	if err := gatewayv1beta1.AddToScheme(client.Scheme()); err != nil {
+		return nil, err
+	}
+	if err := gatewayv1.AddToScheme(client.Scheme()); err != nil {
+		return nil, err
+	}
 
 	dc := dynamic.NewForConfigOrDie(restConfig)
 
@@ -68,11 +77,21 @@ func NewK8sClients(kubeconfig string) (*K8sClients, error) {
 
 func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8sClients {
 	scheme := scheme.Scheme
-	gatewayv1alpha3.AddToScheme(scheme)
-	gatewayv1alpha2.AddToScheme(scheme)
-	gatewayv1beta1.AddToScheme(scheme)
-	gatewayv1.AddToScheme(scheme)
-	apiextensionsv1.AddToScheme(scheme)
+	if err := gatewayv1alpha3.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+	if err := gatewayv1alpha2.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+	if err := gatewayv1beta1.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+	if err := gatewayv1.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
+	if err := apiextensionsv1.AddToScheme(scheme); err != nil {
+		t.Fatal(err)
+	}
 
 	fakeClient := fakeclient.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initRuntimeObjects...).Build()
 	fakeDC := fakedynamicclient.NewSimpleDynamicClient(scheme, initRuntimeObjects...)

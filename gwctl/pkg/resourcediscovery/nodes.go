@@ -47,12 +47,12 @@ type (
 )
 
 // GatewayClassID returns an ID for a GatewayClass.
-func GatewayClassID(gatewayClassName string) gatewayClassID {
+func GatewayClassID(gatewayClassName string) gatewayClassID { //nolint:revive
 	return gatewayClassID(resourceID{Name: gatewayClassName})
 }
 
 // NamespaceID returns an ID for a Namespace.
-func NamespaceID(namespaceName string) namespaceID {
+func NamespaceID(namespaceName string) namespaceID { //nolint:revive
 	if namespaceName == "" {
 		namespaceName = metav1.NamespaceDefault
 	}
@@ -60,7 +60,7 @@ func NamespaceID(namespaceName string) namespaceID {
 }
 
 // GatewayID returns an ID for a Gateway.
-func GatewayID(namespace, name string) gatewayID {
+func GatewayID(namespace, name string) gatewayID { //nolint:revive
 	if namespace == "" {
 		namespace = metav1.NamespaceDefault
 	}
@@ -68,7 +68,7 @@ func GatewayID(namespace, name string) gatewayID {
 }
 
 // HTTPRouteID returns an ID for a HTTPRoute.
-func HTTPRouteID(namespace, name string) httpRouteID {
+func HTTPRouteID(namespace, name string) httpRouteID { //nolint:revive
 	if namespace == "" {
 		namespace = metav1.NamespaceDefault
 	}
@@ -76,7 +76,7 @@ func HTTPRouteID(namespace, name string) httpRouteID {
 }
 
 // BackendID returns an ID for a Backend.
-func BackendID(group, kind, namespace, name string) backendID {
+func BackendID(group, kind, namespace, name string) backendID { //nolint:revive
 	return backendID(resourceID{
 		Group:     strings.ToLower(group),
 		Kind:      strings.ToLower(kind),
@@ -87,12 +87,12 @@ func BackendID(group, kind, namespace, name string) backendID {
 
 // BackendIDForService returns an ID for a Backend which contains an underlying
 // Service type.
-func BackendIDForService(namespace, name string) backendID {
+func BackendIDForService(namespace, name string) backendID { //nolint:revive
 	return BackendID("", "service", namespace, name)
 }
 
 // PolicyID returns an ID for a Policy.
-func PolicyID(group, kind, namespace, name string) policyID {
+func PolicyID(group, kind, namespace, name string) policyID { //nolint:revive
 	return policyID(resourceID{
 		Group:     strings.ToLower(group),
 		Kind:      strings.ToLower(kind),
@@ -127,7 +127,7 @@ func NewGatewayClassNode(gatewayClass *gatewayv1.GatewayClass) *GatewayClassNode
 	}
 }
 
-func (g *GatewayClassNode) ID() gatewayClassID {
+func (g *GatewayClassNode) ID() gatewayClassID { //nolint:revive
 	if g.GatewayClass == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since GatewayClass is nil")
 		return gatewayClassID(resourceID{})
@@ -162,7 +162,7 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 	}
 }
 
-func (g *GatewayNode) ID() gatewayID {
+func (g *GatewayNode) ID() gatewayID { //nolint:revive
 	if g.Gateway == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Gateway is nil")
 		return gatewayID(resourceID{})
@@ -200,7 +200,7 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 	}
 }
 
-func (h *HTTPRouteNode) ID() httpRouteID {
+func (h *HTTPRouteNode) ID() httpRouteID { //nolint:revive
 	if h.HTTPRoute == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since HTTPRoute is nil")
 		return httpRouteID(resourceID{})
@@ -236,7 +236,7 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 	}
 }
 
-func (b *BackendNode) ID() backendID {
+func (b *BackendNode) ID() backendID { //nolint:revive
 	if b.Backend == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Backend is empty")
 		return backendID(resourceID{})
@@ -277,7 +277,7 @@ func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
 	}
 }
 
-func (n *NamespaceNode) ID() namespaceID {
+func (n *NamespaceNode) ID() namespaceID { //nolint:revive
 	if n.Namespace.Name == "" {
 		klog.V(0).ErrorS(nil, "returning empty ID since Namespace is empty")
 		return namespaceID(resourceID{})
@@ -316,7 +316,7 @@ func NewPolicyNode(policy *policymanager.Policy) *PolicyNode {
 	}
 }
 
-func (p *PolicyNode) ID() policyID {
+func (p *PolicyNode) ID() policyID { //nolint:revive
 	if p.Policy == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Policy is empty")
 		return policyID(resourceID{})
