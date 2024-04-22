@@ -2824,6 +2824,9 @@ spec:
                             sent from the gateway to when the full response has been received from the backend.
 
 
+                            Specifying a zero value such as "0s" is interpreted as no timeout.
+
+
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
                             may result in more than one call from the gateway to the destination backend,
                             for example, if automatic retries are supported.
@@ -2845,7 +2848,7 @@ spec:
 
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
-                            to complete.
+                            to complete. Specifying a zero value such as "0s" is interpreted as no timeout.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction
@@ -6037,6 +6040,9 @@ spec:
                             sent from the gateway to when the full response has been received from the backend.
 
 
+                            Specifying a zero value such as "0s" is interpreted as no timeout.
+
+
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
                             may result in more than one call from the gateway to the destination backend,
                             for example, if automatic retries are supported.
@@ -6058,7 +6064,7 @@ spec:
 
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
-                            to complete.
+                            to complete. Specifying a zero value such as "0s" is interpreted as no timeout.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction

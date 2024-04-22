@@ -305,7 +305,7 @@ type HTTPRouteTimeouts struct {
 	//
 	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
 	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
-	// to complete.
+	// to complete. Specifying a zero value such as "0s" is interpreted as no timeout.
 	//
 	// This timeout is intended to cover as close to the whole request-response transaction
 	// as possible although an implementation MAY choose to start the timeout after the entire
@@ -322,6 +322,8 @@ type HTTPRouteTimeouts struct {
 	// BackendRequest specifies a timeout for an individual request from the gateway
 	// to a backend. This covers the time from when the request first starts being
 	// sent from the gateway to when the full response has been received from the backend.
+	//
+	// Specifying a zero value such as "0s" is interpreted as no timeout.
 	//
 	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
 	// may result in more than one call from the gateway to the destination backend,
