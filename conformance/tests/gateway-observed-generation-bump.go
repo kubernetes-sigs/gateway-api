@@ -22,6 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/utils/ptr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
@@ -39,7 +40,6 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 	Description: "A Gateway in the gateway-conformance-infra namespace should update the observedGeneration in all of its Status.Conditions after an update to the spec",
 	Features: []features.SupportedFeature{
 		features.SupportGateway,
-		features.SupportGatewayPort8080,
 	},
 	Manifests: []string{"tests/gateway-observed-generation-bump.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
@@ -65,7 +65,8 @@ var GatewayObservedGenerationBump = suite.ConformanceTest{
 			// mutate the Gateway Spec
 			mutate.Spec.Listeners = append(mutate.Spec.Listeners, v1.Listener{
 				Name:     "alternate",
-				Port:     8080,
+				Hostname: ptr.To[v1.Hostname]("foo.com"),
+				Port:     80,
 				Protocol: v1.HTTPProtocolType,
 				AllowedRoutes: &v1.AllowedRoutes{
 					Namespaces: &v1.RouteNamespaces{From: &all},
