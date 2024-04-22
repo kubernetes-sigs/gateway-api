@@ -28,7 +28,7 @@ cover, and documentation to help users get started.
 - [HashiCorp Consul][8]
 - [Istio][9] (beta)
 - [Kong][10] (GA)
-- [Kuma][11] (beta)
+- [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
 - [NGINX Gateway Fabric][12] (GA)
 - [ngrok][33] (preview)
@@ -40,7 +40,7 @@ cover, and documentation to help users get started.
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
 - [Istio][9] (experimental)
-- [Kuma][11] (experimental)
+- [Kuma][11] (GA)
 - [Linkerd][28] (experimental)
 
 ## Integrations <a name="integrations"></a>
@@ -357,7 +357,7 @@ Kuma 2.3 and later support the [GAMMA initiative's][gamma] experimental
 Gateway API [support for east-west traffic management][gamma] within the mesh.
 
 [kuma]:https://kuma.io
-[kuma-1]:https://kuma.io/docs/latest/explore/gateway-api/
+[kuma-1]:https://kuma.io/docs/latest/using-mesh/managing-ingress-traffic/gateway-api/
 
 ### Linkerd
 
