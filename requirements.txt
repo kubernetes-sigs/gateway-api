@@ -7,7 +7,7 @@ livereload==2.6.3
 # https://github.com/kubernetes-sigs/gateway-api/pull/1671#issuecomment-1400586465
 markdown~=3.6
 MarkupSafe==2.1.5
-mkdocs==1.5.3
+mkdocs==1.6.0
 mkdocs-awesome-pages-plugin==2.9.2
 mkdocs-macros-plugin==1.0.5
 mkdocs-material==9.5.17
