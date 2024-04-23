@@ -295,7 +295,6 @@ type HTTPRouteRule struct {
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
 // Timeout values are represented with Gateway API Duration formatting.
-// Specifying a zero value such as "0s" is interpreted as no timeout.
 //
 // +kubebuilder:validation:XValidation:message="backendRequest timeout cannot be longer than request timeout",rule="!(has(self.request) && has(self.backendRequest) && duration(self.request) != duration('0s') && duration(self.backendRequest) > duration(self.request))"
 type HTTPRouteTimeouts struct {
@@ -305,7 +304,12 @@ type HTTPRouteTimeouts struct {
 	//
 	// For example, setting the `rules.timeouts.request` field to the value `10s` in an
 	// `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
-	// to complete. Specifying a zero value such as "0s" is interpreted as no timeout.
+	// to complete.
+	//
+	// Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+	// completely. Implementations that cannot completely disable the timeout MUST
+	// instead interpret the zero duration as the longest possible value to which
+	// the timeout can be set.
 	//
 	// This timeout is intended to cover as close to the whole request-response transaction
 	// as possible although an implementation MAY choose to start the timeout after the entire
@@ -323,7 +327,10 @@ type HTTPRouteTimeouts struct {
 	// to a backend. This covers the time from when the request first starts being
 	// sent from the gateway to when the full response has been received from the backend.
 	//
-	// Specifying a zero value such as "0s" is interpreted as no timeout.
+	// Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+	// completely. Implementations that cannot completely disable the timeout MUST
+	// instead interpret the zero duration as the longest possible value to which
+	// the timeout can be set.
 	//
 	// An entire client HTTP transaction with a gateway, covered by the Request timeout,
 	// may result in more than one call from the gateway to the destination backend,
