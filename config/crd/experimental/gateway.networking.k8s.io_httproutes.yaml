@@ -2824,6 +2824,12 @@ spec:
                             sent from the gateway to when the full response has been received from the backend.
 
 
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
+
+
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
                             may result in more than one call from the gateway to the destination backend,
                             for example, if automatic retries are supported.
@@ -2846,6 +2852,12 @@ spec:
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
                             to complete.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction
@@ -6037,6 +6049,12 @@ spec:
                             sent from the gateway to when the full response has been received from the backend.
 
 
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
+
+
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
                             may result in more than one call from the gateway to the destination backend,
                             for example, if automatic retries are supported.
@@ -6059,6 +6077,12 @@ spec:
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
                             to complete.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction
