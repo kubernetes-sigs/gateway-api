@@ -19,16 +19,17 @@ limitations under the License.
 package v1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
+
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // RouteParentStatusApplyConfiguration represents an declarative configuration of the RouteParentStatus type for use
 // with apply.
 type RouteParentStatusApplyConfiguration struct {
-	ParentRef      *ParentReferenceApplyConfiguration `json:"parentRef,omitempty"`
-	ControllerName *apisv1.GatewayController          `json:"controllerName,omitempty"`
-	Conditions     []metav1.Condition                 `json:"conditions,omitempty"`
+	ParentRef      *ParentReferenceApplyConfiguration   `json:"parentRef,omitempty"`
+	ControllerName *apisv1.GatewayController            `json:"controllerName,omitempty"`
+	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // RouteParentStatusApplyConfiguration constructs an declarative configuration of the RouteParentStatus type for use with
@@ -56,9 +57,12 @@ func (b *RouteParentStatusApplyConfiguration) WithControllerName(value apisv1.Ga
 // WithConditions adds the given value to the Conditions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *RouteParentStatusApplyConfiguration) WithConditions(values ...metav1.Condition) *RouteParentStatusApplyConfiguration {
+func (b *RouteParentStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *RouteParentStatusApplyConfiguration {
 	for i := range values {
-		b.Conditions = append(b.Conditions, values[i])
+		if values[i] == nil {
+			panic("nil value passed to WithConditions")
+		}
+		b.Conditions = append(b.Conditions, *values[i])
 	}
 	return b
 }

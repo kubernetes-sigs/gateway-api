@@ -19,17 +19,18 @@ limitations under the License.
 package v1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
+
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // ListenerStatusApplyConfiguration represents an declarative configuration of the ListenerStatus type for use
 // with apply.
 type ListenerStatusApplyConfiguration struct {
-	Name           *v1.SectionName                    `json:"name,omitempty"`
-	SupportedKinds []RouteGroupKindApplyConfiguration `json:"supportedKinds,omitempty"`
-	AttachedRoutes *int32                             `json:"attachedRoutes,omitempty"`
-	Conditions     []metav1.Condition                 `json:"conditions,omitempty"`
+	Name           *v1.SectionName                      `json:"name,omitempty"`
+	SupportedKinds []RouteGroupKindApplyConfiguration   `json:"supportedKinds,omitempty"`
+	AttachedRoutes *int32                               `json:"attachedRoutes,omitempty"`
+	Conditions     []metav1.ConditionApplyConfiguration `json:"conditions,omitempty"`
 }
 
 // ListenerStatusApplyConfiguration constructs an declarative configuration of the ListenerStatus type for use with
@@ -70,9 +71,12 @@ func (b *ListenerStatusApplyConfiguration) WithAttachedRoutes(value int32) *List
 // WithConditions adds the given value to the Conditions field in the declarative configuration
 // and returns the receiver, so that objects can be build by chaining "With" function invocations.
 // If called multiple times, values provided by each call will be appended to the Conditions field.
-func (b *ListenerStatusApplyConfiguration) WithConditions(values ...metav1.Condition) *ListenerStatusApplyConfiguration {
+func (b *ListenerStatusApplyConfiguration) WithConditions(values ...*metav1.ConditionApplyConfiguration) *ListenerStatusApplyConfiguration {
 	for i := range values {
-		b.Conditions = append(b.Conditions, values[i])
+		if values[i] == nil {
+			panic("nil value passed to WithConditions")
+		}
+		b.Conditions = append(b.Conditions, *values[i])
 	}
 	return b
 }
