@@ -48,7 +48,7 @@ flowchart LR
     status[["<b>status</b><hr>[ ]PolicyAncestorStatus: ancestors"]]
     validation[["<b>tls</b><hr>LocalObjectReference: caCertificateRefs<br>wellKnownCACertificatesType: wellKnownCACertificates/<br>PreciseHostname: hostname"]]
     ancestorStatus[["<b>ancestors</b><hr>AncestorRef: parentReference<br>GatewayController: controllerName<br>[]Condition: conditions"]]
-    targetRefs[<b>targetRefs</b><hr>]]
+    targetRefs[[<b>targetRefs</b><hr>]]
     service["<b>service</>"]
     backendTLSPolicy -->spec
     backendTLSPolicy -->status
