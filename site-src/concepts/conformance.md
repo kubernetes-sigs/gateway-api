@@ -198,8 +198,8 @@ the conformance report can be uploaded into [this folder][reports-folder] throug
 a PR. Follow the [guide][conformance-guide] to have all the details on how to structure
 and submit reports for a specific implementation.
 
-[reports-folder]: ./conformance/reports/
-[conformance-guide]: ./conformance/reports/README.md
+[reports-folder]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/
+[conformance-guide]: https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports/README.md
 
 ## Contributing to Conformance
 
