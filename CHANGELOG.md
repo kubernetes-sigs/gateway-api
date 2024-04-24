@@ -86,7 +86,7 @@ information on how the tests have been run and provide reproduction steps.
 
 Leading Contributors: @mlavacca, @shaneutt
 
-### Port in ParentRefs
+### ParentRef Port field Graduated to GA
 
 The `port` field in ParentRefs has graduated to GA (v1) and is now part of the
 Standard Channel. You can use the `port` field to attach resources to Gateways,
@@ -155,14 +155,25 @@ Leading Contributors: @howardjohn
   (#2894, @pmalek)
 
 ### Validation Changes
+
 - TLS Configuration is no longer required on Gateway Listeners to enable more
   flexible TLS configuration. (#2721, @robscott)
 
 ### Conformance Tests
 
+- Conformance Profiles have been renamed and a new `Mesh-GRPC` profile has been
+  added (#3019, @mlavacca):
+  - HTTP -> Gateway-HTTP
+  - GRPC -> Gateway-GRPC
+  - TLS -> Gateway-TLS
+  - Mesh -> Mesh-HTTP
 - Fixed GatewayWithAttachedRoutes conformance test to not check that the
   HTTPRoute status includes an "Accepted: False" condition because this is not
   required by the specification. (#2548, @frankbu)
+
+### Dependencies
+
+- Gateway API has upgraded to Go v1.22 and Kubernetes v1.30 (#2988, @robscott)
 
 ### Cleanup
 
