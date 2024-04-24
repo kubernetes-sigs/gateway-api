@@ -42,21 +42,25 @@ type ConformanceProfile struct {
 type ConformanceProfileName string
 
 const (
-	// HTTPConformanceProfileName indicates the name of the conformance profile
-	// which covers HTTP functionality, such as the HTTPRoute API.
-	HTTPConformanceProfileName ConformanceProfileName = "HTTP"
+	// GatewayHTTPConformanceProfileName indicates the name of the conformance profile
+	// which covers HTTP functionality with Gateways.
+	GatewayHTTPConformanceProfileName ConformanceProfileName = "GATEWAY-HTTP"
 
-	// TLSConformanceProfileName indicates the name of the conformance profile
-	// which covers TLS stream functionality, such as the TLSRoute API.
-	TLSConformanceProfileName ConformanceProfileName = "TLS"
+	// GatewayTLSConformanceProfileName indicates the name of the conformance profile
+	// which covers TLS stream functionality with Gateways.
+	GatewayTLSConformanceProfileName ConformanceProfileName = "GATEWAY-TLS"
 
-	// GRPCConformanceProfileName indicates the name of the conformance profile
-	// which covers GRPC functionality, such as the GRPCRoute API.
-	GRPCConformanceProfileName ConformanceProfileName = "GRPC"
+	// GatewayGRPCConformanceProfileName indicates the name of the conformance profile
+	// which covers GRPC functionality with Gateways.
+	GatewayGRPCConformanceProfileName ConformanceProfileName = "GATEWAY-GRPC"
 
-	// MeshConformanceProfileName indicates the name of the conformance profile
-	// which covers service mesh functionality.
-	MeshConformanceProfileName ConformanceProfileName = "MESH"
+	// MeshHTTPConformanceProfileName indicates the name of the conformance profile
+	// which covers HTTP functionality with service mesh.
+	MeshHTTPConformanceProfileName ConformanceProfileName = "MESH-HTTP"
+
+	// MeshGRPCConformanceProfileName indicates the name of the conformance profile
+	// which covers GRPC functionality with service mesh.
+	MeshGRPCConformanceProfileName ConformanceProfileName = "MESH-GRPC"
 )
 
 // -----------------------------------------------------------------------------
@@ -64,10 +68,10 @@ const (
 // -----------------------------------------------------------------------------
 
 var (
-	// HTTPConformanceProfile is a ConformanceProfile that covers testing HTTP
+	// GatewayHTTPConformanceProfile is a ConformanceProfile that covers testing HTTP
 	// related functionality with Gateways.
-	HTTPConformanceProfile = ConformanceProfile{
-		Name: HTTPConformanceProfileName,
+	GatewayHTTPConformanceProfile = ConformanceProfile{
+		Name: GatewayHTTPConformanceProfileName,
 		CoreFeatures: sets.New(
 			features.SupportGateway,
 			features.SupportReferenceGrant,
@@ -78,10 +82,10 @@ var (
 			Insert(features.HTTPRouteExtendedFeatures.UnsortedList()...),
 	}
 
-	// TLSConformanceProfile is a ConformanceProfile that covers testing TLS
+	// GatewayTLSConformanceProfile is a ConformanceProfile that covers testing TLS
 	// related functionality with Gateways.
-	TLSConformanceProfile = ConformanceProfile{
-		Name: TLSConformanceProfileName,
+	GatewayTLSConformanceProfile = ConformanceProfile{
+		Name: GatewayTLSConformanceProfileName,
 		CoreFeatures: sets.New(
 			features.SupportGateway,
 			features.SupportReferenceGrant,
@@ -90,26 +94,37 @@ var (
 		ExtendedFeatures: features.GatewayExtendedFeatures,
 	}
 
-	// GRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
+	// GatewayGRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
 	// related functionality with Gateways.
-	GRPCConformanceProfile = ConformanceProfile{
-		Name: GRPCConformanceProfileName,
+	GatewayGRPCConformanceProfile = ConformanceProfile{
+		Name: GatewayGRPCConformanceProfileName,
 		CoreFeatures: sets.New(
 			features.SupportGateway,
 			features.SupportReferenceGrant,
 			features.SupportGRPCRoute,
 		),
+		ExtendedFeatures: features.GatewayExtendedFeatures,
 	}
 
-	// MeshConformanceProfile is a ConformanceProfile that covers testing
+	// MeshHTTPConformanceProfile is a ConformanceProfile that covers testing HTTP
 	// service mesh related functionality.
-	MeshConformanceProfile = ConformanceProfile{
-		Name: MeshConformanceProfileName,
+	MeshHTTPConformanceProfile = ConformanceProfile{
+		Name: MeshHTTPConformanceProfileName,
 		CoreFeatures: sets.New(
 			features.SupportMesh,
 			features.SupportHTTPRoute,
 		),
 		ExtendedFeatures: features.HTTPRouteExtendedFeatures,
+	}
+
+	// MeshGRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
+	// service mesh related functionality.
+	MeshGRPCConformanceProfile = ConformanceProfile{
+		Name: MeshHTTPConformanceProfileName,
+		CoreFeatures: sets.New(
+			features.SupportMesh,
+			features.SupportGRPCRoute,
+		),
 	}
 )
 
@@ -130,10 +145,11 @@ func RegisterConformanceProfile(p ConformanceProfile) {
 // conformanceProfileMap maps short human-readable names to their respective
 // ConformanceProfiles.
 var conformanceProfileMap = map[ConformanceProfileName]ConformanceProfile{
-	HTTPConformanceProfileName: HTTPConformanceProfile,
-	TLSConformanceProfileName:  TLSConformanceProfile,
-	GRPCConformanceProfileName: GRPCConformanceProfile,
-	MeshConformanceProfileName: MeshConformanceProfile,
+	GatewayHTTPConformanceProfileName: GatewayHTTPConformanceProfile,
+	GatewayTLSConformanceProfileName:  GatewayTLSConformanceProfile,
+	GatewayGRPCConformanceProfileName: GatewayGRPCConformanceProfile,
+	MeshHTTPConformanceProfileName:    MeshHTTPConformanceProfile,
+	MeshGRPCConformanceProfileName:    MeshGRPCConformanceProfile,
 }
 
 // getConformanceProfileForName retrieves a known ConformanceProfile by its simple
