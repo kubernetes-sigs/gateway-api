@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v1.1.0-rc1](#v110-rc1)
 - [v1.0.0](#v100)
 - [v1.0.0-rc2](#v100-rc2)
 - [v1.0.0-rc1](#v100-rc1)
@@ -33,6 +34,156 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v1.1.0-rc1
+
+We expect that this release candidate is quite close to the final v1.1.0
+release. However, subsequent breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but we do not recommend
+shipping products based on a release candidate API due to the possibility of
+incompatible changes prior to the final release. The following represents the
+changes since v1.0.0:
+
+## Standard Channel
+
+### GRPCRoute has Graduated to GA 🎉
+
+GRPCRoute has graduated to GA (v1) and is now part of the Standard Channel. If
+you are already using the experimental version GRPCRoute, we recommend holding
+off on upgrading to the standard channel version of GRPCRoute until the
+controllers you're using have been updated to support GRPCRoute v1. Until then,
+it is safe to upgrade to the experimental channel version of GRPCRoute in v1.1
+that includes both v1alpha2 and v1 API versions.
+
+Leading Contributor: @gnossen
+
+### Service Mesh Support has Graduated to GA 🎉
+
+The standard for using Gateway API for Mesh has formally graduated to GA (v1)
+and is now part of the Standard Channel.
+
+Service mesh support in Gateway API allows service mesh users to use the same
+API to manage ingress traffic and mesh traffic, reusing the same policy and
+routing interfaces. In Gateway API v1.1, routes (such as HTTPRoute) can now have
+a `Service` as a `parentRef`, to control how traffic to specific services
+behave. For more information, read the [service
+mesh](https://gateway-api.sigs.k8s.io/mesh/) documentation or see the list of
+[implementations](https://gateway-api.sigs.k8s.io/implementations/#service-mesh-implementation-status).
+
+Leading Contributors: @howardjohn, @keithmattix, @kflynn, @mikemorris
+
+### Conformance Profiles and Reports
+
+The Conformance Reports API and the corresponding test suite have been graduated
+to GA. The Conformance report API has been expanded with the `mode` field
+(intended to specify the working mode of the implementation), and the
+`gatewayAPIChannel` (standard or experimental). The `gatewayAPIVersion` and
+`gatewayAPIChannel` are now filled in automatically by the suite machinery,
+along with a brief description of the testing outcome. The Reports have been
+reorganized in a more structured way, and the implementations can now add
+information on how the tests have been run and provide reproduction steps.
+
+Leading Contributors: @mlavacca, @shaneutt
+
+### ParentRef Port field Graduated to GA
+
+The `port` field in ParentRefs has graduated to GA (v1) and is now part of the
+Standard Channel. You can use the `port` field to attach resources to Gateways,
+Services, or other parent resources. For example, you can attach an HTTPRoute to
+one or more specific Listeners of a Gateway based on the Listener `port`,
+instead of `name` field.
+
+Leading Contributor: @frankbu
+
+## Experimental Channel
+
+### Session Persistence + BackendLBPolicy
+Session Persistence is being introduced to Gateway API via a new policy
+(BackendLBPolicy) for Service-level configuration and as fields within HTTPRoute
+and GRPCRoute for Route-level configuration. The BackendLBPolicy and Route-level
+APIs provide the same session persistence configuration, including session
+timeouts, session name, session type, and cookie lifetime type.
+
+Leading Contributors: @gcs278, @ginayeh
+
+### Gateway Client Cert Verification
+Gateways can now configure client cert verification for each Gateway Listener by
+introducing a new field `frontendValidation` field within `tls`. This field
+supports configuring a list of CA Certificates that can be used as a trust
+anchor to validate the certificates presented by the client.
+
+Leading Contributors: @arkodg
+
+### BackendTLSPolicy
+As part of a broader goal of making our TLS terminology more consistent
+throughout the API, we've introduced some breaking changes to BackendTLSPolicy.
+This has resulted in a new API version (v1alpha3) and will require any existing
+users of this policy to uninstall the v1alpha2 version before installing this
+newer version.
+
+Any references to v1alpha2 BackendTLSPolicy fields will need to be updated.
+Specific changes include:
+- the `targetRef` field is now a `targetRefs` list and these references no
+  longer include a `namespace` field.
+- the `tls` field has been renamed to `validation`
+- the `caCertRefs` field has been renamed to `caCertificateRefs`
+- the `wellKnownCACerts` field has been renamed to `wellKnownCACertificates`
+
+Leading Contributors: @candita
+
+### Gateway Params
+Gateways now feature a new field that allows references to
+implementation-specific parameters, similar to GatewayClass.
+
+Leading Contributors: @howardjohn
+
+## Everything Else
+
+### gwctl
+
+* We've extended the `get` command to support gateways, gatewayclasses, and
+  namespaces. (#2865, #2782, #2847, @jongwooo)
+* The `get` command now provides more detailed information for httproutes,
+  policies, and policycrds. (#2805, #2808, #2811, @jongwooo)
+* `describe` command now supports descriptions of policycrds and namespaces.
+  (#2872, #2836, @Devaansh-Kumar)
+* We've added the ability to filter resources using labels (through the `-l`
+  flag) with both the `get` and `describe` commands. (#2892, #2915, #2934,
+  @yeedove)
+* Bug fix: Prevent panic when describing gatewayclasses with no description
+  (#2894, @pmalek)
+
+### Validation Changes
+
+- TLS Configuration is no longer required on Gateway Listeners to enable more
+  flexible TLS configuration. (#2721, @robscott)
+
+### Conformance Tests
+
+- Conformance Profiles have been renamed and a new `Mesh-GRPC` profile has been
+  added (#3019, @mlavacca):
+  - HTTP -> Gateway-HTTP
+  - GRPC -> Gateway-GRPC
+  - TLS -> Gateway-TLS
+  - Mesh -> Mesh-HTTP
+- Fixed GatewayWithAttachedRoutes conformance test to not check that the
+  HTTPRoute status includes an "Accepted: False" condition because this is not
+  required by the specification. (#2548, @frankbu)
+
+### Dependencies
+
+- Gateway API has upgraded to Go v1.22 and Kubernetes v1.30 (#2988, @robscott)
+
+### Cleanup
+
+- The validating webhook has been removed. CEL validation is now built-in to
+  CRDs and replaces the webhook. (#2595, @robscott)
+- BackendTLSPolicy WellKnownCACerts field has been updated to
+  implementation-specific support (#2741, @sunjayBhatia)
+- Clarify policy attachment by two of the same policy types when using section
+  names. (#2442, @maleck13)
+- Remove v1alpha2 directory from docs: (#2965, @robscott)
 
 # v1.0.0
 
