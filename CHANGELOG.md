@@ -60,25 +60,39 @@ Leading Contributor: @gnossen
 
 ### Service Mesh Support has Graduated to GA 🎉
 
-The standard for using Gateway API for Mesh has formally graduated to GA (v1) and is now part of the Standard Channel.
+The standard for using Gateway API for Mesh has formally graduated to GA (v1)
+and is now part of the Standard Channel.
 
-Service mesh support in Gateway API allows service mesh users to use the same API to manage ingress traffic and mesh traffic, reusing the same policy and routing interfaces. In Gateway API v1.1, routes (such as HTTPRoute) can now have a `Service` as a `parentRef`, to control how traffic to specific services behave. For more information, read the [service mesh](https://gateway-api.sigs.k8s.io/mesh/) documentation or see the list of [implementations](https://gateway-api.sigs.k8s.io/implementations/#service-mesh-implementation-status).
+Service mesh support in Gateway API allows service mesh users to use the same
+API to manage ingress traffic and mesh traffic, reusing the same policy and
+routing interfaces. In Gateway API v1.1, routes (such as HTTPRoute) can now have
+a `Service` as a `parentRef`, to control how traffic to specific services
+behave. For more information, read the [service
+mesh](https://gateway-api.sigs.k8s.io/mesh/) documentation or see the list of
+[implementations](https://gateway-api.sigs.k8s.io/implementations/#service-mesh-implementation-status).
 
 Leading Contributors: @howardjohn, @keithmattix, @kflynn, @mikemorris
 
 ### Conformance Profiles and Reports
 
-The Conformance Reports API and the corresponding test suite have been graduated to GA. The Conformance report API has been expanded with the `mode` field (intended to specify the working mode of the implementation), and the `gatewayAPIChannel` (standard or experimental). The `gatewayAPIVersion` and `gatewayAPIChannel` are now filled in automatically by the suite machinery, along with a brief description of the testing outcome.
-The Reports have been reorganized in a more structured way, and the implementations can now add information on how the tests have been run and provide reproduction steps.
+The Conformance Reports API and the corresponding test suite have been graduated
+to GA. The Conformance report API has been expanded with the `mode` field
+(intended to specify the working mode of the implementation), and the
+`gatewayAPIChannel` (standard or experimental). The `gatewayAPIVersion` and
+`gatewayAPIChannel` are now filled in automatically by the suite machinery,
+along with a brief description of the testing outcome. The Reports have been
+reorganized in a more structured way, and the implementations can now add
+information on how the tests have been run and provide reproduction steps.
 
 Leading Contributors: @mlavacca, @shaneutt
 
 ### Port in ParentRefs
 
-The `port` field in ParentRefs has graduated to GA (v1) and is now part of the Standard Channel.
-You can use the `port` field to attach resources to Gateways, Services, or other parent resources.
-For example, you can attach an HTTPRoute to one or more specific Listeners of a Gateway based
-on the Listener `port`, instead of `name` field.
+The `port` field in ParentRefs has graduated to GA (v1) and is now part of the
+Standard Channel. You can use the `port` field to attach resources to Gateways,
+Services, or other parent resources. For example, you can attach an HTTPRoute to
+one or more specific Listeners of a Gateway based on the Listener `port`,
+instead of `name` field.
 
 Leading Contributor: @frankbu
 
@@ -86,16 +100,18 @@ Leading Contributor: @frankbu
 
 ### Session Persistence + BackendLBPolicy
 Session Persistence is being introduced to Gateway API via a new policy
-(BackendLBPolicy) for Service-level configuration and as fields within HTTPRoute and
-GRPCRoute for Route-level configuration. The BackendLBPolicy and Route-level
+(BackendLBPolicy) for Service-level configuration and as fields within HTTPRoute
+and GRPCRoute for Route-level configuration. The BackendLBPolicy and Route-level
 APIs provide the same session persistence configuration, including session
 timeouts, session name, session type, and cookie lifetime type.
 
 Leading Contributors: @gcs278, @ginayeh
 
 ### Gateway Client Cert Verification
-Gateways can now configure client cert verification for each Gateway Listener by introducing a new field
-`frontendValidation` field within `tls`. This field supports configuring a list of CA Certificates that can be used as a trust anchor to validate the certificates presented by the client.
+Gateways can now configure client cert verification for each Gateway Listener by
+introducing a new field `frontendValidation` field within `tls`. This field
+supports configuring a list of CA Certificates that can be used as a trust
+anchor to validate the certificates presented by the client.
 
 Leading Contributors: @arkodg
 
@@ -106,12 +122,13 @@ This has resulted in a new API version (v1alpha3) and will require any existing
 users of this policy to uninstall the v1alpha2 version before installing this
 newer version.
 
-Any references to v1alpha2 BackendTLSPolicy fields will need to be updated.  Specific changes include: 
-- the field TargetRef is changed to allow multiples: BackendTLSPolicySpec.TargetRef  becomes a slice named TargetRefs.
-- the field TLS is changed to Validation, and the type name changes from BackendTLSPolicyConfig to  BackendTLSPolicyValidation.
-- the field CACertRefs becomes CACertificateRefs in what is now BackendTLSPolicyValidation
-- the field WellKnownCACerts becomes WellKnownCACertificates and the type name changes from WellKnownCACertType to WellKnownCACertificatesType.
-- the constant WellKnownCACertSystem becomes WellKnownCACertificatesSystem
+Any references to v1alpha2 BackendTLSPolicy fields will need to be updated.
+Specific changes include:
+- the `targetRef` field is now a `targetRefs` list and these references no
+  longer include a `namespace` field.
+- the `tls` field has been renamed to `validation`
+- the `caCertRefs` field has been renamed to `caCertificateRefs`
+- the `wellKnownCACerts` field has been renamed to `wellKnownCACertificates`
 
 Leading Contributors: @candita
 
@@ -122,6 +139,20 @@ implementation-specific parameters, similar to GatewayClass.
 Leading Contributors: @howardjohn
 
 ## Everything Else
+
+### gwctl
+
+* We've extended the `get` command to support gateways, gatewayclasses, and
+  namespaces. (#2865, #2782, #2847, @jongwooo)
+* The `get` command now provides more detailed information for httproutes,
+  policies, and policycrds. (#2805, #2808, #2811, @jongwooo)
+* `describe` command now supports descriptions of policycrds and namespaces.
+  (#2872, #2836, @Devaansh-Kumar)
+* We've added the ability to filter resources using labels (through the `-l`
+  flag) with both the `get` and `describe` commands. (#2892, #2915, #2934,
+  @yeedove)
+* Bug fix: Prevent panic when describing gatewayclasses with no description
+  (#2894, @pmalek)
 
 ### Validation Changes
 - TLS Configuration is no longer required on Gateway Listeners to enable more
@@ -142,19 +173,7 @@ Leading Contributors: @howardjohn
 - Clarify policy attachment by two of the same policy types when using section
   names. (#2442, @maleck13)
 
-### gwctl
 
-* We've extended the `get` command to support gateways, gatewayclasses, and
-  namespaces. (#2865, #2782, #2847, @jongwooo)
-* The `get` command now provides more detailed information for httproutes,
-  policies, and policycrds. (#2805, #2808, #2811, @jongwooo)
-* `describe` command now supports descriptions of policycrds and namespaces.
-  (#2872, #2836, @Devaansh-Kumar)
-* We've added the ability to filter resources using labels (through the `-l`
-  flag) with both the `get` and `describe` commands. (#2892, #2915, #2934,
-  @yeedove)
-* Bug fix: Prevent panic when describing gatewayclasses with no description
-  (#2894, @pmalek)
 # v1.0.0
 
 On behalf of Kubernetes SIG Network, we are pleased to announce the v1.0 release!

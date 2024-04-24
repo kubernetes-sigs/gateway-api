@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2466
-    gateway.networking.k8s.io/bundle-version: v1.0.0
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2997
+    gateway.networking.k8s.io/bundle-version: v1.1.0-rc1
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   labels:
