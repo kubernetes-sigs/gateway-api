@@ -172,7 +172,7 @@ Leading Contributors: @howardjohn
   implementation-specific support (#2741, @sunjayBhatia)
 - Clarify policy attachment by two of the same policy types when using section
   names. (#2442, @maleck13)
-
+- Remove v1alpha2 directory from docs: (#2965, @robscott)
 
 # v1.0.0
 
