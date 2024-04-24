@@ -133,8 +133,8 @@ type BackendTLSPolicyValidation struct {
 	Hostname v1.PreciseHostname `json:"hostname"`
 }
 
-// WellKnownCACertificatesType is the type of CA certificate that will be used when
-// the TLS.caCertRefs is unspecified.
+// WellKnownCACertificatesType is the type of CA certificate that will be used
+// when the caCertificateRefs field is unspecified.
 // +kubebuilder:validation:Enum=System
 type WellKnownCACertificatesType string
 
