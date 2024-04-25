@@ -21,6 +21,8 @@ import (
 	"fmt"
 	"os"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -34,7 +36,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -465,8 +466,12 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 	}
 
 	// Use List call.
+	labelSelector := ""
+	if filter.Labels != nil {
+		labelSelector = filter.Labels.String()
+	}
 	listOptions := metav1.ListOptions{
-		LabelSelector: filter.Labels.String(),
+		LabelSelector: labelSelector,
 	}
 	var backendsList *unstructured.UnstructuredList
 	backendsList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
