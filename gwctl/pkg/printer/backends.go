@@ -43,7 +43,11 @@ type BackendsPrinter struct {
 func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
 	tw := tabwriter.NewWriter(bp.Out, 0, 0, 2, ' ', 0)
 	row := []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to write to the tab writer: %v\n", err)
+		os.Exit(1)
+	}
 
 	backendNodes := make([]*resourcediscovery.BackendNode, 0, len(resourceModel.Backends))
 	for _, backendNode := range resourceModel.Backends {
@@ -60,8 +64,8 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 	for _, backendNode := range backendNodes {
 		backend := backendNode.Backend
 
-		parentHttpRoutes := []string{}
-		remainderHttpRoutes := 0
+		parentHTTPRoutes := []string{}
+		remainderHTTPRoutes := 0
 		associatedDistinctPolicies := map[string]any{}
 
 		httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, len(backendNode.HTTPRoutes))
@@ -80,11 +84,11 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		for _, httpRouteNode := range httpRouteNodes {
 			httpRoute := httpRouteNode.HTTPRoute
 
-			if len(parentHttpRoutes) < 2 {
+			if len(parentHTTPRoutes) < 2 {
 				namespacedName := client.ObjectKeyFromObject(httpRoute).String()
-				parentHttpRoutes = append(parentHttpRoutes, namespacedName)
+				parentHTTPRoutes = append(parentHTTPRoutes, namespacedName)
 			} else {
-				remainderHttpRoutes += 1
+				remainderHTTPRoutes++
 			}
 
 			// TODO(yashvardhan-kukreja): change this to httpRouteNode.EffectivePolicies once the work around inherited policies is matured
@@ -97,10 +101,10 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		}
 
 		referredByRoutes := "None"
-		if len(parentHttpRoutes) != 0 {
-			referredByRoutes = strings.Join(parentHttpRoutes, ",")
-			if remainderHttpRoutes != 0 {
-				referredByRoutes += fmt.Sprintf(" + %d more", remainderHttpRoutes)
+		if len(parentHTTPRoutes) != 0 {
+			referredByRoutes = strings.Join(parentHTTPRoutes, ",")
+			if remainderHTTPRoutes != 0 {
+				referredByRoutes += fmt.Sprintf(" + %d more", remainderHTTPRoutes)
 			}
 		}
 
@@ -118,9 +122,15 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			age,
 			policiesCount,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if _, err = tw.Write([]byte(strings.Join(row, "\t") + "\n")); err != nil {
+			fmt.Fprintf(os.Stderr, "failed to write to the tab writer: %v\n", err)
+			os.Exit(1)
+		}
 	}
-	tw.Flush()
+	if err = tw.Flush(); err != nil {
+		fmt.Fprintf(os.Stderr, "failed to flush to the tab writer: %v\n", err)
+		os.Exit(1)
+	}
 }
 
 type backendDescribeView struct {
