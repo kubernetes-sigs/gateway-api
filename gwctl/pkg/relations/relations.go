@@ -20,6 +20,7 @@ package relations
 
 import (
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	types "k8s.io/apimachinery/pkg/types"
@@ -107,4 +108,43 @@ func FindBackendRefsForHTTPRoute(httpRoute gatewayv1.HTTPRoute) []ObjRef {
 		result = append(result, objRef)
 	}
 	return result
+}
+
+// ReferenceGrantExposes returns true if the provided reference grant "exposes"
+// the given resource. "Exposes" means that the resource is part of the "To"
+// fields within the ReferenceGrant.
+func ReferenceGrantExposes(referenceGrant gatewayv1beta1.ReferenceGrant, resource ObjRef) bool {
+	if referenceGrant.GetNamespace() != resource.Namespace {
+		return false
+	}
+	for _, to := range referenceGrant.Spec.To {
+		if to.Group != gatewayv1.Group(resource.Group) {
+			continue
+		}
+		if to.Kind != gatewayv1.Kind(resource.Kind) {
+			continue
+		}
+		if to.Name == nil || len(*to.Name) == 0 || *to.Name == gatewayv1.ObjectName(resource.Name) {
+			return true
+		}
+	}
+	return false
+}
+
+// ReferenceGrantAccepts returns true if the provided reference grant "accepts"
+// references from the given resource. "Accepts" means that the resource is part
+// of the "From" fields within the ReferenceGrant.
+func ReferenceGrantAccepts(referenceGrant gatewayv1beta1.ReferenceGrant, resource ObjRef) bool {
+	resource.Name = ""
+	for _, from := range referenceGrant.Spec.From {
+		fromRef := ObjRef{
+			Group:     string(from.Group),
+			Kind:      string(from.Kind),
+			Namespace: string(from.Namespace),
+		}
+		if fromRef == resource {
+			return true
+		}
+	}
+	return false
 }

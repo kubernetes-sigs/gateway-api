@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/relations"
@@ -46,9 +47,10 @@ const (
 )
 
 var (
-	defaultGatewayClassGroupVersion = gatewayv1.GroupVersion
-	defaultGatewayGroupVersion      = gatewayv1.GroupVersion
-	defaultHTTPRouteGroupVersion    = gatewayv1.GroupVersion
+	defaultGatewayClassGroupVersion   = gatewayv1.GroupVersion
+	defaultGatewayGroupVersion        = gatewayv1.GroupVersion
+	defaultHTTPRouteGroupVersion      = gatewayv1.GroupVersion
+	defaultReferenceGrantGroupVersion = gatewayv1beta1.GroupVersion
 )
 
 // Filter struct defines parameters for filtering resources
@@ -201,6 +203,7 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	}
 	resourceModel.addBackends(backends...)
 
+	d.discoverReferenceGrantsFromBackends(ctx, resourceModel)
 	d.discoverHTTPRoutesFromBackends(ctx, resourceModel)
 	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
@@ -346,19 +349,54 @@ func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resource
 	}
 
 	for _, httpRoute := range httpRoutes {
-		var found bool
+		// An HTTPRoute will be included in the resourceModel if it references some
+		// Backend which already exists in the resourceModel.
+		var includeRouteInResourceModel bool
+
 		for _, backendRef := range relations.FindBackendRefsForHTTPRoute(httpRoute) {
+			// Check if the referenced backend exists in the resourceModel.
 			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
-			_, ok := resourceModel.Backends[backendID]
+			backendNode, ok := resourceModel.Backends[backendID]
 			if !ok {
 				continue
 			}
-			found = true
+
+			// Ensure that if this is a cross namespace reference, then it is accepted
+			// through some ReferenceGrant.
+			if httpRoute.GetNamespace() != backendRef.Namespace {
+				httpRouteRef := relations.ObjRef{
+					Group:     httpRoute.GroupVersionKind().Group,
+					Kind:      httpRoute.GroupVersionKind().Kind,
+					Name:      httpRoute.GetName(),
+					Namespace: httpRoute.GetNamespace(),
+				}
+				var referenceAccepted bool
+				for _, referenceGrantNode := range backendNode.ReferenceGrants {
+					if relations.ReferenceGrantAccepts(*referenceGrantNode.ReferenceGrant, httpRouteRef) {
+						referenceAccepted = true
+						break
+					}
+				}
+				if !referenceAccepted {
+					klog.V(1).InfoS("Reference from HTTPRoute to Backend in a different namespace is not allowed without a ReferenceGrant",
+						"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+						"backend", backendRef.Namespace+"/"+backendRef.Name,
+					)
+					continue
+				}
+			}
+
+			// At this point, we know that:
+			// 	- The HTTPRoute references some backend which exists in the resourceModel.
+			//  - The referenced backend is either in the same namespace as the
+			//    HTTPRoute, or is exposed through a ReferenceGrant.
+			includeRouteInResourceModel = true
 
 			resourceModel.addHTTPRoutes(httpRoute)
 			resourceModel.connectHTTPRouteWithBackend(HTTPRouteID(httpRoute.GetNamespace(), httpRoute.GetName()), backendID)
 		}
-		if !found {
+
+		if !includeRouteInResourceModel {
 			klog.V(1).InfoS("Skipping HTTPRoute since it does not reference any required Backend",
 				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
 			)
@@ -391,6 +429,40 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 	for backendID, backendNode := range resourceModel.Backends {
 		resourceModel.addNamespace(namespaceMap[backendNode.Backend.GetNamespace()])
 		resourceModel.connectBackendWithNamespace(backendID, NamespaceID(backendNode.Backend.GetNamespace()))
+	}
+}
+
+func (d Discoverer) discoverReferenceGrantsFromBackends(ctx context.Context, resourceModel *ResourceModel) {
+	referenceGrantsByNamespace := make(map[string][]gatewayv1beta1.ReferenceGrant)
+	for _, backendNode := range resourceModel.Backends {
+		backendNS := backendNode.Backend.GetNamespace()
+
+		referenceGrants, ok := referenceGrantsByNamespace[backendNS]
+		if !ok {
+			var err error
+			referenceGrants, err = d.fetchReferenceGrants(ctx, Filter{Namespace: backendNS, Labels: labels.Everything()})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "failed to fetch list of ReferenceGrants: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
+		for _, referenceGrant := range referenceGrants {
+			backendRef := relations.ObjRef{
+				Group:     backendNode.Backend.GroupVersionKind().Group,
+				Kind:      backendNode.Backend.GroupVersionKind().Kind,
+				Name:      backendNode.Backend.GetName(),
+				Namespace: backendNode.Backend.GetNamespace(),
+			}
+			if relations.ReferenceGrantExposes(referenceGrant, backendRef) {
+				klog.V(1).InfoS("ReferenceGrant exposes Backend",
+					"referenceGrant", referenceGrant.GetNamespace()+"/"+referenceGrant.GetName(),
+					"backendRef", backendRef.Namespace+"/"+backendRef.Name,
+				)
+				resourceModel.addReferenceGrants(referenceGrant)
+				resourceModel.connectReferenceGrantWithBackend(ReferenceGrantID(referenceGrant.GetNamespace(), referenceGrant.GetName()), backendNode.ID())
+			}
+		}
 	}
 }
 
@@ -550,6 +622,47 @@ func (d Discoverer) fetchHTTPRoutes(ctx context.Context, filter Filter) ([]gatew
 		return []gatewayv1.HTTPRoute{}, fmt.Errorf("failed to convert unstructured HTTPRouteList to structured: %v", err)
 	}
 	return httpRouteList.Items, nil
+}
+
+// fetchHTTPRoutes fetches HTTPRoutes based on a filter.
+func (d Discoverer) fetchReferenceGrants(ctx context.Context, filter Filter) ([]gatewayv1beta1.ReferenceGrant, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    defaultReferenceGrantGroupVersion.Group,
+		Version:  defaultReferenceGrantGroupVersion.Version,
+		Resource: "referencegrants",
+	}
+	// TODO(gauravkghildiyal): Uncomment once
+	// https://github.com/kubernetes-sigs/gateway-api/pull/3001 merges
+	// if d.PreferredReferenceGrantGroupVersion != (metav1.GroupVersion{}) {
+	// 	gvr.Version = d.PreferredReferenceGrantGroupVersion.Version
+	// }
+
+	if filter.Name != "" {
+		// Use Get call.
+		referenceGrantUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
+			return []gatewayv1beta1.ReferenceGrant{}, err
+		}
+		referenceGrant := &gatewayv1beta1.ReferenceGrant{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(referenceGrantUnstructured.UnstructuredContent(), referenceGrant); err != nil {
+			return []gatewayv1beta1.ReferenceGrant{}, fmt.Errorf("failed to convert unstructured ReferenceGrant to structured: %v", err)
+		}
+		return []gatewayv1beta1.ReferenceGrant{*referenceGrant}, nil
+	}
+
+	// Use List call.
+	listOptions := metav1.ListOptions{
+		LabelSelector: filter.Labels.String(),
+	}
+	referenceGrantListUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	if err != nil {
+		return []gatewayv1beta1.ReferenceGrant{}, err
+	}
+	referenceGrantList := &gatewayv1beta1.ReferenceGrantList{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(referenceGrantListUnstructured.UnstructuredContent(), referenceGrantList); err != nil {
+		return []gatewayv1beta1.ReferenceGrant{}, fmt.Errorf("failed to convert unstructured ReferenceGrantList to structured: %v", err)
+	}
+	return referenceGrantList.Items, nil
 }
 
 // fetchBackends fetches Backends based on a filter.

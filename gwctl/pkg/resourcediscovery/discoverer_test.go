@@ -21,16 +21,215 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
+	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	testingclock "k8s.io/utils/clock/testing"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
+
+func TestDiscoverResourcesForBackend(t *testing.T) {
+	testcases := []struct {
+		name    string
+		objects []runtime.Object
+		filter  Filter
+
+		wantBackends   []apimachinerytypes.NamespacedName
+		wantHTTPRoutes []apimachinerytypes.NamespacedName
+	}{
+		{
+			name:   "normal",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				&corev1.Service{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-svc",
+						Namespace: "default",
+					},
+				},
+				&gatewayv1.HTTPRoute{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-httproute",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind: common.PtrTo(gatewayv1.Kind("Service")),
+												Name: "foo-svc",
+												Port: common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-svc"},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-httproute"},
+			},
+		},
+		{
+			name:   "httproute from different namespace should require referencegrant",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				common.NamespaceForTest("bar"),
+				&corev1.Service{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-svc",
+						Namespace: "default",
+					},
+				},
+				&gatewayv1.HTTPRoute{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "HTTPRoute",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-httproute",
+						Namespace: "bar", // Different namespace than Service.
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind:      common.PtrTo(gatewayv1.Kind("Service")),
+												Name:      "foo-svc",
+												Namespace: common.PtrTo(gatewayv1.Namespace("default")),
+												Port:      common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-svc"},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{},
+		},
+		{
+			name:   "httproute from different namespace should get allowed with referencegrant",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				common.NamespaceForTest("bar"),
+				&corev1.Service{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-svc",
+						Namespace: "default",
+					},
+				},
+				&gatewayv1.HTTPRoute{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "HTTPRoute",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-httproute",
+						Namespace: "bar", // Different namespace than Service.
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind:      common.PtrTo(gatewayv1.Kind("Service")),
+												Name:      "foo-svc",
+												Namespace: common.PtrTo(gatewayv1.Namespace("default")),
+												Port:      common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				&gatewayv1beta1.ReferenceGrant{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-reference-grant",
+						Namespace: "default",
+					},
+					Spec: gatewayv1beta1.ReferenceGrantSpec{
+						From: []gatewayv1beta1.ReferenceGrantFrom{{
+							Group:     gatewayv1.Group(gatewayv1.GroupVersion.Group),
+							Kind:      "HTTPRoute",
+							Namespace: "bar",
+						}},
+						To: []gatewayv1beta1.ReferenceGrantTo{{
+							Kind: "Service",
+						}},
+					},
+				},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-svc"},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{
+				{Namespace: "bar", Name: "bar-httproute"},
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			discoverer := Discoverer{
+				K8sClients:    params.K8sClients,
+				PolicyManager: params.PolicyManager,
+			}
+
+			resourceModel, err := discoverer.DiscoverResourcesForBackend(tc.filter)
+			if err != nil {
+				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+			}
+
+			gotBackends := namespacedBackendsFromResourceModel(resourceModel)
+			gotHTTPRoutes := namespacedHTTPRoutesFromResourceModel(resourceModel)
+
+			if tc.wantBackends != nil {
+				if diff := cmp.Diff(tc.wantBackends, gotBackends, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in Backends; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotBackends, tc.wantBackends, diff)
+				}
+			}
+			if tc.wantHTTPRoutes != nil {
+				if diff := cmp.Diff(tc.wantHTTPRoutes, gotHTTPRoutes, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in HTTPRoutes; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotHTTPRoutes, tc.wantHTTPRoutes, diff)
+				}
+			}
+		})
+	}
+}
 
 // TestDiscoverResourcesForGatewayClass_LabelSelector Tests label selector filtering for GatewayClasses.
 func TestDiscoverResourcesForGatewayClass_LabelSelector(t *testing.T) {
@@ -289,4 +488,26 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 	if diff := cmp.Diff(expectedNamespaceNames, namespaceNames); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", expectedNamespaceNames, namespaceNames, diff)
 	}
+}
+
+func namespacedHTTPRoutesFromResourceModel(r *ResourceModel) []apimachinerytypes.NamespacedName {
+	var httpRoutes []apimachinerytypes.NamespacedName
+	for _, httpRouteNode := range r.HTTPRoutes {
+		httpRoutes = append(httpRoutes, apimachinerytypes.NamespacedName{
+			Namespace: httpRouteNode.HTTPRoute.GetNamespace(),
+			Name:      httpRouteNode.HTTPRoute.GetName(),
+		})
+	}
+	return httpRoutes
+}
+
+func namespacedBackendsFromResourceModel(r *ResourceModel) []apimachinerytypes.NamespacedName {
+	var backends []apimachinerytypes.NamespacedName
+	for _, backendNode := range r.Backends {
+		backends = append(backends, apimachinerytypes.NamespacedName{
+			Namespace: backendNode.Backend.GetNamespace(),
+			Name:      backendNode.Backend.GetName(),
+		})
+	}
+	return backends
 }
