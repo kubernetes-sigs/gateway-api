@@ -14,7 +14,6 @@ cover, and documentation to help users get started.
 - [Apache APISIX][2] (beta)
 - [Avi Kubernetes Operator][31] (tech preview)
 - [Azure Application Gateway for Containers][27] (preview)
-- [BIG-IP Kubernetes Gateway][20] (beta)
 - [Cilium][16] (beta)
 - [Contour][3] (GA)
 - [Easegress][30] (GA)
@@ -70,7 +69,6 @@ cover, and documentation to help users get started.
 [17]:#flomesh-service-mesh-fsm
 [18]:#envoy-gateway
 [19]:#litespeed-ingress-controller
-[20]:#big-ip-kubernetes-gateway
 [21]:#stunner
 [22]:#argo-rollouts
 [23]:#amazon-elastic-kubernetes-service
@@ -137,20 +135,6 @@ Application Gateway for Containers implements `v1beta1` specification of Gateway
 
 [azure-application-gateway-for-containers]:https://aka.ms/appgwcontainers/docs
 [azure-application-gateway-for-containers-quickstart-controller]:https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
-
-### BIG-IP Kubernetes Gateway
-
-[BIG-IP Kubernetes Gateway][big-ip-kubernetes-gateway] is an open-source project that provides an implementation of the Gateway API using [F5 BIG-IP][f5bigip] as the data plane. It provides enterprises with high-performance Gateway API implementation.
-
-We are actively supporting various features of the Gateway API. For compatibility with the features of the Gateway API, please refer to [here][bigipgwfeatures]. For any questions about this project, welcome to create [Issues][bigipgwissues] or [PR][bigipgwpr]. Also, you are welcome to connect with us in the [slack channel][bigipgwslacklink].
-
-
-[big-ip-kubernetes-gateway]:https://gateway-api.f5se.io/
-[f5bigip]:https://f5.com
-[bigipgwfeatures]:https://github.com/f5devcentral/bigip-kubernetes-gateway/blob/master/docs/gateway-api-compatibility.md
-[bigipgwissues]:https://github.com/f5devcentral/bigip-kubernetes-gateway/issues
-[bigipgwpr]:https://github.com/f5devcentral/bigip-kubernetes-gateway/pulls
-[bigipgwslacklink]: https://gateway-api.f5se.io/Support-and-contact/
 
 ### Cilium
 
