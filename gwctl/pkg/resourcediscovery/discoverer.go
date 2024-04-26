@@ -364,7 +364,7 @@ func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resource
 			// Ensure that if this is a cross namespace reference, then it is accepted
 			// through some ReferenceGrant.
 			if httpRoute.GetNamespace() != backendRef.Namespace {
-				httpRouteRef := relations.ObjRef{
+				httpRouteRef := common.ObjRef{
 					Group:     httpRoute.GroupVersionKind().Group,
 					Kind:      httpRoute.GroupVersionKind().Kind,
 					Name:      httpRoute.GetName(),
@@ -448,7 +448,7 @@ func (d Discoverer) discoverReferenceGrantsFromBackends(ctx context.Context, res
 		}
 
 		for _, referenceGrant := range referenceGrants {
-			backendRef := relations.ObjRef{
+			backendRef := common.ObjRef{
 				Group:     backendNode.Backend.GroupVersionKind().Group,
 				Kind:      backendNode.Backend.GroupVersionKind().Kind,
 				Name:      backendNode.Backend.GetName(),
