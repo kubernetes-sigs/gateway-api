@@ -316,6 +316,13 @@ func (rm *ResourceModel) calculateEffectivePolicies() error {
 // Namespace, and Gateway).
 func (rm *ResourceModel) calculateEffectivePoliciesForGateways() error {
 	for _, gatewayNode := range rm.Gateways {
+		// Do not calculate effective policy for the Gateway if the GatewayClass is
+		// incorrect. For now, we only calculate effective policy once the
+		// references are corrected.
+		if gatewayNode.GatewayClass == nil {
+			continue
+		}
+
 		// Fetch all policies.
 		gatewayClassPolicies := convertPoliciesMapToSlice(gatewayNode.GatewayClass.Policies)
 		gatewayNamespacePolicies := convertPoliciesMapToSlice(gatewayNode.Namespace.Policies)
