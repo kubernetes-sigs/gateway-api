@@ -171,6 +171,8 @@ type GatewayNode struct {
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
 	// Events contains the events associated with this Gateway.
 	Events []corev1.Event
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
@@ -180,6 +182,7 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
 		Events:            []corev1.Event{},
+		Errors:            []error{},
 	}
 }
 
@@ -211,6 +214,8 @@ type HTTPRouteNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// HTTPRoute, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
@@ -220,6 +225,7 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 		Backends:          make(map[backendID]*BackendNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
@@ -252,6 +258,8 @@ type BackendNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// Backend, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
@@ -261,6 +269,7 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		Policies:          make(map[policyID]*PolicyNode),
 		ReferenceGrants:   make(map[referenceGrantID]*ReferenceGrantNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 

@@ -30,6 +30,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/relations"
 
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/fields"
@@ -249,12 +250,16 @@ func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, reso
 	}
 
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
-		gwcID := GatewayClassID(relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway))
+		gatewayClassName := relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway)
+		gwcID := GatewayClassID(gatewayClassName)
 		gatewayClass, ok := gatewayClassesByID[gwcID]
 		if !ok {
-			klog.V(1).ErrorS(nil, "GatewayClass referenced in Gateway does not exist",
-				"gateway", gatewayNode.Gateway.GetNamespace()+"/"+gatewayNode.Gateway.GetName(),
-			)
+			err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+				ReferringObject: common.ObjRef{Kind: "Gateway", Name: gatewayNode.Gateway.GetName(), Namespace: gatewayNode.Gateway.GetNamespace()},
+				ReferredObject:  common.ObjRef{Kind: "GatewayClass", Name: gatewayClassName},
+			}}
+			gatewayNode.Errors = append(gatewayNode.Errors, err)
+			klog.V(1).Info(err)
 			continue
 		}
 
@@ -278,10 +283,19 @@ func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resource
 			// Gateway doesn't already exist so fetch and add it to the resourceModel.
 			gateways, err := d.fetchGateways(ctx, Filter{Namespace: gatewayRef.Namespace, Name: gatewayRef.Name, Labels: labels.Everything()})
 			if err != nil {
-				klog.V(1).ErrorS(err, "Gateway referenced by HTTPRoute not found",
-					"gateway", gatewayRef.String(),
-					"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
-				)
+				if apierrors.IsNotFound(err) {
+					err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+						ReferredObject:  common.ObjRef{Kind: "Gateway", Name: gatewayRef.Name, Namespace: gatewayRef.Namespace},
+					}}
+					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+					klog.V(1).Info(err)
+				} else {
+					klog.V(1).ErrorS(err, "Error while fetching Gateway for HTTPRoute",
+						"gateway", gatewayRef.String(),
+						"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
+					)
+				}
 				continue
 			}
 			resourceModel.addGateways(gateways[0])
@@ -378,10 +392,12 @@ func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resource
 					}
 				}
 				if !referenceAccepted {
-					klog.V(1).InfoS("Reference from HTTPRoute to Backend in a different namespace is not allowed without a ReferenceGrant",
-						"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
-						"backend", backendRef.Namespace+"/"+backendRef.Name,
-					)
+					err := ReferenceNotPermittedError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRoute.GetName(), Namespace: httpRoute.GetNamespace()},
+						ReferredObject:  backendRef,
+					}}
+					backendNode.Errors = append(backendNode.Errors, err)
+					klog.V(1).Info(err)
 					continue
 				}
 			}

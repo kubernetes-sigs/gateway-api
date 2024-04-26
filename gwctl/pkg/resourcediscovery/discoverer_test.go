@@ -35,6 +35,102 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
+func TestDiscoverResourcesForGateway(t *testing.T) {
+	testcases := []struct {
+		name    string
+		objects []runtime.Object
+		filter  Filter
+
+		wantGateways []apimachinerytypes.NamespacedName
+		// wantGatewayErrors maps a Gateway to the list of errors that Gateway has.
+		wantGatewayErrors map[apimachinerytypes.NamespacedName][]error
+	}{
+		{
+			name:   "normal",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				&gatewayv1.GatewayClass{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "foo-gatewayclass",
+					},
+				},
+				&gatewayv1.Gateway{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-gateway",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.GatewaySpec{
+						GatewayClassName: "foo-gatewayclass",
+					},
+				},
+			},
+			wantGateways: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-gateway"},
+			},
+			wantGatewayErrors: map[apimachinerytypes.NamespacedName][]error{
+				{Namespace: "default", Name: "foo-gateway"}: nil, // Want no errors.
+			},
+		},
+		{
+			name:   "gateway should have error if it references a non-existent gatewayclass",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				&gatewayv1.Gateway{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-gateway",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.GatewaySpec{
+						GatewayClassName: "foo-gatewayclass", // GatewayClass does not exist.
+					},
+				},
+			},
+			wantGateways: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-gateway"},
+			},
+			wantGatewayErrors: map[apimachinerytypes.NamespacedName][]error{
+				{Namespace: "default", Name: "foo-gateway"}: {
+					ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "Gateway", Name: "foo-gateway", Namespace: "default"},
+						ReferredObject:  common.ObjRef{Kind: "GatewayClass", Name: "foo-gatewayclass"},
+					}},
+				},
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			discoverer := Discoverer{
+				K8sClients:    params.K8sClients,
+				PolicyManager: params.PolicyManager,
+			}
+
+			resourceModel, err := discoverer.DiscoverResourcesForGateway(tc.filter)
+			if err != nil {
+				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+			}
+
+			gotGateways := namespacedGatewaysFromResourceModel(resourceModel)
+			gotGatewayErrors := gatewayErrorsFromResourceModel(resourceModel)
+
+			if tc.wantGateways != nil {
+				if diff := cmp.Diff(tc.wantGateways, gotGateways, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in Gateways; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotGateways, tc.wantGateways, diff)
+				}
+			}
+			if tc.wantGatewayErrors != nil {
+				if diff := cmp.Diff(tc.wantGatewayErrors, gotGatewayErrors, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in Gateway errors; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotGatewayErrors, tc.wantGatewayErrors, diff)
+				}
+			}
+		})
+	}
+}
+
 func TestDiscoverResourcesForBackend(t *testing.T) {
 	testcases := []struct {
 		name    string
@@ -490,6 +586,17 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 	}
 }
 
+func namespacedGatewaysFromResourceModel(r *ResourceModel) []apimachinerytypes.NamespacedName {
+	var gateways []apimachinerytypes.NamespacedName
+	for _, gatewayNode := range r.Gateways {
+		gateways = append(gateways, apimachinerytypes.NamespacedName{
+			Namespace: gatewayNode.Gateway.GetNamespace(),
+			Name:      gatewayNode.Gateway.GetName(),
+		})
+	}
+	return gateways
+}
+
 func namespacedHTTPRoutesFromResourceModel(r *ResourceModel) []apimachinerytypes.NamespacedName {
 	var httpRoutes []apimachinerytypes.NamespacedName
 	for _, httpRouteNode := range r.HTTPRoutes {
@@ -510,4 +617,16 @@ func namespacedBackendsFromResourceModel(r *ResourceModel) []apimachinerytypes.N
 		})
 	}
 	return backends
+}
+
+func gatewayErrorsFromResourceModel(r *ResourceModel) map[apimachinerytypes.NamespacedName][]error {
+	result := make(map[apimachinerytypes.NamespacedName][]error)
+	for _, gatewayNode := range r.Gateways {
+		gatewayNN := apimachinerytypes.NamespacedName{
+			Namespace: gatewayNode.Gateway.GetNamespace(),
+			Name:      gatewayNode.Gateway.GetName(),
+		}
+		result[gatewayNN] = gatewayNode.Errors
+	}
+	return result
 }
