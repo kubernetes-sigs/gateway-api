@@ -33,9 +33,7 @@ var MeshConsumerRoute = suite.ConformanceTest{
 	ShortName:   "MeshConsumerRoute",
 	Description: "An HTTPRoute in a namespace other than its parentRef's namespace only affects requests from the route's namespace",
 	Features: []features.SupportedFeature{
-		features.SupportMesh,
-		features.SupportHTTPRoute,
-		features.SupportHTTPRouteResponseHeaderModification,
+		features.SupportMeshConsumerRoute,
 	},
 	Manifests: []string{"tests/mesh-consumer-route.yaml"},
 	Test: func(t *testing.T, s *suite.ConformanceTestSuite) {
