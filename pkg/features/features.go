@@ -221,9 +221,11 @@ var UDPRouteFeatures = sets.New(
 
 const (
 	// This option indicates general support for service mesh
-	SupportMesh                  SupportedFeature = "Mesh"
+	SupportMesh SupportedFeature = "Mesh"
+	// This option indicates support for matching Service traffic specifically by Cluster IP rather than other mechanisms.
 	SupportMeshClusterIPMatching SupportedFeature = "MeshClusterIPMatching"
-	SupportMeshConsumerRoute     SupportedFeature = "MeshConsumerRoute"
+	// This option indicates support for "consumer" routes, where a namespace creates a route for a service in another namespace.
+	SupportMeshConsumerRoute SupportedFeature = "MeshConsumerRoute"
 )
 
 // MeshCoreFeatures includes all the supported features for the service mesh at
