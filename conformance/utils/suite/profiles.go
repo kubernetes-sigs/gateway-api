@@ -114,7 +114,10 @@ var (
 			features.SupportMesh,
 			features.SupportHTTPRoute,
 		),
-		ExtendedFeatures: features.HTTPRouteExtendedFeatures,
+		ExtendedFeatures: sets.New[features.SupportedFeature]().
+			Insert(features.HTTPRouteExtendedFeatures.UnsortedList()...).
+			Insert(features.SupportMeshClusterIPMatching).
+			Insert(features.SupportMeshConsumerRoute),
 	}
 
 	// MeshGRPCConformanceProfile is a ConformanceProfile that covers testing GRPC
@@ -125,6 +128,9 @@ var (
 			features.SupportMesh,
 			features.SupportGRPCRoute,
 		),
+		ExtendedFeatures: sets.New[features.SupportedFeature]().
+			Insert(features.SupportMeshClusterIPMatching).
+			Insert(features.SupportMeshConsumerRoute),
 	}
 )
 

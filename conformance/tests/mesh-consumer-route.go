@@ -34,6 +34,7 @@ var MeshConsumerRoute = suite.ConformanceTest{
 	Description: "An HTTPRoute in a namespace other than its parentRef's namespace only affects requests from the route's namespace",
 	Features: []features.SupportedFeature{
 		features.SupportMesh,
+		features.SupportMeshConsumerRoute,
 		features.SupportHTTPRoute,
 		features.SupportHTTPRouteResponseHeaderModification,
 	},
