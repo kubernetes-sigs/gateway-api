@@ -66,7 +66,6 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 
 		parentHTTPRoutes := []string{}
 		remainderHTTPRoutes := 0
-		associatedDistinctPolicies := map[string]any{}
 
 		httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, len(backendNode.HTTPRoutes))
 		i := 0
@@ -90,14 +89,6 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			} else {
 				remainderHTTPRoutes++
 			}
-
-			// TODO(yashvardhan-kukreja): change this to httpRouteNode.EffectivePolicies once the work around inherited policies is matured
-			for _, policy := range httpRouteNode.Policies {
-				unstructuredPolicy := policy.Policy.Unstructured()
-				key := fmt.Sprintf("%s/%s/%s",
-					unstructuredPolicy.GetKind(), unstructuredPolicy.GetNamespace(), unstructuredPolicy.GetName())
-				associatedDistinctPolicies[key] = true
-			}
 		}
 
 		referredByRoutes := "None"
@@ -112,7 +103,7 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		name := backendNode.Backend.GetName()
 		backendType := backendNode.Backend.GetKind()
 		age := duration.HumanDuration(bp.Clock.Since(backend.GetCreationTimestamp().Time))
-		policiesCount := fmt.Sprintf("%d", len(associatedDistinctPolicies))
+		policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
 
 		row := []string{
 			namespace,

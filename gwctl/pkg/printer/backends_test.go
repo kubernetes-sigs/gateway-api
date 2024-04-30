@@ -80,9 +80,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 						"key4": "value-parent-4",
 					},
 					"targetRef": map[string]interface{}{
-						"group": "gateway.networking.k8s.io",
-						"kind":  "GatewayClass",
-						"name":  "demo-gatewayclass-1",
+						"group":     "",
+						"kind":      "Service",
+						"name":      "foo-svc-0",
+						"namespace": "default",
 					},
 				},
 			},
@@ -104,10 +105,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 						"key5": "value-child-5",
 					},
 					"targetRef": map[string]interface{}{
-						"group":     "gateway.networking.k8s.io",
-						"kind":      "Gateway",
-						"name":      "demo-gateway-1",
-						"namespace": "default",
+						"group":     "",
+						"kind":      "Service",
+						"name":      "foo-svc-1",
+						"namespace": "ns1",
 					},
 				},
 			},
@@ -460,7 +461,7 @@ func TestBackendsPrinter_Print(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForBackend(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel %v: %v", resourceModel, err)
 	}
 
 	bp := &BackendsPrinter{
@@ -473,10 +474,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
 NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                          AGE   POLICIES
-default    foo-svc-0  Service  default/foo-httproute-1                                     3d    0
-ns1        foo-svc-1  Service  default/foo-httproute-1,default/qmn-httproute-100           2d    0
-ns2        foo-svc-2  Service  default/foo-httproute-1,default/qmn-httproute-100 + 1 more  36h   1
-ns3        foo-svc-3  Service  default/qmn-httproute-100,ns1/bar-route-21                  24h   1
+default    foo-svc-0  Service  default/foo-httproute-1                                     3d    1
+ns1        foo-svc-1  Service  default/foo-httproute-1,default/qmn-httproute-100           2d    1
+ns2        foo-svc-2  Service  default/foo-httproute-1,default/qmn-httproute-100 + 1 more  36h   0
+ns3        foo-svc-3  Service  default/qmn-httproute-100,ns1/bar-route-21                  24h   0
 ns3        foo-svc-4  Service  None                                                        5d8h  0
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
