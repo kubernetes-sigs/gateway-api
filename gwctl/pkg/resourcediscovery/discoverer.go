@@ -346,6 +346,7 @@ func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel
 				fields.OneTermEqualSelector("involvedObject.kind", "Gateway"),
 				fields.OneTermEqualSelector("involvedObject.name", gatewayNode.Gateway.Name),
 				fields.OneTermEqualSelector("involvedObject.namespace", gatewayNode.Gateway.Namespace),
+				fields.OneTermEqualSelector("involvedObject.uid", string(gatewayNode.Gateway.UID)),
 			),
 			Limit: maxEventsPerResource,
 		}

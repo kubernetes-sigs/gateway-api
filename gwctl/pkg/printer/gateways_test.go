@@ -218,6 +218,7 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
 			},
 			Spec: gatewayv1.GatewaySpec{
 				GatewayClassName: "foo-gatewayclass",
@@ -356,6 +357,7 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 			InvolvedObject: corev1.ObjectReference{
 				Kind: "Gateway",
 				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
 			},
 			Message: "some random message",
 		},
@@ -388,6 +390,7 @@ Kind: ""
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
+  uid: 00000000-0000-0000-0000-000000000001
 Spec:
   gatewayClassName: foo-gatewayclass
   listeners: null
