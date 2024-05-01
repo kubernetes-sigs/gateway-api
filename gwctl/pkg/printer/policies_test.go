@@ -343,7 +343,8 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 		Writer: &bytes.Buffer{},
 		Clock:  fakeClock,
 	}
-	pp.printCRDsTable(params.PolicyManager.GetCRDs())
+
+	pp.PrintCRDs(params.PolicyManager.GetCRDs(), utils.OutputFormatTable)
 
 	got := pp.Writer.(*bytes.Buffer).String()
 	want := `
