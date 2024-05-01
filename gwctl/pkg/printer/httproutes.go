@@ -24,13 +24,14 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"sigs.k8s.io/yaml"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"sigs.k8s.io/yaml"
 )
 
 type HTTPRoutesPrinter struct {
