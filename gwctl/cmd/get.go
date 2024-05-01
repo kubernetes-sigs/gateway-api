@@ -19,6 +19,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -38,7 +39,7 @@ func NewGetCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get {namespaces|gateways|gatewayclasses|policies|policycrds|httproutes}",
 		Short: "Display one or many resources",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
 			params := getParams(kubeConfigPath)
 			runGet(cmd, args, params)
@@ -51,8 +52,38 @@ func NewGetCommand() *cobra.Command {
 	return cmd
 }
 
+func getKindAndName(args []string) (string, string, error) {
+	if len(args) < 1 {
+		return "", "", fmt.Errorf("no arguments found to be provided")
+	}
+
+	firstArg := args[0]
+	splittedFirstArg := strings.Split(firstArg, "/")
+
+	if len(splittedFirstArg) > 2 {
+		return "", "", fmt.Errorf("more than two slashes found in the first argument")
+	}
+	if len(splittedFirstArg) == 2 {
+		if len(args) > 1 {
+			return "", "", fmt.Errorf("cannot provide name in a separate arg if already provided alongside the first arg as RESOURCE_TYPE/NAME")
+		}
+		kind, name := splittedFirstArg[0], splittedFirstArg[1]
+		return kind, name, nil
+	}
+
+	kind, name := firstArg, ""
+	if len(args) > 1 {
+		name = args[1]
+	}
+	return kind, name, nil
+}
+
 func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
-	kind := args[0]
+	kind, name, err := getKindAndName(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to parse kind and name: %v\n", err)
+		os.Exit(1)
+	}
 	ns, err := cmd.Flags().GetString("namespace")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to read flag \"namespace\": %v\n", err)
@@ -94,7 +125,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
 			os.Exit(1)
 		}
-		resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{Labels: selector})
+		resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{Labels: selector, Name: name})
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Namespace resources: %v\n", err)
 			os.Exit(1)
@@ -107,10 +138,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
 			os.Exit(1)
 		}
-		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
-		if len(args) > 1 {
-			filter.Name = args[1]
-		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector, Name: name}
 		resourceModel, err := discoverer.DiscoverResourcesForGateway(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover Gateway resources: %v\n", err)
@@ -124,10 +152,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
 			os.Exit(1)
 		}
-		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
-		if len(args) > 1 {
-			filter.Name = args[1]
-		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector, Name: name}
 		resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover GatewayClass resources: %v\n", err)
@@ -149,10 +174,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
 			os.Exit(1)
 		}
-		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
-		if len(args) > 1 {
-			filter.Name = args[1]
-		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector, Name: name}
 		resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover HTTPRoute resources: %v\n", err)
@@ -166,10 +188,7 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
 			os.Exit(1)
 		}
-		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector}
-		if len(args) > 1 {
-			filter.Name = args[1]
-		}
+		filter := resourcediscovery.Filter{Namespace: ns, Labels: selector, Name: name}
 		resourceModel, err := discoverer.DiscoverResourcesForBackend(filter)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to discover backend resources: %v\n", err)
@@ -179,5 +198,6 @@ func runGet(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 
 	default:
 		fmt.Fprintf(os.Stderr, "Unrecognized RESOURCE_TYPE\n")
+		os.Exit(1)
 	}
 }
