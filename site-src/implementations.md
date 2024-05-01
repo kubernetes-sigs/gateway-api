@@ -13,7 +13,7 @@ cover, and documentation to help users get started.
 - [Amazon Elastic Kubernetes Service][23] (alpha)
 - [Apache APISIX][2] (beta)
 - [Avi Kubernetes Operator][31] (tech preview)
-- [Azure Application Gateway for Containers][27] (preview)
+- [Azure Application Gateway for Containers][27] (GA)
 - [Cilium][16] (beta)
 - [Contour][3] (GA)
 - [Easegress][30] (GA)
@@ -129,9 +129,10 @@ Documentation to deploy and use AKO Gateway API can be found at [Avi Kubernetes 
 
 ### Azure Application Gateway for Containers
 
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Partial%20Conformance%20v1.0.0-Azure%20Application%20Gateway%20for%20Containers-orange)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/azure-application-gateway-for-containers)
+
 [Application Gateway for Containers][azure-application-gateway-for-containers] is a managed application (layer 7) load balancing solution, providing dynamic traffic management capabilities for workloads running in a Kubernetes cluster in Azure. Follow the [quickstart guide][azure-application-gateway-for-containers-quickstart-controller] to deploy the ALB controller and get started with Gateway API.
 
-Application Gateway for Containers implements `v1beta1` specification of Gateway API.
 
 [azure-application-gateway-for-containers]:https://aka.ms/appgwcontainers/docs
 [azure-application-gateway-for-containers-quickstart-controller]:https://learn.microsoft.com/azure/application-gateway/for-containers/quickstart-deploy-application-gateway-for-containers-alb-controller
