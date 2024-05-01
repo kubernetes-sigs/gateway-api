@@ -32,21 +32,33 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
 type PoliciesPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
-func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy) {
-	sort.Slice(policies, func(i, j int) bool {
-		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
-		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
-		return a < b
-	})
+func (pp *PoliciesPrinter) printClientObjects(objects []client.Object, format utils.OutputFormat) {
+	printablePayload, err := renderPrintableObject(objects)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to render the printable objects %v\n", err)
+		os.Exit(1)
+	}
+	output, err := utils.MarshalWithFormat(printablePayload, format)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to marshal the object %v\n", err)
+		os.Exit(1)
+	}
+	fmt.Fprint(pp, string(output))
+}
 
-	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
+func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager.Policy) {
+	tw := tabwriter.NewWriter(pp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -54,7 +66,7 @@ func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy)
 		os.Exit(1)
 	}
 
-	for _, policy := range policies {
+	for _, policy := range sortedPoliciesList {
 		policyType := "Direct"
 		if policy.IsInherited() {
 			policyType = "Inherited"
@@ -81,14 +93,23 @@ func (pp *PoliciesPrinter) PrintPoliciesGetView(policies []policymanager.Policy)
 	tw.Flush()
 }
 
-func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.PolicyCRD) {
-	sort.Slice(policyCRDs, func(i, j int) bool {
-		a := fmt.Sprintf("%v/%v", policyCRDs[i].CRD().GetNamespace(), policyCRDs[i].CRD().GetName())
-		b := fmt.Sprintf("%v/%v", policyCRDs[j].CRD().GetNamespace(), policyCRDs[j].CRD().GetName())
-		return a < b
-	})
+func (pp *PoliciesPrinter) PrintPolicies(policies []policymanager.Policy, format utils.OutputFormat) {
+	sortedPolicies := SortByString(policies)
+	clientObjects := ClientObjects(sortedPolicies)
 
-	tw := tabwriter.NewWriter(pp.Out, 0, 0, 2, ' ', 0)
+	switch format {
+	case utils.OutputFormatJSON, utils.OutputFormatYAML:
+		pp.printClientObjects(clientObjects, format)
+	case utils.OutputFormatTable:
+		pp.printPoliciesTable(sortedPolicies)
+	default:
+		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)
+		os.Exit(1)
+	}
+}
+
+func (pp *PoliciesPrinter) printCRDsTable(sortedPolicyCRDsList []policymanager.PolicyCRD) {
+	tw := tabwriter.NewWriter(pp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -96,7 +117,7 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.Pol
 		os.Exit(1)
 	}
 
-	for _, policyCRD := range policyCRDs {
+	for _, policyCRD := range sortedPolicyCRDsList {
 		policyType := "Direct"
 		if policyCRD.IsInherited() {
 			policyType = "Inherited"
@@ -119,6 +140,21 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsGetView(policyCRDs []policymanager.Pol
 	tw.Flush()
 }
 
+func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD, format utils.OutputFormat) {
+	sortedPolicyCRDs := SortByString(policyCRDs)
+	clientObjects := ClientObjects(sortedPolicyCRDs)
+
+	switch format {
+	case utils.OutputFormatJSON, utils.OutputFormatYAML:
+		pp.printClientObjects(clientObjects, format)
+	case utils.OutputFormatTable:
+		pp.printCRDsTable(sortedPolicyCRDs)
+	default:
+		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)
+		os.Exit(1)
+	}
+}
+
 type policyDescribeView struct {
 	Name      string                 `json:",omitempty"`
 	Namespace string                 `json:",omitempty"`
@@ -129,13 +165,7 @@ type policyDescribeView struct {
 }
 
 func (pp *PoliciesPrinter) PrintPoliciesDescribeView(policies []policymanager.Policy) {
-	sort.Slice(policies, func(i, j int) bool {
-		a := fmt.Sprintf("%v/%v", policies[i].Unstructured().GetNamespace(), policies[i].Unstructured().GetName())
-		b := fmt.Sprintf("%v/%v", policies[j].Unstructured().GetNamespace(), policies[j].Unstructured().GetName())
-		return a < b
-	})
-
-	for i, policy := range policies {
+	for i, policy := range SortByString(policies) {
 		views := []policyDescribeView{
 			{
 				Name:      policy.Unstructured().GetName(),
@@ -159,11 +189,11 @@ func (pp *PoliciesPrinter) PrintPoliciesDescribeView(policies []policymanager.Po
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(pp.Out, string(b))
+			fmt.Fprint(pp, string(b))
 		}
 
 		if i+1 != len(policies) {
-			fmt.Fprintf(pp.Out, "\n\n")
+			fmt.Fprintf(pp, "\n\n")
 		}
 	}
 }
@@ -226,11 +256,11 @@ func (pp *PoliciesPrinter) PrintPolicyCRDsDescribeView(policyCrds []policymanage
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(pp.Out, string(b))
+			fmt.Fprint(pp, string(b))
 		}
 
 		if i+1 != len(policyCrds) {
-			fmt.Fprintf(pp.Out, "\n\n")
+			fmt.Fprintf(pp, "\n\n")
 		}
 	}
 }

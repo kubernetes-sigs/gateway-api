@@ -19,8 +19,12 @@ package utils
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
 	"io"
 	"testing"
+
+	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
@@ -42,4 +46,36 @@ func MustParamsForTest(t *testing.T, fakeClients *common.K8sClients) *CmdParams 
 		PolicyManager: policyManager,
 		Out:           &bytes.Buffer{},
 	}
+}
+
+type OutputFormat string
+
+const (
+	OutputFormatJSON  OutputFormat = "json"
+	OutputFormatYAML  OutputFormat = "yaml"
+	OutputFormatTable OutputFormat = ""
+)
+
+func ValidateAndReturnOutputFormat(format string) (OutputFormat, error) {
+	switch format {
+	case "json":
+		return OutputFormatJSON, nil
+	case "yaml":
+		return OutputFormatYAML, nil
+	case "":
+		return OutputFormatTable, nil
+	default:
+		var zero OutputFormat
+		return zero, fmt.Errorf("unknown format %s provided", format)
+	}
+}
+
+func MarshalWithFormat(content any, format OutputFormat) ([]byte, error) {
+	if format == OutputFormatJSON {
+		return json.MarshalIndent(content, "", "  ")
+	}
+	if format == OutputFormatYAML {
+		return yaml.Marshal(content)
+	}
+	return []byte{}, fmt.Errorf("format %s not found to support marshaling", format)
 }

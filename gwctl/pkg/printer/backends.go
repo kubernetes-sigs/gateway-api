@@ -29,19 +29,19 @@ import (
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/yaml"
-
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+
+	"sigs.k8s.io/yaml"
 )
 
 type BackendsPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
 func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(bp.Out, 0, 0, 2, ' ', 0)
+	tw := tabwriter.NewWriter(bp, 0, 0, 2, ' ', 0)
 	row := []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -163,11 +163,11 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(bp.Out, string(b))
+			fmt.Fprint(bp, string(b))
 		}
 
 		if index+1 <= len(resourceModel.Backends) {
-			fmt.Fprintf(bp.Out, "\n\n")
+			fmt.Fprintf(bp, "\n\n")
 		}
 	}
 }

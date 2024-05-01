@@ -465,8 +465,8 @@ func TestBackendsPrinter_Print(t *testing.T) {
 	}
 
 	bp := &BackendsPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 
 	bp.Print(resourceModel)

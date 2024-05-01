@@ -18,6 +18,7 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -37,7 +39,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-func TestHTTPRoutesPrinter_Print(t *testing.T) {
+func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
@@ -214,11 +216,11 @@ func TestHTTPRoutesPrinter_Print(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 
-	hp.Print(resourceModel)
+	hp.PrintTable(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
@@ -403,8 +405,8 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 	hp.PrintDescribeView(resourceModel)
 
@@ -433,5 +435,150 @@ EffectivePolicies:
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+// TestHTTPRoutesPrinter_PrintJsonYaml tests the correctness of JSON/YAML output associated with -o json/yaml of `get` subcommand
+func TestHTTPRoutesPrinter_PrintJsonYaml(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	creationTime := fakeClock.Now().Add(-24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
+
+	hrName, hrNamespace := "httproute-1", "default"
+	hrConfig := apisv1beta1.HTTPRoute(hrName, hrNamespace)
+
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "gatewayclass-1",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "gateway-1",
+				Namespace: "default",
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "gatewayclass-1",
+			},
+		},
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: *hrConfig.APIVersion,
+				Kind:       *hrConfig.Kind,
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      hrName,
+				Namespace: hrNamespace,
+				CreationTimestamp: metav1.Time{
+					Time: creationTime,
+				},
+				Labels: map[string]string{"app": "foo", "env": "internal"},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				Hostnames: []gatewayv1.Hostname{"example.com"},
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Name: "gateway-1",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+
+	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to discover resources: %v", err)
+	}
+
+	hp := &HTTPRoutesPrinter{
+		Writer: params.Out,
+		Clock:  fakeClock,
+	}
+	Print(hp, resourceModel, utils.OutputFormatJSON)
+
+	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	wantJSON := common.JSONString(fmt.Sprintf(`
+        {
+          "apiVersion": "v1",
+          "items": [
+            {
+              "apiVersion": "gateway.networking.k8s.io/v1beta1",
+              "kind": "HTTPRoute",
+              "metadata": {
+                "creationTimestamp": "%s",
+                "labels": {
+                  "app": "foo",
+                  "env": "internal"
+                },
+                "name": "httproute-1",
+                "namespace": "default",
+                "resourceVersion": "999"
+              },
+              "spec": {
+                "hostnames": [
+                  "example.com"
+                ],
+                "parentRefs": [
+                  {
+                    "name": "gateway-1"
+                  }
+                ]
+              },
+              "status": {
+                "parents": null
+              }
+            }
+          ],
+          "kind": "List"
+        }`, creationTime.Format(time.RFC3339)))
+	diff, err := wantJSON.CmpDiff(gotJSON)
+	if err != nil {
+		t.Fatalf("Failed to compare the json diffs: %v", diff)
+	}
+	if diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotJSON, wantJSON, diff)
+	}
+
+	hp.Writer = &bytes.Buffer{}
+
+	Print(hp, resourceModel, utils.OutputFormatYAML)
+
+	gotYaml := common.YamlString(hp.Writer.(*bytes.Buffer).String())
+	wantYaml := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: HTTPRoute
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: httproute-1
+    namespace: default
+    resourceVersion: "999"
+  spec:
+    hostnames:
+    - example.com
+    parentRefs:
+    - name: gateway-1
+  status:
+    parents: null
+kind: List`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(wantYaml, gotYaml, common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotYaml, wantYaml, diff)
 	}
 }

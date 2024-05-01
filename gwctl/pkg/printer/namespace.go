@@ -20,20 +20,23 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"sigs.k8s.io/yaml"
 
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+
+	"sigs.k8s.io/yaml"
 )
 
+var _ Printer = (*NamespacesPrinter)(nil)
+
 type NamespacesPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
@@ -45,8 +48,12 @@ type namespaceDescribeView struct {
 	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
 }
 
-func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(nsp.Out, 0, 0, 2, ' ', 0)
+func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(common.MapToValues(resourceModel.Namespaces))
+}
+
+func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(nsp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "STATUS", "AGE"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -54,16 +61,8 @@ func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceMod
 		os.Exit(1)
 	}
 
-	namespaceNodes := make([]*resourcediscovery.NamespaceNode, 0, len(resourceModel.Namespaces))
-	for _, namespaceNode := range resourceModel.Namespaces {
-		namespaceNodes = append(namespaceNodes, namespaceNode)
-	}
-
-	sort.Slice(namespaceNodes, func(i, j int) bool {
-		return namespaceNodes[i].Namespace.Name < namespaceNodes[j].Namespace.Name
-	})
-
-	for _, namespaceNode := range namespaceNodes {
+	namespaceNodes := common.MapToValues(resourceModel.Namespaces)
+	for _, namespaceNode := range SortByString(namespaceNodes) {
 		age := duration.HumanDuration(nsp.Clock.Since(namespaceNode.Namespace.CreationTimestamp.Time))
 		row := []string{
 			namespaceNode.Namespace.Name,
@@ -80,18 +79,9 @@ func (nsp *NamespacesPrinter) Print(resourceModel *resourcediscovery.ResourceMod
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	namespaceNodes := make([]*resourcediscovery.NamespaceNode, 0, len(resourceModel.Namespaces))
-
-	for _, namespaceNode := range resourceModel.Namespaces {
-		namespaceNodes = append(namespaceNodes, namespaceNode)
-	}
-
-	sort.Slice(namespaceNodes, func(i, j int) bool {
-		return namespaceNodes[i].Namespace.Name < namespaceNodes[j].Namespace.Name
-	})
-
+	namespaceNodes := common.MapToValues(resourceModel.Namespaces)
 	index := 0
-	for _, namespaceNode := range namespaceNodes {
+	for _, namespaceNode := range SortByString(namespaceNodes) {
 		index++
 
 		views := []namespaceDescribeView{
@@ -119,11 +109,11 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(nsp.Out, string(b))
+			fmt.Fprint(nsp, string(b))
 		}
 
 		if index+1 <= len(resourceModel.Namespaces) {
-			fmt.Fprintf(nsp.Out, "\n\n")
+			fmt.Fprintf(nsp, "\n\n")
 		}
 	}
 }

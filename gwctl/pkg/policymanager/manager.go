@@ -22,6 +22,8 @@ import (
 	"fmt"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -180,6 +182,8 @@ type PolicyCRD struct {
 	crd apiextensionsv1.CustomResourceDefinition
 }
 
+func (p PolicyCRD) ClientObject() client.Object { return p.CRD() }
+
 // ID returns a unique identifier for this PolicyCRD.
 func (p PolicyCRD) ID() PolicyCrdID {
 	return PolicyCrdID(p.crd.Spec.Names.Kind + "." + p.crd.Spec.Group)
@@ -219,6 +223,8 @@ type Policy struct {
 	// "direct").
 	inherited bool
 }
+
+func (p Policy) ClientObject() client.Object { return p.Unstructured() }
 
 type ObjRef struct {
 	Group     string `json:",omitempty"`
