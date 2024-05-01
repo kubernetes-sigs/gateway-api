@@ -1,5 +1,5 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2024-04-25T14:54:49Z"
+date: "2024-05-01T15:52:24Z"
 gatewayAPIChannel: experimental
 gatewayAPIVersion: v1.1.0-rc1
 implementation:
@@ -84,13 +84,11 @@ profiles:
       Passed: 2
       Skipped: 0
   extended:
-    result: partial
-    skippedTests:
-    - MeshFrontendHostname
+    result: success
     statistics:
       Failed: 0
       Passed: 3
-      Skipped: 1
+      Skipped: 0
     supportedFeatures:
     - HTTPRouteBackendRequestHeaderModification
     - HTTPRouteBackendTimeout
@@ -106,5 +104,8 @@ profiles:
     - HTTPRouteRequestTimeout
     - HTTPRouteResponseHeaderModification
     - HTTPRouteSchemeRedirect
+    - MeshConsumerRoute
+    unsupportedFeatures:
+    - MeshClusterIPMatching
   name: MESH-HTTP
-  summary: Core tests succeeded. Extended tests partially succeeded with 1 test skips.
+  summary: Core tests succeeded. Extended tests succeeded.

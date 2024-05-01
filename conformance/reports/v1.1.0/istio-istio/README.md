@@ -8,4 +8,4 @@
 
 ## Reproduce
 
-Istio conformance tests can be reproduce by running `prow/integ-suite-kind.sh test.integration.pilot.kube` from within the Istio repo.
+Istio conformance tests can be reproduced by running `prow/integ-suite-kind.sh test.integration.pilot.kube` from within the [Istio repo](https://github.com/istio/istio).
