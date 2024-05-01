@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"testing"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/discovery"
@@ -93,7 +94,30 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 		t.Fatal(err)
 	}
 
-	fakeClient := fakeclient.NewClientBuilder().WithScheme(scheme).WithRuntimeObjects(initRuntimeObjects...).Build()
+	// These extractorFuncs are used to properly mock the kubernetes client
+	// dependency in unit tests. They enable the ability to be able to list Events
+	// associated with a specific resource.
+	eventKindExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Kind}
+	}
+	eventNameExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Name}
+	}
+	eventNamespaceExtractorFunc := func(o client.Object) []string {
+		return []string{o.(*corev1.Event).InvolvedObject.Namespace}
+	}
+	eventUIDExtractorFunc := func(o client.Object) []string {
+		return []string{string(o.(*corev1.Event).InvolvedObject.UID)}
+	}
+
+	fakeClient := fakeclient.NewClientBuilder().
+		WithScheme(scheme).
+		WithRuntimeObjects(initRuntimeObjects...).
+		WithIndex(&corev1.Event{}, "involvedObject.kind", eventKindExtractorFunc).
+		WithIndex(&corev1.Event{}, "involvedObject.name", eventNameExtractorFunc).
+		WithIndex(&corev1.Event{}, "involvedObject.namespace", eventNamespaceExtractorFunc).
+		WithIndex(&corev1.Event{}, "involvedObject.uid", eventUIDExtractorFunc).
+		Build()
 	fakeDC := fakedynamicclient.NewSimpleDynamicClient(scheme, initRuntimeObjects...)
 	fakeDiscoveryClient := fakeclientset.NewSimpleClientset().Discovery()
 

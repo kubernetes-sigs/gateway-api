@@ -23,6 +23,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -217,9 +218,28 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
 			},
 			Spec: gatewayv1.GatewaySpec{
 				GatewayClassName: "foo-gatewayclass",
+			},
+		},
+
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				Kind: "HTTPRoute",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-httproute",
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{{
+						Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+						Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+						Name:  "foo-gateway",
+					}},
+				},
 			},
 		},
 
@@ -324,6 +344,23 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 				},
 			},
 		},
+
+		&corev1.Event{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "event-1",
+			},
+			Type:   corev1.EventTypeNormal,
+			Reason: "SYNC",
+			Source: corev1.EventSource{
+				Component: "my-gateway-controller",
+			},
+			InvolvedObject: corev1.ObjectReference{
+				Kind: "Gateway",
+				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
+			},
+			Message: "some random message",
+		},
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
@@ -345,11 +382,27 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
 Name: foo-gateway
-GatewayClass: foo-gatewayclass
+Namespace: ""
+Labels: null
+Annotations: null
+APIVersion: ""
+Kind: ""
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
+  uid: 00000000-0000-0000-0000-000000000001
+Spec:
+  gatewayClassName: foo-gatewayclass
+  listeners: null
+Status: {}
+AttachedRoutes:
+  Kind       Name
+  ----       ----
+  HTTPRoute  /foo-httproute
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: health-check-gateway
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  /health-check-gateway
 EffectivePolicies:
   HealthCheckPolicy.foo.com:
     key1: value-parent-1
@@ -360,6 +413,10 @@ EffectivePolicies:
   TimeoutPolicy.bar.com:
     condition: path=/abc
     seconds: 30
+Events:
+  Type    Reason  Age      From                   Message
+  ----    ------  ---      ----                   -------
+  Normal  SYNC    Unknown  my-gateway-controller  some random message
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
