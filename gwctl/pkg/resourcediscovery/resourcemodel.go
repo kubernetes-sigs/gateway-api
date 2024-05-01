@@ -317,8 +317,18 @@ func (rm *ResourceModel) calculateEffectivePolicies() error {
 func (rm *ResourceModel) calculateEffectivePoliciesForGateways() error {
 	for _, gatewayNode := range rm.Gateways {
 		// Fetch all policies.
-		gatewayClassPolicies := convertPoliciesMapToSlice(gatewayNode.GatewayClass.Policies)
-		gatewayNamespacePolicies := convertPoliciesMapToSlice(gatewayNode.Namespace.Policies)
+		var gatewayClassPolicies []policymanager.Policy
+		var gatewayNamespacePolicies []policymanager.Policy
+
+		if gatewayNode.GatewayClass != nil {
+			gatewayClassPolicies = convertPoliciesMapToSlice(gatewayNode.GatewayClass.Policies)
+		}
+
+		// although this should never happen under the assumption that .discoverNamespaces is called on the resourceModel beforehand
+		// yet this has been added as a fail-safe if in the future the above (unguarded) assumption breaks
+		if gatewayNode.Namespace != nil {
+			gatewayNamespacePolicies = convertPoliciesMapToSlice(gatewayNode.Namespace.Policies)
+		}
 		gatewayPolicies := convertPoliciesMapToSlice(gatewayNode.Policies)
 
 		// Merge policies by their kind.
@@ -361,7 +371,13 @@ func (rm *ResourceModel) calculateEffectivePoliciesForHTTPRoutes() error {
 		// Step 1: Aggregate all policies of the HTTPRoute and the
 		// HTTPRoute-namespace.
 		httpRoutePolicies := convertPoliciesMapToSlice(httpRouteNode.Policies)
-		httpRouteNamespacePolicies := convertPoliciesMapToSlice(httpRouteNode.Namespace.Policies)
+
+		var httpRouteNamespacePolicies []policymanager.Policy
+		// although this should never happen under the assumption that .discoverNamespaces is called on the resourceModel beforehand
+		// yet this has been added as a fail-safe if in the future the above (unguarded) assumption breaks
+		if httpRouteNode.Namespace != nil {
+			httpRouteNamespacePolicies = convertPoliciesMapToSlice(httpRouteNode.Namespace.Policies)
+		}
 
 		// Step 2: Merge HTTPRoute and HTTPRoute-namespace policies by their kind.
 		httpRoutePoliciesByKind, err := policymanager.MergePoliciesOfSimilarKind(httpRoutePolicies)
@@ -406,7 +422,13 @@ func (rm *ResourceModel) calculateEffectivePoliciesForBackends() error {
 
 		// Step 1: Aggregate all policies of the Backend and the Backend-namespace.
 		backendPolicies := convertPoliciesMapToSlice(backendNode.Policies)
-		backendNamespacePolicies := convertPoliciesMapToSlice(backendNode.Namespace.Policies)
+
+		var backendNamespacePolicies []policymanager.Policy
+		// although this should never happen under the assumption that .discoverNamespaces is called on the resourceModel beforehand
+		// yet this has been added as a fail-safe if in the future the above (unguarded) assumption breaks
+		if backendNode.Namespace != nil {
+			backendNamespacePolicies = convertPoliciesMapToSlice(backendNode.Namespace.Policies)
+		}
 
 		// Step 2: Merge Backend and Backend-namespace policies by their kind.
 		backendPoliciesByKind, err := policymanager.MergePoliciesOfSimilarKind(backendPolicies)
