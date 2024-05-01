@@ -82,12 +82,13 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		K8sClients:    params.K8sClients,
 		PolicyManager: params.PolicyManager,
 	}
-	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out, Clock: clock.RealClock{}}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out, Clock: clock.RealClock{}}
-	gwPrinter := &printer.GatewaysPrinter{Out: params.Out, Clock: clock.RealClock{}}
-	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out, Clock: clock.RealClock{}}
-	backendsPrinter := &printer.BackendsPrinter{Out: params.Out}
-	namespacesPrinter := &printer.NamespacesPrinter{Out: params.Out, Clock: clock.RealClock{}}
+
+	policiesPrinter := &printer.PoliciesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	gwPrinter := &printer.GatewaysPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	gwcPrinter := &printer.GatewayClassesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	backendsPrinter := &printer.BackendsPrinter{Writer: params.Out}
+	namespacesPrinter := &printer.NamespacesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 
 	switch kind {
 	case "policy", "policies":

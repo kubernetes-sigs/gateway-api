@@ -17,6 +17,8 @@ limitations under the License.
 package common
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
@@ -51,3 +53,21 @@ var YamlStringTransformer = cmp.Transformer("YamlLines", func(s YamlString) []st
 	}
 	return lines[start : end+1]
 })
+
+type JSONString string
+
+func (src JSONString) CmpDiff(tgt JSONString) (diff string, err error) {
+	var srcMap, targetMap map[string]interface{}
+	err = json.Unmarshal([]byte(src), &srcMap)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal the source json: %w", err)
+		return
+	}
+	err = json.Unmarshal([]byte(tgt), &targetMap)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal the target json: %w", err)
+		return
+	}
+
+	return cmp.Diff(srcMap, targetMap), nil
+}

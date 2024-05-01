@@ -20,12 +20,14 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 	"text/tabwriter"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 )
 
@@ -147,4 +149,33 @@ func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table 
 		table.Rows = append(table.Rows, row)
 	}
 	return table
+}
+
+type NodeResource interface {
+	ClientObject() client.Object
+}
+
+func ClientObjects[K NodeResource](nodes []K) []client.Object {
+	clientObjects := make([]client.Object, len(nodes))
+	for i, node := range nodes {
+		clientObjects[i] = node.ClientObject()
+	}
+	return clientObjects
+}
+
+func SortByString[K NodeResource](items []K) []K {
+	sort.Slice(items, func(i, j int) bool {
+		a := client.ObjectKeyFromObject(items[i].ClientObject()).String()
+		b := client.ObjectKeyFromObject(items[j].ClientObject()).String()
+		return a < b
+	})
+	return items
+}
+
+func NodeResources[K NodeResource](items []K) []NodeResource {
+	output := make([]NodeResource, len(items))
+	for i, item := range items {
+		output[i] = item
+	}
+	return output
 }

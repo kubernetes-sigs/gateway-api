@@ -18,6 +18,7 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -36,7 +37,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-func TestNamespacePrinter_Print(t *testing.T) {
+func TestNamespacePrinter_PrintTable(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&corev1.Namespace{
@@ -85,10 +86,10 @@ func TestNamespacePrinter_Print(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	nsp.Print(resourceModel)
+	nsp.PrintTable(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
@@ -225,8 +226,8 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 	nsp.PrintDescribeView(resourceModel)
 
@@ -255,5 +256,111 @@ DirectlyAttachedPolicies:
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+// TestNamespacesPrinter_PrintJsonYaml tests the correctness of JSON/YAML output associated with -o json/yaml of `get` subcommand
+func TestNamespacesPrinter_PrintJsonYaml(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	creationTime := fakeClock.Now().Add(-46 * 24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
+
+	nsObject := &corev1.Namespace{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "v1",
+			APIVersion: "Namespace",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: "namespace-1",
+			CreationTimestamp: metav1.Time{
+				Time: creationTime,
+			},
+			Labels: map[string]string{"app": "foo", "env": "internal"},
+		},
+		Spec: corev1.NamespaceSpec{
+			Finalizers: []corev1.FinalizerName{"kubernetes"},
+		},
+		Status: corev1.NamespaceStatus{
+			Phase: corev1.NamespaceActive,
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, nsObject))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+	}
+
+	nsp := &NamespacesPrinter{
+		Writer: params.Out,
+		Clock:  fakeClock,
+	}
+	Print(nsp, resourceModel, utils.OutputFormatJSON)
+
+	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	wantJSON := common.JSONString(fmt.Sprintf(`
+        {
+          "apiVersion": "v1",
+          "items": [
+            {
+              "apiVersion": "Namespace",
+              "kind": "v1",
+              "metadata": {
+                "creationTimestamp": "%s",
+                "labels": {
+                  "app": "foo",
+                  "env": "internal"
+                },
+                "name": "namespace-1",
+                "resourceVersion": "999"
+              },
+              "spec": {
+                "finalizers": [
+                  "kubernetes"
+                ]
+              },
+              "status": {
+                "phase": "Active"
+              }
+            }
+          ],
+          "kind": "List"
+        }`, creationTime.Format(time.RFC3339)))
+	diff, err := wantJSON.CmpDiff(gotJSON)
+	if err != nil {
+		t.Fatalf("Failed to compare the json diffs: %v", diff)
+	}
+	if diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotJSON, wantJSON, diff)
+	}
+
+	nsp.Writer = &bytes.Buffer{}
+	Print(nsp, resourceModel, utils.OutputFormatYAML)
+
+	gotYaml := common.YamlString(nsp.Writer.(*bytes.Buffer).String())
+	wantYaml := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: Namespace
+  kind: v1
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: namespace-1
+    resourceVersion: "999"
+  spec:
+    finalizers:
+    - kubernetes
+  status:
+    phase: Active
+kind: List
+`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(wantYaml, gotYaml, common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotYaml, wantYaml, diff)
 	}
 }

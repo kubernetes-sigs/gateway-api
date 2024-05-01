@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
@@ -28,15 +27,23 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
+var _ Printer = (*GatewaysPrinter)(nil)
+
 type GatewaysPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
-func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gp.Out, 0, 0, 2, ' ', 0)
+func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(common.MapToValues(resourceModel.Gateways))
+}
+
+func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(gp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -44,19 +51,9 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		os.Exit(1)
 	}
 
-	gatewayNodes := make([]*resourcediscovery.GatewayNode, 0, len(resourceModel.Gateways))
-	for _, gatewayNode := range resourceModel.Gateways {
-		gatewayNodes = append(gatewayNodes, gatewayNode)
-	}
+	gatewayNodes := common.MapToValues(resourceModel.Gateways)
 
-	sort.Slice(gatewayNodes, func(i, j int) bool {
-		if gatewayNodes[i].Gateway.GetName() != gatewayNodes[j].Gateway.GetName() {
-			return gatewayNodes[i].Gateway.GetName() < gatewayNodes[j].Gateway.GetName()
-		}
-		return gatewayNodes[i].Gateway.Spec.GatewayClassName < gatewayNodes[j].Gateway.Spec.GatewayClassName
-	})
-
-	for _, gatewayNode := range gatewayNodes {
+	for _, gatewayNode := range SortByString(gatewayNodes) {
 		var addresses []string
 		for _, address := range gatewayNode.Gateway.Status.Addresses {
 			addresses = append(addresses, address.Value)
@@ -160,10 +157,10 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		// Events
 		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayNode.Events, gp.Clock)})
 
-		Describe(gp.Out, pairs)
+		Describe(gp, pairs)
 
 		if index+1 <= len(resourceModel.Gateways) {
-			fmt.Fprintf(gp.Out, "\n\n")
+			fmt.Fprintf(gp, "\n\n")
 		}
 	}
 }

@@ -20,23 +20,26 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
-
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"k8s.io/utils/ptr"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
+
 	"sigs.k8s.io/yaml"
 )
 
+var _ Printer = (*GatewayClassesPrinter)(nil)
+
 type GatewayClassesPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
@@ -57,8 +60,12 @@ type gatewayClassDescribeView struct {
 	DirectlyAttachedPolicies []policymanager.ObjRef        `json:",omitempty"`
 }
 
-func (gcp *GatewayClassesPrinter) Print(model *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gcp.Out, 0, 0, 2, ' ', 0)
+func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(common.MapToValues(resourceModel.GatewayClasses))
+}
+
+func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(gcp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
 	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
 	if err != nil {
@@ -66,19 +73,9 @@ func (gcp *GatewayClassesPrinter) Print(model *resourcediscovery.ResourceModel) 
 		os.Exit(1)
 	}
 
-	gatewayClassNodes := make([]*resourcediscovery.GatewayClassNode, 0, len(model.GatewayClasses))
-	for _, gatewayClassNode := range model.GatewayClasses {
-		gatewayClassNodes = append(gatewayClassNodes, gatewayClassNode)
-	}
+	gatewayClassNodes := common.MapToValues(resourceModel.GatewayClasses)
 
-	sort.Slice(gatewayClassNodes, func(i, j int) bool {
-		if gatewayClassNodes[i].GatewayClass.GetName() != gatewayClassNodes[j].GatewayClass.GetName() {
-			return gatewayClassNodes[i].GatewayClass.GetName() < gatewayClassNodes[j].GatewayClass.GetName()
-		}
-		return string(gatewayClassNodes[i].GatewayClass.Spec.ControllerName) < string(gatewayClassNodes[j].GatewayClass.Spec.ControllerName)
-	})
-
-	for _, gatewayClassNode := range gatewayClassNodes {
+	for _, gatewayClassNode := range SortByString(gatewayClassNodes) {
 		accepted := "Unknown"
 		for _, condition := range gatewayClassNode.GatewayClass.Status.Conditions {
 			if condition.Type == "Accepted" {
@@ -163,12 +160,12 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 
 			emptyOutput := strings.TrimSpace(output) == "{}"
 			if !emptyOutput {
-				fmt.Fprint(gcp.Out, output)
+				fmt.Fprint(gcp, output)
 			}
 		}
 
 		if index+1 <= len(resourceModel.GatewayClasses) {
-			fmt.Fprintf(gcp.Out, "\n\n")
+			fmt.Fprintf(gcp, "\n\n")
 		}
 	}
 }

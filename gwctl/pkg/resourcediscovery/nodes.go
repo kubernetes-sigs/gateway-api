@@ -20,6 +20,8 @@ import (
 	"fmt"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
@@ -35,6 +37,10 @@ type resourceID struct {
 	Kind      string
 	Namespace string
 	Name      string
+}
+
+func (r resourceID) String() string {
+	return fmt.Sprintf("%s|%s|%s|%s", r.Group, r.Kind, r.Namespace, r.Name)
 }
 
 type (
@@ -127,6 +133,8 @@ func NewGatewayClassNode(gatewayClass *gatewayv1.GatewayClass) *GatewayClassNode
 	}
 }
 
+func (g GatewayClassNode) ClientObject() client.Object { return g.GatewayClass }
+
 func (g *GatewayClassNode) ID() gatewayClassID { //nolint:revive
 	if g.GatewayClass == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since GatewayClass is nil")
@@ -164,6 +172,8 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		Events:            []corev1.Event{},
 	}
 }
+
+func (g GatewayNode) ClientObject() client.Object { return g.Gateway }
 
 func (g *GatewayNode) ID() gatewayID { //nolint:revive
 	if g.Gateway == nil {
@@ -203,6 +213,8 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 	}
 }
 
+func (h HTTPRouteNode) ClientObject() client.Object { return h.HTTPRoute }
+
 func (h *HTTPRouteNode) ID() httpRouteID { //nolint:revive
 	if h.HTTPRoute == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since HTTPRoute is nil")
@@ -238,6 +250,8 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
 	}
 }
+
+func (b BackendNode) ClientObject() client.Object { return b.Backend }
 
 func (b *BackendNode) ID() backendID { //nolint:revive
 	if b.Backend == nil {
@@ -280,6 +294,8 @@ func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
 	}
 }
 
+func (n *NamespaceNode) ClientObject() client.Object { return n.Namespace }
+
 func (n *NamespaceNode) ID() namespaceID { //nolint:revive
 	if n.Namespace.Name == "" {
 		klog.V(0).ErrorS(nil, "returning empty ID since Namespace is empty")
@@ -318,6 +334,8 @@ func NewPolicyNode(policy *policymanager.Policy) *PolicyNode {
 		Policy: policy,
 	}
 }
+
+func (p PolicyNode) ClientObject() client.Object { return p.Policy.Unstructured() }
 
 func (p *PolicyNode) ID() policyID { //nolint:revive
 	if p.Policy == nil {
