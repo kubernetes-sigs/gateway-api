@@ -34,7 +34,21 @@ def on_pre_build(config, **kwargs):
     generate_conformance_tables(yamlReports)
 
 
-# NOTE: will have to be updated if new features are added
+desc = """
+The following tables are populated from the conformance reports [uploaded by project implementations](https://github.com/kubernetes-sigs/gateway-api/tree/main/conformance/reports). They are separated into the extended features that each project supports listed in their reports.
+Implementations only appear in this page if they pass Core conformance for the resource type, and the features listed should be Extended features.
+"""
+
+warning_text = """
+???+ warning
+
+
+    This page is under active development and is not in its final form,
+    especially for the project name and the names of the features.
+    However, as it is based on submitted conformance reports, the information is correct.
+"""
+
+# NOTE: will have to be updated if new (extended) features are added
 httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderModification', 'HTTPRouteQueryParamMatching', 'HTTPRouteMethodMatching', 'HTTPRouteResponseHeaderModification', 'HTTPRoutePortRedirect', 'HTTPRouteSchemeRedirect',
                                                 'HTTPRoutePathRedirect', 'HTTPRouteHostRewrite', 'HTTPRoutePathRewrite', 'HTTPRouteRequestMirror', 'HTTPRouteRequestMultipleMirrors', 'HTTPRouteRequestTimeout', 'HTTPRouteBackendTimeout', 'HTTPRouteParentRefPort']
 
@@ -42,7 +56,7 @@ httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderMo
 def generate_conformance_tables(reports):
 
     gateway_http_table = generate_profiles_report(reports, 'HTTP')
-    gateway_http_table = gateway_http_table.rename_axis('Project')
+    gateway_http_table = gateway_http_table.rename_axis('Organization')
 
     # Currently no implementation has extended supported features listed.
     # Can uncomment once a list is needed to keep track
@@ -52,7 +66,11 @@ def generate_conformance_tables(reports):
     mesh_http_table = mesh_http_table.rename_axis('Project')
 
     with open('site-src/implementation-table.md', 'w') as f:
-        f.write("The following tables are populated from the conformance reports uploaded by project implementations. They are separated into the extended features that each project supports listed in their reports, and reflect Gateway API's latest version.\n\n")
+        f.write(desc)
+        f.write("\n\n")
+
+        f.write(warning_text)
+        f.write("\n\n")
 
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
@@ -62,35 +80,32 @@ def generate_conformance_tables(reports):
         f.write("### HTTPRoute\n\n")
         f.write(mesh_http_table.to_markdown())
 
-# reports: raw report passed , route: the x in xRoute
-
 
 def generate_profiles_report(reports, route):
 
     http_reports = reports.loc[reports["name"] == route]
-    projects = http_reports['organization']
     http_reports.set_index('organization')
     http_reports.sort_values(['organization', 'version'], inplace=True)
-    http_reports.drop_duplicates(
-        subset='organization', inplace=True, keep='last')
 
-    http_table = pandas.DataFrame(columns=http_reports['organization'])
-    http_table.insert(loc=0, column='Features',
-                      value=httproute_extended_conformance_features_list)
-    http_reports = http_reports[["organization", "extended.supportedFeatures"]]
+    http_table = pandas.DataFrame(
+        columns=http_reports['organization'])
+    http_table = http_reports[['organization', 'project',
+                               'version', 'extended.supportedFeatures']].T
+    http_table.columns = http_table.iloc[0]
+    http_table = http_table[1:].T
 
-    http_table.set_index('Features')
-    for feat in httproute_extended_conformance_features_list:
+    for row in http_table.itertuples():
+        for feat in row._3:
+            http_table.loc[row.Index, feat] = ':white_check_mark:'
+    http_table = http_table.fillna(':x:')
+    http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
-        for proj in projects:
+    return http_table
 
-            if feat in http_reports.loc[http_reports["organization"] == proj]['extended.supportedFeatures'].to_list()[0]:
-                http_table.loc[http_table['Features'] ==
-                               feat, proj] = ':white_check_mark:'
-            else:
-                http_table.loc[http_table['Features'] == feat, proj] = ':x:'
 
-    return http_table.set_index('Features').T
+def temp_write(report, n):
+    with open('site-src/test'+n+'.md', 'w') as f:
+        f.write(report.to_markdown())
 
 
 # the path should be changed when there is a new version
