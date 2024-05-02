@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+- [v1.1.0-rc2](#v110-rc2)
 - [v1.1.0-rc1](#v110-rc1)
 - [v1.0.0](#v100)
 - [v1.0.0-rc2](#v100-rc2)
@@ -34,6 +35,36 @@
 - [v0.1.0](#v010)
 - [v0.1.0-rc2](#v010-rc2)
 - [v0.1.0-rc1](#v010-rc1)
+
+# v1.1.0-rc1
+
+We expect that this release candidate is quite close to the final v1.1.0
+release. However, subsequent breaking API changes are still possible.
+
+This release candidate is suitable for implementors, but we do not recommend
+shipping products based on a release candidate API due to the possibility of
+incompatible changes prior to the final release. The following represents the
+changes since # v1.1.0-rc1:
+
+## Conformance Profiles
+- Add SupportMeshConsumerRoute and SupportMeshClusterIPMatching supported
+  features to more clearly communicate the purpose of existing Mesh conformance
+  tests (#3035, @howardjohn)
+- Add conformance test for HTTP listener isolation (#3047, @arkodg, @pleshakov)
+
+## gwctl
+- Properly handle different API versions (#3001, @gauravkghildiyal)
+- Provide more detail in describe output (#2999, @gauravkghildiyal)
+- Support JSON and YAML output format in get commands (#2940,
+  @yashvardhan-kukreja)
+
+## Cleanup
+- Revert accidental removal of experimental kustomize configuration (#3022,
+  @howardjohn)
+
+## Dependencies
+- sigs.k8s.io/controller-tools from 0.14.0 to 0.15.0 (#3031)
+- sigs.k8s.io/controller-runtime from 0.17.0 to 0.18.0 (#3023, @tao12345666333)
 
 # v1.1.0-rc1
 
