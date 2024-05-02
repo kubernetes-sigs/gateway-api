@@ -21,7 +21,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -64,12 +63,9 @@ func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcedisco
 }
 
 func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gcp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"},
+		UseSeparator: false,
 	}
 
 	gatewayClassNodes := maps.Values(resourceModel.GatewayClasses)
@@ -90,13 +86,10 @@ func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.Re
 			accepted,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(gcp, 0)
 }
 
 func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

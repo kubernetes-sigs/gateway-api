@@ -20,8 +20,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
@@ -52,12 +50,9 @@ func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery
 }
 
 func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(nsp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "STATUS", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "STATUS", "AGE"},
+		UseSeparator: false,
 	}
 
 	namespaceNodes := maps.Values(resourceModel.Namespaces)
@@ -68,13 +63,10 @@ func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.Resour
 			string(namespaceNode.Namespace.Status.Phase),
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(nsp, 0)
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

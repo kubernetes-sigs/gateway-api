@@ -21,7 +21,6 @@ import (
 	"io"
 	"os"
 	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
@@ -45,12 +44,9 @@ func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.
 }
 
 func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(hp, 0, 0, 2, ' ', 0)
-	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"},
+		UseSeparator: false,
 	}
 
 	httpRouteNodes := maps.Values(resourceModel.HTTPRoutes)
@@ -80,13 +76,9 @@ func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.Resourc
 			parentRefsCount,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+	table.Write(hp, 0)
 }
 
 type httpRouteDescribeView struct {

@@ -54,7 +54,7 @@ func Describe(w io.Writer, pairs []*DescriberKV) {
 				fmt.Fprintf(w, "%v: <none>\n", pair.Key)
 			} else {
 				fmt.Fprintf(w, "%v:\n", pair.Key)
-				table.writeTable(w, defaultDescribeTableIndentSpaces)
+				table.Write(w, defaultDescribeTableIndentSpaces)
 			}
 			continue
 		}
@@ -78,9 +78,9 @@ type Table struct {
 	UseSeparator bool
 }
 
-// writeTable will write a formatted table to the writer. indent controls the
+// Write will write a formatted table to the writer. indent controls the
 // number of spaces at the beginning of each row.
-func (t *Table) writeTable(w io.Writer, indent int) {
+func (t *Table) Write(w io.Writer, indent int) {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 
 	// Print column names.

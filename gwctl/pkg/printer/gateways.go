@@ -19,9 +19,7 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
@@ -42,12 +40,9 @@ func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.Re
 }
 
 func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"},
+		UseSeparator: false,
 	}
 
 	gatewayNodes := maps.Values(resourceModel.Gateways)
@@ -86,13 +81,10 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 			programmedStatus,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(gp, 0)
 }
 
 func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
