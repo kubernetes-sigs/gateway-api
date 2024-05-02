@@ -161,6 +161,7 @@ const (
 	//
 	// Possible reasons for this condition to be False are:
 	//
+	// * "Invalid"
 	// * "InvalidParameters"
 	// * "UnsupportedVersion"
 	//
@@ -177,8 +178,13 @@ const (
 	GatewayClassReasonAccepted GatewayClassConditionReason = "Accepted"
 
 	// This reason is used with the "Accepted" condition when the
-	// GatewayClass was not accepted because the parametersRef field
-	// was invalid, with more detail in the message.
+	// GatewayClass was not accepted, with more detail in the message.
+	GatewayClassReasonInvalid GatewayClassConditionReason = "Invalid"
+
+	// This reason is used with the "Accepted" condition when the GatewayClass
+	// was not accepted because the parametersRef field refers to a nonexistent
+	// or unsupported resource or kind, or when the data within that resource is
+	// malformed.
 	GatewayClassReasonInvalidParameters GatewayClassConditionReason = "InvalidParameters"
 
 	// This reason is used with the "Accepted" condition when the
