@@ -78,10 +78,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		ns = metav1.NamespaceAll
 	}
 
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
+	discoverer := resourcediscovery.NewDiscoverer(params.K8sClients, params.PolicyManager)
 
 	policiesPrinter := &printer.PoliciesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
@@ -182,8 +179,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwcPrinter.PrintDescribeView(resourceModel)
 
 	case "backend", "backends":
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			os.Exit(1)
+		}
 		filter := resourcediscovery.Filter{
 			Namespace: ns,
+			Labels:    selector,
 		}
 		if len(args) > 1 {
 			filter.Name = args[1]

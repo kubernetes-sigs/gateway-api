@@ -82,7 +82,7 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	nsp := &NamespacesPrinter{
@@ -222,7 +222,7 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	nsp := &NamespacesPrinter{

@@ -365,6 +365,10 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 
 	objects := []runtime.Object{
 		&apiextensionsv1.CustomResourceDefinition{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "apiextensions.k8s.io/v1",
+				Kind:       "CustomResourceDefinition",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "healthcheckpolicies.foo.com",
 				Labels: map[string]string{
@@ -410,6 +414,10 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 		},
 
 		&apiextensionsv1.CustomResourceDefinition{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "apiextensions.k8s.io/v1",
+				Kind:       "CustomResourceDefinition",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "timeoutpolicies.bar.com",
 				Labels: map[string]string{
@@ -604,6 +612,10 @@ kind: List`, creationTime1.Format(time.RFC3339), creationTime2.Format(time.RFC33
 func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 	objects := []runtime.Object{
 		&apiextensionsv1.CustomResourceDefinition{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "apiextensions.k8s.io/v1",
+				Kind:       "CustomResourceDefinition",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "healthcheckpolicies.foo.com",
 				Labels: map[string]string{
@@ -647,6 +659,10 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 		},
 
 		&apiextensionsv1.CustomResourceDefinition{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: "apiextensions.k8s.io/v1",
+				Kind:       "CustomResourceDefinition",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "timeoutpolicies.bar.com",
 				Labels: map[string]string{

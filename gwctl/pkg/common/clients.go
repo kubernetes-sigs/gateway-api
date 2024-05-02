@@ -23,6 +23,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/dynamic"
 	fakedynamicclient "k8s.io/client-go/dynamic/fake"
@@ -118,8 +119,55 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 		WithIndex(&corev1.Event{}, "involvedObject.namespace", eventNamespaceExtractorFunc).
 		WithIndex(&corev1.Event{}, "involvedObject.uid", eventUIDExtractorFunc).
 		Build()
-	fakeDC := fakedynamicclient.NewSimpleDynamicClient(scheme, initRuntimeObjects...)
 	fakeDiscoveryClient := fakeclientset.NewSimpleClientset().Discovery()
+
+	// Setup a fake DynamicClient, which requires some special handling.
+	//
+	// When objects are injected using `NewSimpleDynamicClient` or
+	// `NewSimpleDynamicClientWithCustomListKinds` to the fake resource tracker,
+	// internally it will use the `meta.UnsafeGuessKindToResource()` function.
+	// This incorrectly guesses the GVR of Gateway with Resource being guessed as
+	// "gatewaies" (instead of "gateways"). As a workaround, we will have to
+	// create Gateway objects separately.
+	//
+	// Also, because of this incorrect guessing, we need to register the
+	// GatewayList type separately.
+	gatewayv1GVR := schema.GroupVersionResource{
+		Group:    gatewayv1.GroupVersion.Group,
+		Version:  gatewayv1.GroupVersion.Version,
+		Resource: "gateways",
+	}
+	gvrToListKind := map[schema.GroupVersionResource]string{
+		gatewayv1GVR: "GatewayList",
+	}
+	for _, obj := range initRuntimeObjects {
+		if crd, ok := obj.(*apiextensionsv1.CustomResourceDefinition); ok {
+			gvr := schema.GroupVersionResource{
+				Group:    crd.Spec.Group,
+				Version:  crd.Spec.Versions[0].Name,
+				Resource: crd.Spec.Names.Plural, // CRD Kinds directly map to the Resource.
+			}
+			gvrToListKind[gvr] = crd.Spec.Names.Kind + "List"
+		}
+	}
+	fakeDC := fakedynamicclient.NewSimpleDynamicClientWithCustomListKinds(scheme, gvrToListKind)
+	for _, obj := range initRuntimeObjects {
+		var err error
+		if gateway, ok := obj.(*gatewayv1.Gateway); ok {
+			// Register Gateway with correct GVR. This needs to be done explicitly for
+			// Gateway since the automatically guess GVR is incorrect.
+			//
+			// Automatic guessing of GVR uses `meta.UnsafeGuessKindToResource()` which
+			// pluralizes "gateway" to "gatewaies" (since the singular ends in a 'y')
+			err = fakeDC.Tracker().Create(gatewayv1GVR, gateway, gateway.Namespace)
+		} else {
+			// Register non-Gateway resources automatically without GVR.
+			err = fakeDC.Tracker().Add(obj)
+		}
+		if err != nil {
+			t.Fatalf("Failed to add object to fake DynamicClient: %v", err)
+		}
+	}
 
 	return &K8sClients{
 		Client:          fakeClient,

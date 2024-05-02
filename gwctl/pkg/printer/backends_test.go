@@ -208,6 +208,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 			},
 		},
 		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Service",
+				APIVersion: "v1",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-svc-0",
 				Namespace: "default",
@@ -217,6 +221,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 			},
 		},
 		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Service",
+				APIVersion: "v1",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-svc-1",
 				Namespace: "ns1",
@@ -226,6 +234,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 			},
 		},
 		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Service",
+				APIVersion: "v1",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-svc-2",
 				Namespace: "ns2",
@@ -235,6 +247,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 			},
 		},
 		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Service",
+				APIVersion: "v1",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-svc-3",
 				Namespace: "ns3",
@@ -244,6 +260,10 @@ func TestBackendsPrinter_Print(t *testing.T) {
 			},
 		},
 		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       "Service",
+				APIVersion: "v1",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-svc-4",
 				Namespace: "ns3",

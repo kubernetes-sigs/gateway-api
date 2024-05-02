@@ -74,7 +74,7 @@ func TestDiscoverResourcesForGatewayClass_LabelSelector(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(Filter{Labels: selector})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	expectedGatewayClassNames := []string{"foo-com-internal-gateway-class"}
@@ -151,7 +151,7 @@ func TestDiscoverResourcesForGateway_LabelSelector(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(Filter{Labels: selector})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	expectedGatewayNames := []string{"gateway-2"}
@@ -277,7 +277,7 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(Filter{Labels: selector})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	expectedNamespaceNames := []string{"namespace-2"}

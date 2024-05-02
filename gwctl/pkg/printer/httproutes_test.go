@@ -212,7 +212,7 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	hp := &HTTPRoutesPrinter{
@@ -401,7 +401,7 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	hp := &HTTPRoutesPrinter{
