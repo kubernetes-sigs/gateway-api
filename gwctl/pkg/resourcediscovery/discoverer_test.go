@@ -146,6 +146,10 @@ func TestDiscoverResourcesForBackend(t *testing.T) {
 			objects: []runtime.Object{
 				common.NamespaceForTest("default"),
 				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "foo-svc",
 						Namespace: "default",
@@ -190,6 +194,10 @@ func TestDiscoverResourcesForBackend(t *testing.T) {
 				common.NamespaceForTest("default"),
 				common.NamespaceForTest("bar"),
 				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "foo-svc",
 						Namespace: "default",
@@ -237,6 +245,10 @@ func TestDiscoverResourcesForBackend(t *testing.T) {
 				common.NamespaceForTest("default"),
 				common.NamespaceForTest("bar"),
 				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name:      "foo-svc",
 						Namespace: "default",
