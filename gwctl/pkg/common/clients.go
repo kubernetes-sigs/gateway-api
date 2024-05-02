@@ -154,7 +154,11 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 	for _, obj := range initRuntimeObjects {
 		var err error
 		if gateway, ok := obj.(*gatewayv1.Gateway); ok {
-			// Register Gateway with correct GVR (since the guessed GVR is incorrect).
+			// Register Gateway with correct GVR. This needs to be done explicitly for
+			// Gateway since the automatically guess GVR is incorrect.
+			//
+			// Automatic guessing of GVR uses `meta.UnsafeGuessKindToResource()` which
+			// pluralizes "gateway" to "gatewaies" (since the singular ends in a 'y')
 			err = fakeDC.Tracker().Create(gatewayv1GVR, gateway, gateway.Namespace)
 		} else {
 			// Register non-Gateway resources automatically without GVR.
