@@ -7,6 +7,11 @@ Implementors and integrators of Gateway API are encouraged to update this
 document with status information about their implementations, the versions they
 cover, and documentation to help users get started.
 
+
+!!! info "Compare extended supported features across implementations"
+
+    [View a table to quickly compare supported features of projects](/implementation-table). These outline Gateway controller implementations that have passed core conformance tests, and focus on extended conformance features that they have implemented.
+
 ## Gateway Controller Implementation Status <a name="gateways"></a>
 
 - [Acnodal EPIC][1]
@@ -84,6 +89,8 @@ cover, and documentation to help users get started.
 [33]:#ngrok-kubernetes-operator
 
 [gamma]:/concepts/gamma/
+
+
 
 ## Implementations
 

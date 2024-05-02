@@ -5,8 +5,12 @@ site_dir: site
 docs_dir: site-src
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - js/implementations.js
 hooks:
 - hack/mkdocs-copy-geps.py
+- hack/mkdocs-generate-conformance.py
 watch:
 - geps
 theme:
@@ -75,7 +79,9 @@ nav:
         Overview: mesh/index.md
         GAMMA Initiative: mesh/gamma.md
         Service Facets: mesh/service-facets.md
-    - Implementations: implementations.md
+    - Implementations:
+        List: implementations.md
+        Comparison: implementation-table.md
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:
