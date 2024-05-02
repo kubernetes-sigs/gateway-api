@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -33,10 +34,10 @@ func init() {
 var GatewayHTTPListenerIsolation = suite.ConformanceTest{
 	ShortName:   "GatewayHTTPListenerIsolation",
 	Description: "Listener isolation for HTTP listeners with multiple listeners and HTTPRoutes",
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportGatewayHTTPListenerIsolation,
-		suite.SupportHTTPRoute,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportGatewayHTTPListenerIsolation,
+		features.SupportHTTPRoute,
 	},
 	Manifests: []string{
 		"tests/gateway-http-listener-isolation.yaml",
