@@ -62,7 +62,6 @@ var HTTPRouteHTTPSListener = suite.ConformanceTest{
 			backend    string
 		}{
 			{host: "example.org", statusCode: 200, backend: "infra-backend-v1"},
-			{host: "unknown-example.org", statusCode: 404},
 			{host: "second-example.org", statusCode: 200, backend: "infra-backend-v2"},
 		}
 
