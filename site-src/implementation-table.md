@@ -6,7 +6,7 @@ Implementations only appear in this page if they pass Core conformance for the r
 
 ???+ warning
 
-    
+
     This page is under active development and is not in its final form,
     especially for the project name and the names of the features.
     However, as it is based on submitted conformance reports, the information is correct.
@@ -16,7 +16,7 @@ Implementations only appear in this page if they pass Core conformance for the r
 
 ### HTTPRoute
 
-| Organization   | project                       | version       | HTTPRouteMethodMatching   | HTTPRouteQueryParamMatching   | HTTPRouteResponseHeaderModification   | HTTPRouteBackendTimeout   | HTTPRouteHostRewrite   | HTTPRouteParentRefPort   | HTTPRoutePathRedirect   | HTTPRoutePathRewrite   | HTTPRoutePortRedirect   | HTTPRouteRequestMirror   | HTTPRouteRequestMultipleMirrors   | HTTPRouteRequestTimeout   | HTTPRouteSchemeRedirect   |
+| Organization   | Project                       | Version       | HTTPRouteMethodMatching   | HTTPRouteQueryParamMatching   | HTTPRouteResponseHeaderModification   | HTTPRouteBackendTimeout   | HTTPRouteHostRewrite   | HTTPRouteParentRefPort   | HTTPRoutePathRedirect   | HTTPRoutePathRewrite   | HTTPRoutePortRedirect   | HTTPRouteRequestMirror   | HTTPRouteRequestMultipleMirrors   | HTTPRouteRequestTimeout   | HTTPRouteSchemeRedirect   |
 |:---------------|:------------------------------|:--------------|:--------------------------|:------------------------------|:--------------------------------------|:--------------------------|:-----------------------|:-------------------------|:------------------------|:-----------------------|:------------------------|:-------------------------|:----------------------------------|:--------------------------|:--------------------------|
 | Kong           | kubernetes-ingress-controller | v3.0.2        | :white_check_mark:        | :white_check_mark:            | :white_check_mark:                    | :white_check_mark:        | :x:                    | :x:                      | :x:                     | :x:                    | :x:                     | :x:                      | :x:                               | :x:                       | :x:                       |
 | Kong           | kubernetes-ingress-controller | v3.1.1        | :white_check_mark:        | :white_check_mark:            | :white_check_mark:                    | :white_check_mark:        | :x:                    | :x:                      | :x:                     | :x:                    | :x:                     | :x:                      | :x:                               | :x:                       | :x:                       |
@@ -34,7 +34,7 @@ Implementations only appear in this page if they pass Core conformance for the r
 
 ### HTTPRoute
 
-| Project   | project   | version   | HTTPRouteRequestTimeout   | HTTPRoutePathRedirect   | HTTPRouteRequestMirror   | HTTPRoutePathRewrite   | HTTPRouteMethodMatching   | HTTPRouteRequestMultipleMirrors   | HTTPRouteBackendTimeout   | HTTPRouteResponseHeaderModification   | HTTPRoutePortRedirect   | HTTPRouteSchemeRedirect   | HTTPRouteHostRewrite   | HTTPRouteQueryParamMatching   |
-|:----------|:----------|:----------|:--------------------------|:------------------------|:-------------------------|:-----------------------|:--------------------------|:----------------------------------|:--------------------------|:--------------------------------------|:------------------------|:--------------------------|:-----------------------|:------------------------------|
-| istio     | istio     | 1.2       | :white_check_mark:        | :white_check_mark:      | :white_check_mark:       | :white_check_mark:     | :white_check_mark:        | :white_check_mark:                | :white_check_mark:        | :white_check_mark:                    | :white_check_mark:      | :white_check_mark:        | :white_check_mark:     | :white_check_mark:            |
-| kumahq    | kuma      | 2.6.0     | :x:                       | :white_check_mark:      | :white_check_mark:       | :white_check_mark:     | :white_check_mark:        | :x:                               | :x:                       | :white_check_mark:                    | :white_check_mark:      | :white_check_mark:        | :white_check_mark:     | :white_check_mark:            |
+| Organization   | Project   | Version   | HTTPRouteRequestTimeout   | HTTPRoutePathRedirect   | HTTPRouteRequestMirror   | HTTPRoutePathRewrite   | HTTPRouteMethodMatching   | HTTPRouteRequestMultipleMirrors   | HTTPRouteBackendTimeout   | HTTPRouteResponseHeaderModification   | HTTPRoutePortRedirect   | HTTPRouteSchemeRedirect   | HTTPRouteHostRewrite   | HTTPRouteQueryParamMatching   |
+|:---------------|:----------|:----------|:--------------------------|:------------------------|:-------------------------|:-----------------------|:--------------------------|:----------------------------------|:--------------------------|:--------------------------------------|:------------------------|:--------------------------|:-----------------------|:------------------------------|
+| istio          | istio     | 1.2       | :white_check_mark:        | :white_check_mark:      | :white_check_mark:       | :white_check_mark:     | :white_check_mark:        | :white_check_mark:                | :white_check_mark:        | :white_check_mark:                    | :white_check_mark:      | :white_check_mark:        | :white_check_mark:     | :white_check_mark:            |
+| kumahq         | kuma      | 2.6.0     | :x:                       | :white_check_mark:      | :white_check_mark:       | :white_check_mark:     | :white_check_mark:        | :x:                               | :x:                       | :white_check_mark:                    | :white_check_mark:      | :white_check_mark:        | :white_check_mark:     | :white_check_mark:            |

@@ -10,6 +10,7 @@ extra_javascript:
   - js/implementations.js
 hooks:
 - hack/mkdocs-copy-geps.py
+- hack/mkdocs-generate-conformance.py
 watch:
 - geps
 theme:
