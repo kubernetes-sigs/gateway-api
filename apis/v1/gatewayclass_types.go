@@ -163,8 +163,8 @@ const (
 	//
 	// Possible reasons for this condition to be False are:
 	//
-	// * "Invalid"
 	// * "InvalidParameters"
+	// * "Unsupported"
 	// * "UnsupportedVersion"
 	//
 	// Possible reasons for this condition to be Unknown are:
@@ -179,10 +179,6 @@ const (
 	// true.
 	GatewayClassReasonAccepted GatewayClassConditionReason = "Accepted"
 
-	// This reason is used with the "Accepted" condition when the
-	// GatewayClass was not accepted, with more detail in the message.
-	GatewayClassReasonInvalid GatewayClassConditionReason = "Invalid"
-
 	// This reason is used with the "Accepted" condition when the GatewayClass
 	// was not accepted because the parametersRef field refers to a nonexistent
 	// or unsupported resource or kind, or when the data within that resource is
@@ -194,6 +190,11 @@ const (
 	// to admit the GatewayClass. It is the default Reason on a new
 	// GatewayClass.
 	GatewayClassReasonPending GatewayClassConditionReason = "Pending"
+
+	// This reason is used with the "Accepted" condition when the GatewayClass
+	// was not accepted because the implementation does not support a
+	// user-defined GatewayClass.
+	GatewayClassReasonUnsupported GatewayClassConditionReason = "Unsupported"
 
 	// Deprecated: Use "Pending" instead.
 	GatewayClassReasonWaiting GatewayClassConditionReason = "Waiting"
