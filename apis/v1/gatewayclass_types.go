@@ -94,7 +94,7 @@ type GatewayClassSpec struct {
 	// cluster-scoped or namespace-scoped.
 	//
 	// If the referent cannot be found, refers to an unsupported kind, or when
-	// the data within that resource is malformed, the GatewayClass will be
+	// the data within that resource is malformed, the GatewayClass SHOULD be
 	// rejected with the "Accepted" status condition set to "False" and an
 	// "InvalidParameters" reason.
 	//
