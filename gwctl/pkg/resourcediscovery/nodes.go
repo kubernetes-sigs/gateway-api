@@ -23,6 +23,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
 	corev1 "k8s.io/api/core/v1"
@@ -44,12 +45,13 @@ func (r resourceID) String() string {
 }
 
 type (
-	gatewayClassID resourceID
-	namespaceID    resourceID
-	gatewayID      resourceID
-	httpRouteID    resourceID
-	backendID      resourceID
-	policyID       resourceID
+	gatewayClassID   resourceID
+	namespaceID      resourceID
+	gatewayID        resourceID
+	httpRouteID      resourceID
+	backendID        resourceID
+	referenceGrantID resourceID
+	policyID         resourceID
 )
 
 // GatewayClassID returns an ID for a GatewayClass.
@@ -102,6 +104,14 @@ func PolicyID(group, kind, namespace, name string) policyID { //nolint:revive
 	return policyID(resourceID{
 		Group:     strings.ToLower(group),
 		Kind:      strings.ToLower(kind),
+		Namespace: namespace,
+		Name:      name,
+	})
+}
+
+// ReferenceGrantID returns an ID for a ReferenceGrant.
+func ReferenceGrantID(namespace, name string) referenceGrantID { //nolint:revive
+	return referenceGrantID(resourceID{
 		Namespace: namespace,
 		Name:      name,
 	})
@@ -161,6 +171,8 @@ type GatewayNode struct {
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
 	// Events contains the events associated with this Gateway.
 	Events []corev1.Event
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
@@ -170,6 +182,7 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
 		Events:            []corev1.Event{},
+		Errors:            []error{},
 	}
 }
 
@@ -201,6 +214,8 @@ type HTTPRouteNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// HTTPRoute, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
@@ -210,6 +225,7 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 		Backends:          make(map[backendID]*BackendNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
@@ -237,9 +253,13 @@ type BackendNode struct {
 	HTTPRoutes map[httpRouteID]*HTTPRouteNode
 	// Policies stores Policies directly applied to the Backend.
 	Policies map[policyID]*PolicyNode
+	// ReferenceGrants contains ReferenceGrants that expose this Backend.
+	ReferenceGrants map[referenceGrantID]*ReferenceGrantNode
 	// EffectivePolicies reflects the effective policies applicable to this
 	// Backend, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
@@ -247,7 +267,9 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		Backend:           backend,
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
+		ReferenceGrants:   make(map[referenceGrantID]*ReferenceGrantNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
@@ -302,6 +324,30 @@ func (n *NamespaceNode) ID() namespaceID { //nolint:revive
 		return namespaceID(resourceID{})
 	}
 	return NamespaceID(n.Namespace.Name)
+}
+
+// ReferenceGrantNode models the relationships and dependencies of a ReferenceGrant.
+type ReferenceGrantNode struct {
+	// ReferenceGrantName identifies the ReferenceGrant.
+	ReferenceGrant *gatewayv1beta1.ReferenceGrant
+
+	// Backends lists Backends residing within the ReferenceGrant.
+	Backends map[backendID]*BackendNode
+}
+
+func NewReferenceGrantNode(referenceGrant *gatewayv1beta1.ReferenceGrant) *ReferenceGrantNode {
+	return &ReferenceGrantNode{
+		ReferenceGrant: referenceGrant,
+		Backends:       make(map[backendID]*BackendNode),
+	}
+}
+
+func (r *ReferenceGrantNode) ID() referenceGrantID { //nolint:revive
+	if r.ReferenceGrant.Name == "" {
+		klog.V(0).ErrorS(nil, "returning empty ID since ReferenceGrant is empty")
+		return referenceGrantID{}
+	}
+	return ReferenceGrantID(r.ReferenceGrant.GetNamespace(), r.ReferenceGrant.GetName())
 }
 
 // PolicyNode models the relationships and dependencies of a Policy resource

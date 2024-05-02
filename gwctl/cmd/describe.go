@@ -122,7 +122,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	case "httproute", "httproutes":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{
@@ -142,7 +142,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	case "gateway", "gateways":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{
@@ -162,7 +162,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	case "gatewayclass", "gatewayclasses":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{
@@ -181,7 +181,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	case "backend", "backends":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{
@@ -201,7 +201,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	case "namespace", "namespaces", "ns":
 		selector, err := labels.Parse(labelSelector)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
 			os.Exit(1)
 		}
 		filter := resourcediscovery.Filter{

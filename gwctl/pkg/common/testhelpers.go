@@ -22,6 +22,8 @@ import (
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // YamlString defines a custom type for wrapping yaml texts. It makes use of
@@ -70,4 +72,15 @@ func (src JSONString) CmpDiff(tgt JSONString) (diff string, err error) {
 	}
 
 	return cmp.Diff(srcMap, targetMap), nil
+}
+
+func NamespaceForTest(name string) *corev1.Namespace {
+	return &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		Status: corev1.NamespaceStatus{
+			Phase: corev1.NamespaceActive,
+		},
+	}
 }

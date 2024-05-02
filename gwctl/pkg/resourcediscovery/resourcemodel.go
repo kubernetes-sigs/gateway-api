@@ -21,6 +21,7 @@ import (
 	"sort"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
 	corev1 "k8s.io/api/core/v1"
@@ -38,12 +39,13 @@ import (
 //   - Identifying potential conflicts or issues in resource configuration
 //   - Visualizing the topology of Gateway API resources
 type ResourceModel struct {
-	GatewayClasses map[gatewayClassID]*GatewayClassNode
-	Namespaces     map[namespaceID]*NamespaceNode
-	Gateways       map[gatewayID]*GatewayNode
-	HTTPRoutes     map[httpRouteID]*HTTPRouteNode
-	Backends       map[backendID]*BackendNode
-	Policies       map[policyID]*PolicyNode
+	GatewayClasses  map[gatewayClassID]*GatewayClassNode
+	Namespaces      map[namespaceID]*NamespaceNode
+	Gateways        map[gatewayID]*GatewayNode
+	HTTPRoutes      map[httpRouteID]*HTTPRouteNode
+	Backends        map[backendID]*BackendNode
+	ReferenceGrants map[referenceGrantID]*ReferenceGrantNode
+	Policies        map[policyID]*PolicyNode
 }
 
 // addGatewayClasses adds nodes for GatewayClases.
@@ -111,6 +113,20 @@ func (rm *ResourceModel) addBackends(backends ...unstructured.Unstructured) {
 		backendNode := NewBackendNode(&backend)
 		if _, ok := rm.Backends[backendNode.ID()]; !ok {
 			rm.Backends[backendNode.ID()] = backendNode
+		}
+	}
+}
+
+// addReferenceGrants adds nodes for ReferenceGrants.
+func (rm *ResourceModel) addReferenceGrants(referenceGrants ...gatewayv1beta1.ReferenceGrant) {
+	if rm.ReferenceGrants == nil {
+		rm.ReferenceGrants = make(map[referenceGrantID]*ReferenceGrantNode)
+	}
+	for _, referenceGrant := range referenceGrants {
+		referenceGrant := referenceGrant
+		referenceGrantNode := NewReferenceGrantNode(&referenceGrant)
+		if _, ok := rm.ReferenceGrants[referenceGrantNode.ID()]; !ok {
+			rm.ReferenceGrants[referenceGrantNode.ID()] = referenceGrantNode
 		}
 	}
 }
@@ -296,6 +312,24 @@ func (rm *ResourceModel) connectBackendWithNamespace(backendID backendID, namesp
 	namespaceNode.Backends[backendID] = backendNode
 }
 
+// connectReferenceGrantWithBackend establishes a connection between a ReferenceGrant and
+// a Backend.
+func (rm *ResourceModel) connectReferenceGrantWithBackend(referenceGrantID referenceGrantID, backendID backendID) {
+	referenceGrantNode, ok := rm.ReferenceGrants[referenceGrantID]
+	if !ok {
+		klog.V(1).ErrorS(nil, "ReferenceGrant does not exist in ResourceModel", "referenceGrantID", referenceGrantID)
+		return
+	}
+	backendNode, ok := rm.Backends[backendID]
+	if !ok {
+		klog.V(1).ErrorS(nil, "Backend does not exist in ResourceModel", "backendID", backendID)
+		return
+	}
+
+	referenceGrantNode.Backends[backendID] = backendNode
+	backendNode.ReferenceGrants[referenceGrantID] = referenceGrantNode
+}
+
 // calculateEffectivePolicies calculates the effective policies for all
 // Gateways, HTTPRoutes, and Backends in the ResourceModel.
 func (rm *ResourceModel) calculateEffectivePolicies() error {
@@ -316,6 +350,13 @@ func (rm *ResourceModel) calculateEffectivePolicies() error {
 // Namespace, and Gateway).
 func (rm *ResourceModel) calculateEffectivePoliciesForGateways() error {
 	for _, gatewayNode := range rm.Gateways {
+		// Do not calculate effective policy for the Gateway if the referenced
+		// GatewayClass does not exist. For now, we only calculate effective policy
+		// once the references are corrected.
+		if gatewayNode.GatewayClass == nil {
+			continue
+		}
+
 		// Fetch all policies.
 		gatewayClassPolicies := convertPoliciesMapToSlice(gatewayNode.GatewayClass.Policies)
 		gatewayNamespacePolicies := convertPoliciesMapToSlice(gatewayNode.Namespace.Policies)
