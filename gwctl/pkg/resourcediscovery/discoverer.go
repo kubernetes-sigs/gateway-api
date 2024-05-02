@@ -76,9 +76,10 @@ type Discoverer struct {
 	// attempt will be made to discover this information from the discovery APIs.
 	// Failure to do so will mean we use the "default" versions defined in this
 	// file.
-	PreferredGatewayClassGroupVersion metav1.GroupVersion
-	PreferredGatewayGroupVersion      metav1.GroupVersion
-	PreferredHTTPRouteGroupVersion    metav1.GroupVersion
+	PreferredGatewayClassGroupVersion   metav1.GroupVersion
+	PreferredGatewayGroupVersion        metav1.GroupVersion
+	PreferredHTTPRouteGroupVersion      metav1.GroupVersion
+	PreferredReferenceGrantGroupVersion metav1.GroupVersion
 }
 
 func NewDiscoverer(k8sClients *common.K8sClients, policyManager *policymanager.PolicyManager) Discoverer {
@@ -647,11 +648,9 @@ func (d Discoverer) fetchReferenceGrants(ctx context.Context, filter Filter) ([]
 		Version:  defaultReferenceGrantGroupVersion.Version,
 		Resource: "referencegrants",
 	}
-	// TODO(gauravkghildiyal): Uncomment once
-	// https://github.com/kubernetes-sigs/gateway-api/pull/3001 merges
-	// if d.PreferredReferenceGrantGroupVersion != (metav1.GroupVersion{}) {
-	// 	gvr.Version = d.PreferredReferenceGrantGroupVersion.Version
-	// }
+	if d.PreferredReferenceGrantGroupVersion != (metav1.GroupVersion{}) {
+		gvr.Version = d.PreferredReferenceGrantGroupVersion.Version
+	}
 
 	if filter.Name != "" {
 		// Use Get call.
