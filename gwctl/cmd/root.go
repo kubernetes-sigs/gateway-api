@@ -31,23 +31,37 @@ import (
 	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-var kubeConfigPath string
-
 func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "gwctl",
 		Short: "gwctl is a command-line tool for exploring Gateway API resources.",
 		Long:  `gwctl provides a familiar kubectl-like interface for navigating the Kubernetes Gateway API's multi-resource model, offering visibility into resource relationships and the policies that affect them.`,
 	}
-	cobra.OnInitialize(initConfig)
+
+	var kubeConfigPath string
 	rootCmd.PersistentFlags().StringVar(&kubeConfigPath, "kubeconfig", "", "path to kubeconfig file (default is the KUBECONFIG environment variable and if it isn't set, falls back to $HOME/.kube/config)")
 
-	// initialize logging flags in a new flag set
-	// otherwise it conflicts with cobra's flags
+	// Initialize flags for klog.
+	//
+	// These are not directly added to the rootCmd since we ony want to expose the
+	// verbosity (-v) flag and not the rest. To achieve that, we'll define a
+	// separate verbosity flag whose value we'll propagate to the klogFlags.
+	var verbosity int
+	rootCmd.PersistentFlags().IntVarP(&verbosity, "v", "v", 0, "number for the log level verbosity (defaults to 0)")
 	klogFlags := flag.NewFlagSet("klog", flag.ExitOnError)
 	klog.InitFlags(klogFlags)
 
-	rootCmd.PersistentFlags().AddGoFlagSet(klogFlags)
+	cobra.OnInitialize(func() {
+		if kubeConfigPath == "" {
+			kubeConfigPath = os.Getenv("KUBECONFIG")
+			if kubeConfigPath == "" {
+				kubeConfigPath = path.Join(os.Getenv("HOME"), ".kube/config")
+			}
+		}
+		if err := klogFlags.Set("v", fmt.Sprintf("%v", verbosity)); err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to configure verbosity for logging")
+		}
+	})
 
 	rootCmd.AddCommand(NewGetCommand())
 	rootCmd.AddCommand(NewDescribeCommand())
@@ -61,15 +75,6 @@ func Execute() {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to execute command: %v\n", err)
 		os.Exit(1)
-	}
-}
-
-func initConfig() {
-	if kubeConfigPath == "" {
-		kubeConfigPath = os.Getenv("KUBECONFIG")
-		if kubeConfigPath == "" {
-			kubeConfigPath = path.Join(os.Getenv("HOME"), ".kube/config")
-		}
 	}
 }
 
