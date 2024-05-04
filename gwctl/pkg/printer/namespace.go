@@ -19,7 +19,6 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
@@ -35,14 +34,6 @@ var _ Printer = (*NamespacesPrinter)(nil)
 type NamespacesPrinter struct {
 	io.Writer
 	Clock clock.Clock
-}
-
-type namespaceDescribeView struct {
-	Name                     string            `json:",omitempty"`
-	Labels                   map[string]string `json:",omitempty"`
-	Annotations              map[string]string `json:",omitempty"`
-	Status                   string            `json:",omitempty"`
-	DirectlyAttachedPolicies []common.ObjRef   `json:",omitempty"`
 }
 
 func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -75,33 +66,28 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 	for _, namespaceNode := range SortByString(namespaceNodes) {
 		index++
 
-		views := []namespaceDescribeView{
-			{
-				Name: namespaceNode.Namespace.Name,
-			},
-			{
-				Annotations: namespaceNode.Namespace.Annotations,
-				Labels:      namespaceNode.Namespace.Labels,
-			},
-			{
-				Status: string(namespaceNode.Namespace.Status.Phase),
-			},
+		metadata := namespaceNode.Namespace.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+		metadata.ManagedFields = nil
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: namespaceNode.Namespace.GetName()},
+			{Key: "Labels", Value: namespaceNode.Namespace.Labels},
+			{Key: "Annotations", Value: namespaceNode.Namespace.Annotations},
+			{Key: "Status", Value: &namespaceNode.Namespace.Status},
 		}
 
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(namespaceNode.Policies); len(policyRefs) != 0 {
-			views = append(views, namespaceDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(namespaceNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(nsp, string(b))
-		}
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(namespaceNode.Events, nsp.Clock)})
+
+		Describe(nsp, pairs)
 
 		if index+1 <= len(resourceModel.Namespaces) {
 			fmt.Fprintf(nsp, "\n\n")

@@ -97,6 +97,7 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		metadata.Annotations = nil
 		metadata.Name = ""
 		metadata.Namespace = ""
+		metadata.ManagedFields = nil
 
 		pairs := []*DescriberKV{
 			{Key: "Name", Value: gatewayNode.Gateway.GetName()},
@@ -125,20 +126,8 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
 
 		// DirectlyAttachedPolicies
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
-			directlyAttachedPolicies := &Table{
-				ColumnNames:  []string{"Type", "Name"},
-				UseSeparator: true,
-			}
-			for _, policyRef := range policyRefs {
-				row := []string{
-					fmt.Sprintf("%v.%v", policyRef.Kind, policyRef.Group),     // Type
-					fmt.Sprintf("%v/%v", policyRef.Namespace, policyRef.Name), // Name
-				}
-				directlyAttachedPolicies.Rows = append(directlyAttachedPolicies.Rows, row)
-			}
-			pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: directlyAttachedPolicies})
-		}
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
 		// EffectivePolicies
 		if len(gatewayNode.EffectivePolicies) != 0 {

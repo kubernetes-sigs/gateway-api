@@ -19,16 +19,13 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -92,47 +89,59 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 	table.Write(bp, 0)
 }
 
-type backendDescribeView struct {
-	Group                    string          `json:",omitempty"`
-	Kind                     string          `json:",omitempty"`
-	Name                     string          `json:",omitempty"`
-	Namespace                string          `json:",omitempty"`
-	DirectlyAttachedPolicies []common.ObjRef `json:",omitempty"`
-	EffectivePolicies        any             `json:",omitempty"`
-}
-
 func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
 	index := 0
 	for _, backendNode := range resourceModel.Backends {
 		index++
 
-		views := []backendDescribeView{
-			{
-				Group:     backendNode.Backend.GroupVersionKind().Group,
-				Kind:      backendNode.Backend.GroupVersionKind().Kind,
-				Name:      backendNode.Backend.GetName(),
-				Namespace: backendNode.Backend.GetNamespace(),
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies); len(policyRefs) != 0 {
-			views = append(views, backendDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(backendNode.EffectivePolicies) != 0 {
-			views = append(views, backendDescribeView{
-				EffectivePolicies: backendNode.EffectivePolicies,
-			})
+		backend := backendNode.Backend.DeepCopy()
+		backend.SetLabels(nil)
+		backend.SetAnnotations(nil)
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: backendNode.Backend.GetName()},
+			{Key: "Namespace", Value: backendNode.Backend.GetNamespace()},
+			{Key: "Labels", Value: backendNode.Backend.GetLabels()},
+			{Key: "Annotations", Value: backendNode.Backend.GetAnnotations()},
+			{Key: "Backend", Value: backend},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(bp, string(b))
+		// ReferencedByRoutes
+		routes := &Table{
+			ColumnNames:  []string{"Kind", "Name"},
+			UseSeparator: true,
 		}
+		for _, httpRouteNode := range backendNode.HTTPRoutes {
+			row := []string{
+				httpRouteNode.HTTPRoute.Kind, // Kind
+				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+			}
+			routes.Rows = append(routes.Rows, row)
+		}
+		pairs = append(pairs, &DescriberKV{Key: "ReferencedByRoutes", Value: routes})
+
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+
+		// EffectivePolicies
+		if len(backendNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: backendNode.EffectivePolicies})
+		}
+
+		// ReferenceGrants
+		if len(backendNode.ReferenceGrants) != 0 {
+			var names []string
+			for _, refGrantNode := range backendNode.ReferenceGrants {
+				names = append(names, refGrantNode.ReferenceGrant.Name)
+			}
+			pairs = append(pairs, &DescriberKV{Key: "ReferenceGrants", Value: names})
+		}
+
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(backendNode.Events, bp.Clock)})
+
+		Describe(bp, pairs)
 
 		if index+1 <= len(resourceModel.Backends) {
 			fmt.Fprintf(bp, "\n\n")

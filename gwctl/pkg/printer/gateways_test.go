@@ -404,7 +404,7 @@ AttachedRoutes:
 DirectlyAttachedPolicies:
   Type                       Name
   ----                       ----
-  HealthCheckPolicy.foo.com  /health-check-gateway
+  HealthCheckPolicy.foo.com  health-check-gateway
 EffectivePolicies:
   HealthCheckPolicy.foo.com:
     key1: value-parent-1

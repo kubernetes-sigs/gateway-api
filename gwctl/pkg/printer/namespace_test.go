@@ -234,25 +234,30 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
 Name: development
-Annotations:
-  test-annotation: development-annotation
 Labels:
   type: test-namespace
-Status: Active
+Annotations:
+  test-annotation: development-annotation
+Status:
+  phase: Active
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: health-check-gatewayclass
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  health-check-gatewayclass
+Events: <none>
 
 
 Name: production
 Labels:
   type: production-namespace
-Status: Active
+Annotations: null
+Status:
+  phase: Active
 DirectlyAttachedPolicies:
-- Group: bar.com
-  Kind: TimeoutPolicy
-  Name: timeout-policy-namespace
+  Type                   Name
+  ----                   ----
+  TimeoutPolicy.bar.com  timeout-policy-namespace
+Events: <none>
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

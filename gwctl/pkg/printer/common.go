@@ -153,6 +153,25 @@ func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table 
 	return table
 }
 
+func convertPolicyRefsToTable(policyRefs []common.ObjRef) *Table {
+	table := &Table{
+		ColumnNames:  []string{"Type", "Name"},
+		UseSeparator: true,
+	}
+	for _, policyRef := range policyRefs {
+		name := policyRef.Name
+		if policyRef.Namespace != "" {
+			name = fmt.Sprintf("%v/%v", policyRef.Namespace, name)
+		}
+		row := []string{
+			fmt.Sprintf("%v.%v", policyRef.Kind, policyRef.Group), // Type
+			name, // Name
+		}
+		table.Rows = append(table.Rows, row)
+	}
+	return table
+}
+
 type NodeResource interface {
 	ClientObject() client.Object
 }

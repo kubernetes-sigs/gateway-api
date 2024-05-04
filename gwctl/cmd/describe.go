@@ -84,7 +84,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 	gwPrinter := &printer.GatewaysPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 	gwcPrinter := &printer.GatewayClassesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
-	backendsPrinter := &printer.BackendsPrinter{Writer: params.Out}
+	backendsPrinter := &printer.BackendsPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 	namespacesPrinter := &printer.NamespacesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 
 	switch kind {

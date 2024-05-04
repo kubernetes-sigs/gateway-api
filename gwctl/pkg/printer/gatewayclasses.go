@@ -19,18 +19,11 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
-	"strings"
 
 	"golang.org/x/exp/maps"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"k8s.io/utils/ptr"
-	"sigs.k8s.io/yaml"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -39,23 +32,6 @@ var _ Printer = (*GatewayClassesPrinter)(nil)
 type GatewayClassesPrinter struct {
 	io.Writer
 	Clock clock.Clock
-}
-
-type gatewayClassDescribeView struct {
-	APIVersion  string             `json:",omitempty"`
-	Kind        string             `json:",omitempty"`
-	Metadata    *metav1.ObjectMeta `json:",omitempty"`
-	Labels      *map[string]string `json:",omitempty"`
-	Annotations *map[string]string `json:",omitempty"`
-
-	// GatewayClass name
-	Name           string `json:",omitempty"`
-	ControllerName string `json:",omitempty"`
-	// GatewayClass description
-	Description *string `json:",omitempty"`
-
-	Status                   *gatewayv1.GatewayClassStatus `json:",omitempty"`
-	DirectlyAttachedPolicies []common.ObjRef               `json:",omitempty"`
 }
 
 func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -96,65 +72,33 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 	index := 0
 	for _, gatewayClassNode := range resourceModel.GatewayClasses {
 		index++
-		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
+
 		metadata := gatewayClassNode.GatewayClass.ObjectMeta.DeepCopy()
 		metadata.Labels = nil
 		metadata.Annotations = nil
 		metadata.Name = ""
 		metadata.Namespace = ""
+		metadata.ManagedFields = nil
 
-		// views ordered with respect to https://gateway-api.sigs.k8s.io/geps/gep-2722/
-		views := []gatewayClassDescribeView{
-			{
-				Name: gatewayClassNode.GatewayClass.GetName(),
-			},
-			{
-				Labels: ptr.To(gatewayClassNode.GatewayClass.GetLabels()),
-			},
-			{
-				Annotations: ptr.To(gatewayClassNode.GatewayClass.GetAnnotations()),
-			},
-			{
-				APIVersion: apiVersion,
-			},
-			{
-				Kind: kind,
-			},
-			{
-				Metadata: metadata,
-			},
-			{
-				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
-			},
-		}
-		if gatewayClassNode.GatewayClass.Spec.Description != nil {
-			views = append(views, gatewayClassDescribeView{
-				Description: gatewayClassNode.GatewayClass.Spec.Description,
-			})
-		}
-		views = append(views, gatewayClassDescribeView{
-			Status: &gatewayClassNode.GatewayClass.Status,
-		})
-
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
-			views = append(views, gatewayClassDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: gatewayClassNode.GatewayClass.GetName()},
+			{Key: "Labels", Value: gatewayClassNode.GatewayClass.GetLabels()},
+			{Key: "Annotations", Value: gatewayClassNode.GatewayClass.GetAnnotations()},
+			{Key: "APIVersion", Value: gatewayClassNode.GatewayClass.APIVersion},
+			{Key: "Kind", Value: gatewayClassNode.GatewayClass.Kind},
+			{Key: "Metadata", Value: metadata},
+			{Key: "Spec", Value: &gatewayClassNode.GatewayClass.Spec},
+			{Key: "Status", Value: &gatewayClassNode.GatewayClass.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			output := string(b)
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
-			emptyOutput := strings.TrimSpace(output) == "{}"
-			if !emptyOutput {
-				fmt.Fprint(gcp, output)
-			}
-		}
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayClassNode.Events, gcp.Clock)})
+
+		Describe(gcp, pairs)
 
 		if index+1 <= len(resourceModel.GatewayClasses) {
 			fmt.Fprintf(gcp, "\n\n")
