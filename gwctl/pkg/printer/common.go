@@ -172,6 +172,14 @@ func convertPolicyRefsToTable(policyRefs []common.ObjRef) *Table {
 	return table
 }
 
+func convertErrorsToString(errors []error) []string {
+	var result []string
+	for _, err := range errors {
+		result = append(result, err.Error())
+	}
+	return result
+}
+
 type NodeResource interface {
 	ClientObject() client.Object
 }

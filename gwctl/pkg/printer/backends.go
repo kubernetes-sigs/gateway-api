@@ -138,6 +138,11 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 			pairs = append(pairs, &DescriberKV{Key: "ReferenceGrants", Value: names})
 		}
 
+		// Analysis
+		if len(backendNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(backendNode.Errors)})
+		}
+
 		// Events
 		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(backendNode.Events, bp.Clock)})
 

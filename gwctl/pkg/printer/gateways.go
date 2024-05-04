@@ -134,6 +134,11 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})
 		}
 
+		// Analysis
+		if len(gatewayNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(gatewayNode.Errors)})
+		}
+
 		// Events
 		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayNode.Events, gp.Clock)})
 
