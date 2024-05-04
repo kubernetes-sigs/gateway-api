@@ -28,7 +28,7 @@ import (
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -40,11 +40,11 @@ type NamespacesPrinter struct {
 }
 
 type namespaceDescribeView struct {
-	Name                     string                 `json:",omitempty"`
-	Labels                   map[string]string      `json:",omitempty"`
-	Annotations              map[string]string      `json:",omitempty"`
-	Status                   string                 `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
+	Name                     string            `json:",omitempty"`
+	Labels                   map[string]string `json:",omitempty"`
+	Annotations              map[string]string `json:",omitempty"`
+	Status                   string            `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef   `json:",omitempty"`
 }
 
 func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {

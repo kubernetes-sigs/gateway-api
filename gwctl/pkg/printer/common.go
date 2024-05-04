@@ -29,6 +29,8 @@ import (
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 // DescriberKV stores key-value pairs that are used with Describing a resource.

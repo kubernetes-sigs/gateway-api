@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -94,7 +94,7 @@ type httpRouteDescribeView struct {
 	Namespace                string                      `json:",omitempty"`
 	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
 	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef      `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef             `json:",omitempty"`
 	EffectivePolicies        any                         `json:",omitempty"`
 }
 

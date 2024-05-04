@@ -29,7 +29,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -101,12 +101,12 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 }
 
 type backendDescribeView struct {
-	Group                    string                 `json:",omitempty"`
-	Kind                     string                 `json:",omitempty"`
-	Name                     string                 `json:",omitempty"`
-	Namespace                string                 `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
-	EffectivePolicies        any                    `json:",omitempty"`
+	Group                    string          `json:",omitempty"`
+	Kind                     string          `json:",omitempty"`
+	Name                     string          `json:",omitempty"`
+	Namespace                string          `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef `json:",omitempty"`
+	EffectivePolicies        any             `json:",omitempty"`
 }
 
 func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {

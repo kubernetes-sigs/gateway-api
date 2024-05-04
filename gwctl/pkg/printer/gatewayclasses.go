@@ -31,7 +31,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -56,7 +56,7 @@ type gatewayClassDescribeView struct {
 	Description *string `json:",omitempty"`
 
 	Status                   *gatewayv1.GatewayClassStatus `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef        `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef               `json:",omitempty"`
 }
 
 func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
