@@ -290,7 +290,7 @@ type HTTPRouteRule struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // HTTPRouteTimeouts defines timeouts that can be configured for an HTTPRoute.
