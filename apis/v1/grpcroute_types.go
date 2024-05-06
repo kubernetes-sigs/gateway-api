@@ -275,7 +275,7 @@ type GRPCRouteRule struct {
 	//
 	// +optional
 	// <gateway:experimental>
-	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
 
 // GRPCRouteMatch defines the predicate used to match requests to a given

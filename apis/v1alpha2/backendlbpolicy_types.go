@@ -70,5 +70,5 @@ type BackendLBPolicySpec struct {
 	// Support: Extended
 	//
 	// +optional
-	SessionPersistence *SessionPersistence `json:"sessionPersistence"`
+	SessionPersistence *SessionPersistence `json:"sessionPersistence,omitempty"`
 }
