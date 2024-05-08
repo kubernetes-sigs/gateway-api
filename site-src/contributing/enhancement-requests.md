@@ -52,6 +52,13 @@ create an initial discussion first.
 [discussion]: https://github.com/kubernetes-sigs/gateway-api/discussions/new/choose
 [meetings]: /contributing/#meetings
 
+## When are Enhancements Accepted?
+
+Gateway API has a predictable release cycle that includes multiple phases. New
+enhancements are only considered in the early phases of that release cycle while
+the scope of a release is being determined. For more information, refer to our
+[release cycle documentation](/contributing/release-cycle).
+
 ## Why are Enhancements Tracked
 
 As the project evolves, it's important that the community understands how the
