@@ -295,7 +295,7 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/istio-istio)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/istio-istio)
 
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
