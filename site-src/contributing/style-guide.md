@@ -21,13 +21,15 @@ feature is currently included in, and which version it was introduced to that
 channel. To accomplish that, we use admonitions that look like this:
 
 ??? success "Standard Channel in v0.5.0+"
+
     The `HTTPRoute` resource is GA and has been part of the Standard Channel
     since `v0.5.0`. For more information on release channels, refer to the
     [related documentation](/concepts/versioning).
 
-??? example "Experimental Channel in v0.6.0+"
-    The `GRPCRoute` resource is Alpha and has been part of the Experimental
-    Channel since `v0.6.0`. For more information on release channels, refer to
+??? example "Experimental Channel in v0.3.0+"
+
+    The `TLSRoute` resource is Alpha and has been part of the Experimental
+    Channel since `v0.3.0`. For more information on release channels, refer to
     the [related documentation](/concepts/versioning).
 
 ## Diagrams

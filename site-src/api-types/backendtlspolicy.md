@@ -2,7 +2,8 @@
 
 ??? example "Experimental Channel in v1.0.0+"
 
-    The `BackendTLSPolicy` resource is Alpha and part of the Experimental Channel in `v1.0.0+`.
+    The `BackendTLSPolicy` resource is Alpha and has been part of
+    the Experimental Channel since `v1.0.0`.
 
 [BackendTLSPolicy][backendtlspolicy] is a Gateway API type for specifying the TLS configuration
 of the connection from the Gateway to a backend pod/s via the Service API object.

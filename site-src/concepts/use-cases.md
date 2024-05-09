@@ -33,7 +33,7 @@ separately.)
 ??? success "Standard Channel in v0.8.0+"
 
     The [north/south] use case is fully supported by the Standard Channel
-    in `v0.8.0+`.
+    since `v0.8.0`.
 
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
@@ -91,7 +91,7 @@ rollouts](/guides/traffic-splitting)).
 ??? success "Standard Channel in v0.8.0+"
 
     The [north/south] use case is fully supported by the Standard Channel
-    in `v0.8.0+`.
+    since `v0.8.0`.
 
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:

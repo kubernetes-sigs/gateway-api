@@ -1,9 +1,9 @@
 # GRPCRoute
 
-??? example "Experimental Channel in v0.6.0+"
+??? success "Standard Channel in v1.1.0+"
 
-    The `GRPCRoute` resource is Alpha and part of the Experimental Channel in
-    `v0.6.0+`. For more information on release channels, refer to the [related
+    The `GRPCRoute` resource is GA and has been part of the Stable Channel since
+    `v1.1.0`. For more information on release channels, refer to the [related
     documentation](/concepts/versioning).
 
 [GRPCRoute][grpcroute] is a Gateway API type for specifying routing behavior

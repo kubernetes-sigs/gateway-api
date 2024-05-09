@@ -32,8 +32,9 @@ the cluster.
 ### GatewayClass
 
 ??? success "Standard Channel in v0.5.0+"
-    The `GatewayClass` resource is GA and has been part of the Standard Channel in
-    `v0.5.0+`. For more information on release channels, refer to the [related
+
+    The `GatewayClass` resource is GA and has been part of the Standard Channel since
+    `v0.5.0`. For more information on release channels, refer to the [related
     documentation](/concepts/versioning).
 
 GatewayClass defines a set of Gateways that share a common configuration and
@@ -56,6 +57,7 @@ IngressClass object.
 ### Gateway
 
 ??? success "Standard Channel in v0.5.0+"
+
     The `Gateway` resource is GA and has been part of the Standard Channel since
     `v0.5.0`. For more information on release channels, refer to the [related
     documentation](/concepts/versioning).
@@ -95,8 +97,9 @@ types may be added to the API in future.
 #### HTTPRoute
 
 ??? success "Standard Channel in v0.5.0+"
-    The `HTTPRoute` resource is GA and has been part of the Standard Channel in
-    `v0.5.0+`. For more information on release channels, refer to the [related
+
+    The `HTTPRoute` resource is GA and has been part of the Standard Channel since
+    `v0.5.0`. For more information on release channels, refer to the [related
     documentation](/concepts/versioning).
 
 HTTPRoute is for multiplexing HTTP or terminated HTTPS connections. It's intended
@@ -109,7 +112,7 @@ modifying them in-flight.
 ??? example "Experimental Channel in v0.3.0+"
 
     The `TLSRoute` resource is Alpha and has been part of the Experimental
-    Channel since `v0.3.0+`. For more information on release channels, refer to
+    Channel since `v0.3.0`. For more information on release channels, refer to
     the [related documentation](/concepts/versioning).
 
 TLSRoute is for multiplexing TLS connections, discriminated via SNI. It's intended
@@ -135,11 +138,11 @@ is passed through to the backend.
 
 #### GRPCRoute
 
-??? example "Experimental Channel in v0.6.0+"
+??? success "Standard Channel in v1.1.0+"
 
-    The `GRPCRoute` resource is Alpha and has been part of the Experimental
-    Channel since `v0.6.0`. For more information on release channels, refer to
-    the [related documentation](/concepts/versioning).
+    The `GRPCRoute` resource is GA and has been part of the Stable Channel since
+    `v1.1.0`. For more information on release channels, refer to the [related
+    documentation](/concepts/versioning).
 
 GRPCRoute is for idiomatically routing gRPC traffic. Gateways supporting
 GRPCRoute are required to support HTTP/2 without an initial upgrade from HTTP/1,
@@ -213,6 +216,7 @@ The following is required for a Route to be attached to a Gateway:
 #### Referencing Gateways
 
 ??? example "Experimental Channel"
+
     The `Port` field described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
     channels, refer to the [related documentation](/concepts/versioning/#adding-experimental-fields).
