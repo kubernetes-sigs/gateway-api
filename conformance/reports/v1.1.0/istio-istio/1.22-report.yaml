@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1alpha1
-date: "2024-05-01T15:52:24Z"
+date: "2024-05-09T02:49:52Z"
 gatewayAPIChannel: experimental
-gatewayAPIVersion: v1.1.0-rc1
+gatewayAPIVersion: v1.1.0
 implementation:
   contact:
   - '@istio/maintainers'
@@ -16,54 +16,6 @@ profiles:
     result: success
     statistics:
       Failed: 0
-      Passed: 12
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 1
-      Skipped: 0
-    supportedFeatures:
-    - GatewayPort8080
-    - GatewayStaticAddresses
-  name: GATEWAY-GRPC
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 33
-      Skipped: 0
-  extended:
-    result: success
-    statistics:
-      Failed: 0
-      Passed: 18
-      Skipped: 0
-    supportedFeatures:
-    - GatewayPort8080
-    - GatewayStaticAddresses
-    - HTTPRouteBackendRequestHeaderModification
-    - HTTPRouteBackendTimeout
-    - HTTPRouteHostRewrite
-    - HTTPRouteMethodMatching
-    - HTTPRouteParentRefPort
-    - HTTPRoutePathRedirect
-    - HTTPRoutePathRewrite
-    - HTTPRoutePortRedirect
-    - HTTPRouteQueryParamMatching
-    - HTTPRouteRequestMirror
-    - HTTPRouteRequestMultipleMirrors
-    - HTTPRouteRequestTimeout
-    - HTTPRouteResponseHeaderModification
-    - HTTPRouteSchemeRedirect
-  name: GATEWAY-HTTP
-  summary: Core tests succeeded. Extended tests succeeded.
-- core:
-    result: success
-    statistics:
-      Failed: 0
       Passed: 11
       Skipped: 0
   extended:
@@ -73,6 +25,7 @@ profiles:
       Passed: 1
       Skipped: 0
     supportedFeatures:
+    - GatewayHTTPListenerIsolation
     - GatewayPort8080
     - GatewayStaticAddresses
   name: GATEWAY-TLS
@@ -108,4 +61,54 @@ profiles:
     unsupportedFeatures:
     - MeshClusterIPMatching
   name: MESH-HTTP
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 12
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 1
+      Skipped: 0
+    supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+  name: GATEWAY-GRPC
+  summary: Core tests succeeded. Extended tests succeeded.
+- core:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 33
+      Skipped: 0
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 19
+      Skipped: 0
+    supportedFeatures:
+    - GatewayHTTPListenerIsolation
+    - GatewayPort8080
+    - GatewayStaticAddresses
+    - HTTPRouteBackendRequestHeaderModification
+    - HTTPRouteBackendTimeout
+    - HTTPRouteHostRewrite
+    - HTTPRouteMethodMatching
+    - HTTPRouteParentRefPort
+    - HTTPRoutePathRedirect
+    - HTTPRoutePathRewrite
+    - HTTPRoutePortRedirect
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteRequestMirror
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestTimeout
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteSchemeRedirect
+  name: GATEWAY-HTTP
   summary: Core tests succeeded. Extended tests succeeded.
