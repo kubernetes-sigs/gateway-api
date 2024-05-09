@@ -92,3 +92,7 @@ func addLabelSelectorFlag(p *string, cmd *cobra.Command) {
 func addOutputFormatFlag(p *string, cmd *cobra.Command) {
 	cmd.Flags().StringVarP(p, "output", "o", "", `Output format. Must be one of (yaml, json)`)
 }
+
+func addForFlag(p *string, cmd *cobra.Command) {
+	cmd.Flags().StringVar(p, "for", "", `Filter results to only those related to the specified resource. Format: TYPE[/NAMESPACE]/NAME. Not specifying a NAMESPACE assumes the 'default' value. Examples: gateway/ns2/foo-gateway, httproute/bar-httproute, service/ns1/my-svc`)
+}

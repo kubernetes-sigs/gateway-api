@@ -20,12 +20,15 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/utils/clock"
 
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/printer"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
@@ -94,6 +97,7 @@ func newCmdGatewayClasses(f cmdutils.Factory, out io.Writer, cmdName commandName
 	}
 	addLabelSelectorFlag(&o.labelSelectorFlag, cmd)
 	if cmdName == commandNameGet {
+		addForFlag(&o.forFlag, cmd)
 		addOutputFormatFlag(&o.outputFlag, cmd)
 	}
 	return cmd
@@ -115,6 +119,7 @@ func newCmdGateways(f cmdutils.Factory, out io.Writer, cmdName commandName) *cob
 	addAllNamespacesFlag(&o.allNamespacesFlag, cmd)
 	addLabelSelectorFlag(&o.labelSelectorFlag, cmd)
 	if cmdName == commandNameGet {
+		addForFlag(&o.forFlag, cmd)
 		addOutputFormatFlag(&o.outputFlag, cmd)
 	}
 	return cmd
@@ -136,6 +141,7 @@ func newCmdHTTPRoutes(f cmdutils.Factory, out io.Writer, cmdName commandName) *c
 	addAllNamespacesFlag(&o.allNamespacesFlag, cmd)
 	addLabelSelectorFlag(&o.labelSelectorFlag, cmd)
 	if cmdName == commandNameGet {
+		addForFlag(&o.forFlag, cmd)
 		addOutputFormatFlag(&o.outputFlag, cmd)
 	}
 	return cmd
@@ -157,6 +163,7 @@ func newCmdBackends(f cmdutils.Factory, out io.Writer, cmdName commandName) *cob
 	addAllNamespacesFlag(&o.allNamespacesFlag, cmd)
 	addLabelSelectorFlag(&o.labelSelectorFlag, cmd)
 	if cmdName == commandNameGet {
+		addForFlag(&o.forFlag, cmd)
 		addOutputFormatFlag(&o.outputFlag, cmd)
 	}
 	return cmd
@@ -175,6 +182,7 @@ func newCmdPolicies(f cmdutils.Factory, out io.Writer, cmdName commandName) *cob
 		},
 	}
 	if cmdName == commandNameGet {
+		addForFlag(&o.forFlag, cmd)
 		addOutputFormatFlag(&o.outputFlag, cmd)
 	}
 	return cmd
@@ -224,7 +232,19 @@ func runGetOrDescribeGatewayClasses(f cmdutils.Factory, o *getOrDescribeOptions)
 	handleErrOrExitWithMsg(err, "")
 
 	discoverer := resourcediscovery.NewDiscoverer(k8sClients, policyManager)
-	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(o.toResourceDiscoveryFilter())
+	emptyObjRef := common.ObjRef{}
+	var resourceModel *resourcediscovery.ResourceModel
+	if o.cmdName == commandNameGet && o.forObjRef != emptyObjRef {
+		switch o.forObjRef.Kind {
+		case "Gateway":
+			resourceModel, err = discoverer.DiscoverResourcesForGateway(o.forObjRefToResourceDiscoveryFilter())
+		default:
+			fmt.Fprintf(os.Stderr, "Filtering by type %q is not supported for GatewayClasses", o.forObjRef.Kind)
+			os.Exit(1)
+		}
+	} else {
+		resourceModel, err = discoverer.DiscoverResourcesForGatewayClass(o.toResourceDiscoveryFilter())
+	}
 	handleErrOrExitWithMsg(err, "failed to discover GatewayClass resources")
 
 	realClock := clock.RealClock{}
@@ -243,7 +263,21 @@ func runGetOrDescribeGateways(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "")
 
 	discoverer := resourcediscovery.NewDiscoverer(k8sClients, policyManager)
-	resourceModel, err := discoverer.DiscoverResourcesForGateway(o.toResourceDiscoveryFilter())
+	emptyObjRef := common.ObjRef{}
+	var resourceModel *resourcediscovery.ResourceModel
+	if o.cmdName == commandNameGet && o.forObjRef != emptyObjRef {
+		switch o.forObjRef.Kind {
+		case "GatewayClass":
+			resourceModel, err = discoverer.DiscoverResourcesForGatewayClass(o.forObjRefToResourceDiscoveryFilter())
+		case "HTTPRoute":
+			resourceModel, err = discoverer.DiscoverResourcesForHTTPRoute(o.forObjRefToResourceDiscoveryFilter())
+		default:
+			fmt.Fprintf(os.Stderr, "Filtering by type %q is not supported for Gateways", o.forObjRef.Kind)
+			os.Exit(1)
+		}
+	} else {
+		resourceModel, err = discoverer.DiscoverResourcesForGateway(o.toResourceDiscoveryFilter())
+	}
 	handleErrOrExitWithMsg(err, "failed to discover Gateway resources")
 
 	realClock := clock.RealClock{}
@@ -262,7 +296,21 @@ func runGetOrDescribeHTTPRoutes(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "")
 
 	discoverer := resourcediscovery.NewDiscoverer(k8sClients, policyManager)
-	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(o.toResourceDiscoveryFilter())
+	emptyObjRef := common.ObjRef{}
+	var resourceModel *resourcediscovery.ResourceModel
+	if o.cmdName == commandNameGet && o.forObjRef != emptyObjRef {
+		switch o.forObjRef.Kind {
+		case "Gateway":
+			resourceModel, err = discoverer.DiscoverResourcesForGateway(o.forObjRefToResourceDiscoveryFilter())
+		case "Service":
+			resourceModel, err = discoverer.DiscoverResourcesForBackend(o.forObjRefToResourceDiscoveryFilter())
+		default:
+			fmt.Fprintf(os.Stderr, "Filtering by type %q is not supported for HTTPRoutes", o.forObjRef.Kind)
+			os.Exit(1)
+		}
+	} else {
+		resourceModel, err = discoverer.DiscoverResourcesForHTTPRoute(o.toResourceDiscoveryFilter())
+	}
 	handleErrOrExitWithMsg(err, "failed to discover HTTPRoute resources")
 
 	realClock := clock.RealClock{}
@@ -281,7 +329,21 @@ func runGetOrDescribeBackends(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "")
 
 	discoverer := resourcediscovery.NewDiscoverer(k8sClients, policyManager)
-	resourceModel, err := discoverer.DiscoverResourcesForBackend(o.toResourceDiscoveryFilter())
+	emptyObjRef := common.ObjRef{}
+	var resourceModel *resourcediscovery.ResourceModel
+	if o.cmdName == commandNameGet && o.forObjRef != emptyObjRef {
+		switch o.forObjRef.Kind {
+		case "Gateway":
+			resourceModel, err = discoverer.DiscoverResourcesForGateway(o.forObjRefToResourceDiscoveryFilter())
+		case "HTTPRoute":
+			resourceModel, err = discoverer.DiscoverResourcesForHTTPRoute(o.forObjRefToResourceDiscoveryFilter())
+		default:
+			fmt.Fprintf(os.Stderr, "Filtering by type %q is not supported for Backends", o.forObjRef.Kind)
+			os.Exit(1)
+		}
+	} else {
+		resourceModel, err = discoverer.DiscoverResourcesForBackend(o.toResourceDiscoveryFilter())
+	}
 	handleErrOrExitWithMsg(err, "failed to discover Backend resources")
 
 	realClock := clock.RealClock{}
@@ -301,7 +363,10 @@ func runGetOrDescribePolicies(f cmdutils.Factory, o *getOrDescribeOptions) {
 	policiesPrinter := &printer.PoliciesPrinter{Writer: o.out, Clock: realClock}
 
 	var policyList []policymanager.Policy
+	emptyObjRef := common.ObjRef{}
 	switch {
+	case o.cmdName == commandNameGet && o.forObjRef != emptyObjRef: // Fetch policies attached to some resource.
+		policyList = policyManager.PoliciesAttachedTo(policymanager.ObjRef(o.forObjRef))
 	case o.resourceName == "": // Fetch all policies.
 		policyList = policyManager.GetPolicies()
 	default: // Fetch a single policy by its name.
@@ -356,11 +421,13 @@ type getOrDescribeOptions struct {
 	allNamespacesFlag bool
 	labelSelectorFlag string
 	outputFlag        string
+	forFlag           string
 
 	namespace     string
 	resourceName  string
 	labelSelector labels.Selector
 	outputFormat  cmdutils.OutputFormat
+	forObjRef     common.ObjRef
 
 	out io.Writer
 }
@@ -387,6 +454,37 @@ func (o *getOrDescribeOptions) parse(args []string) {
 		fmt.Fprintf(os.Stderr, "%v\n", err)
 		os.Exit(1)
 	}
+
+	// Parse `--for` flag
+	if o.forFlag != "" {
+		parts := strings.Split(o.forFlag, "/")
+		if len(parts) < 2 || len(parts) > 3 {
+			fmt.Fprintf(os.Stderr, "invalid value used in --for flag; value must be in the format TYPE[/NAMESPACE]/NAME\n")
+			os.Exit(1)
+		}
+		if len(parts) == 2 {
+			o.forObjRef = common.ObjRef{Kind: parts[0], Namespace: metav1.NamespaceDefault, Name: parts[1]}
+		} else {
+			o.forObjRef = common.ObjRef{Kind: parts[0], Namespace: parts[1], Name: parts[2]}
+		}
+		switch strings.ToLower(o.forObjRef.Kind) {
+		case "gatewayclass", "gateawyclasses":
+			o.forObjRef.Group = gatewayv1.GroupVersion.Group
+			o.forObjRef.Kind = "GatewayClass"
+			o.forObjRef.Namespace = ""
+		case "gateway", "gateways":
+			o.forObjRef.Group = gatewayv1.GroupVersion.Group
+			o.forObjRef.Kind = "Gateway"
+		case "httproute", "httproutes":
+			o.forObjRef.Group = gatewayv1.GroupVersion.Group
+			o.forObjRef.Kind = "HTTPRoute"
+		case "service", "services":
+			o.forObjRef.Kind = "Service"
+		default:
+			fmt.Fprintf(os.Stderr, "invalid type provided in --for flag; type must be one of [gatewayclass, gateway, httproute, service]\n")
+			os.Exit(1)
+		}
+	}
 }
 
 func (o *getOrDescribeOptions) toResourceDiscoveryFilter() resourcediscovery.Filter {
@@ -394,6 +492,13 @@ func (o *getOrDescribeOptions) toResourceDiscoveryFilter() resourcediscovery.Fil
 		Name:      o.resourceName,
 		Namespace: o.namespace,
 		Labels:    o.labelSelector,
+	}
+}
+
+func (o *getOrDescribeOptions) forObjRefToResourceDiscoveryFilter() resourcediscovery.Filter {
+	return resourcediscovery.Filter{
+		Name:      o.forObjRef.Name,
+		Namespace: o.forObjRef.Namespace,
 	}
 }
 
