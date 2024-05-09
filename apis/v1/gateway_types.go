@@ -32,6 +32,10 @@ import (
 
 // Gateway represents an instance of a service-traffic handling infrastructure
 // by binding Listeners to a set of IP addresses.
+//
+// It is recommended that the Gateway name field be limited to a maximum length
+// of 63 characters. Gateway names may be used in label values on generated
+// in-cluster resources which have a length limit of 63 characters.
 type Gateway struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
