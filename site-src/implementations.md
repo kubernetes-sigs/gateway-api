@@ -30,7 +30,7 @@ cover, and documentation to help users get started.
 - [HAProxy Ingress][7] (alpha)
 - [HAProxy Kubernetes Ingress Controller][32] (GA)
 - [HashiCorp Consul][8]
-- [Istio][9] (beta)
+- [Istio][9] (GA)
 - [Kong][10] (GA)
 - [Kuma][11] (GA)
 - [LiteSpeed Ingress Controller][19]
@@ -43,7 +43,7 @@ cover, and documentation to help users get started.
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
-- [Istio][9] (experimental)
+- [Istio][9] (Beta)
 - [Kuma][11] (GA)
 - [Linkerd][28] (experimental)
 
@@ -295,7 +295,7 @@ Please see the [Consul API Gateway documentation][consul-api-gw-doocs] for curre
 
 ### Istio
 
-[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.0.0/istio-istio)
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.0.0-Istio-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/istio-istio)
 
 [Istio][istio] is an open source [service mesh][istio-mesh] and gateway implementation.
 
