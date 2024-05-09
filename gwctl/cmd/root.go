@@ -17,7 +17,6 @@ limitations under the License.
 package cmd
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"os"
@@ -26,8 +25,6 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/klog/v2"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
@@ -63,8 +60,10 @@ func newRootCmd() *cobra.Command {
 		}
 	})
 
-	rootCmd.AddCommand(NewGetCommand())
-	rootCmd.AddCommand(NewDescribeCommand())
+	factory := cmdutils.NewFactory(&kubeConfigPath)
+
+	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameGet))
+	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameDescribe))
 
 	return rootCmd
 }
@@ -78,24 +77,18 @@ func Execute() {
 	}
 }
 
-func getParams(path string) *cmdutils.CmdParams {
-	k8sClients, err := common.NewK8sClients(path)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to create k8s clients: %v\n", err)
-		os.Exit(1)
-	}
+func addNamespaceFlag(p *string, cmd *cobra.Command) {
+	cmd.Flags().StringVarP(p, "namespace", "n", "default", "")
+}
 
-	policyManager := policymanager.New(k8sClients.DC)
-	if err := policyManager.Init(context.Background()); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to initialize policy manager: %v\n", err)
-		os.Exit(1)
-	}
+func addAllNamespacesFlag(p *bool, cmd *cobra.Command) {
+	cmd.Flags().BoolVarP(p, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
+}
 
-	params := &cmdutils.CmdParams{
-		K8sClients:    k8sClients,
-		PolicyManager: policyManager,
-		Out:           os.Stdout,
-	}
+func addLabelSelectorFlag(p *string, cmd *cobra.Command) {
+	cmd.Flags().StringVarP(p, "selector", "l", "", "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching objects must satisfy all of the specified label constraints.")
+}
 
-	return params
+func addOutputFormatFlag(p *string, cmd *cobra.Command) {
+	cmd.Flags().StringVarP(p, "output", "o", "", `Output format. Must be one of (yaml, json)`)
 }

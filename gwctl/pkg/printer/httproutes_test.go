@@ -205,10 +205,12 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
@@ -216,13 +218,13 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 
 	hp.PrintTable(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 NAMESPACE  NAME                 HOSTNAMES                          PARENT REFS  AGE
 default    foo-httproute-1      example.com,example2.com + 1 more  1            24h
@@ -394,10 +396,12 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
@@ -405,12 +409,12 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	hp.PrintDescribeView(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 Name: foo-httproute
 ParentRefs:
@@ -492,10 +496,12 @@ func TestHTTPRoutesPrinter_PrintJsonYaml(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
@@ -504,12 +510,12 @@ func TestHTTPRoutesPrinter_PrintJsonYaml(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(hp, resourceModel, utils.OutputFormatJSON)
 
-	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	gotJSON := common.JSONString(buff.String())
 	wantJSON := common.JSONString(fmt.Sprintf(`
         {
           "apiVersion": "v1",

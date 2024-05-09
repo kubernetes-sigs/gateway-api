@@ -103,10 +103,11 @@ func TestDiscoverResourcesForGateway(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 			discoverer := Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 
 			resourceModel, err := discoverer.DiscoverResourcesForGateway(tc.filter)
@@ -311,10 +312,11 @@ func TestDiscoverResourcesForBackend(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 			discoverer := Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 
 			resourceModel, err := discoverer.DiscoverResourcesForBackend(tc.filter)
@@ -369,10 +371,11 @@ func TestDiscoverResourcesForGatewayClass_LabelSelector(t *testing.T) {
 		gatewayClass("foo-com-external-gateway-class", map[string]string{"app": "foo"}),
 		gatewayClass("foo-com-internal-gateway-class", map[string]string{"app": "foo", "env": "internal"}),
 	}
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)
@@ -446,10 +449,11 @@ func TestDiscoverResourcesForGateway_LabelSelector(t *testing.T) {
 		gateway("gateway-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)
@@ -522,10 +526,11 @@ func TestDiscoverResourcesForHTTPRoute_LabelSelector(t *testing.T) {
 		httpRoute("httproute-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 
 	labelSelector := "env=internal"
@@ -572,10 +577,11 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 		namespace("namespace-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)

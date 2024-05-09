@@ -175,10 +175,12 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
@@ -186,12 +188,12 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	gp.PrintTable(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE
 abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d
@@ -365,10 +367,12 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
@@ -376,12 +380,12 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	gp.PrintDescribeView(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 Name: foo-gateway
 Namespace: ""
@@ -482,10 +486,12 @@ func TestGatewaysPrinter_PrintJsonYaml(t *testing.T) {
 		gcObject,
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
@@ -493,12 +499,12 @@ func TestGatewaysPrinter_PrintJsonYaml(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gp, resourceModel, utils.OutputFormatJSON)
 
-	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	gotJSON := common.JSONString(buff.String())
 	wantJSON := common.JSONString(fmt.Sprintf(`
         {
           "apiVersion": "v1",
@@ -648,10 +654,12 @@ func TestGatewaysPrinter_PrintYaml(t *testing.T) {
 		gcObject,
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
@@ -659,12 +667,12 @@ func TestGatewaysPrinter_PrintYaml(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gp, resourceModel, utils.OutputFormatYAML)
 
-	got := common.YamlString(params.Out.(*bytes.Buffer).String())
+	got := common.YamlString(buff.String())
 	want := common.YamlString(fmt.Sprintf(`
 apiVersion: v1
 items:
