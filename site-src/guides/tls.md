@@ -14,7 +14,7 @@ implementation(s) you're using with Gateway API.
 
     The `TLSRoute` and `BackendTLSPolicy` resources described below are currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](/concepts/versioning).
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 ## Client/Server and TLS
 

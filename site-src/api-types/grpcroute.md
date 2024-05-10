@@ -1,10 +1,10 @@
 # GRPCRoute
 
-??? success "Standard Channel in v1.1.0+"
+??? success "Standard Channel since v1.1.0"
 
-    The `GRPCRoute` resource is GA and has been part of the Stable Channel since
-    `v1.1.0`. For more information on release channels, refer to the [related
-    documentation](/concepts/versioning).
+    The `GRPCRoute` resource is GA and has been part of the Standard Channel since
+    `v1.1.0`. For more information on release channels, refer to our [versioning
+    guide](/concepts/versioning).
 
 [GRPCRoute][grpcroute] is a Gateway API type for specifying routing behavior
 of gRPC requests from a Gateway listener to an API object, i.e. Service.

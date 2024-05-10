@@ -1,10 +1,10 @@
 
 # Gateway API for Service Mesh
 
-??? success "Standard Channel in v1.2.0+"
+??? success "Standard Channel since v1.2.0"
 
     The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
-    is part of the Standard Channel since v1.2.0 and are considered stable APIs. For more
+    has been part of the Standard Channel since v1.2.0 and are considered stable APIs. For more
     information refer to our [versioning guide](/concepts/versioning).
 
 The "[GAMMA initiative](/mesh/gamma)" refers to the group that is defining how
