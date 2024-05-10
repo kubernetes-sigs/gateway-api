@@ -2,7 +2,7 @@
 
     The `TCPRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](/concepts/versioning).
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 Gateway API is designed to work with multiple protocols and [TCPRoute][tcproute]
 is one such route which allows for managing [TCP][tcp] traffic.

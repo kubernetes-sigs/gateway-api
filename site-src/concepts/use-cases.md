@@ -30,10 +30,11 @@ separately.)
 
 ## Basic [north/south] use case
 
-??? success "Standard Channel in v0.8.0+"
+??? success "Standard Channel since v0.8.0"
 
     The [north/south] use case is fully supported by the Standard Channel
-    in `v0.8.0+`.
+    since `v0.8.0`. For more information on release
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 Ana has created a microservice application which she wants to run in
 Kubernetes. Her application will be used by clients outside the cluster, and
@@ -88,10 +89,11 @@ rollouts](/guides/traffic-splitting)).
 
 ## Multiple applications behind a single Gateway
 
-??? success "Standard Channel in v0.8.0+"
+??? success "Standard Channel since v0.8.0"
 
     The [north/south] use case is fully supported by the Standard Channel
-    in `v0.8.0+`.
+    since `v0.8.0`. For more information on release
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 This is remarkably similar to the [basic north/south use
 case](#basic-northsouth-use-case), but there are multiple application teams:

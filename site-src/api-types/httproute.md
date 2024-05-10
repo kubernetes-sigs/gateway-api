@@ -1,8 +1,10 @@
 # HTTPRoute
 
-??? success "Standard Channel in v0.5.0+"
+??? success "Standard Channel since v0.5.0"
 
-    The `HTTPRoute` resource is Beta and part of the Standard Channel in `v0.5.0+`.
+    The `HTTPRoute` resource is GA and has been part of the Standard Channel since
+    `v0.5.0`. For more information on release channels, refer to our [versioning
+    guide](/concepts/versioning).
 
 [HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
@@ -225,9 +227,11 @@ on `weight` and other fields.
 
 #### Timeouts (optional)
 
-??? example "Experimental Channel in v1.0.0+"
+??? example "Experimental Channel since v1.0.0"
 
-    HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
+    HTTPRoute timeouts have been part of the Experimental Channel since `v1.0.0`.
+    For more information on release channels, refer to our 
+    [versioning guide](/concepts/versioning).
 
 HTTPRoute Rules include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
 
@@ -250,10 +254,11 @@ Reference the [timeouts][timeouts] API documentation for additional details.
 
 ##### Backend Protocol
 
-??? example "Experimental Channel in v1.0.0+"
+??? example "Experimental Channel since v1.0.0"
 
-    This concept is part of the Experimental Channel in `v1.0.0+`.
-
+    This concept has been part of the Experimental Channel since `v1.0.0`.
+    For more information on release channels, refer to our 
+    [versioning guide](/concepts/versioning).
 
 Some implementations may require the [backendRef][backendRef] to be labeled 
 explicitly in order to route traffic using a certain protocol. For Kubernetes 

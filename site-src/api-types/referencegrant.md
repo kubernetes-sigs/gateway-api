@@ -1,8 +1,10 @@
 # ReferenceGrant
 
-??? success "Standard Channel in v0.6.0+"
+??? success "Standard Channel since v0.6.0"
 
-    The `ReferenceGrant` resource is Beta and part of the Standard Channel in `v0.6.0+`.
+    The `ReferenceGrant` resource is Beta and part of the 
+    Standard Channel since `v0.6.0`. For more information on release
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
