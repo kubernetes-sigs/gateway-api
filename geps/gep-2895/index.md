@@ -11,7 +11,7 @@ add and remove a query parameter of the HTTP request before it is sent to the up
 
 ## Goals
 
-* Provide a way to modify query parameters in a `HTTPRoute`.
+* Provide a way to modify query parameters of an incoming request in a `HTTPRoute`.
 
 ## Introduction
 
@@ -47,7 +47,8 @@ const (
 // query param name are invalid and will be rejected by CRD validation.
 type HTTPQueryParamFilter struct {
     // Set overwrites the HTTP request with the given query param (name, value)
-    // before the action. The request query parameter names are case-sensitive.
+    // before the action. 
+    // The request query parameter names are case-sensitive.
     // This must be an exact string match of query param name.
     // (See https://www.rfc-editor.org/rfc/rfc7230#section-2.7.3).
     //
@@ -62,6 +63,19 @@ type HTTPQueryParamFilter struct {
     // Output:
     //   GET /foo?my-parameter=bar HTTP/1.1
     //
+    // If the query parameter is not set in the request,
+    // the Set action MUST be ignored by the Gateway.
+    //
+    // Input:
+    //   GET /foo HTTP/1.1
+    //
+    // Config:
+    //   set:
+    //   - name: "my-parameter"
+    //     value: "bar"
+    //
+    // Output:
+    //   GET /foo HTTP/1.1
     //
     // +optional
     // +listType=map
@@ -70,7 +84,8 @@ type HTTPQueryParamFilter struct {
     Set []HTTPHeader `json:"set,omitempty"`
 
     // Add adds the given query param(s) (name, value) to the HTTP request
-    // before the action.
+    // before the action. Existing query params with the same name are not 
+    // replaced, instead a new param with the same name is added.
     //
     // Input:
     //   GET /foo?my-parameter=foo HTTP/1.1
@@ -115,7 +130,7 @@ type HTTPQueryParamFilter struct {
 The following example shows how a HTTPRoute modifies the query parameter of an HTTP request before it is sent to the upstream target.
 
 It allows to add query parameter for only a certain canary backend, which can help in identifying certain users by the backend service. 
-Based on the following http rule, query parameter "passtoken=$sign_passtoken_plain" will be added to the requests be matched against the query parameter "gray=3", then the request will be routed to the canary service "http-route-canary:80".
+Based on the following http rule, query parameter "passtoken=$sign_passtoken_plain" will be added to the requests to be matched against the query parameter "gray=3", then the request will be routed to the canary service "http-route-canary:80".
 
 ```yaml
 apiVersion: gateway.networking.k8s.io/v1
@@ -157,7 +172,7 @@ spec:
 
 ```
 
-## Prior Art
+## Implementation-Specific Solutions
 
 Some implementations already support query parameter modification.
 
@@ -187,9 +202,9 @@ plugins:
       - new-param=some-value
 ```
 
-### Traefik supports this with a Query Paramter Modification plugin
+### Traefik supports this with a Query Parameter Modification plugin
 
-* This Traefik plugin allows user to modify the query parameters of an incoming request, by either adding new, deleting or modifying existing query parameters.
+* This Traefik plugin allows users to modify the query parameters of an incoming request, by either adding new, deleting or modifying existing query parameters.
 
 In the following example, HTTP route adds a new query parameter "authenticated=true" to the requests. 
 Existing query params with the same name are not replaced, instead a new param with the same name is added. 
