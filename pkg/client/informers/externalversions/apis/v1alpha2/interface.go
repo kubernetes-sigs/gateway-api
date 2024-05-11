@@ -24,8 +24,8 @@ import (
 
 // Interface provides access to all the informers in this group version.
 type Interface interface {
-	// BackendTLSPolicies returns a BackendTLSPolicyInformer.
-	BackendTLSPolicies() BackendTLSPolicyInformer
+	// BackendLBPolicies returns a BackendLBPolicyInformer.
+	BackendLBPolicies() BackendLBPolicyInformer
 	// GRPCRoutes returns a GRPCRouteInformer.
 	GRPCRoutes() GRPCRouteInformer
 	// ReferenceGrants returns a ReferenceGrantInformer.
@@ -49,9 +49,9 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// BackendTLSPolicies returns a BackendTLSPolicyInformer.
-func (v *version) BackendTLSPolicies() BackendTLSPolicyInformer {
-	return &backendTLSPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
+// BackendLBPolicies returns a BackendLBPolicyInformer.
+func (v *version) BackendLBPolicies() BackendLBPolicyInformer {
+	return &backendLBPolicyInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
 // GRPCRoutes returns a GRPCRouteInformer.

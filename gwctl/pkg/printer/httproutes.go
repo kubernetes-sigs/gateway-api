@@ -20,42 +20,42 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-	"sigs.k8s.io/yaml"
-
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/yaml"
+
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
+var _ Printer = (*HTTPRoutesPrinter)(nil)
+
 type HTTPRoutesPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
-func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(hp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(common.MapToValues(resourceModel.HTTPRoutes))
+}
 
-	httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, 0, len(resourceModel.HTTPRoutes))
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
-		httpRouteNodes = append(httpRouteNodes, httpRouteNode)
+func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(hp, 0, 0, 2, ' ', 0)
+	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	sort.Slice(httpRouteNodes, func(i, j int) bool {
-		if httpRouteNodes[i].HTTPRoute.GetNamespace() != httpRouteNodes[j].HTTPRoute.GetNamespace() {
-			return httpRouteNodes[i].HTTPRoute.GetNamespace() < httpRouteNodes[j].HTTPRoute.GetNamespace()
-		}
-		return httpRouteNodes[i].HTTPRoute.GetName() < httpRouteNodes[j].HTTPRoute.GetName()
-	})
+	httpRouteNodes := common.MapToValues(resourceModel.HTTPRoutes)
 
-	for _, httpRouteNode := range httpRouteNodes {
+	for _, httpRouteNode := range SortByString(httpRouteNodes) {
 		var hostNames []string
 		for _, hostName := range httpRouteNode.HTTPRoute.Spec.Hostnames {
 			hostNames = append(hostNames, string(hostName))
@@ -80,7 +80,11 @@ func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceMode
 			parentRefsCount,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }
@@ -126,11 +130,11 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
 				os.Exit(1)
 			}
-			fmt.Fprint(hp.Out, string(b))
+			fmt.Fprint(hp, string(b))
 		}
 
 		if index+1 <= len(resourceModel.HTTPRoutes) {
-			fmt.Fprintf(hp.Out, "\n\n")
+			fmt.Fprintf(hp, "\n\n")
 		}
 	}
 }

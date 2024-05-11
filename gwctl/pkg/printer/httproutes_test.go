@@ -18,27 +18,28 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
-
 	"github.com/google/go-cmp/cmp"
+
 	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-func TestHTTPRoutesPrinter_Print(t *testing.T) {
+func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
@@ -211,15 +212,15 @@ func TestHTTPRoutesPrinter_Print(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 
-	hp.Print(resourceModel)
+	hp.PrintTable(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
@@ -400,12 +401,12 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
 	hp.PrintDescribeView(resourceModel)
 
@@ -437,31 +438,13 @@ EffectivePolicies:
 	}
 }
 
-// TestHTTPRoutesPrinter_LabelSelector tests label selector filtering for HTTPRoute in 'get' command.
-func TestHTTPRoutesPrinter_LabelSelector(t *testing.T) {
+// TestHTTPRoutesPrinter_PrintJsonYaml tests the correctness of JSON/YAML output associated with -o json/yaml of `get` subcommand
+func TestHTTPRoutesPrinter_PrintJsonYaml(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
-	httpRoute := func(name string, labels map[string]string) *gatewayv1.HTTPRoute {
-		return &gatewayv1.HTTPRoute{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      name,
-				Namespace: "default",
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-24 * time.Hour),
-				},
-				Labels: labels,
-			},
-			Spec: gatewayv1.HTTPRouteSpec{
-				Hostnames: []gatewayv1.Hostname{"example.com"},
-				CommonRouteSpec: gatewayv1.CommonRouteSpec{
-					ParentRefs: []gatewayv1.ParentReference{
-						{
-							Name: "gateway-1",
-						},
-					},
-				},
-			},
-		}
-	}
+	creationTime := fakeClock.Now().Add(-24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
+
+	hrName, hrNamespace := "httproute-1", "default"
+	hrConfig := apisv1beta1.HTTPRoute(hrName, hrNamespace)
 
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
@@ -483,8 +466,30 @@ func TestHTTPRoutesPrinter_LabelSelector(t *testing.T) {
 				GatewayClassName: "gatewayclass-1",
 			},
 		},
-		httpRoute("httproute-1", map[string]string{"app": "foo"}),
-		httpRoute("httproute-2", map[string]string{"app": "foo", "env": "internal"}),
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: *hrConfig.APIVersion,
+				Kind:       *hrConfig.Kind,
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      hrName,
+				Namespace: hrNamespace,
+				CreationTimestamp: metav1.Time{
+					Time: creationTime,
+				},
+				Labels: map[string]string{"app": "foo", "env": "internal"},
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				Hostnames: []gatewayv1.Hostname{"example.com"},
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{
+						{
+							Name: "gateway-1",
+						},
+					},
+				},
+			},
+		},
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
@@ -493,29 +498,87 @@ func TestHTTPRoutesPrinter_LabelSelector(t *testing.T) {
 		PolicyManager: params.PolicyManager,
 	}
 
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{Labels: selector})
+	resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(resourcediscovery.Filter{})
 	if err != nil {
 		t.Fatalf("Failed to discover resources: %v", err)
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	hp.Print(resourceModel)
+	Print(hp, resourceModel, utils.OutputFormatJSON)
 
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-NAMESPACE  NAME         HOSTNAMES    PARENT REFS  AGE
-default    httproute-2  example.com  1            24h
+	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	wantJSON := common.JSONString(fmt.Sprintf(`
+        {
+          "apiVersion": "v1",
+          "items": [
+            {
+              "apiVersion": "gateway.networking.k8s.io/v1beta1",
+              "kind": "HTTPRoute",
+              "metadata": {
+                "creationTimestamp": "%s",
+                "labels": {
+                  "app": "foo",
+                  "env": "internal"
+                },
+                "name": "httproute-1",
+                "namespace": "default",
+                "resourceVersion": "999"
+              },
+              "spec": {
+                "hostnames": [
+                  "example.com"
+                ],
+                "parentRefs": [
+                  {
+                    "name": "gateway-1"
+                  }
+                ]
+              },
+              "status": {
+                "parents": null
+              }
+            }
+          ],
+          "kind": "List"
+        }`, creationTime.Format(time.RFC3339)))
+	diff, err := wantJSON.CmpDiff(gotJSON)
+	if err != nil {
+		t.Fatalf("Failed to compare the json diffs: %v", diff)
+	}
+	if diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotJSON, wantJSON, diff)
+	}
 
-`
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	hp.Writer = &bytes.Buffer{}
+
+	Print(hp, resourceModel, utils.OutputFormatYAML)
+
+	gotYaml := common.YamlString(hp.Writer.(*bytes.Buffer).String())
+	wantYaml := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: HTTPRoute
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: httproute-1
+    namespace: default
+    resourceVersion: "999"
+  spec:
+    hostnames:
+    - example.com
+    parentRefs:
+    - name: gateway-1
+  status:
+    parents: null
+kind: List`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(wantYaml, gotYaml, common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotYaml, wantYaml, diff)
 	}
 }

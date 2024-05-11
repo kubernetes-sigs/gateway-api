@@ -47,7 +47,14 @@ This approach is dependent on both the "frontend" role of the Kubernetes `Servic
 
 ### Why Service?
 
-The GAMMA initiative has been working to bring service mesh use-cases to the Gateway API spec, taking the best practices and learnings from mesh implementations and codifying them in a spec. Most mesh users are familiar with using the Kubernetes `Service` resource as the foundation for traffic routing. Generally, this architecture makes perfect sense; unfortunately, `Service` is far too coupled of a resource. It orchestrates IP address allocation, DNS, endpoint collection and propagation, load balancing, etc. For this reason, it **cannot** be the right long-term answer for `parentRef` binding; however, it is the only feasible option that Kubernetes has for mesh implementations today. We expect this to change (indeed, we hope to be a part of that change), but in the interest of developing a spec now, we must once again lean on the `Service` resource. However, we will provide provisions to support additional resources as a `parentRef`.
+The GAMMA initiative has been working to bring service mesh use-cases to the Gateway API spec, taking the best practices and learnings from mesh implementations and codifying them in a spec. Most mesh users are familiar with using the Kubernetes Service resource as the foundation for traffic routing: not only do service meshes take advantage of the IP address management and corresponding DNS functionality provided by Service, but one of the key value propositions of service meshes is that they can be added "on top" of preexisting deployments, which are almost certain to already be using Service resources. This architecture is generally a simple, effective way for service meshes to operate.
+
+Add to that the ubiquity of Service in the Kubernetes ecosystem as well as the time and effort needed to get support for a new resource into the ecosystem (especially true for managed Kubernetes providers), and it's clearly impractical to force GAMMA to wait for a replacement for Service.
+
+Unfortunately, Service is a badly overloaded resource. It orchestrates not only IP address allocation and DNS but also endpoint collection and propagation, load balancing, etc. For this reason, it cannot be the only long-term answer for `parentRef` binding -- however, it is the only feasible option that mesh implementations have today, and as such the graduated GAMMA specification MUST support Service as a `parentRef`.
+
+We expect this situation to change -- and, indeed, we plan to be a part of that change. Luckily, `parentRef` is flexible enough to support additional resources in the future, which allows work on adding a Service alternative in GAMMA to begin and continue in parallel with the graduation of this spec. In fact, we believe that GAMMA's use case can serve as an excellent basis for developing and trialing new, more composable mechanisms for managing IP address allocation and DNS.
+
 
 ## API
 
@@ -176,7 +183,7 @@ If `port` is not set, the implementation MUST associate the route with all ports
 
 GAMMA implementations SHOULD NOT infer any functionality from the `hostnames` field on `xRoute`s (currently, `TLSRoute`, `HTTPRoute`, and `GRPCRoute` have this field) due to current under-specification and reserved potential for future usage or API changes.
 
-For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io%2fv1beta1.HTTPHeaderMatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
+For the use case of filtering incoming traffic from selected HTTP hostnames, it is recommended to guide users toward configuring [`HTTPHeaderMatch`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io%2fv1beta1.HTTPHeaderMatch) rules for the [`Host`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Host) header. Functionality to be explored in future GEPs may include supporting concurrent usage of an `xRoute` traffic configuration for multiple North/South `Gateways` and East/West mesh use cases or redirection of egress traffic to an in-cluster `Service`.
 
 ### Namespace boundaries
 
@@ -234,7 +241,7 @@ A controller could create a matching selector-less `Service` (i.e. no endpoints)
 
 Ownership/trust would remain based on naming pattern: `serviceName.namespace.svc.[USER_DOMAIN]`
 
-Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.CommonRouteSpec), and keep similar patterns as `Service`.
+Separate `HttpService`, `TlsService` and `TcpService` resources could have the benefit of allowing us to define protocol specific elements to the spec along with an embedded `CommonServiceSpec`, similar to [`CommonRouteSpec`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.CommonRouteSpec), and keep similar patterns as `Service`.
 
 ##### Drawbacks
 
@@ -292,7 +299,7 @@ spec:
     name: cool-mesh
 ```
 
-It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteSpec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
+It is currently undefined how this approach may interact with either explicitly configured [`hostnames`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteSpec) or implicit "transparent proxy" routing for Kubernetes `Services` to determine how traffic should be intercepted and redirected.
 
 This approach is not entirely abandoned, as it could supplement the proposed approach if explicit attachment to a specific mesh is deemed necessary. Additionally, this approach may offer a future option for attaching an `HTTPRoute` to a mesh, but not a specific service (e.g. to implement mesh-wide egress functionality for all requests to a specific hostname).
 
@@ -313,7 +320,7 @@ spec:
 
 * Would require separate `HTTPRoute` resources to explicitly define _different_ traffic routing rules for the same service on different meshes.
 
-#### Nested `services` and `hostnames` fields in [`ParentReference`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)
+#### Nested `services` and `hostnames` fields in [`ParentReference`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.ParentReference)
 
 In core conformance, the `services` would only be valid for `Mesh` types, and `hostnames` field only for `Gateway`. Mesh implementations could still use a `Host` header match if they wanted limit rules to specific hostnames.
 
@@ -353,7 +360,7 @@ This is done by configuring the `parentRef`, to point to the `istio` `Mesh`. Thi
 
 ### New field on `HTTPRoute` for `Service` binding
 
-A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](https://gateway-api.sigs.k8s.io/v1alpha2/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
+A new field `serviceBinding` would be added to `HTTPRoute` to attach to the `Service`. Alternatively, this could be a new field in [`HTTPRouteMatch`](https://gateway-api.sigs.k8s.io/reference/spec/#gateway.networking.k8s.io/v1.HTTPRouteMatch). As with the proposed implementation, this approach could be combined with a `Mesh` resource or similar as the `parentRef`, which would just define that the route would be applied to a mesh.
 
 ```
 spec:

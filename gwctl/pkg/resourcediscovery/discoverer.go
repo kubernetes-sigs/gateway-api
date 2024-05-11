@@ -22,18 +22,36 @@ import (
 	"os"
 
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/relations"
 
 	corev1 "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	apimachinerytypes "k8s.io/apimachinery/pkg/types"
 	"k8s.io/klog/v2"
+)
+
+const (
+	// Maximum number of events to be fetched for each resource when constructing
+	// the resourceModel.
+	maxEventsPerResource = 10
+)
+
+var (
+	defaultGatewayClassGroupVersion   = gatewayv1.GroupVersion
+	defaultGatewayGroupVersion        = gatewayv1.GroupVersion
+	defaultHTTPRouteGroupVersion      = gatewayv1.GroupVersion
+	defaultReferenceGrantGroupVersion = gatewayv1beta1.GroupVersion
 )
 
 // Filter struct defines parameters for filtering resources
@@ -53,6 +71,62 @@ type Filter struct {
 type Discoverer struct {
 	K8sClients    *common.K8sClients
 	PolicyManager *policymanager.PolicyManager
+
+	// The API versions to be used when fetching Gateway API related resources. An
+	// attempt will be made to discover this information from the discovery APIs.
+	// Failure to do so will mean we use the "default" versions defined in this
+	// file.
+	PreferredGatewayClassGroupVersion   metav1.GroupVersion
+	PreferredGatewayGroupVersion        metav1.GroupVersion
+	PreferredHTTPRouteGroupVersion      metav1.GroupVersion
+	PreferredReferenceGrantGroupVersion metav1.GroupVersion
+}
+
+func NewDiscoverer(k8sClients *common.K8sClients, policyManager *policymanager.PolicyManager) Discoverer {
+	d := &Discoverer{
+		K8sClients:                        k8sClients,
+		PolicyManager:                     policyManager,
+		PreferredGatewayClassGroupVersion: defaultGatewayClassGroupVersion,
+		PreferredGatewayGroupVersion:      defaultGatewayGroupVersion,
+		PreferredHTTPRouteGroupVersion:    defaultHTTPRouteGroupVersion,
+	}
+
+	// Find preferred versions of types.
+	if err := d.initPreferredResourceVersions(); err != nil {
+		klog.ErrorS(err, "Failed to find preferred version for Gateway API types. Will use the default versions.")
+	}
+	return *d
+}
+
+func (d *Discoverer) initPreferredResourceVersions() error {
+	serverPreferredResources, err := d.K8sClients.DiscoveryClient.ServerPreferredResources()
+	if err != nil {
+		return err
+	}
+	for _, resourceList := range serverPreferredResources {
+		if len(resourceList.APIResources) == 0 {
+			continue
+		}
+		gv, err := schema.ParseGroupVersion(resourceList.GroupVersion)
+		if err != nil {
+			klog.ErrorS(err, "Failed to parse GroupVersion", "groupVersion", resourceList.GroupVersion)
+			continue
+		}
+		if gv.Group != gatewayv1.GroupVersion.Group {
+			continue
+		}
+		for _, resource := range resourceList.APIResources {
+			switch resource.Kind {
+			case "GatewayClass":
+				d.PreferredGatewayClassGroupVersion.Version = gv.Version
+			case "Gateway":
+				d.PreferredGatewayGroupVersion.Version = gv.Version
+			case "HTTPRoute":
+				d.PreferredHTTPRouteGroupVersion.Version = gv.Version
+			}
+		}
+	}
+	return nil
 }
 
 // DiscoverResourcesForGatewayClass discovers resources related to a
@@ -61,13 +135,13 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
 
-	gatewayClasses, err := fetchGatewayClasses(ctx, d.K8sClients, filter)
+	gatewayClasses, err := d.fetchGatewayClasses(ctx, filter)
 	if err != nil {
 		return resourceModel, err
 	}
 	resourceModel.addGatewayClasses(gatewayClasses...)
 
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
 }
@@ -77,17 +151,22 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
 
-	gateways, err := fetchGateways(ctx, d.K8sClients, filter)
+	gateways, err := d.fetchGateways(ctx, filter)
 	if err != nil {
 		return resourceModel, err
 	}
 	resourceModel.addGateways(gateways...)
 
+	d.discoverEventsForGateways(ctx, resourceModel)
+
+	d.discoverHTTPRoutesFromGateways(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -97,7 +176,7 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
 
-	httpRoutes, err := fetchHTTPRoutes(ctx, d.K8sClients, filter)
+	httpRoutes, err := d.fetchHTTPRoutes(ctx, filter)
 	if err != nil {
 		return resourceModel, err
 	}
@@ -106,9 +185,11 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -118,19 +199,22 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
 
-	backends, err := fetchBackends(ctx, d.K8sClients, filter)
+	backends, err := d.fetchBackends(ctx, filter)
 	if err != nil {
 		return resourceModel, err
 	}
 	resourceModel.addBackends(backends...)
 
+	d.discoverReferenceGrantsFromBackends(ctx, resourceModel)
 	d.discoverHTTPRoutesFromBackends(ctx, resourceModel)
 	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
-	resourceModel.calculateEffectivePolicies()
+	if err := resourceModel.calculateEffectivePolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	return resourceModel, nil
 }
@@ -140,14 +224,14 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 	ctx := context.Background()
 	resourceModel := &ResourceModel{}
 
-	namespaces, err := fetchNamespace(ctx, d.K8sClients, filter)
+	namespaces, err := d.fetchNamespace(ctx, filter)
 	if err != nil {
 		return resourceModel, err
 	}
 
 	resourceModel.addNamespace(namespaces...)
 
-	d.discoverPolicies(ctx, resourceModel)
+	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
 }
@@ -155,7 +239,7 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 // discoverGatewayClassesFromGateways will add GatewayClasses associated with
 // Gateways in the resourceModel.
 func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, resourceModel *ResourceModel) {
-	gatewayClasses, err := fetchGatewayClasses(ctx, d.K8sClients, Filter{ /* all GatewayClasses */ })
+	gatewayClasses, err := d.fetchGatewayClasses(ctx, Filter{ /* all GatewayClasses */ Labels: labels.Everything()})
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all GatewayClasses")
 	}
@@ -167,17 +251,21 @@ func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, reso
 	}
 
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
-		gatewayClassID := GatewayClassID(relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway))
-		gatewayClass, ok := gatewayClassesByID[gatewayClassID]
+		gatewayClassName := relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway)
+		gwcID := GatewayClassID(gatewayClassName)
+		gatewayClass, ok := gatewayClassesByID[gwcID]
 		if !ok {
-			klog.V(1).ErrorS(nil, "GatewayClass referenced in Gateway does not exist",
-				"gateway", gatewayNode.Gateway.GetNamespace()+"/"+gatewayNode.Gateway.GetName(),
-			)
+			err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+				ReferringObject: common.ObjRef{Kind: "Gateway", Name: gatewayNode.Gateway.GetName(), Namespace: gatewayNode.Gateway.GetNamespace()},
+				ReferredObject:  common.ObjRef{Kind: "GatewayClass", Name: gatewayClassName},
+			}}
+			gatewayNode.Errors = append(gatewayNode.Errors, err)
+			klog.V(1).Info(err)
 			continue
 		}
 
 		resourceModel.addGatewayClasses(gatewayClass)
-		resourceModel.connectGatewayWithGatewayClass(gatewayID, gatewayClassID)
+		resourceModel.connectGatewayWithGatewayClass(gatewayID, gwcID)
 	}
 }
 
@@ -194,12 +282,21 @@ func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resource
 			}
 
 			// Gateway doesn't already exist so fetch and add it to the resourceModel.
-			gateways, err := fetchGateways(ctx, d.K8sClients, Filter{Namespace: gatewayRef.Namespace, Name: gatewayRef.Name})
+			gateways, err := d.fetchGateways(ctx, Filter{Namespace: gatewayRef.Namespace, Name: gatewayRef.Name, Labels: labels.Everything()})
 			if err != nil {
-				klog.V(1).ErrorS(err, "Gateway referenced by HTTPRoute not found",
-					"gateway", gatewayRef.String(),
-					"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
-				)
+				if apierrors.IsNotFound(err) {
+					err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+						ReferredObject:  common.ObjRef{Kind: "Gateway", Name: gatewayRef.Name, Namespace: gatewayRef.Namespace},
+					}}
+					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+					klog.V(1).Info(err)
+				} else {
+					klog.V(1).ErrorS(err, "Error while fetching Gateway for HTTPRoute",
+						"gateway", gatewayRef.String(),
+						"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
+					)
+				}
 				continue
 			}
 			resourceModel.addGateways(gateways[0])
@@ -214,28 +311,109 @@ func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resource
 	}
 }
 
+// discoverHTTPRoutesFromGateways will add HTTPRoutes that are attached to any
+// Gateway in the resourceModel.
+func (d Discoverer) discoverHTTPRoutesFromGateways(ctx context.Context, resourceModel *ResourceModel) {
+	httpRoutes, err := d.fetchHTTPRoutes(ctx, Filter{ /* all HTTPRoutes */ Labels: labels.Everything()})
+	if err != nil {
+		klog.V(1).ErrorS(err, "Failed to list all HTTPRoutes")
+	}
+
+	// Loop through all HTTPRoutes and figure out which are linked to a Gateway
+	// that exists in the ResourceModel.
+	for _, httpRoute := range httpRoutes {
+		klog.V(1).InfoS("Evaluating whether HTTPRoute needs to be included in the resourceModel",
+			"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+		)
+		var isHTTPRouteAttachedToValidGateway bool
+
+		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(httpRoute) {
+			// Check if Gateway exists in the resourceModel.
+			gatewayID := GatewayID(gatewayRef.Namespace, gatewayRef.Name)
+			_, ok := resourceModel.Gateways[gatewayID]
+			if !ok {
+				continue
+			}
+
+			// At this point, we know that httpRoute is attached to a Gateway which
+			// exists in the resourceModel.
+			klog.V(1).InfoS("HTTPRoute included in the resource model because it is attached to a relevant Gateway",
+				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+				"gateway", gatewayRef.Namespace+"/"+gatewayRef.Name,
+			)
+			isHTTPRouteAttachedToValidGateway = true
+
+			resourceModel.addHTTPRoutes(httpRoute)
+			resourceModel.connectHTTPRouteWithGateway(HTTPRouteID(httpRoute.GetNamespace(), httpRoute.GetName()), gatewayID)
+		}
+
+		if !isHTTPRouteAttachedToValidGateway {
+			klog.V(1).InfoS("Skipping HTTPRoute since it does not reference any relevant Gateway",
+				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
+			)
+		}
+	}
+}
+
 // discoverHTTPRoutesFromBackends will add HTTPRoutes that reference any Backend
 // present in resourceModel.
 func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resourceModel *ResourceModel) {
-	httpRoutes, err := fetchHTTPRoutes(ctx, d.K8sClients, Filter{ /* all HTTPRoutes */ })
+	httpRoutes, err := d.fetchHTTPRoutes(ctx, Filter{ /* all HTTPRoutes */ Labels: labels.Everything()})
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all HTTPRoutes")
 	}
 
 	for _, httpRoute := range httpRoutes {
-		var found bool
+		// An HTTPRoute will be included in the resourceModel if it references some
+		// Backend which already exists in the resourceModel.
+		var includeRouteInResourceModel bool
+
 		for _, backendRef := range relations.FindBackendRefsForHTTPRoute(httpRoute) {
+			// Check if the referenced backend exists in the resourceModel.
 			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
-			_, ok := resourceModel.Backends[backendID]
+			backendNode, ok := resourceModel.Backends[backendID]
 			if !ok {
 				continue
 			}
-			found = true
+
+			// Ensure that if this is a cross namespace reference, then it is accepted
+			// through some ReferenceGrant.
+			if httpRoute.GetNamespace() != backendRef.Namespace {
+				httpRouteRef := common.ObjRef{
+					Group:     httpRoute.GroupVersionKind().Group,
+					Kind:      httpRoute.GroupVersionKind().Kind,
+					Name:      httpRoute.GetName(),
+					Namespace: httpRoute.GetNamespace(),
+				}
+				var referenceAccepted bool
+				for _, referenceGrantNode := range backendNode.ReferenceGrants {
+					if relations.ReferenceGrantAccepts(*referenceGrantNode.ReferenceGrant, httpRouteRef) {
+						referenceAccepted = true
+						break
+					}
+				}
+				if !referenceAccepted {
+					err := ReferenceNotPermittedError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRoute.GetName(), Namespace: httpRoute.GetNamespace()},
+						ReferredObject:  backendRef,
+					}}
+					backendNode.Errors = append(backendNode.Errors, err)
+					klog.V(1).Info(err)
+					continue
+				}
+			}
+
+			// At this point, we know that:
+			// 	- The HTTPRoute references some backend which exists in the resourceModel.
+			//  - The referenced backend is either in the same namespace as the
+			//    HTTPRoute, or is exposed through a ReferenceGrant.
+			includeRouteInResourceModel = true
 
 			resourceModel.addHTTPRoutes(httpRoute)
 			resourceModel.connectHTTPRouteWithBackend(HTTPRouteID(httpRoute.GetNamespace(), httpRoute.GetName()), backendID)
 		}
-		if !found {
+
+		if !includeRouteInResourceModel {
 			klog.V(1).InfoS("Skipping HTTPRoute since it does not reference any required Backend",
 				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
 			)
@@ -271,94 +449,242 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 	}
 }
 
+func (d Discoverer) discoverReferenceGrantsFromBackends(ctx context.Context, resourceModel *ResourceModel) {
+	referenceGrantsByNamespace := make(map[string][]gatewayv1beta1.ReferenceGrant)
+	for _, backendNode := range resourceModel.Backends {
+		backendNS := backendNode.Backend.GetNamespace()
+
+		referenceGrants, ok := referenceGrantsByNamespace[backendNS]
+		if !ok {
+			var err error
+			referenceGrants, err = d.fetchReferenceGrants(ctx, Filter{Namespace: backendNS, Labels: labels.Everything()})
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "failed to fetch list of ReferenceGrants: %v\n", err)
+				os.Exit(1)
+			}
+		}
+
+		for _, referenceGrant := range referenceGrants {
+			backendRef := common.ObjRef{
+				Group:     backendNode.Backend.GroupVersionKind().Group,
+				Kind:      backendNode.Backend.GroupVersionKind().Kind,
+				Name:      backendNode.Backend.GetName(),
+				Namespace: backendNode.Backend.GetNamespace(),
+			}
+			if relations.ReferenceGrantExposes(referenceGrant, backendRef) {
+				klog.V(1).InfoS("ReferenceGrant exposes Backend",
+					"referenceGrant", referenceGrant.GetNamespace()+"/"+referenceGrant.GetName(),
+					"backendRef", backendRef.Namespace+"/"+backendRef.Name,
+				)
+				resourceModel.addReferenceGrants(referenceGrant)
+				resourceModel.connectReferenceGrantWithBackend(ReferenceGrantID(referenceGrant.GetNamespace(), referenceGrant.GetName()), backendNode.ID())
+			}
+		}
+	}
+}
+
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
-func (d Discoverer) discoverPolicies(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
 }
 
-// fetchGatewayClasses fetches GatewayClasses based on a filter.
-func fetchGatewayClasses(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]gatewayv1.GatewayClass, error) {
-	if filter.Name != "" {
-		// Use Get call.
-		gatewayClass := &gatewayv1.GatewayClass{}
-		nn := apimachinerytypes.NamespacedName{Name: filter.Name}
-		if err := k8sClients.Client.Get(ctx, nn, gatewayClass); err != nil {
-			return []gatewayv1.GatewayClass{}, err
+// discoverEventsForGateways adds Events associated with Gateways that exist in
+// the resourceModel.
+func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel *ResourceModel) {
+	for _, gatewayNode := range resourceModel.Gateways {
+		eventList := &corev1.EventList{}
+		options := &client.ListOptions{
+			FieldSelector: fields.AndSelectors(
+				fields.OneTermEqualSelector("involvedObject.kind", "Gateway"),
+				fields.OneTermEqualSelector("involvedObject.name", gatewayNode.Gateway.Name),
+				fields.OneTermEqualSelector("involvedObject.namespace", gatewayNode.Gateway.Namespace),
+				fields.OneTermEqualSelector("involvedObject.uid", string(gatewayNode.Gateway.UID)),
+			),
+			Limit: maxEventsPerResource,
+		}
+		if err := d.K8sClients.Client.List(ctx, eventList, options); err != nil {
+			klog.V(1).ErrorS(err, "Failed to list events associated with Gateway",
+				"gateway", gatewayNode.Gateway.Namespace+"/"+gatewayNode.Gateway.Name)
+			continue
 		}
 
+		gatewayNode.Events = append(gatewayNode.Events, eventList.Items...)
+	}
+}
+
+// fetchGatewayClasses fetches GatewayClasses based on a filter.
+func (d Discoverer) fetchGatewayClasses(ctx context.Context, filter Filter) ([]gatewayv1.GatewayClass, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    defaultGatewayClassGroupVersion.Group,
+		Version:  defaultGatewayClassGroupVersion.Version,
+		Resource: "gatewayclasses",
+	}
+	if d.PreferredGatewayClassGroupVersion != (metav1.GroupVersion{}) {
+		gvr.Version = d.PreferredGatewayClassGroupVersion.Version
+	}
+
+	if filter.Name != "" {
+		// Use Get call.
+		gatewayClassUnstructured, err := d.K8sClients.DC.Resource(gvr).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
+			return []gatewayv1.GatewayClass{}, err
+		}
+		gatewayClass := &gatewayv1.GatewayClass{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(gatewayClassUnstructured.UnstructuredContent(), gatewayClass); err != nil {
+			return []gatewayv1.GatewayClass{}, fmt.Errorf("failed to convert unstructured GatewayClass to structured: %v", err)
+		}
 		return []gatewayv1.GatewayClass{*gatewayClass}, nil
 	}
 
 	// Use List call.
-	options := &client.ListOptions{
-		Namespace:     filter.Namespace,
-		LabelSelector: filter.Labels,
+	labelSelector := ""
+	if filter.Labels != nil {
+		labelSelector = filter.Labels.String()
 	}
-	gatewayClassList := &gatewayv1.GatewayClassList{}
-	if err := k8sClients.Client.List(ctx, gatewayClassList, options); err != nil {
+	listOptions := metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}
+	gatewayClassListUnstructured, err := d.K8sClients.DC.Resource(gvr).List(ctx, listOptions)
+	if err != nil {
 		return []gatewayv1.GatewayClass{}, err
 	}
-
+	gatewayClassList := &gatewayv1.GatewayClassList{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(gatewayClassListUnstructured.UnstructuredContent(), gatewayClassList); err != nil {
+		return []gatewayv1.GatewayClass{}, fmt.Errorf("failed to convert unstructured GatewayClassList to structured: %v", err)
+	}
 	return gatewayClassList.Items, nil
 }
 
 // fetchGateways fetches Gateways based on a filter.
-func fetchGateways(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]gatewayv1.Gateway, error) {
+func (d Discoverer) fetchGateways(ctx context.Context, filter Filter) ([]gatewayv1.Gateway, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    defaultGatewayGroupVersion.Group,
+		Version:  defaultGatewayGroupVersion.Version,
+		Resource: "gateways",
+	}
+	if d.PreferredGatewayGroupVersion != (metav1.GroupVersion{}) {
+		gvr.Version = d.PreferredGatewayGroupVersion.Version
+	}
+
 	if filter.Name != "" {
 		// Use Get call.
-		gateway := &gatewayv1.Gateway{}
-		nn := apimachinerytypes.NamespacedName{Namespace: filter.Namespace, Name: filter.Name}
-		if err := k8sClients.Client.Get(ctx, nn, gateway); err != nil {
+		gatewayUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
 			return []gatewayv1.Gateway{}, err
 		}
-
+		gateway := &gatewayv1.Gateway{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(gatewayUnstructured.UnstructuredContent(), gateway); err != nil {
+			return []gatewayv1.Gateway{}, fmt.Errorf("failed to convert unstructured Gateway to structured: %v", err)
+		}
 		return []gatewayv1.Gateway{*gateway}, nil
 	}
 
 	// Use List call.
-	options := &client.ListOptions{
-		Namespace:     filter.Namespace,
-		LabelSelector: filter.Labels,
+	labelSelector := ""
+	if filter.Labels != nil {
+		labelSelector = filter.Labels.String()
 	}
-	gatewayList := &gatewayv1.GatewayList{}
-	if err := k8sClients.Client.List(ctx, gatewayList, options); err != nil {
+	listOptions := metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}
+	gatewayListUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	if err != nil {
 		return []gatewayv1.Gateway{}, err
 	}
-
+	gatewayList := &gatewayv1.GatewayList{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(gatewayListUnstructured.UnstructuredContent(), gatewayList); err != nil {
+		return []gatewayv1.Gateway{}, fmt.Errorf("failed to convert unstructured GatewayList to structured: %v", err)
+	}
 	return gatewayList.Items, nil
 }
 
 // fetchHTTPRoutes fetches HTTPRoutes based on a filter.
-func fetchHTTPRoutes(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]gatewayv1.HTTPRoute, error) {
+func (d Discoverer) fetchHTTPRoutes(ctx context.Context, filter Filter) ([]gatewayv1.HTTPRoute, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    defaultHTTPRouteGroupVersion.Group,
+		Version:  defaultHTTPRouteGroupVersion.Version,
+		Resource: "httproutes",
+	}
+	if d.PreferredHTTPRouteGroupVersion != (metav1.GroupVersion{}) {
+		gvr.Version = d.PreferredHTTPRouteGroupVersion.Version
+	}
+
 	if filter.Name != "" {
 		// Use Get call.
-		httpRoute := &gatewayv1.HTTPRoute{}
-		nn := apimachinerytypes.NamespacedName{Namespace: filter.Namespace, Name: filter.Name}
-		if err := k8sClients.Client.Get(ctx, nn, httpRoute); err != nil {
+		httpRouteUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
 			return []gatewayv1.HTTPRoute{}, err
 		}
-
+		httpRoute := &gatewayv1.HTTPRoute{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(httpRouteUnstructured.UnstructuredContent(), httpRoute); err != nil {
+			return []gatewayv1.HTTPRoute{}, fmt.Errorf("failed to convert unstructured HTTPRoute to structured: %v", err)
+		}
 		return []gatewayv1.HTTPRoute{*httpRoute}, nil
 	}
 
 	// Use List call.
-	options := &client.ListOptions{
-		Namespace:     filter.Namespace,
-		LabelSelector: filter.Labels,
+	labelSelector := ""
+	if filter.Labels != nil {
+		labelSelector = filter.Labels.String()
 	}
-	httpRouteList := &gatewayv1.HTTPRouteList{}
-	if err := k8sClients.Client.List(ctx, httpRouteList, options); err != nil {
+	listOptions := metav1.ListOptions{
+		LabelSelector: labelSelector,
+	}
+	httpRouteListUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	if err != nil {
 		return []gatewayv1.HTTPRoute{}, err
 	}
-
+	httpRouteList := &gatewayv1.HTTPRouteList{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(httpRouteListUnstructured.UnstructuredContent(), httpRouteList); err != nil {
+		return []gatewayv1.HTTPRoute{}, fmt.Errorf("failed to convert unstructured HTTPRouteList to structured: %v", err)
+	}
 	return httpRouteList.Items, nil
+}
+
+// fetchHTTPRoutes fetches HTTPRoutes based on a filter.
+func (d Discoverer) fetchReferenceGrants(ctx context.Context, filter Filter) ([]gatewayv1beta1.ReferenceGrant, error) {
+	gvr := schema.GroupVersionResource{
+		Group:    defaultReferenceGrantGroupVersion.Group,
+		Version:  defaultReferenceGrantGroupVersion.Version,
+		Resource: "referencegrants",
+	}
+	if d.PreferredReferenceGrantGroupVersion != (metav1.GroupVersion{}) {
+		gvr.Version = d.PreferredReferenceGrantGroupVersion.Version
+	}
+
+	if filter.Name != "" {
+		// Use Get call.
+		referenceGrantUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		if err != nil {
+			return []gatewayv1beta1.ReferenceGrant{}, err
+		}
+		referenceGrant := &gatewayv1beta1.ReferenceGrant{}
+		if err := runtime.DefaultUnstructuredConverter.FromUnstructured(referenceGrantUnstructured.UnstructuredContent(), referenceGrant); err != nil {
+			return []gatewayv1beta1.ReferenceGrant{}, fmt.Errorf("failed to convert unstructured ReferenceGrant to structured: %v", err)
+		}
+		return []gatewayv1beta1.ReferenceGrant{*referenceGrant}, nil
+	}
+
+	// Use List call.
+	listOptions := metav1.ListOptions{
+		LabelSelector: filter.Labels.String(),
+	}
+	referenceGrantListUnstructured, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	if err != nil {
+		return []gatewayv1beta1.ReferenceGrant{}, err
+	}
+	referenceGrantList := &gatewayv1beta1.ReferenceGrantList{}
+	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(referenceGrantListUnstructured.UnstructuredContent(), referenceGrantList); err != nil {
+		return []gatewayv1beta1.ReferenceGrant{}, fmt.Errorf("failed to convert unstructured ReferenceGrantList to structured: %v", err)
+	}
+	return referenceGrantList.Items, nil
 }
 
 // fetchBackends fetches Backends based on a filter.
 //
 // At the moment, this is exclusively used for Backends of type Service, though
 // it still returns a slice of unstructured.Unstructured for future extensions.
-func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]unstructured.Unstructured, error) {
+func (d Discoverer) fetchBackends(ctx context.Context, filter Filter) ([]unstructured.Unstructured, error) {
 	gvr := schema.GroupVersionResource{
 		Group:    "",
 		Version:  "v1",
@@ -367,7 +693,7 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 
 	if filter.Name != "" {
 		// Use Get call.
-		backend, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
+		backend, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).Get(ctx, filter.Name, metav1.GetOptions{})
 		if err != nil {
 			return []unstructured.Unstructured{}, err
 		}
@@ -376,11 +702,15 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 	}
 
 	// Use List call.
+	labelSelector := ""
+	if filter.Labels != nil {
+		labelSelector = filter.Labels.String()
+	}
 	listOptions := metav1.ListOptions{
-		LabelSelector: filter.Labels.String(),
+		LabelSelector: labelSelector,
 	}
 	var backendsList *unstructured.UnstructuredList
-	backendsList, err := k8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
+	backendsList, err := d.K8sClients.DC.Resource(gvr).Namespace(filter.Namespace).List(ctx, listOptions)
 	if err != nil {
 		return nil, err
 	}
@@ -389,12 +719,12 @@ func fetchBackends(ctx context.Context, k8sClients *common.K8sClients, filter Fi
 }
 
 // fetchNamespace fetches Namespaces based on a filter.
-func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter Filter) ([]corev1.Namespace, error) {
+func (d Discoverer) fetchNamespace(ctx context.Context, filter Filter) ([]corev1.Namespace, error) {
 	if filter.Name != "" {
 		// Use Get call.
 		namespace := &corev1.Namespace{}
 		nn := apimachinerytypes.NamespacedName{Name: filter.Name}
-		err := k8sClients.Client.Get(ctx, nn, namespace)
+		err := d.K8sClients.Client.Get(ctx, nn, namespace)
 		if err != nil {
 			return []corev1.Namespace{}, err
 		}
@@ -407,7 +737,7 @@ func fetchNamespace(ctx context.Context, k8sClients *common.K8sClients, filter F
 		LabelSelector: filter.Labels,
 	}
 	namespacesList := &corev1.NamespaceList{}
-	if err := k8sClients.Client.List(ctx, namespacesList, options); err != nil {
+	if err := d.K8sClients.Client.List(ctx, namespacesList, options); err != nil {
 		return []corev1.Namespace{}, err
 	}
 

@@ -1,15 +1,17 @@
 # GEP-713: Metaresources and Policy Attachment
 
 * Issue: [#713](https://github.com/kubernetes-sigs/gateway-api/issues/713)
-* Status: Experimental
-
-> **Note**: This GEP is exempt from the [Probationary Period][expprob] rules of
-> our GEP overview as it existed before those rules did, and so it has been
-> explicitly grandfathered in.
-
-[expprob]:https://gateway-api.sigs.k8s.io/geps/overview/#probationary-period
+* Status: Memorandum
 
 ## TLDR
+
+!!! danger
+    This GEP is in the process of being updated.
+    Please see the discussion at https://github.com/kubernetes-sigs/gateway-api/discussions/2927
+    and expect further changes, although they will not be as extensive as the
+    more focussed GEP-2648 and GEP-2649.
+    Some options under discussion there may make the distinction between Direct
+    and Inherited Policies moot, which would require a rework.
 
 This GEP aims to standardize terminology and processes around using one Kubernetes
 object to modify the functions of one or more other objects.
@@ -26,16 +28,39 @@ settings across either one object (this is "Direct Policy Attachment"), or objec
 in a hierarchy (this is "Inherited Policy Attachment").
 
 Individual policy APIs:
-- must be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
-- can be included in the Gateway API group and installation or be defined by
+- MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
+- MUST include both `spec` and `status` stanzas
+- MUST have the `status` stanza include a `conditions` section using the standard
+  upstream Condition type
+- MAY be included in the Gateway API group and installation or be defined by
   implementations
-- and must include a common `TargetRef` struct in their specification to identify
+- MUST include a common `TargetRef` struct in their specification to identify
   how and where to apply that policy.
-- _may_ include either a `defaults` section, an `overrides` section, or both. If
-  these are included, the Policy is an Inherited Policy, and should use the
-  inheritance rules defined in this document.
+- MAY affect more objects than the object specified in the `targetRef`. In this
+  case, the Policy is an Inherited Policy. A common way to do this is to include
+  either a `defaults` section, an `overrides` section, or both.
+- Policy objects that affect _only_ the object specified in the `targetRef` are
+  Direct Attached Policies (or more simply, Direct Policies.)
 
-For Inherited Policies, this GEP also describes a set of expected behaviors
+The biggest difference between the two types of Policy is that Direct Attached
+Policies are a strict subset of Policy objects with criteria designed to make
+it _much_ easier to understand the state of the system, and so are simpler to
+use and can use a more simple `status` design.
+
+However, Inherited Policies, because of the nature of the useful feature of having
+settings cascade across multiple objects in a hierarchy, require knowledge of
+more resources, and are consequently harder to understand and require a more
+complex status design.
+
+Splitting these two design patterns apart into separate GEPs is intended to
+allow proceeding with stablizing the simpler (Direct) case while we work on
+solving the status problem for the more complex (Inherited) case.
+
+Direct Attached Policies are further specified in the addendum GEP GEP-2648,
+Direct Policy Attachment.
+
+Inherited Policies are further specified in the addendum GEP-2649, Inherited
+Policy Attachment. GEP-2649 also describes a set of expected behaviors
 for how settings can flow across a defined hierarchy.
 
 
@@ -46,6 +71,8 @@ for how settings can flow across a defined hierarchy.
 * Establish a pattern for Policy attachment, whether Direct or Inherited,
   which must be used for any implementation specific policies used with
   Gateway API resources
+* Discuss the problems with communicating status for Policy objects, and suggest
+  mechanisms that Policy APIs can use to mitigate some of them.
 * Provide a way to distinguish between required and default values for all
   policy API implementations
 * Enable policy attachment at all relevant scopes, including Gateways, Routes,
@@ -58,6 +85,14 @@ for how settings can flow across a defined hierarchy.
 * Provide a consistent specification that will ensure familiarity between both
   included and implementation-specific policies so they can both be interpreted
   the same way.
+
+## Deferred Goals and Discussions
+
+* Should Policy objects be able to target more than one object? At the time of
+  writing, the answer to this is _no_, in the interests of managing complexity
+  in one change. But this rule can and should be discussed and reexamined in
+  light of community feedback that users _really_ want this. Any discussion will
+  need to consider the complexity tradeoffs here.
 
 ## Out of scope
 
@@ -107,398 +142,80 @@ In either case, a Policy may either affect an object by controlling the value
 of one of the existing _fields_ in the `spec` of an object, or it may add
 additional fields that are _not_ in the `spec` of the object.
 
+### Why use Policy Attachment at all?
+
+
+Consistent UX across GW implementations
+
+Support for common tooling such as gwctl that can compute and display effective policies at each layer
+
+Avoid annotation hell
+
+
 ### Direct Policy Attachment
 
-A Direct Policy Attachment is tightly bound to one instance of a particular
-Kind within a single namespace (or to an instance of a single Kind at cluster scope),
-and only modifies the behavior of the object that matches its binding.
+For more description of the details of Direct Policy Attachment,
+see [GEP-2648](https://gateway-api.sigs.k8s.io/geps/gep-2648/).
 
-As an example, one use case that Gateway API currently does not support is how
-to configure details of the TLS required to connect to a backend (in other words,
-if the process running inside the backend workload expects TLS, not that some
-automated infrastructure layer is provisioning TLS as in the Mesh case).
+### Inherited Policy Attachment
 
-A hypothetical TLSConnectionPolicy that targets a Service could be used for this,
-using the functionality of the Service as describing a set of endpoints. (It
-should also be noted this is not the only way to solve this problem, just an
-example to illustrate Direct Policy Attachment.)
+For more description of the details of Inherited Policy Attachment,
+see [GEP-2649](https://gateway-api.sigs.k8s.io/geps/gep-2649/).
 
-The TLSConnectionPolicy would look something like this:
+### How to determine if a Policy is a Direct or Inherited one
 
-```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: TLSConnectionPolicy
-metadata:
-  name: tlsport8443
-  namespace: foo
-spec:
-  targetRef: # This struct is defined as part of Gateway API
-    group: "" # Empty string means core - this is a standard convention
-    kind: Service
-    name: fooService
-  tls:
-    certificateAuthorityRefs:
-      - name: CAcert
-    port: 8443
+The basic rule here is "Does the Policy affect _any_ other object aside from
+the one it targets?" If not, it's Direct. If so, it's Inherited.
 
-```
+The reason for this is that Direct Attached Policies make it _much_ easier to
+understand the state of the system, and so can use a more simple `status` design.
+However, Inherited Policies require knowledge of more resources, and consequently
+a more complex status design.
 
-All this does is tell an implementation, that for connecting to port `8443` on the
-Service `fooService`, it should assume that the connection is TLS, and expect the
-service's certificate to be validated by the chain in the `CAcert` Secret.
+#### Policy type examples
 
-Importantly, this would apply to _every_ usage of that Service across any HTTPRoutes
-in that namespace, which could be useful for a Service that is reused in a lot of
-HTTPRoutes.
+The separate GEPs have more examples of policies of each type, but here are two
+small examples. Please see the separated GEPs for more examples.
 
-With these two examples in mind, here are some guidelines for when to consider
-using Direct Policy Attachment:
+**BackendTLSPolicy** is the canonical example of a Direct Attached Policy because
+it _only_ affects the Service that the Policy attaches to, and affects how that
+Service is consumed. But you can know everything you need to about the Service
+and BackendTLSPolicy just by looking at those two objects.
 
-* The number or scope of objects to be modified is limited or singular. Direct
-  Policy Attachments must target one specific object.
-* The modifications to be made to the objects don’t have any transitive information -
-  that is, the modifications only affect the single object that the targeted
-  metaresource is bound to, and don’t have ramifications that flow beyond that
-  object.
-* In terms of status, it should be reasonably easy for a user to understand that
-  everything is working - basically, as long as the targeted object exists, and
-  the modifications are valid, the metaresource is valid, and this should be
-  straightforward to communicate in one or two Conditions. Note that at the time
-  of writing, this is *not* completed.
-* Direct Policy Attachment _should_ only be used to target objects in the same
-  namespace as the Policy object. Allowing cross-namespace references brings in
-  significant security concerns, and/or difficulties about merging cross-namespace
-  policy objects. Notably, Mesh use cases may need to do something like this for
-  consumer policies, but in general, Policy objects that modify the behavior of
-  things outside their own namespace should be avoided unless it uses a handshake
-  of some sort, where the things outside the namespace can opt–out of the behavior.
-  (Notably, this is the design that we used for ReferenceGrant).
+**Hypothetical max body size Policy**: Kate Osborn
+[raised this on Slack](https://kubernetes.slack.com/archives/CR0H13KGA/p1708723178714389),
+asking if a policy applied to a Gateway configures a data plane setting that
+affects routes counts as an Inherited Policy, giving the example of a max body
+size Policy.
 
-### Inherited Policy Attachment: It's all about the defaults and overrides
+In this sort of case, the object does count as an Inherited Policy because
+it's affecting not just the properties of the Gateway, but properties of the
+Routes attached to it (and you thus need to know about the Policy, the Gateway,
+_and_ the Routes to be able to understand the system).
 
-Because a Inherited Policy is a metaresource, it targets some other resource
-and _augments_ its behavior.
-
-But why have this distinct from other types of metaresource? Because Inherited
-Policy resources are designed to have a way for settings to flow down a hierarchy.
-
-Defaults set the default value for something, and can be overridden by the
-“lower” objects (like a connection timeout default policy on a Gateway being
-overridable inside a HTTPRoute), and Overrides cannot be overridden by “lower”
-objects (like setting a maximum client timeout to some non-infinite value at the
-Gateway level to stop HTTPRoute owners from leaking connections over time).
-
-Here are some guidelines for when to consider using a Inherited Policy object:
-
-* The settings or configuration are bound to one containing object, but affect
-  other objects attached to that one (for example, affecting HTTPRoutes attached
-  to a single Gateway, or all HTTPRoutes in a GatewayClass).
-* The settings need to able to be defaulted, but can be overridden on a per-object
-  basis.
-* The settings must be enforced by one persona, and not modifiable or removable
-  by a lesser-privileged persona. (The owner of a GatewayClass may want to restrict
-  something about all Gateways in a GatewayClass, regardless of who owns the Gateway,
-  or a Gateway owner may want to enforce some setting across all attached HTTPRoutes).
-* In terms of status, a good accounting for how to record that the Policy is
-  attached is easy, but recording what resources the Policy is being applied to
-  is not, and needs to be carefully designed to avoid fanout apiserver load.
-  (This is not built at all in the current design either).
-
-When multiple Inherited Policies are used, they can interact in various ways,
-which are governed by the following rules, which will be expanded on later in this document.
-
-* If a Policy does not affect an object's fields directly, then the resultant
-  Policy should be the set of all distinct fields inside the relevant Policy objects,
-  as set out by the rules below.
-* For Policies that affect an object's existing fields, multiple instances of the
-  same Policy Kind affecting an object's fields will be evaluated as
-  though only a single Policy "wins" the right to affect each field. This operation
-  is performed on a _per-distinct-field_ basis.
-* Settings in `overrides` stanzas will win over the same setting in a `defaults`
-  stanza.
-* `overrides` settings operate in a "less specific beats more specific" fashion -
-  Policies attached _higher_ up the hierarchy will beat the same type of Policy
-  attached further down the hierarchy.
-* `defaults` settings operate in a "more specific beats less specific" fashion -
-  Policies attached _lower down_ the hierarchy will beat the same type of Policy
-  attached further _up_ the hierarchy.
-* For `defaults`, the _most specific_ value is the one _inside the object_ that
-  the Policy applies to; that is, if a Policy specifies a `default`, and an object
-  specifies a value, the _object's_ value will win.
-* Policies interact with the fields they are controlling in a "replace value"
-  fashion.
-  * For fields where the `value` is a scalar, (like a string or a number)
-    should have their value _replaced_ by the value in the Policy if it wins.
-    Notably, this means that a `default` will only ever replace an empty or unset
-    value in an object.
-  * For fields where the value is an object, the Policy should include the fields
-    in the object in its definition, so that the replacement can be on simple fields
-    rather than complex ones.
-  * For fields where the final value is non-scalar, but is not an _object_ with
-    fields of its own, the value should be entirely replaced, _not_ merged. This
-    means that lists of strings or lists of ints specified in a Policy will overwrite
-    the empty list (in the case of a `default`) or any specified list (in the case
-    of an `override`). The same applies to `map[string]string` fields. An example
-    here would be a field that stores a map of annotations - specifying a Policy
-    that overrides annotations will mean that a final object specifying those
-    annotations will have its value _entirely replaced_ by an `override` setting.
-* In the case that two Policies of the same type specify different fields, then
-  _all_ of the specified fields should take effect on the affected object.
-
-Examples to further illustrate these rules are given below.
 
 ## Naming Policy objects
 
-The preceding rules discuss how Policy objects should _behave_, but this section
-describes how Policy objects should be _named_.
+Although Direct and Inherited Policies behave differently in many respects, in
+general they should be named using similar rules.
 
-Policy objects should be clearly named so as to indicate that they are Policy
+Policy objects MUST be clearly named so as to indicate that they are Policy
 metaresources.
 
 The simplest way to do that is to ensure that the type's name contains the `Policy`
 string.
 
-Implementations _should_ use `Policy` as the last part of the names of object types
+Implementations SHOULD use `Policy` as the last part of the names of object types
 that use this pattern.
 
-If an implementation does not, then they _must_ clearly document what objects
+If an implementation does not, then they MUST clearly document what objects
 are Policy metaresources in their documentation. Again, this is _not recommended_
 without a _very_ good reason.
 
-## Policy Attachment examples and behavior
-
-This approach is building on concepts from all of the alternatives discussed
-below. This is very similar to the (now removed) BackendPolicy resource in the API,
-but also borrows some concepts from the [ServicePolicy
-proposal](https://github.com/kubernetes-sigs/gateway-api/issues/611).
-
-### Policy Attachment for Ingress
-Attaching a Directly Attached Policy to Gateway resources for ingress use cases
-is relatively straightforward. A policy can reference the resource it wants to
-apply to.
-
-Access is granted with RBAC - anyone that has access to create a RetryPolicy in
-a given namespace can attach it to any resource within that namespace.
-
-![Simple Ingress Example](images/713-ingress-simple.png)
-
-An Inherited Policy can attach to a parent resource, and then each policy
-applies to the referenced resource and everything below it in terms of hierarchy.
-Although this example is likely more complex than many real world
-use cases, it helps demonstrate how policy attachment can work across
-namespaces.
-
-![Complex Ingress Example](images/713-ingress-complex.png)
-
-### Policy Attachment for Mesh
-Although there is a great deal of overlap between ingress and mesh use cases,
-mesh enables more complex policy attachment scenarios. For example, you may want
-to apply policy to requests from a specific namespace to a backend in another
-namespace.
-
-![Simple Mesh Example](images/713-mesh-simple.png)
-
-Policy attachment can be quite simple with mesh. Policy can be applied to any
-resource in any namespace but it can only apply to requests from the same
-namespace if the target is in a different namespace.
-
-At the other extreme, policy can be used to apply to requests from a specific
-workload to a backend in another namespace. A route can be used to intercept
-these requests and split them between different backends (foo-a and foo-b in
-this case).
-
-![Complex Mesh Example](images/713-mesh-complex.png)
-
-### Policy TargetRef API
-
-Each Policy resource MUST include a single `targetRef` field. It must not
-target more than one resource at a time, but it can be used to target larger
-resources such as Gateways or Namespaces that may apply to multiple child
-resources.
-
-As with most APIs, there are countless ways we could choose to expand this in
-the future. This includes supporting multiple targetRefs and/or label selectors.
-Although this would enable compelling functionality, it would increase the
-complexity of an already complex API and potentially result in more conflicts
-between policies. Although we may choose to expand the targeting capabilities
-in the future, at this point it is strongly preferred to start with a simpler
-pattern that still leaves room for future expansion.
-
-The `targetRef` field MUST have the following structure:
-
-```go
-// PolicyTargetReference identifies an API object to apply policy to.
-type PolicyTargetReference struct {
-    // Group is the group of the target resource.
-    //
-    // +kubebuilder:validation:MinLength=1
-    // +kubebuilder:validation:MaxLength=253
-    Group string `json:"group"`
-
-    // Kind is kind of the target resource.
-    //
-    // +kubebuilder:validation:MinLength=1
-    // +kubebuilder:validation:MaxLength=253
-    Kind string `json:"kind"`
-
-    // Name is the name of the target resource.
-    //
-    // +kubebuilder:validation:MinLength=1
-    // +kubebuilder:validation:MaxLength=253
-    Name string `json:"name"`
-
-    // Namespace is the namespace of the referent. When unspecified, the local
-    // namespace is inferred. Even when policy targets a resource in a different
-    // namespace, it may only apply to traffic originating from the same
-    // namespace as the policy.
-    //
-    // +kubebuilder:validation:MinLength=1
-    // +kubebuilder:validation:MaxLength=253
-    // +optional
-    Namespace string `json:"namespace,omitempty"`
-}
-```
-
-### Sample Policy API
-The following structure can be used as a starting point for any Policy resource
-using this API pattern. Note that the PolicyTargetReference struct defined above
-will be distributed as part of the Gateway API.
-
-```go
-// ACMEServicePolicy provides a way to apply Service policy configuration with
-// the ACME implementation of the Gateway API.
-type ACMEServicePolicy struct {
-    metav1.TypeMeta   `json:",inline"`
-    metav1.ObjectMeta `json:"metadata,omitempty"`
-
-    // Spec defines the desired state of ACMEServicePolicy.
-    Spec ACMEServicePolicySpec `json:"spec"`
-
-    // Status defines the current state of ACMEServicePolicy.
-    Status ACMEServicePolicyStatus `json:"status,omitempty"`
-}
-
-// ACMEServicePolicySpec defines the desired state of ACMEServicePolicy.
-type ACMEServicePolicySpec struct {
-    // TargetRef identifies an API object to apply policy to.
-    TargetRef gatewayv1a2.PolicyTargetReference `json:"targetRef"`
-
-    // Override defines policy configuration that should override policy
-    // configuration attached below the targeted resource in the hierarchy.
-    // +optional
-    Override *ACMEPolicyConfig `json:"override,omitempty"`
-
-    // Default defines default policy configuration for the targeted resource.
-    // +optional
-    Default *ACMEPolicyConfig `json:"default,omitempty"`
-}
-
-// ACMEPolicyConfig contains ACME policy configuration.
-type ACMEPolicyConfig struct {
-    // Add configurable policy here
-}
-
-// ACMEServicePolicyStatus defines the observed state of ACMEServicePolicy.
-type ACMEServicePolicyStatus struct {
-    // Conditions describe the current conditions of the ACMEServicePolicy.
-    //
-    // +optional
-    // +listType=map
-    // +listMapKey=type
-    // +kubebuilder:validation:MaxItems=8
-    Conditions []metav1.Condition `json:"conditions,omitempty"`
-}
-```
-
-### Hierarchy
-Each policy MAY include default or override values. Default values are given
-precedence from the bottom up, while override values are top down. That means
-that a default attached to a Backend will have the highest precedence among
-default values while an override value attached to a GatewayClass will have the
-highest precedence overall.
-
-![Ingress and Sidecar Hierarchy](images/713-hierarchy.png)
-
-To illustrate this, consider 3 resources with the following hierarchy:
-A > B > C. When attaching the concept of defaults and overrides to that, the
-hierarchy would be expanded to this:
-
-A override > B override > C override > C default > B default > A default.
-
-Note that the hierarchy is reversed for defaults. The rationale here is that
-overrides usually need to be enforced top down while defaults should apply to
-the lowest resource first. For example, if an admin needs to attach required
-policy, they can attach it as an override to a Gateway. That would have
-precedence over Routes and Services below it. On the other hand, an app owner
-may want to set a default timeout for their Service. That would have precedence
-over defaults attached at higher levels such as Route or Gateway.
-
-If using defaults _and_ overrides, each policy resource MUST include 2 structs
-within the spec. One with override values and the other with default values.
-
-In the following example, the policy attached to the Gateway requires cdn to
-be enabled and provides some default configuration for that. The policy attached
-to the Route changes the value for one of those fields (includeQueryString).
-
-```yaml
-kind: CDNCachingPolicy # Example of implementation specific policy name
-spec:
-  override:
-    cdn:
-      enabled: true
-  default:
-    cdn:
-      cachePolicy:
-        includeHost: true
-        includeProtocol: true
-        includeQueryString: true
-  targetRef:
-    kind: Gateway
-    name: example
----
-kind: CDNCachingPolicy
-spec:
-  default:
-    cdn:
-      cachePolicy:
-        includeQueryString: false
-  targetRef:
-    kind: HTTPRoute
-    name: example
-```
-
-In this final example, we can see how the override attached to the Gateway has
-precedence over the default drainTimeout value attached to the Route. At the
-same time, we can see that the default connectionTimeout attached to the Route
-has precedence over the default attached to the Gateway.
-
-Also note how the different resources interact - fields that are not common across
-objects _may_ both end up affecting the final object.
-
-![Inherited Policy Example](images/713-policy-hierarchy.png)
-
-#### Supported Resources
-It is important to note that not every implementation will be able to support
-policy attachment to each resource described in the hierarchy above. When that
-is the case, implementations MUST clearly document which resources a policy may
-be attached to.
-
-#### Attaching Policy to GatewayClass
-GatewayClass may be the trickiest resource to attach policy to. Policy
-attachment relies on the policy being defined within the same scope as the
-target. This ensures that only users with write access to a policy resource in a
-given scope will be able to modify policy at that level. Since GatewayClass is a
-cluster scoped resource, this means that any policy attached to it must also be
-cluster scoped.
-
-GatewayClass parameters provide an alternative to policy attachment that may be
-easier for some implementations to support. These parameters can similarly be
-used to set defaults and requirements for an entire GatewayClass.
-
-### Targeting External Services
+### Targeting Virtual Types
 In some cases (likely limited to mesh) we may want to apply policies to requests
-to external services. To accomplish this, implementations can choose to support
-a reference to a virtual resource type:
+to external services. To accomplish this, implementations MAY choose to support
+a reference to a virtual resource type. For example:
 
 ```yaml
 apiVersion: networking.acme.io/v1alpha1
@@ -514,45 +231,6 @@ spec:
     name: foo.com
 ```
 
-### Merging into existing `spec` fields
-
-It's possible (even likely) that configuration in a Policy may need to be merged
-into an existing object's fields somehow, particularly for Inherited policies.
-
-When merging into an existing fields inside an object, Policy objects should
-merge values at a scalar level, not at a struct or object level.
-
-For example, in the `CDNCachingPolicy` example above, the `cdn` struct contains
-a `cachePolicy` struct that contains fields. If an implementation was merging
-this configuration into an existing object that contained the same fields, it
-should merge the fields at a scalar level, with the `includeHost`,
-`includeProtocol`, and `includeQueryString` values being defaulted if they were
-not specified in the object being controlled. Similarly, for `overrides`, the
-values of the innermost scalar fields should overwrite the scalar fields in the
-affected object.
-
-Implementations should not copy any structs from the Policy object directly into the
-affected object, any fields that _are_ overridden should be overridden on a per-field
-basis.
-
-In the case that the field in the Policy affects a struct that is a member of a list,
-each existing item in the list in the affected object should have each of its
-fields compared to the corresponding fields in the Policy.
-
-For non-scalar field _values_, like a list of strings, or a `map[string]string`
-value, the _entire value_ must be overwritten by the value from the Policy. No
-merging should take place. This mainly applies to `overrides`, since for
-`defaults`, there should be no value present in a field on the final object.
-
-This table shows how this works for various types:
-
-|Type|Object config|Override Policy config|Result|
-|----|-------------|----------------------|------|
-|string| `key: "foo"` | `key: "bar"`  | `key: "bar"` |
-|list| `key: ["a","b"]` | `key: ["c","d"]` | `key: ["c","d"]` |
-|`map[string]string`| `key: {"foo": "a", "bar": "b"}` | `key: {"foo": "c", "bar": "d"}` | `key: {"foo": "c", "bar": "d"}` |
-
-
 ### Conflict Resolution
 It is possible for multiple policies to target the same object _and_ the same
 fields inside that object. If multiple policy resources target
@@ -567,9 +245,9 @@ ties:
   only come up in exceptional circumstances.
 * Inside Inherited Policies, the same setting in `overrides` beats the one in
   `defaults`.
-* The oldest Policy based on creation timestamp. For example, a Policy with a
-  creation timestamp of "2021-07-15 01:02:03" is given precedence over a Policy
-  with a creation timestamp of "2021-07-15 01:02:04".
+* The oldest Policy based on creation timestamp beats a newer one. For example,
+  a Policy with a creation timestamp of "2021-07-15 01:02:03" MUST be given
+  precedence over a Policy with a creation timestamp of "2021-07-15 01:02:04".
 * The Policy appearing first in alphabetical order by `{namespace}/{name}`. For
   example, foo/bar is given precedence over foo/baz.
 
@@ -913,6 +591,8 @@ here.
 
 Status: Experimental
 
+Included in the Direct Policy Attachment GEP.
+
 Policy objects SHOULD use the upstream `PolicyAncestorStatus` struct in their respective
 Status structs. Please see the included `PolicyAncestorStatus` struct, and its use in
 the `BackendTLSPolicy` object for detailed examples. Included here is a representative
@@ -1043,7 +723,12 @@ Support: Provisional
 
 This solution is IN PROGRESS and so is not binding yet.
 
+However, a version of this proposal is now included in the Direct Policy
+Attachment GEP.
+
 This solution requires definition in a GEP of its own to become binding.
+[GEP-2923](https://github.com/kubernetes-sigs/gateway-api/issues/2923) has been
+opened to cover some aspects of this work.
 
 **The description included here is intended to illustrate the sort of solution
 that an eventual GEP will need to provide, _not to be a binding design.**
@@ -1051,12 +736,12 @@ that an eventual GEP will need to provide, _not to be a binding design.**
 Implementations that use Policy objects MUST put a Condition into `status.Conditions`
 of any objects affected by a Policy.
 
-That Condition must have a `type` ending in `PolicyAffected` (like
+That Condition MUST have a `type` ending in `PolicyAffected` (like
 `gateway.networking.k8s.io/PolicyAffected`),
 and have the optional `observedGeneration` field kept up to date when the `spec`
 of the Policy-attached object changes.
 
-Implementations _should_ use their own unique domain prefix for this Condition
+Implementations SHOULD use their own unique domain prefix for this Condition
 `type` - it is recommended that implementations use the same domain as in the
 `controllerName` field on GatewayClass (or some other implementation-unique
 domain for implementations that do not use GatewayClass).)
@@ -1139,7 +824,7 @@ implementation to when a Policy starts or stops being relevant for an object,
 rather than if that Policy's settings are updated.
 
 It helps a lot with discoverability, but comes at the cost of a reasonably high
-fanout cost. Implementations using this solution should ensure that status updates
+fanout cost. Implementations using this solution SHOULD ensure that status updates
 are deduplicated and only sent to the apiserver when absolutely necessary.
 
 Ideally, these status updates SHOULD be in a separate, lower-priority queue than
@@ -1256,7 +941,9 @@ to the CRD.
 
 ### Conditions
 
-Implementations using Policy objects MUST include a `spec` and `status` stanza, and the `status` stanza MUST contain a `conditions` stanza, using the standard Condition format.
+Implementations using Policy objects MUST include a `spec` and `status` stanza,
+and the `status` stanza MUST contain a `conditions` stanza, using the standard
+Condition format.
 
 Policy authors should consider namespacing the `conditions` stanza with a
 `controllerName`, as in Route status, if more than one implementation will be
@@ -1364,363 +1051,6 @@ controller implementation:
    doing this in the absence of a solution to the status problem is likely to
    be *very* difficult to troubleshoot.
 
-### Conformance Level
-This policy attachment pattern is associated with an "EXTENDED" conformance
-level. The implementations that support this policy attachment model will have
-the same behavior and semantics, although they may not be able to support
-attachment of all types of policy at all potential attachment points.
-
-### Apply Policies to Sections of a Resource
-Policies can target specific matches within nested objects. For instance, rather than
-applying a policy to the entire Gateway, we may want to attach it to a particular Gateway listener.
-
-To achieve this, an optional `sectionName` field can be set in the `targetRef` of a policy
-to refer to a specific listener within the target Gateway.
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
-kind: Gateway
-metadata:
-  name: foo-gateway
-spec:
-  gatewayClassName: foo-lb
-  listeners:
-  - name: bar
-    ...
----
-apiVersion: networking.acme.io/v1alpha2
-kind: AuthenticationPolicy
-metadata:
-  name: foo
-spec:
-  provider:
-    issuer: "https://oidc.example.com"
-  targetRef:
-    name: foo-gateway
-    group: gateway.networking.k8s.io
-    kind: Gateway
-    sectionName: bar
-```
-
-The `sectionName` field can also be used to target a specific section of other resources:
-
-* Service.Ports.Name
-* xRoute.Rules.Name
-
-For example, the RetryPolicy below applies to a RouteRule inside an HTTPRoute.
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
-kind: HTTPRoute
-metadata:
-  name: http-app-1
-  labels:
-    app: foo
-spec:
-  hostnames:
-  - "foo.com"
-  rules:
-  - name: bar
-    matches:
-    - path:
-        type: Prefix
-        value: /bar
-    backendRefs:
-    - name: my-service1
-      port: 8080
----
-apiVersion: networking.acme.io/v1alpha2
-kind: RetryPolicy
-metadata:
-  name: foo
-spec:
-  maxRetries: 5
-  targetRef:
-    name: http-app-1
-    group: gateway.networking.k8s.io
-    kind: HTTPRoute
-    sectionName: bar
-```
-
-This would require adding a `name` field to those sub-resources that currently lack a name. For example,
-a `name` field could be added to the `RouteRule` object:
-```go
-type RouteRule struct {
-    // Name is the name of the Route rule. If more than one Route Rule is
-    // present, each Rule MUST specify a name. The names of Rules MUST be unique
-    // within a Route.
-    //
-    // Support: Core
-    //
-    // +kubebuilder:validation:MinLength=1
-    // +kubebuilder:validation:MaxLength=253
-    // +optional
-    Name string `json:"name,omitempty"`
-    // ...
-}
-```
-
-If a `sectionName` is specified, but does not exist on the targeted object, the Policy must fail to attach,
-and the policy implementation should record a `resolvedRefs` or similar Condition in the Policy's status.
-
-When multiple Policies of the same type target the same object, one with a `sectionName` and one without, the more specific policy (i.e., the one with a `sectionName`) will have its entire `spec` applied to the named section. The less specific policy will also have its `spec` applied to the target but MUST not affect the named section. The less specific policy will have its `spec` applied to all other sections of the target that are not targeted by any other more specific policies. 
-
-Note that the `sectionName` is currently intended to be used only for Direct Policy Attachment when references to
-SectionName are actually needed. Inherited Policies are always applied to the entire object. 
-The `PolicyTargetReferenceWithSectionName` API can be used to apply a direct Policy to a section of an object.
-
-### Advantages
-* Incredibly flexible approach that should work well for both ingress and mesh
-* Conceptually similar to existing ServicePolicy proposal and BackendPolicy
-  pattern
-* Easy to attach policy to resources we don’t control (Service, ServiceImport,
-  etc)
-* Minimal API changes required
-* Simplifies packaging an application for deployment as policy references do not
-  need to be part of the templating
-
-### Disadvantages
-* May be difficult to understand which policies apply to a request
-
-## Examples
-
-This section provides some examples of various types of Policy objects, and how
-merging, `defaults`, `overrides`, and other interactions work.
-
-### Direct Policy Attachment
-
-The following Policy sets the minimum TLS version required on a Gateway Listener:
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: TLSMinimumVersionPolicy
-metadata:
-  name: minimum12
-  namespace: appns
-spec:
-  minimumTLSVersion: 1.2
-  targetRef:
-    name: internet
-    group: gateway.networking.k8s.io
-    kind: Gateway
-```
-
-Note that because there is no version controlling the minimum TLS version in the
-Gateway `spec`, this is an example of a non-field Policy.
-
-### Inherited Policy Attachment
-
-It also could be useful to be able to _default_ the `minimumTLSVersion` setting
-across multiple Gateways.
-
-This version of the above Policy allows this:
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: TLSMinimumVersionPolicy
-metadata:
-  name: minimum12
-  namespace: appns
-spec:
-  defaults:
-    minimumTLSVersion: 1.2
-  targetRef:
-    name: appns
-    group: ""
-    kind: namespace
-```
-
-This Inherited Policy is using the implicit hierarchy that all resources belong
-to a namespace, so attaching a Policy to a namespace means affecting all possible
-resources in a namespace. Multiple hierarchies are possible, even within Gateway
-API, for example Gateway -> Route, Gateway -> Route -> Backend, Gateway -> Route
--> Service. GAMMA Policies could conceivably use a hierarchy of Service -> Route
-as well.
-
-Note that this will not be very discoverable for Gateway owners in the absence of
-a solution to the Policy status problem. This is being worked on and this GEP will
-be updated once we have a design.
-
-Conceivably, a security or admin team may want to _force_ Gateways to have at least
-a minimum TLS version of `1.2` - that would be a job for `overrides`, like so:
-
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: TLSMinimumVersionPolicy
-metadata:
-  name: minimum12
-  namespace: appns
-spec:
-  overrides:
-    minimumTLSVersion: 1.2
-  targetRef:
-    name: appns
-    group: ""
-    kind: namespace
-```
-
-This will make it so that _all Gateways_ in the `default` namespace _must_ use
-a minimum TLS version of `1.2`, and this _cannot_ be changed by Gateway owners.
-Only the Policy owner can change this Policy.
-
-### Handling non-scalar values
-
-In this example, we will assume that at some future point, HTTPRoute has grown
-fields to configure retries, including a field called `retryOn` that reflects
-the HTTP status codes that should be retried. The _value_ of this field is a
-list of strings, being the HTTP codes that must be retried. The `retryOn` field
-has no defaults in the field definitions (which is probably a bad design, but we
-need to show this interaction somehow!)
-
-We also assume that a Inherited `RetryOnPolicy` exists that allows both
-defaulting and overriding of the `retryOn` field.
-
-A full `RetryOnPolicy` to default the field to the codes `501`, `502`, and `503`
-would look like this:
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: RetryOnPolicy
-metadata:
-  name: retryon5xx
-  namespace: appns
-spec:
-  defaults:
-    retryOn:
-      - "501"
-      - "502"
-      - "503"
-  targetRef:
-    kind: Gateway
-    group: gateway.networking.k8s.io
-    name: we-love-retries
-```
-
-This means that, for HTTPRoutes that do _NOT_ explicitly set this field to something
-else, (in other words, they contain an empty list), then the field will be set to
-a list containing `501`, `502`, and `503`. (Notably, because of Go zero values, this
-would also occur if the user explicitly set the value to the empty list.)
-
-However, if a HTTPRoute owner sets any value other than the empty list, then that
-value will remain, and the Policy will have _no effect_. These values are _not_
-merged.
-
-If the Policy used `overrides` instead:
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: RetryOnPolicy
-metadata:
-  name: retryon5xx
-  namespace: appns
-spec:
-  overrides:
-    retryOn:
-      - "501"
-      - "502"
-      - "503"
-  targetRef:
-    kind: Gateway
-    group: gateway.networking.k8s.io
-    name: you-must-retry
-```
-
-Then no matter what the value is in the HTTPRoute, it will be set to `501`, `502`,
-`503` by the Policy override.
-
-### Interactions between defaults, overrides, and field values
-
-All HTTPRoutes that attach to the `YouMustRetry` Gateway will have any value
-_overwritten_ by this policy. The empty list, or any number of values, will all
-be replaced with `501`, `502`, and `503`.
-
-Now, let's also assume that we use the Namespace -> Gateway hierarchy on top of
-the Gateway -> HTTPRoute hierarchy, and allow attaching a `RetryOnPolicy` to a
-_namespace_. The expectation here is that this will affect all Gateways in a namespace
-and all HTTPRoutes that attach to those Gateways. (Note that the HTTPRoutes
-themselves may not necessarily be in the same namespace though.)
-
-If we apply the default policy from earlier to the namespace:
-```yaml
-apiVersion: networking.example.io/v1alpha1
-kind: RetryOnPolicy
-metadata:
-  name: retryon5xx
-  namespace: appns
-spec:
-  defaults:
-    retryOn:
-      - "501"
-      - "502"
-      - "503"
-  targetRef:
-    kind: Namespace
-    group: ""
-    name: appns
-```
-
-Then this will have the same effect as applying that Policy to every Gateway in
-the `default` namespace - namely that every HTTPRoute that attaches to every
-Gateway will have its `retryOn` field set to `501`, `502`, `503`, _if_ there is no
-other setting in the HTTPRoute itself.
-
-With two layers in the hierarchy, we have a more complicated set of interactions
-possible.
-
-Let's look at some tables for a particular HTTPRoute, assuming that it does _not_
-configure the `retryOn` field, for various types of Policy at different levels.
-
-#### Overrides interacting with defaults for RetryOnPolicy, empty list in HTTPRoute
-
-||None|Namespace override|Gateway override|HTTPRoute override|
-|----|-----|-----|----|----|
-|No default|Empty list|Namespace override| Gateway override Policy| HTTPRoute override|
-|Namespace default| Namespace default| Namespace override | Gateway override | HTTPRoute override |
-|Gateway default| Gateway default | Namespace override | Gateway override | HTTPRoute override |
-|HTTPRoute default| HTTPRoute default | Namespace override | Gateway override | HTTPRoute override|
-
-#### Overrides interacting with other overrides for RetryOnPolicy, empty list in HTTPRoute
-||No override|Namespace override A|Gateway override A|HTTPRoute override A|
-|----|-----|-----|----|----|
-|No override|Empty list|Namespace override| Gateway override| HTTPRoute override|
-|Namespace override B| Namespace override B| Namespace override<br />first created wins<br />otherwise first alphabetically | Namespace override B | Namespace override B|
-|Gateway override B| Gateway override B | Namespace override A| Gateway override<br />first created wins<br />otherwise first alphabetically | Gateway override B|
-|HTTPRoute override B| HTTPRoute override B | Namespace override A| Gateway override A| HTTPRoute override<br />first created wins<br />otherwise first alphabetically|
-
-#### Defaults interacting with other defaults for RetryOnPolicy, empty list in HTTPRoute
-||No default|Namespace default A|Gateway default A|HTTPRoute default A|
-|----|-----|-----|----|----|
-|No default|Empty list|Namespace default| Gateway default| HTTPRoute default A|
-|Namespace default B| Namespace default B| Namespace default<br />first created wins<br />otherwise first alphabetically | Gateway default A | HTTPRoute default A|
-|Gateway default B| Gateway default B| Gateway default B| Gateway default<br />first created wins<br />otherwise first alphabetically | HTTPRoute default A|
-|HTTPRoute default B| HTTPRoute default B| HTTPRoute default B| HTTPRoute default B| HTTPRoute default<br />first created wins<br />otherwise first alphabetically|
-
-
-Now, if the HTTPRoute _does_ specify a RetryPolicy,
-it's a bit easier, because we can basically disregard all defaults:
-
-#### Overrides interacting with defaults for RetryOnPolicy, value in HTTPRoute
-
-||None|Namespace override|Gateway override|HTTPRoute override|
-|----|-----|-----|----|----|
-|No default| Value in HTTPRoute|Namespace override| Gateway override | HTTPRoute override|
-|Namespace default|  Value in HTTPRoute| Namespace override | Gateway override | HTTPRoute override |
-|Gateway default|  Value in HTTPRoute | Namespace override | Gateway override | HTTPRoute override |
-|HTTPRoute default| Value in HTTPRoute | Namespace override | Gateway override | HTTPRoute override|
-
-#### Overrides interacting with other overrides for RetryOnPolicy, value in HTTPRoute
-||No override|Namespace override A|Gateway override A|HTTPRoute override A|
-|----|-----|-----|----|----|
-|No override|Value in HTTPRoute|Namespace override A| Gateway override A| HTTPRoute override A|
-|Namespace override B| Namespace override B| Namespace override<br />first created wins<br />otherwise first alphabetically | Namespace override B| Namespace override B|
-|Gateway override B| Gateway override B| Namespace override A| Gateway override<br />first created wins<br />otherwise first alphabetically | Gateway override B|
-|HTTPRoute override B| HTTPRoute override B | Namespace override A| Gateway override A| HTTPRoute override<br />first created wins<br />otherwise first alphabetically|
-
-#### Defaults interacting with other defaults for RetryOnPolicy, value in HTTPRoute
-||No default|Namespace default A|Gateway default A|HTTPRoute default A|
-|----|-----|-----|----|----|
-|No default|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|
-|Namespace default B|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|
-|Gateway default B|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|
-|HTTPRoute default B|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|Value in HTTPRoute|
-
-
 ## Removing BackendPolicy
 BackendPolicy represented the initial attempt to cover policy attachment for
 Gateway API. Although this proposal ended up with a similar structure to
@@ -1728,7 +1058,7 @@ BackendPolicy, it is not clear that we ever found sufficient value or use cases
 for BackendPolicy. Given that this proposal provides more powerful ways to
 attach policy, BackendPolicy was removed.
 
-## Alternatives
+## Alternatives considered
 
 ### 1. ServiceBinding for attaching Policies and Routes for Mesh
 A new ServiceBinding resource has been proposed for mesh use cases. This would

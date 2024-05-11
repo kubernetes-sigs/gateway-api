@@ -1,11 +1,11 @@
 
 # Gateway API for Service Mesh
 
-??? example "Experimental in v0.8.0+"
+??? success "Standard Channel since v1.2.0"
 
-    Gateway API support for service mesh use cases is _experimental_ in `v0.8.0+`.
-    It is possible that it will change; we do not recommend it in production
-    at this point.
+    The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
+    has been part of the Standard Channel since v1.2.0 and are considered stable APIs. For more
+    information refer to our [versioning guide](/concepts/versioning).
 
 The "[GAMMA initiative](/mesh/gamma)" refers to the group that is defining how
 Gateway API can be used for Service Mesh. To date, this group has been able to

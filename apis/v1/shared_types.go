@@ -743,3 +743,115 @@ const (
 	// Support: Implementation-specific
 	NamedAddressType AddressType = "NamedAddress"
 )
+
+// SessionPersistence defines the desired state of SessionPersistence.
+// +kubebuilder:validation:XValidation:message="AbsoluteTimeout must be specified when cookie lifetimeType is Permanent",rule="!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType != 'Permanent' || has(self.absoluteTimeout)"
+type SessionPersistence struct {
+	// SessionName defines the name of the persistent session token
+	// which may be reflected in the cookie or the header. Users
+	// should avoid reusing session names to prevent unintended
+	// consequences, such as rejection or unpredictable behavior.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +kubebuilder:validation:MaxLength=128
+	SessionName *string `json:"sessionName,omitempty"`
+
+	// AbsoluteTimeout defines the absolute timeout of the persistent
+	// session. Once the AbsoluteTimeout duration has elapsed, the
+	// session becomes invalid.
+	//
+	// Support: Extended
+	//
+	// +optional
+	AbsoluteTimeout *Duration `json:"absoluteTimeout,omitempty"`
+
+	// IdleTimeout defines the idle timeout of the persistent session.
+	// Once the session has been idle for more than the specified
+	// IdleTimeout duration, the session becomes invalid.
+	//
+	// Support: Extended
+	//
+	// +optional
+	IdleTimeout *Duration `json:"idleTimeout,omitempty"`
+
+	// Type defines the type of session persistence such as through
+	// the use a header or cookie. Defaults to cookie based session
+	// persistence.
+	//
+	// Support: Core for "Cookie" type
+	//
+	// Support: Extended for "Header" type
+	//
+	// +optional
+	// +kubebuilder:default=Cookie
+	Type *SessionPersistenceType `json:"type,omitempty"`
+
+	// CookieConfig provides configuration settings that are specific
+	// to cookie-based session persistence.
+	//
+	// Support: Core
+	//
+	// +optional
+	CookieConfig *CookieConfig `json:"cookieConfig,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Cookie;Header
+type SessionPersistenceType string
+
+const (
+	// CookieBasedSessionPersistence specifies cookie-based session
+	// persistence.
+	//
+	// Support: Core
+	CookieBasedSessionPersistence SessionPersistenceType = "Cookie"
+
+	// HeaderBasedSessionPersistence specifies header-based session
+	// persistence.
+	//
+	// Support: Extended
+	HeaderBasedSessionPersistence SessionPersistenceType = "Header"
+)
+
+// CookieConfig defines the configuration for cookie-based session persistence.
+type CookieConfig struct {
+	// LifetimeType specifies whether the cookie has a permanent or
+	// session-based lifetime. A permanent cookie persists until its
+	// specified expiry time, defined by the Expires or Max-Age cookie
+	// attributes, while a session cookie is deleted when the current
+	// session ends.
+	//
+	// When set to "Permanent", AbsoluteTimeout indicates the
+	// cookie's lifetime via the Expires or Max-Age cookie attributes
+	// and is required.
+	//
+	// When set to "Session", AbsoluteTimeout indicates the
+	// absolute lifetime of the cookie tracked by the gateway and
+	// is optional.
+	//
+	// Support: Core for "Session" type
+	//
+	// Support: Extended for "Permanent" type
+	//
+	// +optional
+	// +kubebuilder:default=Session
+	LifetimeType *CookieLifetimeType `json:"lifetimeType,omitempty"`
+}
+
+// +kubebuilder:validation:Enum=Permanent;Session
+type CookieLifetimeType string
+
+const (
+	// SessionCookieLifetimeType specifies the type for a session
+	// cookie.
+	//
+	// Support: Core
+	SessionCookieLifetimeType CookieLifetimeType = "Session"
+
+	// PermanentCookieLifetimeType specifies the type for a permanent
+	// cookie.
+	//
+	// Support: Extended
+	PermanentCookieLifetimeType CookieLifetimeType = "Permanent"
+)

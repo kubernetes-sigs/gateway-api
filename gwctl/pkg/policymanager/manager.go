@@ -22,12 +22,15 @@ import (
 	"fmt"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 )
 
@@ -67,7 +70,9 @@ func (p *PolicyManager) Init(ctx context.Context) error {
 		return err
 	}
 	for _, unstrucutredPolicy := range allPolicies {
-		p.AddPolicy(unstrucutredPolicy)
+		if err := p.AddPolicy(unstrucutredPolicy); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -177,6 +182,8 @@ type PolicyCRD struct {
 	crd apiextensionsv1.CustomResourceDefinition
 }
 
+func (p PolicyCRD) ClientObject() client.Object { return p.CRD() }
+
 // ID returns a unique identifier for this PolicyCRD.
 func (p PolicyCRD) ID() PolicyCrdID {
 	return PolicyCrdID(p.crd.Spec.Names.Kind + "." + p.crd.Spec.Group)
@@ -217,6 +224,8 @@ type Policy struct {
 	inherited bool
 }
 
+func (p Policy) ClientObject() client.Object { return p.Unstructured() }
+
 type ObjRef struct {
 	Group     string `json:",omitempty"`
 	Kind      string `json:",omitempty"`
@@ -232,7 +241,7 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		metav1.TypeMeta   `json:",inline"`
 		metav1.ObjectMeta `json:"metadata,omitempty"`
 		Spec              struct {
-			TargetRef gatewayv1alpha2.PolicyTargetReference
+			TargetRef gatewayv1alpha2.NamespacedPolicyTargetReference
 		}
 	}
 	structuredPolicy := &genericPolicy{}
@@ -246,7 +255,7 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		Namespace: structuredPolicy.GetNamespace(),
 	}
 	if result.targetRef.Namespace == "" {
-		result.targetRef.Namespace = "default"
+		result.targetRef.Namespace = result.u.GetNamespace()
 	}
 	if structuredPolicy.Spec.TargetRef.Namespace != nil {
 		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)

@@ -20,6 +20,7 @@ package v1alpha2
 
 import (
 	v1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1"
+
 	apisv1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 

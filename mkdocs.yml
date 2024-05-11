@@ -5,8 +5,12 @@ site_dir: site
 docs_dir: site-src
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - js/implementations.js
 hooks:
 - hack/mkdocs-copy-geps.py
+- hack/mkdocs-generate-conformance.py
 watch:
 - geps
 theme:
@@ -75,7 +79,9 @@ nav:
         Overview: mesh/index.md
         GAMMA Initiative: mesh/gamma.md
         Service Facets: mesh/service-facets.md
-    - Implementations: implementations.md
+    - Implementations:
+        List: implementations.md
+        Comparison: implementation-table.md
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:
@@ -112,14 +118,15 @@ nav:
     - Provisional:
       - geps/gep-91/index.md
       - geps/gep-995/index.md
-      - geps/gep-1619/index.md
       - geps/gep-1651/index.md
       - geps/gep-1867/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
     # - Implementable:
     #   -
     - Experimental:
-      - geps/gep-713/index.md
       - geps/gep-1016/index.md
+      - geps/gep-1619/index.md
       - geps/gep-1742/index.md
       - geps/gep-1748/index.md
       - geps/gep-1762/index.md
@@ -142,6 +149,7 @@ nav:
       - geps/gep-1686/index.md
       - geps/gep-1709/index.md
     - Memorandum:
+      - geps/gep-713/index.md
       - geps/gep-917/index.md
       - geps/gep-922/index.md
       - geps/gep-1324/index.md

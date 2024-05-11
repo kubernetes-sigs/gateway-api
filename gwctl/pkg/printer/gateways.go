@@ -20,51 +20,40 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"sort"
 	"strings"
 	"text/tabwriter"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-	"sigs.k8s.io/yaml"
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
+var _ Printer = (*GatewaysPrinter)(nil)
+
 type GatewaysPrinter struct {
-	Out   io.Writer
+	io.Writer
 	Clock clock.Clock
 }
 
-type gatewayDescribeView struct {
-	// Gateway name
-	Name string `json:",omitempty"`
-	// Gateway namespace
-	Namespace                string                                             `json:",omitempty"`
-	GatewayClass             string                                             `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef                             `json:",omitempty"`
-	EffectivePolicies        map[policymanager.PolicyCrdID]policymanager.Policy `json:",omitempty"`
+func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(common.MapToValues(resourceModel.Gateways))
 }
 
-func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gp.Out, 0, 0, 2, ' ', 0)
+func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+	tw := tabwriter.NewWriter(gp, 0, 0, 2, ' ', 0)
 	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-
-	gatewayNodes := make([]*resourcediscovery.GatewayNode, 0, len(resourceModel.Gateways))
-	for _, gatewayNode := range resourceModel.Gateways {
-		gatewayNodes = append(gatewayNodes, gatewayNode)
+	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+	if err != nil {
+		fmt.Fprint(os.Stderr, err)
+		os.Exit(1)
 	}
 
-	sort.Slice(gatewayNodes, func(i, j int) bool {
-		if gatewayNodes[i].Gateway.GetName() != gatewayNodes[j].Gateway.GetName() {
-			return gatewayNodes[i].Gateway.GetName() < gatewayNodes[j].Gateway.GetName()
-		}
-		return gatewayNodes[i].Gateway.Spec.GatewayClassName < gatewayNodes[j].Gateway.Spec.GatewayClassName
-	})
+	gatewayNodes := common.MapToValues(resourceModel.Gateways)
 
-	for _, gatewayNode := range gatewayNodes {
+	for _, gatewayNode := range SortByString(gatewayNodes) {
 		var addresses []string
 		for _, address := range gatewayNode.Gateway.Status.Addresses {
 			addresses = append(addresses, address.Value)
@@ -98,7 +87,11 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			programmedStatus,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if err != nil {
+			fmt.Fprint(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 	tw.Flush()
 }
@@ -107,37 +100,67 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 	index := 0
 	for _, gatewayNode := range resourceModel.Gateways {
 		index++
-		views := []gatewayDescribeView{
-			{
-				Name:      gatewayNode.Gateway.GetName(),
-				Namespace: gatewayNode.Gateway.GetNamespace(),
-			},
-			{
-				GatewayClass: string(gatewayNode.Gateway.Spec.GatewayClassName),
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
-			views = append(views, gatewayDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(gatewayNode.EffectivePolicies) != 0 {
-			views = append(views, gatewayDescribeView{
-				EffectivePolicies: gatewayNode.EffectivePolicies,
-			})
+
+		metadata := gatewayNode.Gateway.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: gatewayNode.Gateway.GetName()},
+			{Key: "Namespace", Value: gatewayNode.Gateway.GetNamespace()},
+			{Key: "Labels", Value: gatewayNode.Gateway.Labels},
+			{Key: "Annotations", Value: gatewayNode.Gateway.Annotations},
+			{Key: "APIVersion", Value: gatewayNode.Gateway.APIVersion},
+			{Key: "Kind", Value: gatewayNode.Gateway.Kind},
+			{Key: "Metadata", Value: metadata},
+			{Key: "Spec", Value: &gatewayNode.Gateway.Spec},
+			{Key: "Status", Value: &gatewayNode.Gateway.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(gp.Out, string(b))
+		// AttachedRoutes
+		attachedRoutes := &Table{
+			ColumnNames:  []string{"Kind", "Name"},
+			UseSeparator: true,
 		}
+		for _, httpRouteNode := range gatewayNode.HTTPRoutes {
+			row := []string{
+				httpRouteNode.HTTPRoute.Kind, // Kind
+				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+			}
+			attachedRoutes.Rows = append(attachedRoutes.Rows, row)
+		}
+		pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
+
+		// DirectlyAttachedPolicies
+		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
+			directlyAttachedPolicies := &Table{
+				ColumnNames:  []string{"Type", "Name"},
+				UseSeparator: true,
+			}
+			for _, policyRef := range policyRefs {
+				row := []string{
+					fmt.Sprintf("%v.%v", policyRef.Kind, policyRef.Group),     // Type
+					fmt.Sprintf("%v/%v", policyRef.Namespace, policyRef.Name), // Name
+				}
+				directlyAttachedPolicies.Rows = append(directlyAttachedPolicies.Rows, row)
+			}
+			pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: directlyAttachedPolicies})
+		}
+
+		// EffectivePolicies
+		if len(gatewayNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})
+		}
+
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayNode.Events, gp.Clock)})
+
+		Describe(gp, pairs)
 
 		if index+1 <= len(resourceModel.Gateways) {
-			fmt.Fprintf(gp.Out, "\n\n")
+			fmt.Fprintf(gp, "\n\n")
 		}
 	}
 }

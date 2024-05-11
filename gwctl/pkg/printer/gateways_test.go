@@ -18,17 +18,20 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -36,7 +39,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-func TestGatewaysPrinter_Print(t *testing.T) {
+func TestGatewaysPrinter_PrintTable(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
@@ -179,14 +182,14 @@ func TestGatewaysPrinter_Print(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	gp := &GatewaysPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	gp.Print(resourceModel)
+	gp.PrintTable(resourceModel)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
@@ -217,9 +220,28 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
 			},
 			Spec: gatewayv1.GatewaySpec{
 				GatewayClassName: "foo-gatewayclass",
+			},
+		},
+
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				Kind: "HTTPRoute",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-httproute",
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{{
+						Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+						Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+						Name:  "foo-gateway",
+					}},
+				},
 			},
 		},
 
@@ -324,6 +346,140 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 				},
 			},
 		},
+
+		&corev1.Event{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "event-1",
+			},
+			Type:   corev1.EventTypeNormal,
+			Reason: "SYNC",
+			Source: corev1.EventSource{
+				Component: "my-gateway-controller",
+			},
+			InvolvedObject: corev1.ObjectReference{
+				Kind: "Gateway",
+				Name: "foo-gateway",
+				UID:  "00000000-0000-0000-0000-000000000001",
+			},
+			Message: "some random message",
+		},
+	}
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	discoverer := resourcediscovery.Discoverer{
+		K8sClients:    params.K8sClients,
+		PolicyManager: params.PolicyManager,
+	}
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
+	if err != nil {
+		t.Fatalf("Failed to construct resourceModel: %v", err)
+	}
+
+	gp := &GatewaysPrinter{
+		Writer: params.Out,
+		Clock:  fakeClock,
+	}
+	gp.PrintDescribeView(resourceModel)
+
+	got := params.Out.(*bytes.Buffer).String()
+	want := `
+Name: foo-gateway
+Namespace: ""
+Labels: null
+Annotations: null
+APIVersion: ""
+Kind: ""
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
+  uid: 00000000-0000-0000-0000-000000000001
+Spec:
+  gatewayClassName: foo-gatewayclass
+  listeners: null
+Status: {}
+AttachedRoutes:
+  Kind       Name
+  ----       ----
+  HTTPRoute  /foo-httproute
+DirectlyAttachedPolicies:
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  /health-check-gateway
+EffectivePolicies:
+  HealthCheckPolicy.foo.com:
+    key1: value-parent-1
+    key2: value-child-2
+    key3: value-parent-3
+    key4: value-parent-4
+    key5: value-parent-5
+  TimeoutPolicy.bar.com:
+    condition: path=/abc
+    seconds: 30
+Events:
+  Type    Reason  Age      From                   Message
+  ----    ------  ---      ----                   -------
+  Normal  SYNC    Unknown  my-gateway-controller  some random message
+`
+	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+}
+
+// TestGatewaysPrinter_PrintJsonYaml tests the -o json/yaml output of the `get` subcommand
+func TestGatewaysPrinter_PrintJsonYaml(t *testing.T) {
+	fakeClock := testingclock.NewFakeClock(time.Now())
+	creationTime := fakeClock.Now().Add(-5 * 24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
+	gcName := "gateway-1"
+	gcApplyConfig := apisv1beta1.Gateway(gcName, "")
+
+	gcObject := &gatewayv1.Gateway{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: *gcApplyConfig.APIVersion,
+			Kind:       *gcApplyConfig.Kind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   gcName,
+			Labels: map[string]string{"app": "foo", "env": "internal"},
+			CreationTimestamp: metav1.Time{
+				Time: creationTime,
+			},
+		},
+		Spec: gatewayv1.GatewaySpec{
+			GatewayClassName: "gatewayclass-1",
+			Listeners: []gatewayv1.Listener{
+				{
+					Name:     "http-8080",
+					Protocol: gatewayv1.HTTPProtocolType,
+					Port:     gatewayv1.PortNumber(8080),
+				},
+			},
+		},
+		Status: gatewayv1.GatewayStatus{
+			Addresses: []gatewayv1.GatewayStatusAddress{
+				{
+					Value: "192.168.100.5",
+				},
+			},
+			Conditions: []metav1.Condition{
+				{
+					Type:   "Programmed",
+					Status: "False",
+				},
+			},
+		},
+	}
+
+	objects := []runtime.Object{
+		&gatewayv1.GatewayClass{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "gatewayclass-1",
+			},
+			Spec: gatewayv1.GatewayClassSpec{
+				ControllerName: "example.net/gateway-controller",
+				Description:    common.PtrTo("random"),
+			},
+		},
+		gcObject,
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
@@ -337,71 +493,146 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	gp.PrintDescribeView(resourceModel)
+	Print(gp, resourceModel, utils.OutputFormatJSON)
 
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-Name: foo-gateway
-GatewayClass: foo-gatewayclass
-DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: health-check-gateway
-EffectivePolicies:
-  HealthCheckPolicy.foo.com:
-    key1: value-parent-1
-    key2: value-child-2
-    key3: value-parent-3
-    key4: value-parent-4
-    key5: value-parent-5
-  TimeoutPolicy.bar.com:
-    condition: path=/abc
-    seconds: 30
-`
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	wantJSON := common.JSONString(fmt.Sprintf(`
+        {
+          "apiVersion": "v1",
+          "items": [
+            {
+              "apiVersion": "gateway.networking.k8s.io/v1beta1",
+              "kind": "Gateway",
+              "metadata": {
+                "creationTimestamp": "%s",
+                "labels": {
+                  "app": "foo",
+                  "env": "internal"
+                },
+                "name": "gateway-1",
+                "resourceVersion": "999"
+              },
+              "spec": {
+                "gatewayClassName": "gatewayclass-1",
+                "listeners": [
+                  {
+                    "name": "http-8080",
+                    "port": 8080,
+                    "protocol": "HTTP"
+                  }
+                ]
+              },
+              "status": {
+                "addresses": [
+                  {
+                    "value": "192.168.100.5"
+                  }
+                ],
+                "conditions": [
+                  {
+                    "lastTransitionTime": null,
+                    "message": "",
+                    "reason": "",
+                    "status": "False",
+                    "type": "Programmed"
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "List"
+        }`, creationTime.Format(time.RFC3339)))
+	diff, err := wantJSON.CmpDiff(gotJSON)
+	if err != nil {
+		t.Fatalf("Failed to compare the json diffs: %v", diff)
+	}
+	if diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotJSON, wantJSON, diff)
+	}
+
+	gp.Writer = &bytes.Buffer{}
+
+	Print(gp, resourceModel, utils.OutputFormatYAML)
+
+	gotYaml := common.YamlString(gp.Writer.(*bytes.Buffer).String())
+	wantYaml := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: Gateway
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: gateway-1
+    resourceVersion: "999"
+  spec:
+    gatewayClassName: gatewayclass-1
+    listeners:
+    - name: http-8080
+      port: 8080
+      protocol: HTTP
+  status:
+    addresses:
+    - value: 192.168.100.5
+    conditions:
+    - lastTransitionTime: null
+      message: ""
+      reason: ""
+      status: "False"
+      type: Programmed
+kind: List`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(wantYaml, gotYaml, common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotYaml, wantYaml, diff)
 	}
 }
 
-// TestGatewaysPrinter_LabelSelector tests label selector filtering for Gateways in 'get' command.
-func TestGatewaysPrinter_LabelSelector(t *testing.T) {
+// TestGatewaysPrinter_PrintYaml tests the -o yaml output of the `get` subcommand
+func TestGatewaysPrinter_PrintYaml(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
-	gateway := func(name string, labels map[string]string) *gatewayv1.Gateway {
-		return &gatewayv1.Gateway{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:   name,
-				Labels: labels,
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-5 * 24 * time.Hour),
+	creationTime := fakeClock.Now().Add(-5 * 24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
+	gcName := "gateway-1"
+	gcApplyConfig := apisv1beta1.Gateway(gcName, "")
+
+	gcObject := &gatewayv1.Gateway{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: *gcApplyConfig.APIVersion,
+			Kind:       *gcApplyConfig.Kind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   gcName,
+			Labels: map[string]string{"app": "foo", "env": "internal"},
+			CreationTimestamp: metav1.Time{
+				Time: creationTime,
+			},
+		},
+		Spec: gatewayv1.GatewaySpec{
+			GatewayClassName: "gatewayclass-1",
+			Listeners: []gatewayv1.Listener{
+				{
+					Name:     "http-8080",
+					Protocol: gatewayv1.HTTPProtocolType,
+					Port:     gatewayv1.PortNumber(8080),
 				},
 			},
-			Spec: gatewayv1.GatewaySpec{
-				GatewayClassName: "gatewayclass-1",
-				Listeners: []gatewayv1.Listener{
-					{
-						Name:     "http-8080",
-						Protocol: gatewayv1.HTTPProtocolType,
-						Port:     gatewayv1.PortNumber(8080),
-					},
+		},
+		Status: gatewayv1.GatewayStatus{
+			Addresses: []gatewayv1.GatewayStatusAddress{
+				{
+					Value: "192.168.100.5",
 				},
 			},
-			Status: gatewayv1.GatewayStatus{
-				Addresses: []gatewayv1.GatewayStatusAddress{
-					{
-						Value: "192.168.100.5",
-					},
-				},
-				Conditions: []metav1.Condition{
-					{
-						Type:   "Programmed",
-						Status: "False",
-					},
+			Conditions: []metav1.Condition{
+				{
+					Type:   "Programmed",
+					Status: "False",
 				},
 			},
-		}
+		},
 	}
 
 	objects := []runtime.Object{
@@ -414,8 +645,7 @@ func TestGatewaysPrinter_LabelSelector(t *testing.T) {
 				Description:    common.PtrTo("random"),
 			},
 		},
-		gateway("gateway-1", map[string]string{"app": "foo"}),
-		gateway("gateway-2", map[string]string{"app": "foo", "env": "internal"}),
+		gcObject,
 	}
 
 	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
@@ -423,29 +653,47 @@ func TestGatewaysPrinter_LabelSelector(t *testing.T) {
 		K8sClients:    params.K8sClients,
 		PolicyManager: params.PolicyManager,
 	}
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{Labels: selector})
+	resourceModel, err := discoverer.DiscoverResourcesForGateway(resourcediscovery.Filter{})
 	if err != nil {
 		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
 	gp := &GatewaysPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	gp.Print(resourceModel)
+	Print(gp, resourceModel, utils.OutputFormatYAML)
 
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-NAME       CLASS           ADDRESSES      PORTS  PROGRAMMED  AGE
-gateway-2  gatewayclass-1  192.168.100.5  8080   False       5d
-`
-
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
+	got := common.YamlString(params.Out.(*bytes.Buffer).String())
+	want := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: Gateway
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: gateway-1
+    resourceVersion: "999"
+  spec:
+    gatewayClassName: gatewayclass-1
+    listeners:
+    - name: http-8080
+      port: 8080
+      protocol: HTTP
+  status:
+    addresses:
+    - value: 192.168.100.5
+    conditions:
+    - lastTransitionTime: null
+      message: ""
+      reason: ""
+      status: "False"
+      type: Programmed
+kind: List`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(want, got, common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
 	}
 }

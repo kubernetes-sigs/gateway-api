@@ -18,13 +18,13 @@ limitations under the License.
 
 package v1alpha2
 
-// BackendTLSPolicyListerExpansion allows custom methods to be added to
-// BackendTLSPolicyLister.
-type BackendTLSPolicyListerExpansion interface{}
+// BackendLBPolicyListerExpansion allows custom methods to be added to
+// BackendLBPolicyLister.
+type BackendLBPolicyListerExpansion interface{}
 
-// BackendTLSPolicyNamespaceListerExpansion allows custom methods to be added to
-// BackendTLSPolicyNamespaceLister.
-type BackendTLSPolicyNamespaceListerExpansion interface{}
+// BackendLBPolicyNamespaceListerExpansion allows custom methods to be added to
+// BackendLBPolicyNamespaceLister.
+type BackendLBPolicyNamespaceListerExpansion interface{}
 
 // GRPCRouteListerExpansion allows custom methods to be added to
 // GRPCRouteLister.

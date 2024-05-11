@@ -25,7 +25,7 @@ same configuration.
 
 ## Gateway API for Ingress <a name="for-ingress"></a>
 
-??? success "Standard in v0.5.0+"
+??? success "Standard Channel since v0.5.0"
 
     Gateway, GatewayClass, and HTTPRoute have been part of the Standard Channel
     of Gateway API since v0.5.0 and are considered stable APIs. For more
@@ -54,10 +54,10 @@ resources), in the same cluster.
 
 ## Gateway API for Service Mesh (the [GAMMA initiative](/mesh/gamma)) <a name="for-service-mesh"></a>
 
-??? example "Standard in v1.2.0+"
+??? success "Standard Channel since v1.2.0"
 
     The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
-    is part of the Standard Channel of Gateway API since v1.2.0 and are considered stable APIs. For more
+    has been part of the Standard Channel since v1.2.0 and are considered stable APIs. For more
     information refer to our [versioning guide](/concepts/versioning).
 
 Things are a bit different when using Gateway API to manage a [service

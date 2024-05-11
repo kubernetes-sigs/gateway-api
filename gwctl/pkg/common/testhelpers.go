@@ -17,9 +17,13 @@ limitations under the License.
 package common
 
 import (
+	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/google/go-cmp/cmp"
+	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // YamlString defines a custom type for wrapping yaml texts. It makes use of
@@ -51,3 +55,32 @@ var YamlStringTransformer = cmp.Transformer("YamlLines", func(s YamlString) []st
 	}
 	return lines[start : end+1]
 })
+
+type JSONString string
+
+func (src JSONString) CmpDiff(tgt JSONString) (diff string, err error) {
+	var srcMap, targetMap map[string]interface{}
+	err = json.Unmarshal([]byte(src), &srcMap)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal the source json: %w", err)
+		return
+	}
+	err = json.Unmarshal([]byte(tgt), &targetMap)
+	if err != nil {
+		err = fmt.Errorf("failed to unmarshal the target json: %w", err)
+		return
+	}
+
+	return cmp.Diff(srcMap, targetMap), nil
+}
+
+func NamespaceForTest(name string) *corev1.Namespace {
+	return &corev1.Namespace{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: name,
+		},
+		Status: corev1.NamespaceStatus{
+			Phase: corev1.NamespaceActive,
+		},
+	}
+}

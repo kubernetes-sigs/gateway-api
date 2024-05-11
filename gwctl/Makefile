@@ -14,6 +14,7 @@
 
 deps:
 	@echo "Installing dependencies..."
+	@go version
 	@go mod tidy
 	@go mod vendor
 

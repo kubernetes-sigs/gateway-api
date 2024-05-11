@@ -21,14 +21,14 @@ import (
 	"sort"
 	"strings"
 
-	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func main() {
-	features := make([]string, suite.AllFeatures.Len())
-	for i, feat := range suite.AllFeatures.UnsortedList() {
-		features[i] = string(feat)
+	feats := make([]string, features.AllFeatures.Len())
+	for i, feat := range features.AllFeatures.UnsortedList() {
+		feats[i] = string(feat)
 	}
-	sort.Strings(features)
-	fmt.Println(strings.Join(features, ";"))
+	sort.Strings(feats)
+	fmt.Println(strings.Join(feats, ";"))
 }

@@ -19,15 +19,15 @@ limitations under the License.
 package v1
 
 import (
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/client-go/applyconfigurations/meta/v1"
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 )
 
 // RouteNamespacesApplyConfiguration represents an declarative configuration of the RouteNamespaces type for use
 // with apply.
 type RouteNamespacesApplyConfiguration struct {
-	From     *v1.FromNamespaces    `json:"from,omitempty"`
-	Selector *metav1.LabelSelector `json:"selector,omitempty"`
+	From     *v1.FromNamespaces                      `json:"from,omitempty"`
+	Selector *metav1.LabelSelectorApplyConfiguration `json:"selector,omitempty"`
 }
 
 // RouteNamespacesApplyConfiguration constructs an declarative configuration of the RouteNamespaces type for use with
@@ -47,7 +47,7 @@ func (b *RouteNamespacesApplyConfiguration) WithFrom(value v1.FromNamespaces) *R
 // WithSelector sets the Selector field in the declarative configuration to the given value
 // and returns the receiver, so that objects can be built by chaining "With" function invocations.
 // If called multiple times, the Selector field is set to the value of the last call.
-func (b *RouteNamespacesApplyConfiguration) WithSelector(value metav1.LabelSelector) *RouteNamespacesApplyConfiguration {
-	b.Selector = &value
+func (b *RouteNamespacesApplyConfiguration) WithSelector(value *metav1.LabelSelectorApplyConfiguration) *RouteNamespacesApplyConfiguration {
+	b.Selector = value
 	return b
 }

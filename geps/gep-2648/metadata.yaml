@@ -1,0 +1,23 @@
+apiVersion: internal.gateway.networking.k8s.io/v1alpha1
+kind: GEPDetails
+number: 2648
+name: Direct Policy Attachment
+status: Provisional
+# Any authors who contribute to the GEP in any way should be listed here using
+# their Github handle.
+authors:
+  - youngnick
+  - robscott
+relationships:
+  extends:
+    - name: Metaresources and Policy Attachment
+      number: 713
+      description: Split out Direct Policy Attachment into its own GEP
+# references is a list of hyperlinks to relevant external references.
+# It's intended to be used for storing Github discussions, Google docs, etc.
+references:
+  - "https://github.com/kubernetes-sigs/gateway-api/discussions/2927"
+# changelog is a list of hyperlinks to PRs that make changes to the GEP, in
+# ascending date order.
+changelog:
+  - "https://github.com/kubernetes-sigs/gateway-api/pull/2813"

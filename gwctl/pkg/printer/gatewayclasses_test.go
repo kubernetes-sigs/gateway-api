@@ -18,6 +18,7 @@ package printer
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 	"time"
 
@@ -26,10 +27,10 @@ import (
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	testingclock "k8s.io/utils/clock/testing"
 
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
@@ -37,7 +38,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
-func TestGatewayClassesPrinter_Print(t *testing.T) {
+func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
@@ -106,14 +107,14 @@ func TestGatewayClassesPrinter_Print(t *testing.T) {
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
-		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+		t.Fatalf("Failed to construct resourceModel: %v", err)
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	gcp.Print(resourceModel)
+	Print(gcp, resourceModel, utils.OutputFormatTable)
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
@@ -182,8 +183,14 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 			},
 			want: `
 Name: foo-gatewayclass
+Labels: null
+Annotations: null
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
 ControllerName: example.net/gateway-controller
 Description: random
+Status: {}
 DirectlyAttachedPolicies:
 - Group: foo.com
   Kind: HealthCheckPolicy
@@ -196,6 +203,9 @@ DirectlyAttachedPolicies:
 				&gatewayv1.GatewayClass{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
+						Labels: map[string]string{
+							"foo": "bar",
+						},
 					},
 					Spec: gatewayv1.GatewayClassSpec{
 						ControllerName: "example.net/gateway-controller",
@@ -204,7 +214,14 @@ DirectlyAttachedPolicies:
 			},
 			want: `
 Name: foo-gatewayclass
+Labels:
+  foo: bar
+Annotations: null
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
 ControllerName: example.net/gateway-controller
+Status: {}
 `,
 		},
 	}
@@ -219,12 +236,12 @@ ControllerName: example.net/gateway-controller
 			}
 			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 			if err != nil {
-				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+				t.Fatalf("Failed to construct resourceModel: %v", err)
 			}
 
 			gcp := &GatewayClassesPrinter{
-				Out:   params.Out,
-				Clock: fakeClock,
+				Writer: params.Out,
+				Clock:  fakeClock,
 			}
 			gcp.PrintDescribeView(resourceModel)
 
@@ -236,63 +253,128 @@ ControllerName: example.net/gateway-controller
 	}
 }
 
-// TestGatewayClassesPrinter_LabelSelector Tests label selector filtering for GatewayClasses in 'get' command.
-func TestGatewayClassesPrinter_LabelSelector(t *testing.T) {
+// TestGatewayClassesPrinter_PrintJsonYaml tests the -o json/yaml output of the `get` subcommand
+func TestGatewayClassesPrinter_PrintJsonYaml(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
+	creationTime := fakeClock.Now().Add(-365 * 24 * time.Hour).UTC() // UTC being necessary for consistently handling the time while marshaling/unmarshaling its JSON
 
-	gatewayClass := func(name string, labels map[string]string) *gatewayv1.GatewayClass {
-		return &gatewayv1.GatewayClass{
-			ObjectMeta: metav1.ObjectMeta{
-				Name:   name,
-				Labels: labels,
-				CreationTimestamp: metav1.Time{
-					Time: fakeClock.Now().Add(-365 * 24 * time.Hour),
+	gtwName := "foo-com-internal-gateway-class"
+	gtwApplyConfig := apisv1beta1.GatewayClass(gtwName)
+
+	gtwObject := &gatewayv1.GatewayClass{
+		TypeMeta: metav1.TypeMeta{
+			APIVersion: *gtwApplyConfig.APIVersion,
+			Kind:       *gtwApplyConfig.Kind,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:   "foo-com-internal-gateway-class",
+			Labels: map[string]string{"app": "foo", "env": "internal"},
+			CreationTimestamp: metav1.Time{
+				Time: creationTime,
+			},
+		},
+		Spec: gatewayv1.GatewayClassSpec{
+			ControllerName: gatewayv1.GatewayController(gtwName + "/controller"),
+		},
+		Status: gatewayv1.GatewayClassStatus{
+			Conditions: []metav1.Condition{
+				{
+					Type:   "Accepted",
+					Status: metav1.ConditionTrue,
 				},
 			},
-			Spec: gatewayv1.GatewayClassSpec{
-				ControllerName: gatewayv1.GatewayController(name + "/controller"),
-			},
-			Status: gatewayv1.GatewayClassStatus{
-				Conditions: []metav1.Condition{
-					{
-						Type:   "Accepted",
-						Status: metav1.ConditionTrue,
-					},
-				},
-			},
-		}
+		},
 	}
-	objects := []runtime.Object{
-		gatewayClass("foo-com-external-gateway-class", map[string]string{"app": "foo"}),
-		gatewayClass("foo-com-internal-gateway-class", map[string]string{"app": "foo", "env": "internal"}),
-	}
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	gtwObject.APIVersion = *gtwApplyConfig.APIVersion
+	gtwObject.Kind = *gtwApplyConfig.Kind
+
+	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, gtwObject))
 	discoverer := resourcediscovery.Discoverer{
 		K8sClients:    params.K8sClients,
 		PolicyManager: params.PolicyManager,
 	}
-	labelSelector := "env=internal"
-	selector, err := labels.Parse(labelSelector)
-	if err != nil {
-		t.Errorf("Unable to find resources that match the label selector \"%s\": %v\n", labelSelector, err)
-	}
-	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{Labels: selector})
+	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
 		t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Out:   params.Out,
-		Clock: fakeClock,
+		Writer: params.Out,
+		Clock:  fakeClock,
 	}
-	gcp.Print(resourceModel)
+	Print(gcp, resourceModel, utils.OutputFormatJSON)
 
-	got := params.Out.(*bytes.Buffer).String()
-	want := `
-NAME                            CONTROLLER                                 ACCEPTED  AGE
-foo-com-internal-gateway-class  foo-com-internal-gateway-class/controller  True      365d
-`
-	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
-		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	wantJSON := common.JSONString(fmt.Sprintf(`
+        {
+          "apiVersion": "v1",
+          "items": [
+            {
+              "apiVersion": "gateway.networking.k8s.io/v1beta1",
+              "kind": "GatewayClass",
+              "metadata": {
+                "creationTimestamp": "%s",
+                "labels": {
+                  "app": "foo",
+                  "env": "internal"
+                },
+                "name": "foo-com-internal-gateway-class",
+                "resourceVersion": "999"
+              },
+              "spec": {
+                "controllerName": "foo-com-internal-gateway-class/controller"
+              },
+              "status": {
+                "conditions": [
+                  {
+                    "lastTransitionTime": null,
+                    "message": "",
+                    "reason": "",
+                    "status": "True",
+                    "type": "Accepted"
+                  }
+                ]
+              }
+            }
+          ],
+          "kind": "List"
+        }`, creationTime.Format(time.RFC3339)))
+	diff, err := wantJSON.CmpDiff(gotJSON)
+	if err != nil {
+		t.Fatalf("Failed to compare the json diffs: %v", diff)
+	}
+	if diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotJSON, wantJSON, diff)
+	}
+
+	gcp.Writer = &bytes.Buffer{}
+
+	Print(gcp, resourceModel, utils.OutputFormatYAML)
+
+	gotYaml := common.YamlString(gcp.Writer.(*bytes.Buffer).String())
+	wantYaml := common.YamlString(fmt.Sprintf(`
+apiVersion: v1
+items:
+- apiVersion: gateway.networking.k8s.io/v1beta1
+  kind: GatewayClass
+  metadata:
+    creationTimestamp: "%s"
+    labels:
+      app: foo
+      env: internal
+    name: foo-com-internal-gateway-class
+    resourceVersion: "999"
+  spec:
+    controllerName: foo-com-internal-gateway-class/controller
+  status:
+    conditions:
+    - lastTransitionTime: null
+      message: ""
+      reason: ""
+      status: "True"
+      type: Accepted
+kind: List`, creationTime.Format(time.RFC3339)))
+	if diff := cmp.Diff(wantYaml, gotYaml, common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", gotYaml, wantYaml, diff)
 	}
 }

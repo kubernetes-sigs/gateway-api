@@ -28,11 +28,14 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/utils/clock"
 )
 
 func NewDescribeCommand() *cobra.Command {
 	var namespaceFlag string
 	var allNamespacesFlag bool
+	var labelSelector string
 
 	cmd := &cobra.Command{
 		Use:   "describe {policies|httproutes|gateways|gatewayclasses|backends|namespace|policycrd} RESOURCE_NAME",
@@ -45,6 +48,7 @@ func NewDescribeCommand() *cobra.Command {
 	}
 	cmd.Flags().StringVarP(&namespaceFlag, "namespace", "n", "default", "")
 	cmd.Flags().BoolVarP(&allNamespacesFlag, "all-namespaces", "A", false, "If present, list requested resources from all namespaces.")
+	cmd.Flags().StringVarP(&labelSelector, "selector", "l", "", "Selector (label query) to filter on, supports '=', '==', and '!='.(e.g. -l key1=value1,key2=value2). Matching objects must satisfy all of the specified label constraints.")
 
 	return cmd
 }
@@ -64,20 +68,24 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		os.Exit(1)
 	}
 
+	labelSelector, err := cmd.Flags().GetString("selector")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to read flag \"selector\": %v\n", err)
+		os.Exit(1)
+	}
+
 	if allNs {
 		ns = metav1.NamespaceAll
 	}
 
-	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
-	}
-	policiesPrinter := &printer.PoliciesPrinter{Out: params.Out}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Out: params.Out}
-	gwPrinter := &printer.GatewaysPrinter{Out: params.Out}
-	gwcPrinter := &printer.GatewayClassesPrinter{Out: params.Out}
-	backendsPrinter := &printer.BackendsPrinter{Out: params.Out}
-	namespacesPrinter := &printer.NamespacesPrinter{Out: params.Out}
+	discoverer := resourcediscovery.NewDiscoverer(params.K8sClients, params.PolicyManager)
+
+	policiesPrinter := &printer.PoliciesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	gwPrinter := &printer.GatewaysPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	gwcPrinter := &printer.GatewayClassesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
+	backendsPrinter := &printer.BackendsPrinter{Writer: params.Out}
+	namespacesPrinter := &printer.NamespacesPrinter{Writer: params.Out, Clock: clock.RealClock{}}
 
 	switch kind {
 	case "policy", "policies":
@@ -95,7 +103,7 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 			}
 		}
 		policiesPrinter.PrintPoliciesDescribeView(policyList)
-	
+
 	case "policycrd", "policycrds":
 		var policyCrdList []policymanager.PolicyCRD
 		if len(args) == 1 {
@@ -112,7 +120,15 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		policiesPrinter.PrintPolicyCRDsDescribeView(policyCrdList)
 
 	case "httproute", "httproutes":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			Labels:    selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -124,7 +140,15 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		httpRoutesPrinter.PrintDescribeView(resourceModel)
 
 	case "gateway", "gateways":
-		filter := resourcediscovery.Filter{Namespace: ns}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Namespace: ns,
+			Labels:    selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -136,7 +160,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwPrinter.PrintDescribeView(resourceModel)
 
 	case "gatewayclass", "gatewayclasses":
-		filter := resourcediscovery.Filter{}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Labels: selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}
@@ -148,8 +179,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		gwcPrinter.PrintDescribeView(resourceModel)
 
 	case "backend", "backends":
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
+			os.Exit(1)
+		}
 		filter := resourcediscovery.Filter{
 			Namespace: ns,
+			Labels:    selector,
 		}
 		if len(args) > 1 {
 			filter.Name = args[1]
@@ -162,7 +199,14 @@ func runDescribe(cmd *cobra.Command, args []string, params *utils.CmdParams) {
 		backendsPrinter.PrintDescribeView(resourceModel)
 
 	case "namespace", "namespaces", "ns":
-		filter := resourcediscovery.Filter{}
+		selector, err := labels.Parse(labelSelector)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Failed to parse label selector %q: %v\n", labelSelector, err)
+			os.Exit(1)
+		}
+		filter := resourcediscovery.Filter{
+			Labels: selector,
+		}
 		if len(args) > 1 {
 			filter.Name = args[1]
 		}

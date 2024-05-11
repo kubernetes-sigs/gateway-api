@@ -29,6 +29,8 @@ import (
 	fakegatewayv1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1/fake"
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2"
 	fakegatewayv1alpha2 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha2/fake"
+	gatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3"
+	fakegatewayv1alpha3 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1alpha3/fake"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1"
 	fakegatewayv1beta1 "sigs.k8s.io/gateway-api/pkg/client/clientset/versioned/typed/apis/v1beta1/fake"
 )
@@ -86,6 +88,11 @@ var (
 // GatewayV1alpha2 retrieves the GatewayV1alpha2Client
 func (c *Clientset) GatewayV1alpha2() gatewayv1alpha2.GatewayV1alpha2Interface {
 	return &fakegatewayv1alpha2.FakeGatewayV1alpha2{Fake: &c.Fake}
+}
+
+// GatewayV1alpha3 retrieves the GatewayV1alpha3Client
+func (c *Clientset) GatewayV1alpha3() gatewayv1alpha3.GatewayV1alpha3Interface {
+	return &fakegatewayv1alpha3.FakeGatewayV1alpha3{Fake: &c.Fake}
 }
 
 // GatewayV1beta1 retrieves the GatewayV1beta1Client
