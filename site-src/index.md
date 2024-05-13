@@ -54,11 +54,11 @@ resources), in the same cluster.
 
 ## Gateway API for Service Mesh (the [GAMMA initiative](/mesh/gamma)) <a name="for-service-mesh"></a>
 
-??? success "Standard Channel since v1.2.0"
+??? success "Standard Channel since v1.1.0"
 
-    The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use cases
-    has been part of the Standard Channel since v1.2.0 and are considered stable APIs. For more
-    information refer to our [versioning guide](/concepts/versioning).
+    The [GAMMA initiative](/mesh/gamma) work for supporting service mesh use
+    cases has been part of the Standard Channel since v1.1.0 and is considered
+    GA. For more information refer to our [versioning guide](/concepts/versioning).
 
 Things are a bit different when using Gateway API to manage a [service
 mesh][service-mesh]. Since there will usually only be one mesh active in the
