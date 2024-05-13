@@ -18,6 +18,7 @@ package printer
 
 import (
 	"fmt"
+	"golang.org/x/exp/maps"
 	"io"
 	"os"
 	"strings"
@@ -29,7 +30,6 @@ import (
 	"k8s.io/utils/ptr"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 
@@ -61,7 +61,7 @@ type gatewayClassDescribeView struct {
 }
 
 func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(common.MapToValues(resourceModel.GatewayClasses))
+	return NodeResources(maps.Values(resourceModel.GatewayClasses))
 }
 
 func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
@@ -73,7 +73,7 @@ func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.Re
 		os.Exit(1)
 	}
 
-	gatewayClassNodes := common.MapToValues(resourceModel.GatewayClasses)
+	gatewayClassNodes := maps.Values(resourceModel.GatewayClasses)
 
 	for _, gatewayClassNode := range SortByString(gatewayClassNodes) {
 		accepted := "Unknown"

@@ -18,6 +18,7 @@ package printer
 
 import (
 	"fmt"
+	"golang.org/x/exp/maps"
 	"io"
 	"os"
 	"strings"
@@ -27,8 +28,6 @@ import (
 
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 var _ Printer = (*GatewaysPrinter)(nil)
@@ -39,7 +38,7 @@ type GatewaysPrinter struct {
 }
 
 func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(common.MapToValues(resourceModel.Gateways))
+	return NodeResources(maps.Values(resourceModel.Gateways))
 }
 
 func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
@@ -51,7 +50,7 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 		os.Exit(1)
 	}
 
-	gatewayNodes := common.MapToValues(resourceModel.Gateways)
+	gatewayNodes := maps.Values(resourceModel.Gateways)
 
 	for _, gatewayNode := range SortByString(gatewayNodes) {
 		var addresses []string

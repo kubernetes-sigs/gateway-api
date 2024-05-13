@@ -23,7 +23,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"os"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"strings"
 	"text/tabwriter"
 
@@ -49,7 +48,7 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		os.Exit(1)
 	}
 
-	backends := common.MapToValues(resourceModel.Backends)
+	backends := maps.Values(resourceModel.Backends)
 	sortedBackends := SortByString(backends)
 
 	for _, backendNode := range sortedBackends {
@@ -74,7 +73,7 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			}
 		}
 
-		referredByRoutes := strings.Join(parentHTTPRoutes, ", ")
+		referredByRoutes := strings.Join(parentHTTPRoutes, ",")
 
 		namespace := backend.GetNamespace()
 		name := backend.GetName()
