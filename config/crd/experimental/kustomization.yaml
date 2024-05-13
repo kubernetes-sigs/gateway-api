@@ -8,4 +8,4 @@ resources:
 - gateway.networking.k8s.io_udproutes.yaml
 - gateway.networking.k8s.io_grpcroutes.yaml
 - gateway.networking.k8s.io_backendtlspolicies.yaml
-
+- gateway.networking.k8s.io_backendlbpolicies.yaml
