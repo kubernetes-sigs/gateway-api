@@ -58,22 +58,24 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		sortedHTTPRouteNodes := SortByString(httpRouteNodes)
 		totalRoutes := len(sortedHTTPRouteNodes)
 
-		var parentHTTPRoutes []string
+		var referredByRoutes string
 		if totalRoutes == 0 {
-			parentHTTPRoutes = append(parentHTTPRoutes, "None")
+			referredByRoutes = "None"
 		} else {
+			var routes []string
 			for i, httpRouteNode := range sortedHTTPRouteNodes {
 				if i < 2 {
 					namespacedName := client.ObjectKeyFromObject(httpRouteNode.HTTPRoute).String()
-					parentHTTPRoutes = append(parentHTTPRoutes, namespacedName)
+					routes = append(routes, namespacedName)
 				} else {
-					parentHTTPRoutes = append(parentHTTPRoutes, fmt.Sprintf("+%d more", totalRoutes-2))
 					break
 				}
 			}
+			referredByRoutes = strings.Join(routes, ", ")
+			if totalRoutes > 2 {
+				referredByRoutes += fmt.Sprintf(" + %d more", totalRoutes-2)
+			}
 		}
-
-		referredByRoutes := strings.Join(parentHTTPRoutes, ",")
 
 		namespace := backend.GetNamespace()
 		name := backend.GetName()
