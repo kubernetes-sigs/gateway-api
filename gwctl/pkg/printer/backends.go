@@ -18,20 +18,19 @@ package printer
 
 import (
 	"fmt"
-	"golang.org/x/exp/maps"
 	"io"
-	"k8s.io/apimachinery/pkg/util/duration"
-	"k8s.io/utils/clock"
 	"os"
 	"strings"
 	"text/tabwriter"
 
+	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+	"sigs.k8s.io/yaml"
 
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
-	"sigs.k8s.io/yaml"
 )
 
 type BackendsPrinter struct {

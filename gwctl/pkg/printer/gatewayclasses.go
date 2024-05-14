@@ -18,22 +18,21 @@ package printer
 
 import (
 	"fmt"
-	"golang.org/x/exp/maps"
 	"io"
 	"os"
 	"strings"
 	"text/tabwriter"
 
+	"golang.org/x/exp/maps"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"k8s.io/utils/ptr"
+	"sigs.k8s.io/yaml"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
-	"sigs.k8s.io/yaml"
 )
 
 var _ Printer = (*GatewayClassesPrinter)(nil)
