@@ -23,14 +23,13 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
+	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
-	"sigs.k8s.io/yaml"
 )
 
 var _ Printer = (*NamespacesPrinter)(nil)
@@ -49,7 +48,7 @@ type namespaceDescribeView struct {
 }
 
 func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(common.MapToValues(resourceModel.Namespaces))
+	return NodeResources(maps.Values(resourceModel.Namespaces))
 }
 
 func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
@@ -61,7 +60,7 @@ func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.Resour
 		os.Exit(1)
 	}
 
-	namespaceNodes := common.MapToValues(resourceModel.Namespaces)
+	namespaceNodes := maps.Values(resourceModel.Namespaces)
 	for _, namespaceNode := range SortByString(namespaceNodes) {
 		age := duration.HumanDuration(nsp.Clock.Since(namespaceNode.Namespace.CreationTimestamp.Time))
 		row := []string{
@@ -79,7 +78,7 @@ func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.Resour
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
-	namespaceNodes := common.MapToValues(resourceModel.Namespaces)
+	namespaceNodes := maps.Values(resourceModel.Namespaces)
 	index := 0
 	for _, namespaceNode := range SortByString(namespaceNodes) {
 		index++

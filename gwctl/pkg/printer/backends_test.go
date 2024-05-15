@@ -198,9 +198,9 @@ func TestBackendsPrinter_Print(t *testing.T) {
 
 	got := params.Out.(*bytes.Buffer).String()
 	want := `
-NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                AGE  POLICIES
-ns1        foo-svc-1  Service  ns1/foo-httproute-1                               3d   1
-ns1        foo-svc-2  Service  ns1/foo-httproute-2,ns1/foo-httproute-3 + 2 more  2d   0
+NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                 AGE  POLICIES
+ns1        foo-svc-1  Service  ns1/foo-httproute-1                                3d   1
+ns1        foo-svc-2  Service  ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  2d   0
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

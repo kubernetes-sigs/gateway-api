@@ -6,6 +6,7 @@ require (
 	github.com/evanphx/json-patch v5.9.0+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/spf13/cobra v1.8.0
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
 	k8s.io/api v0.30.0
 	k8s.io/apiextensions-apiserver v0.30.0
 	k8s.io/apimachinery v0.30.0
