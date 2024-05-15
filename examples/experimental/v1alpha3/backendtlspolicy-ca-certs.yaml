@@ -11,7 +11,7 @@ spec:
       group: ""
   validation:
     caCertificateRefs:
-      - kind: ConfigMapReference
+      - kind: ConfigMap
         name: auth-cert
         group: ""
     hostname: auth.example.com
