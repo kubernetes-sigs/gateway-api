@@ -50,28 +50,49 @@ httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderMo
                                                 'HTTPRoutePathRedirect', 'HTTPRouteHostRewrite', 'HTTPRoutePathRewrite', 'HTTPRouteRequestMirror', 'HTTPRouteRequestMultipleMirrors', 'HTTPRouteRequestTimeout', 'HTTPRouteBackendTimeout', 'HTTPRouteParentRefPort']
 
 
+# NOTE add past versions of implementations to here when new release is cut
+past_versions = """
+??? info
+
+
+    The latest release of Gateway API is shown here. Past Gateway API implementations and feature support can be found here:
+
+    - [v1.0.0](./implementation-table-v1.0.0.md)
+"""
+
+
 def generate_conformance_tables(reports):
 
-    gateway_http_table = generate_profiles_report(reports, 'HTTP')
+    gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP')
     gateway_http_table = gateway_http_table.rename_axis('Organization')
 
-    # Currently no implementation has extended supported features listed.
-    # Can uncomment once a list is needed to keep track
-    # gateway_tls_table = generate_profiles_report(reprots,'TLS')
+    gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS')
+    gateway_tls_table = gateway_tls_table.rename_axis('Organization')
 
-    mesh_http_table = generate_profiles_report(reports, 'MESH')
+    gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC')
+    gateway_grpc_table = gateway_grpc_table.rename_axis('Organization')
+
+    mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP')
     mesh_http_table = mesh_http_table.rename_axis('Organization')
 
     with open('site-src/implementation-table.md', 'w') as f:
+
         f.write(desc)
         f.write("\n\n")
 
         f.write(warning_text)
         f.write("\n\n")
 
+        f.write(past_versions)
+        f.write("\n\n")
+
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
+        f.write('### TLSRoute\n\n')
+        f.write(gateway_tls_table.to_markdown()+'\n\n')
+        f.write('### GRPCRoute\n\n')
+        f.write(gateway_grpc_table.to_markdown()+'\n\n')
 
         f.write("## Mesh Profile\n\n")
         f.write("### HTTPRoute\n\n")
@@ -103,15 +124,22 @@ def generate_profiles_report(reports, route):
     return http_table
 
 
-# the path should be changed when there is a new version
-conformance_path = "conformance/reports/v1.0.0/**"
+pathTemp = "conformance/reports/*/"
+
+
+def getLatestPath():
+    versions = sorted(glob.glob(pathTemp, recursive=True))
+    report_path = versions[-1]+"**"
+    log.info(report_path)
+    return report_path
 
 
 def getYaml():
     log.info("parsing conformance reports ============================")
     yamls = []
 
-    for p in glob.glob(conformance_path, recursive=True):
+    conf_path = getLatestPath()
+    for p in glob.glob(conf_path, recursive=True):
 
         if fnmatch(p, "*.yaml"):
 
