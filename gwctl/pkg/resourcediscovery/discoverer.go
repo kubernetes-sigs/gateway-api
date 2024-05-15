@@ -510,6 +510,7 @@ func (d Discoverer) discoverBackendsForHTTPRoutes(ctx context.Context, resourceM
 			if !ok {
 				// Backend does not exist in the resourceModel (maybe because of some
 				// error), so skip processing this backend.
+				klog.V(3).ErrorS(nil, "Backend not found in the resourceModel", "backend", fmt.Sprintf("%v/%v/%v", backendRef.Kind, backendRef.Namespace, backendRef.Name))
 				continue
 			}
 
