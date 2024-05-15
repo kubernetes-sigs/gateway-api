@@ -28,7 +28,19 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 )
 
+// Factory encapsulates the common clients and structures which are needed for
+// the execution of some command.
 type Factory interface {
+	// INTERNAL COMMENT:
+	// - The reason for an interface here is to be able to inject this dependency
+	//   during unit tests.
+	// - The reason for the "factory" pattern is to delay the construction of the
+	//   objects for when the commands get run (as opposed to when the commands
+	//   are registered in Cobra). This is required because during registration of
+	//   the commands, we will need to inject this dependency, but we cannot
+	//   construct the dependency because it depends on some flag values which are
+	//   only known during the runtime of the command.
+
 	K8sClients() (*common.K8sClients, error)
 	PolicyManager() (*policymanager.PolicyManager, error)
 }
