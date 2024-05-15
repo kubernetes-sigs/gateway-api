@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 	"k8s.io/klog/v2"
 
-	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/utils"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
 func newRootCmd() *cobra.Command {
@@ -60,7 +60,7 @@ func newRootCmd() *cobra.Command {
 		}
 	})
 
-	factory := cmdutils.NewFactory(&kubeConfigPath)
+	factory := utils.NewFactory(&kubeConfigPath)
 
 	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameGet))
 	rootCmd.AddCommand(NewSubCommand(factory, os.Stdout, commandNameDescribe))
