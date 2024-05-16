@@ -19,19 +19,11 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
-	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"k8s.io/utils/ptr"
-	"sigs.k8s.io/yaml"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -42,34 +34,14 @@ type GatewayClassesPrinter struct {
 	Clock clock.Clock
 }
 
-type gatewayClassDescribeView struct {
-	APIVersion  string             `json:",omitempty"`
-	Kind        string             `json:",omitempty"`
-	Metadata    *metav1.ObjectMeta `json:",omitempty"`
-	Labels      *map[string]string `json:",omitempty"`
-	Annotations *map[string]string `json:",omitempty"`
-
-	// GatewayClass name
-	Name           string `json:",omitempty"`
-	ControllerName string `json:",omitempty"`
-	// GatewayClass description
-	Description *string `json:",omitempty"`
-
-	Status                   *gatewayv1.GatewayClassStatus `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef        `json:",omitempty"`
-}
-
 func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
 	return NodeResources(maps.Values(resourceModel.GatewayClasses))
 }
 
 func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gcp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"},
+		UseSeparator: false,
 	}
 
 	gatewayClassNodes := maps.Values(resourceModel.GatewayClasses)
@@ -90,78 +62,43 @@ func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.Re
 			accepted,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(gcp, 0)
 }
 
 func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
 	index := 0
 	for _, gatewayClassNode := range resourceModel.GatewayClasses {
 		index++
-		apiVersion, kind := gatewayClassNode.GatewayClass.GetObjectKind().GroupVersionKind().ToAPIVersionAndKind()
+
 		metadata := gatewayClassNode.GatewayClass.ObjectMeta.DeepCopy()
 		metadata.Labels = nil
 		metadata.Annotations = nil
 		metadata.Name = ""
 		metadata.Namespace = ""
+		metadata.ManagedFields = nil
 
-		// views ordered with respect to https://gateway-api.sigs.k8s.io/geps/gep-2722/
-		views := []gatewayClassDescribeView{
-			{
-				Name: gatewayClassNode.GatewayClass.GetName(),
-			},
-			{
-				Labels: ptr.To(gatewayClassNode.GatewayClass.GetLabels()),
-			},
-			{
-				Annotations: ptr.To(gatewayClassNode.GatewayClass.GetAnnotations()),
-			},
-			{
-				APIVersion: apiVersion,
-			},
-			{
-				Kind: kind,
-			},
-			{
-				Metadata: metadata,
-			},
-			{
-				ControllerName: string(gatewayClassNode.GatewayClass.Spec.ControllerName),
-			},
-		}
-		if gatewayClassNode.GatewayClass.Spec.Description != nil {
-			views = append(views, gatewayClassDescribeView{
-				Description: gatewayClassNode.GatewayClass.Spec.Description,
-			})
-		}
-		views = append(views, gatewayClassDescribeView{
-			Status: &gatewayClassNode.GatewayClass.Status,
-		})
-
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies); len(policyRefs) != 0 {
-			views = append(views, gatewayClassDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: gatewayClassNode.GatewayClass.GetName()},
+			{Key: "Labels", Value: gatewayClassNode.GatewayClass.GetLabels()},
+			{Key: "Annotations", Value: gatewayClassNode.GatewayClass.GetAnnotations()},
+			{Key: "APIVersion", Value: gatewayClassNode.GatewayClass.APIVersion},
+			{Key: "Kind", Value: gatewayClassNode.GatewayClass.Kind},
+			{Key: "Metadata", Value: metadata},
+			{Key: "Spec", Value: &gatewayClassNode.GatewayClass.Spec},
+			{Key: "Status", Value: &gatewayClassNode.GatewayClass.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			output := string(b)
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
-			emptyOutput := strings.TrimSpace(output) == "{}"
-			if !emptyOutput {
-				fmt.Fprint(gcp, output)
-			}
-		}
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayClassNode.Events, gcp.Clock)})
+
+		Describe(gcp, pairs)
 
 		if index+1 <= len(resourceModel.GatewayClasses) {
 			fmt.Fprintf(gcp, "\n\n")

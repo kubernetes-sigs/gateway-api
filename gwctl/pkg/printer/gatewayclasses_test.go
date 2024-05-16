@@ -24,6 +24,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -140,8 +141,13 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 			name: "GatewayClass with description and policy",
 			objects: []runtime.Object{
 				&gatewayv1.GatewayClass{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "GatewayClass",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
+						UID:  "00000000-0000-0000-0000-000000000001",
 					},
 					Spec: gatewayv1.GatewayClassSpec{
 						ControllerName: "example.net/gateway-controller",
@@ -180,27 +186,55 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 						},
 					},
 				},
+				&corev1.Event{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "event-1",
+					},
+					Type:   corev1.EventTypeNormal,
+					Reason: "SYNC",
+					Source: corev1.EventSource{
+						Component: "my-gateway-controller",
+					},
+					InvolvedObject: corev1.ObjectReference{
+						Kind: "GatewayClass",
+						Name: "foo-gatewayclass",
+						UID:  "00000000-0000-0000-0000-000000000001",
+					},
+					Message: "some random message",
+				},
 			},
 			want: `
 Name: foo-gatewayclass
 Labels: null
 Annotations: null
+APIVersion: gateway.networking.k8s.io/v1
+Kind: GatewayClass
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
-ControllerName: example.net/gateway-controller
-Description: random
+  uid: 00000000-0000-0000-0000-000000000001
+Spec:
+  controllerName: example.net/gateway-controller
+  description: random
 Status: {}
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: policy-name
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  policy-name
+Events:
+  Type    Reason  Age      From                   Message
+  ----    ------  ---      ----                   -------
+  Normal  SYNC    Unknown  my-gateway-controller  some random message
 `,
 		},
 		{
 			name: "GatewayClass with no description",
 			objects: []runtime.Object{
 				&gatewayv1.GatewayClass{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "GatewayClass",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
 						Labels: map[string]string{
@@ -217,11 +251,16 @@ Name: foo-gatewayclass
 Labels:
   foo: bar
 Annotations: null
+APIVersion: gateway.networking.k8s.io/v1
+Kind: GatewayClass
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
-ControllerName: example.net/gateway-controller
+Spec:
+  controllerName: example.net/gateway-controller
 Status: {}
+DirectlyAttachedPolicies: <none>
+Events: <none>
 `,
 		},
 	}

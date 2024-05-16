@@ -19,16 +19,11 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
-	"strings"
-	"text/tabwriter"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -39,25 +34,14 @@ type NamespacesPrinter struct {
 	Clock clock.Clock
 }
 
-type namespaceDescribeView struct {
-	Name                     string                 `json:",omitempty"`
-	Labels                   map[string]string      `json:",omitempty"`
-	Annotations              map[string]string      `json:",omitempty"`
-	Status                   string                 `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
-}
-
 func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
 	return NodeResources(maps.Values(resourceModel.Namespaces))
 }
 
 func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(nsp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "STATUS", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "STATUS", "AGE"},
+		UseSeparator: false,
 	}
 
 	namespaceNodes := maps.Values(resourceModel.Namespaces)
@@ -68,13 +52,10 @@ func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.Resour
 			string(namespaceNode.Namespace.Status.Phase),
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(nsp, 0)
 }
 
 func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
@@ -83,33 +64,28 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 	for _, namespaceNode := range SortByString(namespaceNodes) {
 		index++
 
-		views := []namespaceDescribeView{
-			{
-				Name: namespaceNode.Namespace.Name,
-			},
-			{
-				Annotations: namespaceNode.Namespace.Annotations,
-				Labels:      namespaceNode.Namespace.Labels,
-			},
-			{
-				Status: string(namespaceNode.Namespace.Status.Phase),
-			},
+		metadata := namespaceNode.Namespace.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+		metadata.ManagedFields = nil
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: namespaceNode.Namespace.GetName()},
+			{Key: "Labels", Value: namespaceNode.Namespace.Labels},
+			{Key: "Annotations", Value: namespaceNode.Namespace.Annotations},
+			{Key: "Status", Value: &namespaceNode.Namespace.Status},
 		}
 
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(namespaceNode.Policies); len(policyRefs) != 0 {
-			views = append(views, namespaceDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(namespaceNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(nsp, string(b))
-		}
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(namespaceNode.Events, nsp.Clock)})
+
+		Describe(nsp, pairs)
 
 		if index+1 <= len(resourceModel.Namespaces) {
 			fmt.Fprintf(nsp, "\n\n")

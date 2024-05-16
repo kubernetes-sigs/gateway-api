@@ -32,6 +32,7 @@ import (
 	"k8s.io/client-go/dynamic"
 
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 type PolicyManager struct {
@@ -78,7 +79,7 @@ func (p *PolicyManager) Init(ctx context.Context) error {
 	return nil
 }
 
-func (p *PolicyManager) PoliciesAttachedTo(objRef ObjRef) []Policy {
+func (p *PolicyManager) PoliciesAttachedTo(objRef common.ObjRef) []Policy {
 	var result []Policy
 	for _, policy := range p.policies {
 		if policy.IsAttachedTo(objRef) {
@@ -218,20 +219,13 @@ type Policy struct {
 	// targetRef references the target object this policy is attached to. This
 	// only makes sense in case of a directly-attached-policy, or an
 	// unmerged-inherited-policy.
-	targetRef ObjRef
+	targetRef common.ObjRef
 	// Indicates whether the policy is supposed to be "inherited" (as opposed to
 	// "direct").
 	inherited bool
 }
 
 func (p Policy) ClientObject() client.Object { return p.Unstructured() }
-
-type ObjRef struct {
-	Group     string `json:",omitempty"`
-	Kind      string `json:",omitempty"`
-	Name      string `json:",omitempty"`
-	Namespace string `json:",omitempty"`
-}
 
 func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCrdID]PolicyCRD) (Policy, error) {
 	result := Policy{u: u}
@@ -248,7 +242,7 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.UnstructuredContent(), structuredPolicy); err != nil {
 		return Policy{}, fmt.Errorf("failed to convert unstructured policy resource to structured: %v", err)
 	}
-	result.targetRef = ObjRef{
+	result.targetRef = common.ObjRef{
 		Group:     string(structuredPolicy.Spec.TargetRef.Group),
 		Kind:      string(structuredPolicy.Spec.TargetRef.Kind),
 		Name:      string(structuredPolicy.Spec.TargetRef.Name),
@@ -280,7 +274,7 @@ func (p Policy) PolicyCrdID() PolicyCrdID {
 	return PolicyCrdID(p.u.GetObjectKind().GroupVersionKind().Kind + "." + p.u.GetObjectKind().GroupVersionKind().Group)
 }
 
-func (p Policy) TargetRef() ObjRef {
+func (p Policy) TargetRef() common.ObjRef {
 	return p.targetRef
 }
 
@@ -292,7 +286,7 @@ func (p Policy) IsDirect() bool {
 	return !p.inherited
 }
 
-func (p Policy) IsAttachedTo(objRef ObjRef) bool {
+func (p Policy) IsAttachedTo(objRef common.ObjRef) bool {
 	if p.targetRef.Kind == "Namespace" && p.targetRef.Name == "" {
 		p.targetRef.Name = "default"
 	}

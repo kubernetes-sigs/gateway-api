@@ -21,8 +21,6 @@ import (
 	"io"
 	"os"
 	"sort"
-	"strings"
-	"text/tabwriter"
 
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -55,12 +53,9 @@ func (pp *PoliciesPrinter) printClientObjects(objects []client.Object, format ut
 }
 
 func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager.Policy) {
-	tw := tabwriter.NewWriter(pp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "KIND", "TARGET NAME", "TARGET KIND", "POLICY TYPE", "AGE"},
+		UseSeparator: false,
 	}
 
 	for _, policy := range sortedPoliciesList {
@@ -81,13 +76,9 @@ func (pp *PoliciesPrinter) printPoliciesTable(sortedPoliciesList []policymanager
 			policyType,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+	table.Write(pp, 0)
 }
 
 func (pp *PoliciesPrinter) PrintPolicies(policies []policymanager.Policy, format utils.OutputFormat) {
@@ -106,12 +97,9 @@ func (pp *PoliciesPrinter) PrintPolicies(policies []policymanager.Policy, format
 }
 
 func (pp *PoliciesPrinter) printCRDsTable(sortedPolicyCRDsList []policymanager.PolicyCRD) {
-	tw := tabwriter.NewWriter(pp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "POLICY TYPE", "SCOPE", "AGE"},
+		UseSeparator: false,
 	}
 
 	for _, policyCRD := range sortedPolicyCRDsList {
@@ -128,13 +116,10 @@ func (pp *PoliciesPrinter) printCRDsTable(sortedPolicyCRDsList []policymanager.P
 			string(policyCRD.CRD().Spec.Scope),
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(pp, 0)
 }
 
 func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD, format utils.OutputFormat) {

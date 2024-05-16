@@ -141,6 +141,8 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 	}
 	resourceModel.addGatewayClasses(gatewayClasses...)
 
+	d.discoverEventsForGatewayClasses(ctx, resourceModel)
+
 	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
@@ -159,8 +161,8 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 
 	d.discoverEventsForGateways(ctx, resourceModel)
 
-	d.discoverHTTPRoutesFromGateways(ctx, resourceModel)
-	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
+	d.discoverHTTPRoutesForGateways(ctx, resourceModel)
+	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
@@ -182,8 +184,10 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	}
 	resourceModel.addHTTPRoutes(httpRoutes...)
 
-	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
-	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
+	d.discoverEventsForHTTPRoutes(ctx, resourceModel)
+
+	d.discoverGatewaysForHTTPRoutes(ctx, resourceModel)
+	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
@@ -205,10 +209,12 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	}
 	resourceModel.addBackends(backends...)
 
-	d.discoverReferenceGrantsFromBackends(ctx, resourceModel)
-	d.discoverHTTPRoutesFromBackends(ctx, resourceModel)
-	d.discoverGatewaysFromHTTPRoutes(ctx, resourceModel)
-	d.discoverGatewayClassesFromGateways(ctx, resourceModel)
+	d.discoverEventsForBackends(ctx, resourceModel)
+
+	d.discoverReferenceGrantsForBackends(ctx, resourceModel)
+	d.discoverHTTPRoutesForBackends(ctx, resourceModel)
+	d.discoverGatewaysForHTTPRoutes(ctx, resourceModel)
+	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
@@ -228,17 +234,18 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 	if err != nil {
 		return resourceModel, err
 	}
-
 	resourceModel.addNamespace(namespaces...)
+
+	d.discoverEventsForNamespaces(ctx, resourceModel)
 
 	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
 }
 
-// discoverGatewayClassesFromGateways will add GatewayClasses associated with
+// discoverGatewayClassesForGateways will add GatewayClasses associated with
 // Gateways in the resourceModel.
-func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverGatewayClassesForGateways(ctx context.Context, resourceModel *ResourceModel) {
 	gatewayClasses, err := d.fetchGatewayClasses(ctx, Filter{ /* all GatewayClasses */ Labels: labels.Everything()})
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all GatewayClasses")
@@ -269,9 +276,9 @@ func (d Discoverer) discoverGatewayClassesFromGateways(ctx context.Context, reso
 	}
 }
 
-// discoverGatewaysFromHTTPRoutes will add Gateways associated with HTTPRoutes
+// discoverGatewaysForHTTPRoutes will add Gateways associated with HTTPRoutes
 // in the resourceModel.
-func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverGatewaysForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
 	// Visit all gateways corresponding to the httpRoutes
 	for _, httpRouteNode := range resourceModel.HTTPRoutes {
 		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
@@ -311,9 +318,9 @@ func (d Discoverer) discoverGatewaysFromHTTPRoutes(ctx context.Context, resource
 	}
 }
 
-// discoverHTTPRoutesFromGateways will add HTTPRoutes that are attached to any
+// discoverHTTPRoutesForGateways will add HTTPRoutes that are attached to any
 // Gateway in the resourceModel.
-func (d Discoverer) discoverHTTPRoutesFromGateways(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverHTTPRoutesForGateways(ctx context.Context, resourceModel *ResourceModel) {
 	httpRoutes, err := d.fetchHTTPRoutes(ctx, Filter{ /* all HTTPRoutes */ Labels: labels.Everything()})
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all HTTPRoutes")
@@ -355,9 +362,9 @@ func (d Discoverer) discoverHTTPRoutesFromGateways(ctx context.Context, resource
 	}
 }
 
-// discoverHTTPRoutesFromBackends will add HTTPRoutes that reference any Backend
+// discoverHTTPRoutesForBackends will add HTTPRoutes that reference any Backend
 // present in resourceModel.
-func (d Discoverer) discoverHTTPRoutesFromBackends(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverHTTPRoutesForBackends(ctx context.Context, resourceModel *ResourceModel) {
 	httpRoutes, err := d.fetchHTTPRoutes(ctx, Filter{ /* all HTTPRoutes */ Labels: labels.Everything()})
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all HTTPRoutes")
@@ -449,7 +456,7 @@ func (d Discoverer) discoverNamespaces(ctx context.Context, resourceModel *Resou
 	}
 }
 
-func (d Discoverer) discoverReferenceGrantsFromBackends(ctx context.Context, resourceModel *ResourceModel) {
+func (d Discoverer) discoverReferenceGrantsForBackends(ctx context.Context, resourceModel *ResourceModel) {
 	referenceGrantsByNamespace := make(map[string][]gatewayv1beta1.ReferenceGrant)
 	for _, backendNode := range resourceModel.Backends {
 		backendNS := backendNode.Backend.GetNamespace()
@@ -488,27 +495,43 @@ func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
 }
 
+// discoverEventsForGatewayClasses adds Events associated with GatewayClasses
+// that exist in the resourceModel.
+func (d Discoverer) discoverEventsForGatewayClasses(ctx context.Context, resourceModel *ResourceModel) {
+	for _, gatewayClassNode := range resourceModel.GatewayClasses {
+		gatewayClassNode.Events = append(gatewayClassNode.Events, d.fetchEventsFor(ctx, gatewayClassNode.GatewayClass).Items...)
+	}
+}
+
 // discoverEventsForGateways adds Events associated with Gateways that exist in
 // the resourceModel.
 func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel *ResourceModel) {
 	for _, gatewayNode := range resourceModel.Gateways {
-		eventList := &corev1.EventList{}
-		options := &client.ListOptions{
-			FieldSelector: fields.AndSelectors(
-				fields.OneTermEqualSelector("involvedObject.kind", "Gateway"),
-				fields.OneTermEqualSelector("involvedObject.name", gatewayNode.Gateway.Name),
-				fields.OneTermEqualSelector("involvedObject.namespace", gatewayNode.Gateway.Namespace),
-				fields.OneTermEqualSelector("involvedObject.uid", string(gatewayNode.Gateway.UID)),
-			),
-			Limit: maxEventsPerResource,
-		}
-		if err := d.K8sClients.Client.List(ctx, eventList, options); err != nil {
-			klog.V(1).ErrorS(err, "Failed to list events associated with Gateway",
-				"gateway", gatewayNode.Gateway.Namespace+"/"+gatewayNode.Gateway.Name)
-			continue
-		}
+		gatewayNode.Events = append(gatewayNode.Events, d.fetchEventsFor(ctx, gatewayNode.Gateway).Items...)
+	}
+}
 
-		gatewayNode.Events = append(gatewayNode.Events, eventList.Items...)
+// discoverEventsForHTTPRoutes adds Events associated with HTTPRoutes that exist
+// in the resourceModel.
+func (d Discoverer) discoverEventsForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
+	for _, httpRouteNode := range resourceModel.HTTPRoutes {
+		httpRouteNode.Events = append(httpRouteNode.Events, d.fetchEventsFor(ctx, httpRouteNode.HTTPRoute).Items...)
+	}
+}
+
+// discoverEventsForBackends adds Events associated with Backends that exist in
+// the resourceModel.
+func (d Discoverer) discoverEventsForBackends(ctx context.Context, resourceModel *ResourceModel) {
+	for _, backendNode := range resourceModel.Backends {
+		backendNode.Events = append(backendNode.Events, d.fetchEventsFor(ctx, backendNode.Backend).Items...)
+	}
+}
+
+// discoverEventsForNamespaces adds Events associated with Namespaces that exist
+// in the resourceModel.
+func (d Discoverer) discoverEventsForNamespaces(ctx context.Context, resourceModel *ResourceModel) {
+	for _, nsNode := range resourceModel.Namespaces {
+		nsNode.Events = append(nsNode.Events, d.fetchEventsFor(ctx, nsNode.Namespace).Items...)
 	}
 }
 
@@ -742,4 +765,23 @@ func (d Discoverer) fetchNamespace(ctx context.Context, filter Filter) ([]corev1
 	}
 
 	return namespacesList.Items, nil
+}
+
+// fetchEventsFor fetches events associated with the given object.
+func (d Discoverer) fetchEventsFor(ctx context.Context, object client.Object) *corev1.EventList {
+	eventList := &corev1.EventList{}
+	options := &client.ListOptions{
+		FieldSelector: fields.AndSelectors(
+			fields.OneTermEqualSelector("involvedObject.uid", string(object.GetUID())),
+		),
+		Limit: maxEventsPerResource,
+	}
+	if err := d.K8sClients.Client.List(ctx, eventList, options); err != nil {
+		klog.V(1).ErrorS(err, "Failed to list events associated with resource.",
+			"resourceType", object.GetObjectKind().GroupVersionKind().Kind+"."+object.GetObjectKind().GroupVersionKind().Group,
+			"resourceNamespace", object.GetNamespace(),
+			"resourceName", object.GetName())
+		return eventList
+	}
+	return eventList
 }

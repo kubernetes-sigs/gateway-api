@@ -29,6 +29,8 @@ import (
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 // DescriberKV stores key-value pairs that are used with Describing a resource.
@@ -52,7 +54,7 @@ func Describe(w io.Writer, pairs []*DescriberKV) {
 				fmt.Fprintf(w, "%v: <none>\n", pair.Key)
 			} else {
 				fmt.Fprintf(w, "%v:\n", pair.Key)
-				table.writeTable(w, defaultDescribeTableIndentSpaces)
+				table.Write(w, defaultDescribeTableIndentSpaces)
 			}
 			continue
 		}
@@ -76,9 +78,9 @@ type Table struct {
 	UseSeparator bool
 }
 
-// writeTable will write a formatted table to the writer. indent controls the
+// Write will write a formatted table to the writer. indent controls the
 // number of spaces at the beginning of each row.
-func (t *Table) writeTable(w io.Writer, indent int) {
+func (t *Table) Write(w io.Writer, indent int) {
 	tw := tabwriter.NewWriter(w, 0, 0, 2, ' ', 0)
 
 	// Print column names.
@@ -149,6 +151,33 @@ func convertEventsSliceToTable(events []corev1.Event, clock clock.Clock) *Table 
 		table.Rows = append(table.Rows, row)
 	}
 	return table
+}
+
+func convertPolicyRefsToTable(policyRefs []common.ObjRef) *Table {
+	table := &Table{
+		ColumnNames:  []string{"Type", "Name"},
+		UseSeparator: true,
+	}
+	for _, policyRef := range policyRefs {
+		name := policyRef.Name
+		if policyRef.Namespace != "" {
+			name = fmt.Sprintf("%v/%v", policyRef.Namespace, name)
+		}
+		row := []string{
+			fmt.Sprintf("%v.%v", policyRef.Kind, policyRef.Group), // Type
+			name, // Name
+		}
+		table.Rows = append(table.Rows, row)
+	}
+	return table
+}
+
+func convertErrorsToString(errors []error) []string {
+	var result []string
+	for _, err := range errors {
+		result = append(result, err.Error())
+	}
+	return result
 }
 
 type NodeResource interface {
