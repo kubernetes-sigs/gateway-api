@@ -366,7 +366,7 @@ func runGetOrDescribePolicies(f cmdutils.Factory, o *getOrDescribeOptions) {
 	emptyObjRef := common.ObjRef{}
 	switch {
 	case o.cmdName == commandNameGet && o.forObjRef != emptyObjRef: // Fetch policies attached to some resource.
-		policyList = policyManager.PoliciesAttachedTo(policymanager.ObjRef(o.forObjRef))
+		policyList = policyManager.PoliciesAttachedTo(o.forObjRef)
 	case o.resourceName == "": // Fetch all policies.
 		policyList = policyManager.GetPolicies()
 	default: // Fetch a single policy by its name.
