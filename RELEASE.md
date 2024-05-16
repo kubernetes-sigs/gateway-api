@@ -70,6 +70,7 @@ For a **MAJOR** or **MINOR** release:
 - Run the `make build-install-yaml` command which will generate install files in the `release/` directory.
   Attach these files to the GitHub release.
 - Update the `README.md` and `site-src/guides/index.md` files to point links and examples to the new release.
+- Update the `site-src/implementation-table.md` to `site-src/implementation-table-<oldVersion>.md`. Add the path to the `past_versions` variable in `hack/mkdocs-generate-conformance.py`.
 
 For an **RC** release:
 - Update `pkg/generator/main.go` with the new semver tag and any updates to the API review URL.
