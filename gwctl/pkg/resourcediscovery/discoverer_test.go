@@ -35,6 +35,83 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/utils"
 )
 
+func TestDiscoverResourcesForGatewayClasses(t *testing.T) {
+	testcases := []struct {
+		name    string
+		objects []runtime.Object
+		filter  Filter
+
+		wantGatewayClasses []string
+		wantGateways       []apimachinerytypes.NamespacedName
+	}{
+		{
+			name:   "normal",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				common.NamespaceForTest("baz"),
+				&gatewayv1.GatewayClass{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "foo-gatewayclass",
+					},
+				},
+				&gatewayv1.Gateway{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-gateway",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.GatewaySpec{
+						GatewayClassName: "bar-gatewayclass",
+					},
+				},
+				&gatewayv1.Gateway{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "baz-gateway",
+						Namespace: "baz",
+					},
+					Spec: gatewayv1.GatewaySpec{
+						GatewayClassName: "foo-gatewayclass",
+					},
+				},
+			},
+			wantGatewayClasses: []string{"foo-gatewayclass"},
+			wantGateways: []apimachinerytypes.NamespacedName{
+				{Namespace: "baz", Name: "baz-gateway"},
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+			discoverer := Discoverer{
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
+			}
+
+			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(tc.filter)
+			if err != nil {
+				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+			}
+
+			gotGatewayClasses := gatewayClassNamesFromResourceModel(resourceModel)
+			gotGateways := namespacedGatewaysFromResourceModel(resourceModel)
+
+			if tc.wantGatewayClasses != nil {
+				if diff := cmp.Diff(tc.wantGatewayClasses, gotGatewayClasses, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in GatewayClasses; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotGatewayClasses, tc.wantGatewayClasses, diff)
+				}
+			}
+			if tc.wantGateways != nil {
+				if diff := cmp.Diff(tc.wantGateways, gotGateways, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in Gateways; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotGateways, tc.wantGateways, diff)
+				}
+			}
+		})
+	}
+}
+
 func TestDiscoverResourcesForGateway(t *testing.T) {
 	testcases := []struct {
 		name    string
@@ -103,10 +180,11 @@ func TestDiscoverResourcesForGateway(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 			discoverer := Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 
 			resourceModel, err := discoverer.DiscoverResourcesForGateway(tc.filter)
@@ -125,6 +203,215 @@ func TestDiscoverResourcesForGateway(t *testing.T) {
 			if tc.wantGatewayErrors != nil {
 				if diff := cmp.Diff(tc.wantGatewayErrors, gotGatewayErrors, cmpopts.EquateEmpty()); diff != "" {
 					t.Errorf("Unexpected diff in Gateway errors; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotGatewayErrors, tc.wantGatewayErrors, diff)
+				}
+			}
+		})
+	}
+}
+
+func TestDiscoverResourcesForHTTPRoute(t *testing.T) {
+	testcases := []struct {
+		name    string
+		objects []runtime.Object
+		filter  Filter
+
+		wantHTTPRoutes []apimachinerytypes.NamespacedName
+		wantBackends   []apimachinerytypes.NamespacedName
+	}{
+		{
+			name:   "normal",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				&gatewayv1.HTTPRoute{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-httproute",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind: common.PtrTo(gatewayv1.Kind("Service")),
+												Name: "foo-svc",
+												Port: common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-svc",
+						Namespace: "default",
+					},
+				},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-httproute"},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-svc"},
+			},
+		},
+		{
+			name:   "backendref from different namespace should require referencegrant",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				common.NamespaceForTest("bar"),
+				&gatewayv1.HTTPRoute{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "HTTPRoute",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-httproute",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind:      common.PtrTo(gatewayv1.Kind("Service")),
+												Name:      "bar-svc",
+												Namespace: common.PtrTo(gatewayv1.Namespace("bar")), // Different namespace than HTTPRoute.
+												Port:      common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-svc",
+						Namespace: "bar",
+					},
+				},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-httproute"},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{},
+		},
+		{
+			name:   "backendref from different namespace should get allowed with referencegrant",
+			filter: Filter{Labels: labels.Everything()},
+			objects: []runtime.Object{
+				common.NamespaceForTest("default"),
+				common.NamespaceForTest("bar"),
+				&gatewayv1.HTTPRoute{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "HTTPRoute",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "foo-httproute",
+						Namespace: "default",
+					},
+					Spec: gatewayv1.HTTPRouteSpec{
+						CommonRouteSpec: gatewayv1.CommonRouteSpec{},
+						Rules: []gatewayv1.HTTPRouteRule{
+							{
+								BackendRefs: []gatewayv1.HTTPBackendRef{
+									{
+										BackendRef: gatewayv1.BackendRef{
+											BackendObjectReference: gatewayv1.BackendObjectReference{
+												Kind:      common.PtrTo(gatewayv1.Kind("Service")),
+												Name:      "bar-svc",
+												Namespace: common.PtrTo(gatewayv1.Namespace("bar")), // Different namespace than HTTPRoute.
+												Port:      common.PtrTo(gatewayv1.PortNumber(80)),
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+				&corev1.Service{
+					TypeMeta: metav1.TypeMeta{
+						Kind:       "Service",
+						APIVersion: "v1",
+					},
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-svc",
+						Namespace: "bar",
+					},
+				},
+				&gatewayv1beta1.ReferenceGrant{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "bar-reference-grant",
+						Namespace: "bar",
+					},
+					Spec: gatewayv1beta1.ReferenceGrantSpec{
+						From: []gatewayv1beta1.ReferenceGrantFrom{{
+							Group:     gatewayv1.Group(gatewayv1.GroupVersion.Group),
+							Kind:      "HTTPRoute",
+							Namespace: "default",
+						}},
+						To: []gatewayv1beta1.ReferenceGrantTo{{
+							Kind: "Service",
+						}},
+					},
+				},
+			},
+			wantHTTPRoutes: []apimachinerytypes.NamespacedName{
+				{Namespace: "default", Name: "foo-httproute"},
+			},
+			wantBackends: []apimachinerytypes.NamespacedName{
+				{Namespace: "bar", Name: "bar-svc"},
+			},
+		},
+	}
+
+	for _, tc := range testcases {
+		t.Run(tc.name, func(t *testing.T) {
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+			discoverer := Discoverer{
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
+			}
+
+			resourceModel, err := discoverer.DiscoverResourcesForHTTPRoute(tc.filter)
+			if err != nil {
+				t.Fatalf("Failed to construct resourceModel: %v", resourceModel)
+			}
+
+			gotHTTPRoutes := namespacedHTTPRoutesFromResourceModel(resourceModel)
+			gotBackends := namespacedBackendsFromResourceModel(resourceModel)
+
+			if tc.wantHTTPRoutes != nil {
+				if diff := cmp.Diff(tc.wantHTTPRoutes, gotHTTPRoutes, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in HTTPRoutes; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotHTTPRoutes, tc.wantHTTPRoutes, diff)
+				}
+			}
+			if tc.wantBackends != nil {
+				if diff := cmp.Diff(tc.wantBackends, gotBackends, cmpopts.EquateEmpty()); diff != "" {
+					t.Errorf("Unexpected diff in Backends; got=%v, want=%v;\ndiff (-want +got)=\n%v", gotBackends, tc.wantBackends, diff)
 				}
 			}
 		})
@@ -311,10 +598,11 @@ func TestDiscoverResourcesForBackend(t *testing.T) {
 
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 			discoverer := Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 
 			resourceModel, err := discoverer.DiscoverResourcesForBackend(tc.filter)
@@ -369,10 +657,11 @@ func TestDiscoverResourcesForGatewayClass_LabelSelector(t *testing.T) {
 		gatewayClass("foo-com-external-gateway-class", map[string]string{"app": "foo"}),
 		gatewayClass("foo-com-internal-gateway-class", map[string]string{"app": "foo", "env": "internal"}),
 	}
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)
@@ -446,10 +735,11 @@ func TestDiscoverResourcesForGateway_LabelSelector(t *testing.T) {
 		gateway("gateway-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)
@@ -522,10 +812,11 @@ func TestDiscoverResourcesForHTTPRoute_LabelSelector(t *testing.T) {
 		httpRoute("httproute-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 
 	labelSelector := "env=internal"
@@ -572,10 +863,11 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 		namespace("namespace-2", map[string]string{"app": "foo", "env": "internal"}),
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	discoverer := Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	labelSelector := "env=internal"
 	selector, err := labels.Parse(labelSelector)
@@ -596,6 +888,14 @@ func TestDiscoverResourcesForNamespace_LabelSelector(t *testing.T) {
 	if diff := cmp.Diff(expectedNamespaceNames, namespaceNames); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", expectedNamespaceNames, namespaceNames, diff)
 	}
+}
+
+func gatewayClassNamesFromResourceModel(r *ResourceModel) []string {
+	var gatewayClassNames []string
+	for _, gatewayClassNode := range r.GatewayClasses {
+		gatewayClassNames = append(gatewayClassNames, gatewayClassNode.GatewayClass.GetName())
+	}
+	return gatewayClassNames
 }
 
 func namespacedGatewaysFromResourceModel(r *ResourceModel) []apimachinerytypes.NamespacedName {

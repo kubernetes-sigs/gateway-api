@@ -101,10 +101,12 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
@@ -112,12 +114,12 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gcp, resourceModel, utils.OutputFormatTable)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 NAME                            CONTROLLER                      ACCEPTED  AGE
 bar-com-internal-gateway-class  bar.baz/internal-gateway-class  True      365d
@@ -268,10 +270,12 @@ Events: <none>
 	for _, tc := range testcases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+			buff := &bytes.Buffer{}
 			discoverer := resourcediscovery.Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 			if err != nil {
@@ -279,12 +283,12 @@ Events: <none>
 			}
 
 			gcp := &GatewayClassesPrinter{
-				Writer: params.Out,
+				Writer: buff,
 				Clock:  fakeClock,
 			}
 			gcp.PrintDescribeView(resourceModel)
 
-			got := params.Out.(*bytes.Buffer).String()
+			got := buff.String()
 			if diff := cmp.Diff(common.YamlString(tc.want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 				t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, tc.want, diff)
 			}
@@ -327,10 +331,12 @@ func TestGatewayClassesPrinter_PrintJsonYaml(t *testing.T) {
 	gtwObject.APIVersion = *gtwApplyConfig.APIVersion
 	gtwObject.Kind = *gtwApplyConfig.Kind
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, gtwObject))
+	k8sClients := common.MustClientsForTest(t, gtwObject)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
@@ -338,12 +344,12 @@ func TestGatewayClassesPrinter_PrintJsonYaml(t *testing.T) {
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gcp, resourceModel, utils.OutputFormatJSON)
 
-	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	gotJSON := common.JSONString(buff.String())
 	wantJSON := common.JSONString(fmt.Sprintf(`
         {
           "apiVersion": "v1",

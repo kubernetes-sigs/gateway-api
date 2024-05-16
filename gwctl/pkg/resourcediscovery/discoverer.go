@@ -143,6 +143,7 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 
 	d.discoverEventsForGatewayClasses(ctx, resourceModel)
 
+	d.discoverGatewaysForGatewayClasses(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
@@ -162,6 +163,7 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 	d.discoverEventsForGateways(ctx, resourceModel)
 
 	d.discoverHTTPRoutesForGateways(ctx, resourceModel)
+	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
@@ -186,6 +188,7 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 
 	d.discoverEventsForHTTPRoutes(ctx, resourceModel)
 
+	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewaysForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
@@ -241,6 +244,31 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 	d.discoverPolicies(resourceModel)
 
 	return resourceModel, nil
+}
+
+// discoverGatewaysForGatewayClasses will add Gateways that use any GatewayClass
+// in the resourceModel.
+func (d Discoverer) discoverGatewaysForGatewayClasses(ctx context.Context, resourceModel *ResourceModel) {
+	gateways, err := d.fetchGateways(ctx, Filter{ /* every gateway */ })
+	if err != nil {
+		klog.V(1).ErrorS(err, "Failed to fetch Gateways")
+		return
+	}
+
+	for _, gateway := range gateways {
+		gatewayClassName := relations.FindGatewayClassNameForGateway(gateway)
+		gwcID := GatewayClassID(gatewayClassName)
+		_, ok := resourceModel.GatewayClasses[gwcID]
+		if !ok {
+			klog.V(1).InfoS("Skipping Gateway since it does not use any relevant GatewayClass",
+				"gateway", gateway.GetNamespace()+"/"+gateway.GetName(),
+			)
+			continue
+		}
+
+		resourceModel.addGateways(gateway)
+		resourceModel.connectGatewayWithGatewayClass(GatewayID(gateway.GetNamespace(), gateway.GetName()), gwcID)
+	}
 }
 
 // discoverGatewayClassesForGateways will add GatewayClasses associated with
@@ -424,6 +452,104 @@ func (d Discoverer) discoverHTTPRoutesForBackends(ctx context.Context, resourceM
 			klog.V(1).InfoS("Skipping HTTPRoute since it does not reference any required Backend",
 				"httpRoute", httpRoute.GetNamespace()+"/"+httpRoute.GetName(),
 			)
+		}
+	}
+}
+
+// discoverBackendsForHTTPRoutes will add Backends that are referenced by any
+// HTTPRoute in the resourceModel.
+func (d Discoverer) discoverBackendsForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
+	// This will be a three step process:
+	//  1. Add ALL Backends to the resourceModel that are referenced by the
+	//     HTTPRoutes.
+	//  2. Discover ReferenceGrants for those Backends.
+	//  3. Remove Backends from the resourceModel which are in a different namespace
+	//     from the HTTPRoute and are not exposed through a ReferenceGrant.
+
+	// Step 1
+	for _, httpRouteNode := range resourceModel.HTTPRoutes {
+		for _, backendRef := range relations.FindBackendRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
+			// Check if the Backend already exists in the resourceModel
+			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
+			if _, ok := resourceModel.Backends[backendID]; ok {
+				// Backend already exists in the resourceModel, skip re-fetching.
+				continue
+			}
+
+			// Backend doesn't already exist so fetch and add it to the resourceModel.
+			backends, err := d.fetchBackends(ctx, Filter{Namespace: backendRef.Namespace, Name: backendRef.Name})
+			if err != nil {
+				if apierrors.IsNotFound(err) {
+					err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+						ReferredObject:  backendRef,
+					}}
+					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+					klog.V(1).Info(err)
+				} else {
+					klog.V(1).ErrorS(err, "Error while fetching Backend for HTTPRoute",
+						"backend", fmt.Sprintf("%v/%v/%v", backendRef.Kind, backendRef.Namespace, backendRef.Name),
+						"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
+					)
+				}
+				continue
+			}
+			resourceModel.addBackends(backends[0])
+		}
+	}
+
+	// Step 2
+	d.discoverReferenceGrantsForBackends(ctx, resourceModel)
+
+	// Step 3
+	for _, httpRouteNode := range resourceModel.HTTPRoutes {
+		for _, backendRef := range relations.FindBackendRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
+			// Check if the Backend exists in the resourceModel
+			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
+			backendNode, ok := resourceModel.Backends[backendID]
+			if !ok {
+				// Backend does not exist in the resourceModel (maybe because of some
+				// error), so skip processing this backend.
+				klog.V(3).ErrorS(nil, "Backend not found in the resourceModel", "backend", fmt.Sprintf("%v/%v/%v", backendRef.Kind, backendRef.Namespace, backendRef.Name))
+				continue
+			}
+
+			// Ensure that if this is a cross namespace reference, then it is accepted
+			// through some ReferenceGrant.
+			if httpRouteNode.HTTPRoute.GetNamespace() != backendRef.Namespace {
+				httpRouteRef := common.ObjRef{
+					Group:     httpRouteNode.HTTPRoute.GroupVersionKind().Group,
+					Kind:      httpRouteNode.HTTPRoute.GroupVersionKind().Kind,
+					Name:      httpRouteNode.HTTPRoute.GetName(),
+					Namespace: httpRouteNode.HTTPRoute.GetNamespace(),
+				}
+				var referenceAccepted bool
+				for _, referenceGrantNode := range backendNode.ReferenceGrants {
+					if relations.ReferenceGrantAccepts(*referenceGrantNode.ReferenceGrant, httpRouteRef) {
+						referenceAccepted = true
+						break
+					}
+				}
+				if !referenceAccepted {
+					err := ReferenceNotPermittedError{ReferenceFromTo: ReferenceFromTo{
+						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+						ReferredObject:  backendRef,
+					}}
+					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+					klog.V(1).Info(err)
+					continue
+				}
+			}
+
+			// At this point, we know that either in the same namespace as the
+			// HTTPRoute, or is exposed through a ReferenceGrant.
+			resourceModel.connectHTTPRouteWithBackend(HTTPRouteID(httpRouteNode.HTTPRoute.GetNamespace(), httpRouteNode.HTTPRoute.GetName()), backendID)
+		}
+	}
+	// Remove Backends which are not connected to any HTTPRoute
+	for backendID, backendNode := range resourceModel.Backends {
+		if len(backendNode.HTTPRoutes) == 0 {
+			delete(resourceModel.Backends, backendID)
 		}
 	}
 }
