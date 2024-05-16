@@ -1,0 +1,35 @@
+# https://goreleaser.com/
+#
+# For local testing, use:
+# 
+#   goreleaser release --snapshot --clean
+project_name: gwctl
+
+before:
+  hooks:
+    # Ensure the project builds successfully before release.
+    - go mod tidy
+    - go build -o ./dist/gwctl ./main.go
+
+# Refer https://goreleaser.com/customization/builds/ for all available options.
+builds:
+  - id: gwctl  # Build ID for reference.
+    main: ./main.go
+    binary: gwctl  # Binary name.
+    env:
+      - CGO_ENABLED=0  # Disable CGO for broader compatibility.
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+      - arm64
+    ldflags:
+      # Reduce the size of the binary. Ref: https://pkg.go.dev/cmd/link
+      - -s -w 
+      # Embed versioning and build information in the binary.
+      - -X sigs.k8s.io/gateway-api/gwctl/pkg/version.version={{.Version}}
+      - -X sigs.k8s.io/gateway-api/gwctl/pkg/version.gitCommit={{.Commit}}
+      - -X sigs.k8s.io/gateway-api/gwctl/pkg/version.buildDate={{.Date}}

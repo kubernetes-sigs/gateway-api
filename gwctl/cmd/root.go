@@ -29,6 +29,7 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	cmdutils "sigs.k8s.io/gateway-api/gwctl/pkg/utils"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/version"
 )
 
 var kubeConfigPath string
@@ -51,6 +52,7 @@ func newRootCmd() *cobra.Command {
 
 	rootCmd.AddCommand(NewGetCommand())
 	rootCmd.AddCommand(NewDescribeCommand())
+	rootCmd.AddCommand(newVersionCommand())
 
 	return rootCmd
 }
@@ -93,4 +95,16 @@ func getParams(path string) *cmdutils.CmdParams {
 	}
 
 	return params
+}
+
+func newVersionCommand() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print the version information of gwctl",
+		Long:  `Print the version information of gwctl, including version, git commit and build date.`,
+		Run: func(*cobra.Command, []string) {
+			fmt.Println(version.GetVersionInfo())
+		},
+	}
+	return cmd
 }
