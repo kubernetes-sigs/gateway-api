@@ -13,7 +13,7 @@ Implementations only appear in this page if they pass Core conformance for the r
 
 
 
-??? info
+??? "Previous Gateway API Versions"
 
 
     The latest release of Gateway API is shown here. Past Gateway API implementations and feature support can be found here:
