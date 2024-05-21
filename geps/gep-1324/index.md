@@ -93,17 +93,9 @@ Routes are a collective term for a number of types in gateway-api: `HTTPRoute`, 
 
 While a `Service` in Kubernetes is a single resource, logically it handles two different roles - a "**service frontend**" and "**service backend**".
 
-<div float="left">
-  <figure style="display:inline-block;float:left;text-align: center; width: 50%;">
-    <img src="../images/1324-resource-view-of-service.png"/>
-    <figcaption>Resource level view of Service</figcaption>
-  </figure>
-  <figure style="display:inline-block;float:left;text-align: center; width: 50%;">
-    <img src="../images/1324-decomposed-view-of-service.png"/>
-    <figcaption>Decomposed view of Service</figcaption>
-  </figure>
-</div>
-<br />
+| Resource level view of Service | Decomposed view of Service |
+|---|---|
+| ![Resource level view of Service](images/1324-resource-view-of-service.png "Resource level view of Service") | ![Decomposed view of Service](images/1324-decomposed-view-of-service.png "Decomposed view of Service") |
 
 The "service frontend" refers to how we call a service. In a `Service`, this is an automatically allocated DNS name (`name.namespace.svc.cluster.local`) and IP address (`ClusterIP`). Not all services have frontends - for example, "headless" `Service`s.
 
