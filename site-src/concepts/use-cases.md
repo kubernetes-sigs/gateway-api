@@ -125,12 +125,6 @@ that Chihiro and Ian are handling.
 
 ## Basic [east/west] use case
 
-!!! danger "Experimental in v0.8.0"
-
-    The [GAMMA initiative][gamma] work for supporting service mesh use cases
-    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
-    not recommend it in production at this point.
-
 In this scenario, Ana has built a workload which is already running in a
 cluster with a [GAMMA]-compliant [service mesh]. She wants to use the mesh to
 protect her workload by rejecting calls to her workload with incorrect
@@ -157,12 +151,6 @@ bottlenecks in requests to Chihiro or Ian.
 [service mesh]:/concepts/glossary#service-mesh
 
 ## Gateway and mesh use case
-
-!!! danger "Experimental in v0.8.0"
-
-    The [GAMMA initiative][gamma] work for supporting service mesh use cases
-    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
-    not recommend it in production at this point.
 
 This is effectively a combination of the [multiple applications behind a
 single Gateway](#multiple-applications-behind-a-single-gateway) and [basic
