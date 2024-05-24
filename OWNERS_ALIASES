@@ -22,11 +22,11 @@ aliases:
 
   gateway-api-mesh-leads:
     - howardjohn
-    - keithmattix
+    - mikemorris
     - kflynn
 
   emeritus-gateway-api-mesh-leads:
-    - mikemorris
+    - keithmattix
 
   gateway-api-conformance-reviewers:
     - arkodg
