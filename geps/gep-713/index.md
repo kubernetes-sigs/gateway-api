@@ -28,6 +28,7 @@ settings across either one object (this is "Direct Policy Attachment"), or objec
 in a hierarchy (this is "Inherited Policy Attachment").
 
 Individual policy APIs:
+
 - MUST be their own CRDs (e.g. `TimeoutPolicy`, `RetryPolicy` etc),
 - MUST include both `spec` and `status` stanzas
 - MUST have the `status` stanza include a `conditions` section using the standard
