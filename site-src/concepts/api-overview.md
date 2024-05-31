@@ -320,16 +320,6 @@ Please refer to the [TLS details](/guides/tls) guide for a deep dive on TLS.
 
 ## Attaching Routes to Services
 
-!!! danger "Experimental in v0.8.0"
-
-    The [GAMMA initiative][gamma] work for supporting service mesh use cases
-    is _experimental_ in `v0.8.0`. It is possible that it will change; we do
-    not recommend it in production at this point.
-
-    In particular, binding Routes directly to Services seems to be the current
-    best choice for configuring mesh routing, but it is still **experimental**
-    and thus **subject to change**.
-
 When using Gateway API to configure a [service mesh], the Route will
 attach directly to a Service, representing configuration meant to be applied
 to any traffic directed to the Service. How and which Routes attach to a given

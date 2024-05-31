@@ -162,7 +162,7 @@ of other resources, for example:
 
 * Service.Ports.Name
 * Gateway.Listeners.Name
-* HTTPRoute.Rules.Name (once they are added in GEP-995, PR at https://github.com/kubernetes-sigs/gateway-api/pull/2593)
+* HTTPRoute.Rules.Name (once they are added in [GEP-995](https://gateway-api.sigs.k8s.io/geps/gep-995), implementation tracked by [#2985](https://github.com/kubernetes-sigs/gateway-api/pull/2985))
 
 Implementations SHOULD NOT use the name of a `backendRef` for applying Policy,
 since the `backendRef` both is not guaranteed to be unique across a Route's rules,

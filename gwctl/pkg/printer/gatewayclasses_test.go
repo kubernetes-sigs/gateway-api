@@ -24,6 +24,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	corev1 "k8s.io/api/core/v1"
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -100,10 +101,12 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
@@ -111,12 +114,12 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gcp, resourceModel, utils.OutputFormatTable)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 NAME                            CONTROLLER                      ACCEPTED  AGE
 bar-com-internal-gateway-class  bar.baz/internal-gateway-class  True      365d
@@ -140,8 +143,13 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 			name: "GatewayClass with description and policy",
 			objects: []runtime.Object{
 				&gatewayv1.GatewayClass{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "GatewayClass",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
+						UID:  "00000000-0000-0000-0000-000000000001",
 					},
 					Spec: gatewayv1.GatewayClassSpec{
 						ControllerName: "example.net/gateway-controller",
@@ -180,27 +188,55 @@ func TestGatewayClassesPrinter_PrintDescribeView(t *testing.T) {
 						},
 					},
 				},
+				&corev1.Event{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "event-1",
+					},
+					Type:   corev1.EventTypeNormal,
+					Reason: "SYNC",
+					Source: corev1.EventSource{
+						Component: "my-gateway-controller",
+					},
+					InvolvedObject: corev1.ObjectReference{
+						Kind: "GatewayClass",
+						Name: "foo-gatewayclass",
+						UID:  "00000000-0000-0000-0000-000000000001",
+					},
+					Message: "some random message",
+				},
 			},
 			want: `
 Name: foo-gatewayclass
 Labels: null
 Annotations: null
+APIVersion: gateway.networking.k8s.io/v1
+Kind: GatewayClass
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
-ControllerName: example.net/gateway-controller
-Description: random
+  uid: 00000000-0000-0000-0000-000000000001
+Spec:
+  controllerName: example.net/gateway-controller
+  description: random
 Status: {}
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: policy-name
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  policy-name
+Events:
+  Type    Reason  Age      From                   Message
+  ----    ------  ---      ----                   -------
+  Normal  SYNC    Unknown  my-gateway-controller  some random message
 `,
 		},
 		{
 			name: "GatewayClass with no description",
 			objects: []runtime.Object{
 				&gatewayv1.GatewayClass{
+					TypeMeta: metav1.TypeMeta{
+						APIVersion: gatewayv1.GroupVersion.String(),
+						Kind:       "GatewayClass",
+					},
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "foo-gatewayclass",
 						Labels: map[string]string{
@@ -217,11 +253,16 @@ Name: foo-gatewayclass
 Labels:
   foo: bar
 Annotations: null
+APIVersion: gateway.networking.k8s.io/v1
+Kind: GatewayClass
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
-ControllerName: example.net/gateway-controller
+Spec:
+  controllerName: example.net/gateway-controller
 Status: {}
+DirectlyAttachedPolicies: <none>
+Events: <none>
 `,
 		},
 	}
@@ -229,10 +270,12 @@ Status: {}
 	for _, tc := range testcases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			params := utils.MustParamsForTest(t, common.MustClientsForTest(t, tc.objects...))
+			k8sClients := common.MustClientsForTest(t, tc.objects...)
+			policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+			buff := &bytes.Buffer{}
 			discoverer := resourcediscovery.Discoverer{
-				K8sClients:    params.K8sClients,
-				PolicyManager: params.PolicyManager,
+				K8sClients:    k8sClients,
+				PolicyManager: policyManager,
 			}
 			resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 			if err != nil {
@@ -240,12 +283,12 @@ Status: {}
 			}
 
 			gcp := &GatewayClassesPrinter{
-				Writer: params.Out,
+				Writer: buff,
 				Clock:  fakeClock,
 			}
 			gcp.PrintDescribeView(resourceModel)
 
-			got := params.Out.(*bytes.Buffer).String()
+			got := buff.String()
 			if diff := cmp.Diff(common.YamlString(tc.want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 				t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, tc.want, diff)
 			}
@@ -288,10 +331,12 @@ func TestGatewayClassesPrinter_PrintJsonYaml(t *testing.T) {
 	gtwObject.APIVersion = *gtwApplyConfig.APIVersion
 	gtwObject.Kind = *gtwApplyConfig.Kind
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, gtwObject))
+	k8sClients := common.MustClientsForTest(t, gtwObject)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForGatewayClass(resourcediscovery.Filter{})
 	if err != nil {
@@ -299,12 +344,12 @@ func TestGatewayClassesPrinter_PrintJsonYaml(t *testing.T) {
 	}
 
 	gcp := &GatewayClassesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(gcp, resourceModel, utils.OutputFormatJSON)
 
-	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	gotJSON := common.JSONString(buff.String())
 	wantJSON := common.JSONString(fmt.Sprintf(`
         {
           "apiVersion": "v1",

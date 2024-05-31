@@ -75,10 +75,12 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
 	if err != nil {
@@ -86,12 +88,12 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	nsp.PrintTable(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 NAME         STATUS       AGE
 default      Active       46d
@@ -215,10 +217,12 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
 	if err != nil {
@@ -226,33 +230,38 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	nsp.PrintDescribeView(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
 Name: development
-Annotations:
-  test-annotation: development-annotation
 Labels:
   type: test-namespace
-Status: Active
+Annotations:
+  test-annotation: development-annotation
+Status:
+  phase: Active
 DirectlyAttachedPolicies:
-- Group: foo.com
-  Kind: HealthCheckPolicy
-  Name: health-check-gatewayclass
+  Type                       Name
+  ----                       ----
+  HealthCheckPolicy.foo.com  health-check-gatewayclass
+Events: <none>
 
 
 Name: production
 Labels:
   type: production-namespace
-Status: Active
+Annotations: null
+Status:
+  phase: Active
 DirectlyAttachedPolicies:
-- Group: bar.com
-  Kind: TimeoutPolicy
-  Name: timeout-policy-namespace
+  Type                   Name
+  ----                   ----
+  TimeoutPolicy.bar.com  timeout-policy-namespace
+Events: <none>
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
@@ -284,10 +293,12 @@ func TestNamespacesPrinter_PrintJsonYaml(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, nsObject))
+	k8sClients := common.MustClientsForTest(t, nsObject)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForNamespace(resourcediscovery.Filter{})
 	if err != nil {
@@ -295,12 +306,12 @@ func TestNamespacesPrinter_PrintJsonYaml(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 	Print(nsp, resourceModel, utils.OutputFormatJSON)
 
-	gotJSON := common.JSONString(params.Out.(*bytes.Buffer).String())
+	gotJSON := common.JSONString(buff.String())
 	wantJSON := common.JSONString(fmt.Sprintf(`
         {
           "apiVersion": "v1",

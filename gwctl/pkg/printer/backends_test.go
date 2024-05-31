@@ -179,10 +179,12 @@ func TestBackendsPrinter_Print(t *testing.T) {
 	finalObjects = append(finalObjects, objects...)
 	finalObjects = append(finalObjects, backendPolicies...)
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, finalObjects...))
+	k8sClients := common.MustClientsForTest(t, finalObjects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
+	buff := &bytes.Buffer{}
 	discoverer := resourcediscovery.Discoverer{
-		K8sClients:    params.K8sClients,
-		PolicyManager: params.PolicyManager,
+		K8sClients:    k8sClients,
+		PolicyManager: policyManager,
 	}
 	resourceModel, err := discoverer.DiscoverResourcesForBackend(resourcediscovery.Filter{})
 	if err != nil {
@@ -190,17 +192,17 @@ func TestBackendsPrinter_Print(t *testing.T) {
 	}
 
 	bp := &BackendsPrinter{
-		Writer: params.Out,
+		Writer: buff,
 		Clock:  fakeClock,
 	}
 
 	bp.Print(resourceModel)
 
-	got := params.Out.(*bytes.Buffer).String()
+	got := buff.String()
 	want := `
-NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                AGE  POLICIES
-ns1        foo-svc-1  Service  ns1/foo-httproute-1                               3d   1
-ns1        foo-svc-2  Service  ns1/foo-httproute-2,ns1/foo-httproute-3 + 2 more  2d   0
+NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                 AGE  POLICIES
+ns1        foo-svc-1  Service  ns1/foo-httproute-1                                3d   1
+ns1        foo-svc-2  Service  ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  2d   0
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)

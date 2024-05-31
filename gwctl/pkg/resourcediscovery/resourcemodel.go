@@ -22,6 +22,7 @@ import (
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
 	corev1 "k8s.io/api/core/v1"
@@ -512,10 +513,10 @@ func convertPoliciesMapToSlice(policies map[policyID]*PolicyNode) []policymanage
 // ConvertPoliciesMapToPolicyRefs returns the Object references of all given
 // policies. Note that these are not the value of targetRef within the Policies
 // but rather the reference to the Policy object itself.
-func ConvertPoliciesMapToPolicyRefs(policies map[policyID]*PolicyNode) []policymanager.ObjRef {
-	var result []policymanager.ObjRef
+func ConvertPoliciesMapToPolicyRefs(policies map[policyID]*PolicyNode) []common.ObjRef {
+	var result []common.ObjRef
 	for _, policyNode := range policies {
-		result = append(result, policymanager.ObjRef{
+		result = append(result, common.ObjRef{
 			Group:     policyNode.Policy.Unstructured().GroupVersionKind().Group,
 			Kind:      policyNode.Policy.Unstructured().GroupVersionKind().Kind,
 			Name:      policyNode.Policy.Unstructured().GetName(),

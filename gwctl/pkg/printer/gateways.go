@@ -19,16 +19,13 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
-	"text/tabwriter"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 var _ Printer = (*GatewaysPrinter)(nil)
@@ -39,19 +36,16 @@ type GatewaysPrinter struct {
 }
 
 func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(common.MapToValues(resourceModel.Gateways))
+	return NodeResources(maps.Values(resourceModel.Gateways))
 }
 
 func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gp, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"},
+		UseSeparator: false,
 	}
 
-	gatewayNodes := common.MapToValues(resourceModel.Gateways)
+	gatewayNodes := maps.Values(resourceModel.Gateways)
 
 	for _, gatewayNode := range SortByString(gatewayNodes) {
 		var addresses []string
@@ -87,13 +81,10 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 			programmedStatus,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(gp, 0)
 }
 
 func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
@@ -106,6 +97,7 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		metadata.Annotations = nil
 		metadata.Name = ""
 		metadata.Namespace = ""
+		metadata.ManagedFields = nil
 
 		pairs := []*DescriberKV{
 			{Key: "Name", Value: gatewayNode.Gateway.GetName()},
@@ -134,24 +126,17 @@ func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
 
 		// DirectlyAttachedPolicies
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
-			directlyAttachedPolicies := &Table{
-				ColumnNames:  []string{"Type", "Name"},
-				UseSeparator: true,
-			}
-			for _, policyRef := range policyRefs {
-				row := []string{
-					fmt.Sprintf("%v.%v", policyRef.Kind, policyRef.Group),     // Type
-					fmt.Sprintf("%v/%v", policyRef.Namespace, policyRef.Name), // Name
-				}
-				directlyAttachedPolicies.Rows = append(directlyAttachedPolicies.Rows, row)
-			}
-			pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: directlyAttachedPolicies})
-		}
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
 		// EffectivePolicies
 		if len(gatewayNode.EffectivePolicies) != 0 {
 			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})
+		}
+
+		// Analysis
+		if len(gatewayNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(gatewayNode.Errors)})
 		}
 
 		// Events

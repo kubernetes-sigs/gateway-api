@@ -147,7 +147,7 @@ TCPRoute   ns2/my-tcproute
 	for _, tc := range testcases {
 		t.Run(tc.name, func(t *testing.T) {
 			writable := &bytes.Buffer{}
-			tc.table.writeTable(writable, tc.indent)
+			tc.table.Write(writable, tc.indent)
 
 			got := writable.String()
 			if diff := cmp.Diff(common.YamlString(tc.want), common.YamlString(got), common.YamlStringTransformer); diff != "" {

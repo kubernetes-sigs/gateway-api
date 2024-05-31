@@ -179,13 +179,3 @@ func MustClientsForTest(t *testing.T, initRuntimeObjects ...runtime.Object) *K8s
 func PtrTo[T any](a T) *T {
 	return &a
 }
-
-func MapToValues[K comparable, V any](obj map[K]V) []V {
-	values := make([]V, len(obj))
-	i := 0
-	for _, v := range obj {
-		values[i] = v
-		i++
-	}
-	return values
-}

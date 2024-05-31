@@ -6,13 +6,14 @@ require (
 	github.com/evanphx/json-patch v5.9.0+incompatible
 	github.com/google/go-cmp v0.6.0
 	github.com/spf13/cobra v1.8.0
-	k8s.io/api v0.30.0
-	k8s.io/apiextensions-apiserver v0.30.0
-	k8s.io/apimachinery v0.30.0
-	k8s.io/client-go v0.30.0
+	golang.org/x/exp v0.0.0-20240416160154-fe59bbe5cc7f
+	k8s.io/api v0.30.1
+	k8s.io/apiextensions-apiserver v0.30.1
+	k8s.io/apimachinery v0.30.1
+	k8s.io/client-go v0.30.1
 	k8s.io/klog/v2 v2.120.1
 	k8s.io/utils v0.0.0-20240423183400-0849a56e8f22
-	sigs.k8s.io/controller-runtime v0.18.1
+	sigs.k8s.io/controller-runtime v0.18.2
 	sigs.k8s.io/gateway-api v1.0.0
 	sigs.k8s.io/yaml v1.4.0
 )

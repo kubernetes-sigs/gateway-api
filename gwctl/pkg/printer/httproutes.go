@@ -21,15 +21,14 @@ import (
 	"io"
 	"os"
 	"strings"
-	"text/tabwriter"
 
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/yaml"
 
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -41,19 +40,16 @@ type HTTPRoutesPrinter struct {
 }
 
 func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
-	return NodeResources(common.MapToValues(resourceModel.HTTPRoutes))
+	return NodeResources(maps.Values(resourceModel.HTTPRoutes))
 }
 
 func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(hp, 0, 0, 2, ' ', 0)
-	row := []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"},
+		UseSeparator: false,
 	}
 
-	httpRouteNodes := common.MapToValues(resourceModel.HTTPRoutes)
+	httpRouteNodes := maps.Values(resourceModel.HTTPRoutes)
 
 	for _, httpRouteNode := range SortByString(httpRouteNodes) {
 		var hostNames []string
@@ -80,13 +76,9 @@ func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.Resourc
 			parentRefsCount,
 			age,
 		}
-		_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-		if err != nil {
-			fmt.Fprint(os.Stderr, err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+	table.Write(hp, 0)
 }
 
 type httpRouteDescribeView struct {
@@ -94,7 +86,7 @@ type httpRouteDescribeView struct {
 	Namespace                string                      `json:",omitempty"`
 	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
 	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef      `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef             `json:",omitempty"`
 	EffectivePolicies        any                         `json:",omitempty"`
 }
 

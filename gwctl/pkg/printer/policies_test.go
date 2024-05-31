@@ -163,14 +163,15 @@ func TestPoliciesPrinter_Print_And_PrintDescribeView(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 
 	pp := &PoliciesPrinter{
 		Writer: &bytes.Buffer{},
 		Clock:  fakeClock,
 	}
 
-	pp.PrintPolicies(params.PolicyManager.GetPolicies(), utils.OutputFormatTable)
+	pp.PrintPolicies(policyManager.GetPolicies(), utils.OutputFormatTable)
 	got := pp.Writer.(*bytes.Buffer).String()
 	want := `
 NAME                       KIND                       TARGET NAME       TARGET KIND   POLICY TYPE  AGE
@@ -184,7 +185,7 @@ timeout-policy-namespace   TimeoutPolicy.bar.com      default           Namespac
 	}
 
 	pp.Writer = &bytes.Buffer{}
-	pp.PrintPoliciesDescribeView(params.PolicyManager.GetPolicies())
+	pp.PrintPoliciesDescribeView(policyManager.GetPolicies())
 	got = pp.Writer.(*bytes.Buffer).String()
 	want = `
 Name: health-check-gateway
@@ -338,13 +339,14 @@ func TestPoliciesPrinter_PrintCRDs(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	pp := &PoliciesPrinter{
 		Writer: &bytes.Buffer{},
 		Clock:  fakeClock,
 	}
 
-	pp.PrintCRDs(params.PolicyManager.GetCRDs(), utils.OutputFormatTable)
+	pp.PrintCRDs(policyManager.GetCRDs(), utils.OutputFormatTable)
 
 	got := pp.Writer.(*bytes.Buffer).String()
 	want := `
@@ -456,12 +458,13 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	pp := &PoliciesPrinter{
 		Writer: &bytes.Buffer{},
 		Clock:  fakeClock,
 	}
-	pp.PrintCRDs(params.PolicyManager.GetCRDs(), utils.OutputFormatJSON)
+	pp.PrintCRDs(policyManager.GetCRDs(), utils.OutputFormatJSON)
 
 	gotJSON := common.JSONString(pp.Writer.(*bytes.Buffer).String())
 	wantJSON := common.JSONString(fmt.Sprintf(`{
@@ -549,7 +552,7 @@ func TestPoliciesPrinter_PrintCRDs_JsonYaml(t *testing.T) {
 	}
 
 	pp.Writer = &bytes.Buffer{}
-	pp.PrintCRDs(params.PolicyManager.GetCRDs(), utils.OutputFormatYAML)
+	pp.PrintCRDs(policyManager.GetCRDs(), utils.OutputFormatYAML)
 
 	gotYaml := common.YamlString(pp.Writer.(*bytes.Buffer).String())
 	wantYaml := common.YamlString(fmt.Sprintf(`
@@ -699,11 +702,12 @@ func TestPolicyCrd_PrintDescribeView(t *testing.T) {
 		},
 	}
 
-	params := utils.MustParamsForTest(t, common.MustClientsForTest(t, objects...))
+	k8sClients := common.MustClientsForTest(t, objects...)
+	policyManager := utils.MustPolicyManagerForTest(t, k8sClients)
 	pp := &PoliciesPrinter{
 		Writer: &bytes.Buffer{},
 	}
-	pp.PrintPolicyCRDsDescribeView(params.PolicyManager.GetCRDs())
+	pp.PrintPolicyCRDsDescribeView(policyManager.GetCRDs())
 
 	got := pp.Writer.(*bytes.Buffer).String()
 	want := `

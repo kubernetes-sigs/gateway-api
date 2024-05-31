@@ -19,20 +19,14 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
-	"sort"
 	"strings"
-	"text/tabwriter"
 
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
-	"sigs.k8s.io/yaml"
 )
 
 type BackendsPrinter struct {
@@ -41,67 +35,43 @@ type BackendsPrinter struct {
 }
 
 func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(bp, 0, 0, 2, ' ', 0)
-	row := []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"}
-	_, err := tw.Write([]byte(strings.Join(row, "\t") + "\n"))
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "failed to write to the tab writer: %v\n", err)
-		os.Exit(1)
+	table := &Table{
+		ColumnNames:  []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"},
+		UseSeparator: false,
 	}
 
-	backendNodes := make([]*resourcediscovery.BackendNode, 0, len(resourceModel.Backends))
-	for _, backendNode := range resourceModel.Backends {
-		backendNodes = append(backendNodes, backendNode)
-	}
+	backends := maps.Values(resourceModel.Backends)
+	sortedBackends := SortByString(backends)
 
-	sort.Slice(backendNodes, func(i, j int) bool {
-		if backendNodes[i].Backend.GetNamespace() != backendNodes[j].Backend.GetNamespace() {
-			return backendNodes[i].Backend.GetNamespace() < backendNodes[j].Backend.GetNamespace()
-		}
-		return backendNodes[i].Backend.GetName() < backendNodes[j].Backend.GetName()
-	})
-
-	for _, backendNode := range backendNodes {
+	for _, backendNode := range sortedBackends {
 		backend := backendNode.Backend
 
-		parentHTTPRoutes := []string{}
-		remainderHTTPRoutes := 0
+		httpRouteNodes := maps.Values(backendNode.HTTPRoutes)
+		sortedHTTPRouteNodes := SortByString(httpRouteNodes)
+		totalRoutes := len(sortedHTTPRouteNodes)
 
-		httpRouteNodes := make([]*resourcediscovery.HTTPRouteNode, len(backendNode.HTTPRoutes))
-		i := 0
-		for _, node := range backendNode.HTTPRoutes {
-			httpRouteNodes[i] = node
-			i++
-		}
-		sort.Slice(httpRouteNodes, func(i, j int) bool {
-			if httpRouteNodes[i].HTTPRoute.GetNamespace() != httpRouteNodes[j].HTTPRoute.GetNamespace() {
-				return httpRouteNodes[i].HTTPRoute.GetNamespace() < httpRouteNodes[j].HTTPRoute.GetNamespace()
+		var referredByRoutes string
+		if totalRoutes == 0 {
+			referredByRoutes = "None"
+		} else {
+			var routes []string
+			for i, httpRouteNode := range sortedHTTPRouteNodes {
+				if i < 2 {
+					namespacedName := client.ObjectKeyFromObject(httpRouteNode.HTTPRoute).String()
+					routes = append(routes, namespacedName)
+				} else {
+					break
+				}
 			}
-			return httpRouteNodes[i].HTTPRoute.GetName() < httpRouteNodes[j].HTTPRoute.GetName()
-		})
-
-		for _, httpRouteNode := range httpRouteNodes {
-			httpRoute := httpRouteNode.HTTPRoute
-
-			if len(parentHTTPRoutes) < 2 {
-				namespacedName := client.ObjectKeyFromObject(httpRoute).String()
-				parentHTTPRoutes = append(parentHTTPRoutes, namespacedName)
-			} else {
-				remainderHTTPRoutes++
+			referredByRoutes = strings.Join(routes, ", ")
+			if totalRoutes > 2 {
+				referredByRoutes += fmt.Sprintf(" + %d more", totalRoutes-2)
 			}
 		}
 
-		referredByRoutes := "None"
-		if len(parentHTTPRoutes) != 0 {
-			referredByRoutes = strings.Join(parentHTTPRoutes, ",")
-			if remainderHTTPRoutes != 0 {
-				referredByRoutes += fmt.Sprintf(" + %d more", remainderHTTPRoutes)
-			}
-		}
-
-		namespace := backendNode.Backend.GetNamespace()
-		name := backendNode.Backend.GetName()
-		backendType := backendNode.Backend.GetKind()
+		namespace := backend.GetNamespace()
+		name := backend.GetName()
+		backendType := backend.GetKind()
 		age := duration.HumanDuration(bp.Clock.Since(backend.GetCreationTimestamp().Time))
 		policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
 
@@ -113,24 +83,10 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			age,
 			policiesCount,
 		}
-		if _, err = tw.Write([]byte(strings.Join(row, "\t") + "\n")); err != nil {
-			fmt.Fprintf(os.Stderr, "failed to write to the tab writer: %v\n", err)
-			os.Exit(1)
-		}
+		table.Rows = append(table.Rows, row)
 	}
-	if err = tw.Flush(); err != nil {
-		fmt.Fprintf(os.Stderr, "failed to flush to the tab writer: %v\n", err)
-		os.Exit(1)
-	}
-}
 
-type backendDescribeView struct {
-	Group                    string                 `json:",omitempty"`
-	Kind                     string                 `json:",omitempty"`
-	Name                     string                 `json:",omitempty"`
-	Namespace                string                 `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
-	EffectivePolicies        any                    `json:",omitempty"`
+	table.Write(bp, 0)
 }
 
 func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
@@ -138,33 +94,59 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 	for _, backendNode := range resourceModel.Backends {
 		index++
 
-		views := []backendDescribeView{
-			{
-				Group:     backendNode.Backend.GroupVersionKind().Group,
-				Kind:      backendNode.Backend.GroupVersionKind().Kind,
-				Name:      backendNode.Backend.GetName(),
-				Namespace: backendNode.Backend.GetNamespace(),
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies); len(policyRefs) != 0 {
-			views = append(views, backendDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(backendNode.EffectivePolicies) != 0 {
-			views = append(views, backendDescribeView{
-				EffectivePolicies: backendNode.EffectivePolicies,
-			})
+		backend := backendNode.Backend.DeepCopy()
+		backend.SetLabels(nil)
+		backend.SetAnnotations(nil)
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: backendNode.Backend.GetName()},
+			{Key: "Namespace", Value: backendNode.Backend.GetNamespace()},
+			{Key: "Labels", Value: backendNode.Backend.GetLabels()},
+			{Key: "Annotations", Value: backendNode.Backend.GetAnnotations()},
+			{Key: "Backend", Value: backend},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(bp, string(b))
+		// ReferencedByRoutes
+		routes := &Table{
+			ColumnNames:  []string{"Kind", "Name"},
+			UseSeparator: true,
 		}
+		for _, httpRouteNode := range backendNode.HTTPRoutes {
+			row := []string{
+				httpRouteNode.HTTPRoute.Kind, // Kind
+				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+			}
+			routes.Rows = append(routes.Rows, row)
+		}
+		pairs = append(pairs, &DescriberKV{Key: "ReferencedByRoutes", Value: routes})
+
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+
+		// EffectivePolicies
+		if len(backendNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: backendNode.EffectivePolicies})
+		}
+
+		// ReferenceGrants
+		if len(backendNode.ReferenceGrants) != 0 {
+			var names []string
+			for _, refGrantNode := range backendNode.ReferenceGrants {
+				names = append(names, refGrantNode.ReferenceGrant.Name)
+			}
+			pairs = append(pairs, &DescriberKV{Key: "ReferenceGrants", Value: names})
+		}
+
+		// Analysis
+		if len(backendNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(backendNode.Errors)})
+		}
+
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(backendNode.Events, bp.Clock)})
+
+		Describe(bp, pairs)
 
 		if index+1 <= len(resourceModel.Backends) {
 			fmt.Fprintf(bp, "\n\n")
