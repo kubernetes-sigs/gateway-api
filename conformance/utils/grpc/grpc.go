@@ -270,6 +270,9 @@ func validateExpectedResponse(t *testing.T, expected ExpectedResponse) {
 func MakeRequestAndExpectEventuallyConsistentResponse(t *testing.T, c Client, timeoutConfig config.TimeoutConfig, gwAddr string, expected ExpectedResponse) {
 	t.Helper()
 	validateExpectedResponse(t, expected)
+	if c == nil {
+		c = &DefaultClient{Conn: nil}
+	}
 	defer c.Close()
 	sendRPC := func(elapsed time.Duration) bool {
 		resp, err := c.SendRPC(t, gwAddr, expected, timeoutConfig.MaxTimeToConsistency-elapsed)

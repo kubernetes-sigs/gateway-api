@@ -193,9 +193,6 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 	}
 
 	grpcClient := options.GRPCClient
-	if grpcClient == nil {
-		grpcClient = &grpc.DefaultClient{Conn: nil}
-	}
 
 	installedCRDs := &apiextensionsv1.CustomResourceDefinitionList{}
 	err := options.Client.List(context.TODO(), installedCRDs)
