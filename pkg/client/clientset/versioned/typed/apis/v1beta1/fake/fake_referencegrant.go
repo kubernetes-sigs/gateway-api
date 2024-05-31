@@ -20,12 +20,15 @@ package fake
 
 import (
 	"context"
+	json "encoding/json"
+	"fmt"
 
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	labels "k8s.io/apimachinery/pkg/labels"
 	types "k8s.io/apimachinery/pkg/types"
 	watch "k8s.io/apimachinery/pkg/watch"
 	testing "k8s.io/client-go/testing"
+	apisv1beta1 "sigs.k8s.io/gateway-api/apis/applyconfiguration/apis/v1beta1"
 	v1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 )
 
@@ -121,6 +124,28 @@ func (c *FakeReferenceGrants) DeleteCollection(ctx context.Context, opts v1.Dele
 func (c *FakeReferenceGrants) Patch(ctx context.Context, name string, pt types.PatchType, data []byte, opts v1.PatchOptions, subresources ...string) (result *v1beta1.ReferenceGrant, err error) {
 	obj, err := c.Fake.
 		Invokes(testing.NewPatchSubresourceAction(referencegrantsResource, c.ns, name, pt, data, subresources...), &v1beta1.ReferenceGrant{})
+
+	if obj == nil {
+		return nil, err
+	}
+	return obj.(*v1beta1.ReferenceGrant), err
+}
+
+// Apply takes the given apply declarative configuration, applies it and returns the applied referenceGrant.
+func (c *FakeReferenceGrants) Apply(ctx context.Context, referenceGrant *apisv1beta1.ReferenceGrantApplyConfiguration, opts v1.ApplyOptions) (result *v1beta1.ReferenceGrant, err error) {
+	if referenceGrant == nil {
+		return nil, fmt.Errorf("referenceGrant provided to Apply must not be nil")
+	}
+	data, err := json.Marshal(referenceGrant)
+	if err != nil {
+		return nil, err
+	}
+	name := referenceGrant.Name
+	if name == nil {
+		return nil, fmt.Errorf("referenceGrant.Name must be provided to Apply")
+	}
+	obj, err := c.Fake.
+		Invokes(testing.NewPatchSubresourceAction(referencegrantsResource, c.ns, *name, types.ApplyPatchType, data), &v1beta1.ReferenceGrant{})
 
 	if obj == nil {
 		return nil, err

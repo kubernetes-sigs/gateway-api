@@ -24,6 +24,7 @@ import (
 	"sigs.k8s.io/gateway-api/conformance/utils/http"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
+	"sigs.k8s.io/gateway-api/pkg/features"
 )
 
 func init() {
@@ -38,10 +39,10 @@ var HTTPRouteTimeoutRequest = suite.ConformanceTest{
 	ShortName:   "HTTPRouteTimeoutRequest",
 	Description: "An HTTPRoute with request timeout",
 	Manifests:   []string{"tests/httproute-timeout-request.yaml"},
-	Features: []suite.SupportedFeature{
-		suite.SupportGateway,
-		suite.SupportHTTPRoute,
-		suite.SupportHTTPRouteRequestTimeout,
+	Features: []features.SupportedFeature{
+		features.SupportGateway,
+		features.SupportHTTPRoute,
+		features.SupportHTTPRouteRequestTimeout,
 	},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
@@ -58,6 +59,10 @@ var HTTPRouteTimeoutRequest = suite.ConformanceTest{
 			}, {
 				Request:   http.Request{Path: "/request-timeout?delay=1s"},
 				Response:  http.Response{StatusCode: 504},
+				Namespace: ns,
+			}, {
+				Request:   http.Request{Path: "/disable-request-timeout?delay=1s"},
+				Response:  http.Response{StatusCode: 200},
 				Namespace: ns,
 			},
 		}

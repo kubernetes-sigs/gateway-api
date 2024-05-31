@@ -50,6 +50,18 @@ readonly OUTPUT_PKG=sigs.k8s.io/gateway-api/pkg/client
 readonly APIS_PKG=sigs.k8s.io/gateway-api
 readonly CLIENTSET_NAME=versioned
 readonly CLIENTSET_PKG_NAME=clientset
+readonly VERSIONS=(v1alpha2 v1alpha3 v1beta1 v1)
+
+GATEWAY_INPUT_DIRS_SPACE=""
+GATEWAY_INPUT_DIRS_COMMA=""
+for VERSION in "${VERSIONS[@]}"
+do
+  GATEWAY_INPUT_DIRS_SPACE+="${APIS_PKG}/apis/${VERSION} "
+  GATEWAY_INPUT_DIRS_COMMA+="${APIS_PKG}/apis/${VERSION},"
+done
+GATEWAY_INPUT_DIRS_SPACE="${GATEWAY_INPUT_DIRS_SPACE%,}" # drop trailing space
+GATEWAY_INPUT_DIRS_COMMA="${GATEWAY_INPUT_DIRS_COMMA%,}" # drop trailing comma
+
 
 if [[ "${VERIFY_CODEGEN:-}" == "true" ]]; then
   echo "Running in verification mode"
@@ -61,41 +73,104 @@ readonly COMMON_FLAGS="${VERIFY_FLAG:-} --go-header-file ${SCRIPT_ROOT}/hack/boi
 echo "Generating CRDs"
 go run ./pkg/generator
 
+# throw away
+new_report="$(mktemp -t "$(basename "$0").api_violations.XXXXXX")"
+
+echo "Generating openapi schema"
+go run k8s.io/kube-openapi/cmd/openapi-gen \
+  --output-file zz_generated.openapi.go \
+  --report-filename "${new_report}" \
+  --output-dir "pkg/generated/openapi" \
+  --output-pkg "sigs.k8s.io/gateway-api/pkg/generated/openapi" \
+  ${COMMON_FLAGS} \
+  $GATEWAY_INPUT_DIRS_SPACE \
+  k8s.io/apimachinery/pkg/apis/meta/v1 \
+  k8s.io/apimachinery/pkg/runtime \
+  k8s.io/apimachinery/pkg/version
+
+
+echo "Generating apply configuration"
+go run k8s.io/code-generator/cmd/applyconfiguration-gen \
+  --openapi-schema <(go run ${SCRIPT_ROOT}/cmd/modelschema) \
+  --output-dir "apis/applyconfiguration" \
+  --output-pkg "${APIS_PKG}/apis/applyconfiguration" \
+  ${COMMON_FLAGS} \
+  ${GATEWAY_INPUT_DIRS_SPACE}
+
+
+# Temporary hack until https://github.com/kubernetes/kubernetes/pull/124371 is released
+function fix_applyconfiguration() {
+  local package="$1"
+  local version="$(basename $1)"
+
+  echo $package
+  echo $version
+  pushd $package > /dev/null
+
+  # Replace import
+  for filename in *.go; do
+    import_line=$(grep "$package" "$filename")
+    if [[ -z "$import_line" ]]; then
+      continue
+    fi
+    import_prefix=$(echo "$import_line" | awk '{print $1}')
+    sed -i'.bak' -e "s,${import_prefix} \"sigs.k8s.io/gateway-api/${package}\",,g" "$filename"
+    sed -i'.bak' -e "s,\[\]${import_prefix}\.,\[\],g" "$filename"
+    sed -i'.bak' -e "s,&${import_prefix}\.,&,g" "$filename"
+    sed -i'.bak' -e "s,*${import_prefix}\.,*,g" "$filename"
+    sed -i'.bak' -e "s,^\t${import_prefix}\.,,g" "$filename"
+  done
+
+  rm *.bak
+  go fmt .
+  find . -type f -name "*.go" -exec sed -i'.bak' -e "s,import (),,g" {} \;
+  rm *.bak
+  go fmt .
+
+  popd > /dev/null
+}
+
+export -f fix_applyconfiguration
+find apis/applyconfiguration/apis -name "v*" -type d -exec bash -c 'fix_applyconfiguration $0' {} \;
+
 echo "Generating clientset at ${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}"
 go run k8s.io/code-generator/cmd/client-gen \
   --clientset-name "${CLIENTSET_NAME}" \
-  --input-base "" \
-  --input "${APIS_PKG}/apis/v1alpha2,${APIS_PKG}/apis/v1beta1,${APIS_PKG}/apis/v1" \
-  --output-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
+  --input-base "${APIS_PKG}" \
+  --input "${GATEWAY_INPUT_DIRS_COMMA//${APIS_PKG}/}" \
+  --output-dir "pkg/client/${CLIENTSET_PKG_NAME}" \
+  --output-pkg "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}" \
+  --apply-configuration-package "${APIS_PKG}/apis/applyconfiguration" \
   ${COMMON_FLAGS}
 
 echo "Generating listers at ${OUTPUT_PKG}/listers"
 go run k8s.io/code-generator/cmd/lister-gen \
-  --input-dirs "${APIS_PKG}/apis/v1alpha2,${APIS_PKG}/apis/v1beta1,${APIS_PKG}/apis/v1" \
-  --output-package "${OUTPUT_PKG}/listers" \
-  ${COMMON_FLAGS}
+  --output-dir "pkg/client/listers" \
+  --output-pkg "${OUTPUT_PKG}/listers" \
+  ${COMMON_FLAGS} \
+  ${GATEWAY_INPUT_DIRS_SPACE}
 
 echo "Generating informers at ${OUTPUT_PKG}/informers"
 go run k8s.io/code-generator/cmd/informer-gen \
-  --input-dirs "${APIS_PKG}/apis/v1alpha2,${APIS_PKG}/apis/v1beta1,${APIS_PKG}/apis/v1" \
   --versioned-clientset-package "${OUTPUT_PKG}/${CLIENTSET_PKG_NAME}/${CLIENTSET_NAME}" \
   --listers-package "${OUTPUT_PKG}/listers" \
-  --output-package "${OUTPUT_PKG}/informers" \
-  ${COMMON_FLAGS}
+  --output-dir "pkg/client/informers" \
+  --output-pkg "${OUTPUT_PKG}/informers" \
+  ${COMMON_FLAGS} \
+  ${GATEWAY_INPUT_DIRS_SPACE}
 
-for VERSION in v1alpha2 v1beta1 v1
+echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
+go run k8s.io/code-generator/cmd/register-gen \
+  --output-file zz_generated.register.go \
+  ${COMMON_FLAGS} \
+  ${GATEWAY_INPUT_DIRS_SPACE}
+
+for VERSION in "${VERSIONS[@]}"
 do
-  echo "Generating ${VERSION} register at ${APIS_PKG}/apis/${VERSION}"
-  go run k8s.io/code-generator/cmd/register-gen \
-    --input-dirs "${APIS_PKG}/apis/${VERSION}" \
-    --output-package "${APIS_PKG}/apis/${VERSION}" \
-    ${COMMON_FLAGS}
-
   echo "Generating ${VERSION} deepcopy at ${APIS_PKG}/apis/${VERSION}"
   go run sigs.k8s.io/controller-tools/cmd/controller-gen \
     object:headerFile=${SCRIPT_ROOT}/hack/boilerplate/boilerplate.generatego.txt \
     paths="${APIS_PKG}/apis/${VERSION}"
-
 done
 
 echo "Generating gRPC/Protobuf code"

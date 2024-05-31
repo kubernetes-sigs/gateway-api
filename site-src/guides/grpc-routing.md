@@ -4,7 +4,7 @@
 
     The `GRPCRoute` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](/concepts/versioning).
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 The [GRPCRoute resource](/api-types/grpcroute) allows you to match on gRPC traffic and
 direct it to Kubernetes backends. This guide shows how the GRPCRoute matches

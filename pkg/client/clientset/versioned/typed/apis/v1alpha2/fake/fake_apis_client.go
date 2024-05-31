@@ -28,24 +28,12 @@ type FakeGatewayV1alpha2 struct {
 	*testing.Fake
 }
 
-func (c *FakeGatewayV1alpha2) BackendTLSPolicies(namespace string) v1alpha2.BackendTLSPolicyInterface {
-	return &FakeBackendTLSPolicies{c, namespace}
+func (c *FakeGatewayV1alpha2) BackendLBPolicies(namespace string) v1alpha2.BackendLBPolicyInterface {
+	return &FakeBackendLBPolicies{c, namespace}
 }
 
 func (c *FakeGatewayV1alpha2) GRPCRoutes(namespace string) v1alpha2.GRPCRouteInterface {
 	return &FakeGRPCRoutes{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) Gateways(namespace string) v1alpha2.GatewayInterface {
-	return &FakeGateways{c, namespace}
-}
-
-func (c *FakeGatewayV1alpha2) GatewayClasses() v1alpha2.GatewayClassInterface {
-	return &FakeGatewayClasses{c}
-}
-
-func (c *FakeGatewayV1alpha2) HTTPRoutes(namespace string) v1alpha2.HTTPRouteInterface {
-	return &FakeHTTPRoutes{c, namespace}
 }
 
 func (c *FakeGatewayV1alpha2) ReferenceGrants(namespace string) v1alpha2.ReferenceGrantInterface {

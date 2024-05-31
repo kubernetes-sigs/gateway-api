@@ -18,7 +18,7 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-readonly VERSION="v1.56.2"
+readonly VERSION="v1.57.2"
 readonly KUBE_ROOT=$(dirname "${BASH_SOURCE}")/..
 
 cd "${KUBE_ROOT}"
@@ -26,6 +26,25 @@ cd "${KUBE_ROOT}"
 # See configuration file in ${KUBE_ROOT}/.golangci.yml.
 mkdir -p cache
 
-docker run --rm -v $(pwd)/cache:/cache -v $(pwd):/app --security-opt="label=disable" -e GOLANGCI_LINT_CACHE=/cache -e GOFLAGS="-buildvcs=false"  -w /app "golangci/golangci-lint:$VERSION" golangci-lint run
+failed=false
+for module in $(find . -name "go.mod" | xargs -n1 dirname); do
+  echo "Linting ${module}"
+
+  docker run --rm \
+    -v $(pwd)/cache:/cache \
+    -v $(pwd):/app \
+    -w "/app/${module}" \
+    --security-opt="label=disable" \
+    -e GOLANGCI_LINT_CACHE=/cache \
+    -e GOFLAGS="-buildvcs=false" \
+    "golangci/golangci-lint:$VERSION" \
+    golangci-lint run || failed=true
+done
+
+if ${failed}; then
+  exit 1
+else
+  exit 0
+fi
 
 # ex: ts=2 sw=2 et filetype=sh

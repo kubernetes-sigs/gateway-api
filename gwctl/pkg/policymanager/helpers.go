@@ -16,13 +16,15 @@ limitations under the License.
 
 package policymanager
 
+import "sigs.k8s.io/gateway-api/gwctl/pkg/common"
+
 // ToPolicyRefs returns the Object references of all given policies. Note that
 // these are not the value of targetRef within the Policies but rather the
 // reference to the Policy object itself.
-func ToPolicyRefs(policies []Policy) []ObjRef {
-	var result []ObjRef
+func ToPolicyRefs(policies []Policy) []common.ObjRef {
+	var result []common.ObjRef
 	for _, policy := range policies {
-		result = append(result, ObjRef{
+		result = append(result, common.ObjRef{
 			Group:     policy.Unstructured().GroupVersionKind().Group,
 			Kind:      policy.Unstructured().GroupVersionKind().Kind,
 			Name:      policy.Unstructured().GetName(),

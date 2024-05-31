@@ -63,7 +63,7 @@ This is covered in more detail in [GEP 724](/geps/gep-709/).
 
     The `ReferenceGrant` resource described below is currently only included in the
     "Experimental" channel of Gateway API. For more information on release
-    channels, refer to the [related documentation](/concepts/versioning).
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 It is quite challenging to cross namespace boundaries in a safe manner. With
 Gateway API, we had several key feature requests that required this capability.
