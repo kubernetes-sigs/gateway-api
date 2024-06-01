@@ -19,16 +19,13 @@ package printer
 import (
 	"fmt"
 	"io"
-	"os"
+	"sort"
 	"strings"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"sigs.k8s.io/yaml"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -81,49 +78,124 @@ func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.Resourc
 	table.Write(hp, 0)
 }
 
-type httpRouteDescribeView struct {
-	Name                     string                      `json:",omitempty"`
-	Namespace                string                      `json:",omitempty"`
-	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
-	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []common.ObjRef             `json:",omitempty"`
-	EffectivePolicies        any                         `json:",omitempty"`
-}
-
 func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
 	index := 0
+
 	for _, httpRouteNode := range resourceModel.HTTPRoutes {
 		index++
 
-		views := []httpRouteDescribeView{
-			{
-				Name:      httpRouteNode.HTTPRoute.GetName(),
-				Namespace: httpRouteNode.HTTPRoute.GetNamespace(),
-			},
-			{
-				Hostnames:  httpRouteNode.HTTPRoute.Spec.Hostnames,
-				ParentRefs: httpRouteNode.HTTPRoute.Spec.ParentRefs,
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(httpRouteNode.Policies); len(policyRefs) != 0 {
-			views = append(views, httpRouteDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(httpRouteNode.EffectivePolicies) != 0 {
-			views = append(views, httpRouteDescribeView{
-				EffectivePolicies: httpRouteNode.EffectivePolicies,
-			})
+		metadata := httpRouteNode.HTTPRoute.ObjectMeta.DeepCopy()
+		resetMetadataFields(metadata)
+
+		namespace := handleDefaultNamespace(httpRouteNode.HTTPRoute.Namespace)
+
+		pairs := []*DescriberKV{
+			{"Name", httpRouteNode.HTTPRoute.GetName()},
+			{"Namespace", namespace},
+			{"Label", httpRouteNode.HTTPRoute.Labels},
+			{"Annotations", httpRouteNode.HTTPRoute.Annotations},
+			{"APIVersion", httpRouteNode.HTTPRoute.APIVersion},
+			{"Kind", httpRouteNode.HTTPRoute.Kind},
+			{"Metadata", metadata},
+			{"Spec", httpRouteNode.HTTPRoute.Spec},
+			{"Status", httpRouteNode.HTTPRoute.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(hp, string(b))
+		// DirectlyAttachedPolicies
+		directlyAttachedPolicies := &Table{
+			ColumnNames:  []string{"Type", "Name"},
+			UseSeparator: true,
 		}
+
+		for _, policyNode := range httpRouteNode.Policies {
+			if policyNode.Policy.IsDirect() {
+				policyNamespace := handleDefaultNamespace(policyNode.Policy.TargetRef().Namespace)
+
+				row := []string{
+					// Type
+					fmt.Sprintf("%v.%v", policyNode.Policy.Unstructured().GroupVersionKind().Kind, policyNode.Policy.Unstructured().GroupVersionKind().Group),
+					// Name
+					fmt.Sprintf("%v/%v", policyNamespace, policyNode.Policy.Unstructured().GetName()),
+				}
+
+				directlyAttachedPolicies.Rows = append(directlyAttachedPolicies.Rows, row)
+			}
+		}
+
+		if len(directlyAttachedPolicies.Rows) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: directlyAttachedPolicies})
+		}
+
+		// InheritedPolicies
+		if len(httpRouteNode.InheritedPolicies) != 0 {
+			inheritedPolicies := &Table{
+				ColumnNames:  []string{"Type", "Name", "Target Kind", "Target Name"},
+				UseSeparator: true,
+			}
+
+			for _, policyNode := range httpRouteNode.InheritedPolicies {
+				policyNamespace := handleDefaultNamespace(policyNode.Policy.Unstructured().GetNamespace())
+
+				row := []string{
+					// Type
+					fmt.Sprintf(
+						"%v.%v",
+						policyNode.Policy.Unstructured().GroupVersionKind().Kind,
+						policyNode.Policy.Unstructured().GroupVersionKind().Group,
+					),
+					// Name
+					fmt.Sprintf("%v/%v", policyNamespace, policyNode.Policy.Unstructured().GetName()),
+					// Target Kind
+					policyNode.Policy.TargetRef().Kind,
+				}
+
+				// Target Name
+				switch policyNode.Policy.TargetRef().Kind {
+
+				case "Namespace":
+					row = append(row, handleDefaultNamespace(policyNode.Policy.TargetRef().Name))
+
+				case "GatewayClass":
+					row = append(row, policyNode.Policy.TargetRef().Name)
+
+				default:
+					// handle namespaced objects
+					targetRefNamespace := handleDefaultNamespace(policyNode.Policy.TargetRef().Namespace)
+					name := fmt.Sprintf("%v/%v", targetRefNamespace, policyNode.Policy.TargetRef().Name)
+
+					row = append(row, name)
+				}
+
+				// Sort inheritedPolices on the basis of Type and Name
+				sort.Slice(inheritedPolicies.Rows, func(i, j int) bool {
+					// Compare the Type of inheritedPolicies
+					if inheritedPolicies.Rows[i][0] != inheritedPolicies.Rows[j][0] {
+						return inheritedPolicies.Rows[i][0] < inheritedPolicies.Rows[j][0]
+					}
+					// If inheritedPolicies are of same Type, compare Names
+					return inheritedPolicies.Rows[i][1] < inheritedPolicies.Rows[j][1]
+				})
+
+				inheritedPolicies.Rows = append(inheritedPolicies.Rows, row)
+			}
+
+			pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: inheritedPolicies})
+		}
+
+		// EffectivePolices
+		if len(httpRouteNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: httpRouteNode.EffectivePolicies})
+		}
+
+		// Analysis
+		if len(httpRouteNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(httpRouteNode.Errors)})
+		}
+
+		// Events
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(httpRouteNode.Events, hp.Clock)})
+
+		Describe(hp, pairs)
 
 		if index+1 <= len(resourceModel.HTTPRoutes) {
 			fmt.Fprintf(hp, "\n\n")

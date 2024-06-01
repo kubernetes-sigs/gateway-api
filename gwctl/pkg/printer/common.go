@@ -25,6 +25,7 @@ import (
 	"text/tabwriter"
 
 	corev1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -207,4 +208,19 @@ func NodeResources[K NodeResource](items []K) []NodeResource {
 		output[i] = item
 	}
 	return output
+}
+
+func resetMetadataFields(metadata *metav1.ObjectMeta) {
+	metadata.Labels = nil
+	metadata.Annotations = nil
+	metadata.Name = ""
+	metadata.Namespace = ""
+	metadata.ManagedFields = nil
+}
+
+func handleDefaultNamespace(namespace string) string {
+	if namespace == "" {
+		namespace = "default"
+	}
+	return namespace
 }
