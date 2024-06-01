@@ -471,14 +471,30 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	got := buff.String()
 	want := `
 Name: foo-httproute
-ParentRefs:
-- group: gateway.networking.k8s.io
-  kind: Gateway
-  name: foo-gateway
+Namespace: default
+Label: null
+Annotations: null
+APIVersion: ""
+Kind: ""
+Metadata:
+  creationTimestamp: null
+  resourceVersion: "999"
+Spec:
+  parentRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: foo-gateway
+Status:
+  parents: null
 DirectlyAttachedPolicies:
-- Group: bar.com
-  Kind: TimeoutPolicy
-  Name: timeout-policy-httproute
+  Type                   Name
+  ----                   ----
+  TimeoutPolicy.bar.com  default/timeout-policy-httproute
+InheritedPolicies:
+  Type                       Name                               Target Kind   Target Name
+  ----                       ----                               -----------   -----------
+  HealthCheckPolicy.foo.com  default/health-check-gatewayclass  GatewayClass  foo-gatewayclass
+  HealthCheckPolicy.foo.com  default/health-check-gateway       Gateway       default/foo-gateway
 EffectivePolicies:
   default/foo-gateway:
     HealthCheckPolicy.foo.com:
@@ -490,6 +506,7 @@ EffectivePolicies:
     TimeoutPolicy.bar.com:
       condition: path=/def
       seconds: 60
+Events: <none>
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
