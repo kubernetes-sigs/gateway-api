@@ -168,6 +168,10 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
+	if err := resourceModel.calculateInheritedPolicies(); err != nil {
+		return resourceModel, err
+	}
+
 	if err := resourceModel.calculateEffectivePolicies(); err != nil {
 		return resourceModel, err
 	}
@@ -193,6 +197,10 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
+
+	if err := resourceModel.calculateInheritedPolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	if err := resourceModel.calculateEffectivePolicies(); err != nil {
 		return resourceModel, err
@@ -220,6 +228,10 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
 	d.discoverNamespaces(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
+
+	if err := resourceModel.calculateInheritedPolicies(); err != nil {
+		return resourceModel, err
+	}
 
 	if err := resourceModel.calculateEffectivePolicies(); err != nil {
 		return resourceModel, err
