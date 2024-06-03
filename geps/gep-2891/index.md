@@ -87,7 +87,7 @@ type HTTPCookieMatch struct {
 	// +kubebuilder:default=Exact
 	Type *CookieMatchType `json:"type,omitempty"`
 
-	// Name is the cookie-name of the cookie-pair in the HTTP Cookie header to be matched.
+  // Name is the cookie-name of the cookie-pair in the HTTP Cookie header to be matched.
   // The cookie names are case-sensitive. This must be an exact string match. (See
   // https://www.rfc-editor.org/rfc/rfc6265)
   //
