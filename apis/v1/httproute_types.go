@@ -264,7 +264,7 @@ type HTTPRouteRule struct {
 	// choose how that 50 percent is determined.
 	//
 	// When a HTTPBackendRef refers to a Service that has no ready endpoints,
-	// implementations MAY return a 503 for requests to that backend instead.
+	// implementations SHOULD return a 503 for requests to that backend instead.
 	//
 	// Support: Core for Kubernetes Service
 	//
