@@ -87,17 +87,17 @@ type HTTPCookieMatch struct {
 	// +kubebuilder:default=Exact
 	Type *CookieMatchType `json:"type,omitempty"`
 
-  // Name is the cookie-name of the cookie-pair in the HTTP Cookie header to be matched.
-  // The cookie names are case-sensitive. This must be an exact string match. (See
-  // https://www.rfc-editor.org/rfc/rfc6265)
-  //
+	// Name is the cookie-name of the cookie-pair in the HTTP Cookie header to be matched.
+	// The cookie names are case-sensitive. This must be an exact string match. (See
+	// https://www.rfc-editor.org/rfc/rfc6265)
+	//
 	// cookie-header = "Cookie:" OWS cookie-string OWS
 	// cookie-string = cookie-pair *( ";" SP cookie-pair )
 	// cookie-pair   = cookie-name "=" cookie-value
 	// cookie-name   = token
 	// token         = <token, defined in [RFC2616], Section 2.2>
-  //
-  // If the cookie-name is empty, ignore this HTTPCookieMatch entirely.
+	//
+	// If the cookie-name is empty, ignore this HTTPCookieMatch entirely.
 	//
 	// If multiple entries specify equivalent cookie names, only the first
 	// entry with an equivalent name MUST be considered for a match. Subsequent
@@ -108,7 +108,7 @@ type HTTPCookieMatch struct {
 
 	// Values is the cookie-value of the cookie-pair in the HTTP Cookie header to be matched.
 	// Matches if the value of the cookie with name field is present in the HTTP Cookie header.
-  // The cookie-value is always case-sensitive. This must be an exact string match.
+	// The cookie-value is always case-sensitive. This must be an exact string match.
 	//
 	// +kubebuilder:validation:MinLength=1
 	// +kubebuilder:validation:MaxLength=4096
