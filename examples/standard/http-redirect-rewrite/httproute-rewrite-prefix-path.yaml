@@ -8,7 +8,11 @@ spec:
   hostnames:
     - rewrite.example
   rules:
-    - filters:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /cardamom
+      filters:
         - type: URLRewrite
           urlRewrite:
             hostname: elsewhere.example
