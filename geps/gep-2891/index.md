@@ -39,7 +39,6 @@ Moreover, a new match type `List` is added. Matches if the value of the cookie w
 The `HTTPCookieMatch` and `List` are considered an extended feature.
 
 ```golang
-// HTTPCookieMatch describes how to select a HTTP route by matching HTTP request
 // CookieMatchType specifies the semantics of how HTTP cookie values should be
 // compared. Valid CookieMatchType values, along with their conformance levels, are:
 //
