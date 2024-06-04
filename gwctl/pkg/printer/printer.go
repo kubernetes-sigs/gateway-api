@@ -39,7 +39,7 @@ func Print(p Printer, resourceModel *resourcediscovery.ResourceModel, format uti
 	switch format {
 	case utils.OutputFormatTable:
 		p.PrintTable(resourceModel, false)
-	case utils.OutputFormatWIDE:
+	case utils.OutputFormatWide:
 		p.PrintTable(resourceModel, true)
 	case utils.OutputFormatJSON, utils.OutputFormatYAML:
 		nodes := SortByString(p.GetPrintableNodes(resourceModel))
