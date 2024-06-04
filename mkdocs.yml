@@ -3,6 +3,7 @@ repo_url: https://github.com/kubernetes-sigs/gateway-api
 repo_name: kubernetes-sigs/gateway-api
 site_dir: site
 docs_dir: site-src
+trademark: https://www.linuxfoundation.org/legal/trademark-usage
 extra_css:
   - stylesheets/extra.css
 extra_javascript:
