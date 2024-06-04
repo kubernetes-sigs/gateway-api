@@ -99,6 +99,37 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 				},
 			},
 		},
+		&gatewayv1.Gateway{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "bar-gateway",
+				CreationTimestamp: metav1.Time{
+					Time: fakeClock.Now().Add(-3 * time.Second),
+				},
+			},
+			Spec: gatewayv1.GatewaySpec{
+				GatewayClassName: "bar-com-internal-gateway-class",
+				Listeners: []gatewayv1.Listener{
+					{
+						Name:     gatewayv1.SectionName("http-8443"),
+						Protocol: gatewayv1.HTTPProtocolType,
+						Port:     gatewayv1.PortNumber(8443),
+					},
+				},
+			},
+			Status: gatewayv1.GatewayStatus{
+				Addresses: []gatewayv1.GatewayStatusAddress{
+					{
+						Value: "10.11.12.13",
+					},
+				},
+				Conditions: []metav1.Condition{
+					{
+						Type:   "Programmed",
+						Status: "Unknown",
+					},
+				},
+			},
+		},
 	}
 
 	k8sClients := common.MustClientsForTest(t, objects...)
@@ -117,7 +148,7 @@ func TestGatewayClassesPrinter_PrintTable(t *testing.T) {
 		Writer: buff,
 		Clock:  fakeClock,
 	}
-	Print(gcp, resourceModel, utils.OutputFormatTable)
+	gcp.PrintTable(resourceModel, false)
 
 	got := buff.String()
 	want := `
@@ -128,6 +159,23 @@ foo-com-internal-gateway-class  foo.com/internal-gateway-class  Unknown   24m
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+	buff.Reset()
+	gcp2 := &GatewayClassesPrinter{
+		Writer: buff,
+		Clock:  fakeClock,
+	}
+	gcp2.PrintTable(resourceModel, true)
+
+	got2 := buff.String()
+	want2 := `
+NAME                            CONTROLLER                      ACCEPTED  AGE   GATEWAYS
+bar-com-internal-gateway-class  bar.baz/internal-gateway-class  True      365d  1
+foo-com-external-gateway-class  foo.com/external-gateway-class  False     100d  0
+foo-com-internal-gateway-class  foo.com/internal-gateway-class  Unknown   24m   0
+`
+	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)
 	}
 }
 

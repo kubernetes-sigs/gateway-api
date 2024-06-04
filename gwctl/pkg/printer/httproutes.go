@@ -43,12 +43,18 @@ func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.
 	return NodeResources(maps.Values(resourceModel.HTTPRoutes))
 }
 
-func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
-	table := &Table{
-		ColumnNames:  []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"},
-		UseSeparator: false,
+func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE", "POLICIES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
 	}
 
+	table := &Table{
+		ColumnNames:  columnNames,
+		UseSeparator: false,
+	}
 	httpRouteNodes := maps.Values(resourceModel.HTTPRoutes)
 
 	for _, httpRouteNode := range SortByString(httpRouteNodes) {
@@ -75,6 +81,10 @@ func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.Resourc
 			hostNamesOutput,
 			parentRefsCount,
 			age,
+		}
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(httpRouteNode.Policies))
+			row = append(row, policiesCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}

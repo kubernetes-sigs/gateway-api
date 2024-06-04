@@ -38,9 +38,16 @@ func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery
 	return NodeResources(maps.Values(resourceModel.Namespaces))
 }
 
-func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAME", "STATUS", "AGE", "POLICIES"}
+	} else {
+		columnNames = []string{"NAME", "STATUS", "AGE"}
+	}
+
 	table := &Table{
-		ColumnNames:  []string{"NAME", "STATUS", "AGE"},
+		ColumnNames:  columnNames,
 		UseSeparator: false,
 	}
 
@@ -51,6 +58,10 @@ func (nsp *NamespacesPrinter) PrintTable(resourceModel *resourcediscovery.Resour
 			namespaceNode.Namespace.Name,
 			string(namespaceNode.Namespace.Status.Phase),
 			age,
+		}
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(namespaceNode.Policies))
+			row = append(row, policiesCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}

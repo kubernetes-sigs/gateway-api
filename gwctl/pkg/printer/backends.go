@@ -34,9 +34,20 @@ type BackendsPrinter struct {
 	Clock clock.Clock
 }
 
-func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
+func (bp *BackendsPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(maps.Values(resourceModel.GatewayClasses))
+}
+
+func (bp *BackendsPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE"}
+	}
+
 	table := &Table{
-		ColumnNames:  []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"},
+		ColumnNames:  columnNames,
 		UseSeparator: false,
 	}
 
@@ -73,7 +84,6 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		name := backend.GetName()
 		backendType := backend.GetKind()
 		age := duration.HumanDuration(bp.Clock.Since(backend.GetCreationTimestamp().Time))
-		policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
 
 		row := []string{
 			namespace,
@@ -81,7 +91,10 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			backendType,
 			referredByRoutes,
 			age,
-			policiesCount,
+		}
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
+			row = append(row, policiesCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}
