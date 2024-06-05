@@ -45,6 +45,7 @@ namespace explicitly allows references to Services from HTTPRoutes in the `foo`
 namespace.
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: foo
@@ -57,6 +58,7 @@ spec:
       - name: bar
         namespace: bar
 ---
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: bar
