@@ -38,7 +38,7 @@ var HTTPRouteFilterRequestRedirect = suite.ConformanceTest{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
 	},
-	Manifests: []string{"tests/httproute-header-matching.yaml"},
+	Manifests: []string{"tests/httproute-filter-request-redirect.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
 		routeNN := types.NamespacedName{Name: "filter-request-redirect", Namespace: ns}
@@ -47,9 +47,15 @@ var HTTPRouteFilterRequestRedirect = suite.ConformanceTest{
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
 
 		testCases := []http.ExpectedResponse{{
-			Request:   http.Request{Path: "/", Headers: map[string]string{"Version": "one"}},
+			Request:   http.Request{Path: "/"},
 			Backend:   "infra-backend-v1",
 			Namespace: ns,
+			Response:  http.Response{StatusCode: 302, Headers: map[string]string{"Location": "https://gateway-api.sigs.k8s.io"}},
+		}, {
+			Request:   http.Request{Path: "/"},
+			Backend:   "infra-backend-v2",
+			Namespace: ns,
+			Response:  http.Response{StatusCode: 302, Headers: map[string]string{"Location": "http://www.redirect-example.com"}},
 		}}
 
 		for i := range testCases {

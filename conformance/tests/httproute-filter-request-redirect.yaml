@@ -10,7 +10,7 @@ spec:
   - matches:
     - path:
         type: PathPrefix
-        value: /redirect
+        value: /
     backendRefs:
     - name: infra-backend-v1
       port: 8080
@@ -18,5 +18,13 @@ spec:
       - type: FilterRequestRedirect
         filterRequestRedirect:
           scheme: https
-          hostname: www.redirect-example.com
+          hostname: gateway-api.sigs.k8s.io
           port: 443
+    - name: infra-backend-v2
+      port: 8080
+      filters:
+      - type: FilterRequestRedirect
+        filterRequestRedirect:
+          scheme: http
+          hostname: www.redirect-example.com
+          port: 80
