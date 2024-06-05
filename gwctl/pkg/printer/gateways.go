@@ -41,7 +41,7 @@ func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.Re
 
 func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
 	table := &Table{
-		ColumnNames:  []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"},
+		ColumnNames:  []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"},
 		UseSeparator: false,
 	}
 
@@ -74,6 +74,7 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
 
 		row := []string{
+			gatewayNode.Gateway.GetNamespace(),
 			gatewayNode.Gateway.GetName(),
 			string(gatewayNode.Gateway.Spec.GatewayClassName),
 			addressesOutput,
