@@ -28,20 +28,21 @@ import (
 )
 
 func init() {
-	ConformanceTests = append(ConformanceTests, HTTPRouteFilterRequestRedirect)
+	ConformanceTests = append(ConformanceTests, HTTPRouteBackendPathRedirect)
 }
 
-var HTTPRouteFilterRequestRedirect = suite.ConformanceTest{
-	ShortName:   "HTTPRouteFilterRequestRedirect",
+var HTTPRouteBackendPathRedirect = suite.ConformanceTest{
+	ShortName:   "HTTPRouteBackendPathRedirect",
 	Description: "A single HTTPRoute with a redirection filter for different backends",
 	Features: []features.SupportedFeature{
 		features.SupportGateway,
 		features.SupportHTTPRoute,
+		features.SupportHTTPRouteBackendPathRedirect,
 	},
-	Manifests: []string{"tests/httproute-filter-request-redirect.yaml"},
+	Manifests: []string{"tests/httproute-backend-request-redirect.yaml"},
 	Test: func(t *testing.T, suite *suite.ConformanceTestSuite) {
 		ns := "gateway-conformance-infra"
-		routeNN := types.NamespacedName{Name: "filter-request-redirect", Namespace: ns}
+		routeNN := types.NamespacedName{Name: "backend-request-redirect", Namespace: ns}
 		gwNN := types.NamespacedName{Name: "same-namespace", Namespace: ns}
 		gwAddr := kubernetes.GatewayAndHTTPRoutesMustBeAccepted(t, suite.Client, suite.TimeoutConfig, suite.ControllerName, kubernetes.NewGatewayRef(gwNN), routeNN)
 		kubernetes.HTTPRouteMustHaveResolvedRefsConditionsTrue(t, suite.Client, suite.TimeoutConfig, routeNN, gwNN)
