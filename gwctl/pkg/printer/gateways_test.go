@@ -71,7 +71,8 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 		},
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "abc-gateway-12345",
+				Name:      "abc-gateway-12345",
+				Namespace: "default",
 				CreationTimestamp: metav1.Time{
 					Time: fakeClock.Now().Add(-20 * 24 * time.Hour),
 				},
@@ -107,7 +108,8 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 		},
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "demo-gateway-2",
+				Name:      "demo-gateway-2",
+				Namespace: "default",
 				CreationTimestamp: metav1.Time{
 					Time: fakeClock.Now().Add(-5 * 24 * time.Hour),
 				},
@@ -144,7 +146,8 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 		},
 		&gatewayv1.Gateway{
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "random-gateway",
+				Name:      "random-gateway",
+				Namespace: "default",
 				CreationTimestamp: metav1.Time{
 					Time: fakeClock.Now().Add(-3 * time.Second),
 				},
@@ -195,10 +198,10 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 
 	got := buff.String()
 	want := `
-NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE
-abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d
-demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d
-random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s
+NAMESPACE  NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE
+default    abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d
+default    demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d
+default    random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s
 `
 
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
