@@ -301,10 +301,10 @@ default    random-gateway     regional-internal-class  10.11.12.13              
 
 	got2 := buff.String()
 	want2 := `
-NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE  POLICIES  HTTPROUTES
-abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d  0         1
-demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d   0         0
-random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s   1         0
+NAMESPACE  NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE  POLICIES  HTTPROUTES
+default    abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d  0         1
+default    demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d   0         0
+default    random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s   1         0
 `
 	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)

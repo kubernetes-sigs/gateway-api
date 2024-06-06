@@ -42,9 +42,9 @@ func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.Re
 func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
 	var columnNames []string
 	if wide {
-		columnNames = []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
 	} else {
-		columnNames = []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
 	}
 	table := &Table{
 		ColumnNames:  columnNames,
