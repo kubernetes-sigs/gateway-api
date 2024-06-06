@@ -39,9 +39,15 @@ func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.Re
 	return NodeResources(maps.Values(resourceModel.Gateways))
 }
 
-func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
+	}
 	table := &Table{
-		ColumnNames:  []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"},
+		ColumnNames:  columnNames,
 		UseSeparator: false,
 	}
 
@@ -81,6 +87,11 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 			portsOutput,
 			programmedStatus,
 			age,
+		}
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(gatewayNode.Policies))
+			httpRoutesCount := fmt.Sprintf("%d", len(gatewayNode.HTTPRoutes))
+			row = append(row, policiesCount, httpRoutesCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}

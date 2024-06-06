@@ -349,7 +349,7 @@ func runGetOrDescribeBackends(f cmdutils.Factory, o *getOrDescribeOptions) {
 	realClock := clock.RealClock{}
 	backendsPrinter := &printer.BackendsPrinter{Writer: o.out, Clock: realClock}
 	if o.cmdName == commandNameGet {
-		backendsPrinter.Print(resourceModel)
+		printer.Print(backendsPrinter, resourceModel, o.outputFormat)
 	} else {
 		backendsPrinter.PrintDescribeView(resourceModel)
 	}

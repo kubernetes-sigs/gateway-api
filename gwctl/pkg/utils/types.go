@@ -100,6 +100,7 @@ func MustPolicyManagerForTest(t *testing.T, fakeClients *common.K8sClients) *pol
 type OutputFormat string
 
 const (
+	OutputFormatWide  OutputFormat = "wide"
 	OutputFormatJSON  OutputFormat = "json"
 	OutputFormatYAML  OutputFormat = "yaml"
 	OutputFormatTable OutputFormat = ""
@@ -107,6 +108,8 @@ const (
 
 func ValidateAndReturnOutputFormat(format string) (OutputFormat, error) {
 	switch format {
+	case "wide":
+		return OutputFormatWide, nil
 	case "json":
 		return OutputFormatJSON, nil
 	case "yaml":

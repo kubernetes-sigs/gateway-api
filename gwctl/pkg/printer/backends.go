@@ -34,9 +34,20 @@ type BackendsPrinter struct {
 	Clock clock.Clock
 }
 
-func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
+func (bp *BackendsPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(maps.Values(resourceModel.GatewayClasses))
+}
+
+func (bp *BackendsPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "AGE", "REFERRED BY ROUTES", "POLICIES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "AGE"}
+	}
+
 	table := &Table{
-		ColumnNames:  []string{"NAMESPACE", "NAME", "TYPE", "REFERRED BY ROUTES", "AGE", "POLICIES"},
+		ColumnNames:  columnNames,
 		UseSeparator: false,
 	}
 
@@ -50,38 +61,38 @@ func (bp *BackendsPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 		sortedHTTPRouteNodes := SortByString(httpRouteNodes)
 		totalRoutes := len(sortedHTTPRouteNodes)
 
-		var referredByRoutes string
-		if totalRoutes == 0 {
-			referredByRoutes = "None"
-		} else {
-			var routes []string
-			for i, httpRouteNode := range sortedHTTPRouteNodes {
-				if i < 2 {
-					namespacedName := client.ObjectKeyFromObject(httpRouteNode.HTTPRoute).String()
-					routes = append(routes, namespacedName)
-				} else {
-					break
-				}
-			}
-			referredByRoutes = strings.Join(routes, ", ")
-			if totalRoutes > 2 {
-				referredByRoutes += fmt.Sprintf(" + %d more", totalRoutes-2)
-			}
-		}
-
 		namespace := backend.GetNamespace()
 		name := backend.GetName()
 		backendType := backend.GetKind()
 		age := duration.HumanDuration(bp.Clock.Since(backend.GetCreationTimestamp().Time))
-		policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
 
 		row := []string{
 			namespace,
 			name,
 			backendType,
-			referredByRoutes,
 			age,
-			policiesCount,
+		}
+		if wide {
+			var referredByRoutes string
+			if totalRoutes == 0 {
+				referredByRoutes = "None"
+			} else {
+				var routes []string
+				for i, httpRouteNode := range sortedHTTPRouteNodes {
+					if i < 2 {
+						namespacedName := client.ObjectKeyFromObject(httpRouteNode.HTTPRoute).String()
+						routes = append(routes, namespacedName)
+					} else {
+						break
+					}
+				}
+				referredByRoutes = strings.Join(routes, ", ")
+				if totalRoutes > 2 {
+					referredByRoutes += fmt.Sprintf(" + %d more", totalRoutes-2)
+				}
+			}
+			policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
+			row = append(row, referredByRoutes, policiesCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}

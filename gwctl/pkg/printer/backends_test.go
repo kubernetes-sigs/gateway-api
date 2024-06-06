@@ -196,15 +196,32 @@ func TestBackendsPrinter_Print(t *testing.T) {
 		Clock:  fakeClock,
 	}
 
-	bp.Print(resourceModel)
+	bp.PrintTable(resourceModel, false)
 
 	got := buff.String()
 	want := `
-NAMESPACE  NAME       TYPE     REFERRED BY ROUTES                                 AGE  POLICIES
-ns1        foo-svc-1  Service  ns1/foo-httproute-1                                3d   1
-ns1        foo-svc-2  Service  ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  2d   0
+NAMESPACE  NAME       TYPE     AGE
+ns1        foo-svc-1  Service  3d
+ns1        foo-svc-2  Service  2d
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+
+	buff.Reset()
+	nsp2 := &BackendsPrinter{
+		Writer: buff,
+		Clock:  fakeClock,
+	}
+	nsp2.PrintTable(resourceModel, true)
+
+	got2 := buff.String()
+	want2 := `
+NAMESPACE  NAME       TYPE     AGE  REFERRED BY ROUTES                                 POLICIES
+ns1        foo-svc-1  Service  3d   ns1/foo-httproute-1                                1
+ns1        foo-svc-2  Service  2d   ns1/foo-httproute-2, ns1/foo-httproute-3 + 2 more  0
+`
+	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)
 	}
 }

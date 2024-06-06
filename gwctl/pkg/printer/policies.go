@@ -88,7 +88,7 @@ func (pp *PoliciesPrinter) PrintPolicies(policies []policymanager.Policy, format
 	switch format {
 	case utils.OutputFormatJSON, utils.OutputFormatYAML:
 		pp.printClientObjects(clientObjects, format)
-	case utils.OutputFormatTable:
+	case utils.OutputFormatTable, utils.OutputFormatWide:
 		pp.printPoliciesTable(sortedPolicies)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)
@@ -129,7 +129,7 @@ func (pp *PoliciesPrinter) PrintCRDs(policyCRDs []policymanager.PolicyCRD, forma
 	switch format {
 	case utils.OutputFormatJSON, utils.OutputFormatYAML:
 		pp.printClientObjects(clientObjects, format)
-	case utils.OutputFormatTable:
+	case utils.OutputFormatTable, utils.OutputFormatWide:
 		pp.printCRDsTable(sortedPolicyCRDs)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown output format '%s' found\n", format)

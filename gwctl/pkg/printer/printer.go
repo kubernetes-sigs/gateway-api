@@ -32,13 +32,15 @@ import (
 type Printer interface {
 	io.Writer
 	GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource
-	PrintTable(resourceModel *resourcediscovery.ResourceModel)
+	PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool)
 }
 
 func Print(p Printer, resourceModel *resourcediscovery.ResourceModel, format utils.OutputFormat) {
 	switch format {
 	case utils.OutputFormatTable:
-		p.PrintTable(resourceModel)
+		p.PrintTable(resourceModel, false)
+	case utils.OutputFormatWide:
+		p.PrintTable(resourceModel, true)
 	case utils.OutputFormatJSON, utils.OutputFormatYAML:
 		nodes := SortByString(p.GetPrintableNodes(resourceModel))
 		clientObjects := ClientObjects(nodes)

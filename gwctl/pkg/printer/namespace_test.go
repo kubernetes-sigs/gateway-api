@@ -73,6 +73,41 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 				Phase: corev1.NamespaceTerminating,
 			},
 		},
+		// CRD and definition for TimeoutPolicy attached to default namespace
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "timeoutpolicies.bar.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "direct",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "bar.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "timeoutpolicies",
+					Kind:   "TimeoutPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "bar.com/v1",
+				"kind":       "TimeoutPolicy",
+				"metadata": map[string]interface{}{
+					"name": "timeout-policy-namespace",
+				},
+				"spec": map[string]interface{}{
+					"condition": "path=/abc",
+					"seconds":   int64(30),
+					"targetRef": map[string]interface{}{
+						"kind": "Namespace",
+						"name": "ns1",
+					},
+				},
+			},
+		},
 	}
 
 	k8sClients := common.MustClientsForTest(t, objects...)
@@ -91,7 +126,7 @@ func TestNamespacePrinter_PrintTable(t *testing.T) {
 		Writer: buff,
 		Clock:  fakeClock,
 	}
-	nsp.PrintTable(resourceModel)
+	nsp.PrintTable(resourceModel, false)
 
 	got := buff.String()
 	want := `
@@ -100,9 +135,26 @@ default      Active       46d
 kube-system  Active       46d
 ns1          Terminating  10m
 `
-
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+
+	buff.Reset()
+	nsp2 := &NamespacesPrinter{
+		Writer: buff,
+		Clock:  fakeClock,
+	}
+	nsp2.PrintTable(resourceModel, true)
+
+	got2 := buff.String()
+	want2 := `
+NAME         STATUS       AGE  POLICIES
+default      Active       46d  0
+kube-system  Active       46d  0
+ns1          Terminating  10m  1
+`
+	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)
 	}
 }
 

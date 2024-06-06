@@ -38,9 +38,15 @@ func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcedisco
 	return NodeResources(maps.Values(resourceModel.GatewayClasses))
 }
 
-func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel) {
+func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE", "GATEWAYS"}
+	} else {
+		columnNames = []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"}
+	}
 	table := &Table{
-		ColumnNames:  []string{"NAME", "CONTROLLER", "ACCEPTED", "AGE"},
+		ColumnNames:  columnNames,
 		UseSeparator: false,
 	}
 
@@ -61,6 +67,10 @@ func (gcp *GatewayClassesPrinter) PrintTable(resourceModel *resourcediscovery.Re
 			string(gatewayClassNode.GatewayClass.Spec.ControllerName),
 			accepted,
 			age,
+		}
+		if wide {
+			gatewayCount := fmt.Sprintf("%d", len(gatewayClassNode.Gateways))
+			row = append(row, gatewayCount)
 		}
 		table.Rows = append(table.Rows, row)
 	}

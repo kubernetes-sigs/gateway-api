@@ -176,6 +176,90 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 				},
 			},
 		},
+		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				Kind: "HTTPRoute",
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "foo-httproute",
+			},
+			Spec: gatewayv1.HTTPRouteSpec{
+				CommonRouteSpec: gatewayv1.CommonRouteSpec{
+					ParentRefs: []gatewayv1.ParentReference{{
+						Kind:  common.PtrTo(gatewayv1.Kind("Gateway")),
+						Group: common.PtrTo(gatewayv1.Group("gateway.networking.k8s.io")),
+						Name:  "abc-gateway-12345",
+					}},
+				},
+			},
+		},
+
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "healthcheckpolicies.foo.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "inherited",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "foo.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "healthcheckpolicies",
+					Kind:   "HealthCheckPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "foo.com/v1",
+				"kind":       "HealthCheckPolicy",
+				"metadata": map[string]interface{}{
+					"name": "health-check-gatewayclass",
+				},
+				"spec": map[string]interface{}{
+					"override": map[string]interface{}{
+						"key1": "value-parent-1",
+						"key3": "value-parent-3",
+						"key5": "value-parent-5",
+					},
+					"default": map[string]interface{}{
+						"key2": "value-parent-2",
+						"key4": "value-parent-4",
+					},
+					"targetRef": map[string]interface{}{
+						"group": "gateway.networking.k8s.io",
+						"kind":  "GatewayClass",
+						"name":  "regional-internal-class",
+					},
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "foo.com/v1",
+				"kind":       "HealthCheckPolicy",
+				"metadata": map[string]interface{}{
+					"name": "health-check-gateway",
+				},
+				"spec": map[string]interface{}{
+					"override": map[string]interface{}{
+						"key1": "value-child-1",
+					},
+					"default": map[string]interface{}{
+						"key2": "value-child-2",
+						"key5": "value-child-5",
+					},
+					"targetRef": map[string]interface{}{
+						"group":     "gateway.networking.k8s.io",
+						"kind":      "Gateway",
+						"name":      "random-gateway",
+						"namespace": "default",
+					},
+				},
+			},
+		},
 	}
 
 	k8sClients := common.MustClientsForTest(t, objects...)
@@ -194,7 +278,7 @@ func TestGatewaysPrinter_PrintTable(t *testing.T) {
 		Writer: buff,
 		Clock:  fakeClock,
 	}
-	gp.PrintTable(resourceModel)
+	gp.PrintTable(resourceModel, false)
 
 	got := buff.String()
 	want := `
@@ -206,6 +290,24 @@ default    random-gateway     regional-internal-class  10.11.12.13              
 
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+
+	buff.Reset()
+	nsp2 := &GatewaysPrinter{
+		Writer: buff,
+		Clock:  fakeClock,
+	}
+	nsp2.PrintTable(resourceModel, true)
+
+	got2 := buff.String()
+	want2 := `
+NAMESPACE  NAME               CLASS                    ADDRESSES                   PORTS     PROGRAMMED  AGE  POLICIES  HTTPROUTES
+default    abc-gateway-12345  internal-class           192.168.100.5               443,8080  False       20d  0         1
+default    demo-gateway-2     external-class           10.0.0.1,10.0.0.2 + 1 more  80        True        5d   0         0
+default    random-gateway     regional-internal-class  10.11.12.13                 8443      Unknown     3s   1         0
+`
+	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)
 	}
 }
 

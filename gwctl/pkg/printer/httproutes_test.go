@@ -203,6 +203,41 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 				},
 			},
 		},
+		&apiextensionsv1.CustomResourceDefinition{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "timeoutpolicies.bar.com",
+				Labels: map[string]string{
+					gatewayv1alpha2.PolicyLabelKey: "direct",
+				},
+			},
+			Spec: apiextensionsv1.CustomResourceDefinitionSpec{
+				Scope:    apiextensionsv1.ClusterScoped,
+				Group:    "bar.com",
+				Versions: []apiextensionsv1.CustomResourceDefinitionVersion{{Name: "v1"}},
+				Names: apiextensionsv1.CustomResourceDefinitionNames{
+					Plural: "timeoutpolicies",
+					Kind:   "TimeoutPolicy",
+				},
+			},
+		},
+		&unstructured.Unstructured{
+			Object: map[string]interface{}{
+				"apiVersion": "bar.com/v1",
+				"kind":       "TimeoutPolicy",
+				"metadata": map[string]interface{}{
+					"name": "timeout-policy-httproute",
+				},
+				"spec": map[string]interface{}{
+					"condition": "path=/def",
+					"seconds":   int64(60),
+					"targetRef": map[string]interface{}{
+						"group": "gateway.networking.k8s.io",
+						"kind":  "HTTPRoute",
+						"name":  "foo-httproute-1",
+					},
+				},
+			},
+		},
 	}
 
 	k8sClients := common.MustClientsForTest(t, objects...)
@@ -222,7 +257,7 @@ func TestHTTPRoutesPrinter_PrintTable(t *testing.T) {
 		Clock:  fakeClock,
 	}
 
-	hp.PrintTable(resourceModel)
+	hp.PrintTable(resourceModel, false)
 
 	got := buff.String()
 	want := `
@@ -234,6 +269,25 @@ ns2        bax-httproute-18777  None                               1            
 `
 	if diff := cmp.Diff(common.YamlString(want), common.YamlString(got), common.YamlStringTransformer); diff != "" {
 		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got, want, diff)
+	}
+
+	buff.Reset()
+	hp2 := &HTTPRoutesPrinter{
+		Writer: buff,
+		Clock:  fakeClock,
+	}
+	hp2.PrintTable(resourceModel, true)
+
+	got2 := buff.String()
+	want2 := `
+NAMESPACE  NAME                 HOSTNAMES                          PARENT REFS  AGE  POLICIES
+default    foo-httproute-1      example.com,example2.com + 1 more  1            24h  1
+default    qmn-httproute-100    example.com                        2            11h  0
+ns1        bar-route-21         foo.com,bar.com + 5 more           1            9h   0
+ns2        bax-httproute-18777  None                               1            5m   0
+`
+	if diff := cmp.Diff(common.YamlString(want2), common.YamlString(got2), common.YamlStringTransformer); diff != "" {
+		t.Errorf("Unexpected diff\ngot=\n%v\nwant=\n%v\ndiff (-want +got)=\n%v", got2, want2, diff)
 	}
 }
 
