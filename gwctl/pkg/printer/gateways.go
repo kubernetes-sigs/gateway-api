@@ -80,6 +80,7 @@ func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceM
 		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
 
 		row := []string{
+			gatewayNode.Gateway.GetNamespace(),
 			gatewayNode.Gateway.GetName(),
 			string(gatewayNode.Gateway.Spec.GatewayClassName),
 			addressesOutput,
