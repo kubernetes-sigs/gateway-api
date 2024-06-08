@@ -17,6 +17,7 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -207,4 +208,8 @@ func NodeResources[K NodeResource](items []K) []NodeResource {
 		output[i] = item
 	}
 	return output
+}
+
+type eventFetcher interface {
+	FetchEventsFor(context.Context, client.Object) *corev1.EventList
 }

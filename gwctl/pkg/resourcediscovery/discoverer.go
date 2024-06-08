@@ -135,8 +135,6 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 	}
 	resourceModel.addGatewayClasses(gatewayClasses...)
 
-	d.discoverEventsForGatewayClasses(ctx, resourceModel)
-
 	d.discoverGatewaysForGatewayClasses(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
@@ -153,8 +151,6 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 		return resourceModel, err
 	}
 	resourceModel.addGateways(gateways...)
-
-	d.discoverEventsForGateways(ctx, resourceModel)
 
 	d.discoverHTTPRoutesForGateways(ctx, resourceModel)
 	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
@@ -180,8 +176,6 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	}
 	resourceModel.addHTTPRoutes(httpRoutes...)
 
-	d.discoverEventsForHTTPRoutes(ctx, resourceModel)
-
 	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewaysForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
@@ -205,8 +199,6 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 		return resourceModel, err
 	}
 	resourceModel.addBackends(backends...)
-
-	d.discoverEventsForBackends(ctx, resourceModel)
 
 	d.discoverReferenceGrantsForBackends(ctx, resourceModel)
 	d.discoverHTTPRoutesForBackends(ctx, resourceModel)
@@ -232,8 +224,6 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 		return resourceModel, err
 	}
 	resourceModel.addNamespace(namespaces...)
-
-	d.discoverEventsForNamespaces(ctx, resourceModel)
 
 	d.discoverPolicies(resourceModel)
 
@@ -587,46 +577,6 @@ func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
 }
 
-// discoverEventsForGatewayClasses adds Events associated with GatewayClasses
-// that exist in the resourceModel.
-func (d Discoverer) discoverEventsForGatewayClasses(ctx context.Context, resourceModel *ResourceModel) {
-	for _, gatewayClassNode := range resourceModel.GatewayClasses {
-		gatewayClassNode.Events = append(gatewayClassNode.Events, d.fetchEventsFor(ctx, gatewayClassNode.GatewayClass).Items...)
-	}
-}
-
-// discoverEventsForGateways adds Events associated with Gateways that exist in
-// the resourceModel.
-func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel *ResourceModel) {
-	for _, gatewayNode := range resourceModel.Gateways {
-		gatewayNode.Events = append(gatewayNode.Events, d.fetchEventsFor(ctx, gatewayNode.Gateway).Items...)
-	}
-}
-
-// discoverEventsForHTTPRoutes adds Events associated with HTTPRoutes that exist
-// in the resourceModel.
-func (d Discoverer) discoverEventsForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
-		httpRouteNode.Events = append(httpRouteNode.Events, d.fetchEventsFor(ctx, httpRouteNode.HTTPRoute).Items...)
-	}
-}
-
-// discoverEventsForBackends adds Events associated with Backends that exist in
-// the resourceModel.
-func (d Discoverer) discoverEventsForBackends(ctx context.Context, resourceModel *ResourceModel) {
-	for _, backendNode := range resourceModel.Backends {
-		backendNode.Events = append(backendNode.Events, d.fetchEventsFor(ctx, backendNode.Backend).Items...)
-	}
-}
-
-// discoverEventsForNamespaces adds Events associated with Namespaces that exist
-// in the resourceModel.
-func (d Discoverer) discoverEventsForNamespaces(ctx context.Context, resourceModel *ResourceModel) {
-	for _, nsNode := range resourceModel.Namespaces {
-		nsNode.Events = append(nsNode.Events, d.fetchEventsFor(ctx, nsNode.Namespace).Items...)
-	}
-}
-
 // fetchGatewayClasses fetches GatewayClasses based on a filter.
 func (d Discoverer) fetchGatewayClasses(ctx context.Context, filter Filter) ([]gatewayv1.GatewayClass, error) {
 	gvr := schema.GroupVersionResource{
@@ -860,7 +810,7 @@ func (d Discoverer) fetchNamespace(ctx context.Context, filter Filter) ([]corev1
 }
 
 // fetchEventsFor fetches events associated with the given object.
-func (d Discoverer) fetchEventsFor(ctx context.Context, object client.Object) *corev1.EventList {
+func (d Discoverer) FetchEventsFor(ctx context.Context, object client.Object) *corev1.EventList {
 	eventList := &corev1.EventList{}
 	options := &client.ListOptions{
 		FieldSelector: fields.AndSelectors(

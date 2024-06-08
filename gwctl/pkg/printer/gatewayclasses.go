@@ -17,6 +17,7 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -31,7 +32,8 @@ var _ Printer = (*GatewayClassesPrinter)(nil)
 
 type GatewayClassesPrinter struct {
 	io.Writer
-	Clock clock.Clock
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
 func (gcp *GatewayClassesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -106,7 +108,8 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
 		// Events
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(gatewayClassNode.Events, gcp.Clock)})
+		eventList := gcp.EventFetcher.FetchEventsFor(context.Background(), gatewayClassNode.GatewayClass)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, gcp.Clock)})
 
 		Describe(gcp, pairs)
 

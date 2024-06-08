@@ -485,8 +485,9 @@ func TestGatewaysPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	gp := &GatewaysPrinter{
-		Writer: buff,
-		Clock:  fakeClock,
+		Writer:       buff,
+		Clock:        fakeClock,
+		EventFetcher: discoverer,
 	}
 	gp.PrintDescribeView(resourceModel)
 

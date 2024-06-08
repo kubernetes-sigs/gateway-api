@@ -17,6 +17,7 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
@@ -31,7 +32,8 @@ import (
 
 type BackendsPrinter struct {
 	io.Writer
-	Clock clock.Clock
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
 func (bp *BackendsPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -155,7 +157,8 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		}
 
 		// Events
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(backendNode.Events, bp.Clock)})
+		eventList := bp.EventFetcher.FetchEventsFor(context.Background(), backendNode.Backend)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, bp.Clock)})
 
 		Describe(bp, pairs)
 
