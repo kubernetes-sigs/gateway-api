@@ -1,5 +1,5 @@
 #$ Used in:
-#$ - site-src/api-types/httproute.md
+#$ - site-src/guides/http-redirect-rewrite.md
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -8,13 +8,17 @@ spec:
   hostnames:
     - rewrite.example
   rules:
-    - filters:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /cardamom
+      filters:
         - type: URLRewrite
           urlRewrite:
             hostname: elsewhere.example
             path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /fennel
+              type: ReplaceFullPath
+              replaceFullPath: /fennel
       backendRefs:
         - name: example-svc
           weight: 1
