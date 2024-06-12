@@ -13,6 +13,7 @@ updates:
       - go
       - dependencies
       - ok-to-test
+      - release-note-none
 
   # Dependencies listed in gwctl/go.mod
   - package-ecosystem: "gomod"
@@ -27,6 +28,7 @@ updates:
       - go
       - dependencies
       - ok-to-test
+      - release-note-none
 
   # Dependencies listed in conformance/echo-basic/go.mod
   - package-ecosystem: "gomod"
@@ -41,6 +43,7 @@ updates:
       - go
       - dependencies
       - ok-to-test
+      - release-note-none
 
   # Dependencies listed in .github/workflows/*.yml
   - package-ecosystem: "github-actions"
@@ -51,6 +54,7 @@ updates:
       - github_actions
       - dependencies
       - ok-to-test
+      - release-note-none
 
   # Dependencies listed in Dockerfile
   - package-ecosystem: "docker"
@@ -61,6 +65,7 @@ updates:
       - docker
       - dependencies
       - ok-to-test
+      - release-note-none
 
   # Dependencies listed in requirements.txt
   - package-ecosystem: "pip"
@@ -71,3 +76,4 @@ updates:
       - python
       - dependencies
       - ok-to-test
+      - release-note-none
