@@ -30,7 +30,6 @@ import (
 	"sigs.k8s.io/gateway-api/gwctl/pkg/relations"
 
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/fields"
@@ -63,11 +62,6 @@ type Filter struct {
 
 // Discoverer orchestrates the discovery of resources and their associated
 // policies, building a model of interconnected resources.
-//
-// TODO: Optimization Task: Implement a heuristic within each discovery function
-// to intelligently choose between:
-//   - Single API calls for efficient bulk fetching when appropriate.
-//   - Multiple API calls for targeted retrieval when necessary.
 type Discoverer struct {
 	K8sClients    *common.K8sClients
 	PolicyManager *policymanager.PolicyManager
@@ -141,8 +135,6 @@ func (d Discoverer) DiscoverResourcesForGatewayClass(filter Filter) (*ResourceMo
 	}
 	resourceModel.addGatewayClasses(gatewayClasses...)
 
-	d.discoverEventsForGatewayClasses(ctx, resourceModel)
-
 	d.discoverGatewaysForGatewayClasses(ctx, resourceModel)
 	d.discoverPolicies(resourceModel)
 
@@ -159,8 +151,6 @@ func (d Discoverer) DiscoverResourcesForGateway(filter Filter) (*ResourceModel, 
 		return resourceModel, err
 	}
 	resourceModel.addGateways(gateways...)
-
-	d.discoverEventsForGateways(ctx, resourceModel)
 
 	d.discoverHTTPRoutesForGateways(ctx, resourceModel)
 	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
@@ -186,8 +176,6 @@ func (d Discoverer) DiscoverResourcesForHTTPRoute(filter Filter) (*ResourceModel
 	}
 	resourceModel.addHTTPRoutes(httpRoutes...)
 
-	d.discoverEventsForHTTPRoutes(ctx, resourceModel)
-
 	d.discoverBackendsForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewaysForHTTPRoutes(ctx, resourceModel)
 	d.discoverGatewayClassesForGateways(ctx, resourceModel)
@@ -211,8 +199,6 @@ func (d Discoverer) DiscoverResourcesForBackend(filter Filter) (*ResourceModel, 
 		return resourceModel, err
 	}
 	resourceModel.addBackends(backends...)
-
-	d.discoverEventsForBackends(ctx, resourceModel)
 
 	d.discoverReferenceGrantsForBackends(ctx, resourceModel)
 	d.discoverHTTPRoutesForBackends(ctx, resourceModel)
@@ -238,8 +224,6 @@ func (d Discoverer) DiscoverResourcesForNamespace(filter Filter) (*ResourceModel
 		return resourceModel, err
 	}
 	resourceModel.addNamespace(namespaces...)
-
-	d.discoverEventsForNamespaces(ctx, resourceModel)
 
 	d.discoverPolicies(resourceModel)
 
@@ -278,17 +262,12 @@ func (d Discoverer) discoverGatewayClassesForGateways(ctx context.Context, resou
 	if err != nil {
 		klog.V(1).ErrorS(err, "Failed to list all GatewayClasses")
 	}
-
-	// Build temporary index for GatewayClasses
-	gatewayClassesByID := make(map[gatewayClassID]gatewayv1.GatewayClass)
-	for _, gatewayClass := range gatewayClasses {
-		gatewayClassesByID[GatewayClassID(gatewayClass.GetName())] = gatewayClass
-	}
+	resourceModel.addGatewayClasses(gatewayClasses...)
 
 	for gatewayID, gatewayNode := range resourceModel.Gateways {
 		gatewayClassName := relations.FindGatewayClassNameForGateway(*gatewayNode.Gateway)
 		gwcID := GatewayClassID(gatewayClassName)
-		gatewayClass, ok := gatewayClassesByID[gwcID]
+		_, ok := resourceModel.GatewayClasses[gwcID]
 		if !ok {
 			err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
 				ReferringObject: common.ObjRef{Kind: "Gateway", Name: gatewayNode.Gateway.GetName(), Namespace: gatewayNode.Gateway.GetNamespace()},
@@ -298,50 +277,49 @@ func (d Discoverer) discoverGatewayClassesForGateways(ctx context.Context, resou
 			klog.V(1).Info(err)
 			continue
 		}
-
-		resourceModel.addGatewayClasses(gatewayClass)
 		resourceModel.connectGatewayWithGatewayClass(gatewayID, gwcID)
+	}
+
+	// Remove GatewayClasses which are not connected to any Gateways.
+	for gatewayClassID, gatewayClassNode := range resourceModel.GatewayClasses {
+		if len(gatewayClassNode.Gateways) == 0 {
+			delete(resourceModel.GatewayClasses, gatewayClassID)
+		}
 	}
 }
 
 // discoverGatewaysForHTTPRoutes will add Gateways associated with HTTPRoutes
 // in the resourceModel.
 func (d Discoverer) discoverGatewaysForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
-	// Visit all gateways corresponding to the httpRoutes
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
-		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
-			// Check if Gateway already exists in the resourceModel.
-			if _, ok := resourceModel.Gateways[GatewayID(gatewayRef.Namespace, gatewayRef.Name)]; ok {
-				// Gateway already exists in the resourceModel, skip re-fetching.
-				continue
-			}
+	gateways, err := d.fetchGateways(ctx, Filter{ /* every gateway */ })
+	if err != nil {
+		klog.V(1).ErrorS(err, "Failed to fetch Gateways")
+		return
+	}
+	resourceModel.addGateways(gateways...)
 
-			// Gateway doesn't already exist so fetch and add it to the resourceModel.
-			gateways, err := d.fetchGateways(ctx, Filter{Namespace: gatewayRef.Namespace, Name: gatewayRef.Name, Labels: labels.Everything()})
-			if err != nil {
-				if apierrors.IsNotFound(err) {
-					err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
-						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
-						ReferredObject:  common.ObjRef{Kind: "Gateway", Name: gatewayRef.Name, Namespace: gatewayRef.Namespace},
-					}}
-					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
-					klog.V(1).Info(err)
-				} else {
-					klog.V(1).ErrorS(err, "Error while fetching Gateway for HTTPRoute",
-						"gateway", gatewayRef.String(),
-						"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
-					)
-				}
+	// Visit all gateways corresponding to the httpRoutes
+	for httpRouteID, httpRouteNode := range resourceModel.HTTPRoutes {
+		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
+			gatewayID := GatewayID(gatewayRef.Namespace, gatewayRef.Name)
+			_, ok := resourceModel.Gateways[gatewayID]
+			if !ok {
+				err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+					ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+					ReferredObject:  common.ObjRef{Kind: "Gateway", Name: gatewayRef.Name, Namespace: gatewayRef.Namespace},
+				}}
+				httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+				klog.V(1).Info(err)
 				continue
 			}
-			resourceModel.addGateways(gateways[0])
+			resourceModel.connectHTTPRouteWithGateway(httpRouteID, gatewayID)
 		}
 	}
 
-	// Connect gatewayd with httproutes.
-	for httpRouteID, httpRouteNode := range resourceModel.HTTPRoutes {
-		for _, gatewayRef := range relations.FindGatewayRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
-			resourceModel.connectHTTPRouteWithGateway(httpRouteID, GatewayID(gatewayRef.Namespace, gatewayRef.Name))
+	// Remove Gateways which are not connected to any HTTPRoutes.
+	for gatewayID, gatewayNode := range resourceModel.Gateways {
+		if len(gatewayNode.HTTPRoutes) == 0 {
+			delete(resourceModel.Gateways, gatewayID)
 		}
 	}
 }
@@ -460,43 +438,17 @@ func (d Discoverer) discoverHTTPRoutesForBackends(ctx context.Context, resourceM
 // HTTPRoute in the resourceModel.
 func (d Discoverer) discoverBackendsForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
 	// This will be a three step process:
-	//  1. Add ALL Backends to the resourceModel that are referenced by the
-	//     HTTPRoutes.
+	//  1. Add ALL Backends to the resourceModel.
 	//  2. Discover ReferenceGrants for those Backends.
 	//  3. Remove Backends from the resourceModel which are in a different namespace
 	//     from the HTTPRoute and are not exposed through a ReferenceGrant.
 
 	// Step 1
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
-		for _, backendRef := range relations.FindBackendRefsForHTTPRoute(*httpRouteNode.HTTPRoute) {
-			// Check if the Backend already exists in the resourceModel
-			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
-			if _, ok := resourceModel.Backends[backendID]; ok {
-				// Backend already exists in the resourceModel, skip re-fetching.
-				continue
-			}
-
-			// Backend doesn't already exist so fetch and add it to the resourceModel.
-			backends, err := d.fetchBackends(ctx, Filter{Namespace: backendRef.Namespace, Name: backendRef.Name})
-			if err != nil {
-				if apierrors.IsNotFound(err) {
-					err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
-						ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
-						ReferredObject:  backendRef,
-					}}
-					httpRouteNode.Errors = append(httpRouteNode.Errors, err)
-					klog.V(1).Info(err)
-				} else {
-					klog.V(1).ErrorS(err, "Error while fetching Backend for HTTPRoute",
-						"backend", fmt.Sprintf("%v/%v/%v", backendRef.Kind, backendRef.Namespace, backendRef.Name),
-						"httproute", httpRouteNode.HTTPRoute.GetNamespace()+"/"+httpRouteNode.HTTPRoute.GetName(),
-					)
-				}
-				continue
-			}
-			resourceModel.addBackends(backends[0])
-		}
+	backends, err := d.fetchBackends(ctx, Filter{ /* All Backends */ })
+	if err != nil {
+		klog.V(1).ErrorS(err, "Failed to list all Backends")
 	}
+	resourceModel.addBackends(backends...)
 
 	// Step 2
 	d.discoverReferenceGrantsForBackends(ctx, resourceModel)
@@ -508,9 +460,12 @@ func (d Discoverer) discoverBackendsForHTTPRoutes(ctx context.Context, resourceM
 			backendID := BackendID(backendRef.Group, backendRef.Kind, backendRef.Namespace, backendRef.Name)
 			backendNode, ok := resourceModel.Backends[backendID]
 			if !ok {
-				// Backend does not exist in the resourceModel (maybe because of some
-				// error), so skip processing this backend.
-				klog.V(3).ErrorS(nil, "Backend not found in the resourceModel", "backend", fmt.Sprintf("%v/%v/%v", backendRef.Kind, backendRef.Namespace, backendRef.Name))
+				err := ReferenceToNonExistentResourceError{ReferenceFromTo: ReferenceFromTo{
+					ReferringObject: common.ObjRef{Kind: "HTTPRoute", Name: httpRouteNode.HTTPRoute.GetName(), Namespace: httpRouteNode.HTTPRoute.GetNamespace()},
+					ReferredObject:  backendRef,
+				}}
+				httpRouteNode.Errors = append(httpRouteNode.Errors, err)
+				klog.V(1).Info(err)
 				continue
 			}
 
@@ -541,8 +496,8 @@ func (d Discoverer) discoverBackendsForHTTPRoutes(ctx context.Context, resourceM
 				}
 			}
 
-			// At this point, we know that either in the same namespace as the
-			// HTTPRoute, or is exposed through a ReferenceGrant.
+			// At this point, we know that either Backend is in the same namespace as
+			// the HTTPRoute, or is exposed through a ReferenceGrant.
 			resourceModel.connectHTTPRouteWithBackend(HTTPRouteID(httpRouteNode.HTTPRoute.GetNamespace(), httpRouteNode.HTTPRoute.GetName()), backendID)
 		}
 	}
@@ -595,6 +550,7 @@ func (d Discoverer) discoverReferenceGrantsForBackends(ctx context.Context, reso
 				fmt.Fprintf(os.Stderr, "failed to fetch list of ReferenceGrants: %v\n", err)
 				os.Exit(1)
 			}
+			referenceGrantsByNamespace[backendNS] = referenceGrants
 		}
 
 		for _, referenceGrant := range referenceGrants {
@@ -619,46 +575,6 @@ func (d Discoverer) discoverReferenceGrantsForBackends(ctx context.Context, reso
 // discoverPolicies adds Policies for resources that exist in the resourceModel.
 func (d Discoverer) discoverPolicies(resourceModel *ResourceModel) {
 	resourceModel.addPolicyIfTargetExists(d.PolicyManager.GetPolicies()...)
-}
-
-// discoverEventsForGatewayClasses adds Events associated with GatewayClasses
-// that exist in the resourceModel.
-func (d Discoverer) discoverEventsForGatewayClasses(ctx context.Context, resourceModel *ResourceModel) {
-	for _, gatewayClassNode := range resourceModel.GatewayClasses {
-		gatewayClassNode.Events = append(gatewayClassNode.Events, d.fetchEventsFor(ctx, gatewayClassNode.GatewayClass).Items...)
-	}
-}
-
-// discoverEventsForGateways adds Events associated with Gateways that exist in
-// the resourceModel.
-func (d Discoverer) discoverEventsForGateways(ctx context.Context, resourceModel *ResourceModel) {
-	for _, gatewayNode := range resourceModel.Gateways {
-		gatewayNode.Events = append(gatewayNode.Events, d.fetchEventsFor(ctx, gatewayNode.Gateway).Items...)
-	}
-}
-
-// discoverEventsForHTTPRoutes adds Events associated with HTTPRoutes that exist
-// in the resourceModel.
-func (d Discoverer) discoverEventsForHTTPRoutes(ctx context.Context, resourceModel *ResourceModel) {
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
-		httpRouteNode.Events = append(httpRouteNode.Events, d.fetchEventsFor(ctx, httpRouteNode.HTTPRoute).Items...)
-	}
-}
-
-// discoverEventsForBackends adds Events associated with Backends that exist in
-// the resourceModel.
-func (d Discoverer) discoverEventsForBackends(ctx context.Context, resourceModel *ResourceModel) {
-	for _, backendNode := range resourceModel.Backends {
-		backendNode.Events = append(backendNode.Events, d.fetchEventsFor(ctx, backendNode.Backend).Items...)
-	}
-}
-
-// discoverEventsForNamespaces adds Events associated with Namespaces that exist
-// in the resourceModel.
-func (d Discoverer) discoverEventsForNamespaces(ctx context.Context, resourceModel *ResourceModel) {
-	for _, nsNode := range resourceModel.Namespaces {
-		nsNode.Events = append(nsNode.Events, d.fetchEventsFor(ctx, nsNode.Namespace).Items...)
-	}
 }
 
 // fetchGatewayClasses fetches GatewayClasses based on a filter.
@@ -790,7 +706,7 @@ func (d Discoverer) fetchHTTPRoutes(ctx context.Context, filter Filter) ([]gatew
 	return httpRouteList.Items, nil
 }
 
-// fetchHTTPRoutes fetches HTTPRoutes based on a filter.
+// fetchReferenceGrants fetches ReferenceGrants based on a filter.
 func (d Discoverer) fetchReferenceGrants(ctx context.Context, filter Filter) ([]gatewayv1beta1.ReferenceGrant, error) {
 	gvr := schema.GroupVersionResource{
 		Group:    defaultReferenceGrantGroupVersion.Group,
@@ -894,7 +810,7 @@ func (d Discoverer) fetchNamespace(ctx context.Context, filter Filter) ([]corev1
 }
 
 // fetchEventsFor fetches events associated with the given object.
-func (d Discoverer) fetchEventsFor(ctx context.Context, object client.Object) *corev1.EventList {
+func (d Discoverer) FetchEventsFor(ctx context.Context, object client.Object) *corev1.EventList {
 	eventList := &corev1.EventList{}
 	options := &client.ListOptions{
 		FieldSelector: fields.AndSelectors(

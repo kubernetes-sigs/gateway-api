@@ -282,8 +282,9 @@ func TestNamespacePrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	nsp := &NamespacesPrinter{
-		Writer: buff,
-		Clock:  fakeClock,
+		Writer:       buff,
+		Clock:        fakeClock,
+		EventFetcher: discoverer,
 	}
 	nsp.PrintDescribeView(resourceModel)
 

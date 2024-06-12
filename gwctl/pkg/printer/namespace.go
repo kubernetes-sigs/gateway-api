@@ -17,6 +17,7 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
 
@@ -31,7 +32,8 @@ var _ Printer = (*NamespacesPrinter)(nil)
 
 type NamespacesPrinter struct {
 	io.Writer
-	Clock clock.Clock
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
 func (nsp *NamespacesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -94,7 +96,8 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
 
 		// Events
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(namespaceNode.Events, nsp.Clock)})
+		eventList := nsp.EventFetcher.FetchEventsFor(context.Background(), namespaceNode.Namespace)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, nsp.Clock)})
 
 		Describe(nsp, pairs)
 

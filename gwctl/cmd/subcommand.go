@@ -217,7 +217,7 @@ func runGetOrDescribeNamespaces(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "failed to discover Namespace resources")
 
 	realClock := clock.RealClock{}
-	nsPrinter := &printer.NamespacesPrinter{Writer: o.out, Clock: realClock}
+	nsPrinter := &printer.NamespacesPrinter{Writer: o.out, Clock: realClock, EventFetcher: discoverer}
 	if o.cmdName == commandNameGet {
 		printer.Print(nsPrinter, resourceModel, o.outputFormat)
 	} else {
@@ -248,7 +248,7 @@ func runGetOrDescribeGatewayClasses(f cmdutils.Factory, o *getOrDescribeOptions)
 	handleErrOrExitWithMsg(err, "failed to discover GatewayClass resources")
 
 	realClock := clock.RealClock{}
-	gwcPrinter := &printer.GatewayClassesPrinter{Writer: o.out, Clock: realClock}
+	gwcPrinter := &printer.GatewayClassesPrinter{Writer: o.out, Clock: realClock, EventFetcher: discoverer}
 	if o.cmdName == commandNameGet {
 		printer.Print(gwcPrinter, resourceModel, o.outputFormat)
 	} else {
@@ -281,7 +281,7 @@ func runGetOrDescribeGateways(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "failed to discover Gateway resources")
 
 	realClock := clock.RealClock{}
-	gwPrinter := &printer.GatewaysPrinter{Writer: o.out, Clock: realClock}
+	gwPrinter := &printer.GatewaysPrinter{Writer: o.out, Clock: realClock, EventFetcher: discoverer}
 	if o.cmdName == commandNameGet {
 		printer.Print(gwPrinter, resourceModel, o.outputFormat)
 	} else {
@@ -347,7 +347,7 @@ func runGetOrDescribeBackends(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "failed to discover Backend resources")
 
 	realClock := clock.RealClock{}
-	backendsPrinter := &printer.BackendsPrinter{Writer: o.out, Clock: realClock}
+	backendsPrinter := &printer.BackendsPrinter{Writer: o.out, Clock: realClock, EventFetcher: discoverer}
 	if o.cmdName == commandNameGet {
 		printer.Print(backendsPrinter, resourceModel, o.outputFormat)
 	} else {

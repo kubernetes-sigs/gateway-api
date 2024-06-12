@@ -331,8 +331,9 @@ Events: <none>
 			}
 
 			gcp := &GatewayClassesPrinter{
-				Writer: buff,
-				Clock:  fakeClock,
+				Writer:       buff,
+				Clock:        fakeClock,
+				EventFetcher: discoverer,
 			}
 			gcp.PrintDescribeView(resourceModel)
 

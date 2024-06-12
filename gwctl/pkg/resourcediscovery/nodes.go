@@ -133,8 +133,6 @@ type GatewayClassNode struct {
 	Gateways map[gatewayID]*GatewayNode
 	// Policies stores Policies that directly apply to this GatewayClass.
 	Policies map[policyID]*PolicyNode
-	// Events contains the events associated with this Gateway.
-	Events []corev1.Event
 }
 
 func NewGatewayClassNode(gatewayClass *gatewayv1.GatewayClass) *GatewayClassNode {
@@ -142,7 +140,6 @@ func NewGatewayClassNode(gatewayClass *gatewayv1.GatewayClass) *GatewayClassNode
 		GatewayClass: gatewayClass,
 		Gateways:     make(map[gatewayID]*GatewayNode),
 		Policies:     make(map[policyID]*PolicyNode),
-		Events:       []corev1.Event{},
 	}
 }
 
@@ -172,8 +169,6 @@ type GatewayNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this Gateway,
 	// considering inheritance and hierarchy.
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
-	// Events contains the events associated with this Gateway.
-	Events []corev1.Event
 	// Errors contains any errorrs associated with this resource.
 	Errors []error
 }
@@ -184,7 +179,6 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
-		Events:            []corev1.Event{},
 		Errors:            []error{},
 	}
 }
@@ -217,8 +211,6 @@ type HTTPRouteNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// HTTPRoute, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
-	// Events contains the events associated with this Gateway.
-	Events []corev1.Event
 	// Errors contains any errorrs associated with this resource.
 	Errors []error
 }
@@ -230,7 +222,6 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 		Backends:          make(map[backendID]*BackendNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
-		Events:            []corev1.Event{},
 		Errors:            []error{},
 	}
 }
@@ -264,8 +255,6 @@ type BackendNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// Backend, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
-	// Events contains the events associated with this Gateway.
-	Events []corev1.Event
 	// Errors contains any errorrs associated with this resource.
 	Errors []error
 }
@@ -277,7 +266,6 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		Policies:          make(map[policyID]*PolicyNode),
 		ReferenceGrants:   make(map[referenceGrantID]*ReferenceGrantNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
-		Events:            []corev1.Event{},
 		Errors:            []error{},
 	}
 }
@@ -310,8 +298,6 @@ type NamespaceNode struct {
 	Backends map[backendID]*BackendNode
 	// Policies stores Policies directly applied to the Namespace.
 	Policies map[policyID]*PolicyNode
-	// Events contains the events associated with this Gateway.
-	Events []corev1.Event
 }
 
 func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
@@ -324,7 +310,6 @@ func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
 		HTTPRoutes: make(map[httpRouteID]*HTTPRouteNode),
 		Backends:   make(map[backendID]*BackendNode),
 		Policies:   make(map[policyID]*PolicyNode),
-		Events:     []corev1.Event{},
 	}
 }
 
