@@ -525,3 +525,121 @@ func ConvertPoliciesMapToPolicyRefs(policies map[policyID]*PolicyNode) []common.
 	}
 	return result
 }
+
+// calculateInheritedPolicies calculates the inherited polices for all
+// Gateways, HTTRoutes, and Backends in ResourceModel.
+func (rm *ResourceModel) calculateInheritedPolicies() error {
+	if err := rm.calculateInheritedPoliciesForGateways(); err != nil {
+		return err
+	}
+	if err := rm.calculateInheritedPoliciesForHTTPRoutes(); err != nil {
+		return err
+	}
+	if err := rm.calculateInheritedPoliciesForBackends(); err != nil {
+		return err
+	}
+	return nil
+}
+
+// calculateInheritedPoliciesForGateways calculates the inherited policies for
+// all Gateways present in ResourceModel.
+func (rm *ResourceModel) calculateInheritedPoliciesForGateways() error {
+	for _, gatewayNode := range rm.Gateways {
+		result := make(map[policyID]*PolicyNode)
+
+		// Policies inherited from Gateway's namespace.
+		policiesInheritedFromNamespace := extractInheritablePolicies(gatewayNode.Namespace.Policies)
+		mergePolicyMaps(result, policiesInheritedFromNamespace)
+
+		// Policies inherited from GatewayClass.
+		if gatewayNode.GatewayClass != nil {
+			policiesInheritedFromGatewayClass := extractInheritablePolicies(gatewayNode.GatewayClass.Policies)
+			mergePolicyMaps(result, policiesInheritedFromGatewayClass)
+		}
+
+		gatewayNode.InheritedPolicies = result
+	}
+	return nil
+}
+
+// calculateInheritedPoliciesForHTTPRoutes calculates the inherited policies for
+// all HTTPRoutes present in ResourceModel.
+func (rm *ResourceModel) calculateInheritedPoliciesForHTTPRoutes() error {
+	for _, httpRouteNode := range rm.HTTPRoutes {
+		result := make(map[policyID]*PolicyNode)
+
+		// Policies inherited from HTTPRoute's namespace.
+		policiesInheritedFromNamespace := extractInheritablePolicies(httpRouteNode.Namespace.Policies)
+		mergePolicyMaps(result, policiesInheritedFromNamespace)
+
+		// Policies inherited from Gateways.
+		policiesInheritedFromGateways := make(map[policyID]*PolicyNode)
+
+		for _, gatewayNode := range httpRouteNode.Gateways {
+			// Add policies inherited by GatewayNode.
+			mergePolicyMaps(policiesInheritedFromGateways, gatewayNode.InheritedPolicies)
+
+			// Add inheritable policies directly applied to GatewayNode.
+			mergePolicyMaps(
+				policiesInheritedFromGateways,
+				extractInheritablePolicies(gatewayNode.Policies),
+			)
+		}
+
+		mergePolicyMaps(result, policiesInheritedFromGateways)
+
+		httpRouteNode.InheritedPolicies = result
+	}
+	return nil
+}
+
+// calculateInheritedPoliciesForBackends calculates the inherited policies for
+// all Backends present in ResourceModel.
+func (rm *ResourceModel) calculateInheritedPoliciesForBackends() error {
+	for _, backendNode := range rm.Backends {
+		result := make(map[policyID]*PolicyNode)
+
+		// Policies inherited from Backend's namespace.
+		policiesInheritedFromNamespace := extractInheritablePolicies(backendNode.Namespace.Policies)
+		mergePolicyMaps(result, policiesInheritedFromNamespace)
+
+		// Policies inherited from HTTPRoutes.
+		policiesInheritedFromHTTPRoutes := make(map[policyID]*PolicyNode)
+
+		for _, httpRouteNode := range backendNode.HTTPRoutes {
+			// Add policies inherited by HTTPRouteNode.
+			mergePolicyMaps(policiesInheritedFromHTTPRoutes, httpRouteNode.InheritedPolicies)
+
+			// Add inheritable policies directly applied to HTTPRouteNode.
+			mergePolicyMaps(
+				policiesInheritedFromHTTPRoutes,
+				extractInheritablePolicies(httpRouteNode.Policies),
+			)
+		}
+
+		mergePolicyMaps(result, policiesInheritedFromHTTPRoutes)
+
+		backendNode.InheritedPolicies = result
+	}
+	return nil
+}
+
+// extractInheritablePolicies filters and returns policies which can be inherited.
+func extractInheritablePolicies(policies map[policyID]*PolicyNode) map[policyID]*PolicyNode {
+	inheritablePolicies := make(map[policyID]*PolicyNode)
+
+	for policyID, policyNode := range policies {
+		if policyNode.Policy.IsInherited() {
+			inheritablePolicies[policyID] = policyNode
+		}
+	}
+
+	return inheritablePolicies
+}
+
+// mergePolicyMaps merges the source map into the destination map.
+func mergePolicyMaps(dest, src map[policyID]*PolicyNode) {
+	for id, node := range src {
+		dest[id] = node
+	}
+}
