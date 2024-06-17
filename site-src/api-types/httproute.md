@@ -32,8 +32,9 @@ to. In most cases, that's going to be Gateways, but there is some flexibility
 here for implementations to support other types of parent resources.
 
 The following example shows how a Route would attach to the `acme-lb` Gateway:
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -119,8 +120,9 @@ evaluated. If no hostname is specified, traffic is routed based on HTTPRoute
 rules and filters (optional).
 
 The following example defines hostname "my.example.com":
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -141,8 +143,9 @@ Matches define conditions used for matching an HTTP request. Each match is
 independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 ...
 spec:
@@ -246,6 +249,7 @@ Because the `request` timeout encompasses the `backendRequest` timeout, the valu
 Timeouts are optional, and their fields are of type [Duration](/geps/gep-2257/). A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
 
 The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
+
 ```yaml
 {% include 'experimental/http-route-timeouts/timeout-example.yaml' %}
 ```
@@ -286,7 +290,7 @@ appropriate when the route is modified.
 The following example indicates HTTPRoute "http-example" has been accepted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-example
