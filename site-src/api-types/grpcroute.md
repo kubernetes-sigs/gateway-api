@@ -81,7 +81,7 @@ here for implementations to support other types of parent resources.
 The following example shows how a Route would attach to the `acme-lb` Gateway:
 
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: GRPCRoute
 metadata:
   name: grpcroute-example
@@ -109,8 +109,9 @@ evaluated. If no hostname is specified, traffic is routed based on GRPCRoute
 rules and filters (optional).
 
 The following example defines hostname "my.example.com":
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: GRPCRoute
 metadata:
   name: grpcroute-example
@@ -131,8 +132,9 @@ Matches define conditions used for matching an gRPC requests. Each match is
 independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: GRPCRoute
 ...
 matches:
@@ -168,7 +170,7 @@ header "my.filter.com". Note that GRPCRoute uses HTTPRoute filters for features
 with functionality identical to HTTPRoute, such as this.
 
 ```yaml
-{% include 'experimental/grpc-filter.yaml' %}
+{% include 'standard/grpc-filter.yaml' %}
 ```
 
 API conformance is defined based on the filter type. The effects of ordering
@@ -196,18 +198,18 @@ unspecified, the rule performs no forwarding. If unspecified and no filters
 are specified that would result in a response being sent, an `UNIMPLEMENTED` error code
 is returned.
 
-
-
 The following example forwards gRPC requests for the method `User.Login` to service
 "my-service1" on port `50051` and gRPC requests for the method `Things.DoThing` with
 header `magic: foo` to service "my-service2" on port `50051`:
+
 ```yaml
-{% include 'experimental/basic-grpc.yaml' %}
+{% include 'standard/basic-grpc.yaml' %}
 ```
 
 The following example uses the `weight` field to forward 90% of gRPC requests to
 `foo.example.com` to the "foo-v1" Service and the other 10% to the "foo-v2"
 Service:
+
 ```yaml
 {% include 'experimental/traffic-splitting/grpc-traffic-split-2.yaml' %}
 ```
@@ -236,8 +238,9 @@ appropriate when the route is modified.
 
 The following example indicates GRPCRoute "grpc-example" has been accepted by
 Gateway "gw-example" in namespace "gw-example-ns":
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1alpha2
+apiVersion: gateway.networking.k8s.io/v1
 kind: GRPCRoute
 metadata:
   name: grpc-example
@@ -257,13 +260,11 @@ Multiple GRPCRoutes can be attached to a single Gateway resource. Importantly,
 only one Route rule may match each request. For more information on how conflict
 resolution applies to merging, refer to the [API specification][grpcrouterule].
 
-
-[grpcroute]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCPRoute
-[grpcrouterule]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteRule
+[grpcroute]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCPRoute
+[grpcrouterule]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRouteRule
 [hostname]: /reference/spec/#gateway.networking.k8s.io/v1.Hostname
 [rfc-3986]: https://tools.ietf.org/html/rfc3986
-[matches]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteMatch
-[filters]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCRouteFilter
-[backendRef]: /reference/spec/#gateway.networking.k8s.io/v1alpha2.GRPCBackendRef
+[matches]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRouteMatch
+[filters]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCRouteFilter
+[backendRef]: /reference/spec/#gateway.networking.k8s.io/v1.GRPCBackendRef
 [parentRef]: /reference/spec/#gateway.networking.k8s.io/v1.ParentRef
-
