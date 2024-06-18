@@ -81,9 +81,9 @@ nav:
         Service Facets: mesh/service-facets.md
     - Implementations:
         - List: implementations.md
-        - Comparison: implementation-table-v1.1.0.md
-        - Past Version Comparisons:
-            - v1.0.0: implementation-table-v1.0.0.md
+        - Comparisons:
+          - v1.1: implementations/v1.1.md
+          - v1.0: implementations/v1.0.md
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:

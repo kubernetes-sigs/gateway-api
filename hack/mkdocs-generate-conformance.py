@@ -28,8 +28,8 @@ def on_pre_build(config, **kwargs):
     log.info("generating conformance")
 
     vers = getConformancePaths()
+    for v in vers[3:]:
 
-    for v in vers[4:]:
         confYamls = getYaml(v)
         releaseVersion = v.split(os.sep)[-2]
         generate_conformance_tables(confYamls, releaseVersion)
@@ -54,17 +54,6 @@ httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderMo
                                                 'HTTPRoutePathRedirect', 'HTTPRouteHostRewrite', 'HTTPRoutePathRewrite', 'HTTPRouteRequestMirror', 'HTTPRouteRequestMultipleMirrors', 'HTTPRouteRequestTimeout', 'HTTPRouteBackendTimeout', 'HTTPRouteParentRefPort']
 
 
-# NOTE add past versions of implementations to here when new release is cut
-past_versions = """
-??? "Previous Gateway API Versions"
-
-
-    The latest release of Gateway API is shown here. Past Gateway API implementations and feature support can be found here:
-
-    - [v1.0.0](./implementation-table-v1.0.0.md)
-"""
-
-
 def generate_conformance_tables(reports, currVersion):
 
     gateway_tls_table = pandas.DataFrame()
@@ -87,15 +76,14 @@ def generate_conformance_tables(reports, currVersion):
     gateway_http_table = gateway_http_table.rename_axis('Organization')
     mesh_http_table = mesh_http_table.rename_axis('Organization')
 
-    with open('site-src/implementation-table-'+currVersion+'.md', 'w') as f:
+    versionFile = ".".join(currVersion.split(".")[:2])
+
+    with open('site-src/implementations/'+versionFile+'.md', 'w') as f:
 
         f.write(desc)
         f.write("\n\n")
 
         f.write(warning_text)
-        f.write("\n\n")
-
-        f.write(past_versions)
         f.write("\n\n")
 
         f.write("## Gateway Profile\n\n")
@@ -151,12 +139,10 @@ def getConformancePaths():
         vers = v.split(os.sep)[-2]
         allVersions.append(vers)
         reportedImplementationsPath.append(v+"**")
-    log.info(report_path)
     return reportedImplementationsPath
 
 
 def getYaml(conf_path):
-    log.info("parsing conformance reports ============================")
     yamls = []
 
     for p in glob.glob(conf_path, recursive=True):
