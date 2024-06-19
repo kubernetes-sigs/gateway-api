@@ -49,9 +49,6 @@ warning_text = """
     However, as it is based on submitted conformance reports, the information is correct.
 """
 
-# NOTE: will have to be updated if new (extended) features are added
-httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderModification', 'HTTPRouteQueryParamMatching', 'HTTPRouteMethodMatching', 'HTTPRouteResponseHeaderModification', 'HTTPRoutePortRedirect', 'HTTPRouteSchemeRedirect',
-                                                'HTTPRoutePathRedirect', 'HTTPRouteHostRewrite', 'HTTPRoutePathRewrite', 'HTTPRouteRequestMirror', 'HTTPRouteRequestMultipleMirrors', 'HTTPRouteRequestTimeout', 'HTTPRouteBackendTimeout', 'HTTPRouteParentRefPort']
 
 
 def generate_conformance_tables(reports, currVersion):
@@ -112,10 +109,11 @@ def generate_profiles_report(reports, route):
                                'version', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
-
+    
     for row in http_table.itertuples():
-        for feat in row._3:
-            http_table.loc[row.Index, feat] = ':white_check_mark:'
+        if type(row._3) is list:
+            for feat in row._3:
+                http_table.loc[row.Index, feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
