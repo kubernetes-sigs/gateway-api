@@ -8,7 +8,7 @@ implementation:
   organization: cilium
   project: cilium
   url: github.com/cilium/cilium
-  version: main
+  version: v1.16.0
 kind: ConformanceReport
 mode: default
 profiles:
