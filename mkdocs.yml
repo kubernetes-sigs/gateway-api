@@ -80,8 +80,10 @@ nav:
         GAMMA Initiative: mesh/gamma.md
         Service Facets: mesh/service-facets.md
     - Implementations:
-        List: implementations.md
-        Comparison: implementation-table.md
+        - List: implementations.md
+        - Comparisons:
+          - v1.1: implementations/v1.1.md
+          - v1.0: implementations/v1.0.md
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:

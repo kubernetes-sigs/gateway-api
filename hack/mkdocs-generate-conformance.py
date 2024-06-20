@@ -18,6 +18,7 @@ import yaml
 import pandas
 from fnmatch import fnmatch
 import glob
+import os
 
 log = logging.getLogger('mkdocs')
 
@@ -26,9 +27,12 @@ log = logging.getLogger('mkdocs')
 def on_pre_build(config, **kwargs):
     log.info("generating conformance")
 
-    yamlReports = getYaml()
+    vers = getConformancePaths()
+    for v in vers[3:]:
 
-    generate_conformance_tables(yamlReports)
+        confYamls = getYaml(v)
+        releaseVersion = v.split(os.sep)[-2]
+        generate_conformance_tables(confYamls, releaseVersion)
 
 
 desc = """
@@ -45,24 +49,34 @@ warning_text = """
     However, as it is based on submitted conformance reports, the information is correct.
 """
 
-# NOTE: will have to be updated if new (extended) features are added
-httproute_extended_conformance_features_list = ['HTTPRouteBackendRequestHeaderModification', 'HTTPRouteQueryParamMatching', 'HTTPRouteMethodMatching', 'HTTPRouteResponseHeaderModification', 'HTTPRoutePortRedirect', 'HTTPRouteSchemeRedirect',
-                                                'HTTPRoutePathRedirect', 'HTTPRouteHostRewrite', 'HTTPRoutePathRewrite', 'HTTPRouteRequestMirror', 'HTTPRouteRequestMultipleMirrors', 'HTTPRouteRequestTimeout', 'HTTPRouteBackendTimeout', 'HTTPRouteParentRefPort']
 
 
-def generate_conformance_tables(reports):
+def generate_conformance_tables(reports, currVersion):
 
-    gateway_http_table = generate_profiles_report(reports, 'HTTP')
+    gateway_tls_table = pandas.DataFrame()
+    gateway_grpc_table = pandas.DataFrame()
+
+    if currVersion == allVersions[-1]:
+        gateway_http_table = generate_profiles_report(reports, 'GATEWAY-HTTP')
+
+        gateway_grpc_table = generate_profiles_report(reports, 'GATEWAY-GRPC')
+        gateway_grpc_table = gateway_grpc_table.rename_axis('Organization')
+
+        gateway_tls_table = generate_profiles_report(reports, 'GATEWAY-TLS')
+        gateway_tls_table = gateway_tls_table.rename_axis('Organization')
+
+        mesh_http_table = generate_profiles_report(reports, 'MESH-HTTP')
+    else:
+        gateway_http_table = generate_profiles_report(reports, "HTTP")
+        mesh_http_table = generate_profiles_report(reports, "MESH")
+
     gateway_http_table = gateway_http_table.rename_axis('Organization')
-
-    # Currently no implementation has extended supported features listed.
-    # Can uncomment once a list is needed to keep track
-    # gateway_tls_table = generate_profiles_report(reprots,'TLS')
-
-    mesh_http_table = generate_profiles_report(reports, 'MESH')
     mesh_http_table = mesh_http_table.rename_axis('Organization')
 
-    with open('site-src/implementation-table.md', 'w') as f:
+    versionFile = ".".join(currVersion.split(".")[:2])
+
+    with open('site-src/implementations/'+versionFile+'.md', 'w') as f:
+
         f.write(desc)
         f.write("\n\n")
 
@@ -72,6 +86,11 @@ def generate_conformance_tables(reports):
         f.write("## Gateway Profile\n\n")
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
+        if currVersion == allVersions[-1]:
+            f.write('### GRPCRoute\n\n')
+            f.write(gateway_grpc_table.to_markdown()+'\n\n')
+            f.write('### TLSRoute\n\n')
+            f.write(gateway_tls_table.to_markdown()+'\n\n')
 
         f.write("## Mesh Profile\n\n")
         f.write("### HTTPRoute\n\n")
@@ -90,10 +109,11 @@ def generate_profiles_report(reports, route):
                                'version', 'extended.supportedFeatures']].T
     http_table.columns = http_table.iloc[0]
     http_table = http_table[1:].T
-
+    
     for row in http_table.itertuples():
-        for feat in row._3:
-            http_table.loc[row.Index, feat] = ':white_check_mark:'
+        if type(row._3) is list:
+            for feat in row._3:
+                http_table.loc[row.Index, feat] = ':white_check_mark:'
     http_table = http_table.fillna(':x:')
     http_table = http_table.drop(['extended.supportedFeatures'], axis=1)
 
@@ -103,15 +123,27 @@ def generate_profiles_report(reports, route):
     return http_table
 
 
-# the path should be changed when there is a new version
-conformance_path = "conformance/reports/v1.0.0/**"
+pathTemp = "conformance/reports/*/"
+allVersions = []
+reportedImplementationsPath = []
+
+# returns v1.0.0 and greater, since that's when reports started being generated in the comparison table
 
 
-def getYaml():
-    log.info("parsing conformance reports ============================")
+def getConformancePaths():
+    versions = sorted(glob.glob(pathTemp, recursive=True))
+    report_path = versions[-1]+"**"
+    for v in versions:
+        vers = v.split(os.sep)[-2]
+        allVersions.append(vers)
+        reportedImplementationsPath.append(v+"**")
+    return reportedImplementationsPath
+
+
+def getYaml(conf_path):
     yamls = []
 
-    for p in glob.glob(conformance_path, recursive=True):
+    for p in glob.glob(conf_path, recursive=True):
 
         if fnmatch(p, "*.yaml"):
 
