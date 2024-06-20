@@ -87,10 +87,10 @@ def generate_conformance_tables(reports, currVersion):
         f.write("### HTTPRoute\n\n")
         f.write(gateway_http_table.to_markdown()+'\n\n')
         if currVersion == allVersions[-1]:
-            f.write('### TLSRoute\n\n')
-            f.write(gateway_tls_table.to_markdown()+'\n\n')
             f.write('### GRPCRoute\n\n')
             f.write(gateway_grpc_table.to_markdown()+'\n\n')
+            f.write('### TLSRoute\n\n')
+            f.write(gateway_tls_table.to_markdown()+'\n\n')
 
         f.write("## Mesh Profile\n\n")
         f.write("### HTTPRoute\n\n")
