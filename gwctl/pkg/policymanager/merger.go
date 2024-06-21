@@ -22,6 +22,8 @@ import (
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 // MergePoliciesOfSimilarKind will convert a slice a policies to a map of
@@ -147,7 +149,7 @@ func mergePolicy(parent, child Policy) (Policy, error) {
 	result.u.SetUnstructuredContent(resultUnstructured)
 	// Merging two policies means the targetRef no longer makes any sense since
 	// since they can be conflicting. So we unset the targetRef.
-	result.targetRef = ObjRef{}
+	result.targetRef = common.ObjRef{}
 	return result, nil
 }
 
@@ -192,7 +194,6 @@ func orderPolicyByPrecedence(a, b Policy) (Policy, Policy) {
 		if higherNN > lowerNN {
 			higherPolicy, lowerPolicy = lowerPolicy, higherPolicy
 		}
-
 	} else if higherPolicy.u.GetCreationTimestamp().Time.After(lowerPolicy.u.GetCreationTimestamp().Time) {
 		// Policies have difference creation time, so this will decide the precedence
 		higherPolicy, lowerPolicy = lowerPolicy, higherPolicy

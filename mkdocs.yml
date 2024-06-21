@@ -5,8 +5,12 @@ site_dir: site
 docs_dir: site-src
 extra_css:
   - stylesheets/extra.css
+extra_javascript:
+  - https://unpkg.com/tablesort@5.3.0/dist/tablesort.min.js
+  - js/implementations.js
 hooks:
 - hack/mkdocs-copy-geps.py
+- hack/mkdocs-generate-conformance.py
 watch:
 - geps
 theme:
@@ -75,7 +79,11 @@ nav:
         Overview: mesh/index.md
         GAMMA Initiative: mesh/gamma.md
         Service Facets: mesh/service-facets.md
-    - Implementations: implementations.md
+    - Implementations:
+        - List: implementations.md
+        - Comparisons:
+          - v1.1: implementations/v1.1.md
+          - v1.0: implementations/v1.0.md
     - FAQ: faq.md
     - Glossary: concepts/glossary.md
   - Guides:
@@ -86,6 +94,7 @@ nav:
       - HTTP redirects and rewrites: guides/http-redirect-rewrite.md
       - HTTP header modifier: guides/http-header-modifier.md
       - HTTP traffic splitting: guides/traffic-splitting.md
+      - HTTP request mirroring: guides/http-request-mirroring.md
       - Cross-Namespace routing: guides/multiple-ns.md
       - TLS: guides/tls.md
       - TCP routing: guides/tcp.md
@@ -110,18 +119,16 @@ nav:
     - Overview: geps/overview.md
     - Provisional:
       - geps/gep-91/index.md
-      - geps/gep-1619/index.md
+      - geps/gep-995/index.md
       - geps/gep-1651/index.md
       - geps/gep-1867/index.md
+      - geps/gep-2648/index.md
+      - geps/gep-2649/index.md
     # - Implementable:
     #   -
     - Experimental:
-      - geps/gep-713/index.md
-      - geps/gep-957/index.md
       - geps/gep-1016/index.md
-      - geps/gep-1426/index.md
-      - geps/gep-1686/index.md
-      - geps/gep-1709/index.md
+      - geps/gep-1619/index.md
       - geps/gep-1742/index.md
       - geps/gep-1748/index.md
       - geps/gep-1762/index.md
@@ -137,13 +144,20 @@ nav:
       - geps/gep-746/index.md
       - geps/gep-820/index.md
       - geps/gep-851/index.md
+      - geps/gep-957/index.md
       - geps/gep-1323/index.md
       - geps/gep-1364/index.md
+      - geps/gep-1426/index.md
+      - geps/gep-1686/index.md
+      - geps/gep-1709/index.md
     - Memorandum:
+      - geps/gep-713/index.md
       - geps/gep-917/index.md
       - geps/gep-922/index.md
       - geps/gep-1324/index.md
       - geps/gep-2659/index.md
+      - geps/gep-2722/index.md
+      - geps/gep-2907/index.md
     - Declined:
       - geps/gep-735/index.md
       - geps/gep-1282/index.md
@@ -152,4 +166,5 @@ nav:
     - Developer Guide: contributing/devguide.md
     - Documentation Style Guide: contributing/style-guide.md
     - Enhancement Requests: contributing/enhancement-requests.md
+    - Release Cycle: contributing/release-cycle.md
     - Contributor Ladder: contributing/contributor-ladder.md

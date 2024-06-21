@@ -19,39 +19,76 @@ package printer
 import (
 	"fmt"
 	"io"
+	"os"
 	"strings"
-	"text/tabwriter"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
 	"sigs.k8s.io/yaml"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
+	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
+var _ Printer = (*HTTPRoutesPrinter)(nil)
+
 type HTTPRoutesPrinter struct {
-	Out io.Writer
+	io.Writer
+	Clock clock.Clock
 }
 
-func (hp *HTTPRoutesPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(hp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "HOSTNAMES"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(maps.Values(resourceModel.HTTPRoutes))
+}
 
-	for _, httpRouteNode := range resourceModel.HTTPRoutes {
+func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE", "POLICIES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "HOSTNAMES", "PARENT REFS", "AGE"}
+	}
+
+	table := &Table{
+		ColumnNames:  columnNames,
+		UseSeparator: false,
+	}
+	httpRouteNodes := maps.Values(resourceModel.HTTPRoutes)
+
+	for _, httpRouteNode := range SortByString(httpRouteNodes) {
 		var hostNames []string
 		for _, hostName := range httpRouteNode.HTTPRoute.Spec.Hostnames {
 			hostNames = append(hostNames, string(hostName))
 		}
-		hostNamesOutput := strings.Join(hostNames, ",")
-		if cnt := len(hostNames); cnt > 2 {
-			hostNamesOutput = fmt.Sprintf("%v + %v more", strings.Join(hostNames[:2], ","), cnt-2)
+		hostNamesOutput := "None"
+		if hostNamesCount := len(hostNames); hostNamesCount > 0 {
+			if hostNamesCount > 2 {
+				hostNamesOutput = fmt.Sprintf("%v + %v more", strings.Join(hostNames[:2], ","), hostNamesCount-2)
+			} else {
+				hostNamesOutput = strings.Join(hostNames, ",")
+			}
 		}
 
-		row := []string{httpRouteNode.HTTPRoute.Name, hostNamesOutput}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		parentRefsCount := fmt.Sprintf("%d", len(httpRouteNode.HTTPRoute.Spec.ParentRefs))
+
+		age := duration.HumanDuration(hp.Clock.Since(httpRouteNode.HTTPRoute.GetCreationTimestamp().Time))
+
+		row := []string{
+			httpRouteNode.HTTPRoute.GetNamespace(),
+			httpRouteNode.HTTPRoute.GetName(),
+			hostNamesOutput,
+			parentRefsCount,
+			age,
+		}
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(httpRouteNode.Policies))
+			row = append(row, policiesCount)
+		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+	table.Write(hp, 0)
 }
 
 type httpRouteDescribeView struct {
@@ -59,7 +96,7 @@ type httpRouteDescribeView struct {
 	Namespace                string                      `json:",omitempty"`
 	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
 	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef      `json:",omitempty"`
+	DirectlyAttachedPolicies []common.ObjRef             `json:",omitempty"`
 	EffectivePolicies        any                         `json:",omitempty"`
 }
 
@@ -92,13 +129,14 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 		for _, view := range views {
 			b, err := yaml.Marshal(view)
 			if err != nil {
-				panic(err)
+				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
+				os.Exit(1)
 			}
-			fmt.Fprint(hp.Out, string(b))
+			fmt.Fprint(hp, string(b))
 		}
 
 		if index+1 <= len(resourceModel.HTTPRoutes) {
-			fmt.Fprintf(hp.Out, "\n\n")
+			fmt.Fprintf(hp, "\n\n")
 		}
 	}
 }

@@ -1,8 +1,10 @@
 # ReferenceGrant
 
-??? success "Standard Channel in v0.6.0+"
+??? success "Standard Channel since v0.6.0"
 
-    The `ReferenceGrant` resource is Beta and part of the Standard Channel in `v0.6.0+`.
+    The `ReferenceGrant` resource is Beta and part of the 
+    Standard Channel since `v0.6.0`. For more information on release
+    channels, refer to our [versioning guide](/concepts/versioning).
 
 !!! note
     This resource was originally named "ReferencePolicy". It was renamed
@@ -43,6 +45,7 @@ namespace explicitly allows references to Services from HTTPRoutes in the `foo`
 namespace.
 
 ```yaml
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: foo
@@ -55,6 +58,7 @@ spec:
       - name: bar
         namespace: bar
 ---
+apiVersion: gateway.networking.k8s.io/v1beta1
 kind: ReferenceGrant
 metadata:
   name: bar

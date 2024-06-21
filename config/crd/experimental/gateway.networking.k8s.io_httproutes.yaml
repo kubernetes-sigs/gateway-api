@@ -2,8 +2,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   annotations:
-    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2466
-    gateway.networking.k8s.io/bundle-version: v1.0.0
+    api-approved.kubernetes.io: https://github.com/kubernetes-sigs/gateway-api/pull/2997
+    gateway.networking.k8s.io/bundle-version: v1.2.0-dev
     gateway.networking.k8s.io/channel: experimental
   creationTimestamp: null
   name: httproutes.gateway.networking.k8s.io
@@ -163,8 +163,8 @@ spec:
 
 
                   * Gateway (Gateway conformance profile)
+                  * Service (Mesh conformance profile, ClusterIP Services only)
 
-                  * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 
                   This API may be extended in the future to support additional kinds of parent
                   resources.
@@ -233,7 +233,7 @@ spec:
 
 
                     * Gateway (Gateway conformance profile)
-                    * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                    * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                     This API may be extended in the future to support additional kinds of parent
@@ -266,7 +266,7 @@ spec:
 
 
                         * Gateway (Gateway conformance profile)
-                        * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                        * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                         Support for other resources is Implementation-Specific.
@@ -316,7 +316,7 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                     port:
-                      description: |+
+                      description: |-
                         Port is the network port this Route targets. It can be interpreted
                         differently based on the type of parent resource.
 
@@ -352,8 +352,6 @@ spec:
 
 
                         Support: Extended
-
-
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -364,14 +362,12 @@ spec:
                         following resources, SectionName is interpreted as the following:
 
 
-                        * Gateway: Listener Name. When both Port (experimental) and SectionName
+                        * Gateway: Listener name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
-                        * Service: Port Name. When both Port (experimental) and SectionName
+                        * Service: Port name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
-                        both specified values. Note that attaching Routes to Services as Parents
-                        is part of experimental Mesh support and is not supported for any other
-                        purpose.
+                        both specified values.
 
 
                         Implementations MAY choose to support attaching Routes to other resources.
@@ -2712,6 +2708,106 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    sessionPersistence:
+                      description: |+
+                        SessionPersistence defines and configures session persistence
+                        for the route rule.
+
+
+                        Support: Extended
+
+
+                      properties:
+                        absoluteTimeout:
+                          description: |-
+                            AbsoluteTimeout defines the absolute timeout of the persistent
+                            session. Once the AbsoluteTimeout duration has elapsed, the
+                            session becomes invalid.
+
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        cookieConfig:
+                          description: |-
+                            CookieConfig provides configuration settings that are specific
+                            to cookie-based session persistence.
+
+
+                            Support: Core
+                          properties:
+                            lifetimeType:
+                              default: Session
+                              description: |-
+                                LifetimeType specifies whether the cookie has a permanent or
+                                session-based lifetime. A permanent cookie persists until its
+                                specified expiry time, defined by the Expires or Max-Age cookie
+                                attributes, while a session cookie is deleted when the current
+                                session ends.
+
+
+                                When set to "Permanent", AbsoluteTimeout indicates the
+                                cookie's lifetime via the Expires or Max-Age cookie attributes
+                                and is required.
+
+
+                                When set to "Session", AbsoluteTimeout indicates the
+                                absolute lifetime of the cookie tracked by the gateway and
+                                is optional.
+
+
+                                Support: Core for "Session" type
+
+
+                                Support: Extended for "Permanent" type
+                              enum:
+                              - Permanent
+                              - Session
+                              type: string
+                          type: object
+                        idleTimeout:
+                          description: |-
+                            IdleTimeout defines the idle timeout of the persistent session.
+                            Once the session has been idle for more than the specified
+                            IdleTimeout duration, the session becomes invalid.
+
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        sessionName:
+                          description: |-
+                            SessionName defines the name of the persistent session token
+                            which may be reflected in the cookie or the header. Users
+                            should avoid reusing session names to prevent unintended
+                            consequences, such as rejection or unpredictable behavior.
+
+
+                            Support: Implementation-specific
+                          maxLength: 128
+                          type: string
+                        type:
+                          default: Cookie
+                          description: |-
+                            Type defines the type of session persistence such as through
+                            the use a header or cookie. Defaults to cookie based session
+                            persistence.
+
+
+                            Support: Core for "Cookie" type
+
+
+                            Support: Extended for "Header" type
+                          enum:
+                          - Cookie
+                          - Header
+                          type: string
+                      type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
                       description: |+
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -2726,6 +2822,12 @@ spec:
                             BackendRequest specifies a timeout for an individual request from the gateway
                             to a backend. This covers the time from when the request first starts being
                             sent from the gateway to when the full response has been received from the backend.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
@@ -2750,6 +2852,12 @@ spec:
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
                             to complete.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction
@@ -2992,7 +3100,7 @@ spec:
 
 
                             * Gateway (Gateway conformance profile)
-                            * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                            * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                             Support for other resources is Implementation-Specific.
@@ -3042,7 +3150,7 @@ spec:
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         port:
-                          description: |+
+                          description: |-
                             Port is the network port this Route targets. It can be interpreted
                             differently based on the type of parent resource.
 
@@ -3078,8 +3186,6 @@ spec:
 
 
                             Support: Extended
-
-
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -3090,14 +3196,12 @@ spec:
                             following resources, SectionName is interpreted as the following:
 
 
-                            * Gateway: Listener Name. When both Port (experimental) and SectionName
+                            * Gateway: Listener name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
-                            * Service: Port Name. When both Port (experimental) and SectionName
+                            * Service: Port name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
-                            both specified values. Note that attaching Routes to Services as Parents
-                            is part of experimental Mesh support and is not supported for any other
-                            purpose.
+                            both specified values.
 
 
                             Implementations MAY choose to support attaching Routes to other resources.
@@ -3136,7 +3240,7 @@ spec:
         - spec
         type: object
     served: true
-    storage: false
+    storage: true
     subresources:
       status: {}
   - additionalPrinterColumns:
@@ -3284,8 +3388,8 @@ spec:
 
 
                   * Gateway (Gateway conformance profile)
+                  * Service (Mesh conformance profile, ClusterIP Services only)
 
-                  * Service (Mesh conformance profile, experimental, ClusterIP Services only)
 
                   This API may be extended in the future to support additional kinds of parent
                   resources.
@@ -3354,7 +3458,7 @@ spec:
 
 
                     * Gateway (Gateway conformance profile)
-                    * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                    * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                     This API may be extended in the future to support additional kinds of parent
@@ -3387,7 +3491,7 @@ spec:
 
 
                         * Gateway (Gateway conformance profile)
-                        * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                        * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                         Support for other resources is Implementation-Specific.
@@ -3437,7 +3541,7 @@ spec:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                       type: string
                     port:
-                      description: |+
+                      description: |-
                         Port is the network port this Route targets. It can be interpreted
                         differently based on the type of parent resource.
 
@@ -3473,8 +3577,6 @@ spec:
 
 
                         Support: Extended
-
-
                       format: int32
                       maximum: 65535
                       minimum: 1
@@ -3485,14 +3587,12 @@ spec:
                         following resources, SectionName is interpreted as the following:
 
 
-                        * Gateway: Listener Name. When both Port (experimental) and SectionName
+                        * Gateway: Listener name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
                         both specified values.
-                        * Service: Port Name. When both Port (experimental) and SectionName
+                        * Service: Port name. When both Port (experimental) and SectionName
                         are specified, the name and port of the selected listener must match
-                        both specified values. Note that attaching Routes to Services as Parents
-                        is part of experimental Mesh support and is not supported for any other
-                        purpose.
+                        both specified values.
 
 
                         Implementations MAY choose to support attaching Routes to other resources.
@@ -5833,6 +5933,106 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    sessionPersistence:
+                      description: |+
+                        SessionPersistence defines and configures session persistence
+                        for the route rule.
+
+
+                        Support: Extended
+
+
+                      properties:
+                        absoluteTimeout:
+                          description: |-
+                            AbsoluteTimeout defines the absolute timeout of the persistent
+                            session. Once the AbsoluteTimeout duration has elapsed, the
+                            session becomes invalid.
+
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        cookieConfig:
+                          description: |-
+                            CookieConfig provides configuration settings that are specific
+                            to cookie-based session persistence.
+
+
+                            Support: Core
+                          properties:
+                            lifetimeType:
+                              default: Session
+                              description: |-
+                                LifetimeType specifies whether the cookie has a permanent or
+                                session-based lifetime. A permanent cookie persists until its
+                                specified expiry time, defined by the Expires or Max-Age cookie
+                                attributes, while a session cookie is deleted when the current
+                                session ends.
+
+
+                                When set to "Permanent", AbsoluteTimeout indicates the
+                                cookie's lifetime via the Expires or Max-Age cookie attributes
+                                and is required.
+
+
+                                When set to "Session", AbsoluteTimeout indicates the
+                                absolute lifetime of the cookie tracked by the gateway and
+                                is optional.
+
+
+                                Support: Core for "Session" type
+
+
+                                Support: Extended for "Permanent" type
+                              enum:
+                              - Permanent
+                              - Session
+                              type: string
+                          type: object
+                        idleTimeout:
+                          description: |-
+                            IdleTimeout defines the idle timeout of the persistent session.
+                            Once the session has been idle for more than the specified
+                            IdleTimeout duration, the session becomes invalid.
+
+
+                            Support: Extended
+                          pattern: ^([0-9]{1,5}(h|m|s|ms)){1,4}$
+                          type: string
+                        sessionName:
+                          description: |-
+                            SessionName defines the name of the persistent session token
+                            which may be reflected in the cookie or the header. Users
+                            should avoid reusing session names to prevent unintended
+                            consequences, such as rejection or unpredictable behavior.
+
+
+                            Support: Implementation-specific
+                          maxLength: 128
+                          type: string
+                        type:
+                          default: Cookie
+                          description: |-
+                            Type defines the type of session persistence such as through
+                            the use a header or cookie. Defaults to cookie based session
+                            persistence.
+
+
+                            Support: Core for "Cookie" type
+
+
+                            Support: Extended for "Header" type
+                          enum:
+                          - Cookie
+                          - Header
+                          type: string
+                      type: object
+                      x-kubernetes-validations:
+                      - message: AbsoluteTimeout must be specified when cookie lifetimeType
+                          is Permanent
+                        rule: '!has(self.cookieConfig.lifetimeType) || self.cookieConfig.lifetimeType
+                          != ''Permanent'' || has(self.absoluteTimeout)'
                     timeouts:
                       description: |+
                         Timeouts defines the timeouts that can be configured for an HTTP request.
@@ -5847,6 +6047,12 @@ spec:
                             BackendRequest specifies a timeout for an individual request from the gateway
                             to a backend. This covers the time from when the request first starts being
                             sent from the gateway to when the full response has been received from the backend.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             An entire client HTTP transaction with a gateway, covered by the Request timeout,
@@ -5871,6 +6077,12 @@ spec:
                             For example, setting the `rules.timeouts.request` field to the value `10s` in an
                             `HTTPRoute` will cause a timeout if a client request is taking longer than 10 seconds
                             to complete.
+
+
+                            Setting a timeout to the zero duration (e.g. "0s") SHOULD disable the timeout
+                            completely. Implementations that cannot completely disable the timeout MUST
+                            instead interpret the zero duration as the longest possible value to which
+                            the timeout can be set.
 
 
                             This timeout is intended to cover as close to the whole request-response transaction
@@ -6113,7 +6325,7 @@ spec:
 
 
                             * Gateway (Gateway conformance profile)
-                            * Service (Mesh conformance profile, experimental, ClusterIP Services only)
+                            * Service (Mesh conformance profile, ClusterIP Services only)
 
 
                             Support for other resources is Implementation-Specific.
@@ -6163,7 +6375,7 @@ spec:
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$
                           type: string
                         port:
-                          description: |+
+                          description: |-
                             Port is the network port this Route targets. It can be interpreted
                             differently based on the type of parent resource.
 
@@ -6199,8 +6411,6 @@ spec:
 
 
                             Support: Extended
-
-
                           format: int32
                           maximum: 65535
                           minimum: 1
@@ -6211,14 +6421,12 @@ spec:
                             following resources, SectionName is interpreted as the following:
 
 
-                            * Gateway: Listener Name. When both Port (experimental) and SectionName
+                            * Gateway: Listener name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
                             both specified values.
-                            * Service: Port Name. When both Port (experimental) and SectionName
+                            * Service: Port name. When both Port (experimental) and SectionName
                             are specified, the name and port of the selected listener must match
-                            both specified values. Note that attaching Routes to Services as Parents
-                            is part of experimental Mesh support and is not supported for any other
-                            purpose.
+                            both specified values.
 
 
                             Implementations MAY choose to support attaching Routes to other resources.
@@ -6257,7 +6465,7 @@ spec:
         - spec
         type: object
     served: true
-    storage: true
+    storage: false
     subresources:
       status: {}
 status:

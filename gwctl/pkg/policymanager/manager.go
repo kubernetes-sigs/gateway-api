@@ -22,13 +22,17 @@ import (
 	"fmt"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	apiextensionsv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
+
 	gatewayv1alpha2 "sigs.k8s.io/gateway-api/apis/v1alpha2"
+	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 )
 
 type PolicyManager struct {
@@ -67,13 +71,15 @@ func (p *PolicyManager) Init(ctx context.Context) error {
 		return err
 	}
 	for _, unstrucutredPolicy := range allPolicies {
-		p.AddPolicy(unstrucutredPolicy)
+		if err := p.AddPolicy(unstrucutredPolicy); err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (p *PolicyManager) PoliciesAttachedTo(objRef ObjRef) []Policy {
+func (p *PolicyManager) PoliciesAttachedTo(objRef common.ObjRef) []Policy {
 	var result []Policy
 	for _, policy := range p.policies {
 		if policy.IsAttachedTo(objRef) {
@@ -89,6 +95,16 @@ func (p *PolicyManager) GetCRDs() []PolicyCRD {
 		result = append(result, policyCRD)
 	}
 	return result
+}
+
+func (p *PolicyManager) GetCRD(name string) (PolicyCRD, bool) {
+	for _, policyCrd := range p.policyCRDs {
+		if name == policyCrd.CRD().Name {
+			return policyCrd, true
+		}
+	}
+
+	return PolicyCRD{}, false
 }
 
 func (p *PolicyManager) GetPolicies() []Policy {
@@ -167,6 +183,8 @@ type PolicyCRD struct {
 	crd apiextensionsv1.CustomResourceDefinition
 }
 
+func (p PolicyCRD) ClientObject() client.Object { return p.CRD() }
+
 // ID returns a unique identifier for this PolicyCRD.
 func (p PolicyCRD) ID() PolicyCrdID {
 	return PolicyCrdID(p.crd.Spec.Names.Kind + "." + p.crd.Spec.Group)
@@ -201,18 +219,13 @@ type Policy struct {
 	// targetRef references the target object this policy is attached to. This
 	// only makes sense in case of a directly-attached-policy, or an
 	// unmerged-inherited-policy.
-	targetRef ObjRef
+	targetRef common.ObjRef
 	// Indicates whether the policy is supposed to be "inherited" (as opposed to
 	// "direct").
 	inherited bool
 }
 
-type ObjRef struct {
-	Group     string `json:",omitempty"`
-	Kind      string `json:",omitempty"`
-	Name      string `json:",omitempty"`
-	Namespace string `json:",omitempty"`
-}
+func (p Policy) ClientObject() client.Object { return p.Unstructured() }
 
 func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCrdID]PolicyCRD) (Policy, error) {
 	result := Policy{u: u}
@@ -222,21 +235,21 @@ func PolicyFromUnstructured(u unstructured.Unstructured, policyCRDs map[PolicyCr
 		metav1.TypeMeta   `json:",inline"`
 		metav1.ObjectMeta `json:"metadata,omitempty"`
 		Spec              struct {
-			TargetRef gatewayv1alpha2.PolicyTargetReference
+			TargetRef gatewayv1alpha2.NamespacedPolicyTargetReference
 		}
 	}
 	structuredPolicy := &genericPolicy{}
 	if err := runtime.DefaultUnstructuredConverter.FromUnstructured(u.UnstructuredContent(), structuredPolicy); err != nil {
 		return Policy{}, fmt.Errorf("failed to convert unstructured policy resource to structured: %v", err)
 	}
-	result.targetRef = ObjRef{
+	result.targetRef = common.ObjRef{
 		Group:     string(structuredPolicy.Spec.TargetRef.Group),
 		Kind:      string(structuredPolicy.Spec.TargetRef.Kind),
 		Name:      string(structuredPolicy.Spec.TargetRef.Name),
 		Namespace: structuredPolicy.GetNamespace(),
 	}
 	if result.targetRef.Namespace == "" {
-		result.targetRef.Namespace = "default"
+		result.targetRef.Namespace = result.u.GetNamespace()
 	}
 	if structuredPolicy.Spec.TargetRef.Namespace != nil {
 		result.targetRef.Namespace = string(*structuredPolicy.Spec.TargetRef.Namespace)
@@ -261,7 +274,7 @@ func (p Policy) PolicyCrdID() PolicyCrdID {
 	return PolicyCrdID(p.u.GetObjectKind().GroupVersionKind().Kind + "." + p.u.GetObjectKind().GroupVersionKind().Group)
 }
 
-func (p Policy) TargetRef() ObjRef {
+func (p Policy) TargetRef() common.ObjRef {
 	return p.targetRef
 }
 
@@ -273,7 +286,7 @@ func (p Policy) IsDirect() bool {
 	return !p.inherited
 }
 
-func (p Policy) IsAttachedTo(objRef ObjRef) bool {
+func (p Policy) IsAttachedTo(objRef common.ObjRef) bool {
 	if p.targetRef.Kind == "Namespace" && p.targetRef.Name == "" {
 		p.targetRef.Name = "default"
 	}

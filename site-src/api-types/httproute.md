@@ -1,8 +1,10 @@
 # HTTPRoute
 
-??? success "Standard Channel in v0.5.0+"
+??? success "Standard Channel since v0.5.0"
 
-    The `HTTPRoute` resource is Beta and part of the Standard Channel in `v0.5.0+`.
+    The `HTTPRoute` resource is GA and has been part of the Standard Channel since
+    `v0.5.0`. For more information on release channels, refer to our [versioning
+    guide](/concepts/versioning).
 
 [HTTPRoute][httproute] is a Gateway API type for specifying routing behavior
 of HTTP requests from a Gateway listener to an API object, i.e. Service.
@@ -30,8 +32,9 @@ to. In most cases, that's going to be Gateways, but there is some flexibility
 here for implementations to support other types of parent resources.
 
 The following example shows how a Route would attach to the `acme-lb` Gateway:
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -117,8 +120,9 @@ evaluated. If no hostname is specified, traffic is routed based on HTTPRoute
 rules and filters (optional).
 
 The following example defines hostname "my.example.com":
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: httproute-example
@@ -139,8 +143,9 @@ Matches define conditions used for matching an HTTP request. Each match is
 independent, i.e. this rule will be matched if any single match is satisfied.
 
 Take the following matches configuration as an example:
+
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 ...
 spec:
@@ -225,9 +230,11 @@ on `weight` and other fields.
 
 #### Timeouts (optional)
 
-??? example "Experimental Channel in v1.0.0+"
+??? example "Experimental Channel since v1.0.0"
 
-    HTTPRoute timeouts are part of the Experimental Channel in `v1.0.0+`.
+    HTTPRoute timeouts have been part of the Experimental Channel since `v1.0.0`.
+    For more information on release channels, refer to our 
+    [versioning guide](/concepts/versioning).
 
 HTTPRoute Rules include a `Timeouts` field. If unspecified, timeout behavior is implementation-specific.
 
@@ -242,6 +249,7 @@ Because the `request` timeout encompasses the `backendRequest` timeout, the valu
 Timeouts are optional, and their fields are of type [Duration](/geps/gep-2257/). A zero-valued timeout ("0s") MUST be interpreted as disabling the timeout. A valid non-zero-valued timeout MUST be >= 1ms.
 
 The following example uses the `request` field which will cause a timeout if a client request is taking longer than 10 seconds to complete. The example also defines a 2s `backendRequest` which specifies a timeout for an individual request from the gateway to a backend service `timeout-svc`:
+
 ```yaml
 {% include 'experimental/http-route-timeouts/timeout-example.yaml' %}
 ```
@@ -250,10 +258,11 @@ Reference the [timeouts][timeouts] API documentation for additional details.
 
 ##### Backend Protocol
 
-??? example "Experimental Channel in v1.0.0+"
+??? example "Experimental Channel since v1.0.0"
 
-    This concept is part of the Experimental Channel in `v1.0.0+`.
-
+    This concept has been part of the Experimental Channel since `v1.0.0`.
+    For more information on release channels, refer to our 
+    [versioning guide](/concepts/versioning).
 
 Some implementations may require the [backendRef][backendRef] to be labeled 
 explicitly in order to route traffic using a certain protocol. For Kubernetes 
@@ -281,7 +290,7 @@ appropriate when the route is modified.
 The following example indicates HTTPRoute "http-example" has been accepted by
 Gateway "gw-example" in namespace "gw-example-ns":
 ```yaml
-apiVersion: gateway.networking.k8s.io/v1beta1
+apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: http-example

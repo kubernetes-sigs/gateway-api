@@ -17,40 +17,45 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"strings"
-	"text/tabwriter"
-	"time"
 
-	"sigs.k8s.io/yaml"
-
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
-
+	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
+
+	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
+var _ Printer = (*GatewaysPrinter)(nil)
+
 type GatewaysPrinter struct {
-	Out io.Writer
+	io.Writer
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
-type gatewayDescribeView struct {
-	// Gateway name
-	Name string `json:",omitempty"`
-	// Gateway namespace
-	Namespace                string                                             `json:",omitempty"`
-	GatewayClass             string                                             `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef                             `json:",omitempty"`
-	EffectivePolicies        map[policymanager.PolicyCrdID]policymanager.Policy `json:",omitempty"`
+func (gp *GatewaysPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(maps.Values(resourceModel.Gateways))
 }
 
-func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel) {
-	tw := tabwriter.NewWriter(gp.Out, 0, 0, 2, ' ', 0)
-	row := []string{"NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
-	tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+func (gp *GatewaysPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE", "POLICIES", "HTTPROUTES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "CLASS", "ADDRESSES", "PORTS", "PROGRAMMED", "AGE"}
+	}
+	table := &Table{
+		ColumnNames:  columnNames,
+		UseSeparator: false,
+	}
 
-	for _, gatewayNode := range resourceModel.Gateways {
+	gatewayNodes := maps.Values(resourceModel.Gateways)
+
+	for _, gatewayNode := range SortByString(gatewayNodes) {
 		var addresses []string
 		for _, address := range gatewayNode.Gateway.Status.Addresses {
 			addresses = append(addresses, address.Value)
@@ -74,9 +79,10 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			}
 		}
 
-		age := duration.HumanDuration(time.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
+		age := duration.HumanDuration(gp.Clock.Since(gatewayNode.Gateway.GetCreationTimestamp().Time))
 
 		row := []string{
+			gatewayNode.Gateway.GetNamespace(),
 			gatewayNode.Gateway.GetName(),
 			string(gatewayNode.Gateway.Spec.GatewayClassName),
 			addressesOutput,
@@ -84,45 +90,77 @@ func (gp *GatewaysPrinter) Print(resourceModel *resourcediscovery.ResourceModel)
 			programmedStatus,
 			age,
 		}
-		tw.Write([]byte(strings.Join(row, "\t") + "\n"))
+		if wide {
+			policiesCount := fmt.Sprintf("%d", len(gatewayNode.Policies))
+			httpRoutesCount := fmt.Sprintf("%d", len(gatewayNode.HTTPRoutes))
+			row = append(row, policiesCount, httpRoutesCount)
+		}
+		table.Rows = append(table.Rows, row)
 	}
-	tw.Flush()
+
+	table.Write(gp, 0)
 }
 
 func (gp *GatewaysPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
 	index := 0
 	for _, gatewayNode := range resourceModel.Gateways {
 		index++
-		views := []gatewayDescribeView{
-			{
-				Name:      gatewayNode.Gateway.GetName(),
-				Namespace: gatewayNode.Gateway.GetNamespace(),
-			},
-			{
-				GatewayClass: string(gatewayNode.Gateway.Spec.GatewayClassName),
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies); len(policyRefs) != 0 {
-			views = append(views, gatewayDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(gatewayNode.EffectivePolicies) != 0 {
-			views = append(views, gatewayDescribeView{
-				EffectivePolicies: gatewayNode.EffectivePolicies,
-			})
+
+		metadata := gatewayNode.Gateway.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+		metadata.ManagedFields = nil
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: gatewayNode.Gateway.GetName()},
+			{Key: "Namespace", Value: gatewayNode.Gateway.GetNamespace()},
+			{Key: "Labels", Value: gatewayNode.Gateway.Labels},
+			{Key: "Annotations", Value: gatewayNode.Gateway.Annotations},
+			{Key: "APIVersion", Value: gatewayNode.Gateway.APIVersion},
+			{Key: "Kind", Value: gatewayNode.Gateway.Kind},
+			{Key: "Metadata", Value: metadata},
+			{Key: "Spec", Value: &gatewayNode.Gateway.Spec},
+			{Key: "Status", Value: &gatewayNode.Gateway.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Fprint(gp.Out, string(b))
+		// AttachedRoutes
+		attachedRoutes := &Table{
+			ColumnNames:  []string{"Kind", "Name"},
+			UseSeparator: true,
 		}
+		for _, httpRouteNode := range gatewayNode.HTTPRoutes {
+			row := []string{
+				httpRouteNode.HTTPRoute.Kind, // Kind
+				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+			}
+			attachedRoutes.Rows = append(attachedRoutes.Rows, row)
+		}
+		pairs = append(pairs, &DescriberKV{Key: "AttachedRoutes", Value: attachedRoutes})
+
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+
+		// EffectivePolicies
+		if len(gatewayNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: gatewayNode.EffectivePolicies})
+		}
+
+		// Analysis
+		if len(gatewayNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(gatewayNode.Errors)})
+		}
+
+		// Events
+		eventList := gp.EventFetcher.FetchEventsFor(context.Background(), gatewayNode.Gateway)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, gp.Clock)})
+
+		Describe(gp, pairs)
 
 		if index+1 <= len(resourceModel.Gateways) {
-			fmt.Fprintf(gp.Out, "\n\n")
+			fmt.Fprintf(gp, "\n\n")
 		}
 	}
 }

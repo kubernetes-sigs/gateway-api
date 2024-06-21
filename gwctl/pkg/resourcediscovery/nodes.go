@@ -20,9 +20,13 @@ import (
 	"fmt"
 	"strings"
 
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
+	gatewayv1beta1 "sigs.k8s.io/gateway-api/apis/v1beta1"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/klog/v2"
@@ -36,20 +40,27 @@ type resourceID struct {
 	Name      string
 }
 
-type gatewayClassID resourceID
-type namespaceID resourceID
-type gatewayID resourceID
-type httpRouteID resourceID
-type backendID resourceID
-type policyID resourceID
+func (r resourceID) String() string {
+	return fmt.Sprintf("%s|%s|%s|%s", r.Group, r.Kind, r.Namespace, r.Name)
+}
+
+type (
+	gatewayClassID   resourceID
+	namespaceID      resourceID
+	gatewayID        resourceID
+	httpRouteID      resourceID
+	backendID        resourceID
+	referenceGrantID resourceID
+	policyID         resourceID
+)
 
 // GatewayClassID returns an ID for a GatewayClass.
-func GatewayClassID(gatewayClassName string) gatewayClassID {
+func GatewayClassID(gatewayClassName string) gatewayClassID { //nolint:revive
 	return gatewayClassID(resourceID{Name: gatewayClassName})
 }
 
 // NamespaceID returns an ID for a Namespace.
-func NamespaceID(namespaceName string) namespaceID {
+func NamespaceID(namespaceName string) namespaceID { //nolint:revive
 	if namespaceName == "" {
 		namespaceName = metav1.NamespaceDefault
 	}
@@ -57,7 +68,7 @@ func NamespaceID(namespaceName string) namespaceID {
 }
 
 // GatewayID returns an ID for a Gateway.
-func GatewayID(namespace, name string) gatewayID {
+func GatewayID(namespace, name string) gatewayID { //nolint:revive
 	if namespace == "" {
 		namespace = metav1.NamespaceDefault
 	}
@@ -65,7 +76,7 @@ func GatewayID(namespace, name string) gatewayID {
 }
 
 // HTTPRouteID returns an ID for a HTTPRoute.
-func HTTPRouteID(namespace, name string) httpRouteID {
+func HTTPRouteID(namespace, name string) httpRouteID { //nolint:revive
 	if namespace == "" {
 		namespace = metav1.NamespaceDefault
 	}
@@ -73,7 +84,7 @@ func HTTPRouteID(namespace, name string) httpRouteID {
 }
 
 // BackendID returns an ID for a Backend.
-func BackendID(group, kind, namespace, name string) backendID {
+func BackendID(group, kind, namespace, name string) backendID { //nolint:revive
 	return backendID(resourceID{
 		Group:     strings.ToLower(group),
 		Kind:      strings.ToLower(kind),
@@ -84,15 +95,23 @@ func BackendID(group, kind, namespace, name string) backendID {
 
 // BackendIDForService returns an ID for a Backend which contains an underlying
 // Service type.
-func BackendIDForService(namespace, name string) backendID {
+func BackendIDForService(namespace, name string) backendID { //nolint:revive
 	return BackendID("", "service", namespace, name)
 }
 
 // PolicyID returns an ID for a Policy.
-func PolicyID(group, kind, namespace, name string) policyID {
+func PolicyID(group, kind, namespace, name string) policyID { //nolint:revive
 	return policyID(resourceID{
 		Group:     strings.ToLower(group),
 		Kind:      strings.ToLower(kind),
+		Namespace: namespace,
+		Name:      name,
+	})
+}
+
+// ReferenceGrantID returns an ID for a ReferenceGrant.
+func ReferenceGrantID(namespace, name string) referenceGrantID { //nolint:revive
+	return referenceGrantID(resourceID{
 		Namespace: namespace,
 		Name:      name,
 	})
@@ -124,7 +143,9 @@ func NewGatewayClassNode(gatewayClass *gatewayv1.GatewayClass) *GatewayClassNode
 	}
 }
 
-func (g *GatewayClassNode) ID() gatewayClassID {
+func (g GatewayClassNode) ClientObject() client.Object { return g.GatewayClass }
+
+func (g *GatewayClassNode) ID() gatewayClassID { //nolint:revive
 	if g.GatewayClass == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since GatewayClass is nil")
 		return gatewayClassID(resourceID{})
@@ -148,6 +169,8 @@ type GatewayNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this Gateway,
 	// considering inheritance and hierarchy.
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
@@ -156,10 +179,13 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
-func (g *GatewayNode) ID() gatewayID {
+func (g GatewayNode) ClientObject() client.Object { return g.Gateway }
+
+func (g *GatewayNode) ID() gatewayID { //nolint:revive
 	if g.Gateway == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Gateway is nil")
 		return gatewayID(resourceID{})
@@ -185,6 +211,8 @@ type HTTPRouteNode struct {
 	// EffectivePolicies reflects the effective policies applicable to this
 	// HTTPRoute, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
@@ -194,10 +222,13 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 		Backends:          make(map[backendID]*BackendNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
-func (h *HTTPRouteNode) ID() httpRouteID {
+func (h HTTPRouteNode) ClientObject() client.Object { return h.HTTPRoute }
+
+func (h *HTTPRouteNode) ID() httpRouteID { //nolint:revive
 	if h.HTTPRoute == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since HTTPRoute is nil")
 		return httpRouteID(resourceID{})
@@ -219,9 +250,13 @@ type BackendNode struct {
 	HTTPRoutes map[httpRouteID]*HTTPRouteNode
 	// Policies stores Policies directly applied to the Backend.
 	Policies map[policyID]*PolicyNode
+	// ReferenceGrants contains ReferenceGrants that expose this Backend.
+	ReferenceGrants map[referenceGrantID]*ReferenceGrantNode
 	// EffectivePolicies reflects the effective policies applicable to this
 	// Backend, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
+	// Errors contains any errorrs associated with this resource.
+	Errors []error
 }
 
 func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
@@ -229,11 +264,15 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		Backend:           backend,
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
+		ReferenceGrants:   make(map[referenceGrantID]*ReferenceGrantNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
+		Errors:            []error{},
 	}
 }
 
-func (b *BackendNode) ID() backendID {
+func (b BackendNode) ClientObject() client.Object { return b.Backend }
+
+func (b *BackendNode) ID() backendID { //nolint:revive
 	if b.Backend == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Backend is empty")
 		return backendID(resourceID{})
@@ -246,10 +285,10 @@ func (b *BackendNode) ID() backendID {
 	)
 }
 
-// HTTPRouteNode models the relationships and dependencies of a Namespace.
+// NamespaceNode models the relationships and dependencies of a Namespace.
 type NamespaceNode struct {
 	// NamespaceName identifies the Namespace.
-	NamespaceName string
+	Namespace *corev1.Namespace
 
 	// Gateways lists Gateways deployed within the Namespace.
 	Gateways map[gatewayID]*GatewayNode
@@ -261,25 +300,51 @@ type NamespaceNode struct {
 	Policies map[policyID]*PolicyNode
 }
 
-func NewNamespaceNode(namespaceName string) *NamespaceNode {
-	if namespaceName == "" {
-		namespaceName = metav1.NamespaceDefault
+func NewNamespaceNode(namespace corev1.Namespace) *NamespaceNode {
+	if namespace.Name == "" {
+		namespace.Name = metav1.NamespaceDefault
 	}
 	return &NamespaceNode{
-		NamespaceName: namespaceName,
-		Gateways:      make(map[gatewayID]*GatewayNode),
-		HTTPRoutes:    make(map[httpRouteID]*HTTPRouteNode),
-		Backends:      make(map[backendID]*BackendNode),
-		Policies:      make(map[policyID]*PolicyNode),
+		Namespace:  &namespace,
+		Gateways:   make(map[gatewayID]*GatewayNode),
+		HTTPRoutes: make(map[httpRouteID]*HTTPRouteNode),
+		Backends:   make(map[backendID]*BackendNode),
+		Policies:   make(map[policyID]*PolicyNode),
 	}
 }
 
-func (n *NamespaceNode) ID() namespaceID {
-	if n.NamespaceName == "" {
+func (n *NamespaceNode) ClientObject() client.Object { return n.Namespace }
+
+func (n *NamespaceNode) ID() namespaceID { //nolint:revive
+	if n.Namespace.Name == "" {
 		klog.V(0).ErrorS(nil, "returning empty ID since Namespace is empty")
 		return namespaceID(resourceID{})
 	}
-	return NamespaceID(n.NamespaceName)
+	return NamespaceID(n.Namespace.Name)
+}
+
+// ReferenceGrantNode models the relationships and dependencies of a ReferenceGrant.
+type ReferenceGrantNode struct {
+	// ReferenceGrantName identifies the ReferenceGrant.
+	ReferenceGrant *gatewayv1beta1.ReferenceGrant
+
+	// Backends lists Backends residing within the ReferenceGrant.
+	Backends map[backendID]*BackendNode
+}
+
+func NewReferenceGrantNode(referenceGrant *gatewayv1beta1.ReferenceGrant) *ReferenceGrantNode {
+	return &ReferenceGrantNode{
+		ReferenceGrant: referenceGrant,
+		Backends:       make(map[backendID]*BackendNode),
+	}
+}
+
+func (r *ReferenceGrantNode) ID() referenceGrantID { //nolint:revive
+	if r.ReferenceGrant.Name == "" {
+		klog.V(0).ErrorS(nil, "returning empty ID since ReferenceGrant is empty")
+		return referenceGrantID{}
+	}
+	return ReferenceGrantID(r.ReferenceGrant.GetNamespace(), r.ReferenceGrant.GetName())
 }
 
 // PolicyNode models the relationships and dependencies of a Policy resource
@@ -313,7 +378,9 @@ func NewPolicyNode(policy *policymanager.Policy) *PolicyNode {
 	}
 }
 
-func (p *PolicyNode) ID() policyID {
+func (p PolicyNode) ClientObject() client.Object { return p.Policy.Unstructured() }
+
+func (p *PolicyNode) ID() policyID { //nolint:revive
 	if p.Policy == nil {
 		klog.V(0).ErrorS(nil, "returning empty ID since Policy is empty")
 		return policyID(resourceID{})

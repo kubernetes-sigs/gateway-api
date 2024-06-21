@@ -17,26 +17,89 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"strings"
 
-	"sigs.k8s.io/yaml"
+	"golang.org/x/exp/maps"
+	"k8s.io/apimachinery/pkg/util/duration"
+	"k8s.io/utils/clock"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"sigs.k8s.io/gateway-api/gwctl/pkg/policymanager"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
 type BackendsPrinter struct {
-	Out io.Writer
+	io.Writer
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
-type backendDescribeView struct {
-	Group                    string                 `json:",omitempty"`
-	Kind                     string                 `json:",omitempty"`
-	Name                     string                 `json:",omitempty"`
-	Namespace                string                 `json:",omitempty"`
-	DirectlyAttachedPolicies []policymanager.ObjRef `json:",omitempty"`
-	EffectivePolicies        any                    `json:",omitempty"`
+func (bp *BackendsPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
+	return NodeResources(maps.Values(resourceModel.GatewayClasses))
+}
+
+func (bp *BackendsPrinter) PrintTable(resourceModel *resourcediscovery.ResourceModel, wide bool) {
+	var columnNames []string
+	if wide {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "AGE", "REFERRED BY ROUTES", "POLICIES"}
+	} else {
+		columnNames = []string{"NAMESPACE", "NAME", "TYPE", "AGE"}
+	}
+
+	table := &Table{
+		ColumnNames:  columnNames,
+		UseSeparator: false,
+	}
+
+	backends := maps.Values(resourceModel.Backends)
+	sortedBackends := SortByString(backends)
+
+	for _, backendNode := range sortedBackends {
+		backend := backendNode.Backend
+
+		httpRouteNodes := maps.Values(backendNode.HTTPRoutes)
+		sortedHTTPRouteNodes := SortByString(httpRouteNodes)
+		totalRoutes := len(sortedHTTPRouteNodes)
+
+		namespace := backend.GetNamespace()
+		name := backend.GetName()
+		backendType := backend.GetKind()
+		age := duration.HumanDuration(bp.Clock.Since(backend.GetCreationTimestamp().Time))
+
+		row := []string{
+			namespace,
+			name,
+			backendType,
+			age,
+		}
+		if wide {
+			var referredByRoutes string
+			if totalRoutes == 0 {
+				referredByRoutes = "None"
+			} else {
+				var routes []string
+				for i, httpRouteNode := range sortedHTTPRouteNodes {
+					if i < 2 {
+						namespacedName := client.ObjectKeyFromObject(httpRouteNode.HTTPRoute).String()
+						routes = append(routes, namespacedName)
+					} else {
+						break
+					}
+				}
+				referredByRoutes = strings.Join(routes, ", ")
+				if totalRoutes > 2 {
+					referredByRoutes += fmt.Sprintf(" + %d more", totalRoutes-2)
+				}
+			}
+			policiesCount := fmt.Sprintf("%d", len(backendNode.Policies))
+			row = append(row, referredByRoutes, policiesCount)
+		}
+		table.Rows = append(table.Rows, row)
+	}
+
+	table.Write(bp, 0)
 }
 
 func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
@@ -44,35 +107,63 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 	for _, backendNode := range resourceModel.Backends {
 		index++
 
-		views := []backendDescribeView{
-			{
-				Group:     backendNode.Backend.GroupVersionKind().Group,
-				Kind:      backendNode.Backend.GroupVersionKind().Kind,
-				Name:      backendNode.Backend.GetName(),
-				Namespace: backendNode.Backend.GetNamespace(),
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies); len(policyRefs) != 0 {
-			views = append(views, backendDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(backendNode.EffectivePolicies) != 0 {
-			views = append(views, backendDescribeView{
-				EffectivePolicies: backendNode.EffectivePolicies,
-			})
+		backend := backendNode.Backend.DeepCopy()
+		backend.SetLabels(nil)
+		backend.SetAnnotations(nil)
+
+		pairs := []*DescriberKV{
+			{Key: "Name", Value: backendNode.Backend.GetName()},
+			{Key: "Namespace", Value: backendNode.Backend.GetNamespace()},
+			{Key: "Labels", Value: backendNode.Backend.GetLabels()},
+			{Key: "Annotations", Value: backendNode.Backend.GetAnnotations()},
+			{Key: "Backend", Value: backend},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				panic(err)
-			}
-			fmt.Fprint(bp.Out, string(b))
+		// ReferencedByRoutes
+		routes := &Table{
+			ColumnNames:  []string{"Kind", "Name"},
+			UseSeparator: true,
 		}
+		for _, httpRouteNode := range backendNode.HTTPRoutes {
+			row := []string{
+				httpRouteNode.HTTPRoute.Kind, // Kind
+				fmt.Sprintf("%v/%v", httpRouteNode.HTTPRoute.Namespace, httpRouteNode.HTTPRoute.Name), // Name
+			}
+			routes.Rows = append(routes.Rows, row)
+		}
+		pairs = append(pairs, &DescriberKV{Key: "ReferencedByRoutes", Value: routes})
+
+		// DirectlyAttachedPolicies
+		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies)
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+
+		// EffectivePolicies
+		if len(backendNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: backendNode.EffectivePolicies})
+		}
+
+		// ReferenceGrants
+		if len(backendNode.ReferenceGrants) != 0 {
+			var names []string
+			for _, refGrantNode := range backendNode.ReferenceGrants {
+				names = append(names, refGrantNode.ReferenceGrant.Name)
+			}
+			pairs = append(pairs, &DescriberKV{Key: "ReferenceGrants", Value: names})
+		}
+
+		// Analysis
+		if len(backendNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(backendNode.Errors)})
+		}
+
+		// Events
+		eventList := bp.EventFetcher.FetchEventsFor(context.Background(), backendNode.Backend)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, bp.Clock)})
+
+		Describe(bp, pairs)
 
 		if index+1 <= len(resourceModel.Backends) {
-			fmt.Fprintf(bp.Out, "\n\n")
+			fmt.Fprintf(bp, "\n\n")
 		}
 	}
 }

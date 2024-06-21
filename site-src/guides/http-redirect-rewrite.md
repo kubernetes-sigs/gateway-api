@@ -101,9 +101,14 @@ rewrite.example`.
 Path rewrites also make use of HTTP Path Modifiers. The HTTPRoute below
 will take request for `https://rewrite.example/cardamom/smidgen` and proxy a
 request to `https://elsewhere.example/fennel` upstream to `example-svc`.
+
+```yaml
+{% include 'standard/http-redirect-rewrite/httproute-rewrite-full-path.yaml' %}
+```
+
 Instead using `type: ReplacePrefixMatch` and `replacePrefixMatch: /fennel` will
 request `https://elsewhere.example/fennel/smidgen` upstream.
 
 ```yaml
-{% include 'standard/http-redirect-rewrite/httproute-rewritepath.yaml' %}
+{% include 'standard/http-redirect-rewrite/httproute-rewrite-prefix-path.yaml' %}
 ```

@@ -1,0 +1,43 @@
+apiVersion: gateway.networking.k8s.io/v1alpha1
+date: "2024-04-24T16:38:02-07:00"
+gatewayAPIVersion: v1.0.0
+implementation:
+  contact:
+  - agcfeedback@microsoft.com
+  organization: Microsoft Azure
+  project: Application Gateway for Containers
+  url: https://aka.ms/appgwcontainers/docs
+  version: v1.0.0
+kind: ConformanceReport
+profiles:
+- core:
+    result: partial
+    statistics:
+      Passed: 28
+      Skipped: 1
+      Failed: 0
+    summary: ""
+    skippedTests:
+    - GatewayClassObservedGenerationBump
+  extended:
+    result: success
+    statistics:
+      Failed: 0
+      Passed: 8
+      Skipped: 0
+    summary: ""
+    supportedFeatures:
+    - HTTPRouteResponseHeaderModification
+    - HTTPRouteMethodMatching
+    - HTTPRoutePortRedirect
+    - HTTPRoutePathRedirect
+    - HTTPRouteHostRewrite
+    - HTTPRouteQueryParamMatching
+    - HTTPRouteSchemeRedirect
+    - HTTPRoutePathRewrite
+    unsupportedFeatures:
+    - HTTPRouteRequestTimeout
+    - HTTPRouteBackendTimeout
+    - HTTPRouteRequestMultipleMirrors
+    - HTTPRouteRequestMirror
+  name: HTTP

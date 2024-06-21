@@ -1,0 +1,57 @@
+#$ Used in:
+#$ - site-src/api-types/grpcroute.md
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: example
+spec:
+  controllerName: acme.io/gateway-controller
+  parametersRef:
+    name: example
+    group: acme.io
+    kind: Parameters
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: my-gateway
+spec:
+  gatewayClassName: example
+  listeners:  # Use GatewayClass defaults for listener definition.
+  - name: https
+    protocol: HTTPS
+    port: 50051
+    tls:
+      certificateRefs:
+      - kind: Secret
+        group: ""
+        name: example-com-cert
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: grpc-app-1
+spec:
+  parentRefs:
+  - name: my-gateway
+  hostnames:
+  - "example.com"
+  rules:
+  - matches:
+    - method:
+        service: com.example.User
+        method: Login
+    backendRefs:
+    - name: my-service1
+      port: 50051
+  - matches:
+    - headers:
+      - type: Exact
+        name: magic
+        value: foo
+      method:
+        service: com.example.Things
+        method: DoThing
+    backendRefs:
+    - name: my-service2
+      port: 50051

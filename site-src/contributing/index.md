@@ -14,7 +14,7 @@ new discussion][gh-disc].
 
 ## Bug Reports
 
-Bug reports should be filed as [Github Issues][gh-issues] on this repo.
+Bug reports should be filed as [GitHub Issues][gh-issues] on this repo.
 
 **NOTE**: If you're reporting a bug that applies to a specific implementation of
 Gateway API and not the API specification itself, please check our
@@ -37,10 +37,25 @@ questions, discussions.
 
 ## Meetings
 
-Gateway API has multiple meetings covering different aspects and topics of the
-Gateway API project. The following calendar includes _all_ SIG Network meetings
-(which therefore includes all Gateway API meetings which include "Gateway API"
-somewhere in their name):
+Gateway API community meetings happen on the first Tuesday of each month at
+8am Pacific Time (15:00 UTC, [convert to your timezone][8am-pst-convert]) and
+weekly on all subsequent weeks each month on Mondays at 3pm Pacific Time
+(23:00 UTC, [convert to your timezone][3pm-pst-convert]):
+
+Being the main meeting for Gateway API, the topics can vary here and often this
+is where new topics and ideas are discussed, including both ingress and service
+mesh use cases. Meetings will be moderated by the [Gateway API maintainers][maintainers]
+with notes taken by a volunteer.
+
+* [Zoom link](https://zoom.us/j/441530404) (passcode in [meeting notes] doc)
+* [Add to your calendar](https://calendar.google.com/calendar/u/0/r?cid=88fe1l3qfn2b6r11k8um5am76c@group.calendar.google.com)
+
+[8am-pst-convert]: http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29
+[3pm-pst-convert]: http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29
+[maintainers]:https://github.com/kubernetes-sigs/gateway-api/blob/main/OWNERS_ALIASES#L12
+
+The calendar includes _all_ SIG Network meetings (which therefore includes all
+Gateway API meetings, in addition to other subgroup meetings).
 
 <iframe
   src="https://calendar.google.com/calendar/embed?src=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com"
@@ -48,41 +63,30 @@ somewhere in their name):
   scrolling="no">
 </iframe>
 
-### Main Meeting
-
-The main Gateway API community meetings happen weekly on Mondays at 3pm Pacific
-Time (23:00 UTC):
-
-* [Zoom link](https://zoom.us/j/441530404)
-* [Convert to your timezone](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)
-* [Add to your calendar](https://calendar.google.com/event?action=TEMPLATE&tmeid=NXU4OXYyY2pqNzEzYzUwYnVsYmZwdXJzZDlfMjAyMTA1MTBUMjIwMDAwWiA4OGZlMWwzcWZuMmI2cjExazh1bTVhbTc2Y0Bn&tmsrc=88fe1l3qfn2b6r11k8um5am76c%40group.calendar.google.com&scp=ALL)
-
-Being the main meeting for Gateway API, the topics can vary here and often this
-is where new topics and ideas are discussed. However if you're simply
-interested in the ingress use case, this is the common forum for that.
-
-### Mesh Meeting (GAMMA)
-
-[GAMMA](/concepts/gamma/) is the initative within Gateway API to use the
-resources provided by Gateway API for service mesh use cases. Meetings happen
-every other week on Tuesdays, alternating between 3pm Pacific Time (23:00 UTC)
-and 8AM Pacific Time (16:00 UTC):
-
-* [Zoom link](https://zoom.us/j/96951309977)
-* Convert to your timezone: [3pm PT](http://www.thetimezoneconverter.com/?t=15:00&tz=PT%20%28Pacific%20Time%29)/[8am PT](http://www.thetimezoneconverter.com/?t=08:00&tz=PT%20%28Pacific%20Time%29)
-
 ### Meeting Notes and Recordings
 
-Meeting agendas and notes are maintained in the [meeting notes
-doc][meeting-notes]. Likewise, GAMMA has its own [meeting notes
-doc][gamma-meeting-notes]. Feel free to add topics for discussion at an upcoming
-meeting.
+Meeting agendas and notes are maintained in the [meeting notes] doc. Feel free
+to add topics for discussion at an upcoming meeting.
 
-All meetings are recorded and automatically uploaded to the [Gateway API meetings Youtube playlist][gateway-api-yt-playlist].
+All meetings are recorded and automatically uploaded to the
+[Gateway API meetings YouTube playlist][gateway-api-yt-playlist].
+
+[meeting notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
+[gateway-api-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP1GgO7k02ipPGZUFpSzGaHH
 
 #### Early Meetings
+
 Some early community meetings were uploaded to a [separate YouTube
-playlist][early-yt-playlist], and then to the [SIG Network Youtube playlist][sig-net-yt-playlist].
+playlist][early-yt-playlist], and then to the [SIG Network YouTube playlist][sig-net-yt-playlist].
+
+Meeting notes for early [GAMMA][gamma] meetings focused on Gateway API for
+service mesh use cases can be found in a separate
+[meeting notes doc][gamma-meeting-notes].
+
+[early-yt-playlist]: https://www.youtube.com/playlist?list=PL7KjrPTDcs4Xe6SZj-51WvBfufKf-la1O
+[sig-net-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb
+[gamma]: /mesh/gamma/
+[gamma-meeting-notes]: https://docs.google.com/document/d/1s5hQU0CB9ehjFukRmRHQ41f1FA8GX5_1Rv6nHW6NWAA/edit#
 
 #### Initial Design Discussions
 
@@ -90,14 +94,9 @@ playlist][early-yt-playlist], and then to the [SIG Network Youtube playlist][sig
 * [SIG-NETWORK: Ingress Evolution Sync][sig-net-2019-11-sync]
 * [Kubecon 2019 Barcelona: SIG-NETWORK discussion (general topics, includes V2)][kubecon-2019-eu-discussion]
 
-[gateway-api-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP1GgO7k02ipPGZUFpSzGaHH
-[sig-net-yt-playlist]: https://www.youtube.com/playlist?list=PL69nYSiGNLP2E8vmnqo5MwPOY25sDWIxb
-[early-yt-playlist]: https://www.youtube.com/playlist?list=PL7KjrPTDcs4Xe6SZj-51WvBfufKf-la1O
 [kubecon-2019-na-design-discussion]: https://docs.google.com/document/d/1l_SsVPLMBZ7lm_T4u7ZDBceTTUY71-iEQUPWeOdTAxM/preview
 [kubecon-2019-eu-discussion]: https://docs.google.com/document/d/1n8AaDiPXyZHTosm1dscWhzpbcZklP3vd11fA6L6ajlY/preview
 [sig-net-2019-11-sync]: https://docs.google.com/document/d/1AqBaxNX0uS0fb_fSpVL9c8TmaSP7RYkWO8U_SdJH67k/preview
-[meeting-notes]: https://docs.google.com/document/d/1eg-YjOHaQ7UD28htdNxBR3zufebozXKyI28cl2E11tU/edit
-[gamma-meeting-notes]: https://docs.google.com/document/d/1s5hQU0CB9ehjFukRmRHQ41f1FA8GX5_1Rv6nHW6NWAA/edit#
 
 ## Presentations and Talks
 
@@ -121,4 +120,4 @@ playlist][early-yt-playlist], and then to the [SIG Network Youtube playlist][sig
 ## Code of conduct
 
 Participation in the Kubernetes community is governed by the [Kubernetes Code of
-Conduct](https://github.com/kubernetes/community/blob/master/code-of-conduct.md)
+Conduct](https://github.com/kubernetes/community/blob/master/code-of-conduct.md).

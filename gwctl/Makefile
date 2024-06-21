@@ -14,9 +14,10 @@
 
 deps:
 	@echo "Installing dependencies..."
+	@go version
 	@go mod tidy
 	@go mod vendor
 
 build: deps
 	@echo "Building gwctl..."
-	@go build -o bin/gwctl cmd/main.go
+	@go build -o bin/gwctl main.go
