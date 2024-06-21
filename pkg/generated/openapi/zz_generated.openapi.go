@@ -2739,7 +2739,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_AllowedRoutes(ref common.ReferenceCall
 					},
 					"kinds": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Kinds specifies the groups and kinds of Routes that are allowed to bind to this Gateway Listener. When unspecified or empty, the kinds of Routes selected are determined using the Listener protocol.\n\nA RouteGroupKind MUST correspond to kinds of Routes that are compatible with the application protocol specified in the Listener's Protocol field. If an implementation does not support or recognize this resource type, it MUST set the \"ResolvedRefs\" condition to False for this Listener with the \"InvalidRouteKinds\" reason.\n\nSupport: Core",
+							Description: "Kinds specifies the groups and kinds of Routes that are allowed to bind to this Gateway Listener. When unspecified or empty, the kinds of Routes selected are determined using the Listener protocol.\n\nA RouteGroupKind MUST correspond to kinds of Routes that are compatible with the application protocol specified in the Listener's Protocol field. If an implementation does not support or recognize this resource type, it MUST set the \"ResolvedRefs\" condition to False for this Listener with the \"InvalidRouteKinds\" reason.\n\nSupport: Core\n\n\nThe following list states the Route kinds compatible for each protocolType for route kinds and protocolTypes included in Gateway API\n\nHTTP: HTTPRoutes, GRPCRoutes HTTPS: HTTPRoutes, GRPCRoutes, TLSRoutes TLS: TLSRoutes, TCPRoutes TCP: TCPRoutes UDP:\tUDPRoutes",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{

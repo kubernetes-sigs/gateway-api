@@ -526,6 +526,15 @@ type AllowedRoutes struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=8
+	//
+	// The following list states the Route kinds compatible for each protocolType
+	// for route kinds and protocolTypes included in Gateway API
+	//
+	// HTTP: HTTPRoutes, GRPCRoutes
+	// HTTPS: HTTPRoutes, GRPCRoutes, TLSRoutes
+	// TLS: TLSRoutes, TCPRoutes
+	// TCP: TCPRoutes
+	// UDP:	UDPRoutes
 	Kinds []RouteGroupKind `json:"kinds,omitempty"`
 }
 
