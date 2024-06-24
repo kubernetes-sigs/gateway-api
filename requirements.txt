@@ -2,7 +2,7 @@ Click==8.1.7
 htmlmin==0.1.12
 Jinja2==3.1.4
 jsmin==3.0.1
-livereload==2.6.3
+livereload==2.7.0
 # mkdocs 2.4.1 requires Markdown < 3.4.0
 # https://github.com/kubernetes-sigs/gateway-api/pull/1671#issuecomment-1400586465
 markdown~=3.6
