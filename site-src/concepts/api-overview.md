@@ -260,17 +260,6 @@ following mechanisms:
 If none of the above are specified, a Gateway listener will trust Routes
 attached from the same namespace that support the listener protocol.
 
-The following table shows the **Route kinds** compatible for each **protocolType**
-
-|protocolType|core kind/s compatible|
-|------------|----------------------|
-| HTTP | HTTPRoutes, GRPCRoutes |
-| HTTPS |	HTTPRoutes, GRPCRoutes, TLSRoutes |
-| TLS	| TLSRoutes, TCPRoutes |
-| TCP |	TCPRoutes |
-| UDP |	UDPRoutes |
-
-
 #### Further Gateway - Route attachment examples
 
 The following `my-route` Route wants to attach to the `foo-gateway` in the
