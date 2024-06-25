@@ -3432,7 +3432,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_Gateway(ref common.ReferenceCallback) 
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
 			SchemaProps: spec.SchemaProps{
-				Description: "Gateway represents an instance of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.",
+				Description: "Gateway represents an instance of a service-traffic handling infrastructure by binding Listeners to a set of IP addresses.\n\nIt is recommended that the Gateway name field be limited to a maximum length of 63 characters. Gateway names may be used in label values on generated in-cluster resources which have a length limit of 63 characters.",
 				Type:        []string{"object"},
 				Properties: map[string]spec.Schema{
 					"kind": {
