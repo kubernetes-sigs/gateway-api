@@ -150,6 +150,9 @@ const (
 
 	// This option indicates support for HTTPRoute with a backendref with an appProtoocol 'kubernetes.io/ws' (extended conformance)
 	SupportHTTPRouteBackendProtocolWebSocket SupportedFeature = "HTTPRouteBackendProtocolWebSocket"
+
+	// This option indicates support for HTTPRoute backend path redirect (extended conformance)
+	SupportHTTPRouteBackendPathRedirect SupportedFeature = "HTTPRouteBackendPathRedirect"
 )
 
 // HTTPRouteExtendedFeatures includes all extended features for HTTPRoute
@@ -172,6 +175,7 @@ var HTTPRouteExtendedFeatures = sets.New(
 	SupportHTTPRouteBackendRequestHeaderModification,
 	SupportHTTPRouteBackendProtocolH2C,
 	SupportHTTPRouteBackendProtocolWebSocket,
+	SupportHTTPRouteBackendPathRedirect,
 )
 
 // -----------------------------------------------------------------------------
