@@ -65,6 +65,37 @@ With this configuration, an implementation:
   This is not simply `NAME` to reduce the chance of conflicts with existing resources.
   Where required, this can also serve as the prefix for the object.
 
+### Manual Deployments
+
+A "manual deployment" allows a user to configure existing infrastructure with the Gateway API.
+When a manual deployment is used, a user must explicitly link their Gateway to existing infrastructure.
+This is done by specifying `spec.infrastructure.attachTo`.
+
+For the common case that the "existing infrastructure" is a `Service`:
+
+```yaml
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: my-gateway
+spec:
+  infrastructure:
+    attachTo:
+      kind: Service
+      name: existing-service
+  gatewayClassName: example
+  listeners:
+  - name: default
+    port: 80
+    protocol: HTTP
+```
+
+With this configuration, an implementation:
+* MUST provide an address in `Status.Addresses` where the Gateway can be reached.
+  This MUST be derived from the referenced `spec.infrastructure.attachTo` in some way.
+* MUST not deploy any resources into the cluster; it is expected that a user will do these actions.
+* MUST reject any other `infrastructure` fields (see [GEP-1867](https://gateway-api.sigs.k8s.io/geps/gep-1867/#api)) being configured; these will not be respected.
+
 ### Customizations
 
 With any in-cluster deployment, customization requirements will arise. 
