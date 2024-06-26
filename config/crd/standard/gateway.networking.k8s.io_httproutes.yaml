@@ -2679,6 +2679,16 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    name:
+                      description: |-
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                   type: object
                   x-kubernetes-validations:
                   - message: RequestRedirect filter must not be used together with
@@ -2722,6 +2732,10 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: Route name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
@@ -5689,6 +5703,16 @@ spec:
                         type: object
                       maxItems: 8
                       type: array
+                    name:
+                      description: |-
+                        Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+
+
+                        Support: Extended
+                      maxLength: 253
+                      minLength: 1
+                      pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
+                      type: string
                   type: object
                   x-kubernetes-validations:
                   - message: RequestRedirect filter must not be used together with
@@ -5732,6 +5756,10 @@ spec:
                       != ''PathPrefix'') ? false : true) : true'
                 maxItems: 16
                 type: array
+                x-kubernetes-validations:
+                - message: Route name must be unique within the route
+                  rule: self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name)
+                    && l1.name == l2.name))
             type: object
           status:
             description: Status defines the current state of HTTPRoute.

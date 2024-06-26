@@ -143,6 +143,7 @@ type GRPCRouteSpec struct {
 	//
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
+	// +kubebuilder:validation:XValidation:message="Route name must be unique within the route",rule="self.all(l1, !has(l1.name) || self.exists_one(l2, has(l2.name) && l1.name == l2.name))"
 	Rules []GRPCRouteRule `json:"rules,omitempty"`
 }
 
@@ -150,6 +151,12 @@ type GRPCRouteSpec struct {
 // conditions (matches), processing it (filters), and forwarding the request to
 // an API object (backendRefs).
 type GRPCRouteRule struct {
+	// Name is the name of the route rule. This name MUST be unique within a Route if it is set.
+	//
+	// Support: Extended
+	// +optional
+	Name *SectionName `json:"name,omitempty"`
+
 	// Matches define conditions used for matching the rule against incoming
 	// gRPC requests. Each match is independent, i.e. this rule will be matched
 	// if **any** one of the matches is satisfied.

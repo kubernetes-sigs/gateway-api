@@ -1209,6 +1209,18 @@ func TestHTTPRouteRule(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:       "invalid because multiple names are repeated",
+			wantErrors: []string{"Route name must be unique within the route"},
+			rules: []gatewayv1.HTTPRouteRule{
+				{
+					Name: ptrTo(gatewayv1.SectionName("name1")),
+				},
+				{
+					Name: ptrTo(gatewayv1.SectionName("name1")),
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
