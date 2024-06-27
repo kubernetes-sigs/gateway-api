@@ -22,7 +22,7 @@ For gateway infrastructure to be valuable we need to be able to connect clients 
 
 ## Use Cases
 
-As a cluster administrator, I manage a set of domains and a set of gateways. I would like to declaratively define which DNS provider to use to configure connectivity for clients accessing these domains and my gateway so that I can see and configure which DNS provider is being used.
+As a cluster administrator, I manage a set of domains and a set of gateways. I would like to declaratively define which gateways should be used for provisioning DNS records, and, if necessary, which DNS provider to use to configure connectivity for clients accessing these domains and my gateway so that I can see and configure which DNS provider is being used.
 
 As a cluster administrator, I would like to have the DNS names automatically populated into my specified DNS zones as a set of records based on the assigned addresses of my gateways so that I do not have to undertake external automation or management of this essential task.
 
