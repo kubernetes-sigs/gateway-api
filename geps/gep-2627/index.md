@@ -25,7 +25,7 @@ As a cluster administrator, I would like to have the DNS names automatically pop
 
 As a cluster administrator I would have the status of the DNS records reported back to me, so that I can leverage existing kube based monitoring tools to know the status of the integration.
 
-As a cluster administrator, I would like the DNS records to be setup automatically based on the assigned gateways address and if the IP or hostname changes, I would like for the DNS to update automatically to ensure traffic continues to reach my gateway. 
+As a cluster administrator, I would like the DNS records to be updated automatically if the `spec` of assigned gateways changes, whether those changes are for IP address or hostname. 
 
 ## API
 
