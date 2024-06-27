@@ -8,13 +8,16 @@
 For gateway infrastructure to be valuable we need to be able to connect clients to these gateways. A common way to achieve this is to use domain names/hostnames and DNS. Gateways define listeners that can have assigned hostnames or wildcards.  The guidelines for DNS configuration are a critical piece of service networking, but this is currently not expressible as part of Gateway API.   Instead of leaving this as an exercise for the user to figure out, this proposal attempts to provide options to ease Gateway API operations.
 
 ## Goals
-* Allow cluster operators to declaratively express which DNS service they want to use with a particular Gateway or Gateway Listener.
-* Provide a mechanism to allow the DNS configuration to be delegated to a chosen controller.
-* Provide a standard CRD-based API with expressive status reporting and remove the need for "loose" APIs such as annotations.
+* Provide a way for Gateway API resource owners to mark their resources as relevant for external DNS provisioning
+* Ensure that the above method has a way for multiple providers to be present in the cluster and be able to actuate external DNS provisioning requests
+* Ensure that any method is based on structured fields and makes the most of `status` on whatever resources are relevant, whether they are existing Gateway API resources or new resources.
 * Increase portability and supportability between Gateway API implementations and third party controllers offering DNS integration.
+* Clarity on the scope of hostnames under management. (This should _not_ be able to be used to affect the standard in-cluster DNS configuration)
 
 ## Non-Goals
 
+* Anything to do with configuring in-cluster DNS. This support is for configuration outside the cluster only.
+* Ways to define if the Gateway API resources are allowed to request particular hostnames. These choices should be left to the implementations that actually actuate the requests for hostnames. However, `status` flows should be specified so as to make clear if a hostname provisioning request cannot be performed.
 * Cover more complex DNS routing strategies that come into play for multi-cluster topologies such as round robin, failover, health checks, weighted and geo location with this first pass. Supporting these types of use cases for distributed gateways (e.g., in different regions or multiple gateways for resilience within a region) and offering a form of global load balancing leveraging DNS is a potential future goal.
 
 ## Use Cases
