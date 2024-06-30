@@ -30,12 +30,12 @@ This GEP proposes the following API changes:
 type Fraction struct {
         // +optional
         // +kubebuilder:validation:Minimum=0
-        Numerator int32 `json:"numerator,omitempty"`
+        Numerator int32 `json:"numerator"`
 
         // +optional
         // +kubebuilder:default=100
         // +kubebuilder:validation:Minimum=1
-        Denominator int32 `json:"denominator,omitempty"`
+        Denominator int32 `json:"denominator"`
 }
 
 type Percentage Fraction
