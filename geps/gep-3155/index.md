@@ -79,20 +79,43 @@ type GatewayBackendTLS struct {
 }
 ```
 
-**2. Add a new `Client` field at the top level of BackendTLSPolicy**
+**2. Add a new `ClientCertificateMode` and `ClientCertificateRef` fields at the top
+level of BackendTLSPolicy**
 
 ```go
-type BackendTLSPolicySpec {
-  // Client specifies overriden TLS settings for the given service.
-  //
-  // If Client is omitted, backend mTLS settings inherited from the given gateway are
-  // used.
-  Client TLSClientSettings `json:"client"`
-}
+// +kubebuilder:validation:Enum=Cookie;Header
+type ClientCertificateInheritanceMode string
 
-type TLSClientSettings struct {
-  // CertificateRef is a reference to an object that contains a Client
+const (
+	// Default determines the gateway certificate will be used. If no certificate is
+  // configured on the gateway level, no client certificate will be used.
+	//
+	// Support: Core
+	DefaultClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Default"
+
+	// Override determines the certificate specified in ClientCertificateRef field will be used.
+	//
+	// Support: Implementation-specific
+	OverrideClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Override"
+
+  // Disable determines the certificate will be not provided to the backend, even if it is
+  // configured at the gateway level and requested by the backend.
+	//
+	// Support: Implementation-specific
+	DisableClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Disable"
+)
+
+type BackendTLSPolicySpec {
+  // ClientCertificateMode determines the inheritance mode for client certifacate.
+  //
+  // If ClientCertificateMode is unset, the value assumed is Default.
+  ClientCertificateMode ClientCertificateInheritanceMode `json:"clientCertificateMode,omitempty"`
+
+  // ClientCertificateRef is a reference to an object that contains a Client
   // Certificate.
+  //
+  // This value takes effect and is required only if the ClientCertificateMode is set to 
+  // Override, otherwise it is ignored.
   //
   // References to a resource in different namespace are invalid UNLESS there
   // is a ReferenceGrant in the target namespace that allows the certificate
@@ -103,9 +126,8 @@ type TLSClientSettings struct {
   // CertificateRef can reference to standard Kubernetes resources, i.e.
   // Secret, or implementation-specific custom resources.
   //
-  // If CertificateRef is not specified, no client certificate is presented when
-  // connecting to the service.
-  CertificateRef SecretObjectReference `json:"certificateRef,omitempty"`
+	// Support: Implementation-specific
+  ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 ```
 
@@ -224,13 +246,13 @@ type BackendTLSPolicySpec struct {
 Conformance tests will be written to ensure the following:
 
 1. When SubjectAltNames are specified in BackendTLSPolicy:
-  a. The hostname field is still used as SNI, if specified
-  b. A certificate with at least one matching SubjectAltName is accepted
-  c. A certificate without a matching SubjectAltName is rejected
+  - The hostname field is still used as SNI, if specified
+  - A certificate with at least one matching SubjectAltName is accepted
+  - A certificate without a matching SubjectAltName is rejected
 
 2. When a Client Certificate is specified on a Gateway:
-  a. It is applied to all services.
-  b. The appropriate status condition is populated if the reference is invalid
+  - It is applied to all services.
+  - The appropriate status condition is populated if the reference is invalid
 
 ## References
 
