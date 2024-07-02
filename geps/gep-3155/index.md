@@ -126,7 +126,7 @@ type BackendTLSPolicySpec {
   // CertificateRef can reference to standard Kubernetes resources, i.e.
   // Secret, or implementation-specific custom resources.
   //
-	// Support: Implementation-specific
+  // Support: Implementation-specific
   ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
 }
 ```
@@ -137,14 +137,16 @@ Configuring client certificate on the service level may result in multiple Gatew
 from different vendors sharing the same identity when connecting to a single service.
 
 However, given that:
+
 1. per-service certificate configuration is a niche configuration, required to support
 application-specific compatbility corner-cases
 1. cross-namespace service usage is protected by the reference grants
 
 this limitations should consitute an acceptable trade off.
 
-In case a higher granularity solution is required, a per-gateway or per-gateway class BackendTLSPolicy might be considered as a viable option.
-
+The possible need for more fine-grained settings can be mitigated by allowing shared 
+policies to selectively target specific Gateway instances, GatewayClasses or gateway 
+namespaces.
 
 ### SANs on BackendTLSPolicy
 
@@ -206,7 +208,7 @@ Before:
 
 After:
 ```go
-	// 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
+  // 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
   //    authentication and MUST match the certificate served by the matching
   //    backend.
 ```
