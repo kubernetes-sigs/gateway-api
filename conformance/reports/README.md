@@ -121,7 +121,7 @@ comply with the following rules:
 - `mode`: it is the mode of the implementation used to run the tests. If different
   from `default`, it must correspond to a specific setup of the implementation.
 - Test result: in order to have a report valid to be accepted, all the profiles
-  need to have the `result` fields (core and extended) set to `success`. It means
-  that all the core conformance tests have been successfully run as well as all
-  the tests related to the supported extended features. No reports with partial
-  or failing results can be accepted.
+  need to have the `result` fields (core and extended) set to `success` or `partial`.
+  It means that all the core conformance tests have been successfully run or properly
+  skipped as well as all the tests related to the supported extended features. No
+  reports with failing results can be accepted.
