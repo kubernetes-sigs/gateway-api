@@ -146,13 +146,30 @@ type BackendTLSPolicyValidation struct {
   SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
 }
 
-type SubjectAltName struct {
-  // Hostname contains Subject Alternative Name specified in DNS name format. It is
-  // mutually exclusive with Hostname. At least one of the fields must be specified.
-  Hostname v1.PreciseHostname `json:"hostname"`
+// +kubebuilder:validation:Enum=Cookie;Header
+type SubjectAltNameType string
 
-  // URI contains Subject Alternative Name specified in URI format. It is mutually
-  // exclusive with Hostname. At least one of the fields must be specified.
+const (
+	// HostnameSubjectAltNameType specifies hostname-based SAN.
+	//
+	// Support: Core
+	HostnameSubjectAltNameType SubjectAltNameType = "Hostname"
+
+	// URISubjectAltNameType specifies URI-based SAN, e.g. SPIFFE id.
+	//
+	// Support: Core
+	URISubjectAltNameType SubjectAltNameType = "URI"
+)
+
+
+type SubjectAltName struct {
+  // Type determines the format of the Subject Alternative Name. Always required.
+  Type SubjectAltNameType `json:"type"`
+
+  // Hostname contains Subject Alternative Name specified in DNS name format. Required when Type is set to Hostname, ignored otherwise.
+  Hostname v1.PreciseHostname `json:"hostname,omitempty"`
+
+  // URI contains Subject Alternative Name specified in URI format. Required when Type is set to URI, ignored otherwise.
   URI string `json:"uri,omitempty"`
 }
 ```
@@ -167,10 +184,9 @@ Before:
 
 After:
 ```go
-	// 2. Only when SubjectAltNames is not specified, Hostname MUST be used for 
-    //    authentication and MUST match the certificate served by the matching
-    //    backend.
-    // 3. If HostName is unspecified, SNI header will be omitted.
+	// 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
+  //    authentication and MUST match the certificate served by the matching
+  //    backend.
 ```
 
 ### Allow per-service mTLS settings BackendTLSPolicy
@@ -179,6 +195,10 @@ Gateway level TLS configuration already includes an `options` field. This has
 been helpful for implementation-specific TLS configurations, or simply features
 that have not made it to the core API yet. It would be similarly useful to have
 an identical field on BackendTLSPolicy.
+
+Examples:
+- configuration options for vendor-specific mTLS automation
+- restrictions on the minimum supported TLS version or supported cipher suites
 
 ```go
 type BackendTLSPolicySpec struct {
@@ -205,9 +225,8 @@ Conformance tests will be written to ensure the following:
 
 1. When SubjectAltNames are specified in BackendTLSPolicy:
   a. The hostname field is still used as SNI, if specified
-  b. No SNI is being set, if hostname field is ommitted
-  c. A certificate with at least one matching SubjectAltName is accepted
-  d. A certificate without a matching SubjectAltName is rejected
+  b. A certificate with at least one matching SubjectAltName is accepted
+  c. A certificate without a matching SubjectAltName is rejected
 
 2. When a Client Certificate is specified on a Gateway:
   a. It is applied to all services.
