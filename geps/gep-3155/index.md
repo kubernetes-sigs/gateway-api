@@ -1,0 +1,205 @@
+# GEP-3155: Complete Backend mTLS Configuration
+
+* Issue: [#3155](https://github.com/kubernetes-sigs/gateway-api/issues/3155)
+* Status: Implementable
+
+## TLDR
+
+This GEP aims to complete the configuration required for Backend mTLS in Gateway
+API. This includes the following new capabilities:
+
+1. Configuration for the client certificate Gateways should use when connecting
+   to Backends
+1. Ability to specify SANs on BackendTLSPolicy
+1. Add TLS options to BackendTLSPolicy to mirror TLS config on Gateways
+
+## Goals
+
+* Add sufficient configuration that basic mTLS is possible between Gateways and
+  Backends
+* Enable the optional use of SPIFFE for Backend mTLS
+
+## Non-Goals
+
+* Define how automatic mTLS should be implemented with Gateway API
+
+## Introduction
+
+This is a wide ranging GEP intending to cover three additions to the API that all
+have a shared goal - enabling backend mTLS with Gateway API. Although this
+specific GEP focuses on manual configuration across the board, the hope is that
+it will also enable higher level automation to simplify this process for users.
+
+## API
+
+### Client Certs on Gateways
+
+A key requirement of mTLS is that the Gateway can provide a client cert to the
+backend. This adds that configuration to both Gateway and Service (via 
+BackendTLSPolicy).
+
+Specifying credentials at the service level allows to provide different
+credentials to connect to specific backend. This allows to address a use case,
+when destination service owner requires their clients to use a dedicated client
+certificate.
+
+**1. Add a new `BackendTLS` field at the top level of Gateways**
+
+```go
+type GatewaySpec struct {
+  // BackendTLS configures TLS settings for when this Gateway is connecting to
+  // backends with TLS.
+  BackendTLS GatewayBackendTLS `json:"backendTLS,omitempty"'
+}
+
+type GatewayBackendTLS struct {
+  // ClientCertificateRef is a reference to an object that contains a Client
+  // Certificate.
+  //
+  // References to a resource in different namespace are invalid UNLESS there
+  // is a ReferenceGrant in the target namespace that allows the certificate
+  // to be attached. If a ReferenceGrant does not allow this reference, the
+  // "ResolvedRefs" condition MUST be set to False for this listener with the
+  // "RefNotPermitted" reason.
+  //
+  // ClientCertificateRef can reference to standard Kubernetes resources, i.e.
+  // Secret, or implementation-specific custom resources.
+  //
+  // This setting can be overriden on the service level by use of BackendTLSPolicy.
+  ClientCertificateRef SecretObjectReference `json:"clientCertificateRef,omitempty"`
+}
+```
+
+**2. Add a new `Client` field at the top level of BackendTLSPolicy**
+
+```go
+type BackendTLSPolicySpec {
+  // Client specifies overriden TLS settings for the given service.
+  //
+  // If Client is omitted, backend mTLS settings inherited from the given gateway are
+  // used.
+  Client TLSClientSettings `json:"client"`
+}
+
+type TLSClientSettings struct {
+  // CertificateRef is a reference to an object that contains a Client
+  // Certificate.
+  //
+  // References to a resource in different namespace are invalid UNLESS there
+  // is a ReferenceGrant in the target namespace that allows the certificate
+  // to be attached. If a ReferenceGrant does not allow this reference, the
+  // "ResolvedRefs" condition MUST be set to False for this listener with the
+  // "RefNotPermitted" reason.
+  //
+  // CertificateRef can reference to standard Kubernetes resources, i.e.
+  // Secret, or implementation-specific custom resources.
+  //
+  // If CertificateRef is not specified, no client certificate is presented when
+  // connecting to the service.
+  CertificateRef SecretObjectReference `json:"certificateRef,omitempty"`
+}
+```
+
+#### Limitations
+
+Configuring client certificate on the service level may result in multiple Gateways
+from different vendors sharing the same identity when connecting to a single service.
+
+The problem could be partially mitigated by allowing shared policies to selectively 
+target specific Gateway instances, GatewayClasses or gateway namespaces.
+
+### SANs on BackendTLSPolicy
+
+This change enables the certificate to have a different identity than the SNI
+(both are currently tied to the hostname field). This is particularly useful
+when using SPIFFE, which relies on URI Subject Names which are not valid SNIs 
+as per https://www.rfc-editor.org/rfc/rfc6066.html#section-3.
+
+In such case either connection properties or an arbitrary SNI, like cluster-local 
+service name could be used for certificate selection, while the identity validation
+will be done based on SubjectAltNames field.
+
+**1. Add a new `SubjectAltNames` field to `BackendTLSPolicyValidation`**
+
+```go
+type BackendTLSPolicyValidation struct {
+  // SubjectAltNames contains one or more Subject Alternative Names.
+  // When specified, at least one of certificate's Subject Alternate Names MUST 
+  // match at least one of the specified SubjectAltNames.
+  // +kubebuilder:validation:MaxItems=5
+  SubjectAltNames []SubjectAltName `json:"subjectAltNames,omitempty"`
+}
+
+type SubjectAltName struct {
+  // Hostname contains Subject Alternative Name specified in DNS name format. It is
+  // mutually exclusive with Hostname. At least one of the fields must be specified.
+  Hostname v1.PreciseHostname `json:"hostname"`
+
+  // URI contains Subject Alternative Name specified in URI format. It is mutually
+  // exclusive with Hostname. At least one of the fields must be specified.
+  URI string `json:"uri,omitempty"`
+}
+```
+
+**2. Modify Spec for `BackendTLSPolicyValidation` `Hostname`**
+
+Before:
+```go
+	// 2. Hostname MUST be used for authentication and MUST match the certificate
+	//    served by the matching backend.
+```
+
+After:
+```go
+	// 2. Only when SubjectAltNames is not specified, Hostname MUST be used for 
+    //    authentication and MUST match the certificate served by the matching
+    //    backend.
+    // 3. If HostName is unspecified, SNI header will be omitted.
+```
+
+### Allow per-service mTLS settings BackendTLSPolicy
+
+Gateway level TLS configuration already includes an `options` field. This has
+been helpful for implementation-specific TLS configurations, or simply features
+that have not made it to the core API yet. It would be similarly useful to have
+an identical field on BackendTLSPolicy.
+
+```go
+type BackendTLSPolicySpec struct {
+	// Options are a list of key/value pairs to enable extended TLS
+	// configuration for each implementation. For example, configuring the
+	// minimum TLS version or supported cipher suites.
+	//
+	// A set of common keys MAY be defined by the API in the future. To avoid
+	// any ambiguity, implementation-specific definitions MUST use
+	// domain-prefixed names, such as `example.com/my-custom-option`.
+	// Un-prefixed names are reserved for key names defined by Gateway API.
+	//
+	// Support: Implementation-specific
+	//
+	// +optional
+	// +kubebuilder:validation:MaxProperties=16
+	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
+}
+```
+
+## Conformance Details
+
+Conformance tests will be written to ensure the following:
+
+1. When SubjectAltNames are specified in BackendTLSPolicy:
+  a. The hostname field is still used as SNI, if specified
+  b. No SNI is being set, if hostname field is ommitted
+  c. A certificate with at least one matching SubjectAltName is accepted
+  d. A certificate without a matching SubjectAltName is rejected
+
+2. When a Client Certificate is specified on a Gateway:
+  a. It is applied to all services.
+  b. The appropriate status condition is populated if the reference is invalid
+
+## References
+
+This is a natural continuation of
+[GEP-2907](https://gateway-api.sigs.k8s.io/geps/gep-2907/), the memorandum GEP
+that provided the overall vision for where TLS configuration should fit
+throughout Gateway API.
