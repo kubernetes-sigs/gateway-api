@@ -1,11 +1,11 @@
-# GEP-3155: Complete Backend mTLS Configuration
+# GEP-3155: Complete Backend mutual TLS Configuration
 
 * Issue: [#3155](https://github.com/kubernetes-sigs/gateway-api/issues/3155)
 * Status: Implementable
 
 ## TLDR
 
-This GEP aims to complete the configuration required for Backend mTLS in Gateway
+This GEP aims to complete the configuration required for Backend mutual TLS in Gateway
 API. This includes the following new capabilities:
 
 1. Configuration for the client certificate Gateways should use when connecting
@@ -15,9 +15,9 @@ API. This includes the following new capabilities:
 
 ## Goals
 
-* Add sufficient configuration that basic mTLS is possible between Gateways and
+* Add sufficient configuration that basic mutual TLS is possible between Gateways and
   Backends
-* Enable the optional use of SPIFFE for Backend mTLS
+* Enable the optional use of SPIFFE for Backend mutual TLS
 
 ## Non-Goals
 
@@ -26,7 +26,7 @@ API. This includes the following new capabilities:
 ## Introduction
 
 This is a wide ranging GEP intending to cover three additions to the API that all
-have a shared goal - enabling backend mTLS with Gateway API. Although this
+have a shared goal - enabling backend mutual TLS with Gateway API. Although this
 specific GEP focuses on manual configuration across the board, the hope is that
 it will also enable higher level automation to simplify this process for users.
 
@@ -34,14 +34,23 @@ it will also enable higher level automation to simplify this process for users.
 
 ### Client Certs on Gateways
 
-A key requirement of mTLS is that the Gateway can provide a client cert to the
+A key requirement of mutual TLS is that the Gateway can provide a client cert to the
 backend. This adds that configuration to both Gateway and Service (via 
 BackendTLSPolicy).
 
-Specifying credentials at the service level allows to provide different
-credentials to connect to specific backend. This allows to address a use case,
-when destination service owner requires their clients to use a dedicated client
-certificate.
+#### Gateway-level (Core support)
+Specifying credentials at the gateway level is the default operation mode, where all
+backends will be presented with a single gateway certificate.
+
+#### Service-level (Implementation-specific support)
+Specifying credentials at the service level allows to provide different credentials
+to connect to specific backends or completely disable client certificates. This allows
+to support a wide variety of corner cases, mostly around application-compatibility, e.g.:
+- given OOTB software requires clients to use self-signed, certificates issued by a
+  different issuer, or certificates with a very specific SAN.
+- given OOTB software uses optional certificates for end-user authentication, if the
+  certificate is missing, it falls back to a different application-level authentication
+  method - in such case not providing any certificate is the only way to operate
 
 **1. Add a new `BackendTLS` field at the top level of Gateways**
 
@@ -105,8 +114,15 @@ type TLSClientSettings struct {
 Configuring client certificate on the service level may result in multiple Gateways
 from different vendors sharing the same identity when connecting to a single service.
 
-The problem could be partially mitigated by allowing shared policies to selectively 
-target specific Gateway instances, GatewayClasses or gateway namespaces.
+However, given that:
+1. per-service certificate configuration is a niche configuration, required to support
+application-specific compatbility corner-cases
+1. cross-namespace service usage is protected by the reference grants
+
+this limitations should consitute an acceptable trade off.
+
+In case a higher granularity solution is required, a per-gateway or per-gateway class BackendTLSPolicy might be considered as a viable option.
+
 
 ### SANs on BackendTLSPolicy
 
@@ -132,7 +148,7 @@ type BackendTLSPolicyValidation struct {
 
 type SubjectAltName struct {
   // Hostname contains Subject Alternative Name specified in DNS name format. It is
-  // mutually exclusive with URI. At least one of the fields must be specified.
+  // mutually exclusive with Hostname. At least one of the fields must be specified.
   Hostname v1.PreciseHostname `json:"hostname"`
 
   // URI contains Subject Alternative Name specified in URI format. It is mutually
