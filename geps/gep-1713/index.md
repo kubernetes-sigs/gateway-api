@@ -374,15 +374,6 @@ status: ...
 
 Use of a label (ie. `gateway.networking.k8s.io/parent-gateway: name`) could be used to select child gateways vs using `spec.infrastructure.attachTo`
 
-## References
-
-Mentioned in Prior GEPs:
-- https://github.com/kubernetes-sigs/gateway-api/pull/1757
-
-Prior Discussions:
-- https://github.com/kubernetes-sigs/gateway-api/discussions/1248
-- https://github.com/kubernetes-sigs/gateway-api/discussions/1246
-
 #### Use of Multiple Disjointed Gateways
 
 An alternative would be to encourage users to not use overly large Gateways to minimize the blast radius of any issues. Use of disjoint Gateways could accomplish this but it has the disadvantage of consuming more resources and introducing complexity when it comes to operations work (eg. setting up DNS records etc.)
@@ -397,3 +388,12 @@ For workloads like Knative we can have O(1000) Services on the cluster with uniq
 For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
 
 Sorta related there was a Route Delegation GEP (https://github.com/kubernetes-sigs/gateway-api/issues/1058) that was abandoned
+
+## References
+
+Mentioned in Prior GEPs:
+- https://github.com/kubernetes-sigs/gateway-api/pull/1757
+
+Prior Discussions:
+- https://github.com/kubernetes-sigs/gateway-api/discussions/1248
+- https://github.com/kubernetes-sigs/gateway-api/discussions/1246
