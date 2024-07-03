@@ -289,9 +289,9 @@ With this configuration, the realized "parent" Gateway should listen on port `80
 ###### Listener Precedence
 
 Gateway Listeners should be merged using the following precedence:
-- "parent" Gateway
-- "child" Gateway ordered by creation time (oldest first)
-- "child" Gateway ordered alphabetical by “{namespace}/{name}”.
+1. "parent" Gateway
+2. "child" Gateway ordered by creation time (oldest first)
+3. "child" Gateway ordered alphabetical by “{namespace}/{name}”.
 
 If there are conflicts between these, this should be reported as `Conflicted=True` in the listener as usual.
 
