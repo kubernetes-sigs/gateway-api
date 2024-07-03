@@ -301,6 +301,10 @@ If there are conflicts between these, this should be reported as `Conflicted=Tru
 
 The list of `Addresses` that appear in the status of the "child" Gateway MUST be the same as the "parent" Gateway.
 
+#### AttachedGateways
+
+The property `attachedGateways` will appear on the status of the "parent" Gateway will indicate the total number of "child" Gateways that have are attached
+
 #### Gateway Conditions
 
 Gateway conditions currently supports the following condition types: `Accepted` and `Programmed`
@@ -333,7 +337,7 @@ Parent gateways MUST NOT have children's resources in their listener conditions 
 Children gateways MUST NOT have parent's or sibling's resources in their listener conditions list.
 An implementation MAY reject Listeners with ListenerConditionAccepted=False and Reason "TooManyListeners"
 
-#### Policy attachment
+#### Policy Attachment
 
 Policies attached to a parent Gateway apply to both the parent and all children listeners.
 
