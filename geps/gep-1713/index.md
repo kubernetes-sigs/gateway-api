@@ -11,7 +11,7 @@ The Gateway Resource is a contention point since it is the only place to attach 
 
 ## Goals
 
-- Define a mechanic to merge multiple Gateways (logically)
+- Define a mechanism to merge multiple Gateways (logically)
 - Define a set of acceptable properties that can be merged and their semantics
 
 ## Non-Goals
