@@ -17,9 +17,9 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
-	"sort"
 	"strings"
 
 	"golang.org/x/exp/maps"
@@ -33,7 +33,8 @@ var _ Printer = (*HTTPRoutesPrinter)(nil)
 
 type HTTPRoutesPrinter struct {
 	io.Writer
-	Clock clock.Clock
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
 func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -95,13 +96,15 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 		index++
 
 		metadata := httpRouteNode.HTTPRoute.ObjectMeta.DeepCopy()
-		resetMetadataFields(metadata)
-
-		namespace := handleDefaultNamespace(httpRouteNode.HTTPRoute.Namespace)
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+		metadata.ManagedFields = nil
 
 		pairs := []*DescriberKV{
 			{"Name", httpRouteNode.HTTPRoute.GetName()},
-			{"Namespace", namespace},
+			{"Namespace", httpRouteNode.HTTPRoute.Namespace},
 			{"Label", httpRouteNode.HTTPRoute.Labels},
 			{"Annotations", httpRouteNode.HTTPRoute.Annotations},
 			{"APIVersion", httpRouteNode.HTTPRoute.APIVersion},
@@ -112,85 +115,12 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 		}
 
 		// DirectlyAttachedPolicies
-		directlyAttachedPolicies := &Table{
-			ColumnNames:  []string{"Type", "Name"},
-			UseSeparator: true,
-		}
-
-		for _, policyNode := range httpRouteNode.Policies {
-			if policyNode.Policy.IsDirect() {
-				policyNamespace := handleDefaultNamespace(policyNode.Policy.TargetRef().Namespace)
-
-				row := []string{
-					// Type
-					fmt.Sprintf("%v.%v", policyNode.Policy.Unstructured().GroupVersionKind().Kind, policyNode.Policy.Unstructured().GroupVersionKind().Group),
-					// Name
-					fmt.Sprintf("%v/%v", policyNamespace, policyNode.Policy.Unstructured().GetName()),
-				}
-
-				directlyAttachedPolicies.Rows = append(directlyAttachedPolicies.Rows, row)
-			}
-		}
-
-		if len(directlyAttachedPolicies.Rows) != 0 {
-			pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: directlyAttachedPolicies})
-		}
+		policies := SortByString(maps.Values(httpRouteNode.Policies))
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
 		// InheritedPolicies
-		if len(httpRouteNode.InheritedPolicies) != 0 {
-			inheritedPolicies := &Table{
-				ColumnNames:  []string{"Type", "Name", "Target Kind", "Target Name"},
-				UseSeparator: true,
-			}
-
-			for _, policyNode := range httpRouteNode.InheritedPolicies {
-				policyNamespace := handleDefaultNamespace(policyNode.Policy.Unstructured().GetNamespace())
-
-				row := []string{
-					// Type
-					fmt.Sprintf(
-						"%v.%v",
-						policyNode.Policy.Unstructured().GroupVersionKind().Kind,
-						policyNode.Policy.Unstructured().GroupVersionKind().Group,
-					),
-					// Name
-					fmt.Sprintf("%v/%v", policyNamespace, policyNode.Policy.Unstructured().GetName()),
-					// Target Kind
-					policyNode.Policy.TargetRef().Kind,
-				}
-
-				// Target Name
-				switch policyNode.Policy.TargetRef().Kind {
-
-				case "Namespace":
-					row = append(row, handleDefaultNamespace(policyNode.Policy.TargetRef().Name))
-
-				case "GatewayClass":
-					row = append(row, policyNode.Policy.TargetRef().Name)
-
-				default:
-					// handle namespaced objects
-					targetRefNamespace := handleDefaultNamespace(policyNode.Policy.TargetRef().Namespace)
-					name := fmt.Sprintf("%v/%v", targetRefNamespace, policyNode.Policy.TargetRef().Name)
-
-					row = append(row, name)
-				}
-
-				// Sort inheritedPolices on the basis of Type and Name
-				sort.Slice(inheritedPolicies.Rows, func(i, j int) bool {
-					// Compare the Type of inheritedPolicies
-					if inheritedPolicies.Rows[i][0] != inheritedPolicies.Rows[j][0] {
-						return inheritedPolicies.Rows[i][0] < inheritedPolicies.Rows[j][0]
-					}
-					// If inheritedPolicies are of same Type, compare Names
-					return inheritedPolicies.Rows[i][1] < inheritedPolicies.Rows[j][1]
-				})
-
-				inheritedPolicies.Rows = append(inheritedPolicies.Rows, row)
-			}
-
-			pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: inheritedPolicies})
-		}
+		inheritedPolicies := SortByString(maps.Values(httpRouteNode.InheritedPolicies))
+		pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(inheritedPolicies, true)})
 
 		// EffectivePolices
 		if len(httpRouteNode.EffectivePolicies) != 0 {
@@ -203,7 +133,8 @@ func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.
 		}
 
 		// Events
-		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(httpRouteNode.Events, hp.Clock)})
+		eventList := hp.EventFetcher.FetchEventsFor(context.Background(), httpRouteNode.HTTPRoute)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, hp.Clock)})
 
 		Describe(hp, pairs)
 

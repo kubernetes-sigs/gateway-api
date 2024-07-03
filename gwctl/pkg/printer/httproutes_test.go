@@ -295,6 +295,10 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	fakeClock := testingclock.NewFakeClock(time.Now())
 	objects := []runtime.Object{
 		&gatewayv1.GatewayClass{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: gatewayv1.GroupVersion.String(),
+				Kind:       "GatewayClass",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name: "foo-gatewayclass",
 			},
@@ -330,6 +334,10 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 		},
 
 		&gatewayv1.Gateway{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: gatewayv1.GroupVersion.String(),
+				Kind:       "Gateway",
+			},
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      "foo-gateway",
 				Namespace: "default",
@@ -343,7 +351,8 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 				"apiVersion": "foo.com/v1",
 				"kind":       "HealthCheckPolicy",
 				"metadata": map[string]interface{}{
-					"name": "health-check-gateway",
+					"name":      "health-check-gateway",
+					"namespace": "default",
 				},
 				"spec": map[string]interface{}{
 					"override": map[string]interface{}{
@@ -364,8 +373,13 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 		},
 
 		&gatewayv1.HTTPRoute{
+			TypeMeta: metav1.TypeMeta{
+				APIVersion: gatewayv1.GroupVersion.String(),
+				Kind:       "HTTPRoute",
+			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name: "foo-httproute",
+				Name:      "foo-httproute",
+				Namespace: "default",
 			},
 			Spec: gatewayv1.HTTPRouteSpec{
 				CommonRouteSpec: gatewayv1.CommonRouteSpec{
@@ -382,7 +396,8 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 				"apiVersion": "bar.com/v1",
 				"kind":       "TimeoutPolicy",
 				"metadata": map[string]interface{}{
-					"name": "timeout-policy-httproute",
+					"name":      "timeout-policy-httproute",
+					"namespace": "default",
 				},
 				"spec": map[string]interface{}{
 					"condition": "path=/def",
@@ -463,8 +478,9 @@ func TestHTTPRoutesPrinter_PrintDescribeView(t *testing.T) {
 	}
 
 	hp := &HTTPRoutesPrinter{
-		Writer: buff,
-		Clock:  fakeClock,
+		Writer:       buff,
+		Clock:        fakeClock,
+		EventFetcher: discoverer,
 	}
 	hp.PrintDescribeView(resourceModel)
 
@@ -474,8 +490,8 @@ Name: foo-httproute
 Namespace: default
 Label: null
 Annotations: null
-APIVersion: ""
-Kind: ""
+APIVersion: gateway.networking.k8s.io/v1
+Kind: HTTPRoute
 Metadata:
   creationTimestamp: null
   resourceVersion: "999"
@@ -491,10 +507,10 @@ DirectlyAttachedPolicies:
   ----                   ----
   TimeoutPolicy.bar.com  default/timeout-policy-httproute
 InheritedPolicies:
-  Type                       Name                               Target Kind   Target Name
-  ----                       ----                               -----------   -----------
-  HealthCheckPolicy.foo.com  default/health-check-gatewayclass  GatewayClass  foo-gatewayclass
-  HealthCheckPolicy.foo.com  default/health-check-gateway       Gateway       default/foo-gateway
+  Type                       Name                          Target Kind   Target Name
+  ----                       ----                          -----------   -----------
+  HealthCheckPolicy.foo.com  health-check-gatewayclass     GatewayClass  foo-gatewayclass
+  HealthCheckPolicy.foo.com  default/health-check-gateway  Gateway       default/foo-gateway
 EffectivePolicies:
   default/foo-gateway:
     HealthCheckPolicy.foo.com:

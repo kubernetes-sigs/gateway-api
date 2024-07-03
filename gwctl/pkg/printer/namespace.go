@@ -92,8 +92,8 @@ func (nsp *NamespacesPrinter) PrintDescribeView(resourceModel *resourcediscovery
 		}
 
 		// DirectlyAttachedPolicies
-		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(namespaceNode.Policies)
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+		policies := SortByString(maps.Values(namespaceNode.Policies))
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
 		// Events
 		eventList := nsp.EventFetcher.FetchEventsFor(context.Background(), namespaceNode.Namespace)
