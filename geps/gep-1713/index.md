@@ -326,6 +326,7 @@ For example, if I have a `parent`, `child-1`, and `child-2`:
 * If `child-1` references itself then `child-1` will report `Accepted=False`
 * If `child-1` and `parent` have different gatewayClassNames then `child-1` will report `Accepted=False`
 * If `child-1` references a parent whose allowed child namespaces do not include `child-1`'s namespace, then `child-1` will report `Accepted=False`
+* If `child-1` is valid, then when `child-2` is created if it conflicts with `child-1` then `child-2` will report `Accepted=False`. `child-1` status conditions will remain unchanged. `parent` will report `ListenersNotValid`
 
 When reporting status of a child, an implementation SHOULD be cautious about what information from the parent or siblings are reported
 to avoid accidentally leaking sensitive information that the child would not otherwise have access to.
