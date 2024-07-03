@@ -370,9 +370,17 @@ spec:
 status: ...
 ```
 
+This idea was rejected because
+
+From youngnick in https://github.com/kubernetes-sigs/gateway-api/discussions/1248#discussioncomment-3097235
+
+> I'm a big -1 on having a separate Listeners object, because it will need the full panoply of the two-way handshake between the Gateway and Listener objects, just like the ones between Gateway and Listener, because you know that as soon as you separate them, people will want them in different namespaces. And that's on top of the ETOOMANYCRDs problem.
+
 #### Use of the `gateway.networking.k8s.io/parent-gateway` label
 
-Use of a label (ie. `gateway.networking.k8s.io/parent-gateway: name`) could be used to select child gateways vs using `spec.infrastructure.attachTo`
+Use of a label (ie. `gateway.networking.k8s.io/parent-gateway: name`) could be used to select child gateways instead using `spec.infrastructure.attachTo`
+
+Use of labels is discouraged since it doesn't provide any extensibility.
 
 #### Use of Multiple Disjointed Gateways
 
