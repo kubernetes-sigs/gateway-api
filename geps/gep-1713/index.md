@@ -235,7 +235,7 @@ A parent and child MUST have the same `gatewayClassName`.
 This will be detected by the implementation and reported in [status](#status-fields).
 
 A child resource MUST not set any `spec.infrastructure` fields beyond `attachTo`, and cannot set `spec.address`.
-This can be validated in the CRD schema.
+This can be validated in the CRD schema potentially using CEL.
 
 A parent resource MUST not set `spec.infrastructure.attachTo`.
 That is, we do not allow multiple tiers of Gateways chaining to each other; there is only a single parent with children.
