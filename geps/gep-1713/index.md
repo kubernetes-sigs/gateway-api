@@ -40,8 +40,8 @@ If, and only if, they have done so, the same Gateway is also permitted to leave 
 
 A "child" Gateway references a parent Gateway. 
 This is done with a new field `attachTo` in the `spec.infrastructure` stanza of a Gateway.
-The `attachTo` field is a new type `GatewayObjectReference`.
-Although the use of `GatewayObjectReference` allows users to attach to any `kind`, this GEP only defines the behavior of attaching a Gateway to another Gateway.
+The `attachTo` field is a new type `GatewayParentReference`.
+Although the use of `GatewayParentReference` allows users to attach to any `kind`, this GEP only defines the behavior of attaching a Gateway to another Gateway.
 
 A "sibling" is a Gateway that shares a parent with another child Gateway.
 
@@ -63,7 +63,7 @@ type GatewayInfrastructure struct {
 	// AttachTo allows the Gateway to associate itself with another resource.
 	// A common scenario is to reference another Gateway which marks
 	// this Gateway a child of another.
-	AttachTo GatewayObjectReference `json:"attachTo"`
+	AttachTo GatewayParentReference `json:"attachTo"`
 }
 
 // AllowedChildren defines which objects may be attached as children
@@ -104,9 +104,9 @@ type ChildrenNamespaces struct {
 	Selector *metav1.LabelSelector `json:"selector,omitempty"`
 }
 
-// GatewayObjectReference identifies an API object including its namespace,
+// ParentGatewayReference identifies an API object including its namespace,
 // defaulting to Gateway.
-type GatewayObjectReference struct {
+type ParentGatewayReference struct {
 	// Group is the group of the referent.
 	//
 	// +optional
