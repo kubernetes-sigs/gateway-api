@@ -303,7 +303,7 @@ The list of `Addresses` that appear in the status of the "child" Gateway MUST be
 
 #### AttachedGateways
 
-The property `attachedGateways` will appear on the status of the "parent" Gateway will indicate the total number of "child" Gateways that have are attached
+The property `attachedGateways` will appear on the status of the "parent" Gateway and will indicate the total number of "child" Gateways that are attached.
 
 #### Gateway Conditions
 
