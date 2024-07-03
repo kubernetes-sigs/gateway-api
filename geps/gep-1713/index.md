@@ -382,3 +382,16 @@ Mentioned in Prior GEPs:
 Prior Discussions:
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1248
 - https://github.com/kubernetes-sigs/gateway-api/discussions/1246
+
+#### Use of Multiple Disjointed Gateways
+
+An alternative would be to encourage users to not use overly large Gateways to minimize the blast radius of any issues. Use of disjoint Gateways could accomplish this but it has the disadvantage of consuming more resources and introducing complexity when it comes to operations work (eg. setting up DNS records etc.)
+
+#### Increase the Listener Limit
+
+Increasing the limit may help in situations where you are creating many listeners such as adding certificates created using an ACME HTTP01 challenge. Unfortunately this still makes the Gateway a single point of contention. Unfortunately, there will always be an upper bound because of etcd limitations.
+For workloads like Knative we can have O(1000) Services on the cluster with unique subdomains.
+
+#### Expand Route Functionality
+
+For workloads with many certificates one option would be to introduce a `tls` stanza somewhere in the Route types. These Routes would then attach to a single Gateway. Then application operators can provide their own certificates. This probably would require some ability to have a handshake agreement with the Gateway.
