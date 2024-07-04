@@ -67,7 +67,7 @@ cover, and documentation to help users get started.
 [10]:#kong
 [11]:#kuma
 [12]:#nginx-gateway-fabric
-[13]:#traefik
+[13]:#traefik-proxy
 [14]:#flagger
 [15]:#cert-manager
 [16]:#cilium
