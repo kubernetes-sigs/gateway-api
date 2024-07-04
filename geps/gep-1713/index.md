@@ -293,7 +293,7 @@ Gateway Listeners should be merged using the following precedence:
 2. "child" Gateway ordered by creation time (oldest first)
 3. "child" Gateway ordered alphabetical by “{namespace}/{name}”.
 
-If there are conflicts between these, this should be reported as `Conflicted=True` in the listener as usual.
+If there are listener conflicts between Gateways, this should be reported as `Conflicted=True` in the ListenerStatus as usual. See 'Gateway Conditions' section below for more details on which Gateway resource should report the conflict.
 
 ### Status Fields
 
