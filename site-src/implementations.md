@@ -37,7 +37,7 @@ cover, and documentation to help users get started.
 - [NGINX Gateway Fabric][12] (GA)
 - [ngrok][33] (preview)
 - [STUNner][21] (beta)
-- [Traefik][13] (alpha)
+- [Traefik Proxy][13] (GA)
 - [Tyk][29] (work in progress)
 - [WSO2 APK][25] (GA)
 
@@ -67,7 +67,7 @@ cover, and documentation to help users get started.
 [10]:#kong
 [11]:#kuma
 [12]:#nginx-gateway-fabric
-[13]:#traefik
+[13]:#traefik-proxy
 [14]:#flagger
 [15]:#cert-manager
 [16]:#cilium
@@ -405,16 +405,21 @@ STUNner currently supports version `v1alpha2` of the Gateway API specification. 
 [stunner]:https://github.com/l7mp/stunner
 [stunner-1]:https://github.com/l7mp/stunner/blob/main/doc/INSTALL.md
 
-### Traefik
+### Traefik Proxy
 
-[Traefik][traefik] is an open source cloud-native application proxy.
+[![Conformance](https://img.shields.io/badge/Gateway%20API%20Conformance%20v1.1.0-Traefik Proxy-green)](https://github.com/kubernetes-sigs/gateway-api/blob/main/conformance/reports/v1.1.0/traefik-traefik)
 
-Traefik currently supports version `v1alpha2` (`v0.4.x`) of the Gateway API specification, check the [Kubernetes Gateway Documentation][traefik-1] for information on how to deploy and use Traefik's Gateway implementation.
+[Traefik Proxy][traefik-proxy] is an open source cloud-native application proxy.
 
-Traefik is currently working on implementing UDP, and ReferenceGrant. Status updates and documentation will be provided here as the work progresses.
+Traefik Proxy currently supports version `v1.1.0` of the Gateway API specification, check the [Kubernetes Gateway Provider Documentation][traefik-proxy-gateway-api-doc] for more information on how to deploy and use it.
+Traefik Proxy's implementation passes all HTTP core and some extended conformance tests, but also supports the TCPRoute and TLSRoute features from the Experimental channel. 
 
-[traefik]:https://traefik.io
-[traefik-1]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+For help and support with Traefik Proxy, [create an issue][traefik-proxy-issue-new] or ask for help in the [Traefik Labs Community Forum][traefiklabs-community-forum].
+
+[traefik-proxy]:https://traefik.io
+[traefik-proxy-gateway-api-doc]:https://doc.traefik.io/traefik/routing/providers/kubernetes-gateway/
+[traefik-proxy-issue-new]:https://github.com/traefik/traefik/issues/new/choose
+[traefiklabs-community-forum]:https://community.traefik.io/c/traefik/traefik-v3/21
 
 ### Tyk
 
