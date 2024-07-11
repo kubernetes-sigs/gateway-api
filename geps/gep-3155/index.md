@@ -132,7 +132,7 @@ type BackendTLSPolicyValidation struct {
 
 type SubjectAltName struct {
   // Hostname contains Subject Alternative Name specified in DNS name format. It is
-  // mutually exclusive with Hostname. At least one of the fields must be specified.
+  // mutually exclusive with URI. At least one of the fields must be specified.
   Hostname v1.PreciseHostname `json:"hostname"`
 
   // URI contains Subject Alternative Name specified in URI format. It is mutually
