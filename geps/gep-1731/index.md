@@ -263,6 +263,9 @@ type HTTPRouteRule struct {
 
 // HTTPRouteRetry defines retry configuration for an HTTPRoute.
 //
+// Implementations MUST retry on connection errors (disconnect, reset, timeout,
+// TCP failure) if a retry stanza is configured.
+//
 type HTTPRouteRetry struct {
     // Codes defines the HTTP response status codes for which a backend request
     // should be retried.
