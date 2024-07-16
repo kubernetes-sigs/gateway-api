@@ -68,8 +68,7 @@ support Layer 7, please feel free to correct them.
 
 Implementation retry configuration details below have been summarized or copied verbatim from corresponding project documentation, with links to the original source where applicable.
 
-<details>
-  <summary>Envoy</summary>
+#### Envoy
 
 Retries are configurable in a [`RetryPolicy`](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#config-route-v3-retrypolicy) set on a [virtual host](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-virtualhost-retry-policy) (roughly equivalent to Listener), the [route](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-field-config-route-v3-routeaction-retry-policy) (equivalent to HTTPRoute), or by setting [Router filter headers](https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_filters/router_filter). Policies are not merged - the most internal (specific) one becomes the enforced policy.
 
@@ -133,10 +132,7 @@ Supports configuring a [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest
 
 * `min_retry_concurrency` Specifies the minimum retry concurrency allowed for the retry budget. The limit on the number of active retries may never go below this number. This parameter is optional. Defaults to 3.
 
-</details>
-
-<details>
-  <summary>NGINX</summary>
+#### NGINX
 
 The [`proxy_next_upstream`](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream) directive specifies in which cases a request should be passed to the next server:
 
@@ -169,10 +165,8 @@ The `max_fails` and `fail_timeout` parameters in the [`server`](http://nginx.org
 * `fail_timeout=time` Sets the time during which the specified number of unsuccessful attempts to communicate with the server should happen to consider the server unavailable; and the period of time the server will be considered unavailable. By default, the parameter is set to 10 seconds. Equivalent to Gateway API Request timeout.
 
 May be possible to implement more advanced logic through Lua scripting.
-</details>
 
-<details>
-  <summary>HAProxy</summary>
+#### HAProxy
 
 Retry logic can be configured through the [`retry_on`](https://docs.haproxy.org/3.0/configuration.html#4.2-retry-on) and [`retries`](https://docs.haproxy.org/3.0/configuration.html#4.2-retries) proxy settings.
 
@@ -204,10 +198,8 @@ rejected by the server. These requests are generally considered to be safe to re
 retryable. This currently activates "conn-failure", "empty-response", "junk-response", "response-timeout", "0rtt-rejected", "500", "502", "503", and "504".
 
 The [`option redispatch`](https://docs.haproxy.org/3.0/configuration.html#4.2-option%20redispatch) configuration can be used to distribute retries across multiple backend servers, allowing the proxy to break cookie or consistent hash based persistence and redistribute them to a working server.
-</details>
 
-<details>
-  <summary>Traefik</summary>
+#### Traefik
 
 Offers a [Retry middleware](https://doc.traefik.io/traefik/middlewares/http/retry/) allowing configuration of number of attempts and initial interval.
 
@@ -218,31 +210,22 @@ Reissues requests a given number of times to a backend server if that server doe
 * `initialInterval` Defines the first wait time in the backoff series. The maximum interval is calculated as twice the `initialInterval`. If unspecified, requests will be retried immediately. The value should be provided in seconds or as a valid duration format.
 
 Supports configuration of a [Circuit Breaker](https://doc.traefik.io/traefik/middlewares/http/circuitbreaker/) which could possibly be used to implement budgeted retries. Each router gets its own instance of a given circuit breaker. One circuit breaker instance can be open while the other remains closed: their state is not shared. This is the expected behavior, we want you to be able to define what makes a service healthy without having to declare a circuit breaker for each route.
-</details>
 
-<details>
-  <summary>linkerd2-proxy</summary>
+#### linkerd2-proxy
 
 TODO
-</details>
 
-<details>
-  <summary>F5 BIG-IP</summary>
+#### F5 BIG-IP
 
 TODO
-</details>
 
-<details>
-  <summary>Pipy</summary>
+#### Pipy
 
 TODO
-</details>
 
-<details>
-  <summary>Litespeed WebADC</summary>
+#### Litespeed WebADC
 
 TODO
-</details>
 
 ## API
 
