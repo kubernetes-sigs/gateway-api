@@ -138,8 +138,6 @@ Supports configuring a [RetryBudget](https://www.envoyproxy.io/docs/envoy/latest
 <details>
   <summary>NGINX</summary>
 
-Appears to retry requests to backends by default, configurable primarily through the [`proxy_next_upstream`](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream) directive.
-
 The [`proxy_next_upstream`](http://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_next_upstream) directive specifies in which cases a request should be passed to the next server:
 
 * `error` An error occurred while establishing a connection with the server, passing a request to it, or reading the response header.
@@ -164,7 +162,7 @@ Passing a request to the next server can be limited by the number of tries and b
 * `proxy_next_upstream_timeout time` Limits the time during which a request can be passed to the next server. The 0 value turns off this limitation. Equivalent to the Gateway API BackendRequest timeout.
 * `proxy_next_upstream_tries number` Limits the number of possible tries for passing a request to the next server. The 0 value turns off this limitation.
 
-The `max_fails` and `fail_timeout` parameters in the `server` block of an [`upstream`](<http://nginx.org/en/docs/http/ngx_http_upstream_module.html>) module may also interact with retry logic.
+The `max_fails` and `fail_timeout` parameters in the [`server`](http://nginx.org/en/docs/http/ngx_http_upstream_module.html#server) block of an [`upstream`](<http://nginx.org/en/docs/http/ngx_http_upstream_module.html>) module may also interact with retry logic.
 
 * `max_fails=number` Sets the number of unsuccessful attempts to communicate with the server that should happen in the duration set by the `fail_timeout` parameter to consider the server unavailable for a duration also set by the `fail_timeout` parameter. By default, the number of unsuccessful attempts is set to 1. The zero value disables the accounting of attempts. What is considered an unsuccessful attempt is defined by the proxy_next_upstream, fastcgi_next_upstream, uwsgi_next_upstream, scgi_next_upstream, memcached_next_upstream, and grpc_next_upstream directives.
 
