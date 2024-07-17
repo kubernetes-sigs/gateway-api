@@ -140,6 +140,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"sigs.k8s.io/gateway-api/apis/v1.RouteStatus":                                     schema_sigsk8sio_gateway_api_apis_v1_RouteStatus(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SecretObjectReference":                           schema_sigsk8sio_gateway_api_apis_v1_SecretObjectReference(ref),
 		"sigs.k8s.io/gateway-api/apis/v1.SessionPersistence":                              schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref),
+		"sigs.k8s.io/gateway-api/apis/v1.SupportedFeature":                                schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicy":                           schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicy(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicyList":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicyList(ref),
 		"sigs.k8s.io/gateway-api/apis/v1alpha2.BackendLBPolicySpec":                       schema_sigsk8sio_gateway_api_apis_v1alpha2_BackendLBPolicySpec(ref),
@@ -3675,18 +3676,20 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 					"supportedFeatures": {
 						VendorExtensible: spec.VendorExtensible{
 							Extensions: spec.Extensions{
-								"x-kubernetes-list-type": "set",
+								"x-kubernetes-list-map-keys": []interface{}{
+									"name",
+								},
+								"x-kubernetes-list-type": "map",
 							},
 						},
 						SchemaProps: spec.SchemaProps{
-							Description: "SupportedFeatures is the set of features the GatewayClass support. It MUST be sorted in ascending alphabetical order. <gateway:experimental>",
+							Description: "SupportedFeatures is the set of features the GatewayClass support. It MUST be sorted in ascending alphabetical order by the Name key. <gateway:experimental>",
 							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
-										Default: "",
-										Type:    []string{"string"},
-										Format:  "",
+										Default: map[string]interface{}{},
+										Ref:     ref("sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"),
 									},
 								},
 							},
@@ -3696,7 +3699,7 @@ func schema_sigsk8sio_gateway_api_apis_v1_GatewayClassStatus(ref common.Referenc
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Condition", "sigs.k8s.io/gateway-api/apis/v1.SupportedFeature"},
 	}
 }
 
@@ -5441,6 +5444,26 @@ func schema_sigsk8sio_gateway_api_apis_v1_SessionPersistence(ref common.Referenc
 		},
 		Dependencies: []string{
 			"sigs.k8s.io/gateway-api/apis/v1.CookieConfig"},
+	}
+}
+
+func schema_sigsk8sio_gateway_api_apis_v1_SupportedFeature(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"name": {
+						SchemaProps: spec.SchemaProps{
+							Default: "",
+							Type:    []string{"string"},
+							Format:  "",
+						},
+					},
+				},
+				Required: []string{"name"},
+			},
+		},
 	}
 }
 
