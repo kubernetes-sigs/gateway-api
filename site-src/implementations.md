@@ -43,7 +43,7 @@ cover, and documentation to help users get started.
 
 ## Service Mesh Implementation Status <a name="meshes"></a>
 
-- [Istio][9] (Beta)
+- [Istio][9] (GA)
 - [Kuma][11] (GA)
 - [Linkerd][28] (experimental)
 
