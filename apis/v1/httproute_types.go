@@ -190,7 +190,7 @@ type HTTPRouteRule struct {
 	// parent a request is coming from, a HTTP 404 status code MUST be returned.
 	//
 	// +optional
-	// +kubebuilder:validation:MaxItems=8
+	// +kubebuilder:validation:MaxItems=64
 	// +kubebuilder:default={{path:{ type: "PathPrefix", value: "/"}}}
 	Matches []HTTPRouteMatch `json:"matches,omitempty"`
 

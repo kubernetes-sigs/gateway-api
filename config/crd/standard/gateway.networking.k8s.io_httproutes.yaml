@@ -2683,7 +2683,7 @@ spec:
                             - name
                             x-kubernetes-list-type: map
                         type: object
-                      maxItems: 8
+                      maxItems: 64
                       type: array
                   type: object
                   x-kubernetes-validations:
@@ -5699,7 +5699,7 @@ spec:
                             - name
                             x-kubernetes-list-type: map
                         type: object
-                      maxItems: 8
+                      maxItems: 64
                       type: array
                   type: object
                   x-kubernetes-validations:

@@ -2712,7 +2712,7 @@ spec:
                             - name
                             x-kubernetes-list-type: map
                         type: object
-                      maxItems: 8
+                      maxItems: 64
                       type: array
                     sessionPersistence:
                       description: |+
@@ -5943,7 +5943,7 @@ spec:
                             - name
                             x-kubernetes-list-type: map
                         type: object
-                      maxItems: 8
+                      maxItems: 64
                       type: array
                     sessionPersistence:
                       description: |+
