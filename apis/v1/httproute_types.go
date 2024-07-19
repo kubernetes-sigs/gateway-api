@@ -119,6 +119,7 @@ type HTTPRouteSpec struct {
 	// +optional
 	// +kubebuilder:validation:MaxItems=16
 	// +kubebuilder:default={{matches: {{path: {type: "PathPrefix", value: "/"}}}}}
+	// +kubebuilder:validation:XValidation:message="While 16 rules and 64 matches are allowed, the total matches must be less than 256",rule="self.map(r, r.matches.size()).sum() < 256"
 	Rules []HTTPRouteRule `json:"rules,omitempty"`
 }
 
