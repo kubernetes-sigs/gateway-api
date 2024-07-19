@@ -2730,8 +2730,8 @@ spec:
                 type: array
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 256
-                  rule: self.map(r, r.matches.size()).sum() < 256
+                    must be less than 128
+                  rule: self.map(r, r.matches.size()).sum() < 128
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
@@ -5750,8 +5750,8 @@ spec:
                 type: array
                 x-kubernetes-validations:
                 - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 256
-                  rule: self.map(r, r.matches.size()).sum() < 256
+                    must be less than 128
+                  rule: self.map(r, r.matches.size()).sum() < 128
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
