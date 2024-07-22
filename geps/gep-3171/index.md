@@ -19,6 +19,15 @@ Successfully implement the feature.
 
 This feature is already [supported by Envoy](https://www.envoyproxy.io/docs/envoy/latest/api-v3/config/route/v3/route_components.proto#envoy-v3-api-msg-config-route-v3-routeaction-requestmirrorpolicy), so adding it for the Gateway API would enable better integration between the two products. There's also an existing user desire for this feature on the [HAProxy side](https://www.haproxy.com/blog/haproxy-traffic-mirroring-for-real-world-testing) and [NGINX side](https://alex.dzyoba.com/blog/nginx-mirror/). Since Request Mirroring is already supported by the Gateway API, Percentage-based Request Mirroring would a clear improvement on this pre-existing feature.
 
+## Existing Support in Implementations
+
+| Implementation | Support |
+|----------------|------------|
+| Envoy | [config.route.v3.RouteAction.RequestMirrorPolicy](config.route.v3.RouteAction.RequestMirrorPolicy) |
+| HAProxy | [HAProxy SPOP](https://github.com/haproxytech/spoa-mirror) |
+| NGINX | [ngx_http_mirror_module](https://nginx.org/en/docs/http/ngx_http_mirror_module.html) |
+| gCloud | [RequestMirrorPolicy](https://cloud.google.com/python/docs/reference/compute/latest/google.cloud.compute_v1.types.RequestMirrorPolicy) |
+
 ## API
 
 This GEP proposes the following API changes:
