@@ -307,6 +307,10 @@ func NewConformanceTestSuite(options ConformanceOptions) (*ConformanceTestSuite,
 // Conformance Test Suite - Public Methods
 // -----------------------------------------------------------------------------
 
+const (
+	testSuiteUserAgentPrefix = "gateway-api-conformance.test"
+)
+
 // Setup ensures the base resources required for conformance tests are installed
 // in the cluster. It also ensures that all relevant resources are ready.
 func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) {
@@ -374,6 +378,35 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 	}
 }
 
+func (suite *ConformanceTestSuite) setClientsetForTest(test ConformanceTest) error {
+	featureNames := []string{}
+	for _, v := range test.Features {
+		featureNames = append(featureNames, string(v))
+	}
+	if len(test.Features) == 0 {
+		featureNames = []string{"unknownFeature"}
+	}
+	suite.RestConfig.UserAgent = strings.Join(
+		[]string{
+			testSuiteUserAgentPrefix,
+			suite.apiVersion,
+			test.ShortName,
+			strings.Join(featureNames, ","),
+		},
+		"::")
+	client, err := client.New(suite.RestConfig, client.Options{})
+	if err != nil {
+		return err
+	}
+	clientset, err := clientset.NewForConfig(suite.RestConfig)
+	if err != nil {
+		return err
+	}
+	suite.Client = client
+	suite.Clientset = clientset
+	return nil
+}
+
 // Run runs the provided set of conformance tests.
 func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) error {
 	// verify that the test suite isn't already running, don't start a new run
@@ -410,6 +443,8 @@ func (suite *ConformanceTestSuite) Run(t *testing.T, tests []ConformanceTest) er
 		}
 
 		succeeded := t.Run(test.ShortName, func(t *testing.T) {
+			err := suite.setClientsetForTest(test)
+			require.NoError(t, err, "failed to create new clientset for test")
 			test.Run(t, suite)
 		})
 		if !succeeded {
