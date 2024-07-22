@@ -213,7 +213,9 @@ Supports configuration of a [Circuit Breaker](https://doc.traefik.io/traefik/mid
 
 #### linkerd2-proxy
 
-TODO
+Linkerd supports a configurable [retry budget](https://linkerd.io/2.15/features/retries-and-timeouts/) per-route using its [ServiceProfile](https://linkerd.io/2.15/reference/service-profiles/) CRD. The default budget is 20%, but Linkerd also supports a certain number of "extra" retries every second (10 by default), for a better user experience with low-traffic services.
+
+Linkerd is unique in that it does not currently support counted retries, although this is an area of active development.
 
 #### F5 BIG-IP
 
