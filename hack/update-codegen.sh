@@ -193,15 +193,11 @@ PROTOC_URL=""
 PROTOC_CHECKSUM=""
 
 ARCH=$(uname -m)
-RAW_OS=$(uname -o)
+OS=$(uname)
 
-OS=""
-if echo "${RAW_OS}" | grep -i "Linux" >/dev/null; then
-  OS="Linux"
-elif echo "${RAW_OS}" | grep -i "Darwin" >/dev/null; then
-  OS="Mac"
-else
-  echo "Unsupported operating system"
+if [[ "${OS}" != "Linux" ]] && [[ "${OS}" != "Darwin" ]]; then
+  echo "Unsupported operating system ${OS}" >/dev/stderr
+  exit 1
 fi
 
 if [[ "${OS}" == "Linux" ]]; then
@@ -215,7 +211,7 @@ if [[ "${OS}" == "Linux" ]]; then
     echo "Architecture ${ARCH} is not supported on OS ${OS}." >/dev/stderr
     exit 1
   fi
-elif [[ "${OS}" == "Mac" ]]; then
+elif [[ "${OS}" == "Darwin" ]]; then
     PROTOC_URL="$PROTOC_MAC_UNIVERSAL_URL"
     PROTOC_CHECKSUM="$PROTOC_MAC_UNIVERSAL_CHECKSUM"
 fi
