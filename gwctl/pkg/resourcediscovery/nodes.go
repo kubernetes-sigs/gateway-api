@@ -166,6 +166,8 @@ type GatewayNode struct {
 	HTTPRoutes map[httpRouteID]*HTTPRouteNode
 	// Policies stores Policies directly applied to the Gateway.
 	Policies map[policyID]*PolicyNode
+	// InheritedPolicies stores policies inherited by this Gateway.
+	InheritedPolicies map[policyID]*PolicyNode
 	// EffectivePolicies reflects the effective policies applicable to this Gateway,
 	// considering inheritance and hierarchy.
 	EffectivePolicies map[policymanager.PolicyCrdID]policymanager.Policy
@@ -178,6 +180,7 @@ func NewGatewayNode(gateway *gatewayv1.Gateway) *GatewayNode {
 		Gateway:           gateway,
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
+		InheritedPolicies: make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[policymanager.PolicyCrdID]policymanager.Policy),
 		Errors:            []error{},
 	}
@@ -208,6 +211,8 @@ type HTTPRouteNode struct {
 	Backends map[backendID]*BackendNode
 	// Policies stores Policies directly applied to the HTTPRoute.
 	Policies map[policyID]*PolicyNode
+	// InheritedPolicies stores policies inherited by this HTTPRoute.
+	InheritedPolicies map[policyID]*PolicyNode
 	// EffectivePolicies reflects the effective policies applicable to this
 	// HTTPRoute, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
@@ -221,6 +226,7 @@ func NewHTTPRouteNode(httpRoute *gatewayv1.HTTPRoute) *HTTPRouteNode {
 		Gateways:          make(map[gatewayID]*GatewayNode),
 		Backends:          make(map[backendID]*BackendNode),
 		Policies:          make(map[policyID]*PolicyNode),
+		InheritedPolicies: make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
 		Errors:            []error{},
 	}
@@ -252,6 +258,8 @@ type BackendNode struct {
 	Policies map[policyID]*PolicyNode
 	// ReferenceGrants contains ReferenceGrants that expose this Backend.
 	ReferenceGrants map[referenceGrantID]*ReferenceGrantNode
+	// InheritedPolicies stores policies inherited by this Backend.
+	InheritedPolicies map[policyID]*PolicyNode
 	// EffectivePolicies reflects the effective policies applicable to this
 	// Backend, mapped per Gateway for context-specific enforcement.
 	EffectivePolicies map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy
@@ -265,6 +273,7 @@ func NewBackendNode(backend *unstructured.Unstructured) *BackendNode {
 		HTTPRoutes:        make(map[httpRouteID]*HTTPRouteNode),
 		Policies:          make(map[policyID]*PolicyNode),
 		ReferenceGrants:   make(map[referenceGrantID]*ReferenceGrantNode),
+		InheritedPolicies: make(map[policyID]*PolicyNode),
 		EffectivePolicies: make(map[gatewayID]map[policymanager.PolicyCrdID]policymanager.Policy),
 		Errors:            []error{},
 	}

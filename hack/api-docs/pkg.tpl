@@ -41,12 +41,16 @@ Resource Types:
 
 <p>Packages:</p>
 <ul>
-    {{ template "link" index .packages 1 }}
     {{ template "link" index .packages 0 }}
+    {{ template "link" index .packages 3 }}
+    {{ template "link" index .packages 2 }}
+    {{ template "link" index .packages 1 }}
 </ul>
 
-{{ template "package" index .packages 1 }}
 {{ template "package" index .packages 0 }}
+{{ template "package" index .packages 3 }}
+{{ template "package" index .packages 2 }}
+{{ template "package" index .packages 1 }}
 
 <p><em>
     Generated with <code>gen-crd-api-reference-docs</code>.
