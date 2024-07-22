@@ -41,7 +41,7 @@ type Fraction struct {
 ```
 
 
-* Update the `HTTPRequestMirrorFilter` struct to include a `MirrorPercent` field of type `Percentage`:
+* Update the `HTTPRequestMirrorFilter` struct to include a `MirrorPercent` field of type `int32`, and a `MirrorFraction` field of type `Fraction`:
 
 
 ```go
