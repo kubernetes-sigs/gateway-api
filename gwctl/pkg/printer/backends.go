@@ -134,8 +134,8 @@ func (bp *BackendsPrinter) PrintDescribeView(resourceModel *resourcediscovery.Re
 		pairs = append(pairs, &DescriberKV{Key: "ReferencedByRoutes", Value: routes})
 
 		// DirectlyAttachedPolicies
-		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(backendNode.Policies)
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+		policies := SortByString(maps.Values(backendNode.Policies))
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
 		// EffectivePolicies
 		if len(backendNode.EffectivePolicies) != 0 {
