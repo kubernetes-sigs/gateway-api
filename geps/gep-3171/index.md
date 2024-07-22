@@ -101,3 +101,65 @@ type HTTPRequestMirrorFilter struct {
         MirrorFraction Fraction `json:"mirrorFraction,omitempty"`
 }
 ```
+
+## Example
+
+An example with MirrorPercent:
+
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-filter-mirror
+  labels:
+    gateway: mirror-gateway
+spec:
+  parentRefs:
+  - name: mirror-gateway
+  hostnames:
+  - mirror.example
+  rules:
+  - backendRefs:
+    - name: foo-v1
+      port: 8080
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: foo-v2
+          port: 8080
+        mirrorPercent: 42
+```
+This would result in 42% of requests going to `foo-v1` to be mirrored to `foo-v2`.    
+
+An example with MirrorFraction:
+
+
+```
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: http-filter-mirror
+  labels:
+    gateway: mirror-gateway
+spec:
+  parentRefs:
+  - name: mirror-gateway
+  hostnames:
+  - mirror.example
+  rules:
+  - backendRefs:
+    - name: foo-v1
+      port: 8080
+    filters:
+    - type: RequestMirror
+      requestMirror:
+        backendRef:
+          name: foo-v2
+          port: 8080
+        mirrorFraction:
+          numerator: 5
+          denominator: 1000
+```
+This would result in 0.5% of requests going to `foo-v1` to be mirrored to `foo-v2`.
