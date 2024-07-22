@@ -2729,9 +2729,12 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 128
-                  rule: self.map(r, r.matches.size()).sum() < 128
+                - message: With 2-9 rules, only one can have over 8 matches
+                  rule: '2 < self.size() && self.size() <= 9 ? self.filter(r, r.matches.size()
+                    > 8).size() <= 1 : true'
+                - message: With over 9 rules, rules can only have 8 matches
+                  rule: 'self.size() > 9 ? self.filter(r, r.matches.size() > 8).size()
+                    == 0 : true'
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
@@ -5749,9 +5752,12 @@ spec:
                 maxItems: 16
                 type: array
                 x-kubernetes-validations:
-                - message: While 16 rules and 64 matches are allowed, the total matches
-                    must be less than 128
-                  rule: self.map(r, r.matches.size()).sum() < 128
+                - message: With 2-9 rules, only one can have over 8 matches
+                  rule: '2 < self.size() && self.size() <= 9 ? self.filter(r, r.matches.size()
+                    > 8).size() <= 1 : true'
+                - message: With over 9 rules, rules can only have 8 matches
+                  rule: 'self.size() > 9 ? self.filter(r, r.matches.size() > 8).size()
+                    == 0 : true'
             type: object
           status:
             description: Status defines the current state of HTTPRoute.
