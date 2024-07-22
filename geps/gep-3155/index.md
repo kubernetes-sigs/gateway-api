@@ -226,20 +226,20 @@ Examples:
 
 ```go
 type BackendTLSPolicySpec struct {
-	// Options are a list of key/value pairs to enable extended TLS
-	// configuration for each implementation. For example, configuring the
-	// minimum TLS version or supported cipher suites.
-	//
-	// A set of common keys MAY be defined by the API in the future. To avoid
-	// any ambiguity, implementation-specific definitions MUST use
-	// domain-prefixed names, such as `example.com/my-custom-option`.
-	// Un-prefixed names are reserved for key names defined by Gateway API.
-	//
-	// Support: Implementation-specific
-	//
-	// +optional
-	// +kubebuilder:validation:MaxProperties=16
-	Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
+  // Options are a list of key/value pairs to enable extended TLS
+  // configuration for each implementation. For example, configuring the
+  // minimum TLS version or supported cipher suites.
+  //
+  // A set of common keys MAY be defined by the API in the future. To avoid
+  // any ambiguity, implementation-specific definitions MUST use
+  // domain-prefixed names, such as `example.com/my-custom-option`.
+  // Un-prefixed names are reserved for key names defined by Gateway API.
+  //
+  // Support: Implementation-specific
+  //
+  // +optional
+  // +kubebuilder:validation:MaxProperties=16
+  Options map[AnnotationKey]AnnotationValue `json:"options,omitempty"`
 }
 ```
 
