@@ -83,7 +83,7 @@ type GatewayBackendTLS struct {
 level of BackendTLSPolicy**
 
 ```go
-// +kubebuilder:validation:Enum=Cookie;Header
+// +kubebuilder:validation:Enum=Default;Override;Disable
 type ClientCertificateInheritanceMode string
 
 const (
