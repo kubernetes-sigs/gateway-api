@@ -87,22 +87,22 @@ level of BackendTLSPolicy**
 type ClientCertificateInheritanceMode string
 
 const (
-	// Default determines the gateway certificate will be used. If no certificate is
+  // Default determines the gateway certificate will be used. If no certificate is
   // configured on the gateway level, no client certificate will be used.
-	//
-	// Support: Core
-	DefaultClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Default"
+  //
+  // Support: Core
+  DefaultClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Default"
 
-	// Override determines the certificate specified in ClientCertificateRef field will be used.
-	//
-	// Support: Implementation-specific
-	OverrideClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Override"
+  // Override determines the certificate specified in ClientCertificateRef field will be used.
+  //
+  // Support: Implementation-specific
+  OverrideClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Override"
 
   // Disable determines the certificate will be not provided to the backend, even if it is
   // configured at the gateway level and requested by the backend.
-	//
-	// Support: Implementation-specific
-	DisableClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Disable"
+  //
+  // Support: Implementation-specific
+  DisableClientCertificateInheritanceMode ClientCertificateInheritanceMode = "Disable"
 )
 
 type BackendTLSPolicySpec {
@@ -174,15 +174,15 @@ type BackendTLSPolicyValidation struct {
 type SubjectAltNameType string
 
 const (
-	// HostnameSubjectAltNameType specifies hostname-based SAN.
-	//
-	// Support: Core
-	HostnameSubjectAltNameType SubjectAltNameType = "Hostname"
+   // HostnameSubjectAltNameType specifies hostname-based SAN.
+   //
+   // Support: Core
+   HostnameSubjectAltNameType SubjectAltNameType = "Hostname"
 
-	// URISubjectAltNameType specifies URI-based SAN, e.g. SPIFFE id.
-	//
-	// Support: Core
-	URISubjectAltNameType SubjectAltNameType = "URI"
+   // URISubjectAltNameType specifies URI-based SAN, e.g. SPIFFE id.
+   //
+   // Support: Core
+   URISubjectAltNameType SubjectAltNameType = "URI"
 )
 
 
@@ -202,8 +202,8 @@ type SubjectAltName struct {
 
 Before:
 ```go
-	// 2. Hostname MUST be used for authentication and MUST match the certificate
-	//    served by the matching backend.
+  // 2. Hostname MUST be used for authentication and MUST match the certificate
+  //    served by the matching backend.
 ```
 
 After:
