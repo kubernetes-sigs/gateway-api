@@ -314,7 +314,7 @@ func runGetOrDescribeHTTPRoutes(f cmdutils.Factory, o *getOrDescribeOptions) {
 	handleErrOrExitWithMsg(err, "failed to discover HTTPRoute resources")
 
 	realClock := clock.RealClock{}
-	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: o.out, Clock: realClock}
+	httpRoutesPrinter := &printer.HTTPRoutesPrinter{Writer: o.out, Clock: realClock, EventFetcher: discoverer}
 	if o.cmdName == commandNameGet {
 		printer.Print(httpRoutesPrinter, resourceModel, o.outputFormat)
 	} else {

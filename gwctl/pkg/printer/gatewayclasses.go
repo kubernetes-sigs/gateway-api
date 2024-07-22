@@ -104,8 +104,8 @@ func (gcp *GatewayClassesPrinter) PrintDescribeView(resourceModel *resourcedisco
 		}
 
 		// DirectlyAttachedPolicies
-		policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(gatewayClassNode.Policies)
-		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPolicyRefsToTable(policyRefs)})
+		policies := SortByString(maps.Values(gatewayClassNode.Policies))
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
 
 		// Events
 		eventList := gcp.EventFetcher.FetchEventsFor(context.Background(), gatewayClassNode.GatewayClass)

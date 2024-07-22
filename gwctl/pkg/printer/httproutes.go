@@ -17,18 +17,15 @@ limitations under the License.
 package printer
 
 import (
+	"context"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"golang.org/x/exp/maps"
 	"k8s.io/apimachinery/pkg/util/duration"
 	"k8s.io/utils/clock"
-	"sigs.k8s.io/yaml"
 
-	gatewayv1 "sigs.k8s.io/gateway-api/apis/v1"
-	"sigs.k8s.io/gateway-api/gwctl/pkg/common"
 	"sigs.k8s.io/gateway-api/gwctl/pkg/resourcediscovery"
 )
 
@@ -36,7 +33,8 @@ var _ Printer = (*HTTPRoutesPrinter)(nil)
 
 type HTTPRoutesPrinter struct {
 	io.Writer
-	Clock clock.Clock
+	Clock        clock.Clock
+	EventFetcher eventFetcher
 }
 
 func (hp *HTTPRoutesPrinter) GetPrintableNodes(resourceModel *resourcediscovery.ResourceModel) []NodeResource {
@@ -91,49 +89,54 @@ func (hp *HTTPRoutesPrinter) PrintTable(resourceModel *resourcediscovery.Resourc
 	table.Write(hp, 0)
 }
 
-type httpRouteDescribeView struct {
-	Name                     string                      `json:",omitempty"`
-	Namespace                string                      `json:",omitempty"`
-	Hostnames                []gatewayv1.Hostname        `json:",omitempty"`
-	ParentRefs               []gatewayv1.ParentReference `json:",omitempty"`
-	DirectlyAttachedPolicies []common.ObjRef             `json:",omitempty"`
-	EffectivePolicies        any                         `json:",omitempty"`
-}
-
 func (hp *HTTPRoutesPrinter) PrintDescribeView(resourceModel *resourcediscovery.ResourceModel) {
 	index := 0
+
 	for _, httpRouteNode := range resourceModel.HTTPRoutes {
 		index++
 
-		views := []httpRouteDescribeView{
-			{
-				Name:      httpRouteNode.HTTPRoute.GetName(),
-				Namespace: httpRouteNode.HTTPRoute.GetNamespace(),
-			},
-			{
-				Hostnames:  httpRouteNode.HTTPRoute.Spec.Hostnames,
-				ParentRefs: httpRouteNode.HTTPRoute.Spec.ParentRefs,
-			},
-		}
-		if policyRefs := resourcediscovery.ConvertPoliciesMapToPolicyRefs(httpRouteNode.Policies); len(policyRefs) != 0 {
-			views = append(views, httpRouteDescribeView{
-				DirectlyAttachedPolicies: policyRefs,
-			})
-		}
-		if len(httpRouteNode.EffectivePolicies) != 0 {
-			views = append(views, httpRouteDescribeView{
-				EffectivePolicies: httpRouteNode.EffectivePolicies,
-			})
+		metadata := httpRouteNode.HTTPRoute.ObjectMeta.DeepCopy()
+		metadata.Labels = nil
+		metadata.Annotations = nil
+		metadata.Name = ""
+		metadata.Namespace = ""
+		metadata.ManagedFields = nil
+
+		pairs := []*DescriberKV{
+			{"Name", httpRouteNode.HTTPRoute.GetName()},
+			{"Namespace", httpRouteNode.HTTPRoute.Namespace},
+			{"Label", httpRouteNode.HTTPRoute.Labels},
+			{"Annotations", httpRouteNode.HTTPRoute.Annotations},
+			{"APIVersion", httpRouteNode.HTTPRoute.APIVersion},
+			{"Kind", httpRouteNode.HTTPRoute.Kind},
+			{"Metadata", metadata},
+			{"Spec", httpRouteNode.HTTPRoute.Spec},
+			{"Status", httpRouteNode.HTTPRoute.Status},
 		}
 
-		for _, view := range views {
-			b, err := yaml.Marshal(view)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to marshal to yaml: %v\n", err)
-				os.Exit(1)
-			}
-			fmt.Fprint(hp, string(b))
+		// DirectlyAttachedPolicies
+		policies := SortByString(maps.Values(httpRouteNode.Policies))
+		pairs = append(pairs, &DescriberKV{Key: "DirectlyAttachedPolicies", Value: convertPoliciesToRefsTable(policies, false)})
+
+		// InheritedPolicies
+		inheritedPolicies := SortByString(maps.Values(httpRouteNode.InheritedPolicies))
+		pairs = append(pairs, &DescriberKV{Key: "InheritedPolicies", Value: convertPoliciesToRefsTable(inheritedPolicies, true)})
+
+		// EffectivePolices
+		if len(httpRouteNode.EffectivePolicies) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "EffectivePolicies", Value: httpRouteNode.EffectivePolicies})
 		}
+
+		// Analysis
+		if len(httpRouteNode.Errors) != 0 {
+			pairs = append(pairs, &DescriberKV{Key: "Analysis", Value: convertErrorsToString(httpRouteNode.Errors)})
+		}
+
+		// Events
+		eventList := hp.EventFetcher.FetchEventsFor(context.Background(), httpRouteNode.HTTPRoute)
+		pairs = append(pairs, &DescriberKV{Key: "Events", Value: convertEventsSliceToTable(eventList.Items, hp.Clock)})
+
+		Describe(hp, pairs)
 
 		if index+1 <= len(resourceModel.HTTPRoutes) {
 			fmt.Fprintf(hp, "\n\n")
