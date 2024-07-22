@@ -23,12 +23,13 @@ This feature is already [supported by Envoy](https://www.envoyproxy.io/docs/envo
 
 This GEP proposes the following API changes:
 
-* Add utility type `Fraction` to [v1/shared_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/cb5bf1541fa70f0692aebde8c64bba434cf331b6/apis/v1/shared_types.go) and include the equivalent type `Percentage`:
+* Add utility type `Fraction` to [v1/shared_types.go](https://github.com/kubernetes-sigs/gateway-api/blob/cb5bf1541fa70f0692aebde8c64bba434cf331b6/apis/v1/shared_types.go):
 
 
 ```go
 type Fraction struct {
         // +optional
+        // +kubebuilder:default=100
         // +kubebuilder:validation:Minimum=0
         Numerator int32 `json:"numerator"`
 
@@ -37,8 +38,6 @@ type Fraction struct {
         // +kubebuilder:validation:Minimum=1
         Denominator int32 `json:"denominator"`
 }
-
-type Percentage Fraction
 ```
 
 
@@ -73,13 +72,32 @@ type HTTPRequestMirrorFilter struct {
         // Support: Implementation-specific for any other resource
         BackendRef BackendObjectReference `json:"backendRef"`
       
-        // MirrorPercent represents the fraction of requests that should be
-        // mirrored to BackendRef.
+        // MirrorPercent represents the percentage of requests that should be
+        // mirrored to BackendRef. Its minimum value is 0 (indicating 0% of
+        // requests) and its maximum value is 100 (indicating 100% of requests).
         //
-        // If MirrorPercent is not specified, then 100% of requests will be
-        // mirrored.
+        // If both MirrorPercent and MirrorFraction are specified, MirrorFraction
+        // will take priority. If MirrorPercent is unspecified, it will have a
+        // default value of 100. If MirrorFraction is unspecified, it will have
+        // a default value of 100/100. This means that if neither field is
+        // specified, 100% of requests will be mirrored.
         //
         // +optional
-        MirrorPercent Percentage `json:"mirrorPercent,omitempty"`
+        // +kubebuilder:default=100
+        // +kubebuilder:validation:Minimum=0
+        // +kubebuilder:validation:Maximum=100
+        MirrorPercent int32 `json:"mirrorPercent,omitempty"`
+
+        // MirrorFraction represents the fraction of requests that should be
+        // mirrored to BackendRef.
+        //
+        // If both MirrorPercent and MirrorFraction are specified, MirrorFraction
+        // will take priority. If MirrorPercent is unspecified, it will have a
+        // default value of 100. If MirrorFraction is unspecified, it will have
+        // a default value of 100/100. This means that if neither field is
+        // specified, 100% of requests will be mirrored.
+        //
+        // +optional
+        MirrorFraction Fraction `json:"mirrorFraction,omitempty"`
 }
 ```
