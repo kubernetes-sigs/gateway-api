@@ -63,7 +63,7 @@ type GatewaySpec struct {
 
 type GatewayBackendTLS struct {
   // ClientCertificateRef is a reference to an object that contains a Client
-  // Certificate.
+  // Certificate and the associated private key.
   //
   // References to a resource in different namespace are invalid UNLESS there
   // is a ReferenceGrant in the target namespace that allows the certificate
