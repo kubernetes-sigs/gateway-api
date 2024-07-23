@@ -58,6 +58,9 @@ type ExpectedResponse struct {
 
 	// User Given TestCase name
 	TestCaseName string
+
+	// SNI is the server name indication seen by the backend.
+	SNI string
 }
 
 // Request can be used as both the request to make and a means to verify

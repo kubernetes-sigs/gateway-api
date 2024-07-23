@@ -117,3 +117,79 @@ func generateRSACert(hosts []string, keyOut, certOut io.Writer) error {
 
 	return nil
 }
+
+// MustCreateCASignedCertSecret will create a secret using a CA Certificate, and public and private key for that certificate.
+func MustCreateCASignedCertSecret(t *testing.T, namespace, secretName string, hosts []string) *corev1.Secret {
+	require.NotEmpty(t, hosts, "require a non-empty hosts for Subject Alternate Name values")
+
+	var serverKey, serverCert bytes.Buffer
+
+	require.NoError(t, generateCACert(hosts, &serverKey, &serverCert), "failed to generate CA certificate")
+
+	data := map[string][]byte{
+		corev1.TLSCertKey:       serverCert.Bytes(),
+		corev1.TLSPrivateKeyKey: serverKey.Bytes(),
+	}
+
+	newSecret := &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: namespace,
+			Name:      secretName,
+		},
+		Type: corev1.SecretTypeTLS,
+		Data: data,
+	}
+
+	return newSecret
+}
+
+// generateCACert generates a CA Certificate signed certificate valid for a year.
+func generateCACert(hosts []string, keyOut, certOut io.Writer) error {
+	// Create the CA certificate.
+	ca := &x509.Certificate{
+		SerialNumber: big.NewInt(2024),
+		Subject: pkix.Name{
+			Organization:  []string{"Kubernetes Gateway API"},
+			Country:       []string{"US"},
+			Province:      []string{""},
+			Locality:      []string{"Boston"},
+			StreetAddress: []string{"Melnea Cass Blvd"},
+			PostalCode:    []string{"02120"},
+		},
+		NotBefore:             time.Now(),
+		NotAfter:              time.Now().AddDate(1, 0, 0),
+		IsCA:                  true, // Indicates this is a CA Certificate.
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		BasicConstraintsValid: true,
+	}
+
+	for _, h := range hosts {
+		if ip := net.ParseIP(h); ip != nil {
+			ca.IPAddresses = append(ca.IPAddresses, ip)
+		} else {
+			ca.DNSNames = append(ca.DNSNames, h)
+		}
+	}
+
+	// Generate the private key.
+	caPrivKey, err := rsa.GenerateKey(rand.Reader, rsaBits)
+	if err != nil {
+		return err
+	}
+
+	// Generate the certificate using the CA certificate.
+	caBytes, err := x509.CreateCertificate(rand.Reader, ca, ca, &caPrivKey.PublicKey, caPrivKey)
+	if err != nil {
+		return err
+	}
+
+	if err := pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: caBytes}); err != nil {
+		return fmt.Errorf("failed creating cert: %w", err)
+	}
+
+	if err := pem.Encode(keyOut, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: x509.MarshalPKCS1PrivateKey(caPrivKey)}); err != nil {
+		return fmt.Errorf("failed creating key: %w", err)
+	}
+	return nil
+}
