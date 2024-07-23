@@ -8,8 +8,8 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
 	v1 "sigs.k8s.io/gateway-api/apis/v1"
 	"sigs.k8s.io/gateway-api/conformance/utils/kubernetes"
 	"sigs.k8s.io/gateway-api/conformance/utils/suite"
@@ -70,21 +70,28 @@ var GatewayInfrastructure = suite.ConformanceTest{
 			labels[string(k)] = string(v)
 		}
 		saList := corev1.ServiceAccountList{}
+		podList := corev1.PodList{}
+		serviceList := corev1.ServiceList{}
 		err = s.Client.List(ctx, &saList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
 		require.NoError(t, err, "error listing ServiceAccounts")
+		err = s.Client.List(ctx, &podList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
+		require.NoError(t, err, "error listing Pods")
+		err = s.Client.List(ctx, &serviceList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
+		require.NoError(t, err, "error listing Services")
 		if len(saList.Items) > 0 {
 			sa := saList.Items[0]
 			require.Subsetf(t, sa.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", sa.Labels, labels)
 			require.Subsetf(t, sa.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", sa.Annotations, annotations)
-		} else {
+		} else if len(podList.Items) > 0 {
 			// Fallback to pod
-			podList := corev1.PodList{}
-			err = s.Client.List(ctx, &podList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
-			require.NoError(t, err, "error listing Pods")
-			require.NotEmpty(t, podList.Items, 0, "expected at least one Pod or ServiceAccount with gateway-name label")
 			pod := podList.Items[0]
 			require.Subsetf(t, pod.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", pod.Labels, labels)
 			require.Subsetf(t, pod.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", pod.Annotations, annotations)
+		} else {
+			require.NotEmpty(t, serviceList.Items, 0, "expected at least one Pod, ServiceAccount, or Service with gateway-name label")
+			service := serviceList.Items[0]
+			require.Subsetf(t, service.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", service.Labels, labels)
+			require.Subsetf(t, service.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", service.Annotations, annotations)
 		}
 	},
 }
