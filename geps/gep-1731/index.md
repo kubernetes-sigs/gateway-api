@@ -389,6 +389,10 @@ This may be a reasonable approach for configuring broad default retry policies, 
 ### HTTPRoute filter
 
 TODO
+
+### What accommodations are needed for future retry budget support?
+Should the `retry` stanza follow the Kubernetes "tagged union" pattern with something like a `mode: "count"` to allow future design space for `mode: "budget"` with distinct sibling fields?
+
 ### Should whether to retry on connection errors be configurable?
 Retrying on connection errors (disconnect, reset, timeout, TCP failure) is typically default behavior for most dataplanes, even those that don't support configurable retries based on HTTP status codes. Some proxies allow this to be configurable, but retrying attempts on these sort of errors is typically desirable and excluding it from the Gateway API spec both allows a simpler UX with less boilerplate, and avoids nuances between how these are defined and configured in different proxies.
 
