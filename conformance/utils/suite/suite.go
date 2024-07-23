@@ -370,6 +370,8 @@ func (suite *ConformanceTestSuite) Setup(t *testing.T, tests []ConformanceTest) 
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
 		secret = kubernetes.MustCreateSelfSignedCertSecret(t, "gateway-conformance-app-backend", "tls-passthrough-checks-certificate", []string{"abc.example.com"})
 		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{secret}, suite.Cleanup)
+		caSecret := kubernetes.MustCreateCASignedCertSecret(t, "gateway-conformance-infra", "backend-tls-checks-certificate", []string{"abc.example.com"})
+		suite.Applier.MustApplyObjectsWithCleanup(t, suite.Client, suite.TimeoutConfig, []client.Object{caSecret}, suite.Cleanup)
 
 		tlog.Logf(t, "Test Setup: Ensuring Gateways and Pods from base manifests are ready")
 		namespaces := []string{
