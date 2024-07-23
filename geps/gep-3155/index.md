@@ -208,9 +208,11 @@ Before:
 
 After:
 ```go
-  // 2. Only if SubjectAltNames is not specified, Hostname MUST be used for 
-  //    authentication and MUST match the certificate served by the matching
-  //    backend.
+  // 2. Hostname MUST be used for authentication and MUST match the certificate
+  //     served by the matching backend UNLESS SubjectAltNames is specified. If
+  //     SubjectAltNames is specified, Hostname MUST only be used for setting
+  //     the SNI sent, and the SubjectAltNames MUST be used for validating the
+  //     serving certificate.
 ```
 
 ### Allow per-service mTLS settings BackendTLSPolicy
