@@ -5,6 +5,7 @@ go 1.22.0
 require (
 	github.com/ahmetb/gen-crd-api-reference-docs v0.3.0
 	github.com/miekg/dns v1.1.58
+	github.com/paultag/sniff v0.0.0-20200207005214-cf7e4d167732
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.24.0
 	golang.org/x/sync v0.7.0
