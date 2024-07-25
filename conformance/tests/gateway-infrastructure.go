@@ -85,6 +85,7 @@ var GatewayInfrastructure = suite.ConformanceTest{
 		for k, v := range currentGW.Spec.Infrastructure.Labels {
 			labels[string(k)] = string(v)
 		}
+		var foundResource bool
 		saList := corev1.ServiceAccountList{}
 		podList := corev1.PodList{}
 		serviceList := corev1.ServiceList{}
@@ -95,19 +96,24 @@ var GatewayInfrastructure = suite.ConformanceTest{
 		err = s.Client.List(ctx, &serviceList, client.MatchingLabels{"gateway.networking.k8s.io/gateway-name": gwNN.Name}, client.InNamespace(ns))
 		require.NoError(t, err, "error listing Services")
 		if len(saList.Items) > 0 {
+			foundResource = true
 			sa := saList.Items[0]
 			require.Subsetf(t, sa.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", sa.Labels, labels)
 			require.Subsetf(t, sa.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", sa.Annotations, annotations)
-		} else if len(podList.Items) > 0 {
-			// Fallback to pod
+		}
+		if len(podList.Items) > 0 {
+			foundResource = true
 			pod := podList.Items[0]
 			require.Subsetf(t, pod.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", pod.Labels, labels)
 			require.Subsetf(t, pod.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", pod.Annotations, annotations)
-		} else {
-			require.NotEmpty(t, serviceList.Items, "expected at least one Pod, ServiceAccount, or Service with gateway-name label")
+		}
+		if len(serviceList.Items) > 0 {
+			foundResource = true
 			service := serviceList.Items[0]
 			require.Subsetf(t, service.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", service.Labels, labels)
 			require.Subsetf(t, service.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", service.Annotations, annotations)
 		}
+
+		require.True(t, foundResource, "expected to find a ServiceAccount, Pod, or Service with the gateway-name label")
 	},
 }
