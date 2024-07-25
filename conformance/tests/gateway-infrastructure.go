@@ -104,7 +104,7 @@ var GatewayInfrastructure = suite.ConformanceTest{
 			require.Subsetf(t, pod.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", pod.Labels, labels)
 			require.Subsetf(t, pod.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", pod.Annotations, annotations)
 		} else {
-			require.NotEmpty(t, serviceList.Items, 0, "expected at least one Pod, ServiceAccount, or Service with gateway-name label")
+			require.NotEmpty(t, serviceList.Items, "expected at least one Pod, ServiceAccount, or Service with gateway-name label")
 			service := serviceList.Items[0]
 			require.Subsetf(t, service.Labels, labels, "expected Pod label set %v to contain all Gateway infrastructure labels %v", service.Labels, labels)
 			require.Subsetf(t, service.Annotations, annotations, "expected Pod annotation set %v to contain all Gateway infrastructure annotations %v", service.Annotations, annotations)
